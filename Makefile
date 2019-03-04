@@ -2,18 +2,18 @@ booksite:
 	# Clean up earlier leftovers
 	rm -rf tmp_book
 	# Set up new jupyter-book project
-	docker run --rm -v ${PWD}:/home/jovyan/ gdsbook start.sh \
-		jupyter-book create tmp_book
+	docker run --rm -v ${PWD}:/home/jovyan/host gdsbook start.sh \
+		jupyter-book create host/tmp_book
 	# Copy _config.ym
-	docker run --rm -v ${PWD}:/home/jovyan/ gdsbook start.sh \
-		cp infrastructure/booksite/_config.yml tmp_book/_config.yml
+	docker run --rm -v ${PWD}:/home/jovyan/host gdsbook start.sh \
+		cp host/infrastructure/booksite/_config.yml host/tmp_book/_config.yml
 	# Copy notebooks/content
-	docker run --rm -v ${PWD}:/home/jovyan/ gdsbook start.sh \
-		cp notebooks/ tmp_book/content/notebooks/
+	docker run --rm -v ${PWD}:/home/jovyan/host gdsbook start.sh \
+		cp host/notebooks/ host/tmp_book/content/notebooks/
 	# Copy other contents of the book (intro, etc.)
 	# TOC
-	docker run --rm -v ${PWD}:/home/jovyan/ gdsbook start.sh \
-		cp infrastructure/booksite/toc.yml tmp_book/_data/toc.yml
+	docker run --rm -v ${PWD}:/home/jovyan/host gdsbook start.sh \
+		cp host/infrastructure/booksite/toc.yml host/tmp_book/_data/toc.yml
 	# LICENSE
 	# Code requirements
 	# Bibliography
