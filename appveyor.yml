@@ -1,0 +1,30 @@
+# From: http://tjelvarolsson.com/blog/how-to-continuously-test-your-python-code-on-windows-using-appveyor/
+build: false
+
+environment:
+  matrix:
+    - PYTHON: "C:\\Miniconda-x64"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "64"
+    - PYTHON: "C:\\Miniconda"
+      PYTHON_VERSION: "3.5"
+      PYTHON_ARCH: "32"
+
+init:
+  - "ECHO %PYTHON_VERSION% %MINICONDA%"
+
+install:
+  - "set PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - conda config --set always_yes yes --set changeps1 no
+  - conda install conda-build psutil
+  - conda update -q conda
+  - conda info -a
+  - "conda-env create -f infrastructure/install_gds3.yml"
+    #- "conda create --name gds --file content/infrastructure/gds_requirements_win-%PYTHON_ARCH%.txt"
+  - activate gdsbook3
+
+test_script:
+  - jupyter nbconvert --to markdown --execute --ExecutePreprocessor.timeout=120 infrastructure/check_gds_stack.ipynb
+ #- cd content/labs
+ #- jupyter nbconvert --execute --ExecutePreprocessor.timeout=120 *.ipynb
+
