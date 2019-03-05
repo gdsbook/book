@@ -30,6 +30,11 @@ RUN pip install -U --no-deps \
                     pytest \
                     pyyaml \
                     ruamel.yaml
+RUN jupyter-book create testbook --demo
+RUN cd /home/$NB_USER/testbook \
+ && gem install bundler -v 1.17.2 \
+ && bundle install
+RUN rm -r /home/$NB_USER/testbook
 
 #--- Jupyter config ---#
 
