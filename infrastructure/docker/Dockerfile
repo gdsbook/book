@@ -24,7 +24,7 @@ RUN rm -rf /usr/local/bundle/cache
 #--- Jupyter-book ---#
 RUN pip install -U --no-deps \
                     bs4 \
-                    jupyter-book \
+                    git+https://github.com/jupyter/jupyter-book \
                     nbclean \
                     nbgrader \
                     pytest \
@@ -35,6 +35,8 @@ RUN cd /home/$NB_USER/testbook \
  && gem install bundler -v 1.17.2 \
  && bundle install
 RUN rm -r /home/$NB_USER/testbook
+
+EXPOSE 4000
 
 #--- Jupyter config ---#
 
