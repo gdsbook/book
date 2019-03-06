@@ -5,22 +5,24 @@ echo "Cleaning up existing tmp_book folder..."
 rm -rf host/tmp_book
 # Set up new jupyter-book project
 echo "Starting new jupyter-book project..."
-jupyter-book create host/tmp_book --demo
+jupyter-book create host/tmp_book 
 echo "Copying files over book folder..."
 # Copy _config.ym
 cp host/infrastructure/booksite/_config.yml host/tmp_book/_config.yml
 # Copy notebooks/content
-rm -r host/tmp_book/content
-mkdir host/tmp_book/content
 cp -r host/notebooks/ host/tmp_book/content/notebooks/
 # Copy other contents of the book (intro, etc.)
 cp host/infrastructure/booksite/intro.md host/tmp_book/content/intro.md
 # TOC
 cp host/infrastructure/booksite/toc.yml host/tmp_book/_data/toc.yml
+#---------------------------
+# Fill in
+#---------------------------
 # LICENSE
 # Code requirements
 # Bibliography
 # Build book
+#---------------------------
 echo "Building book..."
 jupyter-book build host/tmp_book
 echo "Building site HTML..."
@@ -30,6 +32,5 @@ echo "Moving build over to docs folder..."
 cd /home/jovyan
 rm -r host/docs
 mv host/tmp_book host/docs
-# Clean up
 echo "All done!"
 
