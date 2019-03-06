@@ -1,3 +1,5 @@
+container:
+	docker build -t gdsbook ./infrastructure/docker/
 booksite:
 	docker run --rm -v ${PWD}:/home/jovyan/host gdsbook start.sh sh -c "\
 		sed -i -e 's/\r$//' host/infrastructure/booksite/build.sh && \
