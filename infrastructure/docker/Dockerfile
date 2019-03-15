@@ -28,13 +28,16 @@ RUN pip install -U --no-deps \
                     nbclean \
                     nbgrader \
                     pytest \
-                    pyyaml \
                     ruamel.yaml
 RUN jupyter-book create testbook --demo
 RUN cd /home/$NB_USER/testbook \
  && gem install bundler -v 1.17.2 \
  && bundle install
-RUN rm -r /home/$NB_USER/testbook
+
+# Clean up
+RUN rm -rf $GEM_HOME/cache \
+    rm -rf /usr/local/bundle/cache \
+    rm -r /home/$NB_USER/testbook
 
 EXPOSE 4000
 
