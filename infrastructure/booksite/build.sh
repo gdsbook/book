@@ -10,7 +10,8 @@ echo "Copying files over book folder..."
 # Copy _config.ym
 cp host/infrastructure/booksite/_config.yml host/tmp_book/_config.yml
 # Copy notebooks/content
-cp -r host/notebooks/ host/tmp_book/content/notebooks/
+mkdir host/tmp_book/content/notebooks/
+cp -r host/notebooks/*.ipynb host/tmp_book/content/notebooks/
 # Copy other contents of the book (intro, etc.)
 cp host/infrastructure/booksite/intro.md host/tmp_book/content/intro.md
 # TOC
