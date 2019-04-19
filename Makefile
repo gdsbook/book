@@ -1,6 +1,11 @@
 container:
 	docker build -t gdsbook ./infrastructure/docker/
-booksite:
+lab:
+	docker run --rm -p 8888:8888 -v ${PWD}:/home/jovyan/host gdsbook
+sync: 
+	docker run --rm -v ${PWD}:/home/jovyan/host gdsbook start.sh sh -c "\
+		jupytext --sync ./host/notebooks/*.ipynb"
+booksite: sync
 	docker run --rm -v ${PWD}:/home/jovyan/host gdsbook start.sh sh -c "\
 		sed -i -e 's/\r$$//' host/infrastructure/booksite/build.sh && \
 		bash ./host/infrastructure/booksite/build.sh"
