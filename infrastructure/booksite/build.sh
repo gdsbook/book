@@ -14,6 +14,7 @@ mkdir host/tmp_book/content/notebooks/
 cp -r host/notebooks/*.ipynb host/tmp_book/content/notebooks/
 # Copy other contents of the book (intro, etc.)
 cp host/infrastructure/booksite/intro.md host/tmp_book/content/intro.md
+cp host/infrastructure/booksite/intro_part_*.md host/tmp_book/content/
 # TOC
 cp host/infrastructure/booksite/toc.yml host/tmp_book/_data/toc.yml
 #---------------------------
