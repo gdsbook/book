@@ -3,21 +3,21 @@ redirect_from:
   - "/notebooks/11-regression"
 interact_link: content/notebooks/11_regression.ipynb
 kernel_name: python3
-title: 'Regression over space'
+has_widgets: false
+title: 'Regression'
 prev_page:
-  url: /notebooks/07_local_autocorrelation
-  title: 'Local Autocorrelation'
+  url: /notebooks/10_clustering_and_regionalization
+  title: 'Clustering & Regionalization'
 next_page:
-  url: 
-  title: ''
+  url: /notebooks/12_feature_engineering
+  title: 'Spatial Feature Engineering'
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 
 # Spatial regression
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 %matplotlib inline
 
@@ -33,7 +33,9 @@ import bookdata
 import matplotlib.pyplot as plt
 import seaborn
 ```
+</div>
 
+</div>
 
 # Introduction
    
@@ -71,16 +73,17 @@ Thus, *regardless of whether or not the true process is explicitly geographic*, 
 To learn a little more about how regression works, we'll examine some information about AirBnB in San Diego, CA. 
 This dataset contains house intrinsic characteristics, both continuous (number of beds as in `beds`) and categorical (type of renting or, in AirBnb jargon, property group as in the series of `pg_X` binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, `d2balboa` or neigbourhood id, `neighbourhood_cleansed`).
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db = geopandas.read_file(bookdata.regression_airbnbs())
 db.info()
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 <class 'geopandas.geodataframe.GeoDataFrame'>
 RangeIndex: 6110 entries, 0 to 6109
@@ -107,21 +110,24 @@ rt_Shared_room        6110 non-null int64
 geometry              6110 non-null object
 dtypes: float64(6), int64(12), object(2)
 memory usage: 954.8+ KB
-
 ```
+</div>
+</div>
+</div>
 
 These are the explanatory variables we will use throughout the chapter.
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 variable_names = ['accommodates', 'bathrooms', 'bedrooms', 
                   'beds', 'rt_Private_room', 'rt_Shared_room',
                   'pg_Condominium', 'pg_House', 
                   'pg_Other', 'pg_Townhouse']
 ```
+</div>
 
+</div>
 
 ## Non-spatial regression, a (very) quick refresh
 
@@ -143,28 +149,30 @@ A regression can be seen as a multivariate extension of bivariate correlations. 
 
 Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. `statsmodels`, `scikit-learn`, `PySAL`). In the context of this chapter, it makes sense to start with `PySAL` as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with $X$ as the list defined, we only need the following line of code:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 m1 = spreg.OLS(db[['log_price']].values, db[variable_names].values,
                 name_y='log_price', name_x=variable_names)
 ```
+</div>
 
+</div>
 
 We use the command `OLS`, part of the `spreg` sub-package, and specify the dependent variable (the log of the price, so we can interpret results in terms of percentage change) and the explanatory ones. Note that both objects need to be arrays, so we extract them from the `pandas.DataFrame` object using `.values`.
 
 In order to inspect the results of the model, we can call `summary`:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 print(m1.summary)
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 REGRESSION
 ----------
@@ -212,8 +220,10 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               10         322.532           0.0000
 Koenker-Bassett test             10         135.581           0.0000
 ================================ END OF REPORT =====================================
-
 ```
+</div>
+</div>
+</div>
 
 A full detailed explanation of the output is beyond the scope of this chapter, so we will focus on the relevant bits for our main purpose. This is concentrated on the `Coefficients` section, which gives us the estimates for $\beta_k$ in our model. In other words, these numbers express the relationship between each explanatory variable and the dependent one, once the effect of confounding factors has been accounted for. Keep in mind however that regression is no magic; we are only discounting the effect of confounding factors that we include in the model, not of *all* potentially confounding factors.
 
@@ -229,9 +239,8 @@ To examine this, we first might want to split our data up by regions and see if 
 One reasonable theory might be that our model does not include any information about *beaches*, a critical aspect of why people live and vacation in San Diego. 
 Therefore, we might want to see whether or not our errors are higher or lower depending on whether or not an airbnb is in a "beach" neighborhood, a neighborhood near the ocean:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 is_coastal = db.coastal.astype(bool)
 coastal = m1.u[is_coastal]
@@ -243,36 +252,43 @@ plt.vlines(0,0,1, linestyle=":", color='k', linewidth=4)
 plt.legend()
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_11_0.png)
 
-
+</div>
+</div>
+</div>
 
 While it appears that the neighborhoods on the coast have only slightly higher average errors (and have lower variance in their prediction errors), the two distributions are significantly distinct from one another when compared using a classic $t$ test:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 stats.ttest_ind(coastal, 
              not_coastal,
 #             permutations=9999 not yet available in scipy
              )
 ```
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
-
-
-
-{:.output .output_data_text}
+{:.output_data_text}
 ```
 Ttest_indResult(statistic=array([13.98193858]), pvalue=array([9.442438e-44]))
 ```
 
 
+</div>
+</div>
+</div>
 
 There are more sophisticated (and harder to fool) tests that may be applicable for this data, however. We cover them in the [Challenge](#Challenge) section. 
 
@@ -282,9 +298,8 @@ For us to determine whether this is the case, we might be interested in the full
 
 To make this more clear, we'll first sort the data by the median residual in that neighborhood, and then make a box plot, which shows the distribution of residuals in each neighborhood:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db['residual'] = m1.u
 medians = db.groupby("neighborhood").residual.median().to_frame('hood_residual')
@@ -299,13 +314,17 @@ seaborn.boxplot('neighborhood', 'residual', ax = ax,
 f.autofmt_xdate()
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_16_0.png)
 
-
+</div>
+</div>
+</div>
 
 No neighborhood is disjoint from one another, but some do appear to be higher than others, such as the well-known downtown tourist neighborhoods areas of the Gaslamp Quarter, Little Italy, or The Core. 
 Thus, there may be a distinctive effect of intangible neighborhood fashionableness that matters in this model. 
@@ -319,19 +338,19 @@ To do this, we will use *spatial weights* to represent the geographic relationsh
 We cover spatial weights in detail in another chapter, so we will not repeat ourselves here.
 For this example, we'll start off with a $KNN$ matrix where $k=1$, meaning we're focusing only on the linkages of each airbnb to their closest other listing.
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 knn = weights.Distance.KNN.from_dataframe(db, k=1)
 ```
+</div>
 
+</div>
 
 This means that, when we compute the *spatial lag* of that knn weight and the residual, we get the residual of the airbnb listing closest to each observation.
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
 ax = seaborn.regplot(m1.u.flatten(), lag_residual.flatten(), 
@@ -340,13 +359,17 @@ ax = seaborn.regplot(m1.u.flatten(), lag_residual.flatten(),
 ax.set_xlabel('Model Residuals - $u$')
 ax.set_ylabel('Spatial Lag of Model Residuals - $W u$');
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_20_0.png)
 
-
+</div>
+</div>
+</div>
 
 In this plot, we see that our prediction errors tend to cluster!
 Above, we show the relationship between our prediction error at each site and the prediction error at the site nearest to it. 
@@ -360,9 +383,8 @@ Given this behavior, let's look at the stable $k=20$ number of neighbors.
 Examining the relationship between this stable *surrounding* average and the focal Airbnb, we can even find clusters in our model error. 
 Recalling the *local Moran* statistics, we can identify certain areas where our predictions of the nightly (log) Airbnb price tend to be significantly off:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 knn.reweight(k=20, inplace=True)
 outliers = esda.moran.Moran_Local(m1.u, knn, permutations=9999)
@@ -374,13 +396,17 @@ db.assign(error_clusters = error_clusters,
   .sort_values('local_I')\
   .plot('local_I', cmap='bwr', marker='.');
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_23_0.png)
 
-
+</div>
+</div>
+</div>
 
 Thus, these areas tend to be locations where our model significantly underpredicts the nightly airbnb price both for that specific observation and observations in its immediate surroundings. 
 This is critical since, if we can identify how these areas are structured &mdash; if they have a *consistent geography* that we can model &mdash; then we might make our predictions even better, or at least not systematically mis-predict prices in some areas while correctly predicting prices in other areas. 
@@ -417,59 +443,67 @@ For a start, one relevant proximity-driven variable that could influence our mod
 
 Therefore, this is sometimes called a *spatially-patterned omitted covariate*: geographic information our model needs to make good precitions which we have left out of our model. Therefore, let's build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize the structure of this distance covariate itself:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db.plot('d2balboa', marker='.', s=5)
 ```
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
-
-
-
-{:.output .output_data_text}
+{:.output_data_text}
 ```
 <matplotlib.axes._subplots.AxesSubplot at 0x1a1ccc31d0>
 ```
 
 
+</div>
+</div>
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_26_1.png)
 
+</div>
+</div>
+</div>
 
-
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 base_names = variable_names
 balboa_names = variable_names + ['d2balboa']
 ```
+</div>
 
+</div>
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 m2 = spreg.OLS(db[['log_price']].values, db[balboa_names].values, 
                   name_y = 'log_price', name_x = balboa_names)
 ```
+</div>
 
+</div>
 
 Unfortunately, when you inspect the regression diagnostics and output, you see that this covariate is not quite as helpful as we might anticipate. It is not statistically significant at conventional significance levels, the model fit does not substantially change:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 print(m2.summary)
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 REGRESSION
 ----------
@@ -518,27 +552,32 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               11         317.519           0.0000
 Koenker-Bassett test             11         132.860           0.0000
 ================================ END OF REPORT =====================================
-
 ```
+</div>
+</div>
+</div>
 
 And, there still appears to be spatial structure in our model's errors:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 lag_residual = weights.spatial_lag.lag_spatial(knn, m2.u)
 seaborn.regplot(m2.u.flatten(), lag_residual.flatten(), 
                 line_kws=dict(color='orangered'),
                 ci=None);
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_32_0.png)
 
-
+</div>
+</div>
+</div>
 
 Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is *positive*, meaning that people are paying a premium to be *further* from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this.
 
@@ -557,35 +596,39 @@ where the main difference is that we are now allowing the constant term, $\alpha
 Programmatically, we will show two different ways can estimate this: one,
 using `statsmodels`; and two, with `PySAL`. First, we will use `statsmodels`. This package provides a formula-like API, which allows us to express the *equation* we wish to estimate directly:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 f = 'log_price ~ ' + ' + '.join(variable_names) + ' + neighborhood - 1'
 print(f)
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 log_price ~ accommodates + bathrooms + bedrooms + beds + rt_Private_room + rt_Shared_room + pg_Condominium + pg_House + pg_Other + pg_Townhouse + neighborhood - 1
-
 ```
+</div>
+</div>
+</div>
 
 The *tilde* operator in this statement is usually read as "log price is a function of ...", to account for the fact that many different model specifications can be fit according to that functional relationship between `log_price` and our covariate list. Critically, note that the trailing `-1` term means that we are fitting this model without an intercept term. This is necessary, since including an intercept term alongside unique means for every neighborhood would make the underlying system of equations underspecified.  
 
 Using this expression, we can estimate the unique effects of each neighborhood, fitting the model in `statsmodels`: 
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 m3 = sm.ols(f, data=db).fit()
 print(m3.summary2())
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
                            Results: Ordinary least squares
 ======================================================================================
@@ -661,16 +704,17 @@ Skew:                      0.989                Prob(JB):                     0.
 Kurtosis:                  6.500                Condition No.:                132     
 ======================================================================================
 
-
 ```
+</div>
+</div>
+</div>
 
 The approach above shows how spatial FE are a particular case of a linear regression with a categorical  variable. Neighborhood membership is modeled using binary dummy variables. Thanks to the formula grammar used in `statsmodels`, we can express the model abstractly, and Python parses it, appropriately creating binary variables as required.
 
 The second approach leverages `PySAL` Regimes functionality, which allows the user to specify which variables are to be estimated separately for each "regime". In this case however, instead of describing the model in a formula, we need to pass each element of the model as separate arguments.
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # PySAL implementation
 m4 = spreg.OLS_Regimes(db[['log_price']].values, db[variable_names].values,
@@ -680,9 +724,11 @@ m4 = spreg.OLS_Regimes(db[['log_price']].values, db[variable_names].values,
                        name_y='log_price', name_x=variable_names)
 print(m4.summary)
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 REGRESSION
 ----------
@@ -780,8 +826,10 @@ REGIMES DIAGNOSTICS - CHOW TEST
                  CONSTANT        44         913.016           0.0000
               Global test        44         913.016           0.0000
 ================================ END OF REPORT =====================================
-
 ```
+</div>
+</div>
+</div>
 
 Econometrically speaking, what the neighborhood FEs we have introduced imply is that, instead of comparing all house prices across San Diego as equal, we only derive variation from within each postcode. Remember that the interpretation of $\beta_k$ is the effect of variable $k$, *given all the other explanatory variables included remain constant*. By including a single variable for each area, we are effectively forcing the model to compare as equal only house prices that share the same value for each variable; or, in other words, only houses located within the same area. Introducing FE affords a higher degree of isolation of the effects of the variables we introduce in the model because we can control for unobserved effects that align spatially with the distribution of the FE introduced (by postcode, in our case).
 
@@ -789,19 +837,19 @@ To make a map of neighborhood fixed effects, we need to process the results from
 
 First, we extract only the effects pertaining to the neighborhoods:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 neighborhood_effects = m3.params.filter(like='neighborhood')
 neighborhood_effects.head()
 ```
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
-
-
-
-{:.output .output_data_text}
+{:.output_data_text}
 ```
 neighborhood[Balboa Park]          4.280766
 neighborhood[Bay Ho]               4.198251
@@ -812,20 +860,24 @@ dtype: float64
 ```
 
 
+</div>
+</div>
+</div>
 
 Then, we need to extract just the neighborhood name from the index of this Series. A simple way to do this is to strip all the characters that come before and after our neighborhood names:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 stripped = neighborhood_effects.index.str.strip('neighborhood[').str.strip(']')
 neighborhood_effects.index = stripped
 neighborhood_effects = neighborhood_effects.to_frame('fixed_effect')
 neighborhood_effects.head()
 ```
+</div>
 
-
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
 
@@ -878,20 +930,23 @@ neighborhood_effects.head()
 </div>
 
 
+</div>
+</div>
+</div>
 
 Good, we're back to our raw neighborhood names. Now, we can join them back up with the neighborhood shapes:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 neighborhoods = geopandas.read_file(bookdata.san_diego_neighborhoods())
 ```
+</div>
 
+</div>
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 ax = neighborhoods.merge(neighborhood_effects, how='left',
                     left_on='neighbourhood', 
@@ -900,13 +955,17 @@ ax = neighborhoods.merge(neighborhood_effects, how='left',
 ax.set_title("San Diego Neighborhood Fixed Effects")
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_46_0.png)
 
-
+</div>
+</div>
+</div>
 
 #### Spatial Regimes
 
@@ -922,9 +981,8 @@ To illustrate this approach, we will use the "spatial differentiator" of whether
 
 To implement this in Python, we use the `OLS_Regimes` class in `PySAL`, which does most of the heavy lifting for us:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 m4 = spreg.OLS_Regimes(db[['log_price']].values, db[variable_names].values,
                           db['coastal'].tolist(),
@@ -933,9 +991,11 @@ m4 = spreg.OLS_Regimes(db[['log_price']].values, db[variable_names].values,
                           name_y='log_price', name_x=variable_names)
 print(m4.summary)
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 REGRESSION
 ----------
@@ -1010,8 +1070,10 @@ REGIMES DIAGNOSTICS - CHOW TEST
            rt_Shared_room         1           3.309           0.0689
               Global test        11         328.869           0.0000
 ================================ END OF REPORT =====================================
-
 ```
+</div>
+</div>
+</div>
 
 ### Spatial Dependence
 
@@ -1064,32 +1126,34 @@ we can calculate the spatial lag of each variable whose name starts by `pg_`
 by first creating a list of all of those names, and then applying `PySAL`'s
 `lag_spatial` to each of them:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 wx = [i for i in variable_names if 'pg_' in i]
 wx = db[wx].apply(lambda y: weights.spatial_lag.lag_spatial(knn, y))\
            .rename(columns=lambda c: 'w_'+c)
 ```
+</div>
 
+</div>
 
 Once computed, we can run the model using OLS estimation because, in this
 context, the spatial  lags included do not violate any of the assumptions OLS
 relies on (they are essentially additional exogenous variables):
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 m5 = spreg.OLS(db[['log_price']].values, 
                   db[variable_names].join(wx).values,
                   name_y='l_price', name_x=variable_names+wx.columns.tolist())
 print(m5.summary)
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 REGRESSION
 ----------
@@ -1141,8 +1205,10 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               14         393.052           0.0000
 Koenker-Bassett test             14         169.585           0.0000
 ================================ END OF REPORT =====================================
-
 ```
+</div>
+</div>
+</div>
 
 The way to interpret the table of results is similar to that of any other
 non-spatial regression. The variables we included in the original regression
@@ -1179,17 +1245,18 @@ advanced techniques developed by the literature on spatial econometrics. For
 example, we can use a general method of moments that account for 
 heterogeneity (Arraiz et al., 2010):
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 m6 = spreg.GM_Error_Het(db[['log_price']].values, db[variable_names].values,
                            w=knn, name_y='log_price', name_x=variable_names)
 print(m6.summary)
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 REGRESSION
 ----------
@@ -1220,8 +1287,10 @@ N. of iterations    :           1                Step1c computed       :        
               lambda       0.6448728       0.0186626      34.5543740       0.0000000
 ------------------------------------------------------------------------------------
 ================================ END OF REPORT =====================================
-
 ```
+</div>
+</div>
+</div>
 
 #### Spatial Lag
 
@@ -1242,17 +1311,18 @@ use a two-stage least squares estimation (Anselin, 1988), where the spatial
 lag of all the explanatory variables is used as instrument for the endogenous
 lag:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 m7 = spreg.GM_Lag(db[['log_price']].values, db[variable_names].values,
                      w=knn, name_y='log_price', name_x=variable_names)
 print(m7.summary)
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 REGRESSION
 ----------
@@ -1287,8 +1357,10 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
              W_pg_Condominium, W_pg_House, W_pg_Other, W_pg_Townhouse,
              W_rt_Private_room, W_rt_Shared_room
 ================================ END OF REPORT =====================================
-
 ```
+</div>
+</div>
+</div>
 
 #### Other ways of bringing space into regression
 
@@ -1305,9 +1377,8 @@ Below, we do this; running 100 simulated re-assignments of districts to either "
 
 Below, the black lines represent our simulations, and the colored patches below them represents the observed distribution of residuals. If the black lines tend to be on the left of the colored patch, then, the simulations (where prediction error is totally random with respect to our categories of "coastal" and "not coastal") tend to have more negative residuals than our actual model. If the black lines tend to be on the right, then they tend to have more positive residuals. As a refresher, positive residuals mean that our model is underpredicting, and negative residuals mean that our model is overpredicting. Below, our simulations provide direct evidence for the claim that our model may be systematically underpredicting coastal price and overpredicting non-coastal prices. 
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 n_simulations = 100
 f, ax = plt.subplots(1,2,figsize=(12,3), sharex=True, sharey=True)
@@ -1342,13 +1413,17 @@ ax[1].legend()
 plt.tight_layout()
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_60_0.png)
 
-
+</div>
+</div>
+</div>
 
 #### The K-neighbor correlogram
 
@@ -1360,9 +1435,8 @@ One quick way to check whether or not what we've seen is *unique* or *significan
 If what we observe is substantially different from what emerges when neighbors are random, then the structure of the neighbors embeds a structure in the residuals. 
 We won't spend too much time on this theory specifically, but we can quickly and efficiently compute the correlation between our observed residuals and the spatial lag of an increasing $k$-nearest neighbor set:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 correlations = []
 nulls = []
@@ -1375,11 +1449,12 @@ for order in range(1, 51, 5):
     correlations.append(numpy.corrcoef(m1.u.flatten(), lag_residual.flatten())[0,1])
     nulls.append(numpy.corrcoef(m1.u.flatten(), random_lag_residual.flatten())[0,1])
 ```
+</div>
 
+</div>
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 plt.plot(range(1,51,5), correlations)
 plt.plot(range(1,51,5), nulls, color='orangered')
@@ -1391,13 +1466,17 @@ plt.xlabel('$K$: number of nearest neighbors')
 plt.ylabel("Correlation between site \n and neighborhood average of size $K$")
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/11_regression_63_0.png)
 
-
+</div>
+</div>
+</div>
 
 Clearly, the two curves are different. The observed correlation reaches a peak around $r=.34$ when around 20 nearest listings are used. This means that adding more than 20 nearest neighbors does not significantly change the correlation in the residuals. Further, the lowest correlation is for the single nearest neighbor, and correlation rapidly increases as more neighbors are added close to the listing. Thus, this means that there does appear to be an unmeasured spatial structure in the residuals, since they are more similar to one another when they are near than when they are far apart. Further, while it's not shown here (since computationally, it becomes intractable), as the number of nearest neighbors gets very large (approaching the number of observations in the dataset), the average of the $k$th nearest neighbors' residuals goes to zero, the global average of residuals. This means that the correlation of the residuals and a vector that is nearly constant begins to approach zero. 
 

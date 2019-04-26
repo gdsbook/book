@@ -2,38 +2,38 @@
 redirect_from:
   - "/notebooks/00-toc"
 interact_link: content/notebooks/00_toc.ipynb
-kernel_name: gdsbook
-title: 'Notebooks'
+kernel_name: python3
+has_widgets: false
+title: 'Table of Contents'
 prev_page:
   url: /intro
   title: 'Home'
 next_page:
-  url: /notebooks/05_choropleth
-  title: 'Choropleths'
+  url: /intro_part_i
+  title: 'Part I - Building Blocks'
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 
-# Geographical Data Science with PySAL and the Python Geospatial Stack
+# Table of Contents
 
+## Part I: Building Blocks
 
-## Table of Contents
+- [Geospatial Computational Environment](01_geospatial_computational_environment)
+- [Spatial data](02_spatial_data)
+- [Spatial data processing](03_spatial_data_processing)
+- [Spatial weights](04_spatial_weights)
 
-### Part I: Building Blocks
+## Part II: Spatial Data Analysis
 
-- [Introduction](introduction.ipynb)
-- [Geospatial Computational Environment](geospatial_computational_environment.ipynb)
-- [Spatial data](spatial data.ipynb)
-- [Spatial data processing](spatial_data_processing.ipynb)
+- [Choropleth Mapping](05_choropleth)
+- [Spatial Autocorrelation](06_spatial_autocorrelation)
+- [Local Spatial Autocorrelation](07_local_autocorrelation)
+- [Point Pattern Analysis](08_point_pattern_analysis)
 
-### Part II: Spatial Data Analysis
-- [Choropleth Mapping](choropleth.ipynb)
-- [Global Spatial Autocorrelation Analysis](sp_autocorrelation.ipynb)
-- Local Autocorrelation Analysis
-- Point Pattern Analysis
+## Part III: Advanced Topics
 
-
-### Part III: Advanced Topics
-- [Clustering and Regionalization](clustering_and_regionalization.ipynb)
-- Spatial Inequality Analysis
-- Spatial Regression
+- [Spatial Inequality](09_spatial_inequality)
+- [Clustering and Regionalization](10_clustering_and_regionalization)
+- [Spatial Regression](11_regression)
+- [Spatial Feature Engineering](12_feature_engineering)
 

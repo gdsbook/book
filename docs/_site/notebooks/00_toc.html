@@ -7,16 +7,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
-  <title>Notebooks</title>
-  <meta name="description" content="Geographical Data Science with PySAL and the Python Geospatial Stack">
+  <title>Table of Contents</title>
+  <meta name="description" content="Table of Contents">
 
   <link rel="canonical" href="/book/book/notebooks/00_toc.html">
   <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="/book/book/feed.xml">
 
   <meta property="og:url"         content="/book/book/notebooks/00_toc.html" />
 <meta property="og:type"        content="article" />
-<meta property="og:title"       content="Notebooks" />
-<meta property="og:description" content="Geographical Data Science with PySAL and the Python Geospatial Stack" />
+<meta property="og:title"       content="Table of Contents" />
+<meta property="og:description" content="Table of Contents" />
 <meta property="og:image"       content="" />
 
 
@@ -27,13 +27,13 @@
   "mainEntityOfPage":
     "/book/notebooks/00_toc.html",
   "headline":
-    "Notebooks",
+    "Table of Contents",
   "datePublished":
-    "2019-03-06T12:14:23+00:00",
+    "2019-04-26T23:33:35+00:00",
   "dateModified":
-    "2019-03-06T12:14:23+00:00",
+    "2019-04-26T23:33:35+00:00",
   "description":
-    "Geographical Data Science with PySAL and the Python Geospatial Stack",
+    "Table of Contents",
   "author": {
     "@type": "Person",
     "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
@@ -139,10 +139,40 @@ initFunction(function () {
   <meta name="turbolinks-cache-control" content="no-cache">
 
   <!-- Load nbinteract for widgets -->
-  <script src="https://unpkg.com/nbinteract-core" async></script>
+  
 
   <!-- Load Thebelab for interactive widgets -->
   <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+<!-- Display Thebelab button in each code cell -->
+<script>
+/**
+ * Set up thebelab button for code blocks
+ */
+
+const thebelabCellButton = id =>
+  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
+    <img src="/book/assets/images/edit-button.svg" alt="Start interactive mode">
+  </a>`
+
+
+const addThebelabButtonToCodeCells =  () => {
+
+  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("thebelab-cell-button-" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
+    }
+  })
+}
+
+initFunction(addThebelabButtonToCodeCells);
+</script>
+
+
 
 <script type="text/x-thebe-config">
     {
@@ -151,12 +181,15 @@ initFunction(function () {
         repo: 'gdsbook/geographic-data-science',
         ref: 'master',
       },
+      codeMirrorConfig: {
+        theme: ""
+      },
       kernelOptions: {
-        name: 'gdsbook',
+        name: 'python3',
       }
     }
 </script>
-<script src="https://unpkg.com/thebelab@0.3.3/lib/index.js"></script>
+<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
 <script>
     /**
      * Add attributes to Thebelab blocks
@@ -212,9 +245,9 @@ initFunction(function () {
             thebelab.bootstrap();
 
             // Remove copy buttons since they won't work anymore
-            const copyButtons = document.querySelectorAll('.copybtn')
-            copyButtons.forEach((copyButton, index) => {
-                copyButton.remove();
+            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
+            copyAndThebeButtons.forEach((button, index) => {
+                button.remove();
             });
 
             // Remove outputs since they'll be stale
@@ -225,18 +258,40 @@ initFunction(function () {
         }
 
         // Add event listener for the function to modify code cells
-        const thebelabButton = document.getElementById('interact-button-thebelab');
-        if (thebelabButton === null) {
-            setTimeout(initThebelab, 250)
-        return
-        };
-        thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
+        thebelabButtons.forEach((thebelabButton,index) => {
+            if (thebelabButton === null) {
+                setTimeout(initThebelab, 250)
+                return
+            };
+            thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        });
     }
 
     // Initialize Thebelab
     initFunction(initThebelab);
 </script>
 
+
+
+  <!-- Load the auto-generating TOC -->
+  <script src="/book/assets/js/tocbot.min.js"  type="text/javascript"></script>
+  <script>
+var initToc = function () {
+  tocbot.init({
+    tocSelector: 'nav.onthispage',
+    contentSelector: '.c-textbook__content',
+    headingSelector: 'h2, h3',
+    orderedList: false,
+    collapseDepth: 6,
+    listClass: 'toc__menu',
+    activeListItemClass: "",  // Not using
+    activeLinkClass: "", // Not using
+  });
+  tocbot.refresh();
+}
+initFunction(initToc);
+</script>
 
   <!-- Google analytics -->
   <script src="/book/assets/js/ga.js" async></script>
@@ -252,7 +307,7 @@ initFunction(function () {
 const codeCellId = index => `codecell${index}`
 
 const clipboardButton = id =>
-  `<a class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
     <img src="/book/assets/images/copy-button.svg" alt="Copy to clipboard">
   </a>`
 
@@ -280,11 +335,11 @@ const addCopyButtonToCodeCells = () => {
     return
   }
 
-  const codeCells = document.querySelectorAll('div.highlighter-rouge:not(.output) pre')
+  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
   codeCells.forEach((codeCell, index) => {
     const id = codeCellId(index)
     codeCell.setAttribute('id', id)
-    if (document.querySelector(`pre#${id} + a`) == null) {
+    if (document.getElementById("copy-button" + id) == null) {
       codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
     }
   })
@@ -308,6 +363,7 @@ const addCopyButtonToCodeCells = () => {
 initFunction(addCopyButtonToCodeCells);
 </script>
 
+
   <!-- Hide cell code -->
   
 <script>
@@ -319,7 +375,7 @@ Add buttons to hide code cells
 var setCodeCellVisibility = function(inputField, kind) {
     // Update the image and class for hidden
     var id = inputField.getAttribute('data-id');
-    var codeCell = document.querySelector(`#${id}`);
+    var codeCell = document.querySelector(`#${id} div.highlight`);
 
     if (kind === "visible") {
         codeCell.classList.remove('hidden');
@@ -357,18 +413,19 @@ var addHideButton = function () {
   }
 
   // Find the input cells and add a hide button
-  document.querySelectorAll('div.input_area div.highlight').forEach(function (item, index) {
-    if (!item.parentElement.classList.contains("hidecode")) {
+  document.querySelectorAll('div.input_area').forEach(function (item, index) {
+    if (!item.classList.contains("hidecode")) {
         // Skip the cell if it doesn't have a hidecode class
         return;
     }
 
     const id = codeCellId(index)
     item.setAttribute('id', id);
-    item.insertAdjacentHTML('afterend', hideCodeButton(id))
+    // Insert the button just inside the end of the next div
+    item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
 
     // Set up the visibility toggle
-    hideLink = document.querySelector(`#${id} + input + label`);
+    hideLink = document.querySelector(`#${id} div.highlight + input + label`);
     hideLink.addEventListener('click', toggleCodeCellVisibility)
   });
 }
@@ -639,7 +696,7 @@ initFunction(initQuery);
 
 
 <nav id="js-sidebar" class="c-textbook__sidebar">
-  <a href="https://jupyter.org/jupyter-book/intro.html"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
+  <a href="https://github.com/gdsbook/geographic-data-science"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
   <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
   <ul class="c-sidebar__chapters">
     
@@ -681,7 +738,129 @@ initFunction(initQuery);
           href="/book/notebooks/00_toc.html"
         >
           
-          Notebooks
+          Table of Contents
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/01_geospatial_computational_environment.html"
+                >
+                  
+                  Geospatial Computational Environment
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/02_spatial_data.html"
+                >
+                  
+                  Spatial Data
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/03_spatial_data_processing.html"
+                >
+                  
+                  Spatial Data Processing
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/04_spatial_weights.html"
+                >
+                  
+                  Spatial Weights
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
         </a>
 
         
@@ -703,7 +882,7 @@ initFunction(initQuery);
                   href="/book/notebooks/05_choropleth.html"
                 >
                   
-                  Choropleths
+                  Choropleth Mapping
                 </a>
 
                 
@@ -717,10 +896,10 @@ initFunction(initQuery);
 
               <li class="c-sidebar__section">
                 <a class="c-sidebar__entry "
-                  href="/book/notebooks/06_global_autocorrelation.html"
+                  href="/book/notebooks/06_spatial_autocorrelation.html"
                 >
                   
-                  Global Autocorrelation
+                  Spatial Autocorrelation
                 </a>
 
                 
@@ -737,7 +916,91 @@ initFunction(initQuery);
                   href="/book/notebooks/07_local_autocorrelation.html"
                 >
                   
-                  Local Autocorrelation
+                  Local Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/08_point_pattern_analysis.html"
+                >
+                  
+                  Point Pattern Analysis
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/09_spatial_inequality.html"
+                >
+                  
+                  Spatial Inequality
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/10_clustering_and_regionalization.html"
+                >
+                  
+                  Clustering & Regionalization
                 </a>
 
                 
@@ -754,7 +1017,24 @@ initFunction(initQuery);
                   href="/book/notebooks/11_regression.html"
                 >
                   
-                  Regression over space
+                  Regression
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/12_feature_engineering.html"
+                >
+                  
+                  Spatial Feature Engineering
                 </a>
 
                 
@@ -774,28 +1054,12 @@ initFunction(initQuery);
 </nav>
 
       
-      <!-- Shamelessly copied from minimal mistakes -->
-
-
-<!-- TOC will only show up if it has at least one item -->
-
-
-  <aside class="sidebar__right">
-    <nav class="onthispage">
-      <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
-      <ul class="toc__menu">
-  <li><a href="#table-of-contents">Table of Contents</a>
-    <ul>
-      <li><a href="#part-i-building-blocks">Part I: Building Blocks</a></li>
-      <li><a href="#part-ii-spatial-data-analysis">Part II: Spatial Data Analysis</a></li>
-      <li><a href="#part-iii-advanced-topics">Part III: Advanced Topics</a></li>
-    </ul>
-  </li>
-</ul>
-    </nav>
-  </aside>
-
-
+      <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+      <aside class="sidebar__right">
+          <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
+          <nav class="onthispage">
+          </nav>
+      </aside>
       
       <main class="c-textbook__page" tabindex="-1">
           <div class="o-wrapper">
@@ -824,6 +1088,7 @@ initFunction(initQuery);
 
 
 
+
 <a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?urlpath=lab/tree/content%2Fnotebooks%2F00_toc.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/book/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
 
 
@@ -831,32 +1096,33 @@ initFunction(initQuery);
 
 
             <div class="c-textbook__content">
-              <h1 id="geographical-data-science-with-pysal-and-the-python-geospatial-stack">Geographical Data Science with PySAL and the Python Geospatial Stack</h1>
+              <h1 id="table-of-contents">Table of Contents</h1>
 
-<h2 id="table-of-contents">Table of Contents</h2>
-
-<h3 id="part-i-building-blocks">Part I: Building Blocks</h3>
+<h2 id="part-i-building-blocks">Part I: Building Blocks</h2>
 
 <ul>
-  <li><a href="introduction.ipynb">Introduction</a></li>
-  <li><a href="geospatial_computational_environment.ipynb">Geospatial Computational Environment</a></li>
-  <li><a href="spatial data.ipynb">Spatial data</a></li>
-  <li><a href="spatial_data_processing.ipynb">Spatial data processing</a></li>
+  <li><a href="01_geospatial_computational_environment">Geospatial Computational Environment</a></li>
+  <li><a href="02_spatial_data">Spatial data</a></li>
+  <li><a href="03_spatial_data_processing">Spatial data processing</a></li>
+  <li><a href="04_spatial_weights">Spatial weights</a></li>
 </ul>
 
-<h3 id="part-ii-spatial-data-analysis">Part II: Spatial Data Analysis</h3>
+<h2 id="part-ii-spatial-data-analysis">Part II: Spatial Data Analysis</h2>
+
 <ul>
-  <li><a href="choropleth.ipynb">Choropleth Mapping</a></li>
-  <li><a href="sp_autocorrelation.ipynb">Global Spatial Autocorrelation Analysis</a></li>
-  <li>Local Autocorrelation Analysis</li>
-  <li>Point Pattern Analysis</li>
+  <li><a href="05_choropleth">Choropleth Mapping</a></li>
+  <li><a href="06_spatial_autocorrelation">Spatial Autocorrelation</a></li>
+  <li><a href="07_local_autocorrelation">Local Spatial Autocorrelation</a></li>
+  <li><a href="08_point_pattern_analysis">Point Pattern Analysis</a></li>
 </ul>
 
-<h3 id="part-iii-advanced-topics">Part III: Advanced Topics</h3>
+<h2 id="part-iii-advanced-topics">Part III: Advanced Topics</h2>
+
 <ul>
-  <li><a href="clustering_and_regionalization.ipynb">Clustering and Regionalization</a></li>
-  <li>Spatial Inequality Analysis</li>
-  <li>Spatial Regression</li>
+  <li><a href="09_spatial_inequality">Spatial Inequality</a></li>
+  <li><a href="10_clustering_and_regionalization">Clustering and Regionalization</a></li>
+  <li><a href="11_regression">Spatial Regression</a></li>
+  <li><a href="12_feature_engineering">Spatial Feature Engineering</a></li>
 </ul>
 
 
@@ -870,8 +1136,8 @@ initFunction(initQuery);
 
   
     
-    <a id="js-page__nav__next" class="c-page__nav__next" href="/book/notebooks/05_choropleth">
-      Choropleths <span class="u-margin-right-tiny"></span> 〉
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/book/intro_part_i">
+      Part I - Building Blocks <span class="u-margin-right-tiny"></span> 〉
     </a>
   
 </nav>

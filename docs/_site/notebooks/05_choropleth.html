@@ -7,16 +7,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
-  <title>Choropleths</title>
-  <meta name="description" content="Choropleth mapping">
+  <title>Choropleth Mapping</title>
+  <meta name="description" content="      ```python    Choropleth mapping  ">
 
   <link rel="canonical" href="/book/book/notebooks/05_choropleth.html">
   <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="/book/book/feed.xml">
 
   <meta property="og:url"         content="/book/book/notebooks/05_choropleth.html" />
 <meta property="og:type"        content="article" />
-<meta property="og:title"       content="Choropleths" />
-<meta property="og:description" content="Choropleth mapping" />
+<meta property="og:title"       content="Choropleth Mapping" />
+<meta property="og:description" content="      ```python    Choropleth mapping  " />
 <meta property="og:image"       content="" />
 
 
@@ -27,13 +27,13 @@
   "mainEntityOfPage":
     "/book/notebooks/05_choropleth.html",
   "headline":
-    "Choropleths",
+    "Choropleth Mapping",
   "datePublished":
-    "2019-03-06T12:14:23+00:00",
+    "2019-04-26T23:33:35+00:00",
   "dateModified":
-    "2019-03-06T12:14:23+00:00",
+    "2019-04-26T23:33:35+00:00",
   "description":
-    "Choropleth mapping",
+    "      ```python    Choropleth mapping  ",
   "author": {
     "@type": "Person",
     "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
@@ -139,10 +139,40 @@ initFunction(function () {
   <meta name="turbolinks-cache-control" content="no-cache">
 
   <!-- Load nbinteract for widgets -->
-  <script src="https://unpkg.com/nbinteract-core" async></script>
+  
 
   <!-- Load Thebelab for interactive widgets -->
   <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+<!-- Display Thebelab button in each code cell -->
+<script>
+/**
+ * Set up thebelab button for code blocks
+ */
+
+const thebelabCellButton = id =>
+  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
+    <img src="/book/assets/images/edit-button.svg" alt="Start interactive mode">
+  </a>`
+
+
+const addThebelabButtonToCodeCells =  () => {
+
+  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("thebelab-cell-button-" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
+    }
+  })
+}
+
+initFunction(addThebelabButtonToCodeCells);
+</script>
+
+
 
 <script type="text/x-thebe-config">
     {
@@ -151,12 +181,15 @@ initFunction(function () {
         repo: 'gdsbook/geographic-data-science',
         ref: 'master',
       },
+      codeMirrorConfig: {
+        theme: ""
+      },
       kernelOptions: {
         name: 'python3',
       }
     }
 </script>
-<script src="https://unpkg.com/thebelab@0.3.3/lib/index.js"></script>
+<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
 <script>
     /**
      * Add attributes to Thebelab blocks
@@ -212,9 +245,9 @@ initFunction(function () {
             thebelab.bootstrap();
 
             // Remove copy buttons since they won't work anymore
-            const copyButtons = document.querySelectorAll('.copybtn')
-            copyButtons.forEach((copyButton, index) => {
-                copyButton.remove();
+            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
+            copyAndThebeButtons.forEach((button, index) => {
+                button.remove();
             });
 
             // Remove outputs since they'll be stale
@@ -225,18 +258,40 @@ initFunction(function () {
         }
 
         // Add event listener for the function to modify code cells
-        const thebelabButton = document.getElementById('interact-button-thebelab');
-        if (thebelabButton === null) {
-            setTimeout(initThebelab, 250)
-        return
-        };
-        thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
+        thebelabButtons.forEach((thebelabButton,index) => {
+            if (thebelabButton === null) {
+                setTimeout(initThebelab, 250)
+                return
+            };
+            thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        });
     }
 
     // Initialize Thebelab
     initFunction(initThebelab);
 </script>
 
+
+
+  <!-- Load the auto-generating TOC -->
+  <script src="/book/assets/js/tocbot.min.js"  type="text/javascript"></script>
+  <script>
+var initToc = function () {
+  tocbot.init({
+    tocSelector: 'nav.onthispage',
+    contentSelector: '.c-textbook__content',
+    headingSelector: 'h2, h3',
+    orderedList: false,
+    collapseDepth: 6,
+    listClass: 'toc__menu',
+    activeListItemClass: "",  // Not using
+    activeLinkClass: "", // Not using
+  });
+  tocbot.refresh();
+}
+initFunction(initToc);
+</script>
 
   <!-- Google analytics -->
   <script src="/book/assets/js/ga.js" async></script>
@@ -252,7 +307,7 @@ initFunction(function () {
 const codeCellId = index => `codecell${index}`
 
 const clipboardButton = id =>
-  `<a class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
     <img src="/book/assets/images/copy-button.svg" alt="Copy to clipboard">
   </a>`
 
@@ -280,11 +335,11 @@ const addCopyButtonToCodeCells = () => {
     return
   }
 
-  const codeCells = document.querySelectorAll('div.highlighter-rouge:not(.output) pre')
+  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
   codeCells.forEach((codeCell, index) => {
     const id = codeCellId(index)
     codeCell.setAttribute('id', id)
-    if (document.querySelector(`pre#${id} + a`) == null) {
+    if (document.getElementById("copy-button" + id) == null) {
       codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
     }
   })
@@ -308,6 +363,7 @@ const addCopyButtonToCodeCells = () => {
 initFunction(addCopyButtonToCodeCells);
 </script>
 
+
   <!-- Hide cell code -->
   
 <script>
@@ -319,7 +375,7 @@ Add buttons to hide code cells
 var setCodeCellVisibility = function(inputField, kind) {
     // Update the image and class for hidden
     var id = inputField.getAttribute('data-id');
-    var codeCell = document.querySelector(`#${id}`);
+    var codeCell = document.querySelector(`#${id} div.highlight`);
 
     if (kind === "visible") {
         codeCell.classList.remove('hidden');
@@ -357,18 +413,19 @@ var addHideButton = function () {
   }
 
   // Find the input cells and add a hide button
-  document.querySelectorAll('div.input_area div.highlight').forEach(function (item, index) {
-    if (!item.parentElement.classList.contains("hidecode")) {
+  document.querySelectorAll('div.input_area').forEach(function (item, index) {
+    if (!item.classList.contains("hidecode")) {
         // Skip the cell if it doesn't have a hidecode class
         return;
     }
 
     const id = codeCellId(index)
     item.setAttribute('id', id);
-    item.insertAdjacentHTML('afterend', hideCodeButton(id))
+    // Insert the button just inside the end of the next div
+    item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
 
     // Set up the visibility toggle
-    hideLink = document.querySelector(`#${id} + input + label`);
+    hideLink = document.querySelector(`#${id} div.highlight + input + label`);
     hideLink.addEventListener('click', toggleCodeCellVisibility)
   });
 }
@@ -639,7 +696,7 @@ initFunction(initQuery);
 
 
 <nav id="js-sidebar" class="c-textbook__sidebar">
-  <a href="https://jupyter.org/jupyter-book/intro.html"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
+  <a href="https://github.com/gdsbook/geographic-data-science"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
   <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
   <ul class="c-sidebar__chapters">
     
@@ -681,7 +738,129 @@ initFunction(initQuery);
           href="/book/notebooks/00_toc.html"
         >
           
-          Notebooks
+          Table of Contents
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/01_geospatial_computational_environment.html"
+                >
+                  
+                  Geospatial Computational Environment
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/02_spatial_data.html"
+                >
+                  
+                  Spatial Data
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/03_spatial_data_processing.html"
+                >
+                  
+                  Spatial Data Processing
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/04_spatial_weights.html"
+                >
+                  
+                  Spatial Weights
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
         </a>
 
         
@@ -703,7 +882,7 @@ initFunction(initQuery);
                   href="/book/notebooks/05_choropleth.html"
                 >
                   
-                  Choropleths
+                  Choropleth Mapping
                 </a>
 
                 
@@ -717,10 +896,10 @@ initFunction(initQuery);
 
               <li class="c-sidebar__section">
                 <a class="c-sidebar__entry "
-                  href="/book/notebooks/06_global_autocorrelation.html"
+                  href="/book/notebooks/06_spatial_autocorrelation.html"
                 >
                   
-                  Global Autocorrelation
+                  Spatial Autocorrelation
                 </a>
 
                 
@@ -737,7 +916,91 @@ initFunction(initQuery);
                   href="/book/notebooks/07_local_autocorrelation.html"
                 >
                   
-                  Local Autocorrelation
+                  Local Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/08_point_pattern_analysis.html"
+                >
+                  
+                  Point Pattern Analysis
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/09_spatial_inequality.html"
+                >
+                  
+                  Spatial Inequality
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/10_clustering_and_regionalization.html"
+                >
+                  
+                  Clustering & Regionalization
                 </a>
 
                 
@@ -754,7 +1017,24 @@ initFunction(initQuery);
                   href="/book/notebooks/11_regression.html"
                 >
                   
-                  Regression over space
+                  Regression
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/12_feature_engineering.html"
+                >
+                  
+                  Spatial Feature Engineering
                 </a>
 
                 
@@ -774,33 +1054,12 @@ initFunction(initQuery);
 </nav>
 
       
-      <!-- Shamelessly copied from minimal mistakes -->
-
-
-<!-- TOC will only show up if it has at least one item -->
-
-
-  <aside class="sidebar__right">
-    <nav class="onthispage">
-      <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
-      <ul class="toc__menu">
-  <li><a href="#principles">Principles</a></li>
-  <li><a href="#quantitative-data-classification">Quantitative data classification</a>
-    <ul>
-      <li><a href="#classification-schemes">Classification schemes</a></li>
-      <li><a href="#comparing-classification-schemes">Comparing Classification schemes</a></li>
-      <li><a href="#color">Color</a></li>
-      <li><a href="#diverging-attributes">Diverging Attributes</a></li>
-    </ul>
-  </li>
-  <li><a href="#qualitative-attributes">Qualitative Attributes</a></li>
-  <li><a href="#conclusion">Conclusion</a></li>
-  <li><a href="#references">References</a></li>
-</ul>
-    </nav>
-  </aside>
-
-
+      <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+      <aside class="sidebar__right">
+          <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
+          <nav class="onthispage">
+          </nav>
+      </aside>
       
       <main class="c-textbook__page" tabindex="-1">
           <div class="o-wrapper">
@@ -829,6 +1088,7 @@ initFunction(initQuery);
 
 
 
+
 <a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?urlpath=lab/tree/content%2Fnotebooks%2F05_choropleth.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/book/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
 
 
@@ -836,9 +1096,20 @@ initFunction(initQuery);
 
 
             <div class="c-textbook__content">
-              <h1 id="choropleth-mapping">Choropleth mapping</h1>
+              <div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Choropleth mapping</span>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 
 <span class="kn">import</span> <span class="nn">seaborn</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
@@ -848,7 +1119,10 @@ initFunction(initQuery);
 <span class="kn">from</span> <span class="nn">booktools</span> <span class="kn">import</span> <span class="n">choropleth</span>
 <span class="kn">from</span> <span class="nn">pysal.viz.mapclassify</span> <span class="kn">import</span> <span class="n">classifiers</span> <span class="k">as</span> <span class="n">mapclassify</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <h2 id="principles">Principles</h2>
 
@@ -906,11 +1180,17 @@ consideration the statistical distribution of the attribute values.</p>
 32 Mexican states. The variable we focus on is per capita gross domestic product
 for 1940 (PCGDP1940):</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"../data/mexicojoin.shp"</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"../data/mexicojoin.shp"</span><span class="p">)</span>
 <span class="n">mx</span><span class="p">[[</span><span class="s">'NAME'</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_html">
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -964,22 +1244,42 @@ for 1940 (PCGDP1940):</p>
 </div>
 </div>
 
+    </div>
+  </div>
+</div>
+
 <p>Which displays the following statistical distribution:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">h</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">rug</span><span class="o">=</span><span class="bp">True</span><span class="p">);</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">h</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">rug</span><span class="o">=</span><span class="bp">True</span><span class="p">);</span>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_6_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_6_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>As we can see, the distribution is positively skewed as in common in regional income studies. In other words,
 the mean exceeds the median (<code class="highlighter-rouge">50%</code>, in the table below), leading the to fat right tail in the figure. As
 we shall see, this skewness will have implications for the choice of choropleth
 classification scheme.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>count       32.000000
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>count       32.000000
 mean      7230.531250
 std       5204.952883
 min       1892.000000
@@ -988,7 +1288,11 @@ min       1892.000000
 75%       8701.750000
 max      22361.000000
 Name: PCGDP1940, dtype: float64
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <h3 id="classification-schemes">Classification schemes</h3>
 
@@ -1005,24 +1309,49 @@ function under the hood to determine the class boundaries and the counts of
 observations in each class. In the figure, we have five classes which can be
 extracted with an explicit call to the <code class="highlighter-rouge">hist</code> function:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">counts</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">counts</span><span class="p">,</span> <span class="n">bins</span><span class="p">,</span> <span class="n">patches</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>The <code class="highlighter-rouge">counts</code> object captures how many observations each category in the classification has:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">counts</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">counts</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([17.,  9.,  3.,  1.,  2.])
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([17.,  9.,  3.,  1.,  2.])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>The <code class="highlighter-rouge">bin</code> object stores these break points we are interested in when considering classification schemes (the <code class="highlighter-rouge">patches</code> object can be ignored in this context, as it stores the geometries of the histogram plot):</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bins</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bins</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([ 1892. ,  5985.8, 10079.6, 14173.4, 18267.2, 22361. ])
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([ 1892. ,  5985.8, 10079.6, 14173.4, 18267.2, 22361. ])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>This yields 5 bins, with the first having a lower bound of 1892 and an upper
 bound of 5985.8 which contains 17 observations. 
@@ -1059,11 +1388,17 @@ classes being sparse. This is clearly the case in our income dataset, as the maj
 the values are placed into the first two classes leaving the last three classes
 rather sparse:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ei5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Equal_Interval</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ei5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Equal_Interval</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">ei5</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                Equal Interval                
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                Equal Interval                
  
   Lower              Upper               Count
 ==============================================
@@ -1072,7 +1407,11 @@ rather sparse:</p>
 10079.600 &lt; x[i] &lt;= 14173.400                3
 14173.400 &lt; x[i] &lt;= 18267.200                1
 18267.200 &lt; x[i] &lt;= 22361.000                2
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Note that each of the intervals, however, has equal width of
 $w=4093.8$. This value of $k=5$ also coincides with the default classification
@@ -1085,11 +1424,17 @@ class will have approximately $\mid\frac{n}{k}\mid$ observations using the quant
 classifier. If $k=5$ the sample quintiles are used to define the upper limits of
 each class resulting in the following classification:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">mx</span><span class="o">.</span><span class="n">PCGDP1940</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">mx</span><span class="o">.</span><span class="n">PCGDP1940</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">q5</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                  Quantiles                  
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                  Quantiles                  
  
   Lower              Upper              Count
 =============================================
@@ -1098,16 +1443,30 @@ each class resulting in the following classification:</p>
  4582.800 &lt; x[i] &lt;=  6925.200               6
  6925.200 &lt; x[i] &lt;=  9473.000               6
  9473.000 &lt; x[i] &lt;= 22361.000               7
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Note that while the numbers of values in each class are roughly equal, the
 widths of the first four intervals are rather different:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q5</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">q5</span><span class="o">.</span><span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">q5</span><span class="o">.</span><span class="n">bins</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">q5</span><span class="o">.</span><span class="n">bins</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([ 1006.6,  2342.4,  2547.8, 12888. ])
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([ 1006.6,  2342.4,  2547.8, 12888. ])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>While quantiles does avoid the pitfall of sparse classes, this classification is
 not problem free. The varying widths of the intervals can be markedly different
@@ -1127,11 +1486,17 @@ classes to have upper limits within one standard deviation ($c_{1}^u = \bar{x}-s
 = \bar{x}+2s$). Any values greater (smaller) than two standard deviations above (below) the mean
 are placed into the top (bottom) class.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">msd</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Std_Mean</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">])</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">msd</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Std_Mean</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">])</span>
 <span class="n">msd</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                   Std_Mean                   
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                   Std_Mean                   
  
   Lower              Upper               Count
 ==============================================
@@ -1140,7 +1505,11 @@ are placed into the top (bottom) class.</p>
  2025.578 &lt; x[i] &lt;= 12435.484               28
 12435.484 &lt; x[i] &lt;= 17640.437                0
 17640.437 &lt; x[i] &lt;= 22361.000                3
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>This classifier is best used when data is normally distributed or, at least, when the sample mean is a meaningful measure to anchor the classification around. Clearly this is
 not the case for our income data as the positive skew results in a loss of
@@ -1152,11 +1521,17 @@ vast majority of values in the middle class.</p>
 
 <p>The maximum breaks classifier decides where to set the break points between classes by considering the difference between sorted values. That is, rather than considering a value of the dataset in itself, it looks at how appart each value is from the next one in the sorted sequence. The classifier then places the the $k-1$ break points in between the $k$ values most stretched apart from each other in the entire sequence:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mb5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Maximum_Breaks</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mb5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Maximum_Breaks</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">mb5</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                Maximum_Breaks                
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                Maximum_Breaks                
  
   Lower              Upper               Count
 ==============================================
@@ -1165,7 +1540,11 @@ vast majority of values in the middle class.</p>
 11574.000 &lt; x[i] &lt;= 14974.000                1
 14974.000 &lt; x[i] &lt;= 19890.500                1
 19890.500 &lt; x[i] &lt;= 22361.000                2
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Maximum breaks is an appropriate approach when we are interested in making sure observations in each class are as similar to each other as possible. As such, it works well in cases where the distribution of values is not unimodal. In addition, the algorithm is relatively fast to compute. However, its simplicitly can sometimes cause unexpected results. To the extent in only considers the top $k$ differences between consecutive values, other more nuanced within-group differences and dissimilarities can be ignored.</p>
 
@@ -1178,11 +1557,17 @@ inter-quartile range; $h$ corresponds to the hinge, or the multiplier of the $IQ
 IQR$. Intermediate classes have their upper limits set to the 0.25, 0.50 and
 0.75 percentiles of the attribute values.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bp</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Box_Plot</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">])</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bp</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Box_Plot</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">])</span>
 <span class="n">bp</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                   Box Plot                  
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                   Box Plot                  
  
   Lower              Upper              Count
 =============================================
@@ -1192,7 +1577,11 @@ IQR$. Intermediate classes have their upper limits set to the 0.25, 0.50 and
  5256.000 &lt; x[i] &lt;=  8701.750               8
  8701.750 &lt; x[i] &lt;= 16201.750               5
 16201.750 &lt; x[i] &lt;= 22361.000               3
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Any values falling into either of the extreme classes are defined as outlers.
 Note that because the income values are non-negative by definition, the lower
@@ -1202,11 +1591,17 @@ not be possible for this sample.</p>
 <p>The default value for the hinge is $h=1.5$ in
 PySAL. However, this can be specified by the user for an alternative classification:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bp1</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Box_Plot</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">hinge</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bp1</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Box_Plot</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">hinge</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">bp1</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                   Box Plot                  
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                   Box Plot                  
  
   Lower              Upper              Count
 =============================================
@@ -1216,7 +1611,11 @@ PySAL. However, this can be specified by the user for an alternative classificat
  5256.000 &lt; x[i] &lt;=  8701.750               8
  8701.750 &lt; x[i] &lt;= 13701.750               5
 13701.750 &lt; x[i] &lt;= 22361.000               3
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Doing so will affect the definition of the outlier classes, as well as the
 neighboring internal classes.</p>
@@ -1229,11 +1628,17 @@ the classes no longer display a heavy-tailed distribution in the sense that
 there is a balance between the number of smaller and larger values assigned to
 each class.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ht</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">HeadTail_Breaks</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">])</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ht</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">HeadTail_Breaks</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">])</span>
 <span class="n">ht</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>               HeadTail_Breaks                
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>               HeadTail_Breaks                
  
   Lower              Upper               Count
 ==============================================
@@ -1242,7 +1647,11 @@ each class.</p>
 12244.417 &lt; x[i] &lt;= 20714.000                1
 20714.000 &lt; x[i] &lt;= 22163.000                1
 22163.000 &lt; x[i] &lt;= 22361.000                1
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>For data with a heavy-tailed distribution, such as power law and log normal
 distributions, the head tail breaks classifier (Jiang 2015) can be particularly
@@ -1261,12 +1670,18 @@ into the first quintile. The candidate move resulting in the largest reduction
 in the objective function would be made, and the process continues until no
 other improving moves are possible.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
 <span class="n">jc5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Jenks_Caspall</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">jc5</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                Jenks_Caspall                 
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                Jenks_Caspall                 
  
   Lower              Upper               Count
 ==============================================
@@ -1275,7 +1690,11 @@ other improving moves are possible.</p>
  4414.000 &lt; x[i] &lt;=  6399.000                5
  6399.000 &lt; x[i] &lt;= 12132.000               11
 12132.000 &lt; x[i] &lt;= 22361.000                3
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <h4 id="fisher-jenks">Fisher Jenks</h4>
 
@@ -1284,12 +1703,18 @@ the sum of the absolute deviations around class medians. In contrast to the
 Jenks-Caspall approach, Fisher-Jenks is guaranteed to produce an optimal
 classification for a prespecified number of classes:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
 <span class="n">fj5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Fisher_Jenks</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">fj5</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                 Fisher_Jenks                 
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                 Fisher_Jenks                 
  
   Lower              Upper               Count
 ==============================================
@@ -1298,7 +1723,11 @@ classification for a prespecified number of classes:</p>
  9073.000 &lt; x[i] &lt;= 12132.000                4
 12132.000 &lt; x[i] &lt;= 17816.000                1
 17816.000 &lt; x[i] &lt;= 22361.000                2
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <h4 id="max-p">Max-p</h4>
 
@@ -1308,11 +1737,17 @@ Jenks Caspall in that it considers greedy swapping between adjacent classes to
 improve the objective function. It is a heuristic, however, so unlike
 Fisher-Jenks, there is no optimial solution guaranteed:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mp5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Max_P_Classifier</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mp5</span> <span class="o">=</span> <span class="n">mapclassify</span><span class="o">.</span><span class="n">Max_P_Classifier</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s">'PCGDP1940'</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">mp5</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                    Max_P                     
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                    Max_P                     
  
   Lower              Upper               Count
 ==============================================
@@ -1321,7 +1756,11 @@ Fisher-Jenks, there is no optimial solution guaranteed:</p>
  5309.000 &lt; x[i] &lt;=  7990.000                5
  7990.000 &lt; x[i] &lt;= 10384.000                5
 10384.000 &lt; x[i] &lt;= 22361.000                5
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <h3 id="comparing-classification-schemes">Comparing Classification schemes</h3>
 
@@ -1350,15 +1789,25 @@ comparison of alternative classifiers for the same value of $k$.</p>
 
 <p>To see this, we can compare different classifiers for $k=5$ on the Mexico data:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">class5</span> <span class="o">=</span> <span class="n">q5</span><span class="p">,</span> <span class="n">ei5</span><span class="p">,</span> <span class="n">ht</span><span class="p">,</span> <span class="n">mb5</span><span class="p">,</span> <span class="n">msd</span><span class="p">,</span> <span class="n">fj5</span><span class="p">,</span> <span class="n">jc5</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">class5</span> <span class="o">=</span> <span class="n">q5</span><span class="p">,</span> <span class="n">ei5</span><span class="p">,</span> <span class="n">ht</span><span class="p">,</span> <span class="n">mb5</span><span class="p">,</span> <span class="n">msd</span><span class="p">,</span> <span class="n">fj5</span><span class="p">,</span> <span class="n">jc5</span>
 <span class="n">fits</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span> <span class="n">c</span><span class="o">.</span><span class="n">adcm</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class5</span><span class="p">])</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">fits</span><span class="p">)</span>
 <span class="n">data</span><span class="p">[</span><span class="s">'classifier'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class5</span><span class="p">]</span>
 <span class="n">data</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'ADCM'</span><span class="p">,</span> <span class="s">'Classifier'</span><span class="p">]</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s">'Classifier'</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s">'ADCM'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_39_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_39_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>As is to be expected, the Fisher-Jenks classifier dominates all other k=5
 classifiers with an ACDM of 23,729. Interestingly, the equal interval classifier
@@ -1374,19 +1823,31 @@ the alternative approaches. To do this we can add the class bin attribute (<code
 generated by the PySAL classifiers as additional columns in the data frame and
 present these jointly in a table:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span><span class="p">[</span><span class="s">'q540'</span><span class="p">]</span> <span class="o">=</span> <span class="n">q5</span><span class="o">.</span><span class="n">yb</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span><span class="p">[</span><span class="s">'q540'</span><span class="p">]</span> <span class="o">=</span> <span class="n">q5</span><span class="o">.</span><span class="n">yb</span>
 <span class="n">mx</span><span class="p">[</span><span class="s">'ei540'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ei5</span><span class="o">.</span><span class="n">yb</span>
 <span class="n">mx</span><span class="p">[</span><span class="s">'ht40'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ht</span><span class="o">.</span><span class="n">yb</span>
 <span class="n">mx</span><span class="p">[</span><span class="s">'mb540'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mb5</span><span class="o">.</span><span class="n">yb</span>
 <span class="n">mx</span><span class="p">[</span><span class="s">'msd40'</span><span class="p">]</span> <span class="o">=</span> <span class="n">msd</span><span class="o">.</span><span class="n">yb</span>
 <span class="n">mx</span><span class="p">[</span><span class="s">'fj540'</span><span class="p">]</span> <span class="o">=</span> <span class="n">fj5</span><span class="o">.</span><span class="n">yb</span>
 <span class="n">mx</span><span class="p">[</span><span class="s">'jc540'</span><span class="p">]</span> <span class="o">=</span> <span class="n">jc5</span><span class="o">.</span><span class="n">yb</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mxs</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'PCGDP1940'</span><span class="p">)</span>
-</code></pre></div></div>
+</div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">highlight_values</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mxs</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'PCGDP1940'</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">highlight_values</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">val</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">'background-color: </span><span class="si">%</span><span class="s">s'</span> <span class="o">%</span> <span class="s">'#ffffff'</span>
     <span class="k">elif</span> <span class="n">val</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
@@ -1399,13 +1860,22 @@ present these jointly in a table:</p>
         <span class="k">return</span> <span class="s">'background-color: </span><span class="si">%</span><span class="s">s'</span> <span class="o">%</span> <span class="s">'#62e4ff'</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="s">''</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">t</span> <span class="o">=</span> <span class="n">mxs</span><span class="p">[[</span><span class="s">'NAME'</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="s">'q540'</span><span class="p">,</span> <span class="s">'ei540'</span><span class="p">,</span> <span class="s">'ht40'</span><span class="p">,</span> <span class="s">'mb540'</span><span class="p">,</span> <span class="s">'msd40'</span><span class="p">,</span> <span class="s">'fj540'</span><span class="p">,</span> <span class="s">'jc540'</span><span class="p">]]</span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">t</span> <span class="o">=</span> <span class="n">mxs</span><span class="p">[[</span><span class="s">'NAME'</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="s">'q540'</span><span class="p">,</span> <span class="s">'ei540'</span><span class="p">,</span> <span class="s">'ht40'</span><span class="p">,</span> <span class="s">'mb540'</span><span class="p">,</span> <span class="s">'msd40'</span><span class="p">,</span> <span class="s">'fj540'</span><span class="p">,</span> <span class="s">'jc540'</span><span class="p">]]</span>
 <span class="n">t</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">applymap</span><span class="p">(</span><span class="n">highlight_values</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_html">
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
 <style type="text/css">
     #T_dd3aec68_8c7e_11e8_9d0d_a8667f2c8eafrow0_col2 {
             background-color:  #ffffff;
@@ -2225,6 +2695,10 @@ present these jointly in a table:</p>
 </table> 
 </div>
 
+    </div>
+  </div>
+</div>
+
 <p>Inspection of this table reveals a number of interesting results. First, the
 only Mexican state that is treated consistantly across the k=5 classifiers is
 Baja California Norte which is placed in the highest class by all classifiers.
@@ -2236,11 +2710,17 @@ class (2).</p>
 results by comparing the number of values assigned to each class across the
 different classifiers:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class5</span><span class="p">},</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">counts</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class5</span><span class="p">},</span>
                  <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'Class-{}'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)])</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_html">
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -2324,6 +2804,10 @@ different classifiers:</p>
 </div>
 </div>
 
+    </div>
+  </div>
+</div>
+
 <p>Doing so highlights the similarities between Fisher Jenks and equal intervals as
 the distribution counts are very similar as the two approaches agree on all 17
 states assigned to the first class. Indeed, the only observation that
@@ -2340,11 +2824,21 @@ distribution of the attribute values.</p>
 
 <p>Let us start by refreshing the <code class="highlighter-rouge">mx</code> object and exploring the base polygons for the Mexican states:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"../data/mexicojoin.shp"</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"../data/mexicojoin.shp"</span><span class="p">)</span>
 <span class="n">mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'blue'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'y'</span><span class="p">);</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_48_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_48_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>Prior to examining the attribute values it is important to note that the
 spatial units for these states are far from homogenous in their shapes and
@@ -2357,10 +2851,20 @@ statistical perspective.</p>
 <p>With this qualification in mind, we will explore the construction of choropleth
 maps using PySAL and the helper method <code class="highlighter-rouge">choropleth</code>:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'BuGn'</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'BuGn'</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_50_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_50_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>The default uses a quantile classification with k=5, together with a green color
 pallete where darker hues indicate higher class assignment for the attribute
@@ -2369,10 +2873,20 @@ values associated with each polygon.</p>
 <p>These defaults can be overriden in a
 number of ways, for example changing the colormap and number of quantiles:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_52_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_52_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>We will continue to use the <code class="highlighter-rouge">Blues</code>
 colormap in what follows in order to examine the spatial distribution revealed by
@@ -2391,46 +2905,101 @@ each of the k=5 classifiers:</p>
 
 <p><strong>DA-B NOTE</strong>: it would <em>really</em> nice to have a <code class="highlighter-rouge">mapclassify.plot</code> method to go from created classifications to choropleths in this context.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span>
            <span class="n">scheme</span><span class="o">=</span><span class="s">'equal_interval'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_54_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#choropleth(mx, 'PCGDP1940', cmap='Blues',</span>
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_54_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#choropleth(mx, 'PCGDP1940', cmap='Blues',</span>
 <span class="c">#           scheme='Std_Mean', k=5)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span>
            <span class="n">scheme</span><span class="o">=</span><span class="s">'maximum_breaks'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_56_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#choropleth(mx, 'PCGDP1940', cmap='Blues',</span>
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_56_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#choropleth(mx, 'PCGDP1940', cmap='Blues',</span>
 <span class="c">#           scheme='Box_Plot')</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#choropleth(mx, 'PCGDP1940', cmap='Blues', </span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#choropleth(mx, 'PCGDP1940', cmap='Blues', </span>
 <span class="c">#           scheme='headtail_breaks')</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
 <span class="c">#choropleth(mx, 'PCGDP1940', cmap='Blues',</span>
 <span class="c">#           scheme='jenks_caspall', k=5)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
 <span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'PCGDP1940'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span> 
            <span class="n">scheme</span><span class="o">=</span><span class="s">'fisher_jenks'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_60_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_60_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>We also note that geopandas can be used to do the plotting here, and we add some customization to the legend to report the upper bounds of each class:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### Fill in with example once `geopandas` is back in sync with PySAL 2.0</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">### Fill in with example once `geopandas` is back in sync with PySAL 2.0</span>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <h3 id="diverging-attributes">Diverging Attributes</h3>
 
@@ -2444,28 +3013,48 @@ to distinguish the low and high extremes.</p>
 income data we can derive a new variable which measures the change in a state’s
 rank in the income distribution between 1940 to 2000:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rnk</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c"># ascending ranks 1=high, n=lowest</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rnk</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span> <span class="c"># ascending ranks 1=high, n=lowest</span>
 <span class="n">rnk</span><span class="p">[</span><span class="s">'NAME'</span><span class="p">]</span><span class="o">=</span><span class="n">mx</span><span class="p">[</span><span class="s">'NAME'</span><span class="p">]</span>
 <span class="n">delta_rnk</span> <span class="o">=</span> <span class="n">rnk</span><span class="o">.</span><span class="n">PCGDP1940</span> <span class="o">-</span> <span class="n">rnk</span><span class="o">.</span><span class="n">PCGDP2000</span>
 <span class="n">delta_rnk</span>
 <span class="n">cls</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">delta_rnk</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
 <span class="n">cls</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([1, 1, 0, 2, 1, 2, 1, 1, 2, 3, 2, 2, 1, 1, 4, 3, 1, 1, 2, 2, 3, 1,
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([1, 1, 0, 2, 1, 2, 1, 1, 2, 3, 2, 2, 1, 1, 4, 3, 1, 1, 2, 2, 3, 1,
        2, 2, 2, 1, 0, 0, 2, 3, 2, 0])
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Here we have created four classes for the rank changes: [-inf, -5), [-5, 0), [0,
 5), [5, 20]. Note that these are descending ranks, so the wealthiest state in
 any period has a rank of 1 and therefore when considering the change in ranks, a
 negative change reflects moving down the income distribution.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">rkd</span><span class="o">=</span><span class="n">cls</span><span class="p">),</span> <span class="s">'rkd'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'RdYlBu'</span><span class="p">,</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">rkd</span><span class="o">=</span><span class="n">cls</span><span class="p">),</span> <span class="s">'rkd'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'RdYlBu'</span><span class="p">,</span>
            <span class="n">scheme</span><span class="o">=</span><span class="s">'equal_interval'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_66_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_66_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>Here the red (blue) hues are states that have moved downwards (upwards) in the
 income distribution, with the darker hue representing a larger movement.</p>
@@ -2476,25 +3065,45 @@ income distribution, with the darker hue representing a larger movement.</p>
 are on a nominal measurement scale. One of these is a region definition variable
 that groups individual states in contiguous clusters of similar characteristics:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span><span class="p">[</span><span class="s">'HANSON98'</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mx</span><span class="p">[</span><span class="s">'HANSON98'</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0    1.0
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0    1.0
 1    2.0
 2    2.0
 3    3.0
 4    2.0
 Name: HANSON98, dtype: float64
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>This regionalization scheme partions Mexico into 5 regions. A naive (and
 incorrect) way to display this would be to treat the region variable as
 sequential and use equal_inteval $k=5$ to display the regions:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'HANSON98'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'equal_interval'</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'HANSON98'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Blues'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'equal_interval'</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_71_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_71_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>This is not correct because the region variable is not on an interval scale, so
 the differences between the values have no quantitative significance but rather
@@ -2505,11 +3114,21 @@ than those in the north, as the color map implies an intensity gradient.</p>
 <p>A more appropriate visualization
 is to use a “qualitative” color palette:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'HANSON98'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Pastel1'</span><span class="p">,</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">choropleth</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="s">'HANSON98'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Pastel1'</span><span class="p">,</span>
            <span class="n">scheme</span><span class="o">=</span><span class="s">'equal_interval'</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/05_choropleth_73_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/05_choropleth_73_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <h2 id="conclusion">Conclusion</h2>
 
@@ -2550,15 +3169,15 @@ structure and dynamics.” <em>Cities</em>, 43: 69-77.</p>
               <nav class="c-page__nav">
   
     
-    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/book/notebooks/00_toc">
-      〈 <span class="u-margin-right-tiny"></span> Notebooks
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/book/intro_part_ii">
+      〈 <span class="u-margin-right-tiny"></span> Part II - Spatial Data Analysis
     </a>
   
 
   
     
-    <a id="js-page__nav__next" class="c-page__nav__next" href="/book/notebooks/06_global_autocorrelation">
-      Global Autocorrelation <span class="u-margin-right-tiny"></span> 〉
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/book/notebooks/06_spatial_autocorrelation">
+      Spatial Autocorrelation <span class="u-margin-right-tiny"></span> 〉
     </a>
   
 </nav>

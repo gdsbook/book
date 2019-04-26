@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
-  <title>Regression over space</title>
+  <title>Regression</title>
   <meta name="description" content="Spatial regression">
 
   <link rel="canonical" href="/book/book/notebooks/11_regression.html">
@@ -15,7 +15,7 @@
 
   <meta property="og:url"         content="/book/book/notebooks/11_regression.html" />
 <meta property="og:type"        content="article" />
-<meta property="og:title"       content="Regression over space" />
+<meta property="og:title"       content="Regression" />
 <meta property="og:description" content="Spatial regression" />
 <meta property="og:image"       content="" />
 
@@ -27,11 +27,11 @@
   "mainEntityOfPage":
     "/book/notebooks/11_regression.html",
   "headline":
-    "Regression over space",
+    "Regression",
   "datePublished":
-    "2019-03-06T12:14:23+00:00",
+    "2019-04-26T23:33:35+00:00",
   "dateModified":
-    "2019-03-06T12:14:23+00:00",
+    "2019-04-26T23:33:35+00:00",
   "description":
     "Spatial regression",
   "author": {
@@ -139,10 +139,40 @@ initFunction(function () {
   <meta name="turbolinks-cache-control" content="no-cache">
 
   <!-- Load nbinteract for widgets -->
-  <script src="https://unpkg.com/nbinteract-core" async></script>
+  
 
   <!-- Load Thebelab for interactive widgets -->
   <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+<!-- Display Thebelab button in each code cell -->
+<script>
+/**
+ * Set up thebelab button for code blocks
+ */
+
+const thebelabCellButton = id =>
+  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
+    <img src="/book/assets/images/edit-button.svg" alt="Start interactive mode">
+  </a>`
+
+
+const addThebelabButtonToCodeCells =  () => {
+
+  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("thebelab-cell-button-" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
+    }
+  })
+}
+
+initFunction(addThebelabButtonToCodeCells);
+</script>
+
+
 
 <script type="text/x-thebe-config">
     {
@@ -151,12 +181,15 @@ initFunction(function () {
         repo: 'gdsbook/geographic-data-science',
         ref: 'master',
       },
+      codeMirrorConfig: {
+        theme: ""
+      },
       kernelOptions: {
         name: 'python3',
       }
     }
 </script>
-<script src="https://unpkg.com/thebelab@0.3.3/lib/index.js"></script>
+<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
 <script>
     /**
      * Add attributes to Thebelab blocks
@@ -212,9 +245,9 @@ initFunction(function () {
             thebelab.bootstrap();
 
             // Remove copy buttons since they won't work anymore
-            const copyButtons = document.querySelectorAll('.copybtn')
-            copyButtons.forEach((copyButton, index) => {
-                copyButton.remove();
+            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
+            copyAndThebeButtons.forEach((button, index) => {
+                button.remove();
             });
 
             // Remove outputs since they'll be stale
@@ -225,18 +258,40 @@ initFunction(function () {
         }
 
         // Add event listener for the function to modify code cells
-        const thebelabButton = document.getElementById('interact-button-thebelab');
-        if (thebelabButton === null) {
-            setTimeout(initThebelab, 250)
-        return
-        };
-        thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
+        thebelabButtons.forEach((thebelabButton,index) => {
+            if (thebelabButton === null) {
+                setTimeout(initThebelab, 250)
+                return
+            };
+            thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        });
     }
 
     // Initialize Thebelab
     initFunction(initThebelab);
 </script>
 
+
+
+  <!-- Load the auto-generating TOC -->
+  <script src="/book/assets/js/tocbot.min.js"  type="text/javascript"></script>
+  <script>
+var initToc = function () {
+  tocbot.init({
+    tocSelector: 'nav.onthispage',
+    contentSelector: '.c-textbook__content',
+    headingSelector: 'h2, h3',
+    orderedList: false,
+    collapseDepth: 6,
+    listClass: 'toc__menu',
+    activeListItemClass: "",  // Not using
+    activeLinkClass: "", // Not using
+  });
+  tocbot.refresh();
+}
+initFunction(initToc);
+</script>
 
   <!-- Google analytics -->
   <script src="/book/assets/js/ga.js" async></script>
@@ -252,7 +307,7 @@ initFunction(function () {
 const codeCellId = index => `codecell${index}`
 
 const clipboardButton = id =>
-  `<a class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
     <img src="/book/assets/images/copy-button.svg" alt="Copy to clipboard">
   </a>`
 
@@ -280,11 +335,11 @@ const addCopyButtonToCodeCells = () => {
     return
   }
 
-  const codeCells = document.querySelectorAll('div.highlighter-rouge:not(.output) pre')
+  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
   codeCells.forEach((codeCell, index) => {
     const id = codeCellId(index)
     codeCell.setAttribute('id', id)
-    if (document.querySelector(`pre#${id} + a`) == null) {
+    if (document.getElementById("copy-button" + id) == null) {
       codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
     }
   })
@@ -308,6 +363,7 @@ const addCopyButtonToCodeCells = () => {
 initFunction(addCopyButtonToCodeCells);
 </script>
 
+
   <!-- Hide cell code -->
   
 <script>
@@ -319,7 +375,7 @@ Add buttons to hide code cells
 var setCodeCellVisibility = function(inputField, kind) {
     // Update the image and class for hidden
     var id = inputField.getAttribute('data-id');
-    var codeCell = document.querySelector(`#${id}`);
+    var codeCell = document.querySelector(`#${id} div.highlight`);
 
     if (kind === "visible") {
         codeCell.classList.remove('hidden');
@@ -357,18 +413,19 @@ var addHideButton = function () {
   }
 
   // Find the input cells and add a hide button
-  document.querySelectorAll('div.input_area div.highlight').forEach(function (item, index) {
-    if (!item.parentElement.classList.contains("hidecode")) {
+  document.querySelectorAll('div.input_area').forEach(function (item, index) {
+    if (!item.classList.contains("hidecode")) {
         // Skip the cell if it doesn't have a hidecode class
         return;
     }
 
     const id = codeCellId(index)
     item.setAttribute('id', id);
-    item.insertAdjacentHTML('afterend', hideCodeButton(id))
+    // Insert the button just inside the end of the next div
+    item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
 
     // Set up the visibility toggle
-    hideLink = document.querySelector(`#${id} + input + label`);
+    hideLink = document.querySelector(`#${id} div.highlight + input + label`);
     hideLink.addEventListener('click', toggleCodeCellVisibility)
   });
 }
@@ -639,7 +696,7 @@ initFunction(initQuery);
 
 
 <nav id="js-sidebar" class="c-textbook__sidebar">
-  <a href="https://jupyter.org/jupyter-book/intro.html"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
+  <a href="https://github.com/gdsbook/geographic-data-science"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
   <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
   <ul class="c-sidebar__chapters">
     
@@ -681,7 +738,129 @@ initFunction(initQuery);
           href="/book/notebooks/00_toc.html"
         >
           
-          Notebooks
+          Table of Contents
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/01_geospatial_computational_environment.html"
+                >
+                  
+                  Geospatial Computational Environment
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/02_spatial_data.html"
+                >
+                  
+                  Spatial Data
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/03_spatial_data_processing.html"
+                >
+                  
+                  Spatial Data Processing
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/04_spatial_weights.html"
+                >
+                  
+                  Spatial Weights
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
         </a>
 
         
@@ -703,7 +882,7 @@ initFunction(initQuery);
                   href="/book/notebooks/05_choropleth.html"
                 >
                   
-                  Choropleths
+                  Choropleth Mapping
                 </a>
 
                 
@@ -717,10 +896,10 @@ initFunction(initQuery);
 
               <li class="c-sidebar__section">
                 <a class="c-sidebar__entry "
-                  href="/book/notebooks/06_global_autocorrelation.html"
+                  href="/book/notebooks/06_spatial_autocorrelation.html"
                 >
                   
-                  Global Autocorrelation
+                  Spatial Autocorrelation
                 </a>
 
                 
@@ -737,7 +916,91 @@ initFunction(initQuery);
                   href="/book/notebooks/07_local_autocorrelation.html"
                 >
                   
-                  Local Autocorrelation
+                  Local Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/08_point_pattern_analysis.html"
+                >
+                  
+                  Point Pattern Analysis
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/09_spatial_inequality.html"
+                >
+                  
+                  Spatial Inequality
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/10_clustering_and_regionalization.html"
+                >
+                  
+                  Clustering & Regionalization
                 </a>
 
                 
@@ -754,7 +1017,24 @@ initFunction(initQuery);
                   href="/book/notebooks/11_regression.html"
                 >
                   
-                  Regression over space
+                  Regression
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/12_feature_engineering.html"
+                >
+                  
+                  Spatial Feature Engineering
                 </a>
 
                 
@@ -774,35 +1054,12 @@ initFunction(initQuery);
 </nav>
 
       
-      <!-- Shamelessly copied from minimal mistakes -->
-
-
-<!-- TOC will only show up if it has at least one item -->
-
-
-  <aside class="sidebar__right">
-    <nav class="onthispage">
-      <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
-      <ul class="toc__menu">
-  <li><a href="#what-is-spatial-regression-and-why-should-i-care">What is spatial regression and why should I care?</a></li>
-  <li><a href="#the-data-san-diego-airbnb">The Data: San Diego AirBnB</a></li>
-  <li><a href="#non-spatial-regression-a-very-quick-refresh">Non-spatial regression, a (very) quick refresh</a>
-    <ul>
-      <li><a href="#hidden-structures">Hidden Structures</a></li>
-    </ul>
-  </li>
-  <li><a href="#bringing-space-into-the-regression-framework">Bringing space into the regression framework</a>
-    <ul>
-      <li><a href="#spatial-feature-engineering">Spatial Feature Engineering</a></li>
-      <li><a href="#spatial-dependence">Spatial Dependence</a></li>
-      <li><a href="#challenge">Challenge</a></li>
-    </ul>
-  </li>
-</ul>
-    </nav>
-  </aside>
-
-
+      <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+      <aside class="sidebar__right">
+          <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
+          <nav class="onthispage">
+          </nav>
+      </aside>
       
       <main class="c-textbook__page" tabindex="-1">
           <div class="o-wrapper">
@@ -831,6 +1088,7 @@ initFunction(initQuery);
 
 
 
+
 <a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?urlpath=lab/tree/content%2Fnotebooks%2F11_regression.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/book/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
 
 
@@ -840,7 +1098,9 @@ initFunction(initQuery);
             <div class="c-textbook__content">
               <h1 id="spatial-regression">Spatial regression</h1>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 
 <span class="kn">from</span> <span class="nn">pysal.model</span> <span class="kn">import</span> <span class="n">spreg</span>
 <span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
@@ -853,7 +1113,10 @@ initFunction(initQuery);
 <span class="kn">import</span> <span class="nn">bookdata</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">import</span> <span class="nn">seaborn</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <h1 id="introduction">Introduction</h1>
 
@@ -891,11 +1154,16 @@ Thus, <em>regardless of whether or not the true process is explicitly geographic
 <p>To learn a little more about how regression works, we’ll examine some information about AirBnB in San Diego, CA. 
 This dataset contains house intrinsic characteristics, both continuous (number of beds as in <code class="highlighter-rouge">beds</code>) and categorical (type of renting or, in AirBnb jargon, property group as in the series of <code class="highlighter-rouge">pg_X</code> binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, <code class="highlighter-rouge">d2balboa</code> or neigbourhood id, <code class="highlighter-rouge">neighbourhood_cleansed</code>).</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">regression_airbnbs</span><span class="p">())</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">regression_airbnbs</span><span class="p">())</span>
 <span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
 RangeIndex: 6110 entries, 0 to 6109
 Data columns (total 20 columns):
 accommodates          6110 non-null int64
@@ -920,16 +1188,23 @@ rt_Shared_room        6110 non-null int64
 geometry              6110 non-null object
 dtypes: float64(6), int64(12), object(2)
 memory usage: 954.8+ KB
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>These are the explanatory variables we will use throughout the chapter.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'accommodates'</span><span class="p">,</span> <span class="s">'bathrooms'</span><span class="p">,</span> <span class="s">'bedrooms'</span><span class="p">,</span> 
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'accommodates'</span><span class="p">,</span> <span class="s">'bathrooms'</span><span class="p">,</span> <span class="s">'bedrooms'</span><span class="p">,</span> 
                   <span class="s">'beds'</span><span class="p">,</span> <span class="s">'rt_Private_room'</span><span class="p">,</span> <span class="s">'rt_Shared_room'</span><span class="p">,</span>
                   <span class="s">'pg_Condominium'</span><span class="p">,</span> <span class="s">'pg_House'</span><span class="p">,</span> 
                   <span class="s">'pg_Other'</span><span class="p">,</span> <span class="s">'pg_Townhouse'</span><span class="p">]</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <h2 id="non-spatial-regression-a-very-quick-refresh">Non-spatial regression, a (very) quick refresh</h2>
 
@@ -947,18 +1222,28 @@ memory usage: 954.8+ KB
 
 <p>Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. <code class="highlighter-rouge">statsmodels</code>, <code class="highlighter-rouge">scikit-learn</code>, <code class="highlighter-rouge">PySAL</code>). In the context of this chapter, it makes sense to start with <code class="highlighter-rouge">PySAL</code> as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with $X$ as the list defined, we only need the following line of code:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m1</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m1</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
                 <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>We use the command <code class="highlighter-rouge">OLS</code>, part of the <code class="highlighter-rouge">spreg</code> sub-package, and specify the dependent variable (the log of the price, so we can interpret results in terms of percentage change) and the explanatory ones. Note that both objects need to be arrays, so we extract them from the <code class="highlighter-rouge">pandas.DataFrame</code> object using <code class="highlighter-rouge">.values</code>.</p>
 
 <p>In order to inspect the results of the model, we can call <code class="highlighter-rouge">summary</code>:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES
 -----------------------------------------
@@ -1004,8 +1289,10 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               10         322.532           0.0000
 Koenker-Bassett test             10         135.581           0.0000
 ================================ END OF REPORT =====================================
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>A full detailed explanation of the output is beyond the scope of this chapter, so we will focus on the relevant bits for our main purpose. This is concentrated on the <code class="highlighter-rouge">Coefficients</code> section, which gives us the estimates for $\beta_k$ in our model. In other words, these numbers express the relationship between each explanatory variable and the dependent one, once the effect of confounding factors has been accounted for. Keep in mind however that regression is no magic; we are only discounting the effect of confounding factors that we include in the model, not of <em>all</em> potentially confounding factors.</p>
 
@@ -1021,7 +1308,9 @@ To examine this, we first might want to split our data up by regions and see if 
 One reasonable theory might be that our model does not include any information about <em>beaches</em>, a critical aspect of why people live and vacation in San Diego. 
 Therefore, we might want to see whether or not our errors are higher or lower depending on whether or not an airbnb is in a “beach” neighborhood, a neighborhood near the ocean:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">is_coastal</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">coastal</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">is_coastal</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">coastal</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
 <span class="n">coastal</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">is_coastal</span><span class="p">]</span>
 <span class="n">not_coastal</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">~</span><span class="n">is_coastal</span><span class="p">]</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Coastal'</span><span class="p">)</span>
@@ -1030,20 +1319,38 @@ Therefore, we might want to see whether or not our errors are higher or lower de
 <span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">":"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_11_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_11_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>While it appears that the neighborhoods on the coast have only slightly higher average errors (and have lower variance in their prediction errors), the two distributions are significantly distinct from one another when compared using a classic $t$ test:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> 
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> 
              <span class="n">not_coastal</span><span class="p">,</span>
 <span class="c">#             permutations=9999 not yet available in scipy</span>
              <span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Ttest_indResult(statistic=array([13.98193858]), pvalue=array([9.442438e-44]))
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Ttest_indResult(statistic=array([13.98193858]), pvalue=array([9.442438e-44]))
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>There are more sophisticated (and harder to fool) tests that may be applicable for this data, however. We cover them in the <a href="#Challenge">Challenge</a> section.</p>
 
@@ -1053,7 +1360,9 @@ For us to determine whether this is the case, we might be interested in the full
 
 <p>To make this more clear, we’ll first sort the data by the median residual in that neighborhood, and then make a box plot, which shows the distribution of residuals in each neighborhood:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'residual'</span><span class="p">]</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'residual'</span><span class="p">]</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span>
 <span class="n">medians</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">"neighborhood"</span><span class="p">)</span><span class="o">.</span><span class="n">residual</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s">'hood_residual'</span><span class="p">)</span>
 
 <span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
@@ -1065,9 +1374,17 @@ For us to determine whether this is the case, we might be interested in the full
                    <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'hood_residual'</span><span class="p">),</span> <span class="n">palette</span><span class="o">=</span><span class="s">'bwr'</span><span class="p">)</span>
 <span class="n">f</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_16_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_16_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>No neighborhood is disjoint from one another, but some do appear to be higher than others, such as the well-known downtown tourist neighborhoods areas of the Gaslamp Quarter, Little Italy, or The Core. 
 Thus, there may be a distinctive effect of intangible neighborhood fashionableness that matters in this model.</p>
@@ -1081,20 +1398,35 @@ One exceptionally simple way we can look into this structure is by examining the
 We cover spatial weights in detail in another chapter, so we will not repeat ourselves here.
 For this example, we’ll start off with a $KNN$ matrix where $k=1$, meaning we’re focusing only on the linkages of each airbnb to their closest other listing.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">Distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">Distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>This means that, when we compute the <em>spatial lag</em> of that knn weight and the residual, we get the residual of the airbnb listing closest to each observation.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
                      <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'orangered'</span><span class="p">),</span>
                      <span class="n">ci</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'Model Residuals - $u$'</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'Spatial Lag of Model Residuals - $W u$'</span><span class="p">);</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_20_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_20_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>In this plot, we see that our prediction errors tend to cluster!
 Above, we show the relationship between our prediction error at each site and the prediction error at the site nearest to it. 
@@ -1108,7 +1440,9 @@ Consult the <a href="#Challenge">Challenge</a> section for more on this property
 Examining the relationship between this stable <em>surrounding</em> average and the focal Airbnb, we can even find clusters in our model error. 
 Recalling the <em>local Moran</em> statistics, we can identify certain areas where our predictions of the nightly (log) Airbnb price tend to be significantly off:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span><span class="o">.</span><span class="n">reweight</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span><span class="o">.</span><span class="n">reweight</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="n">outliers</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">knn</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">9999</span><span class="p">)</span>
 <span class="n">error_clusters</span> <span class="o">=</span> <span class="p">(</span><span class="n">outliers</span><span class="o">.</span><span class="n">q</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="c"># only the cluster cores</span>
 <span class="n">error_clusters</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">outliers</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;=</span> <span class="o">.</span><span class="mo">001</span><span class="p">)</span> <span class="c"># filtering out non-significant clusters</span>
@@ -1117,9 +1451,17 @@ Recalling the <em>local Moran</em> statistics, we can identify certain areas whe
   <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">"error_clusters"</span><span class="p">)</span>\
   <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'local_I'</span><span class="p">)</span>\
   <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'local_I'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'bwr'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">);</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_23_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_23_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>Thus, these areas tend to be locations where our model significantly underpredicts the nightly airbnb price both for that specific observation and observations in its immediate surroundings. 
 This is critical since, if we can identify how these areas are structured — if they have a <em>consistent geography</em> that we can model — then we might make our predictions even better, or at least not systematically mis-predict prices in some areas while correctly predicting prices in other areas.</p>
@@ -1155,28 +1497,58 @@ Indeed, this heterogeneity can have a large impact on how a process is understoo
 
 <p>Therefore, this is sometimes called a <em>spatially-patterned omitted covariate</em>: geographic information our model needs to make good precitions which we have left out of our model. Therefore, let’s build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize the structure of this distance covariate itself:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'d2balboa'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'d2balboa'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ccc31d0&gt;
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_26_1.png" alt="png" /></p>
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ccc31d0&gt;
+</code></pre></div>      </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">base_names</span> <span class="o">=</span> <span class="n">variable_names</span>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_26_1.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">base_names</span> <span class="o">=</span> <span class="n">variable_names</span>
 <span class="n">balboa_names</span> <span class="o">=</span> <span class="n">variable_names</span> <span class="o">+</span> <span class="p">[</span><span class="s">'d2balboa'</span><span class="p">]</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m2</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">balboa_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m2</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">balboa_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
                   <span class="n">name_y</span> <span class="o">=</span> <span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span> <span class="o">=</span> <span class="n">balboa_names</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>Unfortunately, when you inspect the regression diagnostics and output, you see that this covariate is not quite as helpful as we might anticipate. It is not statistically significant at conventional significance levels, the model fit does not substantially change:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES
 -----------------------------------------
@@ -1223,18 +1595,30 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               11         317.519           0.0000
 Koenker-Bassett test             11         132.860           0.0000
 ================================ END OF REPORT =====================================
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>And, there still appears to be spatial structure in our model’s errors:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
                 <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'orangered'</span><span class="p">),</span>
                 <span class="n">ci</span><span class="o">=</span><span class="bp">None</span><span class="p">);</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_32_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_32_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is <em>positive</em>, meaning that people are paying a premium to be <em>further</em> from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this.</p>
 
@@ -1251,23 +1635,35 @@ Koenker-Bassett test             11         132.860           0.0000
 <p>Programmatically, we will show two different ways can estimate this: one,
 using <code class="highlighter-rouge">statsmodels</code>; and two, with <code class="highlighter-rouge">PySAL</code>. First, we will use <code class="highlighter-rouge">statsmodels</code>. This package provides a formula-like API, which allows us to express the <em>equation</em> we wish to estimate directly:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span> <span class="o">=</span> <span class="s">'log_price ~ '</span> <span class="o">+</span> <span class="s">' + '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variable_names</span><span class="p">)</span> <span class="o">+</span> <span class="s">' + neighborhood - 1'</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span> <span class="o">=</span> <span class="s">'log_price ~ '</span> <span class="o">+</span> <span class="s">' + '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variable_names</span><span class="p">)</span> <span class="o">+</span> <span class="s">' + neighborhood - 1'</span>
 <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>log_price ~ accommodates + bathrooms + bedrooms + beds + rt_Private_room + rt_Shared_room + pg_Condominium + pg_House + pg_Other + pg_Townhouse + neighborhood - 1
-
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>log_price ~ accommodates + bathrooms + bedrooms + beds + rt_Private_room + rt_Shared_room + pg_Condominium + pg_House + pg_Other + pg_Townhouse + neighborhood - 1
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>The <em>tilde</em> operator in this statement is usually read as “log price is a function of …”, to account for the fact that many different model specifications can be fit according to that functional relationship between <code class="highlighter-rouge">log_price</code> and our covariate list. Critically, note that the trailing <code class="highlighter-rouge">-1</code> term means that we are fitting this model without an intercept term. This is necessary, since including an intercept term alongside unique means for every neighborhood would make the underlying system of equations underspecified.</p>
 
 <p>Using this expression, we can estimate the unique effects of each neighborhood, fitting the model in <code class="highlighter-rouge">statsmodels</code>:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m3</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m3</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
 <span class="k">print</span><span class="p">(</span><span class="n">m3</span><span class="o">.</span><span class="n">summary2</span><span class="p">())</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                           Results: Ordinary least squares
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                           Results: Ordinary least squares
 ======================================================================================
 Model:                      OLS                    Adj. R-squared:           0.709    
 Dependent Variable:         log_price              AIC:                      7229.6640
@@ -1341,23 +1737,30 @@ Skew:                      0.989                Prob(JB):                     0.
 Kurtosis:                  6.500                Condition No.:                132     
 ======================================================================================
 
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>The approach above shows how spatial FE are a particular case of a linear regression with a categorical  variable. Neighborhood membership is modeled using binary dummy variables. Thanks to the formula grammar used in <code class="highlighter-rouge">statsmodels</code>, we can express the model abstractly, and Python parses it, appropriately creating binary variables as required.</p>
 
 <p>The second approach leverages <code class="highlighter-rouge">PySAL</code> Regimes functionality, which allows the user to specify which variables are to be estimated separately for each “regime”. In this case however, instead of describing the model in a formula, we need to pass each element of the model as separate arguments.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># PySAL implementation</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># PySAL implementation</span>
 <span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
                        <span class="n">db</span><span class="p">[</span><span class="s">'neighborhood'</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
                        <span class="n">constant_regi</span><span class="o">=</span><span class="s">'many'</span><span class="p">,</span> <span class="n">cols2regi</span><span class="o">=</span><span class="p">[</span><span class="bp">False</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">variable_names</span><span class="p">),</span>
                        <span class="n">regime_err_sep</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                        <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">m4</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES - REGIMES
 ---------------------------------------------------
@@ -1453,8 +1856,10 @@ REGIMES DIAGNOSTICS - CHOW TEST
                  CONSTANT        44         913.016           0.0000
               Global test        44         913.016           0.0000
 ================================ END OF REPORT =====================================
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>Econometrically speaking, what the neighborhood FEs we have introduced imply is that, instead of comparing all house prices across San Diego as equal, we only derive variation from within each postcode. Remember that the interpretation of $\beta_k$ is the effect of variable $k$, <em>given all the other explanatory variables included remain constant</em>. By including a single variable for each area, we are effectively forcing the model to compare as equal only house prices that share the same value for each variable; or, in other words, only houses located within the same area. Introducing FE affords a higher degree of isolation of the effects of the variables we introduce in the model because we can control for unobserved effects that align spatially with the distribution of the FE introduced (by postcode, in our case).</p>
 
@@ -1462,27 +1867,43 @@ REGIMES DIAGNOSTICS - CHOW TEST
 
 <p>First, we extract only the effects pertaining to the neighborhoods:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neighborhood_effects</span> <span class="o">=</span> <span class="n">m3</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="nb">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s">'neighborhood'</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neighborhood_effects</span> <span class="o">=</span> <span class="n">m3</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="nb">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s">'neighborhood'</span><span class="p">)</span>
 <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>neighborhood[Balboa Park]          4.280766
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>neighborhood[Balboa Park]          4.280766
 neighborhood[Bay Ho]               4.198251
 neighborhood[Bay Park]             4.329223
 neighborhood[Carmel Valley]        4.389261
 neighborhood[City Heights West]    4.053518
 dtype: float64
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Then, we need to extract just the neighborhood name from the index of this Series. A simple way to do this is to strip all the characters that come before and after our neighborhood names:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stripped</span> <span class="o">=</span> <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">'neighborhood['</span><span class="p">)</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">']'</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stripped</span> <span class="o">=</span> <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">'neighborhood['</span><span class="p">)</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">']'</span><span class="p">)</span>
 <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">stripped</span>
 <span class="n">neighborhood_effects</span> <span class="o">=</span> <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s">'fixed_effect'</span><span class="p">)</span>
 <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_html">
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1530,20 +1951,39 @@ dtype: float64
 </div>
 </div>
 
+    </div>
+  </div>
+</div>
+
 <p>Good, we’re back to our raw neighborhood names. Now, we can join them back up with the neighborhood shapes:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neighborhoods</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">san_diego_neighborhoods</span><span class="p">())</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neighborhoods</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">san_diego_neighborhoods</span><span class="p">())</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">neighborhood_effects</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">,</span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">neighborhood_effects</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">,</span>
                     <span class="n">left_on</span><span class="o">=</span><span class="s">'neighbourhood'</span><span class="p">,</span> 
                     <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'fixed_effect'</span><span class="p">,</span>
                                            <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"San Diego Neighborhood Fixed Effects"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_46_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_46_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <h4 id="spatial-regimes">Spatial Regimes</h4>
 
@@ -1557,15 +1997,20 @@ dtype: float64
 
 <p>To implement this in Python, we use the <code class="highlighter-rouge">OLS_Regimes</code> class in <code class="highlighter-rouge">PySAL</code>, which does most of the heavy lifting for us:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
                           <span class="n">db</span><span class="p">[</span><span class="s">'coastal'</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
                           <span class="n">constant_regi</span><span class="o">=</span><span class="s">'many'</span><span class="p">,</span>
                           <span class="n">regime_err_sep</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
                           <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">m4</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES - REGIMES
 ---------------------------------------------------
@@ -1638,8 +2083,10 @@ REGIMES DIAGNOSTICS - CHOW TEST
            rt_Shared_room         1           3.309           0.0689
               Global test        11         328.869           0.0000
 ================================ END OF REPORT =====================================
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <h3 id="spatial-dependence">Spatial Dependence</h3>
 
@@ -1690,22 +2137,32 @@ we can calculate the spatial lag of each variable whose name starts by <code cla
 by first creating a list of all of those names, and then applying <code class="highlighter-rouge">PySAL</code>’s
 <code class="highlighter-rouge">lag_spatial</code> to each of them:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">variable_names</span> <span class="k">if</span> <span class="s">'pg_'</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">variable_names</span> <span class="k">if</span> <span class="s">'pg_'</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
 <span class="n">wx</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">wx</span><span class="p">]</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>\
            <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s">'w_'</span><span class="o">+</span><span class="n">c</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>Once computed, we can run the model using OLS estimation because, in this
 context, the spatial  lags included do not violate any of the assumptions OLS
 relies on (they are essentially additional exogenous variables):</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
                   <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wx</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
                   <span class="n">name_y</span><span class="o">=</span><span class="s">'l_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="o">+</span><span class="n">wx</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 <span class="k">print</span><span class="p">(</span><span class="n">m5</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES
 -----------------------------------------
@@ -1755,8 +2212,10 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               14         393.052           0.0000
 Koenker-Bassett test             14         169.585           0.0000
 ================================ END OF REPORT =====================================
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>The way to interpret the table of results is similar to that of any other
 non-spatial regression. The variables we included in the original regression
@@ -1789,12 +2248,17 @@ advanced techniques developed by the literature on spatial econometrics. For
 example, we can use a general method of moments that account for 
 heterogeneity (Arraiz et al., 2010):</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m6</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Error_Het</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m6</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Error_Het</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
                            <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">m6</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
 ----------
 SUMMARY OF OUTPUT: SPATIALLY WEIGHTED LEAST SQUARES (HET)
 ---------------------------------------------------------
@@ -1823,8 +2287,10 @@ N. of iterations    :           1                Step1c computed       :        
               lambda       0.6448728       0.0186626      34.5543740       0.0000000
 ------------------------------------------------------------------------------------
 ================================ END OF REPORT =====================================
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <h4 id="spatial-lag">Spatial Lag</h4>
 
@@ -1843,12 +2309,17 @@ use a two-stage least squares estimation (Anselin, 1988), where the spatial
 lag of all the explanatory variables is used as instrument for the endogenous
 lag:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m7</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Lag</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m7</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Lag</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
                      <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">m7</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
 ----------
 SUMMARY OF OUTPUT: SPATIAL TWO STAGE LEAST SQUARES
 --------------------------------------------------
@@ -1881,8 +2352,10 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
              W_pg_Condominium, W_pg_House, W_pg_Other, W_pg_Townhouse,
              W_rt_Private_room, W_rt_Shared_room
 ================================ END OF REPORT =====================================
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <h4 id="other-ways-of-bringing-space-into-regression">Other ways of bringing space into regression</h4>
 
@@ -1899,7 +2372,9 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
 
 <p>Below, the black lines represent our simulations, and the colored patches below them represents the observed distribution of residuals. If the black lines tend to be on the left of the colored patch, then, the simulations (where prediction error is totally random with respect to our categories of “coastal” and “not coastal”) tend to have more negative residuals than our actual model. If the black lines tend to be on the right, then they tend to have more positive residuals. As a refresher, positive residuals mean that our model is underpredicting, and negative residuals mean that our model is overpredicting. Below, our simulations provide direct evidence for the claim that our model may be systematically underpredicting coastal price and overpredicting non-coastal prices.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">n_simulations</span> <span class="o">=</span> <span class="mi">100</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">n_simulations</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> 
            <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Coastal'</span><span class="p">,</span> 
@@ -1931,9 +2406,17 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
 <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_60_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_60_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <h4 id="the-k-neighbor-correlogram">The K-neighbor correlogram</h4>
 
@@ -1945,7 +2428,9 @@ This main idea is central to the geostatistical concept, the <em>correlogram</em
 If what we observe is substantially different from what emerges when neighbors are random, then the structure of the neighbors embeds a structure in the residuals. 
 We won’t spend too much time on this theory specifically, but we can quickly and efficiently compute the correlation between our observed residuals and the spatial lag of an increasing $k$-nearest neighbor set:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">correlations</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">correlations</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">nulls</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
     <span class="n">knn</span><span class="o">.</span><span class="n">reweight</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c">#operates in place, quickly and efficiently avoiding copies</span>
@@ -1955,9 +2440,14 @@ We won’t spend too much time on this theory specifically, but we can quickly a
     <span class="n">random_lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">random_residual</span><span class="p">)</span> <span class="c"># identical to random neighbors in KNN </span>
     <span class="n">correlations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">nulls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">random_lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">correlations</span><span class="p">)</span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">correlations</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">nulls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'orangered'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">correlations</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]),</span><span class="o">*</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(),</span><span class="n">linestyle</span><span class="o">=</span><span class="s">':'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nulls</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]),</span><span class="o">*</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(),</span><span class="n">linestyle</span><span class="o">=</span><span class="s">':'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">)</span>
@@ -1966,9 +2456,17 @@ We won’t spend too much time on this theory specifically, but we can quickly a
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'$K$: number of nearest neighbors'</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">"Correlation between site </span><span class="se">\n</span><span class="s"> and neighborhood average of size $K$"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/11_regression_63_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/11_regression_63_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>Clearly, the two curves are different. The observed correlation reaches a peak around $r=.34$ when around 20 nearest listings are used. This means that adding more than 20 nearest neighbors does not significantly change the correlation in the residuals. Further, the lowest correlation is for the single nearest neighbor, and correlation rapidly increases as more neighbors are added close to the listing. Thus, this means that there does appear to be an unmeasured spatial structure in the residuals, since they are more similar to one another when they are near than when they are far apart. Further, while it’s not shown here (since computationally, it becomes intractable), as the number of nearest neighbors gets very large (approaching the number of observations in the dataset), the average of the $k$th nearest neighbors’ residuals goes to zero, the global average of residuals. This means that the correlation of the residuals and a vector that is nearly constant begins to approach zero.</p>
 
@@ -1999,15 +2497,15 @@ This means that our over- and under-predictions are likely to cluster.</p>
               <nav class="c-page__nav">
   
     
-    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/book/notebooks/07_local_autocorrelation">
-      〈 <span class="u-margin-right-tiny"></span> Local Autocorrelation
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/book/notebooks/10_clustering_and_regionalization">
+      〈 <span class="u-margin-right-tiny"></span> Clustering & Regionalization
     </a>
   
 
   
     
-    <a id="js-page__nav__next" class="c-page__nav__next" href="">
-       <span class="u-margin-right-tiny"></span> 〉
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/book/notebooks/12_feature_engineering">
+      Spatial Feature Engineering <span class="u-margin-right-tiny"></span> 〉
     </a>
   
 </nav>

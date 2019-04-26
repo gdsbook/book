@@ -5,7 +5,7 @@ prev_page:
   title: ''
 next_page:
   url: /notebooks/00_toc
-  title: 'Notebooks'
+  title: 'Table of Contents'
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 # Geographic Data Science with Python
