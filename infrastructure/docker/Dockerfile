@@ -34,10 +34,23 @@ RUN cd /home/$NB_USER/testbook \
  && gem install bundler -v 1.17.2 \
  && bundle install
 
+# JupyText
+
+RUN pip install jupytext --upgrade
+USER root
+RUN jupyter nbextension install --py jupytext \
+ && jupyter nbextension enable --py jupytext \
+ && jupyter labextension install jupyterlab-jupytext
+USER $NB_UID
+RUN echo "c.NotebookApp.contents_manager_class = "\
+         "'jupytext.TextFileContentsManager'" \
+ >> /home/$NB_USER/.jupyter/jupyter_notebook_config.py
+
 # Clean up
 RUN rm -rf $GEM_HOME/cache \
-    rm -rf /usr/local/bundle/cache \
-    rm -r /home/$NB_USER/testbook
+ && rm -rf /usr/local/bundle/cache \
+ && rm -r /home/$NB_USER/testbook \
+ && conda clean -tipsy
 
 EXPOSE 4000
 

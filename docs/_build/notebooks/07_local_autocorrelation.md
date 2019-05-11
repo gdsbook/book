@@ -3,13 +3,14 @@ redirect_from:
   - "/notebooks/07-local-autocorrelation"
 interact_link: content/notebooks/07_local_autocorrelation.ipynb
 kernel_name: python3
-title: 'Local Autocorrelation'
+has_widgets: false
+title: 'Local Spatial Autocorrelation'
 prev_page:
-  url: /notebooks/06_global_autocorrelation
-  title: 'Global Autocorrelation'
+  url: /notebooks/06_spatial_autocorrelation
+  title: 'Spatial Autocorrelation'
 next_page:
-  url: /notebooks/11_regression
-  title: 'Regression over space'
+  url: /notebooks/08_point_pattern_analysis
+  title: 'Point Pattern Analysis'
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 
@@ -26,9 +27,8 @@ Moran's I is good tool to summarize a dataset into a single value that informs a
 
 We continue with the same dataset we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # Display graphics within the notebook
 %matplotlib inline
@@ -47,18 +47,21 @@ import bookdata
 from booktools import choropleth
 
 ```
+</div>
 
+</div>
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 ref = pandas.read_csv(bookdata.brexit(), index_col='Area_Code')
 ref.info()
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 <class 'pandas.core.frame.DataFrame'>
 Index: 382 entries, E06000031 to E08000036
@@ -85,22 +88,25 @@ Pct_Leave                  382 non-null float64
 Pct_Rejected               382 non-null float64
 dtypes: float64(4), int64(13), object(3)
 memory usage: 62.7+ KB
-
 ```
+</div>
+</div>
+</div>
 
 Now let us bring in the spatial data:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 lads = geopandas.read_file(bookdata.lads())\
                 .set_index('lad16cd')
 lads.info()
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 <class 'geopandas.geodataframe.GeoDataFrame'>
 Index: 391 entries, E06000001 to W06000023
@@ -117,14 +123,15 @@ st_lengths    391 non-null float64
 geometry      391 non-null object
 dtypes: float64(4), int64(3), object(3)
 memory usage: 33.6+ KB
-
 ```
+</div>
+</div>
+</div>
 
 And to "trim" the `DataFrame` so it only retains what we know we will need:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db = geopandas.GeoDataFrame(lads.join(ref[['Pct_Leave']]), crs=lads.crs)\
               .to_crs(epsg=3857)\
@@ -132,9 +139,11 @@ db = geopandas.GeoDataFrame(lads.join(ref[['Pct_Leave']]), crs=lads.crs)\
               .dropna()
 db.info()
 ```
+</div>
 
-
-{:.output .output_stream}
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
+{:.output_stream}
 ```
 <class 'geopandas.geodataframe.GeoDataFrame'>
 Index: 380 entries, E06000001 to W06000023
@@ -145,34 +154,38 @@ Pct_Leave    380 non-null float64
 geometry     380 non-null object
 dtypes: float64(1), int64(1), object(2)
 memory usage: 14.8+ KB
-
 ```
+</div>
+</div>
+</div>
 
 Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes for the Leave alternative. For convenience, let us merge this with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), which will allow us to combine them with contextual tiles.
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 lads.crs
 ```
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
-
-
-
-{:.output .output_data_text}
+{:.output_data_text}
 ```
 {'init': 'epsg:4326'}
 ```
 
 
+</div>
+</div>
+</div>
 
 Throughout the chapter, we will rely heavily on geovisualizations. To create more useful maps that bring geographical context to the spatial distribution of votes, we will use an image made up of tiles from a web map. Let us first download it on-the-fly. The image will be reused later on in several maps.
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # Bounding box of the polygon layer
 we, so, ea, no = db.total_bounds
@@ -183,13 +196,14 @@ img, ext = contextily.bounds2img(we, so, ea, no, 6,
 lic = ("Map tiles by Stamen Design, under CC BY 3.0. "\
                "Data by OpenStreetMap, under ODbL.")
 ```
+</div>
 
+</div>
 
 And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
 ax.imshow(img, extent=ext, alpha=0.5)
@@ -198,26 +212,31 @@ choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
 plt.text(ext[0],ext[2], lic, size=8)
 ax.set_axis_off()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/07_local_autocorrelation_14_0.png)
 
-
+</div>
+</div>
+</div>
 
 The final piece we need before we can delve into spatial autocorrelation is the spatial weights matrix. We will use eight nearest neighbors for the sake of comparison with the previous chapter. We also row-standardize the weights:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # Generate W from the GeoDataFrame
 w = weights.Distance.KNN.from_dataframe(db, k=8)
 # Row-standardization
 w.transform = 'R'
 ```
+</div>
 
+</div>
 
 **Should we adopt some scheme so as to refer to earlier chapters, as in the case of maps and weights here to improve the flow of the book and reduce any repetition of basic tasks?**
 
@@ -225,32 +244,33 @@ w.transform = 'R'
 
 To better understand the underpinning of local autorocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db['w_Pct_Leave'] = weights.spatial_lag.lag_spatial(w, db['Pct_Leave'])
 ```
+</div>
 
+</div>
 
 And their respective standardized versions, where we substract the average and divide by the standard deviation:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )\
                     / db['Pct_Leave'].std()
 db['w_Pct_Leave_std'] = ( db['w_Pct_Leave'] - db['w_Pct_Leave'].mean() )\
                     / db['w_Pct_Leave'].std()
 ```
+</div>
 
+</div>
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
@@ -259,13 +279,17 @@ seaborn.regplot(x='Pct_Leave_std', y='w_Pct_Leave_std', data=db, ci=None)
 # Display
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/07_local_autocorrelation_23_0.png)
 
-
+</div>
+</div>
+</div>
 
 Using standardised values allows us to divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: above and below the average. This, in turn, divides a Moran Plot in four quadrants, depending on whether a given area displays a value above the mean (high) or below (low), and how its spatial lag behaves:
 
@@ -276,9 +300,8 @@ Using standardised values allows us to divide each variable (the percentage that
 
 Graphically, this can be captured as follows:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
@@ -295,13 +318,17 @@ plt.text(-1.5, -1.5, "LL", fontsize=25)
 # Display
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/07_local_autocorrelation_25_0.png)
 
-
+</div>
+</div>
+</div>
 
 ### Local Moran's I
 
@@ -321,39 +348,45 @@ LISAs are widely used in many fields to identify clusters of values in space. Th
 
 In Python, we can calculate LISAs in a very streamlined way thanks to `PySAL`:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 lisa = esda.moran.Moran_Local(db['Pct_Leave'], w)
 ```
+</div>
 
+</div>
 
 All we need to pass is the variable of interest -proportion of Leave votes in this context- and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a lisa object that has a number of attibutes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using seaborn:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 seaborn.distplot(lisa.Is)
 ```
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
-
-
-
-{:.output .output_data_text}
+{:.output_data_text}
 ```
 <matplotlib.axes._subplots.AxesSubplot at 0x7efddc450588>
 ```
 
 
+</div>
+</div>
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/07_local_autocorrelation_31_1.png)
 
-
+</div>
+</div>
+</div>
 
 This reveals a rather skewed distribution due to the dominance of the positive forms of spatial association. Here it is important to keep in mind that the high positive values arise from value simularity in space, and this can be due to either high values being next to high values *or* low values next to low values. The local $I_i$ values themselves cannot distinguish between these two.
 
@@ -361,27 +394,29 @@ The values in the left tail of the density represent locations displaying negati
 
 Because of their very nature, looking at the numerical result of LISAs is not always the most useful way to exploit all the information they can provide. Remember we are calculating a statistic for every single observation in the data so, if we have many of them, it will be difficult to extract any meaningful pattern. In this context, a choropleth can help. At first glance, this may seem to suggest that a map of the $I_i$  values would be a useful way to visualize the spatial distribution:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db['Is'] = lisa.Is
 choropleth(db, column='Is', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True);
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/07_local_autocorrelation_34_0.png)
 
-
+</div>
+</div>
+</div>
 
 However, this does not inform us in any way about what type of spatial correlation each area is experiencing. For example, are the yellow areas in Scotland similar to those in the East cluster of high values too? Also, we know that values around zero will not be statistically significant. Which ones are thus significant and non-significant from a statistical point of view? In other words, which ones can be considered statistical clusters and which ones noise? To answer these questions, we need to bring in additional information that we have obtained when calculating the LISA statistics. Let us first build a four-plot figure that brings all these different perspectives together:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # Set up figure and axes
 f, axs = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
@@ -444,36 +479,43 @@ ax.set_axis_off()
 # Display the figure
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/07_local_autocorrelation_36_0.png)
 
-
+</div>
+</div>
+</div>
 
 The figure in the upper-left replicates our first map above. The green and yellow locations have the largest values for the local statistics, yet this does not distinguish between positive association of low support for the Brexit vote and positive association of high support for Brexit.
 
 To distinguish between these two cases, the map in the upper-right shows the location of the LISA statistic in the quadrant of the Moran Scatter plot, which is recorded in the `q` attribute:
 
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 lisa.q[:10]
 ```
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
-
-
-
-{:.output .output_data_text}
+{:.output_data_text}
 ```
 array([1, 1, 1, 1, 1, 1, 4, 1, 4, 1])
 ```
 
 
+</div>
+</div>
+</div>
 
 The correspondence between the numbers in the `q` attribute and the actual quadrants is as follows:
 
@@ -486,24 +528,27 @@ The correspondence between the numbers in the `q` attribute and the actual quadr
 
 Comparing the two maps in the top row reveals that the positive association in the north is due to low support for the Brexit vote, while the positive association in the south is of the high-support for Brexit. Overall, we can obtain counts of areas in each quadrant:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 counts = [(j,(lisa.q==j).sum()) for j in range(1,5)]
 counts
 ```
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
-
-
-
-{:.output .output_data_text}
+{:.output_data_text}
 ```
 [(1, 181), (2, 51), (3, 112), (4, 36)]
 ```
 
 
+</div>
+</div>
+</div>
 
 Showing that the high-high (1), and low-low (3), values are predominant.
 
@@ -513,17 +558,18 @@ Instead, what is typically done is to create a map, a cluster map as it is usual
 
 All of the needed pieces are contained inside the `lisa` object we have created above. But, to make the map making more straightforward, it is convenient to pull them out and insert them in the main data table:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 sig = 1 * (lisa.p_sim < 0.05)
 db['p-sim'] = lisa.p_sim
 db['sig'] = sig
 db[['sig','p-sim']].head()
 ```
+</div>
 
-
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
 
@@ -587,15 +633,19 @@ db[['sig','p-sim']].head()
 </div>
 
 
+</div>
+</div>
+</div>
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db[['sig','p-sim']].tail()
 ```
+</div>
 
-
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
 
@@ -659,6 +709,9 @@ db[['sig','p-sim']].tail()
 </div>
 
 
+</div>
+</div>
+</div>
 
 Thus, the first five values are statistically significant, while the last five observations are not.
 
@@ -666,9 +719,8 @@ Let us stop for second on these two steps. First, the `significant` column. Simi
 
 Next we consider the `q` attribute signifying what quadrant the local value is, but now mask these values using are newly created signficance indicator:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 hotspot = 1 * (sig * lisa.q==1)
 coldspot = 3 * (sig * lisa.q==3)
@@ -677,24 +729,26 @@ diamond = 4 * (sig * lisa.q==4)
 spots = hotspot + coldspot + doughnut + diamond
 spot_labels = [ '0 ns', '1 hot spot', '2 doughnut', '3 cold spot', '4 diamond']
 ```
+</div>
 
+</div>
 
 We also give descriptive labels to the five cases, where the locations with non-significant p-values for the LISAs are labeled as `ns`. Positive forms of local spatial autocorrelation are of two types: significant HH clustering, or so called 'hot spot's, or significant clustering of LL values, or 'cold spot's. Locations with significant, but negative, local autocorrelation are either 'doughnut's where a low value is neighbored by locations with high support for Brexit, or 'diamonds in the rough' where a high value is surrounded by low values.
 
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 db['labels'] = labels
 [(spot_label, (db['labels']==spot_label).sum()) for spot_label in spot_labels]
 ```
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
 
-
-
-
-{:.output .output_data_text}
+{:.output_data_text}
 ```
 [('0 ns', 218),
  ('1 hot spot', 80),
@@ -704,6 +758,9 @@ db['labels'] = labels
 ```
 
 
+</div>
+</div>
+</div>
 
 The final cluster map in the lower right above displays the output of the LISA statistics for the percentage of Leave votes in English, Welsh and Scottish local authorities. In bright red, we find those with an unusual concentration of high Leave proportions surrounded also by high Leave results. This corresponds with areas in the East and center of the map. In light red, we find the first type of spatial outliers: areas that still voted to Leave in high proportions, despite being surrounded by areas with more modest support for Leave. These correspond with some of the peripheral areas of London and and adjacent to Oxford. In darker blue we can see the spatial clusters of low support for the Leave campaign, which include London, Oxford and most of Scotland. Finally, in light blue we find the other type of spatial outlier: areas with lower percentages of Leave votes nearby areas of high concentration of supporters for Leave.
 
@@ -711,24 +768,24 @@ The final cluster map in the lower right above displays the output of the LISA s
 
 Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `PySAL` includes Getis and Ord's $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # Gi
 gaol = esda.getisord.G_Local(db['Pct_Leave'], w)
 # Gi*
 gaols = esda.getisord.G_Local(db['Pct_Leave'], w, star=True)
 ```
+</div>
 
+</div>
 
 As the local statistics they are, it is best to explore them by plotting them on a map. Unlike with LISA though, the $G$ statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.
 
 In this case, let us write a little function that generates the map so we can then easily use it to generate two maps, one for $G_i$ and one for $G_i^*$:
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 def g_map(g, geog, img, ext, ax):
     '''
@@ -776,11 +833,12 @@ def g_map(g, geog, img, ext, ax):
     ax.set_axis_off()
     return ax
 ```
+</div>
 
+</div>
 
-
-
-{:.input_area}
+<div markdown="1" class="cell code_cell">
+<div class="input_area" markdown="1">
 ```python
 # Setup figure and axes
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
@@ -790,12 +848,16 @@ for g, ax in zip([gaol, gaols], axs.flatten()):
 # Render
 plt.show()
 ```
+</div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output_subarea" markdown="1">
 
-
-{:.output .output_png}
+{:.output_png}
 ![png](../images/notebooks/07_local_autocorrelation_58_0.png)
 
-
+</div>
+</div>
+</div>
 
 As you can see, the results are virtually the same for $G_i$ and $G_i^*$. Also, at first glance, these maps appear to be visually similar to the final LISA map from above, and this leads to the question of why use the $G$ statistics at all. The answer to this question is that the two sets of local statistics, Local $I$ and the local $G$, are complementary statistics. This is because the local $I$ by itself cannot distinguish between the two forms of positive spatial association while the G can. At the same time, the G statistic does not consider negative spatial association, while the local I statistic does.

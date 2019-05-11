@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
-  <title>Local Autocorrelation</title>
+  <title>Local Spatial Autocorrelation</title>
   <meta name="description" content="Local Spatial Autocorrelation">
 
   <link rel="canonical" href="/book/book/notebooks/07_local_autocorrelation.html">
@@ -15,7 +15,7 @@
 
   <meta property="og:url"         content="/book/book/notebooks/07_local_autocorrelation.html" />
 <meta property="og:type"        content="article" />
-<meta property="og:title"       content="Local Autocorrelation" />
+<meta property="og:title"       content="Local Spatial Autocorrelation" />
 <meta property="og:description" content="Local Spatial Autocorrelation" />
 <meta property="og:image"       content="" />
 
@@ -27,11 +27,11 @@
   "mainEntityOfPage":
     "/book/notebooks/07_local_autocorrelation.html",
   "headline":
-    "Local Autocorrelation",
+    "Local Spatial Autocorrelation",
   "datePublished":
-    "2019-03-06T12:14:23+00:00",
+    "2019-04-26T23:33:35+00:00",
   "dateModified":
-    "2019-03-06T12:14:23+00:00",
+    "2019-04-26T23:33:35+00:00",
   "description":
     "Local Spatial Autocorrelation",
   "author": {
@@ -139,10 +139,40 @@ initFunction(function () {
   <meta name="turbolinks-cache-control" content="no-cache">
 
   <!-- Load nbinteract for widgets -->
-  <script src="https://unpkg.com/nbinteract-core" async></script>
+  
 
   <!-- Load Thebelab for interactive widgets -->
   <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+<!-- Display Thebelab button in each code cell -->
+<script>
+/**
+ * Set up thebelab button for code blocks
+ */
+
+const thebelabCellButton = id =>
+  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
+    <img src="/book/assets/images/edit-button.svg" alt="Start interactive mode">
+  </a>`
+
+
+const addThebelabButtonToCodeCells =  () => {
+
+  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("thebelab-cell-button-" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
+    }
+  })
+}
+
+initFunction(addThebelabButtonToCodeCells);
+</script>
+
+
 
 <script type="text/x-thebe-config">
     {
@@ -151,12 +181,15 @@ initFunction(function () {
         repo: 'gdsbook/geographic-data-science',
         ref: 'master',
       },
+      codeMirrorConfig: {
+        theme: ""
+      },
       kernelOptions: {
         name: 'python3',
       }
     }
 </script>
-<script src="https://unpkg.com/thebelab@0.3.3/lib/index.js"></script>
+<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
 <script>
     /**
      * Add attributes to Thebelab blocks
@@ -212,9 +245,9 @@ initFunction(function () {
             thebelab.bootstrap();
 
             // Remove copy buttons since they won't work anymore
-            const copyButtons = document.querySelectorAll('.copybtn')
-            copyButtons.forEach((copyButton, index) => {
-                copyButton.remove();
+            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
+            copyAndThebeButtons.forEach((button, index) => {
+                button.remove();
             });
 
             // Remove outputs since they'll be stale
@@ -225,18 +258,40 @@ initFunction(function () {
         }
 
         // Add event listener for the function to modify code cells
-        const thebelabButton = document.getElementById('interact-button-thebelab');
-        if (thebelabButton === null) {
-            setTimeout(initThebelab, 250)
-        return
-        };
-        thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
+        thebelabButtons.forEach((thebelabButton,index) => {
+            if (thebelabButton === null) {
+                setTimeout(initThebelab, 250)
+                return
+            };
+            thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        });
     }
 
     // Initialize Thebelab
     initFunction(initThebelab);
 </script>
 
+
+
+  <!-- Load the auto-generating TOC -->
+  <script src="/book/assets/js/tocbot.min.js"  type="text/javascript"></script>
+  <script>
+var initToc = function () {
+  tocbot.init({
+    tocSelector: 'nav.onthispage',
+    contentSelector: '.c-textbook__content',
+    headingSelector: 'h2, h3',
+    orderedList: false,
+    collapseDepth: 6,
+    listClass: 'toc__menu',
+    activeListItemClass: "",  // Not using
+    activeLinkClass: "", // Not using
+  });
+  tocbot.refresh();
+}
+initFunction(initToc);
+</script>
 
   <!-- Google analytics -->
   <script src="/book/assets/js/ga.js" async></script>
@@ -252,7 +307,7 @@ initFunction(function () {
 const codeCellId = index => `codecell${index}`
 
 const clipboardButton = id =>
-  `<a class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
     <img src="/book/assets/images/copy-button.svg" alt="Copy to clipboard">
   </a>`
 
@@ -280,11 +335,11 @@ const addCopyButtonToCodeCells = () => {
     return
   }
 
-  const codeCells = document.querySelectorAll('div.highlighter-rouge:not(.output) pre')
+  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
   codeCells.forEach((codeCell, index) => {
     const id = codeCellId(index)
     codeCell.setAttribute('id', id)
-    if (document.querySelector(`pre#${id} + a`) == null) {
+    if (document.getElementById("copy-button" + id) == null) {
       codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
     }
   })
@@ -308,6 +363,7 @@ const addCopyButtonToCodeCells = () => {
 initFunction(addCopyButtonToCodeCells);
 </script>
 
+
   <!-- Hide cell code -->
   
 <script>
@@ -319,7 +375,7 @@ Add buttons to hide code cells
 var setCodeCellVisibility = function(inputField, kind) {
     // Update the image and class for hidden
     var id = inputField.getAttribute('data-id');
-    var codeCell = document.querySelector(`#${id}`);
+    var codeCell = document.querySelector(`#${id} div.highlight`);
 
     if (kind === "visible") {
         codeCell.classList.remove('hidden');
@@ -357,18 +413,19 @@ var addHideButton = function () {
   }
 
   // Find the input cells and add a hide button
-  document.querySelectorAll('div.input_area div.highlight').forEach(function (item, index) {
-    if (!item.parentElement.classList.contains("hidecode")) {
+  document.querySelectorAll('div.input_area').forEach(function (item, index) {
+    if (!item.classList.contains("hidecode")) {
         // Skip the cell if it doesn't have a hidecode class
         return;
     }
 
     const id = codeCellId(index)
     item.setAttribute('id', id);
-    item.insertAdjacentHTML('afterend', hideCodeButton(id))
+    // Insert the button just inside the end of the next div
+    item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
 
     // Set up the visibility toggle
-    hideLink = document.querySelector(`#${id} + input + label`);
+    hideLink = document.querySelector(`#${id} div.highlight + input + label`);
     hideLink.addEventListener('click', toggleCodeCellVisibility)
   });
 }
@@ -639,7 +696,7 @@ initFunction(initQuery);
 
 
 <nav id="js-sidebar" class="c-textbook__sidebar">
-  <a href="https://jupyter.org/jupyter-book/intro.html"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
+  <a href="https://github.com/gdsbook/geographic-data-science"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
   <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
   <ul class="c-sidebar__chapters">
     
@@ -681,7 +738,129 @@ initFunction(initQuery);
           href="/book/notebooks/00_toc.html"
         >
           
-          Notebooks
+          Table of Contents
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/01_geospatial_computational_environment.html"
+                >
+                  
+                  Geospatial Computational Environment
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/02_spatial_data.html"
+                >
+                  
+                  Spatial Data
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/03_spatial_data_processing.html"
+                >
+                  
+                  Spatial Data Processing
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/04_spatial_weights.html"
+                >
+                  
+                  Spatial Weights
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
         </a>
 
         
@@ -703,7 +882,7 @@ initFunction(initQuery);
                   href="/book/notebooks/05_choropleth.html"
                 >
                   
-                  Choropleths
+                  Choropleth Mapping
                 </a>
 
                 
@@ -717,10 +896,10 @@ initFunction(initQuery);
 
               <li class="c-sidebar__section">
                 <a class="c-sidebar__entry "
-                  href="/book/notebooks/06_global_autocorrelation.html"
+                  href="/book/notebooks/06_spatial_autocorrelation.html"
                 >
                   
-                  Global Autocorrelation
+                  Spatial Autocorrelation
                 </a>
 
                 
@@ -737,7 +916,91 @@ initFunction(initQuery);
                   href="/book/notebooks/07_local_autocorrelation.html"
                 >
                   
-                  Local Autocorrelation
+                  Local Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/08_point_pattern_analysis.html"
+                >
+                  
+                  Point Pattern Analysis
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/book/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/09_spatial_inequality.html"
+                >
+                  
+                  Spatial Inequality
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/10_clustering_and_regionalization.html"
+                >
+                  
+                  Clustering & Regionalization
                 </a>
 
                 
@@ -754,7 +1017,24 @@ initFunction(initQuery);
                   href="/book/notebooks/11_regression.html"
                 >
                   
-                  Regression over space
+                  Regression
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/book/notebooks/12_feature_engineering.html"
+                >
+                  
+                  Spatial Feature Engineering
                 </a>
 
                 
@@ -774,28 +1054,12 @@ initFunction(initQuery);
 </nav>
 
       
-      <!-- Shamelessly copied from minimal mistakes -->
-
-
-<!-- TOC will only show up if it has at least one item -->
-
-
-  <aside class="sidebar__right">
-    <nav class="onthispage">
-      <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
-      <ul class="toc__menu">
-  <li><a href="#an-empirical-illustration-the-eu-referendum">An empirical illustration: the EU Referendum</a>
-    <ul>
-      <li><a href="#motivating-local-spatial-autocorrelation">Motivating Local Spatial Autocorrelation</a></li>
-      <li><a href="#local-morans-i">Local Moran’s I</a></li>
-      <li><a href="#other-local-indices">Other local indices</a></li>
-    </ul>
-  </li>
-</ul>
-    </nav>
-  </aside>
-
-
+      <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+      <aside class="sidebar__right">
+          <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
+          <nav class="onthispage">
+          </nav>
+      </aside>
       
       <main class="c-textbook__page" tabindex="-1">
           <div class="o-wrapper">
@@ -824,6 +1088,7 @@ initFunction(initQuery);
 
 
 
+
 <a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?urlpath=lab/tree/content%2Fnotebooks%2F07_local_autocorrelation.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/book/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
 
 
@@ -842,7 +1107,9 @@ Moran’s I is good tool to summarize a dataset into a single value that informs
 
 <p>We continue with the same dataset we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Display graphics within the notebook</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Display graphics within the notebook</span>
 <span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>  <span class="c"># Graphics</span>
@@ -858,13 +1125,21 @@ Moran’s I is good tool to summarize a dataset into a single value that informs
 <span class="kn">import</span> <span class="nn">bookdata</span>
 <span class="kn">from</span> <span class="nn">booktools</span> <span class="kn">import</span> <span class="n">choropleth</span>
 
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">brexit</span><span class="p">(),</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'Area_Code'</span><span class="p">)</span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">brexit</span><span class="p">(),</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'Area_Code'</span><span class="p">)</span>
 <span class="n">ref</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
 Index: 382 entries, E06000031 to E08000036
 Data columns (total 20 columns):
 id                         382 non-null int64
@@ -889,17 +1164,24 @@ Pct_Leave                  382 non-null float64
 Pct_Rejected               382 non-null float64
 dtypes: float64(4), int64(13), object(3)
 memory usage: 62.7+ KB
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>Now let us bring in the spatial data:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">lads</span><span class="p">())</span>\
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">lads</span><span class="p">())</span>\
                 <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'lad16cd'</span><span class="p">)</span>
 <span class="n">lads</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
 Index: 391 entries, E06000001 to W06000023
 Data columns (total 10 columns):
 objectid      391 non-null int64
@@ -914,19 +1196,26 @@ st_lengths    391 non-null float64
 geometry      391 non-null object
 dtypes: float64(4), int64(3), object(3)
 memory usage: 33.6+ KB
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>And to “trim” the <code class="highlighter-rouge">DataFrame</code> so it only retains what we know we will need:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">lads</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ref</span><span class="p">[[</span><span class="s">'Pct_Leave'</span><span class="p">]]),</span> <span class="n">crs</span><span class="o">=</span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>\
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">lads</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ref</span><span class="p">[[</span><span class="s">'Pct_Leave'</span><span class="p">]]),</span> <span class="n">crs</span><span class="o">=</span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>\
               <span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>\
               <span class="p">[[</span><span class="s">'objectid'</span><span class="p">,</span> <span class="s">'lad16nm'</span><span class="p">,</span> <span class="s">'Pct_Leave'</span><span class="p">,</span> <span class="s">'geometry'</span><span class="p">]]</span>\
               <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
 <span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
 Index: 380 entries, E06000001 to W06000023
 Data columns (total 4 columns):
 objectid     380 non-null int64
@@ -935,20 +1224,34 @@ Pct_Leave    380 non-null float64
 geometry     380 non-null object
 dtypes: float64(1), int64(1), object(2)
 memory usage: 14.8+ KB
-
-</code></pre></div></div>
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
 
 <p>Although there are several variables that could be considered, we will focus on <code class="highlighter-rouge">Pct_Leave</code>, which measures the proportion of votes for the Leave alternative. For convenience, let us merge this with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), which will allow us to combine them with contextual tiles.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'init': 'epsg:4326'}
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'init': 'epsg:4326'}
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Throughout the chapter, we will rely heavily on geovisualizations. To create more useful maps that bring geographical context to the spatial distribution of votes, we will use an image made up of tiles from a web map. Let us first download it on-the-fly. The image will be reused later on in several maps.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Bounding box of the polygon layer</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Bounding box of the polygon layer</span>
 <span class="n">we</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">ea</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">total_bounds</span>
 <span class="c"># Download image and extent at zoom 6</span>
 <span class="n">img</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">contextily</span><span class="o">.</span><span class="n">bounds2img</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">ea</span><span class="p">,</span> <span class="n">no</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span>
@@ -956,27 +1259,45 @@ memory usage: 14.8+ KB
 <span class="c"># License text</span>
 <span class="n">lic</span> <span class="o">=</span> <span class="p">(</span><span class="s">"Map tiles by Stamen Design, under CC BY 3.0. "</span>\
                <span class="s">"Data by OpenStreetMap, under ODbL."</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the <code class="highlighter-rouge">alpha</code> attribute) to make the final plot easier to read.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="n">choropleth</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s">'Pct_Leave'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'quantiles'</span><span class="p">,</span>
         <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">ext</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ext</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lic</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/07_local_autocorrelation_14_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_14_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>The final piece we need before we can delve into spatial autocorrelation is the spatial weights matrix. We will use eight nearest neighbors for the sake of comparison with the previous chapter. We also row-standardize the weights:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Generate W from the GeoDataFrame</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Generate W from the GeoDataFrame</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">Distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="c"># Row-standardization</span>
 <span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s">'R'</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p><strong>Should we adopt some scheme so as to refer to earlier chapters, as in the case of maps and weights here to improve the flow of the book and reduce any repetition of basic tasks?</strong></p>
 
@@ -984,28 +1305,48 @@ memory usage: 14.8+ KB
 
 <p>To better understand the underpinning of local autorocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">])</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">])</span>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>And their respective standardized versions, where we substract the average and divide by the standard deviation:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave_std'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>\
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave_std'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>\
                     <span class="o">/</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
 <span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave_std'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>\
                     <span class="o">/</span> <span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup the figure and axis</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup the figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c"># Plot values</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'Pct_Leave_std'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'w_Pct_Leave_std'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
 <span class="c"># Display</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/07_local_autocorrelation_23_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_23_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>Using standardised values allows us to divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: above and below the average. This, in turn, divides a Moran Plot in four quadrants, depending on whether a given area displays a value above the mean (high) or below (low), and how its spatial lag behaves:</p>
 
@@ -1018,7 +1359,9 @@ memory usage: 14.8+ KB
 
 <p>Graphically, this can be captured as follows:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup the figure and axis</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup the figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c"># Plot values</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'Pct_Leave_std'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'w_Pct_Leave_std'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
@@ -1032,9 +1375,17 @@ memory usage: 14.8+ KB
 <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="s">"LL"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
 <span class="c"># Display</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/07_local_autocorrelation_25_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_25_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <h3 id="local-morans-i">Local Moran’s I</h3>
 
@@ -1052,18 +1403,38 @@ memory usage: 14.8+ KB
 
 <p>In Python, we can calculate LISAs in a very streamlined way thanks to <code class="highlighter-rouge">PySAL</code>:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lisa</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lisa</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>All we need to pass is the variable of interest -proportion of Leave votes in this context- and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a lisa object that has a number of attibutes of interest. The local indicators themselves are in the <code class="highlighter-rouge">Is</code> attribute and we can get a sense of their distribution using seaborn:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">seaborn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">Is</span><span class="p">)</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">seaborn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">Is</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7efddc450588&gt;
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
 
-<p class="output output_png"><img src="../images/notebooks/07_local_autocorrelation_31_1.png" alt="png" /></p>
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7efddc450588&gt;
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_31_1.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>This reveals a rather skewed distribution due to the dominance of the positive forms of spatial association. Here it is important to keep in mind that the high positive values arise from value simularity in space, and this can be due to either high values being next to high values <em>or</em> low values next to low values. The local $I_i$ values themselves cannot distinguish between these two.</p>
 
@@ -1071,16 +1442,28 @@ memory usage: 14.8+ KB
 
 <p>Because of their very nature, looking at the numerical result of LISAs is not always the most useful way to exploit all the information they can provide. Remember we are calculating a statistic for every single observation in the data so, if we have many of them, it will be difficult to extract any meaningful pattern. In this context, a choropleth can help. At first glance, this may seem to suggest that a map of the $I_i$  values would be a useful way to visualize the spatial distribution:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'Is'</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">Is</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'Is'</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">Is</span>
 <span class="n">choropleth</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s">'Is'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'quantiles'</span><span class="p">,</span>
         <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">);</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/07_local_autocorrelation_34_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_34_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>However, this does not inform us in any way about what type of spatial correlation each area is experiencing. For example, are the yellow areas in Scotland similar to those in the East cluster of high values too? Also, we know that values around zero will not be statistically significant. Which ones are thus significant and non-significant from a statistical point of view? In other words, which ones can be considered statistical clusters and which ones noise? To answer these questions, we need to bring in additional information that we have obtained when calculating the LISA statistics. Let us first build a four-plot figure that brings all these different perspectives together:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axes</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axes</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
 <span class="c"># Make the axes accessible with single indexing</span>
 <span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -1140,19 +1523,37 @@ memory usage: 14.8+ KB
 
 <span class="c"># Display the figure</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/07_local_autocorrelation_36_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_36_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>The figure in the upper-left replicates our first map above. The green and yellow locations have the largest values for the local statistics, yet this does not distinguish between positive association of low support for the Brexit vote and positive association of high support for Brexit.</p>
 
 <p>To distinguish between these two cases, the map in the upper-right shows the location of the LISA statistic in the quadrant of the Moran Scatter plot, which is recorded in the <code class="highlighter-rouge">q</code> attribute:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
-</code></pre></div></div>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([1, 1, 1, 1, 1, 1, 4, 1, 4, 1])
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([1, 1, 1, 1, 1, 1, 4, 1, 4, 1])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>The correspondence between the numbers in the <code class="highlighter-rouge">q</code> attribute and the actual quadrants is as follows:</p>
 
@@ -1165,12 +1566,22 @@ memory usage: 14.8+ KB
 
 <p>Comparing the two maps in the top row reveals that the positive association in the north is due to low support for the Brexit vote, while the positive association in the south is of the high-support for Brexit. Overall, we can obtain counts of areas in each quadrant:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">counts</span> <span class="o">=</span> <span class="p">[(</span><span class="n">j</span><span class="p">,(</span><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="n">j</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">counts</span> <span class="o">=</span> <span class="p">[(</span><span class="n">j</span><span class="p">,(</span><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="n">j</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
 <span class="n">counts</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[(1, 181), (2, 51), (3, 112), (4, 36)]
-</code></pre></div></div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[(1, 181), (2, 51), (3, 112), (4, 36)]
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>Showing that the high-high (1), and low-low (3), values are predominant.</p>
 
@@ -1180,13 +1591,19 @@ memory usage: 14.8+ KB
 
 <p>All of the needed pieces are contained inside the <code class="highlighter-rouge">lisa</code> object we have created above. But, to make the map making more straightforward, it is convenient to pull them out and insert them in the main data table:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span>
 <span class="n">db</span><span class="p">[</span><span class="s">'p-sim'</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span>
 <span class="n">db</span><span class="p">[</span><span class="s">'sig'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span>
 <span class="n">db</span><span class="p">[[</span><span class="s">'sig'</span><span class="p">,</span><span class="s">'p-sim'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_html">
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1245,10 +1662,20 @@ memory usage: 14.8+ KB
 </div>
 </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[[</span><span class="s">'sig'</span><span class="p">,</span><span class="s">'p-sim'</span><span class="p">]]</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
-</code></pre></div></div>
+    </div>
+  </div>
+</div>
 
-<div class="output output_html">
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[[</span><span class="s">'sig'</span><span class="p">,</span><span class="s">'p-sim'</span><span class="p">]]</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
 <div>
 <style scoped="">
     .dataframe tbody tr th:only-of-type {
@@ -1307,32 +1734,51 @@ memory usage: 14.8+ KB
 </div>
 </div>
 
+    </div>
+  </div>
+</div>
+
 <p>Thus, the first five values are statistically significant, while the last five observations are not.</p>
 
 <p>Let us stop for second on these two steps. First, the <code class="highlighter-rouge">significant</code> column. Similarly as with global Moran’s I, <code class="highlighter-rouge">PySAL</code> is automatically computing a p-value for each LISA. Because not every observation represents a statistically significant one, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar situation from pure chance. Following a similar reasoning as with global Moran’s I, we select 5% as the threshold for statistical significance. To identify these values, we create a variable, <code class="highlighter-rouge">significant</code>, that contains <code class="highlighter-rouge">True</code> if the p-value of the observation satisfies the condition, and <code class="highlighter-rouge">False</code> otherwise. We can check this is the case:</p>
 
 <p>Next we consider the <code class="highlighter-rouge">q</code> attribute signifying what quadrant the local value is, but now mask these values using are newly created signficance indicator:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">hotspot</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">hotspot</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">coldspot</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">doughnut</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">2</span><span class="p">)</span>
 <span class="n">diamond</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">spots</span> <span class="o">=</span> <span class="n">hotspot</span> <span class="o">+</span> <span class="n">coldspot</span> <span class="o">+</span> <span class="n">doughnut</span> <span class="o">+</span> <span class="n">diamond</span>
 <span class="n">spot_labels</span> <span class="o">=</span> <span class="p">[</span> <span class="s">'0 ns'</span><span class="p">,</span> <span class="s">'1 hot spot'</span><span class="p">,</span> <span class="s">'2 doughnut'</span><span class="p">,</span> <span class="s">'3 cold spot'</span><span class="p">,</span> <span class="s">'4 diamond'</span><span class="p">]</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>We also give descriptive labels to the five cases, where the locations with non-significant p-values for the LISAs are labeled as <code class="highlighter-rouge">ns</code>. Positive forms of local spatial autocorrelation are of two types: significant HH clustering, or so called ‘hot spot’s, or significant clustering of LL values, or ‘cold spot’s. Locations with significant, but negative, local autocorrelation are either ‘doughnut’s where a low value is neighbored by locations with high support for Brexit, or ‘diamonds in the rough’ where a high value is surrounded by low values.</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'labels'</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'labels'</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
 <span class="p">[(</span><span class="n">spot_label</span><span class="p">,</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'labels'</span><span class="p">]</span><span class="o">==</span><span class="n">spot_label</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">spot_label</span> <span class="ow">in</span> <span class="n">spot_labels</span><span class="p">]</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="output output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[('0 ns', 218),
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[('0 ns', 218),
  ('1 hot spot', 80),
  ('2 doughnut', 7),
  ('3 cold spot', 71),
  ('4 diamond', 4)]
-</code></pre></div></div>
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
 
 <p>The final cluster map in the lower right above displays the output of the LISA statistics for the percentage of Leave votes in English, Welsh and Scottish local authorities. In bright red, we find those with an unusual concentration of high Leave proportions surrounded also by high Leave results. This corresponds with areas in the East and center of the map. In light red, we find the first type of spatial outliers: areas that still voted to Leave in high proportions, despite being surrounded by areas with more modest support for Leave. These correspond with some of the peripheral areas of London and and adjacent to Oxford. In darker blue we can see the spatial clusters of low support for the Leave campaign, which include London, Oxford and most of Scotland. Finally, in light blue we find the other type of spatial outlier: areas with lower percentages of Leave votes nearby areas of high concentration of supporters for Leave.</p>
 
@@ -1340,17 +1786,24 @@ memory usage: 14.8+ KB
 
 <p>Similar to the global case, there are more local indicators of spatial correlation than the local Moran’s I. <code class="highlighter-rouge">PySAL</code> includes Getis and Ord’s $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Gi</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Gi</span>
 <span class="n">gaol</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
 <span class="c"># Gi*</span>
 <span class="n">gaols</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">],</span> <span class="n">w</span><span class="p">,</span> <span class="n">star</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
+
+</div>
 
 <p>As the local statistics they are, it is best to explore them by plotting them on a map. Unlike with LISA though, the $G$ statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.</p>
 
 <p>In this case, let us write a little function that generates the map so we can then easily use it to generate two maps, one for $G_i$ and one for $G_i^*$:</p>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">geog</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">geog</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
     <span class="s">'''
     Create a cluster map
     ...
@@ -1395,33 +1848,46 @@ memory usage: 14.8+ KB
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'G</span><span class="si">%</span><span class="s">s statistic for Pct of Leave votes'</span><span class="o">%</span><span class="n">st</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ax</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<div class="language-python input_area highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup figure and axes</span>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup figure and axes</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c"># Loop over the two statistics and generate the map</span>
 <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">gaol</span><span class="p">,</span> <span class="n">gaols</span><span class="p">],</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
     <span class="n">ax</span> <span class="o">=</span> <span class="n">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
 <span class="c"># Render</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</code></pre></div></div>
+</code></pre></div>    </div>
+  </div>
 
-<p class="output output_png"><img src="../images/notebooks/07_local_autocorrelation_58_0.png" alt="png" /></p>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_58_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
 
 <p>As you can see, the results are virtually the same for $G_i$ and $G_i^*$. Also, at first glance, these maps appear to be visually similar to the final LISA map from above, and this leads to the question of why use the $G$ statistics at all. The answer to this question is that the two sets of local statistics, Local $I$ and the local $G$, are complementary statistics. This is because the local $I$ by itself cannot distinguish between the two forms of positive spatial association while the G can. At the same time, the G statistic does not consider negative spatial association, while the local I statistic does.</p>
 
               <nav class="c-page__nav">
   
     
-    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/book/notebooks/06_global_autocorrelation">
-      〈 <span class="u-margin-right-tiny"></span> Global Autocorrelation
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/book/notebooks/06_spatial_autocorrelation">
+      〈 <span class="u-margin-right-tiny"></span> Spatial Autocorrelation
     </a>
   
 
   
     
-    <a id="js-page__nav__next" class="c-page__nav__next" href="/book/notebooks/11_regression">
-      Regression over space <span class="u-margin-right-tiny"></span> 〉
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/book/notebooks/08_point_pattern_analysis">
+      Point Pattern Analysis <span class="u-margin-right-tiny"></span> 〉
     </a>
   
 </nav>
