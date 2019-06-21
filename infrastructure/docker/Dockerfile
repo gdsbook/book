@@ -2,25 +2,6 @@ FROM darribas/gds_py:2.0
 
 LABEL maintainer="Dani Arribas-Bel <d.arribas-bel@liverpool.ac.uk>"
 
-#--- Jekyll ---#
-
-USER root
-
-RUN apt-get update \
- && apt-get install -y ruby-full build-essential zlib1g-dev 
-
-# Install Ruby Gems to ~/gems
-ENV GEM_HOME="/home/$NB_USER/gems"
-ENV PATH="/home/$NB_USER/gems/bin:$PATH"
-
-USER $NB_UID
-
-RUN gem install jekyll bundler jekyll-scholar
-
-# Clean up
-RUN rm -rf $GEM_HOME/cache
-RUN rm -rf /usr/local/bundle/cache
-
 #--- Jupyter-book ---#
 RUN pip install -U --no-deps \
                     bs4 \
@@ -30,8 +11,21 @@ RUN pip install -U --no-deps \
                     pytest \
                     ruamel.yaml
 RUN jupyter-book create testbook --demo
+
+#--- Jekyll ---#
+# Taken inspiration from:
+# https://github.com/jupyter/jupyter-book/blob/master/jupyter_book/Dockerfile
+
+USER root
+RUN apt-get update \
+ && apt-get install -y ruby-full build-essential zlib1g-dev libc-dev
+USER $NB_UID
+# Install Ruby Gems to ~/gems
+ENV GEM_HOME="/home/$NB_USER/gems"
+ENV PATH="/home/$NB_USER/gems/bin:$PATH"
 RUN cd /home/$NB_USER/testbook \
- && gem install bundler -v 1.17.2 \
+#&& mv Gemfile.lock original_Gemfile.lock \
+ && gem install bundler -v '2.0.1' \
  && bundle install
 
 # JupyText
@@ -50,7 +44,7 @@ RUN echo "c.NotebookApp.contents_manager_class = "\
 RUN rm -rf $GEM_HOME/cache \
  && rm -rf /usr/local/bundle/cache \
  && rm -r /home/$NB_USER/testbook \
- && conda clean -tipsy
+ && conda clean --all
 
 EXPOSE 4000
 
