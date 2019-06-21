@@ -21,6 +21,7 @@ cp host/infrastructure/booksite/toc.yml host/tmp_book/_data/toc.yml
 # Fill in
 #---------------------------
 # LICENSE
+cp host/infrastructure/booksite/LICENSE host/tmp_book/LICENSE
 # Code requirements
 # Bibliography
 # Build book
