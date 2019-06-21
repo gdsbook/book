@@ -21,6 +21,7 @@ cp host/infrastructure/booksite/toc.yml host/tmp_book/_data/toc.yml
 # Fill in
 #---------------------------
 # LICENSE
+cp host/infrastructure/booksite/LICENSE host/tmp_book/LICENSE
 # Code requirements
 # Bibliography
 # Build book
@@ -28,7 +29,7 @@ cp host/infrastructure/booksite/toc.yml host/tmp_book/_data/toc.yml
 echo "Building book..."
 jupyter-book build host/tmp_book
 echo "Building site HTML..."
-cd host/tmp_book && make site
+cd host/tmp_book && make build
 # Move over to docs folder to be served online
 echo "Moving build over to docs folder..."
 cd /home/jovyan

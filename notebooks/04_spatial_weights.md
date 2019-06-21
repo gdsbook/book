@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.1.1
+      jupytext_version: 1.1.6
   kernelspec:
     display_name: Python 3
     language: python
@@ -1108,3 +1108,8 @@ These are the starkest contrasts in the map, and result in the most distinctive 
 [3] Fitzpatrick, M C.,Preisser, E.L., Porter, A., Elkinton, J., Waller, L.A., Carlin, B. P., and Ellison, A.M. 2010. “Ecological Boundary Detection Using Bayesian Areal Wombling.” *Ecology* 91 (12): 3448–3455.
 
 [4] Dean, N., Dong, G., and Price, G. "Frontiers in Residential Segregation: Understanding Neighbourhood Boundaries and their Impacts." *Tijdschrift voor economische en sociale geografie*, in press
+
+
+---
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
