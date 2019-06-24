@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.1.6
+      jupytext_version: 1.1.7
   kernelspec:
-    display_name: Python 3
+    display_name: Analysis
     language: python
-    name: python3
+    name: ana
 ---
 
 # Local Spatial Autocorrelation
@@ -95,7 +95,7 @@ And with this elements, we can generate a choropleth to get a quick sense of the
 f, ax = plt.subplots(1, figsize=(9, 9))
 ax.imshow(img, extent=ext, alpha=0.5)
 choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
-        k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True, ax=ax)
+           k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True, ax=ax)
 plt.text(ext[0],ext[2], lic, size=8)
 ax.set_axis_off()
 ```
@@ -104,13 +104,10 @@ The final piece we need before we can delve into spatial autocorrelation is the 
 
 ```python
 # Generate W from the GeoDataFrame
-w = weights.Distance.KNN.from_dataframe(db, k=8)
+w = weights.distance.KNN.from_dataframe(db, k=8)
 # Row-standardization
 w.transform = 'R'
 ```
-
-**Should we adopt some scheme so as to refer to earlier chapters, as in the case of maps and weights here to improve the flow of the book and reduce any repetition of basic tasks?**
-
 
 ### Motivating Local Spatial Autocorrelation
 
@@ -355,9 +352,9 @@ Similar to the global case, there are more local indicators of spatial correlati
 
 ```python
 # Gi
-gaol = esda.getisord.G_Local(db['Pct_Leave'], w)
+gostats = esda.getisord.G_Local(db['Pct_Leave'], w)
 # Gi*
-gaols = esda.getisord.G_Local(db['Pct_Leave'], w, star=True)
+gostars = esda.getisord.G_Local(db['Pct_Leave'], w, star=True)
 ```
 
 As the local statistics they are, it is best to explore them by plotting them on a map. Unlike with LISA though, the $G$ statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.
@@ -416,7 +413,7 @@ def g_map(g, geog, img, ext, ax):
 # Setup figure and axes
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 # Loop over the two statistics and generate the map
-for g, ax in zip([gaol, gaols], axs.flatten()):
+for g, ax in zip([gostats, gostars], axs.flatten()):
     ax = g_map(g, db, img, ext, ax)
 # Render
 plt.show()
@@ -425,6 +422,36 @@ plt.show()
 As you can see, the results are virtually the same for $G_i$ and $G_i^*$. Also, at first glance, these maps appear to be visually similar to the final LISA map from above, and this leads to the question of why use the $G$ statistics at all. The answer to this question is that the two sets of local statistics, Local $I$ and the local $G$, are complementary statistics. This is because the local $I$ by itself cannot distinguish between the two forms of positive spatial association while the G can. At the same time, the G statistic does not consider negative spatial association, while the local I statistic does.
 
 
+# Questions
+1. Do the same Local Moran analysis done for `Pct_Leave`, but using `Pct_Turnout`. Is there a geography to how involved people were in different places? Where was turnout percentage (relatively) higher or lower? 
+2. Do the same Getis-Ord analysis done for `Pct_Leave`, but using `Pct_Turnout`. 
+3. Local Moran statistics are premised on a few distributional assumptions. One well-recognized concern with Moran statistics is when they are estimated for *rates*. Rate data is distinct from other kinds of data because it embeds the relationship between two quantities: the event and the population. For instance, in the case of Leave voting, the "event" is a person voting leave, and the "population" could be the number of eligible voters, the number of votes cast, or the total number of people. This usually only poses a problem for analysis when the event outcome is somehow dependent on the population. 
+    1. Using our past analytical steps, build a new `db` dataframe from `ref` and `lads` that contains the `Electorate`, `Votes_Cast`, and `Leave` columns. 
+    - From this new dataframe, make scatterplots of:
+       - the number of votes cast and the percent leave vote
+       - the size of the electorate and the percent of leave vote
+    2. Based on your answers to the previous point, does it appear that there is a relationship between the event and the population size? Use `scipy.stats.kendalltau` or `scipy.stats.pearsonr`  to confirm your visual intuition. 
+        3. Using `esda.moran.Moran_Rate`, estimate a global Moran's I that takes into account the rate structure of `Pct_Leave`, using the `Electorate` as the population. Is this estimate different from the one obtained without taking into account the rate structure? What about when `Votes_Cast` is used for the population? 
+    4. Using `esda.moran.Moran_Local_Rate`, estimate *local* Moran's I treating Leave data as a rate.
+        - does any site's local I change? Make a scatterplot of the `lisa.Is` you estimated before and this new rate-based local Moran. 
+        - does any site's local I change their outlier/statistical significance classifications? Use `pandas.crosstab` to examine how many classifications change between the two kinds of statistic. Make sure to consider observations' statistical significances in addition to their quadrant classification.
+    5. Make two maps, side by side, of the local statistics without rate correction and with rate correction. Does your interpretation of the maps change depending on the correction?
+4. Local statistics use *permutation-based* inference for their significance testing. This means that, to test the statistical significance of a local relationship, values of the observed variable are *shuffled* around the map. These large numbers of *random* maps are then used to compare against the observed map. Local inference requires some restrictions on how each shuffle occurs, since each observation must be "fixed" and compared to randomly-shuffle neighboring observations. The distribution of local statistics for each "shuffle" is contained in the `.rlisas` attribute of a Local Moran object. 
+    - For the first observation, make a `seaborn.distplot` of its shuffled local statistics. Add a vertical line to the histogram using `plt.axvline()`. 
+    - Do the same for the last observation as well. 
+    - Looking only at their permutation distributions, do you expect the first LISA statistic to be statistically-significant? Do you expect the last?
+5. LISAs have some amount of fundamental uncertainty due to their estimation. This is called the `standard error` of the statistic.
+    - The standard errors are contained in the `.seI_sim` attribute. Make a map of the standard errors. Are there any areas of the map that appear to be more uncertain about their local statistics? 
+    - compute the standard deviation of each observation's "shuffle" distribution, contained in the `.rlisas` attribute. Verify that the standard deviation of this shuffle distribution is the same as the standard errors in `seI_sim`. 
+6. Local Getis-Ord statistics come in two forms. As discussed above, Getis-Ord $G_i$ statistics *omit* each site from their own local statistic. In contrast, $G_i^*$ statistics *include* the site in its own local statistic.
+    - Make a scatterplot of the two types of statistic, contained in `gostats.Zs` and `gostars.Zs` to examine how similar the two forms of the Getis-Ord statistic are. 
+    - The two forms of the Getis-Ord statistic differ by their inclusion of the *site* value, $y_i$, in the value for the $G_i$ statistic at that site. So, make a scatterplot of the percent leave variable and the *difference* of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using `scipy.stats.kendalltau` or `scipy.stats.pearsonr`. 
+
+
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+```python
+
+```

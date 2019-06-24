@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.1.6
+      jupytext_version: 1.1.7
   kernelspec:
-    display_name: Python 3
+    display_name: Analysis
     language: python
-    name: python3
+    name: ana
 ---
 
 # Spatial Weights
@@ -85,7 +85,7 @@ question share an *edge*. According to this definition, polygon $0$ would be a r
 
 ```python
 # do a regular 3x3 lattice and draw it here
-w = weights.Contiguity.Rook.from_dataframe(gdf)
+w = weights.contiguity.Rook.from_dataframe(gdf)
 w.neighbors
 ```
 
@@ -150,7 +150,7 @@ neighbor relations for this same configuration as follows:
 
 ```python
 # do a regular 3x3 lattice and draw it here
-w = weights.Contiguity.Queen.from_dataframe(gdf)
+w = weights.contiguity.Queen.from_dataframe(gdf)
 w.neighbors
 ```
 
@@ -250,7 +250,7 @@ structures to extract these.
 
 ```python
 san_diego_tracts = geopandas.read_file(bookdata.san_diego_tracts())
-wq = weights.Contiguity.Queen.from_dataframe(san_diego_tracts)
+wq = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 ```
 
 Note the warning about disconnected observations (no neighbors). The disconnected observation warning indicates that there are polygons in the shapefile that do not share any vertices with other polygons. Any time there is a disconnected observation, sometimes called a topological *island*, the graph is also disconnected into at least two one components. Further, graphs can have more than one disconnected component even without any islands. We will return to deal with this later in this chapter. For now we focus on the object just created.
@@ -300,7 +300,7 @@ queen neighbors. The most common number of neighbors is 6.
 There is also a function to create the rook weights for the same dataframe:
 
 ```python
-wr = weights.Contiguity.Rook.from_dataframe(san_diego_tracts)
+wr = weights.contiguity.Rook.from_dataframe(san_diego_tracts)
 print(wr.pct_nonzero)
 s = pandas.Series(wr.cardinalities)
 s.plot.hist(bins=s.unique().shape[0]);
@@ -371,7 +371,7 @@ between these polygon objects, however. To do so we develop a representative
 point for each of the polygons using the so called "center of mass" or centroid.
 
 ```python
-wk4 = weights.Distance.KNN.from_dataframe(gdf, k=4)
+wk4 = weights.distance.KNN.from_dataframe(gdf, k=4)
 ```
 
 The centroids are attributes of the polygon shapes that PySAL calculates from
@@ -419,7 +419,7 @@ The simplest way to compute Kernel weights in PySAL involves a single function
 call:
 
 ```python
-w_kernel = weights.Distance.Kernel.from_dataframe(gdf)
+w_kernel = weights.distance.Kernel.from_dataframe(gdf)
 ```
 
 Like KNN weights, the Kernel weights are based on distances between observations. By default, if the input data is an areal unit, we use a central representative point (like the centroid) for that polygon.
@@ -469,7 +469,7 @@ ax.set_axis_off()
 We can see that the adaptive bandwidth adjusts for this:
 
 ```python
-w_adaptive = weights.Distance.Kernel.from_dataframe(top_30, fixed=False, k=15)
+w_adaptive = weights.distance.Kernel.from_dataframe(top_30, fixed=False, k=15)
 w_adaptive.bandwidth
 ```
 
@@ -512,7 +512,7 @@ other observations are within the buffer. If they are, they are assigned a
 weight of one in the spatial weights matrix, if not they receive a zero.
 
 ```python
-w_bdb = weights.Distance.DistanceBand.from_dataframe(gdf, 1.5, binary=True)
+w_bdb = weights.distance.DistanceBand.from_dataframe(gdf, 1.5, binary=True)
 ```
 
 This creates a binary distance weights where every other observation within
@@ -528,7 +528,7 @@ everyone else. For this example we will return to the small lattice example
 covered in the beginning:
 
 ```python
-w_hy = weights.Distance.DistanceBand.from_dataframe(gdf, 1.5, binary=False)
+w_hy = weights.distance.DistanceBand.from_dataframe(gdf, 1.5, binary=False)
 ```
 
 We apply a threshold of 1.5 for this illustration. PySAL truncates continuous
@@ -562,14 +562,13 @@ curvature implicit in non-projected reference systems (e.g.
 longitude/latitude) can be a sufficient workaround. PySAL provides such
 approximation as part of its functionality.
 
-[**LJW: we've gotta keep this section as is, not upgrading to use the `KNN` class, until [libpysal#82](https://github.com/pysal/libpysal/pull/82) is fixed**]
-
 To illustrate the relevance of ignoring this aspect altogether we will examine
 distance based weights for the case of counties in the state of Texas. First, let us compute
 a KNN-4 object that ignores the curvature of the Earth's surface:
 
 ```python
-knn4_bad = weights.user.knnW_from_shapefile(bookdata.texas(), k=4) # ignore curvature of the earth
+texas = geopandas.read_file(bookdata.texas())
+knn4_bad = weights.distance.KNN.from_dataframe(texas, k=4) # ignore curvature of the earth
 ```
 
 ```python
@@ -591,7 +590,7 @@ expressed in the units we have used for the radious, that is in miles in our
 case:
 
 ```python
-knn4 = weights.user.knnW_from_shapefile(bookdata.texas(), k=4, radius=radius)
+knn4 = weights.distance.KNN.from_dataframe(texas, k=4, radius=radius)
 ```
 
 ```python
@@ -661,7 +660,7 @@ From this, we can see *why* our tract is disconnected, rather than simply *that*
 That aside, we can still re-attach the observation to the graph by connecting it to its nearest neighbor. To do this, we can construct the KNN graph as we did above, but set `k=1`, so observations are only assigned to their nearest neighbor:
 
 ```python
-wk1 = weights.Distance.KNN.from_dataframe(san_diego_tracts, k=1)
+wk1 = weights.distance.KNN.from_dataframe(san_diego_tracts, k=1)
 ```
 
 In this graph, all our observations are connected to *at least* one other observation, so island observation is connected to:
@@ -707,7 +706,7 @@ A more elegant approach to the island problem makes use of PySAL's support for
 *set theoretic operations* on PySAL weights:
 
 ```python
-w_fixed_sets = weights.Wsets.w_union(wr, wk1)
+w_fixed_sets = weights.set_operations.w_union(wr, wk1)
 w_fixed_sets.histogram
 ```
 
@@ -798,7 +797,7 @@ Beginning with Queen weights:
 <!-- #endregion -->
 
 ```python
-queen_mx = weights.Contiguity.Queen.from_dataframe(mx)
+queen_mx = weights.contiguity.Queen.from_dataframe(mx)
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax)
 queen_mx.plot(mx,edge_kws=dict(linewidth=1.5, color='orangered'), node_kws=dict(marker='*'),  ax=ax, )
@@ -833,7 +832,7 @@ plt.show()
 Next, we construct the union of queen contiguity and block weights
 
 ```python
-union_mx = weights.Wsets.w_union(block_mx, queen_mx)
+union_mx = weights.set_operations.w_union(block_mx, queen_mx)
 
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(column='INEGI2', categorical=True, cmap='Pastel2', ax=ax)
@@ -999,7 +998,7 @@ plt.hist(adjlist_wealth['diff'],
          histtype='step', bins=50, label='Neighbors')
 seaborn.despine()
 plt.ylabel("Density")
-plt.xlabel("Dollars ($)")
+plt.xlabel("Dollar Differences ($)")
 plt.legend()
 ```
 
@@ -1047,7 +1046,7 @@ plt.hist(adjlist_wealth['diff'], histtype='step',
          linewidth=2)
 seaborn.despine()
 plt.ylabel("Density")
-plt.xlabel("Dollars ($)")
+plt.xlabel("Dollar Differences ($)")
 plt.show()
 ```
 
@@ -1098,6 +1097,61 @@ ax[2].axis([west, south, east, north])
 These are the starkest contrasts in the map, and result in the most distinctive divisions between adjacent tracts' household incomes. 
 
 
+# Questions
+
+
+1. Rook contiguity & Queen contiguity are two of three kinds of contiguity that are defined in terms of chess analogies. The third kind, *Bishop contiguity*, applies when two observations are considered connected when they share single vertices, but are considered *disconnected* if they share an edge. This means that observations that exhibit Queen contiguity are those that exhibit either Rook or Bishop contiguity. Using the Rook and Queen contiguity matrices we built for San Diego and the `Wsets.w_difference` function, are there any Bishop-contiguous observations in San Diego? 
+
+2. Different kinds of spatial weights objects can result in very different kinds of graph structures. Considering the `cardinalities` of the Queen, Block, and union of Queen & Block, which graph type has the highest average cardinality? Why might this be the case? Which graph has more nonzero entries?
+
+3. Comparing their average cardinality and percentage of nonzero links, which graph in this chapter has the *most sparse* structure? That is, which graph is the most sparsely connected?
+
+4. In this chapter, we worked with regular *square* lattices using the `lat2W` function. In the same manner, the `hexLat2W` function can generate *hexagonal regular lattices*. For lattices of size (3,3), (6,6), and (9,9) for Rook & Queen `lat2W`, as well as for `hexLat2W`:
+
+    1. examine the average cardinality. Does `lat2W` or `hexLat2W` have higher average cardinality? 
+    2. Further, make a histogram of the cardinalities. Which type of lattice has higher variation in its number of neighbors? 
+    3. Why is there no `rook=True` option in `hexLat2W`, as there is in `lat2W`?
+
+5. The *Voronoi diagram* is a common method to construct polygons from a point dataset. A Voronoi diagram is built up from *Voronoi cells*, each of which contains the area that is closer to its source point than any other source point in the diagram. Further, the Queen contiguity graph for a *Voronoi diagram* obeys a number of useful properties, since it is the *Delaunay Triangulation* of a set of points. 
+    1. Using the following code, build and plot the voronoi diagram for the *centroids* of Mexican states, with the states and their centroids overlayed:
+    ```python
+    from pysal.lib.weights.distance import get_points_array
+    from pysal.lib.cg import voronoi_frames
+    
+    centroid_coordinates = get_points_array(mx.centroid)
+    cells, centers = voronoi_frames(centroid_coordinates)
+    
+    ax = cells.plot(facecolor='none', edgecolor='k')
+    mx.plot(ax=ax, edgecolor='red', facecolor='whitesmoke', alpha=.5)
+    mx.centroid.plot(ax=ax,color='red', alpha=.5, markersize=10)
+    ax.axis(mx.total_bounds[[0,2,1,3]])
+    plt.show()
+    ```
+    2. Using the `weights.Voronoi` function, build the Voronoi weights for the Mexico states data.
+    3. Compare the connections in the Voronoi and Queen weights for the Mexico states data. Which form is more connected? 
+    4. Make a plot of the Queen contiguity and Voronoi contiguity graphs to compare them visually, like we did with the block weights & Queen weights. How do the two graphs compare in terms of the length of their links and how they connect the Mexican states?
+    5. Using `weights.set_operations`, find any links that are in the Voronoi contiguity graph, but not in the Queen contiguity graph. Alternatively, find any links that are in the Queen contiguity graph, but not the Voronoi contiguity graph. 
+
+6. Interoperability is important for the Python scientific stack. Thanks to standardization around the `numpy` array and the `scipy.sparse` array datastructures, it is simple and computationally-easy to convert objects from one representation to another:
+    1. Using `w.to_networkx()`, convert the Mexico Regions Queen+Block weights matrix to a `networkx` graph. Compute the Eigenvector Centrality of that new object using `networkx.eigenvector_centrality`
+    2. Using `w.sparse`, compute the number of connected components in the Mexico Regions Block weights matrix using the `connected_components` function in `scipy.sparse.csgraph`. 
+    3. Using `w.sparse`, compute the all-pairs shortest path matrix in the Mexico Queen weights matrix using the `shortest_path` function in `scipy.sparse.csgraph`. 
+    
+7. While every node in a $k$-nearest neighbor graph has 5 neighbors, there is a conceptual difference between *indegree* and *outdegree* of nodes in a graph. The *outdegree* of a node is the number of outgoing links from a node; for a K-Nearest Neighbor graph, this is $k$ for every variable. The *indegree* of a node in a graph is the number of *incoming* links to that node; for a K-Nearest Neighbor graph, this is the number of other observations that pick the target as their nearest neighbor. The *indegree* of a node in the K-Nearest Neighbor graph can provide a measure of *hubbiness*, or how central a node is to other nodes. 
+    1. Using the San Diego Tracts data, build a $k=6$ nearest neighbor weight and call it `knn_6`. 
+    2. Verify that the $k=6$ by taking the row sum over the weights matrix in `knn_6.sparse`.
+    3. Compute the indegree of each observation by taking the *column sum* over the weights matrix in `knn_6.sparse`, and divide by 6, the outdegree for all observations. 
+    4. Make a histogram of the indegrees for the $k=6$ weights. How evenly-distributed is the distribution of indegrees?
+    5. Make a new histogram of the indegree standardized by the outdegree when $k=26$. Does hubbiness reduce when increasing the number of $k$-nearest neighbors?
+
+8. Sometimes, graphs are not simple to construct. For the `san_diego_neighborhoods` dataset:
+    1. Build the Queen contiguity weights, and plot the graph on top of the neighborhoods themselves. How many connected components does this Queen contiguity graph have? 
+    2. Build the K-Nearest Neighbor graph for the default, $k=2$. How many connected components does this K-Nearest Neighbor graph have? 
+    3. What is the smallest $k$ that you can find for the K-Nearest Neighbor graph to be fully-connected?
+    4. In graph theory, a link whose *removal* will increase the number of connected components in a graph is called a *bridge*. In the fully-connected KNN graph with the smallest $k$, how many bridges are there between the north and south components? *(hint: use the plotting functionality)*
+    5. What are the next two values of $k$ required for there to be an *additional* bridge at that $k$?
+
+
 # References
 
 
@@ -1110,6 +1164,18 @@ These are the starkest contrasts in the map, and result in the most distinctive 
 [4] Dean, N., Dong, G., and Price, G. "Frontiers in Residential Segregation: Understanding Neighbourhood Boundaries and their Impacts." *Tijdschrift voor economische en sociale geografie*, in press
 
 
+# Further Reading
+
+LeSage, James P., and R. Kelley Pace. 2014. “The Biggest Myth in Spatial Econometrics.” *Econometrics* 2(4): 217–49. https://doi.org/10.3390/econometrics2040217.
+
+Griffith, D. A. 1996. “Some Guidelines for Specifying the Geographic Weights Matrix Contained in Spatial Statistical Models.” In *Practical Handbook of Spatial Statistics*, edited by Sandra Lach Arlinghaus, 65–82. Boca Raton, FL: CRC Press.
+
+
+
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+```python
+
+```
