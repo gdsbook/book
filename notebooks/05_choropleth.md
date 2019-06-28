@@ -160,7 +160,7 @@ range of the attribute values. Given $w$ the number of bins ($k$) is:
 $$k=(max-
 min)/w.$$
 
-Below we present several approaches to create these break points that follow criteria that can be of interest in different contests, as they focus on different priorities.
+Below we present several approaches to create these break points that follow criteria that can be of interest in different contexts, as they focus on different priorities.
  
 #### Equal Intervals
 
@@ -169,9 +169,9 @@ the width and, in turn, the number of bins for the classification. This is a
 special case of a more general classifier known as "equal intervals", where each
 of the bins has the same width in the value space. 
 For a given value of $k$, equal intervals
-classification splits the range of the attribute space into equal lengthened
+classification splits the range of the attribute space into $k$ equal length
 intervals, with each interval having a width
-$w = \frac{x_0 - x_{n-1}}{k-1}$.
+$w = \frac{x_0 - x_{n-1}}{k}$.
 Thus the maximum class is $(x_{n-1}-w, x_{n-1}]$ and the first class is
 $(-\infty, x_{n-1} - (k-1)w]$.
 
@@ -215,7 +215,7 @@ While quantiles does avoid the pitfall of sparse classes, this classification is
 not problem free. The varying widths of the intervals can be markedly different
 which can lead to problems of interpretation. A second challenge facing quantiles
 arises when there are a large number of duplicate values in the distribution
-such that the limits for one or more classes become ambiguous.
+such that the limits for one or more classes become ambiguous. For example, if one had a variable with $n=20$ but 10 of the observations took on the same value which was the minimum observed, then for values of $k>2$, the class boundaries become ill-defined since a simple rule of splitting at the $n/k$ ranked observed value would depend upon how ties are tried when ranking.
 
 #### Mean-standard deviation
 
@@ -236,20 +236,32 @@ msd
 
 This classifier is best used when data is normally distributed or, at least, when the sample mean is a meaningful measure to anchor the classification around. Clearly this is
 not the case for our income data as the positive skew results in a loss of
-information when we use the standard deviation. The lack of symmetry thus leads to
-inadmissible boundaries for the first  class as well as a concentration of the
+information when we use the standard deviation. The lack of symmetry leads to
+an inadmissible upper bound for the first  class as well as a concentration of the
 vast majority of values in the middle class.
 
 #### Maximum Breaks
 
-The maximum breaks classifier decides where to set the break points between classes by considering the difference between sorted values. That is, rather than considering a value of the dataset in itself, it looks at how appart each value is from the next one in the sorted sequence. The classifier then places the the $k-1$ break points in between the $k$ values most stretched apart from each other in the entire sequence:
+The maximum breaks classifier decides where to set the break points between
+classes by considering the difference between sorted values. That is, rather
+than considering a value of the dataset in itself, it looks at how appart each
+value is from the next one in the sorted sequence. The classifier then places
+the the $k-1$ break points in between the pairs of values most stretched apart from
+each other in the entire sequence, proceeding in descending order relative to
+the size of the breaks:
 
 ```python
 mb5 = mapclassify.Maximum_Breaks(mx['PCGDP1940'], k=5)
 mb5
 ```
 
-Maximum breaks is an appropriate approach when we are interested in making sure observations in each class are as similar to each other as possible. As such, it works well in cases where the distribution of values is not unimodal. In addition, the algorithm is relatively fast to compute. However, its simplicitly can sometimes cause unexpected results. To the extent in only considers the top $k$ differences between consecutive values, other more nuanced within-group differences and dissimilarities can be ignored.
+Maximum breaks is an appropriate approach when we are interested in making sure
+observations in each class are separated from those in neighboring classes. As
+such, it works well in cases where the distribution of values is not unimodal.
+In addition, the algorithm is relatively fast to compute. However, its
+simplicitly can sometimes cause unexpected results. To the extent in only
+considers the top $k-1$ differences between consecutive values, other more nuanced
+within-group differences and dissimilarities can be ignored.
 
 #### Box-Plot
 
@@ -283,7 +295,7 @@ neighboring internal classes.
 
 #### Head Tail Breaks
 
-The head tail algorithm, introduced by Jiang (2013) is based on a recursive partioning of the data using splits around
+The head tail algorithm, introduced by Jiang (2013), is based on a recursive partioning of the data using splits around
 iterative means. The splitting process continues until the distributions within each of
 the classes no longer display a heavy-tailed distribution in the sense that
 there is a balance between the number of smaller and larger values assigned to
@@ -349,12 +361,12 @@ As a special case of clustering, the definition of
 the number of classes and the class boundaries pose a problem to the map
 designer. Recall that the Freedman-Diaconis rule was said to be optimal,
 however, the optimality necessitates the specification of an objective function.
-In the case of Freedman-Diaconis the objective function is to minimize the
+In the case of Freedman-Diaconis, the objective function is to minimize the
 difference between the area under estimated kernel density based on the sample
 and the area under the theoretical population distribution that generated the
 sample.
 
-This notion of statistical fit is an important one, however, not the
+This notion of statistical fit is an important one. However, it is not the
 only consideration when evaluating classifiers for the purpose of choropleth
 mapping. Also relevant is the spatial distribution of the attribute values and
 the ability of the classifier to convey a sense of that spatial distribution. As
@@ -632,10 +644,22 @@ choropleth maps. Readers interested in pursuing this literature are encouraged
 to see the references cited.
 
 At the same time, given the philosophy underlying PySAL the methods we cover
-here are sufficient for exploratory data analysis where rapid and flexible
-generation of views is critical to the work flow. Once the analysis is complete
+here are sufficient for exploratory data analysis where the rapid and flexible
+generation of views is critical to the work flow. Once the analysis is complete,
 and the final presentation quality maps are to be generated, there are excellent
 packages in the data stack that the user can turn to.
+
+## Questions
+
+1. A variable such as population density measured for census tracts in a metropolitan area can display a high degree of skewness. What is an appropriate choice for a choropleth classification for such a variable?
+2. Provide two solutions to the problem of ties when applying quantile classification to the following series: $y=[2,2,2,2,2,2,4,7,8,9,20,21]$ and $k=4$. Discuss the merits of each approach.
+3. Which classifiers are appropriate for data that displays a high degree of multi-modality in its statistical distribution?
+4. Contrast and compare classed choropleth maps with class-less choropleth maps? What are the strengths and limitations of each type of visualization for spatial data?
+5. In what ways do choropleth classifiers treat intra-class and inter-class heterogeneity differently? What are the implications of these choices?
+6. To what extent do most commonly employed choropleth classification methods take the geographical distribution of the variable into consideration? Can you think of ways to incorporate the spatial features of a variable into a classification?
+7. Discuss the similarities between  the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?
+8. The Fisher-Jenks classifier will always dominate other k-classifiers for a given data set, with respect to statistical fit. Given this, why might one decide on choosing a different k-classifier for a particular data set?
+
 
 ## References
 
