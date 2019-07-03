@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.1.6
+      jupytext_version: 1.2.1
   kernelspec:
     display_name: Python 3
     language: python
@@ -18,33 +18,22 @@ jupyter:
 
 
 
-```python
-%matplotlib inline
-
-import seaborn
-import pandas
-import geopandas
-import pysal
-import numpy
-from booktools import choropleth
-from pysal.viz.mapclassify import classifiers as mapclassify
-import matplotlib.pyplot as plt
-```
-
 <!-- #region -->
 ## Principles
 
 
-Choropleth maps play a prominent role in geographic data science as they allow us to display non-geographic attributes or variables on a geographic map. The word
-choropleth stems from the root "choro", meaning "region". As such choropleth maps
-represent data at the region level, and
-are appropriate for areal unit data where each observation combines a value of
-an attribute and a geometric figure, usually a polygon. Choropleth maps derive from an earlier era where
-cartographers faced technological constraints that precluded the use of
+Choropleth maps play a prominent role in geographic data science as they allow
+us to display non-geographic attributes or variables on a geographic map. The
+word choropleth stems from the root "choro", meaning "region". As such
+choropleth maps represent data at the region level, and are appropriate for
+areal unit data where each observation combines a value of an attribute and a
+geometric figure, usually a polygon. Choropleth maps derive from an earlier era
+where cartographers faced technological constraints that precluded the use of
 unclassed maps where each unique attribute value could be represented by a
-distinct symbol or color. Instead, attribute values were grouped into a smaller number of
-classes, usually not more than 12. Each class was associated with a unique symbol that was in turn
-applied to all observations with attribute values falling in the class.
+distinct symbol or color. Instead, attribute values were grouped into a smaller
+number of classes, usually not more than 12. Each class was associated with a
+unique symbol that was in turn applied to all observations with attribute values
+falling in the class.
 
 Although today these technological constraints are no longer binding, and
 unclassed mapping is feasible, there are still good reasons for adopting a
@@ -61,14 +50,27 @@ defines the number of classes as well as the rules for assignment, while the
 symbolization should convey information about the value differentiation across
 the classes.
 
-In this chapter we first discuss the approaches used to classify
-attribute values. This is followed by an overview of color theory and the
-implications of different color schemes for effective map design. We  combine
-theory and practice by exploring how these concepts are implemented in different Python packages, including `geopandas`, and `PySAL`.
+In this chapter we first discuss the approaches used to classify attribute
+values. This is followed by an overview of color theory and the implications of
+different color schemes for effective map design. We combine theory and practice
+by exploring how these concepts are implemented in different Python packages,
+including `geopandas`, and `PySAL`.
 
 
 
 <!-- #endregion -->
+
+```python
+%matplotlib inline
+
+import seaborn
+import pandas
+import geopandas
+import pysal
+import numpy
+import mapclassify
+import matplotlib.pyplot as plt
+```
 
 ## Quantitative data classification 
 
@@ -80,7 +82,7 @@ measurement scale of the attribute in question. For quantitative attributes
 More formally, the classification problem is to define class boundaries such
 that
 $$
-c_j < y_i \le  c_{j+1} \ \forall y_i \in C_{j+1}
+c_j < y_i \le  c_{j+1} \ \forall y_i \in C_{j}
 $$
 where $y_i$ is the
 value of the attribute for spatial location $i$, $j$ is a class index, and $c_j$
@@ -162,32 +164,31 @@ Below we present several approaches to create these break points that follow cri
  
 #### Equal Intervals
 
-The Freedman-Diaconis approach provides a rule to determine
-the width and, in turn, the number of bins for the classification. This is a
-special case of a more general classifier known as "equal intervals", where each
-of the bins has the same width in the value space. 
-For a given value of $k$, equal intervals
+The Freedman-Diaconis approach provides a rule to determine the width and, in
+turn, the number of bins for the classification. This is a special case of a
+more general classifier known as "equal intervals", where each of the bins has
+the same width in the value space. For a given value of $k$, equal intervals
 classification splits the range of the attribute space into $k$ equal length
-intervals, with each interval having a width
-$w = \frac{x_0 - x_{n-1}}{k}$.
-Thus the maximum class is $(x_{n-1}-w, x_{n-1}]$ and the first class is
-$(-\infty, x_{n-1} - (k-1)w]$.
+intervals, with each interval having a width $w = \frac{x_0 - x_{n-1}}{k}$. Thus
+the maximum class is $(x_{n-1}-w, x_{n-1}]$ and the first class is $(-\infty,
+x_{n-1} - (k-1)w]$.
 
-Equal intervals have the dual advantages of
-simplicity and ease of interpretation. However, this rule only considers the extreme
-values of the distribution and, in some cases, this can result in one or more
-classes being sparse. This is clearly the case in our income dataset, as the majority of
-the values are placed into the first two classes leaving the last three classes
+Equal intervals have the dual advantages of simplicity and ease of
+interpretation. However, this rule only considers the extreme values of the
+distribution and, in some cases, this can result in one or more classes being
+sparse. This is clearly the case in our income dataset, as the majority of the
+values are placed into the first two classes leaving the last three classes
 rather sparse:
 
 ```python
-ei5 = mapclassify.Equal_Interval(mx['PCGDP1940'], k=5)
+ei5 = mapclassify.EqualInterval(mx['PCGDP1940'], k=5)
 ei5
 ```
 
-  Note that each of the intervals, however, has equal width of
+ Note that each of the intervals, however, has equal width of
 $w=4093.8$. This value of $k=5$ also coincides with the default classification
-in the Seaborn histogram in Figure 1.
+in the Seaborn histogram displayed in Figure 1. It should also be noted that the first class is closed on the lower bound,
+in contrast to the general approach defined in Equation (1).
 
 
 #### Quantiles
@@ -215,28 +216,30 @@ which can lead to problems of interpretation. A second challenge facing quantile
 arises when there are a large number of duplicate values in the distribution
 such that the limits for one or more classes become ambiguous. For example, if one had a variable with $n=20$ but 10 of the observations took on the same value which was the minimum observed, then for values of $k>2$, the class boundaries become ill-defined since a simple rule of splitting at the $n/k$ ranked observed value would depend upon how ties are tried when ranking.
 
-#### Mean-standard deviation
-
-Our third classifer uses the sample mean $\bar{x} =
-\frac{1}{n} \sum_{i=1}^n x_i$ and sample standard deviation $s = \sqrt{
-\frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})  }$ to define class boundaries as
-some distance from the sample mean, with the distance being a multiple of the
-standard deviation. For example, a common definition for $k=5$ is to set the
-upper limit of the first class to two standard deviations ($c_{0}^u = \bar{x} - 2 s$), and the intermediate
-classes to have upper limits within one standard deviation ($c_{1}^u = \bar{x}-s,\ c_{2}^u = \bar{x}+s, \ c_{3}^u
-= \bar{x}+2s$). Any values greater (smaller) than two standard deviations above (below) the mean
-are placed into the top (bottom) class.
-
 ```python
-msd = mapclassify.Std_Mean(mx['PCGDP1940'])
-msd
+numpy.random.seed(12345)
+x = numpy.random.randint(0,10,20)
+x[0:10] = x.min()
+x
 ```
 
-This classifier is best used when data is normally distributed or, at least, when the sample mean is a meaningful measure to anchor the classification around. Clearly this is
-not the case for our income data as the positive skew results in a loss of
-information when we use the standard deviation. The lack of symmetry leads to
-an inadmissible upper bound for the first  class as well as a concentration of the
-vast majority of values in the middle class.
+```python
+ties = mapclassify.Quantiles(x, k=5)
+ties
+```
+
+Clearly this is not a uniform distribution of counts across five quintiles. 
+In this case, `mapclassify` has issued a warning alerting  us to the issue
+that this sample does not contain enough unique values to form the number of
+well-defined classes requested. More specifically, if the percentiles are taken across the sorted data, then scipy reports
+the percentiles as:
+```python
+import scipy.stats as stats
+q = numpy.array([stats.scoreatpercentile(x, pct) for pct in numpy.arange(20, 120, 20)])
+q
+```
+with the 20th and 40th percentiles equal at (0). `Mapclassify`` then collapses the duplicate
+classes into a single class to form pseudo quantiles with reduced dimension.
 
 #### Maximum Breaks
 
@@ -249,7 +252,7 @@ each other in the entire sequence, proceeding in descending order relative to
 the size of the breaks:
 
 ```python
-mb5 = mapclassify.Maximum_Breaks(mx['PCGDP1940'], k=5)
+mb5 = mapclassify.MaximumBreaks(mx['PCGDP1940'], k=5)
 mb5
 ```
 
@@ -261,6 +264,39 @@ simplicitly can sometimes cause unexpected results. To the extent in only
 considers the top $k-1$ differences between consecutive values, other more nuanced
 within-group differences and dissimilarities can be ignored.
 
+#### Mean-standard deviation
+
+Our third classifer uses the sample mean $\bar{x} =
+\frac{1}{n} \sum_{i=1}^n x_i$ and sample standard deviation $s = \sqrt{
+\frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})^2  }$ to define class boundaries as
+some distance from the sample mean, with the distance being a multiple of the
+standard deviation. For example, a common definition for $k=4$ is to set the
+upper limits of the classes to be:
+$
+c_{0}^u = \bar{x} - 2s,
+c_{1}^u = \bar{x} - s,
+c_{2}^u = \bar{x} + s,
+c_{3}^u = \bar{x} + 2s
+$.
+
+```python
+msd = mapclassify.StdMean(mx['PCGDP1940'])
+msd
+```
+
+This classifier is best used when data is normally distributed or, at least,
+when the sample mean is a meaningful measure to anchor the classification
+around. Clearly this is not the case for our income data as the positive skew
+results in a loss of information when we use the standard deviation. The lack of
+symmetry leads to an inadmissible upper bound for the first class as well as a
+concentration of the vast majority of values in the middle class. On the other
+hand, this classifer can be useful in detecting outliers. Close inspection of
+the resulting classes based on our sample reveals five, not four, intervals. The
+additional interval is due to three values in the sample exceeding $
+c_{3}^u = \bar{x} + 2s$. In this case, `mapclassify` will append an additional
+class to capture the outlier.
+
+
 #### Box-Plot
 
 The box-plot classification is a blend of the quantile and
@@ -271,7 +307,7 @@ IQR$. Intermediate classes have their upper limits set to the 0.25, 0.50 and
 0.75 percentiles of the attribute values.
 
 ```python
-bp = mapclassify.Box_Plot(mx['PCGDP1940'])
+bp = mapclassify.BoxPlot(mx['PCGDP1940'])
 bp
 ```
 
@@ -284,7 +320,7 @@ The default value for the hinge is $h=1.5$ in
 PySAL. However, this can be specified by the user for an alternative classification:
 
 ```python
-bp1 = mapclassify.Box_Plot(mx['PCGDP1940'], hinge=1)
+bp1 = mapclassify.BoxPlot(mx['PCGDP1940'], hinge=1)
 bp1
 ```
 
@@ -300,7 +336,7 @@ there is a balance between the number of smaller and larger values assigned to
 each class.
 
 ```python
-ht = mapclassify.HeadTail_Breaks(mx['PCGDP1940'])
+ht = mapclassify.HeadTailBreaks(mx['PCGDP1940'])
 ht
 ```
 
@@ -323,7 +359,7 @@ other improving moves are possible.
 
 ```python
 numpy.random.seed(12345)
-jc5 = mapclassify.Jenks_Caspall(mx['PCGDP1940'], k=5)
+jc5 = mapclassify.JenksCaspall(mx['PCGDP1940'], k=5)
 jc5
 ```
 
@@ -336,7 +372,7 @@ classification for a prespecified number of classes:
 
 ```python
 numpy.random.seed(12345)
-fj5 = mapclassify.Fisher_Jenks(mx['PCGDP1940'], k=5)
+fj5 = mapclassify.FisherJenks(mx['PCGDP1940'], k=5)
 fj5
 ```
 
@@ -349,7 +385,7 @@ improve the objective function. It is a heuristic, however, so unlike
 Fisher-Jenks, there is no optimial solution guaranteed:
 
 ```python
-mp5 = mapclassify.Max_P_Classifier(mx['PCGDP1940'], k=5)
+mp5 = mapclassify.MaxP(mx['PCGDP1940'], k=5)
 mp5
 ```
 
@@ -487,18 +523,71 @@ With this qualification in mind, we will explore the construction of choropleth
 maps using PySAL and the helper method `choropleth`:
 
 ```python
-choropleth(mx, 'PCGDP1940', cmap='BuGn')
+mx.plot(column='PCGDP1940', legend=True, scheme='Quantiles')
 ```
 
-The default uses a quantile classification with k=5, together with a green color
-pallete where darker hues indicate higher class assignment for the attribute
-values associated with each polygon.
-
-These defaults can be overriden in a
-number of ways, for example changing the colormap and number of quantiles:
+```python
+mx.plot(column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}')
+```
 
 ```python
-choropleth(mx, 'PCGDP1940', cmap='Blues', k=4)
+mx.plot(column='PCGDP1940', legend=True, scheme='stdmean')
+```
+
+```python
+mx.plot(column='PCGDP1940', legend=True, scheme='stdmean', fmt='{:.0f}')
+```
+
+```python
+cuts = [2026, 17650, 25000]
+mx.plot(column='PCGDP1940', legend=True, scheme='UserDefined', classification_kwds={"bins":cuts}, fmt="{:.0f}") 
+```
+
+```python
+PCGDP1940 = mx.PCGDP1940
+q5 = mapclassify.Quantiles(PCGDP1940)
+q5
+```
+
+The resulting classifier object has a plot method takes a geopandas dataframe as an argument:
+
+```python
+q5.plot(mx)
+```
+
+The default uses a `YlGnBu` color map from matplotlib. We can override the color map, as well as drop the axes, as follows:
+
+
+```python
+_ = q5.plot(mx, cmap='Blues', axis_on=False, legend=True,
+           legend_kwds={'loc': 'upper right'}, fmt='{:.2f}')
+```
+
+```python
+_ = q5.plot(mx, cmap='Blues', axis_on=False, legend=True,
+           legend_kwds={'loc': 'upper right'}, fmt='{:.0f}')
+```
+
+```python
+stdm = mapclassify.StdMean(PCGDP1940)
+_ = stdm.plot(mx, cmap='Blues', axis_on=False, legend=True,
+           legend_kwds={'loc': 'upper right', 'title':'Std Mean'}, 
+           title='PCGDP 1940', fmt='{:.0f}')
+```
+
+```python
+stdm
+```
+
+```python
+bp = mapclassify.BoxPlot(PCGDP1940)
+_ = bp.plot(mx, cmap='Blues', axis_on=False, legend=True,
+           legend_kwds={'loc': 'upper right', 'title':'Box Plot'}, fmt='{:.0f}',
+           title='PCGDP 1940')
+```
+
+```python
+bp
 ```
 
 We will continue to use the `Blues`
@@ -514,43 +603,17 @@ each of the k=5 classifiers:
 - Jenks Caspall
 - Fisher Jenks
 
-**DA-B NOTE**: it would *really* nice to have a `mapclassify.plot` method to go from created classifications to choropleths in this context.
+
 
 ```python
-choropleth(mx, 'PCGDP1940', cmap='Blues',
-           scheme='equal_interval', k=5)
+ea5 = mapclassify.EqualInterval(PCGDP1940, k=5)
+ea5
 ```
 
 ```python
-#choropleth(mx, 'PCGDP1940', cmap='Blues',
-#           scheme='Std_Mean', k=5)
-```
-
-```python
-choropleth(mx, 'PCGDP1940', cmap='Blues',
-           scheme='maximum_breaks', k=5)
-```
-
-```python
-#choropleth(mx, 'PCGDP1940', cmap='Blues',
-#           scheme='Box_Plot')
-```
-
-```python
-#choropleth(mx, 'PCGDP1940', cmap='Blues', 
-#           scheme='headtail_breaks')
-```
-
-```python
-numpy.random.seed(12345)
-#choropleth(mx, 'PCGDP1940', cmap='Blues',
-#           scheme='jenks_caspall', k=5)
-```
-
-```python
-numpy.random.seed(12345)
-choropleth(mx, 'PCGDP1940', cmap='Blues', 
-           scheme='fisher_jenks', k=5)
+_ = ea5.plot(mx, cmap='Blues', axis_on=False, legend=True,
+           legend_kwds={'loc': 'upper right'}, fmt='{:.0f}',
+            border_color='gray')
 ```
 
 We also note that geopandas can be used to do the plotting here, and we add some customization to the legend to report the upper bounds of each class:
@@ -586,7 +649,7 @@ any period has a rank of 1 and therefore when considering the change in ranks, a
 negative change reflects moving down the income distribution.
 
 ```python
-choropleth(mx.assign(rkd=cls), 'rkd', cmap='RdYlBu',
+mx.assign(cl=cls).plot(column='cl', categorical=True, cmap='RdYlBu',
            scheme='equal_interval', k=4)
 ```
 
@@ -606,24 +669,30 @@ mx['HANSON98'].head()
 
 This regionalization scheme partions Mexico into 5 regions. A naive (and
 incorrect) way to display this would be to treat the region variable as
-sequential and use equal_inteval $k=5$ to display the regions:
+sequential and use a `UserDefined` classifier to display the regions:
 
 ```python
-choropleth(mx, 'HANSON98', cmap='Blues', scheme='equal_interval')
+import numpy as np
+h5 = mapclassify.UserDefined(mx['HANSON98'], bins=np.arange(1,6).tolist())
+h5.fmt = '{:.0f}'
+h5
+```
+
+```python
+_ = h5.plot(mx, axis_on=False)
 ```
 
 This is not correct because the region variable is not on an interval scale, so
 the differences between the values have no quantitative significance but rather
 the values simply indicate region membership. However, the choropleth above gives
-a clear visual cue that regions in the south are more (of whichever is being plot)
+a clear visual cue that regions in the south have larger values
 than those in the north, as the color map implies an intensity gradient.
 
 A more appropriate visualization
 is to use a "qualitative" color palette:
 
 ```python
-choropleth(mx, 'HANSON98', cmap='Pastel1',
-           scheme='equal_interval')
+_ = h5.plot(mx, cmap='Pastel1', axis_on=False)
 ```
 
 ## Conclusion
@@ -678,3 +747,15 @@ Rey, S.J. and M.L. Guitierez. (2010)
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
