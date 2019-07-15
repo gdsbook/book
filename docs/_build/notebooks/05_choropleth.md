@@ -14,6 +14,7 @@ next_page:
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -21,10 +22,13 @@ comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /con
 
 
 
+
 ```
 </div>
 
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -39,10 +43,13 @@ import numpy
 from booktools import choropleth
 from pysal.viz.mapclassify import classifiers as mapclassify
 import matplotlib.pyplot as plt
+
 ```
 </div>
 
 </div>
+
+
 
 ## Principles
 
@@ -81,6 +88,8 @@ theory and practice by exploring how these concepts are implemented in different
 
 
 
+
+
 ## Quantitative data classification
 
 Data classification considers the problem of 
@@ -105,11 +114,14 @@ To illustrate these considerations, we will examine regional income data for the
 32 Mexican states. The variable we focus on is per capita gross domestic product
 for 1940 (PCGDP1940):
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 mx = geopandas.read_file("../data/mexicojoin.shp")
 mx[['NAME', 'PCGDP1940']].head()
+
 ```
 </div>
 
@@ -177,12 +189,17 @@ mx[['NAME', 'PCGDP1940']].head()
 </div>
 </div>
 
+
+
 Which displays the following statistical distribution:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 h = seaborn.distplot(mx['PCGDP1940'], bins=5, rug=True);
+
 ```
 </div>
 
@@ -196,15 +213,20 @@ h = seaborn.distplot(mx['PCGDP1940'], bins=5, rug=True);
 </div>
 </div>
 
+
+
 As we can see, the distribution is positively skewed as in common in regional income studies. In other words,
 the mean exceeds the median (`50%`, in the table below), leading the to fat right tail in the figure. As
 we shall see, this skewness will have implications for the choice of choropleth
 classification scheme.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 mx['PCGDP1940'].describe()
+
 ```
 </div>
 
@@ -230,6 +252,8 @@ Name: PCGDP1940, dtype: float64
 </div>
 </div>
 
+
+
 ### Classification schemes
 
 For quantitative attributes we first sort the data by their value,
@@ -245,21 +269,29 @@ function under the hood to determine the class boundaries and the counts of
 observations in each class. In the figure, we have five classes which can be
 extracted with an explicit call to the `hist` function:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 counts, bins, patches = h.hist(mx['PCGDP1940'], bins=5)
+
 ```
 </div>
 
 </div>
 
+
+
 The `counts` object captures how many observations each category in the classification has:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 counts
+
 ```
 </div>
 
@@ -277,12 +309,17 @@ array([17.,  9.,  3.,  1.,  2.])
 </div>
 </div>
 
+
+
 The `bin` object stores these break points we are interested in when considering classification schemes (the `patches` object can be ignored in this context, as it stores the geometries of the histogram plot):
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 bins
+
 ```
 </div>
 
@@ -300,6 +337,8 @@ array([ 1892. ,  5985.8, 10079.6, 14173.4, 18267.2, 22361. ])
 </div>
 </div>
 
+
+
 This yields 5 bins, with the first having a lower bound of 1892 and an upper
 bound of 5985.8 which contains 17 observations. 
 The determination of the
@@ -313,7 +352,7 @@ range of the attribute values. Given $w$ the number of bins ($k$) is:
 $$k=(max-
 min)/w.$$
 
-Below we present several approaches to create these break points that follow criteria that can be of interest in different contests, as they focus on different priorities.
+Below we present several approaches to create these break points that follow criteria that can be of interest in different contexts, as they focus on different priorities.
  
 #### Equal Intervals
 
@@ -322,9 +361,9 @@ the width and, in turn, the number of bins for the classification. This is a
 special case of a more general classifier known as "equal intervals", where each
 of the bins has the same width in the value space. 
 For a given value of $k$, equal intervals
-classification splits the range of the attribute space into equal lengthened
+classification splits the range of the attribute space into $k$ equal length
 intervals, with each interval having a width
-$w = \frac{x_0 - x_{n-1}}{k-1}$.
+$w = \frac{x_0 - x_{n-1}}{k}$.
 Thus the maximum class is $(x_{n-1}-w, x_{n-1}]$ and the first class is
 $(-\infty, x_{n-1} - (k-1)w]$.
 
@@ -335,11 +374,14 @@ classes being sparse. This is clearly the case in our income dataset, as the maj
 the values are placed into the first two classes leaving the last three classes
 rather sparse:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ei5 = mapclassify.Equal_Interval(mx['PCGDP1940'], k=5)
 ei5
+
 ```
 </div>
 
@@ -365,9 +407,13 @@ ei5
 </div>
 </div>
 
+
+
   Note that each of the intervals, however, has equal width of
 $w=4093.8$. This value of $k=5$ also coincides with the default classification
 in the Seaborn histogram in Figure 1.
+
+
 
 #### Quantiles
 To avoid the potential problem of sparse classes, the quantiles of
@@ -376,11 +422,14 @@ class will have approximately $\mid\frac{n}{k}\mid$ observations using the quant
 classifier. If $k=5$ the sample quintiles are used to define the upper limits of
 each class resulting in the following classification:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 q5 = mapclassify.Quantiles(mx.PCGDP1940, k=5)
 q5
+
 ```
 </div>
 
@@ -406,13 +455,18 @@ q5
 </div>
 </div>
 
+
+
 Note that while the numbers of values in each class are roughly equal, the
 widths of the first four intervals are rather different:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 q5.bins[1:]-q5.bins[:-1]
+
 ```
 </div>
 
@@ -430,11 +484,13 @@ array([ 1006.6,  2342.4,  2547.8, 12888. ])
 </div>
 </div>
 
+
+
 While quantiles does avoid the pitfall of sparse classes, this classification is
 not problem free. The varying widths of the intervals can be markedly different
 which can lead to problems of interpretation. A second challenge facing quantiles
 arises when there are a large number of duplicate values in the distribution
-such that the limits for one or more classes become ambiguous.
+such that the limits for one or more classes become ambiguous. For example, if one had a variable with $n=20$ but 10 of the observations took on the same value which was the minimum observed, then for values of $k>2$, the class boundaries become ill-defined since a simple rule of splitting at the $n/k$ ranked observed value would depend upon how ties are tried when ranking.
 
 #### Mean-standard deviation
 
@@ -448,11 +504,14 @@ classes to have upper limits within one standard deviation ($c_{1}^u = \bar{x}-s
 = \bar{x}+2s$). Any values greater (smaller) than two standard deviations above (below) the mean
 are placed into the top (bottom) class.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 msd = mapclassify.Std_Mean(mx['PCGDP1940'])
 msd
+
 ```
 </div>
 
@@ -478,21 +537,32 @@ msd
 </div>
 </div>
 
+
+
 This classifier is best used when data is normally distributed or, at least, when the sample mean is a meaningful measure to anchor the classification around. Clearly this is
 not the case for our income data as the positive skew results in a loss of
-information when we use the standard deviation. The lack of symmetry thus leads to
-inadmissible boundaries for the first  class as well as a concentration of the
+information when we use the standard deviation. The lack of symmetry leads to
+an inadmissible upper bound for the first  class as well as a concentration of the
 vast majority of values in the middle class.
 
 #### Maximum Breaks
 
-The maximum breaks classifier decides where to set the break points between classes by considering the difference between sorted values. That is, rather than considering a value of the dataset in itself, it looks at how appart each value is from the next one in the sorted sequence. The classifier then places the the $k-1$ break points in between the $k$ values most stretched apart from each other in the entire sequence:
+The maximum breaks classifier decides where to set the break points between
+classes by considering the difference between sorted values. That is, rather
+than considering a value of the dataset in itself, it looks at how appart each
+value is from the next one in the sorted sequence. The classifier then places
+the the $k-1$ break points in between the pairs of values most stretched apart from
+each other in the entire sequence, proceeding in descending order relative to
+the size of the breaks:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 mb5 = mapclassify.Maximum_Breaks(mx['PCGDP1940'], k=5)
 mb5
+
 ```
 </div>
 
@@ -518,7 +588,15 @@ mb5
 </div>
 </div>
 
-Maximum breaks is an appropriate approach when we are interested in making sure observations in each class are as similar to each other as possible. As such, it works well in cases where the distribution of values is not unimodal. In addition, the algorithm is relatively fast to compute. However, its simplicitly can sometimes cause unexpected results. To the extent in only considers the top $k$ differences between consecutive values, other more nuanced within-group differences and dissimilarities can be ignored.
+
+
+Maximum breaks is an appropriate approach when we are interested in making sure
+observations in each class are separated from those in neighboring classes. As
+such, it works well in cases where the distribution of values is not unimodal.
+In addition, the algorithm is relatively fast to compute. However, its
+simplicitly can sometimes cause unexpected results. To the extent in only
+considers the top $k-1$ differences between consecutive values, other more nuanced
+within-group differences and dissimilarities can be ignored.
 
 #### Box-Plot
 
@@ -529,11 +607,14 @@ inter-quartile range; $h$ corresponds to the hinge, or the multiplier of the $IQ
 IQR$. Intermediate classes have their upper limits set to the 0.25, 0.50 and
 0.75 percentiles of the attribute values.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 bp = mapclassify.Box_Plot(mx['PCGDP1940'])
 bp
+
 ```
 </div>
 
@@ -560,6 +641,8 @@ bp
 </div>
 </div>
 
+
+
 Any values falling into either of the extreme classes are defined as outlers.
 Note that because the income values are non-negative by definition, the lower
 outlier class has an inadmissible upper bound meaning that lower outliers would
@@ -568,11 +651,14 @@ not be possible for this sample.
 The default value for the hinge is $h=1.5$ in
 PySAL. However, this can be specified by the user for an alternative classification:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 bp1 = mapclassify.Box_Plot(mx['PCGDP1940'], hinge=1)
 bp1
+
 ```
 </div>
 
@@ -599,22 +685,27 @@ bp1
 </div>
 </div>
 
+
+
 Doing so will affect the definition of the outlier classes, as well as the
 neighboring internal classes.
 
 #### Head Tail Breaks
 
-The head tail algorithm, introduced by Jiang (2013) is based on a recursive partioning of the data using splits around
+The head tail algorithm, introduced by Jiang (2013), is based on a recursive partioning of the data using splits around
 iterative means. The splitting process continues until the distributions within each of
 the classes no longer display a heavy-tailed distribution in the sense that
 there is a balance between the number of smaller and larger values assigned to
 each class.
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ht = mapclassify.HeadTail_Breaks(mx['PCGDP1940'])
 ht
+
 ```
 </div>
 
@@ -640,6 +731,8 @@ ht
 </div>
 </div>
 
+
+
 For data with a heavy-tailed distribution, such as power law and log normal
 distributions, the head tail breaks classifier (Jiang 2015) can be particularly
 effective.
@@ -657,12 +750,15 @@ into the first quintile. The candidate move resulting in the largest reduction
 in the objective function would be made, and the process continues until no
 other improving moves are possible.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 numpy.random.seed(12345)
 jc5 = mapclassify.Jenks_Caspall(mx['PCGDP1940'], k=5)
 jc5
+
 ```
 </div>
 
@@ -688,6 +784,8 @@ jc5
 </div>
 </div>
 
+
+
 #### Fisher Jenks
 
 The second optimal algorithm adopts a dynamic programming approach to minimize
@@ -695,12 +793,15 @@ the sum of the absolute deviations around class medians. In contrast to the
 Jenks-Caspall approach, Fisher-Jenks is guaranteed to produce an optimal
 classification for a prespecified number of classes:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 numpy.random.seed(12345)
 fj5 = mapclassify.Fisher_Jenks(mx['PCGDP1940'], k=5)
 fj5
+
 ```
 </div>
 
@@ -726,6 +827,8 @@ fj5
 </div>
 </div>
 
+
+
 #### Max-p
 
 Finally, the max-p classifiers adopts the algorithm underlying the max-p region
@@ -734,11 +837,14 @@ Jenks Caspall in that it considers greedy swapping between adjacent classes to
 improve the objective function. It is a heuristic, however, so unlike
 Fisher-Jenks, there is no optimial solution guaranteed:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 mp5 = mapclassify.Max_P_Classifier(mx['PCGDP1940'], k=5)
 mp5
+
 ```
 </div>
 
@@ -764,18 +870,20 @@ mp5
 </div>
 </div>
 
+
+
 ### Comparing Classification schemes
 
 As a special case of clustering, the definition of
 the number of classes and the class boundaries pose a problem to the map
 designer. Recall that the Freedman-Diaconis rule was said to be optimal,
 however, the optimality necessitates the specification of an objective function.
-In the case of Freedman-Diaconis the objective function is to minimize the
+In the case of Freedman-Diaconis, the objective function is to minimize the
 difference between the area under estimated kernel density based on the sample
 and the area under the theoretical population distribution that generated the
 sample.
 
-This notion of statistical fit is an important one, however, not the
+This notion of statistical fit is an important one. However, it is not the
 only consideration when evaluating classifiers for the purpose of choropleth
 mapping. Also relevant is the spatial distribution of the attribute values and
 the ability of the classifier to convey a sense of that spatial distribution. As
@@ -791,6 +899,8 @@ comparison of alternative classifiers for the same value of $k$.
 
 To see this, we can compare different classifiers for $k=5$ on the Mexico data:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -800,6 +910,7 @@ data = pandas.DataFrame(fits)
 data['classifier'] = [c.name for c in class5]
 data.columns = ['ADCM', 'Classifier']
 ax = seaborn.barplot(y='Classifier', x='ADCM', data=data)
+
 ```
 </div>
 
@@ -812,6 +923,8 @@ ax = seaborn.barplot(y='Classifier', x='ADCM', data=data)
 </div>
 </div>
 </div>
+
+
 
 As is to be expected, the Fisher-Jenks classifier dominates all other k=5
 classifiers with an ACDM of 23,729. Interestingly, the equal interval classifier
@@ -827,6 +940,8 @@ the alternative approaches. To do this we can add the class bin attribute (`yb`)
 generated by the PySAL classifiers as additional columns in the data frame and
 present these jointly in a table:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -837,19 +952,25 @@ mx['mb540'] = mb5.yb
 mx['msd40'] = msd.yb
 mx['fj540'] = fj5.yb
 mx['jc540'] = jc5.yb
+
 ```
 </div>
 
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 mxs = mx.sort_values('PCGDP1940')
+
 ```
 </div>
 
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -867,16 +988,20 @@ def highlight_values(val):
         return 'background-color: %s' % '#62e4ff'
     else:
         return ''
+
 ```
 </div>
 
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 t = mxs[['NAME', 'PCGDP1940', 'q540', 'ei540', 'ht40', 'mb540', 'msd40', 'fj540', 'jc540']]
 t.style.applymap(highlight_values)
+
 ```
 </div>
 
@@ -1710,6 +1835,8 @@ t.style.applymap(highlight_values)
 </div>
 </div>
 
+
+
 Inspection of this table reveals a number of interesting results. First, the
 only Mexican state that is treated consistantly across the k=5 classifiers is
 Baja California Norte which is placed in the highest class by all classifiers.
@@ -1721,11 +1848,14 @@ Finally, we can consider a meso-level view of the clasification
 results by comparing the number of values assigned to each class across the
 different classifiers:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 pandas.DataFrame({c.name: c.counts for c in class5},
                  index=['Class-{}'.format(i) for i in range(5)])
+
 ```
 </div>
 
@@ -1823,6 +1953,8 @@ pandas.DataFrame({c.name: c.counts for c in class5},
 </div>
 </div>
 
+
+
 Doing so highlights the similarities between Fisher Jenks and equal intervals as
 the distribution counts are very similar as the two approaches agree on all 17
 states assigned to the first class. Indeed, the only observation that
@@ -1839,11 +1971,14 @@ distribution of the attribute values.
 
 Let us start by refreshing the `mx` object and exploring the base polygons for the Mexican states:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 mx = geopandas.read_file("../data/mexicojoin.shp")
 mx.plot(color='blue', edgecolor='y');
+
 ```
 </div>
 
@@ -1857,6 +1992,8 @@ mx.plot(color='blue', edgecolor='y');
 </div>
 </div>
 
+
+
 Prior to examining the attribute values it is important to note that the
 spatial units for these states are far from homogenous in their shapes and
 sizes. This can have major impacts on our brain's pattern recognition capabilities
@@ -1868,10 +2005,13 @@ statistical perspective.
 With this qualification in mind, we will explore the construction of choropleth
 maps using PySAL and the helper method `choropleth`:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 choropleth(mx, 'PCGDP1940', cmap='BuGn')
+
 ```
 </div>
 
@@ -1885,6 +2025,8 @@ choropleth(mx, 'PCGDP1940', cmap='BuGn')
 </div>
 </div>
 
+
+
 The default uses a quantile classification with k=5, together with a green color
 pallete where darker hues indicate higher class assignment for the attribute
 values associated with each polygon.
@@ -1892,10 +2034,13 @@ values associated with each polygon.
 These defaults can be overriden in a
 number of ways, for example changing the colormap and number of quantiles:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 choropleth(mx, 'PCGDP1940', cmap='Blues', k=4)
+
 ```
 </div>
 
@@ -1908,6 +2053,8 @@ choropleth(mx, 'PCGDP1940', cmap='Blues', k=4)
 </div>
 </div>
 </div>
+
+
 
 We will continue to use the `Blues`
 colormap in what follows in order to examine the spatial distribution revealed by
@@ -1924,11 +2071,14 @@ each of the k=5 classifiers:
 
 **DA-B NOTE**: it would *really* nice to have a `mapclassify.plot` method to go from created classifications to choropleths in this context.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 choropleth(mx, 'PCGDP1940', cmap='Blues',
            scheme='equal_interval', k=5)
+
 ```
 </div>
 
@@ -1942,21 +2092,27 @@ choropleth(mx, 'PCGDP1940', cmap='Blues',
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 #choropleth(mx, 'PCGDP1940', cmap='Blues',
 #           scheme='Std_Mean', k=5)
+
 ```
 </div>
 
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 choropleth(mx, 'PCGDP1940', cmap='Blues',
            scheme='maximum_breaks', k=5)
+
 ```
 </div>
 
@@ -1970,25 +2126,33 @@ choropleth(mx, 'PCGDP1940', cmap='Blues',
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 #choropleth(mx, 'PCGDP1940', cmap='Blues',
 #           scheme='Box_Plot')
+
 ```
 </div>
 
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 #choropleth(mx, 'PCGDP1940', cmap='Blues', 
 #           scheme='headtail_breaks')
+
 ```
 </div>
 
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1996,10 +2160,13 @@ choropleth(mx, 'PCGDP1940', cmap='Blues',
 numpy.random.seed(12345)
 #choropleth(mx, 'PCGDP1940', cmap='Blues',
 #           scheme='jenks_caspall', k=5)
+
 ```
 </div>
 
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -2007,6 +2174,7 @@ numpy.random.seed(12345)
 numpy.random.seed(12345)
 choropleth(mx, 'PCGDP1940', cmap='Blues', 
            scheme='fisher_jenks', k=5)
+
 ```
 </div>
 
@@ -2020,16 +2188,23 @@ choropleth(mx, 'PCGDP1940', cmap='Blues',
 </div>
 </div>
 
+
+
 We also note that geopandas can be used to do the plotting here, and we add some customization to the legend to report the upper bounds of each class:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ### Fill in with example once `geopandas` is back in sync with PySAL 2.0
+
 ```
 </div>
 
 </div>
+
+
 
 ### Diverging Attributes
 
@@ -2043,6 +2218,8 @@ To illustrate this for the Mexican
 income data we can derive a new variable which measures the change in a state's
 rank in the income distribution between 1940 to 2000:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -2052,6 +2229,7 @@ delta_rnk = rnk.PCGDP1940 - rnk.PCGDP2000
 delta_rnk
 cls = numpy.digitize(delta_rnk, [-5, 0, 5, 20])
 cls
+
 ```
 </div>
 
@@ -2070,16 +2248,21 @@ array([1, 1, 0, 2, 1, 2, 1, 1, 2, 3, 2, 2, 1, 1, 4, 3, 1, 1, 2, 2, 3, 1,
 </div>
 </div>
 
+
+
 Here we have created four classes for the rank changes: [-inf, -5), [-5, 0), [0,
 5), [5, 20]. Note that these are descending ranks, so the wealthiest state in
 any period has a rank of 1 and therefore when considering the change in ranks, a
 negative change reflects moving down the income distribution.
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 choropleth(mx.assign(rkd=cls), 'rkd', cmap='RdYlBu',
            scheme='equal_interval', k=4)
+
 ```
 </div>
 
@@ -2093,8 +2276,12 @@ choropleth(mx.assign(rkd=cls), 'rkd', cmap='RdYlBu',
 </div>
 </div>
 
+
+
 Here the red (blue) hues are states that have moved downwards (upwards) in the
 income distribution, with the darker hue representing a larger movement.
+
+
 
 ## Qualitative Attributes
 
@@ -2102,10 +2289,13 @@ The Mexico data set also has several variables that
 are on a nominal measurement scale. One of these is a region definition variable
 that groups individual states in contiguous clusters of similar characteristics:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 mx['HANSON98'].head()
+
 ```
 </div>
 
@@ -2128,14 +2318,19 @@ Name: HANSON98, dtype: float64
 </div>
 </div>
 
+
+
 This regionalization scheme partions Mexico into 5 regions. A naive (and
 incorrect) way to display this would be to treat the region variable as
 sequential and use equal_inteval $k=5$ to display the regions:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 choropleth(mx, 'HANSON98', cmap='Blues', scheme='equal_interval')
+
 ```
 </div>
 
@@ -2149,6 +2344,8 @@ choropleth(mx, 'HANSON98', cmap='Blues', scheme='equal_interval')
 </div>
 </div>
 
+
+
 This is not correct because the region variable is not on an interval scale, so
 the differences between the values have no quantitative significance but rather
 the values simply indicate region membership. However, the choropleth above gives
@@ -2158,11 +2355,14 @@ than those in the north, as the color map implies an intensity gradient.
 A more appropriate visualization
 is to use a "qualitative" color palette:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 choropleth(mx, 'HANSON98', cmap='Pastel1',
            scheme='equal_interval')
+
 ```
 </div>
 
@@ -2175,6 +2375,8 @@ choropleth(mx, 'HANSON98', cmap='Pastel1',
 </div>
 </div>
 </div>
+
+
 
 ## Conclusion
 
@@ -2192,10 +2394,23 @@ choropleth maps. Readers interested in pursuing this literature are encouraged
 to see the references cited.
 
 At the same time, given the philosophy underlying PySAL the methods we cover
-here are sufficient for exploratory data analysis where rapid and flexible
-generation of views is critical to the work flow. Once the analysis is complete
+here are sufficient for exploratory data analysis where the rapid and flexible
+generation of views is critical to the work flow. Once the analysis is complete,
 and the final presentation quality maps are to be generated, there are excellent
 packages in the data stack that the user can turn to.
+
+## Questions
+
+1. A variable such as population density measured for census tracts in a metropolitan area can display a high degree of skewness. What is an appropriate choice for a choropleth classification for such a variable?
+2. Provide two solutions to the problem of ties when applying quantile classification to the following series: $y=[2,2,2,2,2,2,4,7,8,9,20,21]$ and $k=4$. Discuss the merits of each approach.
+3. Which classifiers are appropriate for data that displays a high degree of multi-modality in its statistical distribution?
+4. Contrast and compare classed choropleth maps with class-less choropleth maps? What are the strengths and limitations of each type of visualization for spatial data?
+5. In what ways do choropleth classifiers treat intra-class and inter-class heterogeneity differently? What are the implications of these choices?
+6. To what extent do most commonly employed choropleth classification methods take the geographical distribution of the variable into consideration? Can you think of ways to incorporate the spatial features of a variable into a classification?
+7. Discuss the similarities between  the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?
+8. The Fisher-Jenks classifier will always dominate other k-classifiers for a given data set, with respect to statistical fit. Given this, why might one decide on choosing a different k-classifier for a particular data set?
+
+
 
 ## References
 
@@ -2211,3 +2426,10 @@ structure and dynamics." *Cities*, 43: 69-77.
 Rey, S.J. and M.L. Guitierez. (2010)
 "Interregional inequality dynamics in Mexico." *Spatial Economic Analysis*, 5:
 277-298.
+
+
+
+---
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+

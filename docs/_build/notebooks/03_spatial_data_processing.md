@@ -14,6 +14,7 @@ next_page:
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 
+
 # Spatial Data Processing
 
 Intro paragraph
@@ -25,9 +26,15 @@ Intro paragraph
 
  airports.csv
 
+
+
 ## Vignette: Airports
 
+
+
 - Querying based on attributes (volume, lon/lat, etc.)
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -35,15 +42,19 @@ Intro paragraph
 import pysal as ps
 import pandas as pd
 df = pd.read_csv("data/airports/world-airports.csv")
+
 ```
 </div>
 
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 df.head()
+
 ```
 </div>
 
@@ -206,12 +217,17 @@ df.head()
 </div>
 </div>
 
+
+
 Let's use pandas to query for the airports within the `large_airport` class:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 df[df.type == 'large_airport']
+
 ```
 </div>
 
@@ -1663,12 +1679,17 @@ df[df.type == 'large_airport']
 </div>
 </div>
 
+
+
 Since both latitude and longitude are columns in the dataframe we can use pandas to carry out a limited number of geospatial queries. For example, extract all the airports in the northern hemisphere:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 df[df.latitude_deg > 0.0]
+
 ```
 </div>
 
@@ -3120,21 +3141,29 @@ df[df.latitude_deg > 0.0]
 </div>
 </div>
 
+
+
 - Subsetting (querying but return dataframe not just indices)
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 gb = df.groupby('type')
+
 ```
 </div>
 
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 gb.all()
+
 ```
 </div>
 
@@ -3357,21 +3386,27 @@ gb.all()
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 small = df[df.type=='small_airport']
 medium = df[df.type=='medium_airport']
 large = df[df.type=='large_airport']
+
 ```
 </div>
 
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 len(small)
+
 ```
 </div>
 
@@ -3389,10 +3424,13 @@ len(small)
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 len(medium)
+
 ```
 </div>
 
@@ -3410,10 +3448,13 @@ len(medium)
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 len(large)
+
 ```
 </div>
 
@@ -3431,16 +3472,23 @@ len(large)
 </div>
 </div>
 
+
+
 - spatial join - airports by countries
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 countries_shp = ps.pdio.read_files("data/airports/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
+
 ```
 </div>
 
 </div>
+
+
 
 - derived features - point sequence to line for the routes
 - spatial join - does route pass through a country
@@ -3449,13 +3497,18 @@ countries_shp = ps.pdio.read_files("data/airports/ne_10m_admin_0_countries/ne_10
 - voronoi - whats my closest airport
 - dissolve - dissovle boundaries in europe
 
+
+
 ## Vignette: House Prices
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 df = pd.read_csv('data/sandiego/listings.csv')
 len(df)
+
 ```
 </div>
 
@@ -3473,10 +3526,13 @@ len(df)
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 df.columns
+
 ```
 </div>
 
@@ -3522,6 +3578,8 @@ Index(['id', 'listing_url', 'scrape_id', 'last_scraped', 'name', 'summary',
 </div>
 </div>
 
+
+
 - keyword table join (census)
 (keyword comes from spatial join with polygon shown below)
 
@@ -3534,3 +3592,10 @@ Index(['id', 'listing_url', 'scrape_id', 'last_scraped', 'name', 'summary',
 - Sets: union, intersection, difference: point out that these are really implied by the buffer used to define regimes (intersection dummy = 1, difference dummy=0)
 
 message is, if you have the column in the table use it, but many cases you do not have the column and need to go the spatial join route
+
+
+
+---
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
