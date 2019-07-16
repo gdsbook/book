@@ -1,0 +1,4628 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,minimum-scale=1">
+
+  <title>Spatial Data Processing</title>
+  <meta name="description" content="Spatial Data Processing">
+
+  <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/03_spatial_data_processing.html">
+  <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
+
+  <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/03_spatial_data_processing.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Spatial Data Processing" />
+<meta property="og:description" content="Spatial Data Processing" />
+<meta property="og:image"       content="" />
+
+
+  <script type="application/ld+json">
+  {
+  "@context": "http://schema.org",
+  "@type": "NewsArticle",
+  "mainEntityOfPage":
+    "https://gdsbook.github.io/geographic-data-science/notebooks/03_spatial_data_processing.html",
+  "headline":
+    "Spatial Data Processing",
+  "datePublished":
+    "2019-07-16T21:14:36+00:00",
+  "dateModified":
+    "2019-07-16T21:14:36+00:00",
+  "description":
+    "Spatial Data Processing",
+  "author": {
+    "@type": "Person",
+    "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Data 100 at UC Berkeley",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://gdsbook.github.io/geographic-data-science",
+      "width": 60,
+      "height": 60
+    }
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://gdsbook.github.io/geographic-data-science",
+    "height": 60,
+    "width": 60
+  }
+}
+
+  </script>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css ">
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+
+  <!-- <link rel="manifest" href="/manifest.json"> -->
+  <!-- <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#efae0a"> -->
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <meta name="theme-color" content="#233947">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/x-icon" href="/images/logo/favicon.ico">
+
+  <!-- MathJax Config -->
+  <!-- Allow inline math using $ and automatically break long math lines -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    CommonHTML: {
+        linebreaks: {
+            automatic: true,
+        },
+    },
+});
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_CHTML' async></script>
+
+  <!-- DOM updating function -->
+  <script>
+const runWhenDOMLoaded = cb => {
+  if (document.readyState != 'loading') {
+    cb()
+  } else if (document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', cb)
+  } else {
+    document.attachEvent('onreadystatechange', function() {
+      if (document.readyState == 'complete') cb()
+    })
+  }
+}
+
+// Helper function to init things quickly
+initFunction = function(myfunc) {
+  runWhenDOMLoaded(myfunc);
+  document.addEventListener('turbolinks:load', myfunc);
+};
+</script>
+
+  <!-- Define some javascript variables that will be useful in other javascript -->
+  <script>
+    const site_basename = '';
+  </script>
+
+  <!-- Add AnchorJS to let headers be linked -->
+  <script src="/assets/js/anchor.min.js"  type="text/javascript"></script>
+  <script>
+
+initFunction(function () {
+    anchors.add("main h1, main h2, main h3, main h4")
+});
+
+</script>
+
+  <!-- Include Turbolinks to make page loads fast -->
+  <!-- https://github.com/turbolinks/turbolinks -->
+  <script src="/assets/js/turbolinks.js" async></script>
+  <meta name="turbolinks-cache-control" content="no-cache">
+
+  <!-- Load nbinteract for widgets -->
+  
+
+  <!-- Load Thebelab for interactive widgets -->
+  <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+<!-- Display Thebelab button in each code cell -->
+<script>
+/**
+ * Set up thebelab button for code blocks
+ */
+
+const thebelabCellButton = id =>
+  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
+    <img src="/assets/images/edit-button.svg" alt="Start interactive mode">
+  </a>`
+
+
+const addThebelabButtonToCodeCells =  () => {
+
+  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("thebelab-cell-button-" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
+    }
+  })
+}
+
+initFunction(addThebelabButtonToCodeCells);
+</script>
+
+
+
+<script type="text/x-thebe-config">
+    {
+      requestKernel: true,
+      binderOptions: {
+        repo: 'gdsbook/geographic-data-science',
+        ref: 'master',
+      },
+      codeMirrorConfig: {
+        theme: ""
+      },
+      kernelOptions: {
+        name: 'python3',
+      }
+    }
+</script>
+<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
+<script>
+    /**
+     * Add attributes to Thebelab blocks
+     */
+
+    const initThebelab = () => {
+        const addThebelabToCodeCells = () => {
+            console.log("Adding thebelab to code cells...");
+            // If Thebelab hasn't loaded, wait a bit and try again. This
+            // happens because we load ClipboardJS asynchronously.
+            if (window.thebelab === undefined) {
+                setTimeout(addThebelabToCodeCells, 250)
+            return
+            }
+
+            // If we already detect a Thebelab cell, don't re-run
+            if (document.querySelectorAll('div.thebelab-cell').length > 0) {
+                return;
+            }
+
+            // Find all code cells, replace with Thebelab interactive code cells
+            const codeCells = document.querySelectorAll('.input_area pre')
+            codeCells.forEach((codeCell, index) => {
+                const id = codeCellId(index)
+                codeCell.setAttribute('data-executable', 'true')
+
+                // Figure out the language it uses and add this too
+                var parentDiv = codeCell.parentElement.parentElement;
+                var arrayLength = parentDiv.classList.length;
+                for (var ii = 0; ii < arrayLength; ii++) {
+                    var parts = parentDiv.classList[ii].split('language-');
+                    if (parts.length === 2) {
+                        // If found, assign dataLanguage and break the loop
+                        var dataLanguage = parts[1];
+                        break;
+                    }
+                }
+                codeCell.setAttribute('data-language', dataLanguage)
+
+                // If the code cell is hidden, show it
+                var inputCheckbox = document.querySelector(`input#hidebtn${codeCell.id}`);
+                if (inputCheckbox !== null) {
+                    setCodeCellVisibility(inputCheckbox, 'visible');
+                }
+            });
+
+            // Remove the event listener from the page so keyboard press doesn't
+            // Change page
+            document.removeEventListener('keydown', initPageNav)
+            keyboardListener = false;
+
+            // Init thebelab
+            thebelab.bootstrap();
+
+            // Remove copy buttons since they won't work anymore
+            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
+            copyAndThebeButtons.forEach((button, index) => {
+                button.remove();
+            });
+
+            // Remove outputs since they'll be stale
+            const outputs = document.querySelectorAll('.output *, .output')
+            outputs.forEach((output, index) => {
+                output.remove();
+            });
+        }
+
+        // Add event listener for the function to modify code cells
+        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
+        thebelabButtons.forEach((thebelabButton,index) => {
+            if (thebelabButton === null) {
+                setTimeout(initThebelab, 250)
+                return
+            };
+            thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        });
+    }
+
+    // Initialize Thebelab
+    initFunction(initThebelab);
+</script>
+
+
+
+  <!-- Load the auto-generating TOC -->
+  <script src="/assets/js/tocbot.min.js"  type="text/javascript"></script>
+  <script>
+var initToc = function () {
+  tocbot.init({
+    tocSelector: 'nav.onthispage',
+    contentSelector: '.c-textbook__content',
+    headingSelector: 'h2, h3',
+    orderedList: false,
+    collapseDepth: 6,
+    listClass: 'toc__menu',
+    activeListItemClass: "",  // Not using
+    activeLinkClass: "", // Not using
+  });
+  tocbot.refresh();
+}
+initFunction(initToc);
+</script>
+
+  <!-- Google analytics -->
+  <script src="/assets/js/ga.js" async></script>
+
+  <!-- Clipboard copy button -->
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" async></script>
+
+  <!-- Load JS that depends on site variables -->
+  <script>
+/**
+ * Set up copy/paste for code blocks
+ */
+const codeCellId = index => `codecell${index}`
+
+const clipboardButton = id =>
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+    <img src="/assets/images/copy-button.svg" alt="Copy to clipboard">
+  </a>`
+
+// Clears selected text since ClipboardJS will select the text when copying
+const clearSelection = () => {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
+// Changes tooltip text for two seconds, then changes it back
+const temporarilyChangeTooltip = (el, newText) => {
+  const oldText = el.getAttribute('data-tooltip')
+  el.setAttribute('data-tooltip', newText)
+  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
+}
+
+const addCopyButtonToCodeCells = () => {
+  // If ClipboardJS hasn't loaded, wait a bit and try again. This
+  // happens because we load ClipboardJS asynchronously.
+  if (window.ClipboardJS === undefined) {
+    setTimeout(addCopyButtonToCodeCells, 250)
+    return
+  }
+
+  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("copy-button" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
+    }
+  })
+
+  const clipboard = new ClipboardJS('.copybtn')
+  clipboard.on('success', event => {
+    clearSelection()
+    temporarilyChangeTooltip(event.trigger, 'Copied!')
+  })
+
+  clipboard.on('error', event => {
+    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
+  })
+
+  // Get rid of clipboard before the next page visit to avoid memory leak
+  document.addEventListener('turbolinks:before-visit', () =>
+    clipboard.destroy()
+  )
+}
+
+initFunction(addCopyButtonToCodeCells);
+</script>
+
+
+  <!-- Hide cell code -->
+  <script>
+    /**
+    Add buttons to hide code cells
+    */
+
+
+    var setCodeCellVisibility = function (inputField, kind) {
+        // Update the image and class for hidden
+        var id = inputField.getAttribute('data-id');
+        var codeCell = document.querySelector(`#${id} div.highlight`);
+
+        if (kind === "visible") {
+            codeCell.classList.remove('hidden');
+            inputField.checked = true;
+        } else {
+            codeCell.classList.add('hidden');
+            inputField.checked = false;
+        }
+    }
+
+    var toggleCodeCellVisibility = function (event) {
+        // The label is clicked, and now we decide what to do based on the input field's clicked status
+        if (event.target.tagName === "LABEL") {
+            var inputField = event.target.previousElementSibling;
+        } else {
+            // It is the span inside the target
+            var inputField = event.target.parentElement.previousElementSibling;
+        }
+
+        if (inputField.checked === true) {
+            setCodeCellVisibility(inputField, "visible");
+        } else {
+            setCodeCellVisibility(inputField, "hidden");
+        }
+    }
+
+
+    // Button constructor
+    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
+
+    var addHideButton = function () {
+        // If a hide button is already added, don't add another
+        if (document.querySelector('div.hidecode input') !== null) {
+            return;
+        }
+
+        // Find the input cells and add a hide button
+        document.querySelectorAll('div.input_area').forEach(function (item, index) {
+            if (!item.classList.contains("hidecode")) {
+                // Skip the cell if it doesn't have a hidecode class
+                return;
+            }
+
+            const id = codeCellId(index)
+            item.setAttribute('id', id);
+            // Insert the button just inside the end of the next div
+            item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
+
+            // Set up the visibility toggle
+            hideLink = document.querySelector(`#${id} div.highlight + input + label`);
+            hideLink.addEventListener('click', toggleCodeCellVisibility)
+        });
+    }
+
+
+    // Initialize the hide buttos
+    var initHiddenCells = function () {
+        // Add hide buttons to the cells
+        addHideButton();
+
+        // Toggle the code cells that should be hidden
+        document.querySelectorAll('div.hidecode input').forEach(function (item) {
+            setCodeCellVisibility(item, 'hidden');
+            item.checked = true;
+        })
+    }
+
+    initFunction(initHiddenCells);
+
+</script>
+
+  <!-- Load custom website scripts -->
+  <script src="/assets/js/scripts.js" async></script>
+
+  <!-- Load custom user CSS and JS  -->
+  <script src="/assets/custom/custom.js" async></script>
+  <link rel="stylesheet" href="/assets/custom/custom.css">
+
+  <!-- Update interact links w/ REST param, is defined in includes so we can use templates -->
+  
+<script>
+/**
+  * To auto-embed hub URLs in interact links if given in a RESTful fashion
+ */
+
+function getJsonFromUrl(url) {
+  var query = url.split('?');
+  if (query.length < 2) {
+    // No queries so just return false
+    return false;
+  }
+  query = query[1];
+  // Collect REST params into a dictionary
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
+}
+    
+function dict2param(dict) {
+    params = Object.keys(dict).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(dict[k])
+    });
+    return params.join('&')
+}
+
+// Parse a Binder URL, converting it to the string needed for JupyterHub
+function binder2Jupyterhub(url) {
+  newUrl = {};
+  parts = url.split('v2/gh/')[1];
+  // Grab the base repo information
+  repoinfo = parts.split('?')[0];
+  var [org, repo, ref] = repoinfo.split('/');
+  newUrl['repo'] = ['https://github.com', org, repo].join('/');
+  newUrl['branch'] = ref
+  // Grab extra parameters passed
+  params = getJsonFromUrl(url);
+  if (params['filepath'] !== undefined) {
+    newUrl['subPath'] = params['filepath']
+  }
+  return dict2param(newUrl);
+}
+
+// Filter out potentially unsafe characters to prevent xss
+function safeUrl(url)
+{
+   return String(encodeURIComponent(url))
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
+
+function addParamToInternalLinks(hub) {
+  var links = document.querySelectorAll("a").forEach(function(link) {
+    var href = link.href;
+    // If the link is an internal link...
+    if (href.search("https://gdsbook.github.io/geographic-data-science") !== -1 || href.startsWith('/') || href.search("127.0.0.1:") !== -1) {
+      // Assume we're an internal link, add the hub param to it
+      var params = getJsonFromUrl(href);
+      if (params !== false) {
+        // We have REST params, so append a new one
+        params['jupyterhub'] = hub;
+      } else {
+        // Create the REST params
+        params = {'jupyterhub': hub};
+      }
+      // Update the link
+      var newHref = href.split('?')[0] + '?' + dict2param(params);
+      link.setAttribute('href', decodeURIComponent(newHref));
+    }
+  });
+  return false;
+}
+
+
+// Update interact links
+function updateInteractLink() {
+    // hack to make this work since it expects a ? in the URL
+    rest = getJsonFromUrl("?" + location.search.substr(1));
+    jupyterHubUrl = rest['jupyterhub'];
+    var hubType = null;
+    var hubUrl = null;
+    if (jupyterHubUrl !== undefined) {
+      hubType = 'jupyterhub';
+      hubUrl = jupyterHubUrl;
+    }
+
+    if (hubType !== null) {
+      // Sanitize the hubUrl
+      hubUrl = safeUrl(hubUrl);
+
+      // Add HTTP text if omitted
+      if (hubUrl.indexOf('http') < 0) {hubUrl = 'http://' + hubUrl;}
+      var interactButtons = document.querySelectorAll("button.interact-button")
+      var lastButton = interactButtons[interactButtons.length-1];
+      var link = lastButton.parentElement;
+
+      // If we've already run this, skip the link updating
+      if (link.nextElementSibling !== null) {
+        return;
+      }
+
+      // Update the link and add context div
+      var href = link.getAttribute('href');
+      if (lastButton.id === 'interact-button-binder') {
+        // If binder links exist, we need to re-work them for jupyterhub
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // If localhost, assume we're working from a local Jupyter server and remove `/hub`
+          first = [hubUrl, 'git-sync'].join('/')
+        } else {
+          first = [hubUrl, 'hub', 'user-redirect', 'git-sync'].join('/')
+        }
+        href = first + '?' + binder2Jupyterhub(href);
+      } else {
+        // If interact button isn't binderhub, assume it's jupyterhub
+        // If JupyterHub links, we only need to replace the hub url
+        href = href.replace("", hubUrl);
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // Assume we're working from a local Jupyter server and remove `/hub`
+          href = href.replace("/hub/user-redirect", "");
+        }
+      }
+      link.setAttribute('href', decodeURIComponent(href));
+
+      // Add text after interact link saying where we're launching
+      hubUrlNoHttp = decodeURIComponent(hubUrl).replace('http://', '').replace('https://', '');
+      link.insertAdjacentHTML('afterend', '<div class="interact-context">on ' + hubUrlNoHttp + '</div>');
+
+      // Update internal links so we retain the hub url
+      addParamToInternalLinks(hubUrl);
+    }
+}
+
+runWhenDOMLoaded(updateInteractLink)
+document.addEventListener('turbolinks:load', updateInteractLink)
+</script>
+
+
+  <!-- Lunr search code - will only be executed on the /search page -->
+  <script src="/assets/js/lunr/lunr.min.js" type="text/javascript"></script>
+  <script>var initQuery = function() {
+  // See if we have a search box
+  var searchInput = document.querySelector('input#lunr_search');
+  if (searchInput === null) {
+    return;
+  }
+
+  // Function to parse our lunr cache
+  var idx = lunr(function () {
+    this.field('title')
+    this.field('excerpt')
+    this.field('categories')
+    this.field('tags')
+    this.ref('id')
+
+    this.pipeline.remove(lunr.trimmer)
+
+    for (var item in store) {
+      this.add({
+        title: store[item].title,
+        excerpt: store[item].excerpt,
+        categories: store[item].categories,
+        tags: store[item].tags,
+        id: item
+      })
+    }
+  });
+
+  // Run search upon keyup
+  searchInput.addEventListener('keyup', function () {
+    var resultdiv = document.querySelector('#results');
+    var query = document.querySelector("input#lunr_search").value.toLowerCase();
+    var result =
+      idx.query(function (q) {
+        query.split(lunr.tokenizer.separator).forEach(function (term) {
+          q.term(term, { boost: 100 })
+          if(query.lastIndexOf(" ") != query.length-1){
+            q.term(term, {  usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING, boost: 10 })
+          }
+          if (term != ""){
+            q.term(term, {  usePipeline: false, editDistance: 1, boost: 1 })
+          }
+        })
+      });
+
+      // Empty the results div
+      while (resultdiv.firstChild) {
+        resultdiv.removeChild(resultdiv.firstChild);
+      }
+
+    resultdiv.insertAdjacentHTML('afterbegin', '<p class="results__found">'+result.length+' Result(s) found</p>');
+    for (var item in result) {
+      var ref = result[item].ref;
+      if(store[ref].teaser){
+        var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<div class="archive__item-teaser">'+
+                '<img src="'+store[ref].teaser+'" alt="">'+
+              '</div>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      else{
+    	  var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      resultdiv.insertAdjacentHTML('beforeend', searchitem);
+    }
+  });
+};
+
+initFunction(initQuery);
+</script>
+</head>
+
+  <body>
+    <!-- .js-show-sidebar shows sidebar by default -->
+    <div id="js-textbook" class="c-textbook js-show-sidebar">
+      
+
+
+
+<nav id="js-sidebar" class="c-textbook__sidebar">
+  <a href="https://github.com/gdsbook/geographic-data-science"><img src="/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
+  <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
+  <ul class="c-sidebar__chapters">
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro.html"
+        >
+          
+          Home
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+        <li class="c-sidebar__chapter"><a class="c-sidebar__entry" href="/search.html">Search</a></li>
+        
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/notebooks/00_toc.html"
+        >
+          
+          Table of Contents
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/01_geospatial_computational_environment.html"
+                >
+                  
+                  Geospatial Computational Environment
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/02_spatial_data.html"
+                >
+                  
+                  Spatial Data
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry c-sidebar__entry--active"
+                  href="/notebooks/03_spatial_data_processing.html"
+                >
+                  
+                  Spatial Data Processing
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/04_spatial_weights.html"
+                >
+                  
+                  Spatial Weights
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/05_choropleth.html"
+                >
+                  
+                  Choropleth Mapping
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/06_spatial_autocorrelation.html"
+                >
+                  
+                  Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/07_local_autocorrelation.html"
+                >
+                  
+                  Local Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/08_point_pattern_analysis.html"
+                >
+                  
+                  Point Pattern Analysis
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/09_spatial_inequality.html"
+                >
+                  
+                  Spatial Inequality
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/10_clustering_and_regionalization.html"
+                >
+                  
+                  Clustering & Regionalization
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/11_regression.html"
+                >
+                  
+                  Regression
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/12_feature_engineering.html"
+                >
+                  
+                  Spatial Feature Engineering
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+  </ul>
+  <p class="sidebar_footer">Powered by <a href="https://github.com/jupyter/jupyter-book">Jupyter Book</a></p>
+</nav>
+
+      
+      <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+      <aside class="sidebar__right">
+          <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
+          <nav class="onthispage">
+          </nav>
+      </aside>
+      
+      <main class="c-textbook__page" tabindex="-1">
+          <div class="o-wrapper">
+            <div class="c-sidebar-toggle">
+  <!-- We show the sidebar by default so we use .is-active -->
+  <button
+    id="js-sidebar-toggle"
+    class="hamburger hamburger--arrowalt is-active"
+  >
+    <span class="hamburger-box">
+      <span class="hamburger-inner"></span>
+    </span>
+    <span class="c-sidebar-toggle__label">Toggle Sidebar</span>
+  </button>
+</div>
+
+            
+<div class="buttons">
+
+<button id="interact-button-thebelab" class="interact-button">Thebelab</button>
+
+
+
+
+
+
+
+
+
+<a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?urlpath=lab/tree/content%2Fnotebooks%2F03_spatial_data_processing.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
+
+
+</div>
+
+
+            <div class="c-textbook__content">
+              <h1 id="spatial-data-processing">Spatial Data Processing</h1>
+
+<p>Intro paragraph</p>
+<ul>
+  <li>
+    <p>deterministic spatial analysis (SG)</p>
+  </li>
+  <li>Explain what we mean by dsa</li>
+  <li>outline what we will cover below</li>
+</ul>
+
+<p>airports.csv</p>
+
+<h2 id="vignette-airports">Vignette: Airports</h2>
+
+<ul>
+  <li>Querying based on attributes (volume, lon/lat, etc.)</li>
+</ul>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">pysal</span> <span class="k">as</span> <span class="n">ps</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"data/airports/world-airports.csv"</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>ident</th>
+      <th>type</th>
+      <th>name</th>
+      <th>latitude_deg</th>
+      <th>longitude_deg</th>
+      <th>elevation_ft</th>
+      <th>continent</th>
+      <th>iso_country</th>
+      <th>iso_region</th>
+      <th>municipality</th>
+      <th>scheduled_service</th>
+      <th>gps_code</th>
+      <th>iata_code</th>
+      <th>local_code</th>
+      <th>home_link</th>
+      <th>wikipedia_link</th>
+      <th>keywords</th>
+      <th>score</th>
+      <th>last_updated</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2434</td>
+      <td>EGLL</td>
+      <td>large_airport</td>
+      <td>London Heathrow Airport</td>
+      <td>51.470600</td>
+      <td>-0.461941</td>
+      <td>83.0</td>
+      <td>EU</td>
+      <td>GB</td>
+      <td>GB-ENG</td>
+      <td>London</td>
+      <td>1</td>
+      <td>EGLL</td>
+      <td>LHR</td>
+      <td>NaN</td>
+      <td>http://www.heathrowairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/London_Heathrow_A...</td>
+      <td>LON, Londres</td>
+      <td>1251675</td>
+      <td>2016-02-09T10:54:31+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3632</td>
+      <td>KLAX</td>
+      <td>large_airport</td>
+      <td>Los Angeles International Airport</td>
+      <td>33.942501</td>
+      <td>-118.407997</td>
+      <td>125.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-CA</td>
+      <td>Los Angeles</td>
+      <td>1</td>
+      <td>KLAX</td>
+      <td>LAX</td>
+      <td>LAX</td>
+      <td>http://www.iflylax.com/</td>
+      <td>http://en.wikipedia.org/wiki/Los_Angeles_Inter...</td>
+      <td>NaN</td>
+      <td>1335475</td>
+      <td>2010-01-23T11:27:55+00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3754</td>
+      <td>KORD</td>
+      <td>large_airport</td>
+      <td>Chicago O'Hare International Airport</td>
+      <td>41.978600</td>
+      <td>-87.904800</td>
+      <td>672.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-IL</td>
+      <td>Chicago</td>
+      <td>1</td>
+      <td>KORD</td>
+      <td>ORD</td>
+      <td>ORD</td>
+      <td>http://www.flychicago.com/ohare/en/home/Pages/...</td>
+      <td>http://en.wikipedia.org/wiki/O'Hare_Internatio...</td>
+      <td>CHI, Orchard Place</td>
+      <td>1503175</td>
+      <td>2014-08-19T18:55:27+00:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3622</td>
+      <td>KJFK</td>
+      <td>large_airport</td>
+      <td>John F Kennedy International Airport</td>
+      <td>40.639801</td>
+      <td>-73.778900</td>
+      <td>13.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NY</td>
+      <td>New York</td>
+      <td>1</td>
+      <td>KJFK</td>
+      <td>JFK</td>
+      <td>JFK</td>
+      <td>http://www.panynj.gov/CommutingTravel/airports...</td>
+      <td>http://en.wikipedia.org/wiki/John_F._Kennedy_I...</td>
+      <td>Manhattan, New York City, NYC, Idlewild</td>
+      <td>1052075</td>
+      <td>2010-01-23T11:27:54+00:00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3384</td>
+      <td>KATL</td>
+      <td>large_airport</td>
+      <td>Hartsfield Jackson Atlanta International Airport</td>
+      <td>33.636700</td>
+      <td>-84.428101</td>
+      <td>1026.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-GA</td>
+      <td>Atlanta</td>
+      <td>1</td>
+      <td>KATL</td>
+      <td>ATL</td>
+      <td>ATL</td>
+      <td>http://www.atlanta-airport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Hartsfield-Jackso...</td>
+      <td>NaN</td>
+      <td>2002475</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Let’s use pandas to query for the airports within the <code class="highlighter-rouge">large_airport</code> class:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="nb">type</span> <span class="o">==</span> <span class="s">'large_airport'</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>ident</th>
+      <th>type</th>
+      <th>name</th>
+      <th>latitude_deg</th>
+      <th>longitude_deg</th>
+      <th>elevation_ft</th>
+      <th>continent</th>
+      <th>iso_country</th>
+      <th>iso_region</th>
+      <th>municipality</th>
+      <th>scheduled_service</th>
+      <th>gps_code</th>
+      <th>iata_code</th>
+      <th>local_code</th>
+      <th>home_link</th>
+      <th>wikipedia_link</th>
+      <th>keywords</th>
+      <th>score</th>
+      <th>last_updated</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2434</td>
+      <td>EGLL</td>
+      <td>large_airport</td>
+      <td>London Heathrow Airport</td>
+      <td>51.470600</td>
+      <td>-0.461941</td>
+      <td>83.0</td>
+      <td>EU</td>
+      <td>GB</td>
+      <td>GB-ENG</td>
+      <td>London</td>
+      <td>1</td>
+      <td>EGLL</td>
+      <td>LHR</td>
+      <td>NaN</td>
+      <td>http://www.heathrowairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/London_Heathrow_A...</td>
+      <td>LON, Londres</td>
+      <td>1251675</td>
+      <td>2016-02-09T10:54:31+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3632</td>
+      <td>KLAX</td>
+      <td>large_airport</td>
+      <td>Los Angeles International Airport</td>
+      <td>33.942501</td>
+      <td>-118.407997</td>
+      <td>125.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-CA</td>
+      <td>Los Angeles</td>
+      <td>1</td>
+      <td>KLAX</td>
+      <td>LAX</td>
+      <td>LAX</td>
+      <td>http://www.iflylax.com/</td>
+      <td>http://en.wikipedia.org/wiki/Los_Angeles_Inter...</td>
+      <td>NaN</td>
+      <td>1335475</td>
+      <td>2010-01-23T11:27:55+00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3754</td>
+      <td>KORD</td>
+      <td>large_airport</td>
+      <td>Chicago O'Hare International Airport</td>
+      <td>41.978600</td>
+      <td>-87.904800</td>
+      <td>672.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-IL</td>
+      <td>Chicago</td>
+      <td>1</td>
+      <td>KORD</td>
+      <td>ORD</td>
+      <td>ORD</td>
+      <td>http://www.flychicago.com/ohare/en/home/Pages/...</td>
+      <td>http://en.wikipedia.org/wiki/O'Hare_Internatio...</td>
+      <td>CHI, Orchard Place</td>
+      <td>1503175</td>
+      <td>2014-08-19T18:55:27+00:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3622</td>
+      <td>KJFK</td>
+      <td>large_airport</td>
+      <td>John F Kennedy International Airport</td>
+      <td>40.639801</td>
+      <td>-73.778900</td>
+      <td>13.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NY</td>
+      <td>New York</td>
+      <td>1</td>
+      <td>KJFK</td>
+      <td>JFK</td>
+      <td>JFK</td>
+      <td>http://www.panynj.gov/CommutingTravel/airports...</td>
+      <td>http://en.wikipedia.org/wiki/John_F._Kennedy_I...</td>
+      <td>Manhattan, New York City, NYC, Idlewild</td>
+      <td>1052075</td>
+      <td>2010-01-23T11:27:54+00:00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3384</td>
+      <td>KATL</td>
+      <td>large_airport</td>
+      <td>Hartsfield Jackson Atlanta International Airport</td>
+      <td>33.636700</td>
+      <td>-84.428101</td>
+      <td>1026.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-GA</td>
+      <td>Atlanta</td>
+      <td>1</td>
+      <td>KATL</td>
+      <td>ATL</td>
+      <td>ATL</td>
+      <td>http://www.atlanta-airport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Hartsfield-Jackso...</td>
+      <td>NaN</td>
+      <td>2002475</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>4185</td>
+      <td>LFPG</td>
+      <td>large_airport</td>
+      <td>Charles de Gaulle International Airport</td>
+      <td>49.012798</td>
+      <td>2.550000</td>
+      <td>392.0</td>
+      <td>EU</td>
+      <td>FR</td>
+      <td>FR-J</td>
+      <td>Paris</td>
+      <td>1</td>
+      <td>LFPG</td>
+      <td>CDG</td>
+      <td>NaN</td>
+      <td>http://www.aeroportsdeparis.fr/</td>
+      <td>http://en.wikipedia.org/wiki/Charles_de_Gaulle...</td>
+      <td>PAR, Aéroport Roissy-Charles de Gaulle, Roissy...</td>
+      <td>1127475</td>
+      <td>2010-01-05T18:17:43+00:00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>3878</td>
+      <td>KSFO</td>
+      <td>large_airport</td>
+      <td>San Francisco International Airport</td>
+      <td>37.618999</td>
+      <td>-122.375000</td>
+      <td>13.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-CA</td>
+      <td>San Francisco</td>
+      <td>1</td>
+      <td>KSFO</td>
+      <td>SFO</td>
+      <td>SFO</td>
+      <td>http://www.flysfo.com/</td>
+      <td>http://en.wikipedia.org/wiki/San_Francisco_Int...</td>
+      <td>QSF, QBA</td>
+      <td>1112475</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>2513</td>
+      <td>EHAM</td>
+      <td>large_airport</td>
+      <td>Amsterdam Airport Schiphol</td>
+      <td>52.308601</td>
+      <td>4.763890</td>
+      <td>-11.0</td>
+      <td>EU</td>
+      <td>NL</td>
+      <td>NL-NH</td>
+      <td>Amsterdam</td>
+      <td>1</td>
+      <td>EHAM</td>
+      <td>AMS</td>
+      <td>NaN</td>
+      <td>http://www.schiphol.nl/</td>
+      <td>http://en.wikipedia.org/wiki/Amsterdam_Schipho...</td>
+      <td>NaN</td>
+      <td>1093275</td>
+      <td>2011-10-05T23:26:15+00:00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2212</td>
+      <td>EDDF</td>
+      <td>large_airport</td>
+      <td>Frankfurt am Main International Airport</td>
+      <td>50.033333</td>
+      <td>8.570556</td>
+      <td>364.0</td>
+      <td>EU</td>
+      <td>DE</td>
+      <td>DE-HE</td>
+      <td>Frankfurt-am-Main</td>
+      <td>1</td>
+      <td>EDDF</td>
+      <td>FRA</td>
+      <td>NaN</td>
+      <td>http://www.frankfurt-airport.de/</td>
+      <td>http://en.wikipedia.org/wiki/Frankfurt_Airport</td>
+      <td>EDAF, Rhein-Main Air Base</td>
+      <td>1144675</td>
+      <td>2016-09-15T03:34:21+00:00</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>3521</td>
+      <td>KEWR</td>
+      <td>large_airport</td>
+      <td>Newark Liberty International Airport</td>
+      <td>40.692501</td>
+      <td>-74.168701</td>
+      <td>18.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NJ</td>
+      <td>Newark</td>
+      <td>1</td>
+      <td>KEWR</td>
+      <td>EWR</td>
+      <td>EWR</td>
+      <td>http://www.panynj.gov/CommutingTravel/airports...</td>
+      <td>http://en.wikipedia.org/wiki/Newark_Liberty_In...</td>
+      <td>Manhattan, New York City, NYC</td>
+      <td>1064475</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>3631</td>
+      <td>KLAS</td>
+      <td>large_airport</td>
+      <td>McCarran International Airport</td>
+      <td>36.080101</td>
+      <td>-115.152000</td>
+      <td>2181.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NV</td>
+      <td>Las Vegas</td>
+      <td>1</td>
+      <td>KLAS</td>
+      <td>LAS</td>
+      <td>LAS</td>
+      <td>http://www.mccarran.com/</td>
+      <td>http://en.wikipedia.org/wiki/McCarran_Internat...</td>
+      <td>NaN</td>
+      <td>1068475</td>
+      <td>2010-07-05T16:48:39+00:00</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>3488</td>
+      <td>KDFW</td>
+      <td>large_airport</td>
+      <td>Dallas Fort Worth International Airport</td>
+      <td>32.896801</td>
+      <td>-97.038002</td>
+      <td>607.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-TX</td>
+      <td>Dallas-Fort Worth</td>
+      <td>1</td>
+      <td>KDFW</td>
+      <td>DFW</td>
+      <td>DFW</td>
+      <td>http://www.dfwairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Dallas-Fort_Worth...</td>
+      <td>QDF</td>
+      <td>1203175</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>3670</td>
+      <td>KMCO</td>
+      <td>large_airport</td>
+      <td>Orlando International Airport</td>
+      <td>28.429399</td>
+      <td>-81.308998</td>
+      <td>96.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-FL</td>
+      <td>Orlando</td>
+      <td>1</td>
+      <td>KMCO</td>
+      <td>MCO</td>
+      <td>MCO</td>
+      <td>http://www.orlandoairports.net/</td>
+      <td>http://en.wikipedia.org/wiki/Orlando_Internati...</td>
+      <td>Disney World,Epcot Center</td>
+      <td>1044075</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>3486</td>
+      <td>KDEN</td>
+      <td>large_airport</td>
+      <td>Denver International Airport</td>
+      <td>39.861698</td>
+      <td>-104.672997</td>
+      <td>5431.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-CO</td>
+      <td>Denver</td>
+      <td>1</td>
+      <td>KDEN</td>
+      <td>DEN</td>
+      <td>DEN</td>
+      <td>http://www.flydenver.com/</td>
+      <td>http://en.wikipedia.org/wiki/Denver_Internatio...</td>
+      <td>DVX, KVDX</td>
+      <td>1103275</td>
+      <td>2015-11-13T09:28:42+00:00</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>3685</td>
+      <td>KMIA</td>
+      <td>large_airport</td>
+      <td>Miami International Airport</td>
+      <td>25.793200</td>
+      <td>-80.290604</td>
+      <td>8.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-FL</td>
+      <td>Miami</td>
+      <td>1</td>
+      <td>KMIA</td>
+      <td>MIA</td>
+      <td>MIA</td>
+      <td>http://www.miami-airport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Miami_Internation...</td>
+      <td>MFW, South Florida</td>
+      <td>1073075</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>3602</td>
+      <td>KIAD</td>
+      <td>large_airport</td>
+      <td>Washington Dulles International Airport</td>
+      <td>38.944500</td>
+      <td>-77.455803</td>
+      <td>312.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-DC</td>
+      <td>Washington</td>
+      <td>1</td>
+      <td>KIAD</td>
+      <td>IAD</td>
+      <td>IAD</td>
+      <td>http://www.mwaa.com/dulles/</td>
+      <td>http://en.wikipedia.org/wiki/Washington_Dulles...</td>
+      <td>WAS</td>
+      <td>1023875</td>
+      <td>2010-01-23T11:27:53+00:00</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>3643</td>
+      <td>KLGA</td>
+      <td>large_airport</td>
+      <td>La Guardia Airport</td>
+      <td>40.777199</td>
+      <td>-73.872597</td>
+      <td>21.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NY</td>
+      <td>New York</td>
+      <td>1</td>
+      <td>KLGA</td>
+      <td>LGA</td>
+      <td>LGA</td>
+      <td>http://www.panynj.gov/CommutingTravel/airports...</td>
+      <td>http://en.wikipedia.org/wiki/LaGuardia_Airport</td>
+      <td>Manhattan, New York City, NYC, Glenn H. Curtis...</td>
+      <td>1030575</td>
+      <td>2010-01-23T11:27:55+00:00</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>3772</td>
+      <td>KPHX</td>
+      <td>large_airport</td>
+      <td>Phoenix Sky Harbor International Airport</td>
+      <td>33.434299</td>
+      <td>-112.012001</td>
+      <td>1135.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-AZ</td>
+      <td>Phoenix</td>
+      <td>1</td>
+      <td>KPHX</td>
+      <td>PHX</td>
+      <td>PHX</td>
+      <td>http://phoenix.gov/skyharborairport/</td>
+      <td>http://en.wikipedia.org/wiki/Phoenix_Sky_Harbo...</td>
+      <td>NaN</td>
+      <td>1060875</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>2429</td>
+      <td>EGKK</td>
+      <td>large_airport</td>
+      <td>London Gatwick Airport</td>
+      <td>51.148102</td>
+      <td>-0.190278</td>
+      <td>202.0</td>
+      <td>EU</td>
+      <td>GB</td>
+      <td>GB-ENG</td>
+      <td>London</td>
+      <td>1</td>
+      <td>EGKK</td>
+      <td>LGW</td>
+      <td>NaN</td>
+      <td>http://www.gatwickairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/London_Gatwick_Ai...</td>
+      <td>LON, Crawley, Charlwood</td>
+      <td>1049275</td>
+      <td>2009-01-30T17:53:54+00:00</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>3875</td>
+      <td>KSEA</td>
+      <td>large_airport</td>
+      <td>Seattle Tacoma International Airport</td>
+      <td>47.449001</td>
+      <td>-122.308998</td>
+      <td>433.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-WA</td>
+      <td>Seattle</td>
+      <td>1</td>
+      <td>KSEA</td>
+      <td>SEA</td>
+      <td>SEA</td>
+      <td>http://www.portseattle.org/seatac/</td>
+      <td>http://en.wikipedia.org/wiki/Seattle-Tacoma_In...</td>
+      <td>NaN</td>
+      <td>1038675</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>3422</td>
+      <td>KBOS</td>
+      <td>large_airport</td>
+      <td>General Edward Lawrence Logan International Ai...</td>
+      <td>42.364300</td>
+      <td>-71.005203</td>
+      <td>20.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-MA</td>
+      <td>Boston</td>
+      <td>1</td>
+      <td>KBOS</td>
+      <td>BOS</td>
+      <td>BOS</td>
+      <td>http://www.massport.com/logan/</td>
+      <td>http://en.wikipedia.org/wiki/Logan_Internation...</td>
+      <td>General Edward Lawrence Logan International Ai...</td>
+      <td>1035875</td>
+      <td>2010-01-23T11:27:48+00:00</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>3771</td>
+      <td>KPHL</td>
+      <td>large_airport</td>
+      <td>Philadelphia International Airport</td>
+      <td>39.871899</td>
+      <td>-75.241096</td>
+      <td>36.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-PA</td>
+      <td>Philadelphia</td>
+      <td>1</td>
+      <td>KPHL</td>
+      <td>PHL</td>
+      <td>PHL</td>
+      <td>http://www.phl.org/</td>
+      <td>http://en.wikipedia.org/wiki/Philadelphia_Inte...</td>
+      <td>NaN</td>
+      <td>1031075</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>1990</td>
+      <td>CYYZ</td>
+      <td>large_airport</td>
+      <td>Lester B. Pearson International Airport</td>
+      <td>43.677200</td>
+      <td>-79.630600</td>
+      <td>569.0</td>
+      <td>NaN</td>
+      <td>CA</td>
+      <td>CA-ON</td>
+      <td>Toronto</td>
+      <td>1</td>
+      <td>CYYZ</td>
+      <td>YYZ</td>
+      <td>YYZ</td>
+      <td>http://www.gtaa.com/</td>
+      <td>http://en.wikipedia.org/wiki/Toronto_Pearson_I...</td>
+      <td>YTO, Toronto International Airport, Malton</td>
+      <td>1040275</td>
+      <td>2009-10-15T13:44:39+00:00</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>3483</td>
+      <td>KDCA</td>
+      <td>large_airport</td>
+      <td>Ronald Reagan Washington National Airport</td>
+      <td>38.852100</td>
+      <td>-77.037697</td>
+      <td>15.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-DC</td>
+      <td>Washington</td>
+      <td>1</td>
+      <td>KDCA</td>
+      <td>DCA</td>
+      <td>DCA</td>
+      <td>http://www.flyreagan.com/dca/reagan-national-a...</td>
+      <td>http://en.wikipedia.org/wiki/Ronald_Reagan_Was...</td>
+      <td>WAS</td>
+      <td>1016175</td>
+      <td>2016-12-13T09:13:00+00:00</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>3604</td>
+      <td>KIAH</td>
+      <td>large_airport</td>
+      <td>George Bush Intercontinental Houston Airport</td>
+      <td>29.984400</td>
+      <td>-95.341400</td>
+      <td>97.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-TX</td>
+      <td>Houston</td>
+      <td>1</td>
+      <td>KIAH</td>
+      <td>IAH</td>
+      <td>IAH</td>
+      <td>http://www.fly2houston.com/iah</td>
+      <td>http://en.wikipedia.org/wiki/George_Bush_Inter...</td>
+      <td>QHO</td>
+      <td>1055675</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>3457</td>
+      <td>KCLT</td>
+      <td>large_airport</td>
+      <td>Charlotte Douglas International Airport</td>
+      <td>35.214001</td>
+      <td>-80.943100</td>
+      <td>748.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NC</td>
+      <td>Charlotte</td>
+      <td>1</td>
+      <td>KCLT</td>
+      <td>CLT</td>
+      <td>CLT</td>
+      <td>http://www.charlotteairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Charlotte/Douglas...</td>
+      <td>NaN</td>
+      <td>1028075</td>
+      <td>2009-01-30T14:52:52+00:00</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>3497</td>
+      <td>KDTW</td>
+      <td>large_airport</td>
+      <td>Detroit Metropolitan Wayne County Airport</td>
+      <td>42.212399</td>
+      <td>-83.353401</td>
+      <td>645.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-MI</td>
+      <td>Detroit</td>
+      <td>1</td>
+      <td>KDTW</td>
+      <td>DTW</td>
+      <td>DTW</td>
+      <td>http://www.metroairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Detroit_Metropoli...</td>
+      <td>DTT, Detroit Metro Airport</td>
+      <td>1079375</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>2218</td>
+      <td>EDDM</td>
+      <td>large_airport</td>
+      <td>Munich International Airport</td>
+      <td>48.353802</td>
+      <td>11.786100</td>
+      <td>1487.0</td>
+      <td>EU</td>
+      <td>DE</td>
+      <td>DE-BY</td>
+      <td>Munich</td>
+      <td>1</td>
+      <td>EDDM</td>
+      <td>MUC</td>
+      <td>NaN</td>
+      <td>http://www.munich-airport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Munich_Internatio...</td>
+      <td>Franz Josef Strauss International Airport, Flu...</td>
+      <td>1026675</td>
+      <td>2015-10-17T03:56:24+00:00</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>3709</td>
+      <td>KMSP</td>
+      <td>large_airport</td>
+      <td>Minneapolis-St Paul International/Wold-Chamber...</td>
+      <td>44.882000</td>
+      <td>-93.221802</td>
+      <td>841.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-MN</td>
+      <td>Minneapolis</td>
+      <td>1</td>
+      <td>KMSP</td>
+      <td>MSP</td>
+      <td>MSP</td>
+      <td>http://www.mspairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Minneapolis-Saint...</td>
+      <td>NaN</td>
+      <td>1085275</td>
+      <td>2009-12-17T08:53:11+00:00</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>4372</td>
+      <td>LIRF</td>
+      <td>large_airport</td>
+      <td>Leonardo da Vinci–Fiumicino Airport</td>
+      <td>41.800278</td>
+      <td>12.238889</td>
+      <td>13.0</td>
+      <td>EU</td>
+      <td>IT</td>
+      <td>IT-62</td>
+      <td>Rome</td>
+      <td>1</td>
+      <td>LIRF</td>
+      <td>FCO</td>
+      <td>RM11</td>
+      <td>http://www.adr.it/portal/portal/adr/Fiumicino/...</td>
+      <td>http://en.wikipedia.org/wiki/Leonardo_da_Vinci...</td>
+      <td>ROM, Rome Fiumicino Airport, Fiumicino Airport</td>
+      <td>1031875</td>
+      <td>2016-10-08T00:37:02+00:00</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>6695</th>
+      <td>3567</td>
+      <td>KGSB</td>
+      <td>large_airport</td>
+      <td>Seymour Johnson Air Force Base</td>
+      <td>35.339401</td>
+      <td>-77.960602</td>
+      <td>109.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NC</td>
+      <td>Goldsboro</td>
+      <td>0</td>
+      <td>KGSB</td>
+      <td>GSB</td>
+      <td>GSB</td>
+      <td>http://www.seymourjohnson.af.mil/</td>
+      <td>http://en.wikipedia.org/wiki/Seymour_Johnson_A...</td>
+      <td>NaN</td>
+      <td>850</td>
+      <td>2014-10-04T01:51:25+00:00</td>
+    </tr>
+    <tr>
+      <th>6696</th>
+      <td>3914</td>
+      <td>KSZL</td>
+      <td>large_airport</td>
+      <td>Whiteman Air Force Base</td>
+      <td>38.730301</td>
+      <td>-93.547897</td>
+      <td>870.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-MO</td>
+      <td>Knob Noster</td>
+      <td>0</td>
+      <td>KSZL</td>
+      <td>SZL</td>
+      <td>SZL</td>
+      <td>http://www.whiteman.af.mil/</td>
+      <td>http://en.wikipedia.org/wiki/Whiteman_Air_Forc...</td>
+      <td>Sedalia Glider Base</td>
+      <td>850</td>
+      <td>2015-05-31T03:54:50+00:00</td>
+    </tr>
+    <tr>
+      <th>6697</th>
+      <td>3391</td>
+      <td>KBAB</td>
+      <td>large_airport</td>
+      <td>Beale Air Force Base</td>
+      <td>39.136101</td>
+      <td>-121.436996</td>
+      <td>113.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-CA</td>
+      <td>Marysville</td>
+      <td>0</td>
+      <td>KBAB</td>
+      <td>BAB</td>
+      <td>BAB</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Beale_Air_Force_Base</td>
+      <td>NaN</td>
+      <td>850</td>
+      <td>2012-06-21T01:43:23+00:00</td>
+    </tr>
+    <tr>
+      <th>6698</th>
+      <td>3715</td>
+      <td>KMUO</td>
+      <td>large_airport</td>
+      <td>Mountain Home Air Force Base</td>
+      <td>43.043598</td>
+      <td>-115.872002</td>
+      <td>2996.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-ID</td>
+      <td>Mountain Home</td>
+      <td>0</td>
+      <td>KMUO</td>
+      <td>MUO</td>
+      <td>MUO</td>
+      <td>http://www.mountainhome.af.mil/</td>
+      <td>https://en.wikipedia.org/wiki/Mountain_Home_Ai...</td>
+      <td>NaN</td>
+      <td>850</td>
+      <td>2016-05-31T09:36:32+00:00</td>
+    </tr>
+    <tr>
+      <th>6699</th>
+      <td>3573</td>
+      <td>KGUS</td>
+      <td>large_airport</td>
+      <td>Grissom Air Reserve Base</td>
+      <td>40.648102</td>
+      <td>-86.152100</td>
+      <td>812.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-IN</td>
+      <td>Peru</td>
+      <td>0</td>
+      <td>KGUS</td>
+      <td>GUS</td>
+      <td>GUS</td>
+      <td>http://www.grissom.afrc.af.mil/</td>
+      <td>http://en.wikipedia.org/wiki/Grissom_Air_Reser...</td>
+      <td>NaN</td>
+      <td>850</td>
+      <td>2014-10-03T23:32:05+00:00</td>
+    </tr>
+    <tr>
+      <th>6700</th>
+      <td>5510</td>
+      <td>RCBS</td>
+      <td>large_airport</td>
+      <td>Kinmen Airport</td>
+      <td>24.427900</td>
+      <td>118.359001</td>
+      <td>93.0</td>
+      <td>AS</td>
+      <td>TW</td>
+      <td>TW-X-KM</td>
+      <td>Shang-I</td>
+      <td>1</td>
+      <td>RCBS</td>
+      <td>KNH</td>
+      <td>NaN</td>
+      <td>http://www.kma.gov.tw/index-e.htm</td>
+      <td>http://en.wikipedia.org/wiki/Kinmen_Airport</td>
+      <td>Shang Yi Airport, 金門尚義機場, 金门尚义机场, Jīnmén Shàng...</td>
+      <td>850</td>
+      <td>2009-07-11T09:13:57+00:00</td>
+    </tr>
+    <tr>
+      <th>7035</th>
+      <td>6061</td>
+      <td>SELT</td>
+      <td>large_airport</td>
+      <td>Cotopaxi International Airport</td>
+      <td>-0.906833</td>
+      <td>-78.615799</td>
+      <td>9205.0</td>
+      <td>SA</td>
+      <td>EC</td>
+      <td>EC-X</td>
+      <td>Latacunga</td>
+      <td>1</td>
+      <td>SELT</td>
+      <td>LTX</td>
+      <td>NaN</td>
+      <td>http://www.dgac.gob.ec/latacunga/</td>
+      <td>http://es.wikipedia.org/wiki/Aeropuerto_Intern...</td>
+      <td>Latacunga, Vulcano, Ecuador, Cargo, Long runwa...</td>
+      <td>400</td>
+      <td>2013-02-25T10:27:48+00:00</td>
+    </tr>
+    <tr>
+      <th>10197</th>
+      <td>42924</td>
+      <td>RU-0035</td>
+      <td>large_airport</td>
+      <td>Grozny North Airport</td>
+      <td>43.388302</td>
+      <td>45.698601</td>
+      <td>548.0</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-CE</td>
+      <td>Grozny</td>
+      <td>1</td>
+      <td>URMG</td>
+      <td>GRV</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https://en.wikipedia.org/wiki/Grozny_Airport</td>
+      <td>Grozny Severny, Grozny, Аэропорт Грозный Север...</td>
+      <td>0</td>
+      <td>2016-05-31T10:29:00+00:00</td>
+    </tr>
+    <tr>
+      <th>10260</th>
+      <td>299238</td>
+      <td>rjns</td>
+      <td>large_airport</td>
+      <td>Mt. Fuji Shizuoka Airport</td>
+      <td>34.796043</td>
+      <td>138.187752</td>
+      <td>433.0</td>
+      <td>AS</td>
+      <td>JP</td>
+      <td>JP-22</td>
+      <td>Makinohara / Shimada</td>
+      <td>1</td>
+      <td>RJNS</td>
+      <td>FSZ</td>
+      <td>NaN</td>
+      <td>http://www.mtfuji-shizuokaairport.jp/english/i...</td>
+      <td>http://en.wikipedia.org/wiki/Shizuoka_Airport</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2013-09-29T13:51:58+00:00</td>
+    </tr>
+    <tr>
+      <th>10316</th>
+      <td>320984</td>
+      <td>GB-0458</td>
+      <td>large_airport</td>
+      <td>[Duplicate] Pic</td>
+      <td>55.505694</td>
+      <td>-4.586792</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>GB</td>
+      <td>GB-SCT</td>
+      <td>Prestwick</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-11-12T08:02:29+00:00</td>
+    </tr>
+    <tr>
+      <th>10381</th>
+      <td>309668</td>
+      <td>DNAI</td>
+      <td>large_airport</td>
+      <td>Akwa Ibom International Airport</td>
+      <td>4.872500</td>
+      <td>8.093000</td>
+      <td>170.0</td>
+      <td>AF</td>
+      <td>NG</td>
+      <td>NG-AK</td>
+      <td>Uyo</td>
+      <td>1</td>
+      <td>DNAI</td>
+      <td>QUO</td>
+      <td>NaN</td>
+      <td>http://www.ibomairport.com.ng/</td>
+      <td>http://en.wikipedia.org/wiki/Akwa_Ibom_Airport</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2013-09-28T12:53:18+00:00</td>
+    </tr>
+    <tr>
+      <th>10407</th>
+      <td>27197</td>
+      <td>ZGNN</td>
+      <td>large_airport</td>
+      <td>Nanning Wuxu Airport</td>
+      <td>22.608299</td>
+      <td>108.171997</td>
+      <td>421.0</td>
+      <td>AS</td>
+      <td>CN</td>
+      <td>CN-45</td>
+      <td>Nanning</td>
+      <td>1</td>
+      <td>ZGNN</td>
+      <td>NNG</td>
+      <td>NaN</td>
+      <td>http://www.nnairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Nanning_Wuxu_Inte...</td>
+      <td>南宁吴圩机场, Nanning Wuxu Air Base</td>
+      <td>1200</td>
+      <td>2009-04-16T20:31:13+00:00</td>
+    </tr>
+    <tr>
+      <th>10418</th>
+      <td>27195</td>
+      <td>ZGHA</td>
+      <td>large_airport</td>
+      <td>Changsha Huanghua International Airport</td>
+      <td>28.189199</td>
+      <td>113.220001</td>
+      <td>217.0</td>
+      <td>AS</td>
+      <td>CN</td>
+      <td>CN-43</td>
+      <td>Changsha</td>
+      <td>1</td>
+      <td>ZGHA</td>
+      <td>CSX</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Changsha_Huanghua...</td>
+      <td>长沙黄花国际机场</td>
+      <td>1050</td>
+      <td>2013-05-17T01:38:00+00:00</td>
+    </tr>
+    <tr>
+      <th>10500</th>
+      <td>4168</td>
+      <td>LFOA</td>
+      <td>large_airport</td>
+      <td>Avord (BA 702) Air Base</td>
+      <td>47.053299</td>
+      <td>2.632500</td>
+      <td>580.0</td>
+      <td>EU</td>
+      <td>FR</td>
+      <td>FR-F</td>
+      <td>Avord</td>
+      <td>0</td>
+      <td>LFOA</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https://en.wikipedia.org/wiki/Avord_Air_Base</td>
+      <td>NaN</td>
+      <td>850</td>
+      <td>2016-05-31T09:37:29+00:00</td>
+    </tr>
+    <tr>
+      <th>10501</th>
+      <td>35102</td>
+      <td>RU-2244</td>
+      <td>large_airport</td>
+      <td>Ukrainka Air Base</td>
+      <td>51.169997</td>
+      <td>128.445007</td>
+      <td>771.0</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-AMU</td>
+      <td>Belogorsk</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>XHBU</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Ukrainka_(air_base)</td>
+      <td>ЬХБУ, Украинка</td>
+      <td>850</td>
+      <td>2017-01-20T18:03:03+00:00</td>
+    </tr>
+    <tr>
+      <th>10502</th>
+      <td>30601</td>
+      <td>PK-0001</td>
+      <td>large_airport</td>
+      <td>(Under construction) New Islamabad Internation...</td>
+      <td>33.560714</td>
+      <td>72.851614</td>
+      <td>646.0</td>
+      <td>AS</td>
+      <td>PK</td>
+      <td>PK-PB</td>
+      <td>Islamabad</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://www.niia.com.pk/</td>
+      <td>http://en.wikipedia.org/wiki/New_Islamabad_Int...</td>
+      <td>Fateh Jang</td>
+      <td>850</td>
+      <td>2010-12-28T15:14:35+00:00</td>
+    </tr>
+    <tr>
+      <th>10503</th>
+      <td>41136</td>
+      <td>RU-0016</td>
+      <td>large_airport</td>
+      <td>Lipetsk Air Base</td>
+      <td>52.634998</td>
+      <td>39.445000</td>
+      <td>636.0</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-LIP</td>
+      <td>Lipetsk</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Lipetsk_Air_Base</td>
+      <td>NaN</td>
+      <td>850</td>
+      <td>2008-08-11T13:10:57+00:00</td>
+    </tr>
+    <tr>
+      <th>10504</th>
+      <td>35046</td>
+      <td>RU-4464</td>
+      <td>large_airport</td>
+      <td>Olenya Air Base</td>
+      <td>68.151802</td>
+      <td>33.463902</td>
+      <td>702.0</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-MUR</td>
+      <td>Olenegorsk</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>XLMO</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Olenya_(air_base)</td>
+      <td>ЬЛМО, Оленья, Olenegorsk</td>
+      <td>850</td>
+      <td>2015-09-25T10:50:57+00:00</td>
+    </tr>
+    <tr>
+      <th>10506</th>
+      <td>42967</td>
+      <td>UUBW</td>
+      <td>large_airport</td>
+      <td>Zhukovsky International Airport</td>
+      <td>55.553299</td>
+      <td>38.150002</td>
+      <td>377.0</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-MOS</td>
+      <td>Zhukovsky</td>
+      <td>1</td>
+      <td>UUBW</td>
+      <td>ZIA</td>
+      <td>NaN</td>
+      <td>http://zia.aero/</td>
+      <td>https://en.wikipedia.org/wiki/Zhukovsky_Intern...</td>
+      <td>Аэропорт Раменское, Zhukovsky Air Base, Gromov...</td>
+      <td>850</td>
+      <td>2016-10-05T13:48:10+00:00</td>
+    </tr>
+    <tr>
+      <th>11631</th>
+      <td>34954</td>
+      <td>UWKG</td>
+      <td>large_airport</td>
+      <td>Borisoglebskoye Airport</td>
+      <td>55.866699</td>
+      <td>49.133301</td>
+      <td>213.0</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-TA</td>
+      <td>Kazan</td>
+      <td>0</td>
+      <td>UWKG</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Borisoglebskoye_A...</td>
+      <td>Аэропорт Борисоглебское</td>
+      <td>250</td>
+      <td>2015-08-21T19:49:50+00:00</td>
+    </tr>
+    <tr>
+      <th>41518</th>
+      <td>309579</td>
+      <td>VCRI</td>
+      <td>large_airport</td>
+      <td>Mattala Rajapaksa International Airport</td>
+      <td>6.284467</td>
+      <td>81.124128</td>
+      <td>157.0</td>
+      <td>AS</td>
+      <td>LK</td>
+      <td>LK-3</td>
+      <td>NaN</td>
+      <td>1</td>
+      <td>VCRI</td>
+      <td>HRI</td>
+      <td>VCRI</td>
+      <td>http://www.mria.lk/</td>
+      <td>http://en.wikipedia.org/wiki/Mattala_Rajapaksa...</td>
+      <td>Hambantota International Airport</td>
+      <td>0</td>
+      <td>2015-10-06T05:20:29+00:00</td>
+    </tr>
+    <tr>
+      <th>42016</th>
+      <td>317314</td>
+      <td>US-0303</td>
+      <td>large_airport</td>
+      <td>atl</td>
+      <td>33.137551</td>
+      <td>-84.375000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-U-A</td>
+      <td>NaN</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-03-19T09:20:40+00:00</td>
+    </tr>
+    <tr>
+      <th>42399</th>
+      <td>320983</td>
+      <td>CA-0671</td>
+      <td>large_airport</td>
+      <td>Cyll</td>
+      <td>53.310365</td>
+      <td>-110.072021</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>CA</td>
+      <td>CA-U-A</td>
+      <td>NaN</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-10-31T22:20:17+00:00</td>
+    </tr>
+    <tr>
+      <th>42571</th>
+      <td>322136</td>
+      <td>YYZ</td>
+      <td>large_airport</td>
+      <td>Toronto Pearson International Airport</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>CA</td>
+      <td>CA-ON</td>
+      <td>NaN</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>YYZ</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2017-02-12T14:34:35+00:00</td>
+    </tr>
+    <tr>
+      <th>42689</th>
+      <td>299747</td>
+      <td>OM-0004</td>
+      <td>large_airport</td>
+      <td>Rustaq Airport</td>
+      <td>23.640556</td>
+      <td>57.487500</td>
+      <td>349.0</td>
+      <td>AS</td>
+      <td>OM</td>
+      <td>OM-BA</td>
+      <td>Al Masna'ah</td>
+      <td>0</td>
+      <td>OORQ</td>
+      <td>MNH</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https://en.wikipedia.org/wiki/Rustaq_Airport</td>
+      <td>Musanaa, Wadi al Maawil, Al Muladdah</td>
+      <td>0</td>
+      <td>2016-03-16T00:34:25+00:00</td>
+    </tr>
+    <tr>
+      <th>43270</th>
+      <td>44093</td>
+      <td>ZBNY</td>
+      <td>large_airport</td>
+      <td>Beijing Nanyuan Airport</td>
+      <td>39.782799</td>
+      <td>116.388000</td>
+      <td>NaN</td>
+      <td>AS</td>
+      <td>CN</td>
+      <td>CN-11</td>
+      <td>Beijing</td>
+      <td>1</td>
+      <td>ZBNY</td>
+      <td>NAY</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Nanyuan_Airport</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2009-08-30T19:53:52+00:00</td>
+    </tr>
+    <tr>
+      <th>44663</th>
+      <td>299738</td>
+      <td>OM-0003</td>
+      <td>large_airport</td>
+      <td>Duqm Jaaluni Airport</td>
+      <td>19.500000</td>
+      <td>57.642800</td>
+      <td>380.0</td>
+      <td>AS</td>
+      <td>OM</td>
+      <td>OM-WU</td>
+      <td>Duqm</td>
+      <td>1</td>
+      <td>OODQ</td>
+      <td>JNJ</td>
+      <td>NaN</td>
+      <td>http://www.omanairports.com/</td>
+      <td>https://en.wikipedia.org/wiki/Duqm_Jaaluni_Air...</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-05-31T09:45:53+00:00</td>
+    </tr>
+    <tr>
+      <th>47391</th>
+      <td>302303</td>
+      <td>RKJB</td>
+      <td>large_airport</td>
+      <td>Muan International Airport</td>
+      <td>34.991406</td>
+      <td>126.382814</td>
+      <td>35.0</td>
+      <td>AS</td>
+      <td>KR</td>
+      <td>KR-46</td>
+      <td>Muan</td>
+      <td>1</td>
+      <td>RKJB</td>
+      <td>MWX</td>
+      <td>NaN</td>
+      <td>http://muan.airport.co.kr/doc/muan_eng/</td>
+      <td>http://en.wikipedia.org/wiki/Muan_Internationa...</td>
+      <td>Gwangju, Mokpo</td>
+      <td>0</td>
+      <td>2015-08-19T02:40:29+00:00</td>
+    </tr>
+    <tr>
+      <th>48343</th>
+      <td>45229</td>
+      <td>AMC</td>
+      <td>large_airport</td>
+      <td>Mar de Cortés International Airport</td>
+      <td>31.351621</td>
+      <td>-113.305864</td>
+      <td>71.0</td>
+      <td>NaN</td>
+      <td>MX</td>
+      <td>MX-SON</td>
+      <td>Puerto Peñasco</td>
+      <td>1</td>
+      <td>MMPE</td>
+      <td>PPE</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Mar_de_Cort%C3%A9...</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-05-31T10:21:05+00:00</td>
+    </tr>
+    <tr>
+      <th>48768</th>
+      <td>309298</td>
+      <td>ID-0017</td>
+      <td>large_airport</td>
+      <td>Sungai Siring International Airport</td>
+      <td>-0.373611</td>
+      <td>117.255556</td>
+      <td>82.0</td>
+      <td>AS</td>
+      <td>ID</td>
+      <td>ID-KI</td>
+      <td>Samarinda</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://www.proyek.dishubprovkaltim.info/?pro=1</td>
+      <td>http://en.wikipedia.org/wiki/Samarinda_Interna...</td>
+      <td>Sungai Siring Airport, فرودگاه سیرینگ</td>
+      <td>0</td>
+      <td>2015-02-15T02:52:02+00:00</td>
+    </tr>
+  </tbody>
+</table>
+<p>574 rows × 20 columns</p>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Since both latitude and longitude are columns in the dataframe we can use pandas to carry out a limited number of geospatial queries. For example, extract all the airports in the northern hemisphere:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">latitude_deg</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>ident</th>
+      <th>type</th>
+      <th>name</th>
+      <th>latitude_deg</th>
+      <th>longitude_deg</th>
+      <th>elevation_ft</th>
+      <th>continent</th>
+      <th>iso_country</th>
+      <th>iso_region</th>
+      <th>municipality</th>
+      <th>scheduled_service</th>
+      <th>gps_code</th>
+      <th>iata_code</th>
+      <th>local_code</th>
+      <th>home_link</th>
+      <th>wikipedia_link</th>
+      <th>keywords</th>
+      <th>score</th>
+      <th>last_updated</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>2434</td>
+      <td>EGLL</td>
+      <td>large_airport</td>
+      <td>London Heathrow Airport</td>
+      <td>51.470600</td>
+      <td>-0.461941</td>
+      <td>83.0</td>
+      <td>EU</td>
+      <td>GB</td>
+      <td>GB-ENG</td>
+      <td>London</td>
+      <td>1</td>
+      <td>EGLL</td>
+      <td>LHR</td>
+      <td>NaN</td>
+      <td>http://www.heathrowairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/London_Heathrow_A...</td>
+      <td>LON, Londres</td>
+      <td>1251675</td>
+      <td>2016-02-09T10:54:31+00:00</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3632</td>
+      <td>KLAX</td>
+      <td>large_airport</td>
+      <td>Los Angeles International Airport</td>
+      <td>33.942501</td>
+      <td>-118.407997</td>
+      <td>125.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-CA</td>
+      <td>Los Angeles</td>
+      <td>1</td>
+      <td>KLAX</td>
+      <td>LAX</td>
+      <td>LAX</td>
+      <td>http://www.iflylax.com/</td>
+      <td>http://en.wikipedia.org/wiki/Los_Angeles_Inter...</td>
+      <td>NaN</td>
+      <td>1335475</td>
+      <td>2010-01-23T11:27:55+00:00</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>3754</td>
+      <td>KORD</td>
+      <td>large_airport</td>
+      <td>Chicago O'Hare International Airport</td>
+      <td>41.978600</td>
+      <td>-87.904800</td>
+      <td>672.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-IL</td>
+      <td>Chicago</td>
+      <td>1</td>
+      <td>KORD</td>
+      <td>ORD</td>
+      <td>ORD</td>
+      <td>http://www.flychicago.com/ohare/en/home/Pages/...</td>
+      <td>http://en.wikipedia.org/wiki/O'Hare_Internatio...</td>
+      <td>CHI, Orchard Place</td>
+      <td>1503175</td>
+      <td>2014-08-19T18:55:27+00:00</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>3622</td>
+      <td>KJFK</td>
+      <td>large_airport</td>
+      <td>John F Kennedy International Airport</td>
+      <td>40.639801</td>
+      <td>-73.778900</td>
+      <td>13.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NY</td>
+      <td>New York</td>
+      <td>1</td>
+      <td>KJFK</td>
+      <td>JFK</td>
+      <td>JFK</td>
+      <td>http://www.panynj.gov/CommutingTravel/airports...</td>
+      <td>http://en.wikipedia.org/wiki/John_F._Kennedy_I...</td>
+      <td>Manhattan, New York City, NYC, Idlewild</td>
+      <td>1052075</td>
+      <td>2010-01-23T11:27:54+00:00</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3384</td>
+      <td>KATL</td>
+      <td>large_airport</td>
+      <td>Hartsfield Jackson Atlanta International Airport</td>
+      <td>33.636700</td>
+      <td>-84.428101</td>
+      <td>1026.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-GA</td>
+      <td>Atlanta</td>
+      <td>1</td>
+      <td>KATL</td>
+      <td>ATL</td>
+      <td>ATL</td>
+      <td>http://www.atlanta-airport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Hartsfield-Jackso...</td>
+      <td>NaN</td>
+      <td>2002475</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>4185</td>
+      <td>LFPG</td>
+      <td>large_airport</td>
+      <td>Charles de Gaulle International Airport</td>
+      <td>49.012798</td>
+      <td>2.550000</td>
+      <td>392.0</td>
+      <td>EU</td>
+      <td>FR</td>
+      <td>FR-J</td>
+      <td>Paris</td>
+      <td>1</td>
+      <td>LFPG</td>
+      <td>CDG</td>
+      <td>NaN</td>
+      <td>http://www.aeroportsdeparis.fr/</td>
+      <td>http://en.wikipedia.org/wiki/Charles_de_Gaulle...</td>
+      <td>PAR, Aéroport Roissy-Charles de Gaulle, Roissy...</td>
+      <td>1127475</td>
+      <td>2010-01-05T18:17:43+00:00</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>3878</td>
+      <td>KSFO</td>
+      <td>large_airport</td>
+      <td>San Francisco International Airport</td>
+      <td>37.618999</td>
+      <td>-122.375000</td>
+      <td>13.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-CA</td>
+      <td>San Francisco</td>
+      <td>1</td>
+      <td>KSFO</td>
+      <td>SFO</td>
+      <td>SFO</td>
+      <td>http://www.flysfo.com/</td>
+      <td>http://en.wikipedia.org/wiki/San_Francisco_Int...</td>
+      <td>QSF, QBA</td>
+      <td>1112475</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>2513</td>
+      <td>EHAM</td>
+      <td>large_airport</td>
+      <td>Amsterdam Airport Schiphol</td>
+      <td>52.308601</td>
+      <td>4.763890</td>
+      <td>-11.0</td>
+      <td>EU</td>
+      <td>NL</td>
+      <td>NL-NH</td>
+      <td>Amsterdam</td>
+      <td>1</td>
+      <td>EHAM</td>
+      <td>AMS</td>
+      <td>NaN</td>
+      <td>http://www.schiphol.nl/</td>
+      <td>http://en.wikipedia.org/wiki/Amsterdam_Schipho...</td>
+      <td>NaN</td>
+      <td>1093275</td>
+      <td>2011-10-05T23:26:15+00:00</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>2212</td>
+      <td>EDDF</td>
+      <td>large_airport</td>
+      <td>Frankfurt am Main International Airport</td>
+      <td>50.033333</td>
+      <td>8.570556</td>
+      <td>364.0</td>
+      <td>EU</td>
+      <td>DE</td>
+      <td>DE-HE</td>
+      <td>Frankfurt-am-Main</td>
+      <td>1</td>
+      <td>EDDF</td>
+      <td>FRA</td>
+      <td>NaN</td>
+      <td>http://www.frankfurt-airport.de/</td>
+      <td>http://en.wikipedia.org/wiki/Frankfurt_Airport</td>
+      <td>EDAF, Rhein-Main Air Base</td>
+      <td>1144675</td>
+      <td>2016-09-15T03:34:21+00:00</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>3521</td>
+      <td>KEWR</td>
+      <td>large_airport</td>
+      <td>Newark Liberty International Airport</td>
+      <td>40.692501</td>
+      <td>-74.168701</td>
+      <td>18.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NJ</td>
+      <td>Newark</td>
+      <td>1</td>
+      <td>KEWR</td>
+      <td>EWR</td>
+      <td>EWR</td>
+      <td>http://www.panynj.gov/CommutingTravel/airports...</td>
+      <td>http://en.wikipedia.org/wiki/Newark_Liberty_In...</td>
+      <td>Manhattan, New York City, NYC</td>
+      <td>1064475</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>3631</td>
+      <td>KLAS</td>
+      <td>large_airport</td>
+      <td>McCarran International Airport</td>
+      <td>36.080101</td>
+      <td>-115.152000</td>
+      <td>2181.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NV</td>
+      <td>Las Vegas</td>
+      <td>1</td>
+      <td>KLAS</td>
+      <td>LAS</td>
+      <td>LAS</td>
+      <td>http://www.mccarran.com/</td>
+      <td>http://en.wikipedia.org/wiki/McCarran_Internat...</td>
+      <td>NaN</td>
+      <td>1068475</td>
+      <td>2010-07-05T16:48:39+00:00</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>3488</td>
+      <td>KDFW</td>
+      <td>large_airport</td>
+      <td>Dallas Fort Worth International Airport</td>
+      <td>32.896801</td>
+      <td>-97.038002</td>
+      <td>607.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-TX</td>
+      <td>Dallas-Fort Worth</td>
+      <td>1</td>
+      <td>KDFW</td>
+      <td>DFW</td>
+      <td>DFW</td>
+      <td>http://www.dfwairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Dallas-Fort_Worth...</td>
+      <td>QDF</td>
+      <td>1203175</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>3670</td>
+      <td>KMCO</td>
+      <td>large_airport</td>
+      <td>Orlando International Airport</td>
+      <td>28.429399</td>
+      <td>-81.308998</td>
+      <td>96.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-FL</td>
+      <td>Orlando</td>
+      <td>1</td>
+      <td>KMCO</td>
+      <td>MCO</td>
+      <td>MCO</td>
+      <td>http://www.orlandoairports.net/</td>
+      <td>http://en.wikipedia.org/wiki/Orlando_Internati...</td>
+      <td>Disney World,Epcot Center</td>
+      <td>1044075</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>3486</td>
+      <td>KDEN</td>
+      <td>large_airport</td>
+      <td>Denver International Airport</td>
+      <td>39.861698</td>
+      <td>-104.672997</td>
+      <td>5431.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-CO</td>
+      <td>Denver</td>
+      <td>1</td>
+      <td>KDEN</td>
+      <td>DEN</td>
+      <td>DEN</td>
+      <td>http://www.flydenver.com/</td>
+      <td>http://en.wikipedia.org/wiki/Denver_Internatio...</td>
+      <td>DVX, KVDX</td>
+      <td>1103275</td>
+      <td>2015-11-13T09:28:42+00:00</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>3685</td>
+      <td>KMIA</td>
+      <td>large_airport</td>
+      <td>Miami International Airport</td>
+      <td>25.793200</td>
+      <td>-80.290604</td>
+      <td>8.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-FL</td>
+      <td>Miami</td>
+      <td>1</td>
+      <td>KMIA</td>
+      <td>MIA</td>
+      <td>MIA</td>
+      <td>http://www.miami-airport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Miami_Internation...</td>
+      <td>MFW, South Florida</td>
+      <td>1073075</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>3602</td>
+      <td>KIAD</td>
+      <td>large_airport</td>
+      <td>Washington Dulles International Airport</td>
+      <td>38.944500</td>
+      <td>-77.455803</td>
+      <td>312.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-DC</td>
+      <td>Washington</td>
+      <td>1</td>
+      <td>KIAD</td>
+      <td>IAD</td>
+      <td>IAD</td>
+      <td>http://www.mwaa.com/dulles/</td>
+      <td>http://en.wikipedia.org/wiki/Washington_Dulles...</td>
+      <td>WAS</td>
+      <td>1023875</td>
+      <td>2010-01-23T11:27:53+00:00</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>3643</td>
+      <td>KLGA</td>
+      <td>large_airport</td>
+      <td>La Guardia Airport</td>
+      <td>40.777199</td>
+      <td>-73.872597</td>
+      <td>21.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NY</td>
+      <td>New York</td>
+      <td>1</td>
+      <td>KLGA</td>
+      <td>LGA</td>
+      <td>LGA</td>
+      <td>http://www.panynj.gov/CommutingTravel/airports...</td>
+      <td>http://en.wikipedia.org/wiki/LaGuardia_Airport</td>
+      <td>Manhattan, New York City, NYC, Glenn H. Curtis...</td>
+      <td>1030575</td>
+      <td>2010-01-23T11:27:55+00:00</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>3772</td>
+      <td>KPHX</td>
+      <td>large_airport</td>
+      <td>Phoenix Sky Harbor International Airport</td>
+      <td>33.434299</td>
+      <td>-112.012001</td>
+      <td>1135.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-AZ</td>
+      <td>Phoenix</td>
+      <td>1</td>
+      <td>KPHX</td>
+      <td>PHX</td>
+      <td>PHX</td>
+      <td>http://phoenix.gov/skyharborairport/</td>
+      <td>http://en.wikipedia.org/wiki/Phoenix_Sky_Harbo...</td>
+      <td>NaN</td>
+      <td>1060875</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>2429</td>
+      <td>EGKK</td>
+      <td>large_airport</td>
+      <td>London Gatwick Airport</td>
+      <td>51.148102</td>
+      <td>-0.190278</td>
+      <td>202.0</td>
+      <td>EU</td>
+      <td>GB</td>
+      <td>GB-ENG</td>
+      <td>London</td>
+      <td>1</td>
+      <td>EGKK</td>
+      <td>LGW</td>
+      <td>NaN</td>
+      <td>http://www.gatwickairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/London_Gatwick_Ai...</td>
+      <td>LON, Crawley, Charlwood</td>
+      <td>1049275</td>
+      <td>2009-01-30T17:53:54+00:00</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>3875</td>
+      <td>KSEA</td>
+      <td>large_airport</td>
+      <td>Seattle Tacoma International Airport</td>
+      <td>47.449001</td>
+      <td>-122.308998</td>
+      <td>433.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-WA</td>
+      <td>Seattle</td>
+      <td>1</td>
+      <td>KSEA</td>
+      <td>SEA</td>
+      <td>SEA</td>
+      <td>http://www.portseattle.org/seatac/</td>
+      <td>http://en.wikipedia.org/wiki/Seattle-Tacoma_In...</td>
+      <td>NaN</td>
+      <td>1038675</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>3422</td>
+      <td>KBOS</td>
+      <td>large_airport</td>
+      <td>General Edward Lawrence Logan International Ai...</td>
+      <td>42.364300</td>
+      <td>-71.005203</td>
+      <td>20.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-MA</td>
+      <td>Boston</td>
+      <td>1</td>
+      <td>KBOS</td>
+      <td>BOS</td>
+      <td>BOS</td>
+      <td>http://www.massport.com/logan/</td>
+      <td>http://en.wikipedia.org/wiki/Logan_Internation...</td>
+      <td>General Edward Lawrence Logan International Ai...</td>
+      <td>1035875</td>
+      <td>2010-01-23T11:27:48+00:00</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>3771</td>
+      <td>KPHL</td>
+      <td>large_airport</td>
+      <td>Philadelphia International Airport</td>
+      <td>39.871899</td>
+      <td>-75.241096</td>
+      <td>36.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-PA</td>
+      <td>Philadelphia</td>
+      <td>1</td>
+      <td>KPHL</td>
+      <td>PHL</td>
+      <td>PHL</td>
+      <td>http://www.phl.org/</td>
+      <td>http://en.wikipedia.org/wiki/Philadelphia_Inte...</td>
+      <td>NaN</td>
+      <td>1031075</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>1990</td>
+      <td>CYYZ</td>
+      <td>large_airport</td>
+      <td>Lester B. Pearson International Airport</td>
+      <td>43.677200</td>
+      <td>-79.630600</td>
+      <td>569.0</td>
+      <td>NaN</td>
+      <td>CA</td>
+      <td>CA-ON</td>
+      <td>Toronto</td>
+      <td>1</td>
+      <td>CYYZ</td>
+      <td>YYZ</td>
+      <td>YYZ</td>
+      <td>http://www.gtaa.com/</td>
+      <td>http://en.wikipedia.org/wiki/Toronto_Pearson_I...</td>
+      <td>YTO, Toronto International Airport, Malton</td>
+      <td>1040275</td>
+      <td>2009-10-15T13:44:39+00:00</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>3483</td>
+      <td>KDCA</td>
+      <td>large_airport</td>
+      <td>Ronald Reagan Washington National Airport</td>
+      <td>38.852100</td>
+      <td>-77.037697</td>
+      <td>15.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-DC</td>
+      <td>Washington</td>
+      <td>1</td>
+      <td>KDCA</td>
+      <td>DCA</td>
+      <td>DCA</td>
+      <td>http://www.flyreagan.com/dca/reagan-national-a...</td>
+      <td>http://en.wikipedia.org/wiki/Ronald_Reagan_Was...</td>
+      <td>WAS</td>
+      <td>1016175</td>
+      <td>2016-12-13T09:13:00+00:00</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>3604</td>
+      <td>KIAH</td>
+      <td>large_airport</td>
+      <td>George Bush Intercontinental Houston Airport</td>
+      <td>29.984400</td>
+      <td>-95.341400</td>
+      <td>97.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-TX</td>
+      <td>Houston</td>
+      <td>1</td>
+      <td>KIAH</td>
+      <td>IAH</td>
+      <td>IAH</td>
+      <td>http://www.fly2houston.com/iah</td>
+      <td>http://en.wikipedia.org/wiki/George_Bush_Inter...</td>
+      <td>QHO</td>
+      <td>1055675</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>3457</td>
+      <td>KCLT</td>
+      <td>large_airport</td>
+      <td>Charlotte Douglas International Airport</td>
+      <td>35.214001</td>
+      <td>-80.943100</td>
+      <td>748.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-NC</td>
+      <td>Charlotte</td>
+      <td>1</td>
+      <td>KCLT</td>
+      <td>CLT</td>
+      <td>CLT</td>
+      <td>http://www.charlotteairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Charlotte/Douglas...</td>
+      <td>NaN</td>
+      <td>1028075</td>
+      <td>2009-01-30T14:52:52+00:00</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>3497</td>
+      <td>KDTW</td>
+      <td>large_airport</td>
+      <td>Detroit Metropolitan Wayne County Airport</td>
+      <td>42.212399</td>
+      <td>-83.353401</td>
+      <td>645.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-MI</td>
+      <td>Detroit</td>
+      <td>1</td>
+      <td>KDTW</td>
+      <td>DTW</td>
+      <td>DTW</td>
+      <td>http://www.metroairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Detroit_Metropoli...</td>
+      <td>DTT, Detroit Metro Airport</td>
+      <td>1079375</td>
+      <td>2008-06-13T14:30:04+00:00</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>2218</td>
+      <td>EDDM</td>
+      <td>large_airport</td>
+      <td>Munich International Airport</td>
+      <td>48.353802</td>
+      <td>11.786100</td>
+      <td>1487.0</td>
+      <td>EU</td>
+      <td>DE</td>
+      <td>DE-BY</td>
+      <td>Munich</td>
+      <td>1</td>
+      <td>EDDM</td>
+      <td>MUC</td>
+      <td>NaN</td>
+      <td>http://www.munich-airport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Munich_Internatio...</td>
+      <td>Franz Josef Strauss International Airport, Flu...</td>
+      <td>1026675</td>
+      <td>2015-10-17T03:56:24+00:00</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>3709</td>
+      <td>KMSP</td>
+      <td>large_airport</td>
+      <td>Minneapolis-St Paul International/Wold-Chamber...</td>
+      <td>44.882000</td>
+      <td>-93.221802</td>
+      <td>841.0</td>
+      <td>NaN</td>
+      <td>US</td>
+      <td>US-MN</td>
+      <td>Minneapolis</td>
+      <td>1</td>
+      <td>KMSP</td>
+      <td>MSP</td>
+      <td>MSP</td>
+      <td>http://www.mspairport.com/</td>
+      <td>http://en.wikipedia.org/wiki/Minneapolis-Saint...</td>
+      <td>NaN</td>
+      <td>1085275</td>
+      <td>2009-12-17T08:53:11+00:00</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>4372</td>
+      <td>LIRF</td>
+      <td>large_airport</td>
+      <td>Leonardo da Vinci–Fiumicino Airport</td>
+      <td>41.800278</td>
+      <td>12.238889</td>
+      <td>13.0</td>
+      <td>EU</td>
+      <td>IT</td>
+      <td>IT-62</td>
+      <td>Rome</td>
+      <td>1</td>
+      <td>LIRF</td>
+      <td>FCO</td>
+      <td>RM11</td>
+      <td>http://www.adr.it/portal/portal/adr/Fiumicino/...</td>
+      <td>http://en.wikipedia.org/wiki/Leonardo_da_Vinci...</td>
+      <td>ROM, Rome Fiumicino Airport, Fiumicino Airport</td>
+      <td>1031875</td>
+      <td>2016-10-08T00:37:02+00:00</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>50599</th>
+      <td>44389</td>
+      <td>KZ-0071</td>
+      <td>closed</td>
+      <td>Karas Air Base</td>
+      <td>48.737000</td>
+      <td>58.042000</td>
+      <td>NaN</td>
+      <td>AS</td>
+      <td>KZ</td>
+      <td>KZ-AKT</td>
+      <td>Zhem</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Emba Air Base, Аэродром Карась,Аэродром Эмба</td>
+      <td>0</td>
+      <td>2009-04-24T13:54:46+00:00</td>
+    </tr>
+    <tr>
+      <th>50600</th>
+      <td>44390</td>
+      <td>KZ-0072</td>
+      <td>closed</td>
+      <td>Karas Air Base</td>
+      <td>48.737000</td>
+      <td>58.042000</td>
+      <td>NaN</td>
+      <td>AS</td>
+      <td>KZ</td>
+      <td>KZ-AKT</td>
+      <td>Zhem</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Emba Air Base, Аэродром Карась, Аэродром Эмба</td>
+      <td>0</td>
+      <td>2009-04-24T13:54:54+00:00</td>
+    </tr>
+    <tr>
+      <th>50601</th>
+      <td>319812</td>
+      <td>HSJ</td>
+      <td>small_airport</td>
+      <td>Shangjie Airport</td>
+      <td>34.842153</td>
+      <td>113.273983</td>
+      <td>450.0</td>
+      <td>AS</td>
+      <td>CN</td>
+      <td>CN-41</td>
+      <td>Zhengzhou</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>HSJ</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-08-06T20:22:46+00:00</td>
+    </tr>
+    <tr>
+      <th>50602</th>
+      <td>43684</td>
+      <td>UWKV</td>
+      <td>medium_airport</td>
+      <td>Zhigansk Airport</td>
+      <td>66.796501</td>
+      <td>123.361000</td>
+      <td>292.0</td>
+      <td>AS</td>
+      <td>RU</td>
+      <td>RU-SA</td>
+      <td>Zhigansk</td>
+      <td>1</td>
+      <td>UEVV</td>
+      <td>ZIX</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https://en.wikipedia.org/wiki/Zhigansk_Airport</td>
+      <td>УЕЖЖ, Аэропорт Жиганск</td>
+      <td>0</td>
+      <td>2015-09-20T23:58:06+00:00</td>
+    </tr>
+    <tr>
+      <th>50603</th>
+      <td>308462</td>
+      <td>ZLZW</td>
+      <td>medium_airport</td>
+      <td>Zhongwei Shapotou Airport</td>
+      <td>37.573125</td>
+      <td>105.154454</td>
+      <td>8202.0</td>
+      <td>AS</td>
+      <td>CN</td>
+      <td>CN-64</td>
+      <td>Zhongwei</td>
+      <td>1</td>
+      <td>ZLZW</td>
+      <td>ZHY</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Zhongwei_Shapotou...</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2013-04-10T00:28:33+00:00</td>
+    </tr>
+    <tr>
+      <th>50604</th>
+      <td>44386</td>
+      <td>KZ-0070</td>
+      <td>small_airport</td>
+      <td>Zhosaly Airport</td>
+      <td>45.514999</td>
+      <td>64.084999</td>
+      <td>335.0</td>
+      <td>AS</td>
+      <td>KZ</td>
+      <td>KZ-KZY</td>
+      <td>Zhosaly</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Dzhusaly Airport, Аэропорт Жосалы, Аэропорт Дж...</td>
+      <td>0</td>
+      <td>2009-04-24T13:34:01+00:00</td>
+    </tr>
+    <tr>
+      <th>50605</th>
+      <td>46369</td>
+      <td>UA-0071</td>
+      <td>closed</td>
+      <td>Zhovti Vody Airstrip</td>
+      <td>48.350503</td>
+      <td>33.444271</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>UA</td>
+      <td>UA-12</td>
+      <td>Zhovti Vody</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Zholtyye Vody Airstrip, ЗПС Жовті Води, ВПП Жё...</td>
+      <td>0</td>
+      <td>2010-03-27T18:04:32+00:00</td>
+    </tr>
+    <tr>
+      <th>50606</th>
+      <td>46370</td>
+      <td>UA-0072</td>
+      <td>closed</td>
+      <td>Volodimirivka Airstrip</td>
+      <td>48.284035</td>
+      <td>33.448949</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>UA</td>
+      <td>UA-12</td>
+      <td>Zhovti Vody</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>ЗПС Володимирівка, ВПП Владимировка</td>
+      <td>0</td>
+      <td>2010-03-27T18:11:37+00:00</td>
+    </tr>
+    <tr>
+      <th>50607</th>
+      <td>44432</td>
+      <td>UKKO</td>
+      <td>medium_airport</td>
+      <td>Ozerne Air Base</td>
+      <td>50.158298</td>
+      <td>28.738300</td>
+      <td>761.0</td>
+      <td>EU</td>
+      <td>UA</td>
+      <td>UA-18</td>
+      <td>Zhytomyr</td>
+      <td>0</td>
+      <td>UKKO</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https://en.wikipedia.org/wiki/Ozerne_(air_base)</td>
+      <td>Zhitomyr Ozernoye, Oziernoye, Ozernoe, Ozernoy...</td>
+      <td>0</td>
+      <td>2017-02-18T21:11:10+00:00</td>
+    </tr>
+    <tr>
+      <th>50608</th>
+      <td>308157</td>
+      <td>DE-0040</td>
+      <td>small_airport</td>
+      <td>Zierenberg Airfield</td>
+      <td>51.367000</td>
+      <td>9.336000</td>
+      <td>1450.0</td>
+      <td>EU</td>
+      <td>DE</td>
+      <td>DE-HE</td>
+      <td>Zierenberg</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2012-12-15T23:37:53+00:00</td>
+    </tr>
+    <tr>
+      <th>50609</th>
+      <td>44743</td>
+      <td>RU-0197</td>
+      <td>small_airport</td>
+      <td>Zimovniki Air Base</td>
+      <td>47.141998</td>
+      <td>42.395000</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-ROS</td>
+      <td>Zimovniki</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Аэродром Зимовники</td>
+      <td>0</td>
+      <td>2009-08-17T10:56:36+00:00</td>
+    </tr>
+    <tr>
+      <th>50610</th>
+      <td>319653</td>
+      <td>MX-0257</td>
+      <td>small_airport</td>
+      <td>El Pinocho Airport</td>
+      <td>19.476550</td>
+      <td>-100.433200</td>
+      <td>6265.0</td>
+      <td>NaN</td>
+      <td>MX</td>
+      <td>MX-MIC</td>
+      <td>Zitácuaro</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>PIO</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-07-26T00:52:39+00:00</td>
+    </tr>
+    <tr>
+      <th>50611</th>
+      <td>43961</td>
+      <td>CZ-0044</td>
+      <td>heliport</td>
+      <td>Bat’A Hospital Heliport</td>
+      <td>49.226147</td>
+      <td>17.705345</td>
+      <td>738.0</td>
+      <td>EU</td>
+      <td>CZ</td>
+      <td>CZ-ZL</td>
+      <td>Zlín</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2009-03-27T18:08:04+00:00</td>
+    </tr>
+    <tr>
+      <th>50612</th>
+      <td>46129</td>
+      <td>RU-0304</td>
+      <td>medium_airport</td>
+      <td>Kapustin Yar Airfield</td>
+      <td>48.667000</td>
+      <td>45.732000</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-AST</td>
+      <td>Znamensk</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Аэродром Капустин Яр</td>
+      <td>0</td>
+      <td>2010-01-09T12:30:12+00:00</td>
+    </tr>
+    <tr>
+      <th>50613</th>
+      <td>319421</td>
+      <td>IT-0275</td>
+      <td>small_airport</td>
+      <td>Campo di Volo Arcobaleno</td>
+      <td>44.496944</td>
+      <td>11.243611</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>IT</td>
+      <td>IT-45</td>
+      <td>Zola Predosa (BO)</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>BO11</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-07-10T05:35:40+00:00</td>
+    </tr>
+    <tr>
+      <th>50614</th>
+      <td>45182</td>
+      <td>UA-0053</td>
+      <td>closed</td>
+      <td>Palmira Airfield</td>
+      <td>49.763000</td>
+      <td>32.123000</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>UA</td>
+      <td>UA-71</td>
+      <td>Zolotonosha</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Аэродром Пальмира</td>
+      <td>0</td>
+      <td>2009-11-18T14:53:00+00:00</td>
+    </tr>
+    <tr>
+      <th>50615</th>
+      <td>319121</td>
+      <td>MX-0184</td>
+      <td>heliport</td>
+      <td>Jupiter I Platform Helipad</td>
+      <td>19.520472</td>
+      <td>-92.184506</td>
+      <td>50.0</td>
+      <td>NaN</td>
+      <td>MX</td>
+      <td>MX-CAM</td>
+      <td>Zonda De Campeche</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>HJU</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-06-25T00:38:37+00:00</td>
+    </tr>
+    <tr>
+      <th>50616</th>
+      <td>43747</td>
+      <td>EBZO</td>
+      <td>heliport</td>
+      <td>Zandvoorde heliport</td>
+      <td>50.817280</td>
+      <td>2.974564</td>
+      <td>102.0</td>
+      <td>EU</td>
+      <td>BE</td>
+      <td>BE-VWV</td>
+      <td>Zonnebeke</td>
+      <td>0</td>
+      <td>EBZO</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2012-10-21T18:35:45+00:00</td>
+    </tr>
+    <tr>
+      <th>50618</th>
+      <td>43230</td>
+      <td>GE-0002</td>
+      <td>closed</td>
+      <td>Zugdidi Airport</td>
+      <td>42.489201</td>
+      <td>41.818699</td>
+      <td>NaN</td>
+      <td>AS</td>
+      <td>GE</td>
+      <td>GE-SZ</td>
+      <td>Zugdidi</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2009-08-17T13:52:57+00:00</td>
+    </tr>
+    <tr>
+      <th>50620</th>
+      <td>298761</td>
+      <td>IT-0032</td>
+      <td>small_airport</td>
+      <td>Campo di Volo Il Grifo</td>
+      <td>38.637255</td>
+      <td>15.947750</td>
+      <td>630.0</td>
+      <td>EU</td>
+      <td>IT</td>
+      <td>IT-78</td>
+      <td>Zungri</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>VVZUN</td>
+      <td>http://www.aeroclubilgrifo.it</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2017-01-03T03:03:17+00:00</td>
+    </tr>
+    <tr>
+      <th>50621</th>
+      <td>308403</td>
+      <td>ZUZY</td>
+      <td>medium_airport</td>
+      <td>Zunyi Xinzhou Airport</td>
+      <td>27.589500</td>
+      <td>107.000700</td>
+      <td>2920.0</td>
+      <td>AS</td>
+      <td>CN</td>
+      <td>CN-52</td>
+      <td>Zunyi</td>
+      <td>1</td>
+      <td>ZUZY</td>
+      <td>ZYI</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://en.wikipedia.org/wiki/Zunyi_Xinzhou_Air...</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2013-03-30T12:14:29+00:00</td>
+    </tr>
+    <tr>
+      <th>50622</th>
+      <td>316165</td>
+      <td>LDZE</td>
+      <td>small_airport</td>
+      <td>Zvekovac</td>
+      <td>45.823056</td>
+      <td>16.500000</td>
+      <td>374.0</td>
+      <td>EU</td>
+      <td>HR</td>
+      <td>HR-01</td>
+      <td>Zvekovac</td>
+      <td>0</td>
+      <td>LDZE</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://www.akdubrava.net</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2015-11-02T23:33:02+00:00</td>
+    </tr>
+    <tr>
+      <th>50623</th>
+      <td>44702</td>
+      <td>RU-0193</td>
+      <td>heliport</td>
+      <td>Pushkino Heliport</td>
+      <td>56.042000</td>
+      <td>37.978001</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-MOS</td>
+      <td>Zverosovkhoz</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>http://www.agusta.ru/</td>
+      <td>NaN</td>
+      <td>Вертодром Пушкино</td>
+      <td>0</td>
+      <td>2010-02-25T11:06:38+00:00</td>
+    </tr>
+    <tr>
+      <th>50624</th>
+      <td>43804</td>
+      <td>LOKZ</td>
+      <td>heliport</td>
+      <td>Zwatzhof Heliport</td>
+      <td>46.975555</td>
+      <td>14.274722</td>
+      <td>2500.0</td>
+      <td>EU</td>
+      <td>AT</td>
+      <td>AT-2</td>
+      <td>Zwatzhof</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2009-03-23T20:54:13+00:00</td>
+    </tr>
+    <tr>
+      <th>50625</th>
+      <td>43816</td>
+      <td>LOAZ</td>
+      <td>heliport</td>
+      <td>Zwettl Heliport</td>
+      <td>48.599998</td>
+      <td>15.164167</td>
+      <td>1900.0</td>
+      <td>EU</td>
+      <td>AT</td>
+      <td>AT-3</td>
+      <td>Zwettl</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2009-03-23T20:54:37+00:00</td>
+    </tr>
+    <tr>
+      <th>50626</th>
+      <td>43708</td>
+      <td>NL-0013</td>
+      <td>heliport</td>
+      <td>Isala Klinieken. Locatie Sophia Heliport</td>
+      <td>52.513874</td>
+      <td>6.128000</td>
+      <td>6.0</td>
+      <td>EU</td>
+      <td>NL</td>
+      <td>NL-OV</td>
+      <td>Zwolle</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>EH0029</td>
+      <td>0</td>
+      <td>2009-03-21T16:38:26+00:00</td>
+    </tr>
+    <tr>
+      <th>50627</th>
+      <td>315523</td>
+      <td>RU-0438</td>
+      <td>small_airport</td>
+      <td>Zyryanka West Airport</td>
+      <td>65.736700</td>
+      <td>150.705000</td>
+      <td>150.0</td>
+      <td>EU</td>
+      <td>RU</td>
+      <td>RU-SA</td>
+      <td>Zyryanka</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https://en.wikipedia.org/wiki/Zyryanka_West_Ai...</td>
+      <td>ZCQ6, Зырянка (Западный)</td>
+      <td>0</td>
+      <td>2015-09-23T00:19:01+00:00</td>
+    </tr>
+    <tr>
+      <th>50628</th>
+      <td>318187</td>
+      <td>KZ-0081</td>
+      <td>small_airport</td>
+      <td>Zubovsk Airport</td>
+      <td>49.800103</td>
+      <td>84.214661</td>
+      <td>NaN</td>
+      <td>AS</td>
+      <td>KZ</td>
+      <td>KZ-VOS</td>
+      <td>Zyryanovsk</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2016-05-31T03:11:45+00:00</td>
+    </tr>
+    <tr>
+      <th>50629</th>
+      <td>42246</td>
+      <td>BITH</td>
+      <td>closed</td>
+      <td>Sauðanes Airport</td>
+      <td>66.250603</td>
+      <td>-15.267200</td>
+      <td>15.0</td>
+      <td>EU</td>
+      <td>IS</td>
+      <td>IS-6</td>
+      <td>Þórshöfn</td>
+      <td>0</td>
+      <td>BITH</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>https://en.wikipedia.org/wiki/%C3%9E%C3%B3rsh%...</td>
+      <td>THO</td>
+      <td>0</td>
+      <td>2015-08-20T20:43:01+00:00</td>
+    </tr>
+    <tr>
+      <th>50630</th>
+      <td>315917</td>
+      <td>BG-0027</td>
+      <td>small_airport</td>
+      <td>Gabrovo</td>
+      <td>42.948200</td>
+      <td>25.359980</td>
+      <td>NaN</td>
+      <td>EU</td>
+      <td>BG</td>
+      <td>BG-07</td>
+      <td>Габрово</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>2015-10-20T12:54:39+00:00</td>
+    </tr>
+  </tbody>
+</table>
+<p>39368 rows × 20 columns</p>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li>Subsetting (querying but return dataframe not just indices)</li>
+</ul>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gb</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'type'</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gb</span><span class="o">.</span><span class="nb">all</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>continent</th>
+      <th>elevation_ft</th>
+      <th>gps_code</th>
+      <th>home_link</th>
+      <th>iata_code</th>
+      <th>id</th>
+      <th>ident</th>
+      <th>iso_country</th>
+      <th>iso_region</th>
+      <th>keywords</th>
+      <th>last_updated</th>
+      <th>latitude_deg</th>
+      <th>local_code</th>
+      <th>longitude_deg</th>
+      <th>municipality</th>
+      <th>name</th>
+      <th>scheduled_service</th>
+      <th>score</th>
+      <th>wikipedia_link</th>
+    </tr>
+    <tr>
+      <th>type</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>balloonport</th>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>closed</th>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>heliport</th>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>large_airport</th>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>medium_airport</th>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>seaplane_base</th>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>small_airport</th>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">small</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="nb">type</span><span class="o">==</span><span class="s">'small_airport'</span><span class="p">]</span>
+<span class="n">medium</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="nb">type</span><span class="o">==</span><span class="s">'medium_airport'</span><span class="p">]</span>
+<span class="n">large</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="nb">type</span><span class="o">==</span><span class="s">'large_airport'</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">len</span><span class="p">(</span><span class="n">small</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>32875
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">len</span><span class="p">(</span><span class="n">medium</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>4530
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">len</span><span class="p">(</span><span class="n">large</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>574
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li>spatial join - airports by countries</li>
+</ul>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">countries_shp</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">pdio</span><span class="o">.</span><span class="n">read_files</span><span class="p">(</span><span class="s">"data/airports/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp"</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<ul>
+  <li>derived features - point sequence to line for the routes</li>
+  <li>spatial join - does route pass through a country</li>
+  <li>crs: contextily example,</li>
+  <li>knn analysis - find most isolated airport</li>
+  <li>voronoi - whats my closest airport</li>
+  <li>dissolve - dissovle boundaries in europe</li>
+</ul>
+
+<h2 id="vignette-house-prices">Vignette: House Prices</h2>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'data/sandiego/listings.csv'</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>6608
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Index(['id', 'listing_url', 'scrape_id', 'last_scraped', 'name', 'summary',
+       'space', 'description', 'experiences_offered', 'neighborhood_overview',
+       'notes', 'transit', 'access', 'interaction', 'house_rules',
+       'thumbnail_url', 'medium_url', 'picture_url', 'xl_picture_url',
+       'host_id', 'host_url', 'host_name', 'host_since', 'host_location',
+       'host_about', 'host_response_time', 'host_response_rate',
+       'host_acceptance_rate', 'host_is_superhost', 'host_thumbnail_url',
+       'host_picture_url', 'host_neighbourhood', 'host_listings_count',
+       'host_total_listings_count', 'host_verifications',
+       'host_has_profile_pic', 'host_identity_verified', 'street',
+       'neighbourhood', 'neighbourhood_cleansed',
+       'neighbourhood_group_cleansed', 'city', 'state', 'zipcode', 'market',
+       'smart_location', 'country_code', 'country', 'latitude', 'longitude',
+       'is_location_exact', 'property_type', 'room_type', 'accommodates',
+       'bathrooms', 'bedrooms', 'beds', 'bed_type', 'amenities', 'square_feet',
+       'price', 'weekly_price', 'monthly_price', 'security_deposit',
+       'cleaning_fee', 'guests_included', 'extra_people', 'minimum_nights',
+       'maximum_nights', 'calendar_updated', 'has_availability',
+       'availability_30', 'availability_60', 'availability_90',
+       'availability_365', 'calendar_last_scraped', 'number_of_reviews',
+       'first_review', 'last_review', 'review_scores_rating',
+       'review_scores_accuracy', 'review_scores_cleanliness',
+       'review_scores_checkin', 'review_scores_communication',
+       'review_scores_location', 'review_scores_value', 'requires_license',
+       'license', 'jurisdiction_names', 'instant_bookable',
+       'cancellation_policy', 'require_guest_profile_picture',
+       'require_guest_phone_verification', 'calculated_host_listings_count',
+       'reviews_per_month'],
+      dtype='object')
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li>
+    <p>keyword table join (census)
+(keyword comes from spatial join with polygon shown below)</p>
+  </li>
+  <li>groupby: avg house price by census polygon</li>
+  <li>buffer: deriving dummies for houses within x of an amenity</li>
+  <li>spatial join: create keyword that we use for the table</li>
+  <li>raster/clip with shape: elevation or pollution by tract, or by house, or  noise</li>
+  <li>
+    <p>voronoi - what’s my closest coffee shop</p>
+  </li>
+  <li>Sets: union, intersection, difference: point out that these are really implied by the buffer used to define regimes (intersection dummy = 1, difference dummy=0)</li>
+</ul>
+
+<p>message is, if you have the column in the table use it, but many cases you do not have the column and need to go the spatial join route</p>
+
+<hr />
+
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
+
+
+              <nav class="c-page__nav">
+  
+    
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/notebooks/02_spatial_data">
+      〈 <span class="u-margin-right-tiny"></span> Spatial Data
+    </a>
+  
+
+  
+    
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/notebooks/04_spatial_weights">
+      Spatial Weights <span class="u-margin-right-tiny"></span> 〉
+    </a>
+  
+</nav>
+
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  </body>
+</html>
