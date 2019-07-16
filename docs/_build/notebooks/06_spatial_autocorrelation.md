@@ -14,7 +14,10 @@ next_page:
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 
+
 # Global Spatial Autocorrelation
+
+
 
 ## Spatial autocorrelation
 
@@ -27,11 +30,17 @@ Similar to the traditional, non-spatial case, spatial autocorrelation can adopt 
 Spatial autocorrelation can also be delimited by the scale at which it is considered. We talk of global or local processes. **Global** spatial autocorrelation, on which this chapter is focused on, considers the overall trend that the location of values follows. In doing this, the study of global spatial autocorrelatio makes possible statements about the degree of *clustering* in the dataset. Do values generally follow a particular pattern in their geographical distribution? Are similar values closer to other similar values than we would expect from pure chance? These are some of the questions that relate to global spatial autocorrelation. **Local** autocorrelation focuses on deviations from the global trend at much more focused levels than the entire map, and it is the subject of the next chapter.
 
 
+
+
 We will explore these concepts with an applied example, interrogating the data about the presence, nature, and strength of global spatial autocorrelation. To do this, we will use a set of tools collectively known as Exploratory Spatial Data Analysis (ESDA). Analogous to its non-spatial counterpart (EDA; Tukey, 1977), ESDA has been specifically designed for this purpose, and puts space and the relative location of the observations in a dataset at the forefront of the analysis. The range of ESDA methods is wide and spans from simpler approaches like choropleth maps (previous chapter), to more advanced and robust methodologies that include statistical inference and an explicit recognition of the geographical arrangement of the data. The purpose of this chapter is to dip our toes into the latter group.
+
+
 
 ## An empirical illustration: the EU Referendum
 
 To illustrate the notion of spatial autocorrelation and its different variants, let us turn to an example with real world data. Before the data, let us import all the relevant libraries that we will use throughout the chapter:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -52,10 +61,13 @@ from numpy.random import seed
 # Bespoke
 import bookdata
 from booktools import choropleth
+
 ```
 </div>
 
 </div>
+
+
 
 In 2016, Great Britain ran a referendum to decide whether to remain in the European Union or to leave the club, the so called "Brexit" vote. We will use the official data from the Electoral Comission at the local authority level on percentage of votes for the Remain and Leave campains. There are two distinct datasets we will combine:
 
@@ -64,11 +76,14 @@ In 2016, Great Britain ran a referendum to decide whether to remain in the Europ
 
 To load it up, we can use the `bookdata` utility, which pulls the path to the file on your local machine. The vote results are stored in a `csv` file:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ref = pandas.read_csv(bookdata.brexit(), index_col='Area_Code')
 ref.info()
+
 ```
 </div>
 
@@ -106,7 +121,11 @@ memory usage: 62.7+ KB
 </div>
 </div>
 
+
+
 While the shapes of the geographical units (local authority districts, in this case) are stored in a compressed GeoJSON file. We can read it directly from the `.zip` file as follows:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -114,6 +133,7 @@ While the shapes of the geographical units (local authority districts, in this c
 lads = geopandas.read_file(bookdata.lads())\
                 .set_index('lad16cd')
 lads.info()
+
 ```
 </div>
 
@@ -141,7 +161,11 @@ memory usage: 33.6+ KB
 </div>
 </div>
 
+
+
 Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes for the Leave alternative. For convenience, let us merge the vote results with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), the preferred choice of web maps, which will allow us to combine them with contextual tiles later:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -151,6 +175,7 @@ db = geopandas.GeoDataFrame(lads.join(ref[['Pct_Leave']]), crs=lads.crs)\
               [['objectid', 'lad16nm', 'Pct_Leave', 'geometry']]\
               .dropna()
 db.info()
+
 ```
 </div>
 
@@ -172,10 +197,13 @@ memory usage: 14.8+ KB
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 lads.crs
+
 ```
 </div>
 
@@ -193,10 +221,13 @@ lads.crs
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 db.crs
+
 ```
 </div>
 
@@ -214,9 +245,13 @@ db.crs
 </div>
 </div>
 
+
+
 Throughout the chapter, we will rely heavily on geovisualizations. To create more useful maps that bring geographical context to the spatial distribution of votes, we will use an image made up of tiles from a web map. Let us first download it on-the-fly using `contextily`. The image will be reused later on in several maps.
 
 **DA-B note**: update with `contextily.add_basemap` once it's released
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -226,12 +261,17 @@ img, ext = contextily.bounds2img(we, so, ea, no, 6,
                          url=ST_TERRAIN_BACKGROUND)
 lic = ("Map tiles by Stamen Design, under CC BY 3.0. "\
                "Data by OpenStreetMap, under ODbL.")
+
 ```
 </div>
 
 </div>
 
+
+
 And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -244,6 +284,7 @@ choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
 
 plt.text(ext[0],ext[2], lic, size=8)
 ax.set_axis_off()
+
 ```
 </div>
 
@@ -257,7 +298,11 @@ ax.set_axis_off()
 </div>
 </div>
 
+
+
 The final piece we need before we can delve into autocorrelation is the spatial weights matrix. We will use eight nearest neighbors for the sake of the example, but the discussion in the earlier chapter on weights applies in this context, and other criteriums would be valid too. We also row-standardize them:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -266,10 +311,13 @@ The final piece we need before we can delve into autocorrelation is the spatial 
 w = weights.Distance.KNN.from_dataframe(db, k=8)
 # Row-standardization
 w.transform = 'R'
+
 ```
 </div>
 
 </div>
+
+
 
 ## Global spatial autocorrelation
 
@@ -277,9 +325,15 @@ The map above is a good way to begin exploring the main spatial patterns in the 
 
 That is exactly the purpose of indicators of global spatial autocorrelation: to leverage the power of statistics to help us first summarize the spatial distribution of values present in a map, and second obtain a formal quantification of the departure from randomness. Statistics designed to measure this trend thus characterize a map in terms of its degree of clustering and summarize it, either in a visual or numerical way. However, before we can delve into the statistics, we need to understand a core building block: the spatial lag. With that concept under the belt, we are in a position to build a good understanding of global spatial autocorrelation. We will gently enter it with the binary case, when observations can only take two (potentially categorical) values, before we cover the two workhorses of the continous case: the Moran Plot and Moran's I.
 
+
+
 ### Spatial Lag
 
+
+
 The spatial lag operator is one of the most common and direct applications of spatial weights matrices ($W$'s) in spatial analysis. The mathematical definition is the product of $W$ and the vector of a given variable. Conceptually, the spatial lag captures the behaviour of a variable in the inmediate surroundings of each location; in that respect, it is akin to a local smoother of a variable. 
+
+
 
 We can formally express it in matrix notation as:
 
@@ -297,22 +351,30 @@ where $w_{ij}$ is the cell in $W$ on the $i$-th row and $j$-th column, thus capt
 
 As we will discover throughout this book, the spatial lag is a key element of many spatial analysis techniques and, as such, it is fully supported in PySAL. To compute the spatial lag of a given variable, `Pct_Leave` for example, we can do it as follows:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 db['Pct_Leave_lag'] = weights.spatial_lag.lag_spatial(w, db['Pct_Leave'])
+
 ```
 </div>
 
 </div>
 
+
+
 Let us peak into two local authority districts to get a better intuition of what is behind the spatial lag:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 db.loc[['E08000012', 'S12000019'], 
        ['Pct_Leave', 'Pct_Leave_lag']]
+
 ```
 </div>
 
@@ -370,9 +432,13 @@ db.loc[['E08000012', 'S12000019'],
 </div>
 </div>
 
+
+
 The first row (`E08000012`) represents Liverpool, which was a notorious "remainer" island among the mostly-Leave North of England. Outside of London and Scotland, it was one of the few locations with less than majority to Leave. The second row (`S12000019`) represents Midlothian, in Scotland, where no local authority voted to leave. Although both Liverpool and Midlothian display a similar percentage of population who voted to leave (42% and 38%, respectively), the difference in their spatial lags captures the wider geographical context, which was rather opposite.
 
 To end this section visually, the smoothing nature of the lag can be appreciated in the following map comparison:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -397,6 +463,7 @@ ax2.set_axis_off()
 ax2.set_title("% Leave - Spatial Lag")
 
 plt.show()
+
 ```
 </div>
 
@@ -410,7 +477,11 @@ plt.show()
 </div>
 </div>
 
+
+
 Stark differences on the left between immendiate neighbors (as in the case of Liverpool, in the NW of England) are diminished on the map in the right.
+
+
 
 ### Binary case: join counts
 
@@ -418,11 +489,14 @@ The spatial lag plays an important role in quantifying spatial autocorrelation. 
 
 Our first dip into these measures considers a simplified case: binary values. This occurs when the variable we are interested in only takes two values. In this context, we are interested in whether a given observation is surrounded by others within the same category. For example, returning to our dataset, we want to assess the extent to which local authorities who voted to Leave tend to be surrounded by others who also voted to leave. To proceed, let us first calculate a binary variable (`Leave`) that indicates 1 if the local authority voted to leave, and zero otherwise:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 db['Leave'] = (db['Pct_Leave'] > 50).astype(int)
 db[['Pct_Leave', 'Leave']].tail()
+
 ```
 </div>
 
@@ -495,7 +569,11 @@ db[['Pct_Leave', 'Leave']].tail()
 </div>
 </div>
 
+
+
 Which we can visualise readily:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -503,6 +581,7 @@ Which we can visualise readily:
 db.plot(column='Leave', categorical=True, legend=True, 
         edgecolor='0.5', linewidth=0.25, cmap='Set3', 
         figsize=(9, 9));
+
 ```
 </div>
 
@@ -516,14 +595,19 @@ db.plot(column='Leave', categorical=True, legend=True,
 </div>
 </div>
 
+
+
 Visually, it appears that the map represents a clear case of positive spatial autocorrelation: overall, there are few visible cases where a given observation is surrounded by others in the opposite category. To formally explore this initial assessment, we can use what is called a "joint count" statistic (JC; Cliff & Ord 1981). Imagine a checkerboard with green (G, value 0) and yellow (Y, value 1) squares. The idea of the statistic is to count occurrences of green-green (GG), yellow-yellow (YY), or green-yellow/yellow-green (GY) joins (or neighboring pairs) on the map. In this context, both GG and YY reflect positive spatial autocorrelation, while GY captures its negative counterpart. The intuition of the statistic is to provide a baseline of how many GG, YY, and GY one would expect under the case of complete spatial randomness, and to compare this with the observed counts in the dataset. A situation where we observe more GG/YY than expected and less GY than expected would suggest positive spatial autocorrelation; while the oposite, more GY than GG/YY, would point towards negative spatial autocorrelation.
 
 Since the spatial weights are only used here to delimit who is a neighbor or not, the joint count statistic requires binary weights. Let us thus transform `w` back to a non-standardised state:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w.transform
+
 ```
 </div>
 
@@ -541,19 +625,25 @@ w.transform
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w.transform = 'O'
+
 ```
 </div>
 
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w.transform
+
 ```
 </div>
 
@@ -571,7 +661,11 @@ w.transform
 </div>
 </div>
 
+
+
 We can compute the statistic as:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -579,6 +673,7 @@ We can compute the statistic as:
 seed(1234)
 jc = esda.join_counts.Join_Counts(db['Leave'], w)
 jc
+
 ```
 </div>
 
@@ -596,12 +691,17 @@ jc
 </div>
 </div>
 
+
+
 As it is common throughout PySAL, we are creating an object (`jc`) that holds a lot of information beyond the value of the statistic calculated. For example, we can check how many occurrences of GG we have (note the attribute is `bb`, which originates from the original reference where the two considered classes were black and white):
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.bb
+
 ```
 </div>
 
@@ -619,12 +719,17 @@ jc.bb
 </div>
 </div>
 
+
+
 how many YY occurrences our map has:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.ww
+
 ```
 </div>
 
@@ -642,12 +747,17 @@ jc.ww
 </div>
 </div>
 
+
+
 and how many GY/YG we find:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.bw
+
 ```
 </div>
 
@@ -665,12 +775,17 @@ jc.bw
 </div>
 </div>
 
+
+
 The sum of those three gives us the total number of comparisons:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.bb + jc.ww + jc.bw
+
 ```
 </div>
 
@@ -687,11 +802,14 @@ jc.bb + jc.ww + jc.bw
 </div>
 </div>
 </div>
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.J
+
 ```
 </div>
 
@@ -709,12 +827,17 @@ jc.J
 </div>
 </div>
 
+
+
 The statistic is based on comparing the actual number of joins of each class (`bb`, `ww`, `bc`) with what one would expect in a case of spatial randomness. Those expectations can be accessed as well, for the GG/YY case:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.mean_bb
+
 ```
 </div>
 
@@ -732,12 +855,17 @@ jc.mean_bb
 </div>
 </div>
 
+
+
 and for GY joins:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.mean_bw
+
 ```
 </div>
 
@@ -755,12 +883,17 @@ jc.mean_bw
 </div>
 </div>
 
+
+
 Statistical inference to obtain a sense of whether these values are likely to come from random chance or not can be accessed as:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.p_sim_bb
+
 ```
 </div>
 
@@ -778,10 +911,13 @@ jc.p_sim_bb
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 jc.p_sim_bw
+
 ```
 </div>
 
@@ -799,7 +935,11 @@ jc.p_sim_bw
 </div>
 </div>
 
+
+
 These results point to a clear presence of positive spatial autocorrelation, as there are a lot more joins of pairs in the same category than one would expect (`p_sim_bb`) and significantly less of opposite joins (`p_sim_bw`).
+
+
 
 ### Continuous case: Moran Plot and Moran's I
 
@@ -813,6 +953,8 @@ where $n$ is the  number of observations, $z_{i}$ is the standardized value of t
 
 In order to understand the intuition behind its math, it is useful to begin with a graphical interpretation: the Moran Plot. The Moran Plot is a way of visualizing a spatial dataset to explore the nature and strength of spatial autocorrelation. It is essentially a traditional scatter plot in which the variable of interest is displayed against its *spatial lag*. In order to be able to interpret values as above or below the mean, and their quantities in terms of standard deviations, the variable of interest is usually standardized by substracting its mean and dividing it by its standard deviation:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -820,12 +962,17 @@ db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )\
                     / db['Pct_Leave'].std()
 db['Pct_Leave_lag_std'] = ( db['Pct_Leave_lag'] - db['Pct_Leave_lag'].mean() )\
                     / db['Pct_Leave_lag'].std()
+
 ```
 </div>
 
 </div>
 
+
+
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -837,6 +984,7 @@ ax.axvline(0, c='k', alpha=0.5)
 ax.axhline(0, c='k', alpha=0.5)
 ax.set_title('Moran Plot - % Leave')
 plt.show()
+
 ```
 </div>
 
@@ -850,7 +998,11 @@ plt.show()
 </div>
 </div>
 
+
+
 The figure above displays the relationship between the standardized percentage to leave and its spatial lag which, because the $W$ used is row-standardized, can be interpreted as the average standardized density of the Pct_Leave in the neighborhood of each observation. In order to guide the interpretation of the plot, a linear fit is also included in the post, together with confidence intervals. This line represents the best linear fit to the scatter plot or, in other words, what is the best way to represent the relationship between the two variables as a straight line.
+
+
 
 The plot displays a positive relationship between both variables. This is associated with the presence of positive spatial autocorrelation: similar values tend to be located close to each other. This means that the overall trend is for high values to be close to other high values, and for low values to be surrounded by other low values. This however does not mean that this is the only case in the dataset: there can of course be particular situations where high values are surrounded by low ones, and viceversa. But it means that, if we had to summarize the main pattern of the data in terms of how clustered similar values are, the best way would be to say they are positively correlated and, hence, clustered over space. In the context of the example, this can be interpreted along the lines of: local authorities where people voted in high proportion to leave the EU tend to be located nearby other regions that also registered high proportions of Leave vote. In other words, we can say the percentage of Leave votes is spatially autocorrelated in a positive way.
 
@@ -860,22 +1012,30 @@ Very much in the same way the mean summarizes a crucial element of the distribut
 
 In order to calculate Moran's I in our dataset, we can call a specific function in PySAL directly (before that, let us row-standardised the `w` object again):
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w.transform = 'R'
 moran = esda.moran.Moran(db['Pct_Leave'], w)
+
 ```
 </div>
 
 </div>
 
+
+
 The method `Moran` creates an object that contains much more information than the actual statistic. If we want to retrieve the value of the statistic, we can do it this way:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 moran.I
+
 ```
 </div>
 
@@ -893,12 +1053,17 @@ moran.I
 </div>
 </div>
 
+
+
 The other bit of information we will extract from Moran's I relates to statistical inference: how likely is the pattern we observe in the map and Moran's I captures in its value to be generated by an entirely random process? If we considered the same variable but shuffled its locations randomly, would we obtain a map with similar characteristics? To obtain insight into these questions, PySAL performs a simulation and returns a measure of certainty about how likely it is the pattern we observe in our dataset came from a spatially random process. This is summarised in the `p_sim` attribute:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 moran.p_sim
+
 ```
 </div>
 
@@ -916,16 +1081,21 @@ moran.p_sim
 </div>
 </div>
 
+
+
 The value is calculated as an empirical P-value that represents the proportion of realisations in the simulation under spatial randomness that are more extreme than the observed value. A small enough p-value associated with the Moran's I of a map allows to reject the hypothesis that the map is random. In other words, we can conclude that the map displays more spatial pattern than we would expect if the values had been randomly allocated to a locations.
 
 That is a very low value, particularly considering it is actually the minimum value we could have obtained given the simulation behind it used 999 permutations (default in `PySAL`) and, by standard terms, it would be deemed statistically significant. We can ellaborate a bit further on the intuition behind the value of `p_sim`. If we generated a large number of maps with the same values but randomly allocated over space, and calculated the Moran's I statistic for each of those maps, only 0.01% of them would display a larger (absolute) value than the one we obtain from the observed data, and the other 99.99% of the random maps would receive a smaller (absolute) value of Moran's I. If we remember again that the value of Moran's I can also be interpreted as the slope of the Moran Plot, what we have is that, in this case, the particular spatial arrangement of values over space we observe for the percentage of Leave votes is more concentrated than if we were to randomly shuffle the vote proportions among the map, hence the statistical significance. As a first step, the global autocorrelation analysis can teach us that observations do seem to be positively autocorrelated over space. Indeed, the overall spatial pattern in the EU Referendum vote was highly marked: nearby areas tended to vote alike.
 
 Thanks to the `splot` visualisation module in PySAL, we can obtain a quick representation of the statistic that combines the Moran Plot (right) with a graphic of the empirical test that we carry out to obtain `p_sim` (left):
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 plot_moran(moran);
+
 ```
 </div>
 
@@ -939,7 +1109,11 @@ plot_moran(moran);
 </div>
 </div>
 
+
+
 On the left panel we can see in grey the empirical distribution generated from simulating 999 random maps with the values of the `Pct_Leave` variable and then calculating Moran's I for each of those maps. The black rug signals the mean. In contrary, the red rug shows Moran's I calculated for the variable using the geography observed in the dataset. It is clear the value under the observed pattern is significantly higher than under randomness. This insight is confirmed on the right panel, where there is displayed an equivalent plot to the Moran Plot we created above.
+
+
 
 ### Other global indices
 
@@ -956,25 +1130,35 @@ C = \dfrac{(n-1)}
           {\sum_i (y_i - \bar{y})^2}
 $$
 
+
+
 where $n$ is the number of observations, $w_{ij}$ is the cell in a binary matrix $W$ expressing whether $i$ and $j$ are neighbours ($w_{ij}=1$) or not ($w_{ij}=1$), $y_i$ is the $i$-th observation of the variable of interest, and $\bar{y}$ is its sample mean. When compared to Moran's I, it is apparent both measures put in relation the behaviour of $Y$ within each observation's local neighbourhood with that over the entire sample. However, there are also subtle differences. While Moran's I takes cross-products on the standardised values, Geary's C uses differences on the values without any standardisation. The key implication this has is that, unlike Moran's I, Geary's C cannot distinguish between positive and negative spatial autocorrelation, as all the differences are squared, hence turning always into positive values.
 
 Computationally, Geary's C is more demanding, but it can be easily computed using PySAL:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 geary = esda.geary.Geary(db['Pct_Leave'], w)
+
 ```
 </div>
 
 </div>
 
+
+
 Which has a similar way of accessing its estimate:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 geary.C
+
 ```
 </div>
 
@@ -992,12 +1176,17 @@ geary.C
 </div>
 </div>
 
+
+
 Inference is performed in a similar way as with Moran. We can perform a simulation that allows us to draw an empirical distribution of the statistic under the null of spatial randomness, and then compare it with the statistic obtained when using the observed geographical distribution of the data. To access the pseudo p-value, calculated as in the Moran case, we can call `p_sim`:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 geary.p_sim
+
 ```
 </div>
 
@@ -1015,7 +1204,11 @@ geary.p_sim
 </div>
 </div>
 
+
+
 In this case, Geary's C points in the same direction as Moran's I: there is clear indication that the statistic we calculate on the observed dataset is different from what would be expected in a situation of pure spatial randomness. Hence, from this analysis, we can also conclude spatial autocorrelation is present.
+
+
 
 #### Getis and Ord's G
 
@@ -1030,6 +1223,8 @@ where $w_{ij}(d)$ is the binary weight assigned on the relationship between obse
 
 To illustrate its computation, let us calculate a binary distance band $W$. To make sure every observation has at least one neighbor, we will use the `min_threshold_distance` method and project the dataset into the Ordnance Survey CRS (`EPSG` code 27700), expressed in metres:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -1038,6 +1233,7 @@ pts = db_osgb.centroid
 xys = pandas.DataFrame({'X': pts.x, 'Y': pts.y})
 min_thr = weights.util.min_threshold_distance(xys)
 min_thr
+
 ```
 </div>
 
@@ -1055,34 +1251,49 @@ min_thr
 </div>
 </div>
 
+
+
 For every local authority to have a neighbour, the distance band needs to at least be about 181 Km. This information can then be passed to the `DistanceBand` constructor:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w_db = weights.Distance.DistanceBand.from_dataframe(db_osgb, min_thr)
+
 ```
 </div>
 
 </div>
 
+
+
 At this point, we are ready to calculate the global $G$ statistic:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 gao = esda.getisord.G(db['Pct_Leave'], w_db)
+
 ```
 </div>
 
 </div>
 
+
+
 Access to the statistic (`gao.G`) and additional attributes can be gained in the same way as with the previous statistics:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 print("Getis & Ord G: %.3f | Pseudo P-value: %.3f"%(gao.G, gao.p_sim))
+
 ```
 </div>
 
@@ -1096,7 +1307,11 @@ Getis & Ord G: 0.436 | Pseudo P-value: 0.002
 </div>
 </div>
 
+
+
 Similarly, inference can also be carried out by relying on computational simulations that replicate several instances of spatial randomness using the values in the variable of interest, but shuffling their locations. In this case, the pseudo P-value computed suggests a clear departure from the hypothesis of no concentration.
+
+
 
 ## References
 
@@ -1111,3 +1326,10 @@ Getis, A., & Ord, J. K. (1992). The analysis of spatial association by use of di
 Moran, P. A. (1950). Notes on continuous stochastic phenomena. Biometrika, 37(1/2), 17-23.
 
 Tukey, J. W. (1977). Exploratory data analysis (Vol. 2).
+
+
+
+---
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+

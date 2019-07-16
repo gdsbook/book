@@ -14,6 +14,7 @@ next_page:
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 
+
 # Computational Tools for Geographic Data Science
 
 In this tutorial, we will introduce the main tools we will be working with
@@ -103,14 +104,19 @@ can be of two types:
 *
 **Code**, like the following one below:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 # This is a code cell
+
 ```
 </div>
 
 </div>
+
+
 
 You can create a new cell by clicking `Insert` -> `Cell Above`/`Below` in the
 top menu. By default, this will be a code cell, but you can change that on the
@@ -133,10 +139,13 @@ figures, etc.). As an example, the cell below contains a snipet of Python that
 returns a printed statement. This statement is then printed below and recorded
 in the notebook as output:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 print("Hello, world!")
+
 ```
 </div>
 
@@ -149,6 +158,8 @@ Hello, world!
 </div>
 </div>
 </div>
+
+
 
 Note how the notebook automatically colors the Python code in the code block?
 This makes the code much more readable and understandable. More on Python below.
@@ -285,22 +296,30 @@ More information about markdown is provided by:
 Notebooks can also include rich content from the web. For this, we need to
 import the `display` module from the
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 import IPython.display as display
+
 ```
 </div>
 
 </div>
 
+
+
 This makes available additional functionality that allows us to embed rich
 content. For example, we can include a YouTube clip by passing the video ID:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 display.YouTubeVideo('iinQDhsdE9s')
+
 ```
 </div>
 
@@ -326,7 +345,11 @@ display.YouTubeVideo('iinQDhsdE9s')
 </div>
 </div>
 
+
+
 Or we can pass standard HTML code:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -345,6 +368,7 @@ display.HTML("""<table>
 <td>row 2, cell 2</td>
 </tr>
 </table>""")
+
 ```
 </div>
 
@@ -375,9 +399,13 @@ display.HTML("""<table>
 </div>
 </div>
 
+
+
 Note that this opens the door for including a large number of elements from the
 web, since an `iframe` of any other website can also be included. For example, 
 interactive maps can be shown from within an `iframe`:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -386,6 +414,7 @@ osm = """
 <iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-2.9662737250328064%2C53.400500637844594%2C-2.964626848697662%2C53.402550738394034&amp;layer=mapnik" style="border: 1px solid black"></iframe><br/><small><a href="http://www.openstreetmap.org/#map=19/53.40153/-2.96545">View Larger Map</a></small>
 """
 display.HTML(osm)
+
 ```
 </div>
 
@@ -405,7 +434,11 @@ display.HTML(osm)
 </div>
 </div>
 
+
+
 Sound content can also be included by providing an `iframe` over an audio website:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -414,6 +447,7 @@ sound = '''
 <iframe width="100%" height="450" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/178720725&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe>
 '''
 display.HTML(sound)
+
 ```
 </div>
 
@@ -432,6 +466,8 @@ display.HTML(sound)
 </div>
 </div>
 </div>
+
+
 
 A more thorough exploration of these forms of rich content is available in
 [this](http://jeffskinnerbox.me/notebooks/ipython's-rich-display-system.html)
@@ -444,11 +480,14 @@ you, the following Wikipedia entry:
 
 [https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream](https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream).
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 display.IFrame('https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream', 
               700, 500)
+
 ```
 </div>
 
@@ -473,6 +512,8 @@ display.IFrame('https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cr
 </div>
 </div>
 </div>
+
+
 
 Pay special attention to getting the bold, italics, links, headlines and lists
 correctly formated, but don't worry too much about the overall layout. Bonus if
@@ -527,10 +568,13 @@ dictionaries) and allows many basic mathematical operations (e.g. sums, differen
 products). For example, right out of the box, and without any further
 action needed, you can use Python as a calculator:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 3 + 5
+
 ```
 </div>
 
@@ -548,10 +592,13 @@ action needed, you can use Python as a calculator:
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 2 / 3
+
 ```
 </div>
 
@@ -569,10 +616,13 @@ action needed, you can use Python as a calculator:
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 (3 + 5) * 2 / 3
+
 ```
 </div>
 
@@ -590,6 +640,8 @@ action needed, you can use Python as a calculator:
 </div>
 </div>
 
+
+
 However, the strength of Python as a data analysis tool comes from additional
 software that adds functionality to the language itself. This additional software
 provides many more useful data structures and functions for data science. These
@@ -603,14 +655,19 @@ specific tasks. For now, though, let us have a look at the foundational library,
 additional Python libraries into a session is called *importing* them, and is 
 done using the `import` statement:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 import numpy as np # we rename it in the session as `np` by convention
+
 ```
 </div>
 
 </div>
+
+
 
 Note how we `import numpy`, introducing it into our Python session, *and* rename it
 in the session, suggesting that `numpy` be known as `np`, which is shorter and more convenient.
@@ -623,11 +680,14 @@ can help make your code more clear.
 Once imports are out of the way, let us start exploring what we can do with
 `numpy`. One of the most basic tasks is to create sequences of numbers:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 seq = np.arange(10)
 seq
+
 ```
 </div>
 
@@ -644,6 +704,8 @@ array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 </div>
 </div>
 </div>
+
+
 
 The first thing to note is that, in line 1, we create the sequence by calling
 the function `arange` and assign it to an object called `seq`. `seq` is just a
@@ -663,15 +725,20 @@ means that we are using the `arange` function from inside the `np` *namespace*.
 This means that the function `arange` comes explicitly from `numpy`. To find out how
 necessary this is, you can try generating the sequence without `np`:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 # NOTE: comment out to run the cell
 #seq = arange(10)
+
 ```
 </div>
 
 </div>
+
+
 
 What you get instead is an error, also called a "traceback". In particular,
 Python is telling that it cannot find a function named `arange` in the core
@@ -685,35 +752,48 @@ or objects. These objects are also sometimes called "variables" as well. We have
 one variable (`seq`) in the example above but let's make things more explicit. 
 For example, an object can be a single number.:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 a = 3
+
 ```
 </div>
 
 </div>
+
+
 
 Now, we've assigned an object (the number `3`) to a variable, `a`. 
 
 Words or sentences can also be objects. In Python, we call this kind of text a "string,"
 and they are marked off from other text using either single or double quotation marks:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 b = 'Hello World'
+
 ```
 </div>
 
 </div>
 
+
+
 You can check what "type" of object is stored in a variable using the `type` function:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 type(a)
+
 ```
 </div>
 
@@ -731,15 +811,20 @@ int
 </div>
 </div>
 
+
+
 Here, `int` is short for "integer" which, roughly speaking, means a whole number. 
 In most cases, a number with a decimal in Python is called a "floating-point number,"
 or a "float" for short:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 c = 1.5
 type(c)
+
 ```
 </div>
 
@@ -757,13 +842,18 @@ float
 </div>
 </div>
 
+
+
 As mentioned, what we understand as text in a wide sense (spaces and other
 symbols count as well) is called a "string" (`str` for short):
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 type(b)
+
 ```
 </div>
 
@@ -781,6 +871,8 @@ str
 </div>
 </div>
 
+
+
 ### Help
 
 A very handy feature of Python is the ability to access on-the-spot help for functions. 
@@ -793,10 +885,13 @@ Take the `numpy` function `arange` that we have used above. The
 easiest way to check its help dialog from within the notebook is to add a question
 mark after it:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 np.arange?
+
 ```
 </div>
 
@@ -870,16 +965,21 @@ array([3, 5])
 </div>
 </div>
 
+
+
 As you can see, this brings up a sub-window in the browser with all the
 information you need.
 
 If, for whatever reason, you needed to print that info
 into the notebook itself, you can use the following `help` function instead:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 help(np.arange)
+
 ```
 </div>
 
@@ -953,6 +1053,8 @@ arange(...)
 </div>
 </div>
 
+
+
 ### Control flow (a.k.a. `for` loops and `if` statements)
 
 Although this book is not intend to be a comprehensive introduction to computer
@@ -973,11 +1075,14 @@ Loops allow you to repeat a particular action or set of actions. In this case,
 `for` loops allow you repeat an action over every element in a collection. For 
 example, you could print your name ten times without having to type it yourself every single time:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 for i in np.arange(10):
     print('my name')
+
 ```
 </div>
 
@@ -1000,6 +1105,8 @@ my name
 </div>
 </div>
 
+
+
 A couple of features in the loop are useful to note:
 
 1. Loops are conducted *over* a sequence. In this
@@ -1012,12 +1119,15 @@ the loop as well. Although we did not use this feature in the loop above, this
 can be extremely useful in some cases. For example, we could iterate over a list of
 names:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 names = ['Jane', 'Robert', 'Elise', 'Reilly']
 for name in names:
     print("Whose turn is it?", name)
+
 ```
 </div>
 
@@ -1034,6 +1144,8 @@ Whose turn is it? Reilly
 </div>
 </div>
 
+
+
 One more thing to note: it often makes sense to describe what you are iterating
 over directly like we did in `for name in names`. But, remember, `name` is arbitrary, 
 and we could have called it any valid Python variable name.
@@ -1049,12 +1161,15 @@ select or restrict actions to only run when a condition (or many conditions) are
 For example, if you think of the loops written above,
 we might want to skip players whose name begins with 'R':
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 for name in names:
     if (name.startswith("R")):
         print("We are skipping ", name)
+
 ```
 </div>
 
@@ -1069,10 +1184,14 @@ We are skipping  Reilly
 </div>
 </div>
 
+
+
 We can also take an action only when our `if` statement is *not* satisfied by 
 using an `else` statement. 
 Together, these are sometimes called "ifelse" statements. For example,
 we could skip players whose names begin with "R", but allow everyone else to go:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1082,6 +1201,7 @@ for name in names:
         print("We are skipping ", name)
     else:
         print(name, "gets to go")
+
 ```
 </div>
 
@@ -1097,6 +1217,8 @@ We are skipping  Reilly
 </div>
 </div>
 </div>
+
+
 
 ### Data structures
 
@@ -1116,11 +1238,14 @@ dictionaries.
 
 An integer is a whole number:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 i = 5
 type(i)
+
 ```
 </div>
 
@@ -1138,13 +1263,18 @@ int
 </div>
 </div>
 
+
+
 A float is a number that allows for decimals:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 f = 5.2
 type(f)
+
 ```
 </div>
 
@@ -1162,13 +1292,18 @@ float
 </div>
 </div>
 
+
+
 Note that a float can also not have decimals and still be stored as such:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 fw = 5.
 type(fw)
+
 ```
 </div>
 
@@ -1186,12 +1321,17 @@ float
 </div>
 </div>
 
+
+
 However, they are different representations:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 f == fw
+
 ```
 </div>
 
@@ -1209,6 +1349,8 @@ False
 </div>
 </div>
 
+
+
 #### Lists
 A list is an ordered sequence of values that can be of mixed types.
 They are represented between squared brackets (`[]`) and, although not very
@@ -1217,11 +1359,14 @@ together".
 
 For example, the following list of integers:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 l = [1, 2, 3, 4, 5]
 l
+
 ```
 </div>
 
@@ -1239,10 +1384,13 @@ l
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 type(l)
+
 ```
 </div>
 
@@ -1260,13 +1408,18 @@ list
 </div>
 </div>
 
+
+
 Or the following mixed one:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 m = ['a', 'b', 5, 'c', 6, 7]
 m
+
 ```
 </div>
 
@@ -1284,13 +1437,18 @@ m
 </div>
 </div>
 
+
+
 Lists can be queried and sliced. For example, the first element can be retrieved
 by:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 l[0]
+
 ```
 </div>
 
@@ -1308,12 +1466,17 @@ l[0]
 </div>
 </div>
 
+
+
 Or the second to the fourth:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 m[1:4]
+
 ```
 </div>
 
@@ -1331,12 +1494,17 @@ m[1:4]
 </div>
 </div>
 
+
+
 Lists can be added:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 l + m
+
 ```
 </div>
 
@@ -1354,13 +1522,18 @@ l + m
 </div>
 </div>
 
+
+
 New elements added:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 l.append(4)
 l
+
 ```
 </div>
 
@@ -1378,12 +1551,17 @@ l
 </div>
 </div>
 
+
+
 Or modified:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 l[1]
+
 ```
 </div>
 
@@ -1401,11 +1579,14 @@ l[1]
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 l[1] = 'two'
 l[1]
+
 ```
 </div>
 
@@ -1423,10 +1604,13 @@ l[1]
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 l
+
 ```
 </div>
 
@@ -1444,6 +1628,8 @@ l
 </div>
 </div>
 
+
+
 #### Dictionaries
 Dictionaries are unordered collections of "keys" and
 "values". A key, which can be of any kind, is the element associated with a
@@ -1455,11 +1641,14 @@ For example, we
 can think of a dictionary to store a series of names and the ages of the people
 they represent:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ages = {'Ana': 24, 'John': 20, 'Li': 27, 'Ivan': 40, 'Tali':33}
 ages
+
 ```
 </div>
 
@@ -1477,10 +1666,13 @@ ages
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 type(ages)
+
 ```
 </div>
 
@@ -1498,13 +1690,18 @@ dict
 </div>
 </div>
 
+
+
 Dictionaries can then be queried and values retrieved using their
 keys. For example, if we quickly want to know Li's age:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ages['Li']
+
 ```
 </div>
 
@@ -1522,13 +1719,18 @@ ages['Li']
 </div>
 </div>
 
+
+
 Similarly to lists, you can modify and assign new values:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ages['Juan'] = 73
 ages
+
 ```
 </div>
 
@@ -1546,8 +1748,12 @@ ages
 </div>
 </div>
 
+
+
 Using this property, you can create entirely empty dictionaries and fill them 
 with values later:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1556,6 +1762,7 @@ newdict = {}
 newdict['key1'] = 1
 newdict['key2'] = 2
 newdict
+
 ```
 </div>
 
@@ -1572,6 +1779,8 @@ newdict
 </div>
 </div>
 </div>
+
+
 
 ### Functions
 
@@ -1595,6 +1804,8 @@ Now, we will see how to *create* a method of our own that performs one specific 
 For example, let us create a very simple method to reproduce the first
 loop we created above:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -1602,10 +1813,13 @@ def run_simple_loop():
     for i in np.arange(10):
         print(i)
     return None
+
 ```
 </div>
 
 </div>
+
+
 
 Already with this simple method, there is a bunch of interesting things going
 on:
@@ -1633,10 +1847,13 @@ later use.
 Once we have paid attention to these elements, we can see how the
 method can be *called* and hence the code inside it executed:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 run_simple_loop()
+
 ```
 </div>
 
@@ -1659,6 +1876,8 @@ run_simple_loop()
 </div>
 </div>
 
+
+
 This is the same way that we called `np.arange` before. Note how we do not
 include the colon (`:`). Instead, when we call a method, we only use the name of
 the method followed by the parenthesis.
@@ -1679,6 +1898,8 @@ we will eventually provide to the function.
 
 For example, we can modify our method:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -1686,18 +1907,24 @@ def run_simple_loopX(x):
     for i in np.arange(x):
         print(i)
     return None
+
 ```
 </div>
 
 </div>
 
+
+
 We have replaced the fixed length of the sequence (10) by a variable named `x`
 that allows us to specify *any value we want* when we call the method:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 run_simple_loopX(3)
+
 ```
 </div>
 
@@ -1713,10 +1940,13 @@ run_simple_loopX(3)
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 run_simple_loopX(2)
+
 ```
 </div>
 
@@ -1731,25 +1961,33 @@ run_simple_loopX(2)
 </div>
 </div>
 
+
+
 Another way you can build more flexibility into a method is by allowing it to
 return an output directly, instead of returning `None`. In the previous examples, our function
 performs a computation (i.e. printing values on the screen), but it does not
 return any value. This is in contrast with, for example, `np.arange` which does
 return an output, the sequence of values:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 a = np.arange(10)
+
 ```
 </div>
 
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 a
+
 ```
 </div>
 
@@ -1767,12 +2005,17 @@ array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 </div>
 </div>
 
+
+
 Our function does not save anything:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 b = run_simple_loopX(3)
+
 ```
 </div>
 
@@ -1788,18 +2031,25 @@ b = run_simple_loopX(3)
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 b
+
 ```
 </div>
 
 </div>
 
+
+
 We can modify this using the last line of a method. For example, let us assume
 we want to return a sequence as long as the series of numbers we print on the
 screen. One way to do this would be:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1808,10 +2058,13 @@ def run_simple_loopXout(x):
     for i in np.arange(x):
         print(i)
     return np.arange(x)
+
 ```
 </div>
 
 </div>
+
+
 
 Note that the main difference now is that instead of returning `None`, we return
 the sequence we used in the `for` loop. We could be even more efficient, though,
@@ -1819,6 +2072,8 @@ by assigning the sequence to a new object *inside of the method*, and using it f
 in the loop and then returning it. The results are exactly the same, but there are less computations
 performed, since we only build the sequence one time. More critically, 
 we minimize the chances of making mistakes by referring to the same object every time:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1828,18 +2083,24 @@ def run_simple_loopXout(x):
     for i in seq:
         print(i)
     return seq
+
 ```
 </div>
 
 </div>
 
+
+
 Either of these two new versions of the method return an output:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 a = run_simple_loopX(3)
 b = run_simple_loopXout(3)
+
 ```
 </div>
 
@@ -1858,19 +2119,25 @@ b = run_simple_loopXout(3)
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 a
+
 ```
 </div>
 
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 b
+
 ```
 </div>
 
@@ -1888,6 +2155,8 @@ array([0, 1, 2])
 </div>
 </div>
 
+
+
 The advantage of methods, as oposed to straight code, is that they force us to
 think in a modular way, helping us identify the small components of what what we 
 are doing in our analysis overall.  Encapsulating these little atoms of
@@ -1900,6 +2169,8 @@ does more generally, and what values it returns. This is called the *docstring*
 of a function, and it looks like one big quote that comes immediately following the 
 `def` statement. Although there are many ways formatting a docstring, one common format
 is:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1923,10 +2194,13 @@ def run_simple_loopXout(x):
     for i in seq:
         print(i)
     return seq
+
 ```
 </div>
 
 </div>
+
+
 
 Docstrings, like other strings, is colored red in the notebook by default. Let us have
 a look at the structure and components of a well-made docstring:
@@ -1948,10 +2222,13 @@ very useful to remember what a function does. They also to force you to
 write clearer code. A bonus is that, if you include documentation in this way,
 it can be checked with the standard `help` or `?` systems reviewed above:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 run_simple_loopXout?
+
 ```
 </div>
 
@@ -1982,10 +2259,13 @@ seq   : np.array
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 help(run_simple_loopXout)
+
 ```
 </div>
 
@@ -2014,6 +2294,8 @@ run_simple_loopXout(x)
 </div>
 </div>
 
+
+
 ### Exercise to work on your own
 
 Write a properly documented function that:
@@ -2025,3 +2307,8 @@ Write a properly documented function that:
   2. If the number is even, it should be stored in the dictionary as a key, with a value of "even"
   3. If the number is odd, it should be stored in the dictionary as a key, with a value of "odd."
 4. Returns the now-filled dictionary.
+
+
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+

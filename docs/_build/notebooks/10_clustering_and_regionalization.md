@@ -14,12 +14,15 @@ next_page:
 comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
 ---
 
+
 # Clustering and Regionalization
 <!--
 **NOTE**: parts of this notebook have been
 borrowed from [GDS'17 - Lab
 6](http://darribas.org/gds17/content/labs/lab_06.html)
 -->
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -36,10 +39,13 @@ import numpy
 from sklearn.cluster import KMeans, AgglomerativeClustering
 import matplotlib.pyplot as plt
 
+
 ```
 </div>
 
 </div>
+
+
 
 ## Introduction
 
@@ -131,6 +137,8 @@ The dataset we will use in this chapter comes from the American Community Survey
 California in 2016. Let us begin by reading in the data as a GeoDataFrame and
 exploring the attribute names.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -138,6 +146,7 @@ exploring the attribute names.
 db = geopandas.read_file(data.san_diego_tracts())
 # Print column names
 db.columns
+
 ```
 </div>
 
@@ -166,6 +175,8 @@ Index(['GEOID', 'GEOID_x', 'Total Popu', 'White', 'Black', 'Hispanic',
 </div>
 </div>
 
+
+
 While the ACS comes with a large number of attributes we can use for clustering
 and regionalization, we are not limited to the original variables at hand; we
 can construct additional variables. This is particularly useful when
@@ -177,6 +188,8 @@ about the variables itself. To get around this, we will cast many of these count
 and use them in addition to a subset of the original variables. 
 Together, this set of constructed and received variables will to
 will be used for our clustering and regionalization.
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -199,15 +212,20 @@ db['pct_female_hh'] = pct_female_hh
 db['pct_bachelor'] = pct_bachelor
 # Calculate percentage of population white
 db['pct_white'] = db["White"] / (db['Total Popu'] + (db['Total Popu']==0) * 1)
+
 ```
 </div>
 
 </div>
 
+
+
 To make things easier later on, let us collect the variables we will use to
 characterize Census tracts. These variables capture different aspects of the socio-
 economic reality of each area and, taken together, they provide a comprehensive
 characterization of San Diego as a whole:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -222,10 +240,13 @@ cluster_variables =  ['Median Val',   # Median house value
                       'Med Age',      # Median age of tract population
                       'Travel tim'    # ???
                       ]
+
 ```
 </div>
 
 </div>
+
+
 
 ### Exploring the data
 
@@ -237,6 +258,8 @@ looking at the spatial distribution of each variable alone.
 This will help us draw a picture of the multi-faceted view of the tracts we
 want to capture with our clustering. Let's use choropleth maps for the
 nine attributes and compare these choropleth maps side-by-side:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -258,6 +281,7 @@ for i, col in enumerate(cluster_variables):
     ax.set_title(col)
 # Display the figure
 plt.show()
+
 ```
 </div>
 
@@ -270,6 +294,8 @@ plt.show()
 </div>
 </div>
 </div>
+
+
 
 Many visual patterns jump out from the maps, revealing both commonalities as
 well as differences across the spatial distributions of the individual variables.
@@ -292,14 +318,19 @@ extent this is present in our dataset.
 First, we need to build a spatial weights matrix that encodes the spatial
 relationships in our San Diego data. We will start with queen contiguity:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w_queen = Queen.from_dataframe(db)
+
 ```
 </div>
 
 </div>
+
+
 
 As the warning tells us, observation `103` is an *island*, a disconnected observation
 with no queen contiguity neighbors. To make sure that every observation
@@ -308,35 +339,48 @@ nearest neighbor matrix. This would ensure that every observation is neighbor
 of at least the observation it is closest to, plus all the areas with which 
 it shares any border. Let's first create the `KNN-1 W`:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w_k1 = KNN.from_dataframe(db, k=1)
+
 ```
 </div>
 
 </div>
+
+
 
 Now we can combine the queen and nearest neighbor matrices into a single representation
 with no disconnected observations. This full-connected connectivity matrix is the 
 one we will use for analysis:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w = Wsets.w_union(w_queen, w_k1)
+
 ```
 </div>
 
 </div>
 
+
+
 As we ensured (thanks to the nearest neighbor connections),  `w` does not contain
 any islands:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w.islands
+
 ```
 </div>
 
@@ -354,8 +398,12 @@ w.islands
 </div>
 </div>
 
+
+
 Now let's calculate Moran's I for the variables being used. This will measure
 the extent to which each variable contains spatial structure:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -370,6 +418,7 @@ table = pandas.DataFrame([(variable, res.I, res.p_sim) for variable,res
                      columns=['Variable', "Moran's I", 'P-value'])\
           .set_index('Variable')
 table
+
 ```
 </div>
 
@@ -462,6 +511,8 @@ table
 </div>
 </div>
 
+
+
 Each of the variables displays significant positive spatial autocorrelation,
 suggesting that Tobler's law is alive and well in the socioeconomic geography of San
 Diego County. This means we also should expect the clusters we find will have
@@ -479,10 +530,13 @@ Given the 9 maps, there are 36 pairs of maps that must be compared. This is too
 many maps to process visually, so we can turn to an alternative tool to
 explicitly focus on the bivariate relations between each pair of attributes.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 _ = seaborn.pairplot(db[cluster_variables], kind='reg', diag_kind='kde')
+
 ```
 </div>
 
@@ -495,6 +549,8 @@ _ = seaborn.pairplot(db[cluster_variables], kind='reg', diag_kind='kde')
 </div>
 </div>
 </div>
+
+
 
 Two different types of plots are contained in the scatterplot matrix. On the
 diagonal are the density functions for the nine attributes. These allow for an
@@ -550,17 +606,24 @@ want to create. The right number of clusters is unknown in practice. For
 illustration, we will use $k=5$ in the `KMeans` implementation from
 `scikit-learn`. To proceed, we first create a `KMeans` clusterer:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 # Initialise KMeans instance
 kmeans = KMeans(n_clusters=5)
+
 ```
 </div>
 
 </div>
 
+
+
 Next, we call the `fit` method to actually apply the k-means algorithm to our data:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -569,18 +632,24 @@ Next, we call the `fit` method to actually apply the k-means algorithm to our da
 numpy.random.seed(1234)
 # Run K-Means algorithm
 k5cls = kmeans.fit(db[cluster_variables])
+
 ```
 </div>
 
 </div>
 
+
+
 Now that the clusters have been assigned, we can examine the label vector, which 
 records the cluster to which each observation is assigned:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 k5cls.labels_
+
 ```
 </div>
 
@@ -626,6 +695,8 @@ array([3, 4, 4, 0, 0, 4, 0, 0, 0, 2, 0, 2, 2, 2, 4, 0, 2, 2, 2, 4, 4, 4,
 </div>
 </div>
 
+
+
 In this case, the second and third observations are assigned to cluster 4, while
 the fourth and fifth observations have been placed in cluster 0. It is important
 to note that the integer labels should be viewed as denoting membership only &mdash;
@@ -645,6 +716,8 @@ characteristics, mapping their labels allows to see to what extent similar areas
 to have similar locations.
 Thus, this gives us one map that incorporates the information of from all nine covariates.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -662,6 +735,7 @@ plt.axis('equal')
 plt.title(r'Geodemographic Clusters (k-means, $k=5$)')
 # Display the map
 plt.show()
+
 ```
 </div>
 
@@ -674,6 +748,8 @@ plt.show()
 </div>
 </div>
 </div>
+
+
 
 The map provides a useful view of the clustering results; it allows for
 a visual inspection of the extent to which Tobler's first law of geography is
@@ -699,12 +775,15 @@ This gives us the profile of each cluster so we can interpret the meaning of the
 labels we've obtained. We can start, for example, by
 considering cardinality, or the count of observations in each cluster:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 # Group data table by cluster label and count observations
 k5sizes = db.groupby('k5cls').size()
 k5sizes
+
 ```
 </div>
 
@@ -728,12 +807,17 @@ dtype: int64
 </div>
 </div>
 
+
+
 And we can get a visual representation of cardinality as well:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 _ = k5sizes.plot.bar()
+
 ```
 </div>
 
@@ -747,6 +831,8 @@ _ = k5sizes.plot.bar()
 </div>
 </div>
 
+
+
 There are substantial differences in the sizes of the five clusters, with two very
 large clusters (0, 2), one medium sized cluster (4), and two small clusters (1,
 3). Cluster 2 is the largest when measured by the number of assigned tracts.
@@ -757,12 +843,15 @@ combines all tracts belonging to each cluster into a single
 polygon object. After we have dissolved all the members of the clusters,
 we report the total land area of the cluster:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 # Dissolve areas by Cluster, aggregate by summing, and keep column for area
 areas = db.dissolve(by='k5cls', aggfunc='sum')['AREALAND']
 areas
+
 ```
 </div>
 
@@ -786,12 +875,17 @@ Name: AREALAND, dtype: int64
 </div>
 </div>
 
+
+
 And, to show this visually:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 areas.plot.bar()
+
 ```
 </div>
 
@@ -817,14 +911,19 @@ areas.plot.bar()
 </div>
 </div>
 
+
+
 Our visual impression is confirmed: cluster 2 contains tracts that
 together comprise 5,816,736,150 square meters (approximately 2,245 square miles),
 which accounts for over half of the total land area in the county:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 areas[2]/areas.sum()
+
 ```
 </div>
 
@@ -842,10 +941,14 @@ areas[2]/areas.sum()
 </div>
 </div>
 
+
+
 Let's move on to build the profiles for each cluster. Again, the profiles is what
 provides the conceptual shorthand, moving from the arbitrary label to a meaningful
 collection of observations with similar attributes. To build a basic profile, we can
 compute the means of each of the attributes in every cluster:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -854,6 +957,7 @@ compute the means of each of the attributes in every cluster:
 # for clustering, and obtain their mean
 k5means = db.groupby('k5cls')[cluster_variables].mean()
 k5means.T
+
 ```
 </div>
 
@@ -971,6 +1075,8 @@ k5means.T
 </div>
 </div>
 
+
+
 We see that cluster 3, for example, is composed of tracts that have
 the highest average `Median_val`, while cluster 2 has the highest level of inequality
 (`Gini index`), and cluster 1 contains an older population (`Med Age`)
@@ -979,6 +1085,8 @@ Average values, however, can hide a great deal of detail and, in some cases,
 give wrong impressions about the type of data distribution they represent. To
 obtain more detailed profiles, we can use the `describe` command in `pandas`, 
 after grouping our observations by their clusters:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -990,6 +1098,7 @@ k5desc = db.groupby('k5cls')[cluster_variables].describe()
 for cluster in k5desc.T:
     print('\n\t---------\n\tCluster %i'%cluster)
     print(k5desc.T[cluster].unstack())
+
 ```
 </div>
 
@@ -1122,6 +1231,8 @@ Travel tim       1484.500000    2077.500000    2794.250000    8339.000000
 </div>
 </div>
 
+
+
 However, this approach quickly gets out of hand: more detailed profiles can simply
 return to an unwieldy mess of numbers. A better approach to constructing
 cluster profiles is be to draw the distributions of cluster members' data.
@@ -1129,6 +1240,8 @@ To do this we need to "tidy up" the dataset. A tidy dataset ([Wickham,
 2014](https://www.jstatsoft.org/article/view/v059i10)) is one where every row is
 an observation, and every column is a variable. Thus, a few steps are required 
 to tidy up our labelled data:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1148,6 +1261,7 @@ tidy_db = tidy_db.rename(columns={
                         0: 'Values'})
 # Check out result
 tidy_db.head()
+
 ```
 </div>
 
@@ -1221,8 +1335,12 @@ tidy_db.head()
 </div>
 </div>
 
+
+
 Now we are ready to plot. Below, we'll show the distribution of each cluster's values
 for each variable. This gives us the full distributional profile of each cluster:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1232,6 +1350,7 @@ facets = seaborn.FacetGrid(data=tidy_db, col='Attribute', hue='k5cls', \
                   sharey=False, sharex=False, aspect=2, col_wrap=3)
 # Build the plot from `sns.kdeplot`
 _ = facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend()
+
 ```
 </div>
 
@@ -1244,6 +1363,8 @@ _ = facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend()
 </div>
 </div>
 </div>
+
+
 
 This allows us to see that, while some attributes such as the percentage of
 female households (`pct_female_hh`) display largely the same distribution for
@@ -1281,6 +1402,8 @@ with `scikit-learn` in very much the same way we did for k-means in the previous
 section. In this case, we use the `AgglomerativeClustering` class and again 
 use the `fit` method to actually apply the clustering algorithm to our data:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -1292,18 +1415,24 @@ model = AgglomerativeClustering(linkage='ward', n_clusters=5)
 model.fit(db[cluster_variables])
 # Assign labels to main data table
 db['ward5'] =model.labels_
+
 ```
 </div>
 
 </div>
 
+
+
 As above, we can check the number of observations that fall within each cluster:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ward5sizes = db.groupby('ward5').size()
 ward5sizes
+
 ```
 </div>
 
@@ -1327,13 +1456,18 @@ dtype: int64
 </div>
 </div>
 
+
+
 Further, we can check the simple average profiles of our clusters:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 ward5means = db.groupby('ward5')[cluster_variables].mean()
 ward5means.T
+
 ```
 </div>
 
@@ -1451,8 +1585,12 @@ ward5means.T
 </div>
 </div>
 
+
+
 And again, we can create a plot of the profiles' distributions (after properly 
 tidying up):
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1472,6 +1610,7 @@ tidy_db = tidy_db.rename(columns={
                         0: 'Values'})
 # Check out result
 tidy_db.head()
+
 ```
 </div>
 
@@ -1545,6 +1684,8 @@ tidy_db.head()
 </div>
 </div>
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -1553,6 +1694,7 @@ facets = seaborn.FacetGrid(data=tidy_db, col='Attribute', hue='ward5', \
                   sharey=False, sharex=False, aspect=2, col_wrap=3)
 # Build the plot as a `sns.kdeplot`
 _ = facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend()
+
 ```
 </div>
 
@@ -1566,11 +1708,15 @@ _ = facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend()
 </div>
 </div>
 
+
+
 For the sake of brevity, we will not spend much time on the plots above.
 However, the interpretation is analogous to that of the k-means example.
 
 On the spatial side, we can explore the geographical dimension of the
 clustering solution by making a map the clusters:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1588,6 +1734,7 @@ plt.axis('equal')
 plt.title('Geodemographic Clusters (AHC, $k=5$)')
 # Display the map
 plt.show()
+
 ```
 </div>
 
@@ -1601,8 +1748,12 @@ plt.show()
 </div>
 </div>
 
+
+
 And, to make comparisons simpler, we can display both the k-means and the AHC
 results side by side:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1635,6 +1786,7 @@ ax.set_title('AHC solution ($k=5$)')
 
 # Display the map
 plt.show()
+
 ```
 </div>
 
@@ -1647,6 +1799,8 @@ plt.show()
 </div>
 </div>
 </div>
+
+
 
 While we must remember our earlier caveat about how irregular polygons can 
 baffle our visual intuition, a closer visual inspection of the cluster geography
@@ -1701,6 +1855,8 @@ our spatial weights matrix as a `connectivity` option.
 This will force the agglomerative algorithm to only allow observations to be grouped
 in a cluster if they are also spatially connected:
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
@@ -1709,6 +1865,7 @@ model = AgglomerativeClustering(linkage='ward',
                                             connectivity=w.sparse,
                                             n_clusters=5)
 model.fit(db[cluster_variables])
+
 ```
 </div>
 
@@ -1730,7 +1887,11 @@ AgglomerativeClustering(affinity='euclidean', compute_full_tree='auto',
 </div>
 </div>
 
+
+
 Let's inspect the output:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1749,6 +1910,7 @@ plt.title(r'Geodemographic Regions (Ward, $k=5$, Queen Contiguity)')
 # Display the map
 plt.show()
 
+
 ```
 </div>
 
@@ -1761,6 +1923,8 @@ plt.show()
 </div>
 </div>
 </div>
+
+
 
 Introducing the spatial constraint results in fully-connected clusters with much
 more concentrated spatial distributions. From an initial visual impression, it might
@@ -1780,17 +1944,24 @@ but replace the Queen contiguity matrix with a spatial k-nearest neighbor matrix
 where each observation is connected to its four nearest observations, instead
 of those it touches.
 
+
+
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
 ```python
 w = KNN.from_shapefile(data.san_diego_tracts(), k=4)
+
 ```
 </div>
 
 </div>
 
+
+
 With this matrix connecting each tract to the four closest tracts, we can run 
 another AHC regionalization:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1800,6 +1971,7 @@ model = AgglomerativeClustering(linkage='ward',
                                             connectivity=w.sparse,
                                             n_clusters=5)
 model.fit(db[cluster_variables])
+
 ```
 </div>
 
@@ -1821,7 +1993,11 @@ AgglomerativeClustering(affinity='euclidean', compute_full_tree='auto',
 </div>
 </div>
 
+
+
 And plot the final regions:
+
+
 
 <div markdown="1" class="cell code_cell">
 <div class="input_area" markdown="1">
@@ -1839,6 +2015,7 @@ plt.axis('equal')
 plt.title('Geodemographic Regions (Ward, $k=5$, four nearest neighbors)')
 # Display the map
 plt.show()
+
 ```
 </div>
 
@@ -1851,6 +2028,8 @@ plt.show()
 </div>
 </div>
 </div>
+
+
 
 Even though we have specified a spatial constraint, the constraint applies to the
 connectivity graph modeled by our weights matrix. Therefore, using k-nearest neighbors
@@ -1904,3 +2083,20 @@ Clustering and regionalization are intimately related to the analysis of spatial
 since the spatial structure and covariation in multivariate spatial data is what
 determines the spatial structure and data profile of discovered clusters or regions.
 Thus, clustering and regionalization are essential tools for the spatial data scientist.
+
+## Questions
+
+1. What disciplines employ regionalization? Cite concrete examples for each discipline you list.
+2. Contrast and compare  the concepts of *clusters* and *regions*?
+3. In evaluating the quality of the solution to a regionalization problem, how might traditional measures of cluster evaluation be used? In what ways might those measures be limited and need expansion to consider the geographical dimensions of the problem?
+4. Discuss the implications for the processes of regionalization that follow from the number of *connected components* in the spatial weights matrix that would be used.
+5. True or false: The average silhouette score for a spatially constrained solution will be no larger than the average silhouette score for an unconstrained solution. Why, or why not? (add reference and  or explain silhouette)
+6. Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook versus queen). How might this sparsity affect the quality of the clustering solution?
+7. What are the challenges and opportunities that spatial dependence pose for spatial cluster formation?
+8. In other areas of spatial analysis, the concept of multilevel modeling (cites) exploits the hierarchical nesting of spatial units at different levels of aggregation. How might such nesting be exploited in the implementation of regionalization algorithms? What are some possible limitations/challenges that such nesting imposes/represents in obtaining a regionalization solution.
+9. Using a spatial weights object obtained as `w = libpysal.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = libpysal.weights.lat2W(20,20, rook=False)` ?
+
+---
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
