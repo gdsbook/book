@@ -1,0 +1,2992 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,minimum-scale=1">
+
+  <title>Geospatial Computational Environment</title>
+  <meta name="description" content="Computational Tools for Geographic Data Science">
+
+  <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/01_geospatial_computational_environment.html">
+  <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
+
+  <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/01_geospatial_computational_environment.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Geospatial Computational Environment" />
+<meta property="og:description" content="Computational Tools for Geographic Data Science" />
+<meta property="og:image"       content="" />
+
+
+  <script type="application/ld+json">
+  {
+  "@context": "http://schema.org",
+  "@type": "NewsArticle",
+  "mainEntityOfPage":
+    "https://gdsbook.github.io/geographic-data-science/notebooks/01_geospatial_computational_environment.html",
+  "headline":
+    "Geospatial Computational Environment",
+  "datePublished":
+    "2019-07-16T20:45:30+00:00",
+  "dateModified":
+    "2019-07-16T20:45:30+00:00",
+  "description":
+    "Computational Tools for Geographic Data Science",
+  "author": {
+    "@type": "Person",
+    "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Data 100 at UC Berkeley",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://gdsbook.github.io/geographic-data-science",
+      "width": 60,
+      "height": 60
+    }
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://gdsbook.github.io/geographic-data-science",
+    "height": 60,
+    "width": 60
+  }
+}
+
+  </script>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css ">
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+
+  <!-- <link rel="manifest" href="/manifest.json"> -->
+  <!-- <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#efae0a"> -->
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <meta name="theme-color" content="#233947">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/x-icon" href="/images/logo/favicon.ico">
+
+  <!-- MathJax Config -->
+  <!-- Allow inline math using $ and automatically break long math lines -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    CommonHTML: {
+        linebreaks: {
+            automatic: true,
+        },
+    },
+});
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_CHTML' async></script>
+
+  <!-- DOM updating function -->
+  <script>
+const runWhenDOMLoaded = cb => {
+  if (document.readyState != 'loading') {
+    cb()
+  } else if (document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', cb)
+  } else {
+    document.attachEvent('onreadystatechange', function() {
+      if (document.readyState == 'complete') cb()
+    })
+  }
+}
+
+// Helper function to init things quickly
+initFunction = function(myfunc) {
+  runWhenDOMLoaded(myfunc);
+  document.addEventListener('turbolinks:load', myfunc);
+};
+</script>
+
+  <!-- Define some javascript variables that will be useful in other javascript -->
+  <script>
+    const site_basename = '';
+  </script>
+
+  <!-- Add AnchorJS to let headers be linked -->
+  <script src="/assets/js/anchor.min.js"  type="text/javascript"></script>
+  <script>
+
+initFunction(function () {
+    anchors.add("main h1, main h2, main h3, main h4")
+});
+
+</script>
+
+  <!-- Include Turbolinks to make page loads fast -->
+  <!-- https://github.com/turbolinks/turbolinks -->
+  <script src="/assets/js/turbolinks.js" async></script>
+  <meta name="turbolinks-cache-control" content="no-cache">
+
+  <!-- Load nbinteract for widgets -->
+  
+
+  <!-- Load Thebelab for interactive widgets -->
+  <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+<!-- Display Thebelab button in each code cell -->
+<script>
+/**
+ * Set up thebelab button for code blocks
+ */
+
+const thebelabCellButton = id =>
+  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
+    <img src="/assets/images/edit-button.svg" alt="Start interactive mode">
+  </a>`
+
+
+const addThebelabButtonToCodeCells =  () => {
+
+  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("thebelab-cell-button-" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
+    }
+  })
+}
+
+initFunction(addThebelabButtonToCodeCells);
+</script>
+
+
+
+<script type="text/x-thebe-config">
+    {
+      requestKernel: true,
+      binderOptions: {
+        repo: 'gdsbook/geographic-data-science',
+        ref: 'master',
+      },
+      codeMirrorConfig: {
+        theme: ""
+      },
+      kernelOptions: {
+        name: 'python3',
+      }
+    }
+</script>
+<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
+<script>
+    /**
+     * Add attributes to Thebelab blocks
+     */
+
+    const initThebelab = () => {
+        const addThebelabToCodeCells = () => {
+            console.log("Adding thebelab to code cells...");
+            // If Thebelab hasn't loaded, wait a bit and try again. This
+            // happens because we load ClipboardJS asynchronously.
+            if (window.thebelab === undefined) {
+                setTimeout(addThebelabToCodeCells, 250)
+            return
+            }
+
+            // If we already detect a Thebelab cell, don't re-run
+            if (document.querySelectorAll('div.thebelab-cell').length > 0) {
+                return;
+            }
+
+            // Find all code cells, replace with Thebelab interactive code cells
+            const codeCells = document.querySelectorAll('.input_area pre')
+            codeCells.forEach((codeCell, index) => {
+                const id = codeCellId(index)
+                codeCell.setAttribute('data-executable', 'true')
+
+                // Figure out the language it uses and add this too
+                var parentDiv = codeCell.parentElement.parentElement;
+                var arrayLength = parentDiv.classList.length;
+                for (var ii = 0; ii < arrayLength; ii++) {
+                    var parts = parentDiv.classList[ii].split('language-');
+                    if (parts.length === 2) {
+                        // If found, assign dataLanguage and break the loop
+                        var dataLanguage = parts[1];
+                        break;
+                    }
+                }
+                codeCell.setAttribute('data-language', dataLanguage)
+
+                // If the code cell is hidden, show it
+                var inputCheckbox = document.querySelector(`input#hidebtn${codeCell.id}`);
+                if (inputCheckbox !== null) {
+                    setCodeCellVisibility(inputCheckbox, 'visible');
+                }
+            });
+
+            // Remove the event listener from the page so keyboard press doesn't
+            // Change page
+            document.removeEventListener('keydown', initPageNav)
+            keyboardListener = false;
+
+            // Init thebelab
+            thebelab.bootstrap();
+
+            // Remove copy buttons since they won't work anymore
+            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
+            copyAndThebeButtons.forEach((button, index) => {
+                button.remove();
+            });
+
+            // Remove outputs since they'll be stale
+            const outputs = document.querySelectorAll('.output *, .output')
+            outputs.forEach((output, index) => {
+                output.remove();
+            });
+        }
+
+        // Add event listener for the function to modify code cells
+        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
+        thebelabButtons.forEach((thebelabButton,index) => {
+            if (thebelabButton === null) {
+                setTimeout(initThebelab, 250)
+                return
+            };
+            thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        });
+    }
+
+    // Initialize Thebelab
+    initFunction(initThebelab);
+</script>
+
+
+
+  <!-- Load the auto-generating TOC -->
+  <script src="/assets/js/tocbot.min.js"  type="text/javascript"></script>
+  <script>
+var initToc = function () {
+  tocbot.init({
+    tocSelector: 'nav.onthispage',
+    contentSelector: '.c-textbook__content',
+    headingSelector: 'h2, h3',
+    orderedList: false,
+    collapseDepth: 6,
+    listClass: 'toc__menu',
+    activeListItemClass: "",  // Not using
+    activeLinkClass: "", // Not using
+  });
+  tocbot.refresh();
+}
+initFunction(initToc);
+</script>
+
+  <!-- Google analytics -->
+  <script src="/assets/js/ga.js" async></script>
+
+  <!-- Clipboard copy button -->
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" async></script>
+
+  <!-- Load JS that depends on site variables -->
+  <script>
+/**
+ * Set up copy/paste for code blocks
+ */
+const codeCellId = index => `codecell${index}`
+
+const clipboardButton = id =>
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+    <img src="/assets/images/copy-button.svg" alt="Copy to clipboard">
+  </a>`
+
+// Clears selected text since ClipboardJS will select the text when copying
+const clearSelection = () => {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
+// Changes tooltip text for two seconds, then changes it back
+const temporarilyChangeTooltip = (el, newText) => {
+  const oldText = el.getAttribute('data-tooltip')
+  el.setAttribute('data-tooltip', newText)
+  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
+}
+
+const addCopyButtonToCodeCells = () => {
+  // If ClipboardJS hasn't loaded, wait a bit and try again. This
+  // happens because we load ClipboardJS asynchronously.
+  if (window.ClipboardJS === undefined) {
+    setTimeout(addCopyButtonToCodeCells, 250)
+    return
+  }
+
+  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("copy-button" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
+    }
+  })
+
+  const clipboard = new ClipboardJS('.copybtn')
+  clipboard.on('success', event => {
+    clearSelection()
+    temporarilyChangeTooltip(event.trigger, 'Copied!')
+  })
+
+  clipboard.on('error', event => {
+    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
+  })
+
+  // Get rid of clipboard before the next page visit to avoid memory leak
+  document.addEventListener('turbolinks:before-visit', () =>
+    clipboard.destroy()
+  )
+}
+
+initFunction(addCopyButtonToCodeCells);
+</script>
+
+
+  <!-- Hide cell code -->
+  <script>
+    /**
+    Add buttons to hide code cells
+    */
+
+
+    var setCodeCellVisibility = function (inputField, kind) {
+        // Update the image and class for hidden
+        var id = inputField.getAttribute('data-id');
+        var codeCell = document.querySelector(`#${id} div.highlight`);
+
+        if (kind === "visible") {
+            codeCell.classList.remove('hidden');
+            inputField.checked = true;
+        } else {
+            codeCell.classList.add('hidden');
+            inputField.checked = false;
+        }
+    }
+
+    var toggleCodeCellVisibility = function (event) {
+        // The label is clicked, and now we decide what to do based on the input field's clicked status
+        if (event.target.tagName === "LABEL") {
+            var inputField = event.target.previousElementSibling;
+        } else {
+            // It is the span inside the target
+            var inputField = event.target.parentElement.previousElementSibling;
+        }
+
+        if (inputField.checked === true) {
+            setCodeCellVisibility(inputField, "visible");
+        } else {
+            setCodeCellVisibility(inputField, "hidden");
+        }
+    }
+
+
+    // Button constructor
+    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
+
+    var addHideButton = function () {
+        // If a hide button is already added, don't add another
+        if (document.querySelector('div.hidecode input') !== null) {
+            return;
+        }
+
+        // Find the input cells and add a hide button
+        document.querySelectorAll('div.input_area').forEach(function (item, index) {
+            if (!item.classList.contains("hidecode")) {
+                // Skip the cell if it doesn't have a hidecode class
+                return;
+            }
+
+            const id = codeCellId(index)
+            item.setAttribute('id', id);
+            // Insert the button just inside the end of the next div
+            item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
+
+            // Set up the visibility toggle
+            hideLink = document.querySelector(`#${id} div.highlight + input + label`);
+            hideLink.addEventListener('click', toggleCodeCellVisibility)
+        });
+    }
+
+
+    // Initialize the hide buttos
+    var initHiddenCells = function () {
+        // Add hide buttons to the cells
+        addHideButton();
+
+        // Toggle the code cells that should be hidden
+        document.querySelectorAll('div.hidecode input').forEach(function (item) {
+            setCodeCellVisibility(item, 'hidden');
+            item.checked = true;
+        })
+    }
+
+    initFunction(initHiddenCells);
+
+</script>
+
+  <!-- Load custom website scripts -->
+  <script src="/assets/js/scripts.js" async></script>
+
+  <!-- Load custom user CSS and JS  -->
+  <script src="/assets/custom/custom.js" async></script>
+  <link rel="stylesheet" href="/assets/custom/custom.css">
+
+  <!-- Update interact links w/ REST param, is defined in includes so we can use templates -->
+  
+<script>
+/**
+  * To auto-embed hub URLs in interact links if given in a RESTful fashion
+ */
+
+function getJsonFromUrl(url) {
+  var query = url.split('?');
+  if (query.length < 2) {
+    // No queries so just return false
+    return false;
+  }
+  query = query[1];
+  // Collect REST params into a dictionary
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
+}
+    
+function dict2param(dict) {
+    params = Object.keys(dict).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(dict[k])
+    });
+    return params.join('&')
+}
+
+// Parse a Binder URL, converting it to the string needed for JupyterHub
+function binder2Jupyterhub(url) {
+  newUrl = {};
+  parts = url.split('v2/gh/')[1];
+  // Grab the base repo information
+  repoinfo = parts.split('?')[0];
+  var [org, repo, ref] = repoinfo.split('/');
+  newUrl['repo'] = ['https://github.com', org, repo].join('/');
+  newUrl['branch'] = ref
+  // Grab extra parameters passed
+  params = getJsonFromUrl(url);
+  if (params['filepath'] !== undefined) {
+    newUrl['subPath'] = params['filepath']
+  }
+  return dict2param(newUrl);
+}
+
+// Filter out potentially unsafe characters to prevent xss
+function safeUrl(url)
+{
+   return String(encodeURIComponent(url))
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
+
+function addParamToInternalLinks(hub) {
+  var links = document.querySelectorAll("a").forEach(function(link) {
+    var href = link.href;
+    // If the link is an internal link...
+    if (href.search("https://gdsbook.github.io/geographic-data-science") !== -1 || href.startsWith('/') || href.search("127.0.0.1:") !== -1) {
+      // Assume we're an internal link, add the hub param to it
+      var params = getJsonFromUrl(href);
+      if (params !== false) {
+        // We have REST params, so append a new one
+        params['jupyterhub'] = hub;
+      } else {
+        // Create the REST params
+        params = {'jupyterhub': hub};
+      }
+      // Update the link
+      var newHref = href.split('?')[0] + '?' + dict2param(params);
+      link.setAttribute('href', decodeURIComponent(newHref));
+    }
+  });
+  return false;
+}
+
+
+// Update interact links
+function updateInteractLink() {
+    // hack to make this work since it expects a ? in the URL
+    rest = getJsonFromUrl("?" + location.search.substr(1));
+    jupyterHubUrl = rest['jupyterhub'];
+    var hubType = null;
+    var hubUrl = null;
+    if (jupyterHubUrl !== undefined) {
+      hubType = 'jupyterhub';
+      hubUrl = jupyterHubUrl;
+    }
+
+    if (hubType !== null) {
+      // Sanitize the hubUrl
+      hubUrl = safeUrl(hubUrl);
+
+      // Add HTTP text if omitted
+      if (hubUrl.indexOf('http') < 0) {hubUrl = 'http://' + hubUrl;}
+      var interactButtons = document.querySelectorAll("button.interact-button")
+      var lastButton = interactButtons[interactButtons.length-1];
+      var link = lastButton.parentElement;
+
+      // If we've already run this, skip the link updating
+      if (link.nextElementSibling !== null) {
+        return;
+      }
+
+      // Update the link and add context div
+      var href = link.getAttribute('href');
+      if (lastButton.id === 'interact-button-binder') {
+        // If binder links exist, we need to re-work them for jupyterhub
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // If localhost, assume we're working from a local Jupyter server and remove `/hub`
+          first = [hubUrl, 'git-sync'].join('/')
+        } else {
+          first = [hubUrl, 'hub', 'user-redirect', 'git-sync'].join('/')
+        }
+        href = first + '?' + binder2Jupyterhub(href);
+      } else {
+        // If interact button isn't binderhub, assume it's jupyterhub
+        // If JupyterHub links, we only need to replace the hub url
+        href = href.replace("", hubUrl);
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // Assume we're working from a local Jupyter server and remove `/hub`
+          href = href.replace("/hub/user-redirect", "");
+        }
+      }
+      link.setAttribute('href', decodeURIComponent(href));
+
+      // Add text after interact link saying where we're launching
+      hubUrlNoHttp = decodeURIComponent(hubUrl).replace('http://', '').replace('https://', '');
+      link.insertAdjacentHTML('afterend', '<div class="interact-context">on ' + hubUrlNoHttp + '</div>');
+
+      // Update internal links so we retain the hub url
+      addParamToInternalLinks(hubUrl);
+    }
+}
+
+runWhenDOMLoaded(updateInteractLink)
+document.addEventListener('turbolinks:load', updateInteractLink)
+</script>
+
+
+  <!-- Lunr search code - will only be executed on the /search page -->
+  <script src="/assets/js/lunr/lunr.min.js" type="text/javascript"></script>
+  <script>var initQuery = function() {
+  // See if we have a search box
+  var searchInput = document.querySelector('input#lunr_search');
+  if (searchInput === null) {
+    return;
+  }
+
+  // Function to parse our lunr cache
+  var idx = lunr(function () {
+    this.field('title')
+    this.field('excerpt')
+    this.field('categories')
+    this.field('tags')
+    this.ref('id')
+
+    this.pipeline.remove(lunr.trimmer)
+
+    for (var item in store) {
+      this.add({
+        title: store[item].title,
+        excerpt: store[item].excerpt,
+        categories: store[item].categories,
+        tags: store[item].tags,
+        id: item
+      })
+    }
+  });
+
+  // Run search upon keyup
+  searchInput.addEventListener('keyup', function () {
+    var resultdiv = document.querySelector('#results');
+    var query = document.querySelector("input#lunr_search").value.toLowerCase();
+    var result =
+      idx.query(function (q) {
+        query.split(lunr.tokenizer.separator).forEach(function (term) {
+          q.term(term, { boost: 100 })
+          if(query.lastIndexOf(" ") != query.length-1){
+            q.term(term, {  usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING, boost: 10 })
+          }
+          if (term != ""){
+            q.term(term, {  usePipeline: false, editDistance: 1, boost: 1 })
+          }
+        })
+      });
+
+      // Empty the results div
+      while (resultdiv.firstChild) {
+        resultdiv.removeChild(resultdiv.firstChild);
+      }
+
+    resultdiv.insertAdjacentHTML('afterbegin', '<p class="results__found">'+result.length+' Result(s) found</p>');
+    for (var item in result) {
+      var ref = result[item].ref;
+      if(store[ref].teaser){
+        var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<div class="archive__item-teaser">'+
+                '<img src="'+store[ref].teaser+'" alt="">'+
+              '</div>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      else{
+    	  var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      resultdiv.insertAdjacentHTML('beforeend', searchitem);
+    }
+  });
+};
+
+initFunction(initQuery);
+</script>
+</head>
+
+  <body>
+    <!-- .js-show-sidebar shows sidebar by default -->
+    <div id="js-textbook" class="c-textbook js-show-sidebar">
+      
+
+
+
+<nav id="js-sidebar" class="c-textbook__sidebar">
+  <a href="https://github.com/gdsbook/geographic-data-science"><img src="/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
+  <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
+  <ul class="c-sidebar__chapters">
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro.html"
+        >
+          
+          Home
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+        <li class="c-sidebar__chapter"><a class="c-sidebar__entry" href="/search.html">Search</a></li>
+        
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/notebooks/00_toc.html"
+        >
+          
+          Table of Contents
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry c-sidebar__entry--active"
+                  href="/notebooks/01_geospatial_computational_environment.html"
+                >
+                  
+                  Geospatial Computational Environment
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/02_spatial_data.html"
+                >
+                  
+                  Spatial Data
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/03_spatial_data_processing.html"
+                >
+                  
+                  Spatial Data Processing
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/04_spatial_weights.html"
+                >
+                  
+                  Spatial Weights
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/05_choropleth.html"
+                >
+                  
+                  Choropleth Mapping
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/06_spatial_autocorrelation.html"
+                >
+                  
+                  Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/07_local_autocorrelation.html"
+                >
+                  
+                  Local Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/08_point_pattern_analysis.html"
+                >
+                  
+                  Point Pattern Analysis
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/09_spatial_inequality.html"
+                >
+                  
+                  Spatial Inequality
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/10_clustering_and_regionalization.html"
+                >
+                  
+                  Clustering & Regionalization
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/11_regression.html"
+                >
+                  
+                  Regression
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/12_feature_engineering.html"
+                >
+                  
+                  Spatial Feature Engineering
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+  </ul>
+  <p class="sidebar_footer">Powered by <a href="https://github.com/jupyter/jupyter-book">Jupyter Book</a></p>
+</nav>
+
+      
+      <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+      <aside class="sidebar__right">
+          <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
+          <nav class="onthispage">
+          </nav>
+      </aside>
+      
+      <main class="c-textbook__page" tabindex="-1">
+          <div class="o-wrapper">
+            <div class="c-sidebar-toggle">
+  <!-- We show the sidebar by default so we use .is-active -->
+  <button
+    id="js-sidebar-toggle"
+    class="hamburger hamburger--arrowalt is-active"
+  >
+    <span class="hamburger-box">
+      <span class="hamburger-inner"></span>
+    </span>
+    <span class="c-sidebar-toggle__label">Toggle Sidebar</span>
+  </button>
+</div>
+
+            
+<div class="buttons">
+
+<button id="interact-button-thebelab" class="interact-button">Thebelab</button>
+
+
+
+
+
+
+
+
+
+<a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?urlpath=lab/tree/content%2Fnotebooks%2F01_geospatial_computational_environment.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
+
+
+</div>
+
+
+            <div class="c-textbook__content">
+              <h1 id="computational-tools-for-geographic-data-science">Computational Tools for Geographic Data Science</h1>
+
+<p>In this tutorial, we will introduce the main tools we will be working with
+throughout the rest of the book. Although very basic and seemingly abstract,
+everything showed here will become the basis on top of which we will build more
+sophisticated (and fun) tasks. But, before, let us get to know the tools that
+will power our data science.</p>
+
+<h2 id="open-source-software">Open Source Software</h2>
+
+<p>This course will introduce you to a series of computational tools that make the
+life of the Data Scientist possible, and much easier. All of them are <a href="https://en.wikipedia.org/wiki/Open_source">open-
+source</a>, which means the creators of
+these pieces of software have made available the source code for people to use
+it, study it, modify it, and re-distribute it. This has produced a large eco-
+system that today represents the best option for scientific computing, and is
+used widely both in industry and academia. Thanks to this, this course can be
+taught with entirely freely available tools that you can install in any of your
+computers.</p>
+
+<p>If you want to learn more about open-source and free software, here
+are a few links:</p>
+
+<ul>
+  <li><strong>[Video]</strong>: brief
+<a href="https://www.youtube.com/watch?v=Tyd0FO0tko8">explanation</a> of open source.</li>
+  <li><strong>[Book]</strong> <a href="https://en.wikipedia.org/wiki/The_Cathedral_and_the_Bazaar">The Cathedral and the Bazaar</a>: classic
+book, freely available, that documents the benefits and history of open-source
+software.</li>
+</ul>
+
+<h2 id="jupyter-notebook"><code class="highlighter-rouge">Jupyter</code> Notebook</h2>
+
+<p>The main computational tool you will be using during this course is the <a href="http://jupyter.org/">Jupyter
+notebook</a>. Notebooks are a convenient way to thread text,
+code and the output it produces in a simple file that you can then share, edit
+and modify. You can think of notebooks as the Word document of Data Scientists,
+just much nicer.</p>
+
+<h3 id="start-a-notebook">Start a notebook</h3>
+
+<p>Jupyter notebook is an app that must be started from a <em>command line</em>, a text-based
+interface that allows you to interact directly with programs through written
+commands. This is how you can fire up a terminal:</p>
+
+<ul>
+  <li>If you are
+on a <strong>Windows</strong> computer, you can start the “Anaconda Command Prompt” from the
+Start menu.</li>
+  <li>On a <strong>Mac</strong>, use the Terminal.app, in Utilities.</li>
+  <li>In <strong>Linux</strong>, use any of the terminals available, such as GNOME Terminal, 
+Konsole, or XTerm, or any other terminal you find easy to use.</li>
+</ul>
+
+<p>Once the terminal is opened, you should be greeted with a text interface, like other
+common text entry fields. There, type the following command and press enter:</p>
+
+<p><code class="highlighter-rouge">source activate gds</code></p>
+
+<p><strong>NOTE</strong>: ignore <code class="highlighter-rouge">source</code> if you are on Windows and
+simply type <code class="highlighter-rouge">activate gds</code>.</p>
+
+<p>Then, after you run that command, launch <code class="highlighter-rouge">Jupyter</code> by typing the following 
+command and pressing enter again:</p>
+
+<p><code class="highlighter-rouge">jupyter notebook</code></p>
+
+<p>This should bring up a web browser window
+with a home page that shows a list of files and folders in the location where the 
+<code class="highlighter-rouge">jupyter notebook</code> was started. It should look something like like this:</p>
+
+<p><img src="figs/lab01_jupyter_home.png" alt="Jupyter home" /></p>
+
+<p>Clicking on the folders in the file browser, go to the folder where you have 
+placed the <code class="highlighter-rouge">lab_01.ipynb</code> file for this tutorial and click on it. 
+This will open the notebook on a different tab. You are now in the notebook, which
+you can both run like a computer program and edit like a word document.</p>
+
+<p>Whenever you want to save your work, you can save the notebook using
+<code class="highlighter-rouge">File -&gt; Save and Checkpoint</code>. Everything you do in the notebook 
+(text, code, and the output from code) is saved into a single <code class="highlighter-rouge">.ipynb</code> file
+that you can open again to edit and run, share with others, or publish online.</p>
+
+<h3 id="cells">Cells</h3>
+
+<p>The main building block of Jupyter notebooks are called <em>cells</em>. These are 
+chunks of content that is all of the same “type.” Cells
+can be of two types:</p>
+
+<ul>
+  <li><strong>Text</strong>, like the one where this is written.
+*
+<strong>Code</strong>, like the following one below:</li>
+</ul>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># This is a code cell</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>You can create a new cell by clicking <code class="highlighter-rouge">Insert</code> -&gt; <code class="highlighter-rouge">Cell Above</code>/<code class="highlighter-rouge">Below</code> in the
+top menu. By default, this will be a code cell, but you can change that on the
+<code class="highlighter-rouge">Cell</code> -&gt; <code class="highlighter-rouge">Cell Type</code> menu. Choose <code class="highlighter-rouge">Markdown</code> for a text cell. Once a new cell
+is created, you can edit it by clicking on it, which will create the cursor bar
+inside for you to start typing. Cells can also be cut, pasted, moved, inserted,
+and deleted in a notebook. Think of them like computational paragraphs that can
+be mixed around to form larger or longer thoughts.</p>
+
+<div class="alert alert-info" style="font-size:110%"> <b>Pro tip</b>: cells can also be created with
+shortcuts. If you press the 'escape' key and then the 'b' key (or 'a' key), a new cell will be
+created below (or above) the current cell. There is a whole bunch of shortcuts you can explore by
+pressing 'escape' and 'h' (press 'escape' again to leave the help).
+</div>
+<h3 id="code-and-its-output">Code and its output</h3>
+
+<p>A particularly useful feature of notebooks is that you
+can save, in the same place, the code you use to generate any output (tables,
+figures, etc.). As an example, the cell below contains a snipet of Python that
+returns a printed statement. This statement is then printed below and recorded
+in the notebook as output:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"Hello, world!"</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Hello, world!
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>Note how the notebook automatically colors the Python code in the code block?
+This makes the code much more readable and understandable. More on Python below.</p>
+
+<h3 id="markdown">Markdown</h3>
+
+<p>Text cells in a notebook a <em>markup</em> language, <a href="https://help.github.com/articles/github-flavored-markdown/">Github Flavored
+Markdown</a>, to 
+express many commonly-used structures in documents. One strength of Markdown is 
+that it is written in plain, flat text, but is rendered into something that looks
+more structured. The notebook does this automatically, rendering the more 
+visually appealing version any markdown you write. Let’s see some examples:</p>
+
+<h4 id="text-formatting">Text formatting</h4>
+
+<p>Bold an italic text can be obtained using asterisks. For example:</p>
+
+<p><code class="highlighter-rouge">This is **bold**.</code></p>
+
+<p>is rendered:</p>
+
+<p>This is <strong>bold</strong>.</p>
+
+<p>and</p>
+
+<p><code class="highlighter-rouge">This is *italic*.</code></p>
+
+<p>is rendered:</p>
+
+<p>This is <em>italic</em>.</p>
+
+<h4 id="lists">Lists</h4>
+
+<p>You can create bullet lists. For example:</p>
+
+<p><code class="highlighter-rouge">* Item 1</code>
+<code class="highlighter-rouge">* Item 2</code>
+<code class="highlighter-rouge">* ...</code></p>
+
+<p>will produce:</p>
+<ul>
+  <li>Item 1</li>
+  <li>Item 2</li>
+  <li>…</li>
+</ul>
+
+<p>Or, you can create numbered lists using</p>
+
+<p><code class="highlighter-rouge">1. First element</code>
+<code class="highlighter-rouge">1. Second element</code>
+<code class="highlighter-rouge">1. ...</code></p>
+
+<p>which renders into:</p>
+
+<ol>
+  <li>First element</li>
+  <li>Second element
+1.
+…</li>
+</ol>
+
+<p>Note that you don’t have to write the actual number of the element. Markdown will
+keep track of how many elements are in a given list and number them appropriately.
+So, if you want, you can simply use <code class="highlighter-rouge">1.</code> for each element while writing, and Markdown
+will render it into a simple sequence of numbered entries.</p>
+
+<p>You can also nest lists:</p>
+
+<p><code class="highlighter-rouge">*First unnumbered element, which can be split into:</code>
+<code class="highlighter-rouge">
+`  1. One numbered element`
+`  2. Another numbered element`
+</code>
+<code class="highlighter-rouge">* Second element.</code>
+<code class="highlighter-rouge">* ...</code></p>
+
+<ul>
+  <li>
+    <p>First unnumbered element, which can be split into:</p>
+
+    <ol>
+      <li>One numbered element</li>
+      <li>Another numbered element</li>
+    </ol>
+  </li>
+  <li>Second element.</li>
+  <li>…</li>
+</ul>
+
+<p>This creates many opportunities to combine document elements in a nice way.</p>
+
+<h4 id="hyperlinks">Hyperlinks</h4>
+
+<p>Markdown allows for hyperlinks to be inserted into text inline using a 
+combination of brackets and parentheses. For example:</p>
+
+<p><code class="highlighter-rouge">Consult [Wikipedia](https://www.wikipedia.org/) for more information.</code></p>
+
+<p>becomes</p>
+
+<p>Consult <a href="https://www.wikipedia.org/">Wikipedia</a> for more information.</p>
+
+<h4 id="headings">headings</h4>
+
+<p>including <code class="highlighter-rouge">#</code> before a line causes it to render a heading.</p>
+
+<hr />
+<p><code class="highlighter-rouge"># This is Header 1</code></p>
+
+<p>Turns into:</p>
+
+<h1 id="this-is-header-1">This is Header 1</h1>
+
+<hr />
+
+<p><code class="highlighter-rouge">## This is Header
+2</code></p>
+
+<p>Turns into:</p>
+
+<h2 id="this-is-header-2">This is Header 2</h2>
+
+<hr />
+
+<p><code class="highlighter-rouge">### This is Header 3</code></p>
+
+<p>Turns into:</p>
+<h3 id="this-is-header-3">This is Header 3</h3>
+
+<p>And so on.</p>
+
+<hr />
+
+<p>More information about markdown is provided by:</p>
+
+<p><a href="https://help.github.com/articles/markdown-basics">https://help.github.com/articles/markdown-basics</a></p>
+
+<p><a href="https://help.github.com/articles/github-flavored-markdown">https://help.github.com/articles/github-flavored-markdown</a></p>
+
+<h3 id="rich-content-in-a-notebook">Rich content in a notebook</h3>
+
+<p>Notebooks can also include rich content from the web. For this, we need to
+import the <code class="highlighter-rouge">display</code> module from the</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">IPython.display</span> <span class="k">as</span> <span class="n">display</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>This makes available additional functionality that allows us to embed rich
+content. For example, we can include a YouTube clip by passing the video ID:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">display</span><span class="o">.</span><span class="n">YouTubeVideo</span><span class="p">(</span><span class="s">'iinQDhsdE9s'</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+
+        <iframe width="400" height="300" src="https://www.youtube.com/embed/iinQDhsdE9s" frameborder="0" allowfullscreen=""></iframe>
+        
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Or we can pass standard HTML code:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">display</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="s">"""&lt;table&gt;
+&lt;tr&gt;
+&lt;th&gt;Header 1&lt;/th&gt;
+&lt;th&gt;Header 2&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;row 1, cell 1&lt;/td&gt;
+&lt;td&gt;row 1, cell 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;row 2, cell 1&lt;/td&gt;
+&lt;td&gt;row 2, cell 2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;"""</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<table>
+<tr>
+<th>Header 1</th>
+<th>Header 2</th>
+</tr>
+<tr>
+<td>row 1, cell 1</td>
+<td>row 1, cell 2</td>
+</tr>
+<tr>
+<td>row 2, cell 1</td>
+<td>row 2, cell 2</td>
+</tr>
+</table>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Note that this opens the door for including a large number of elements from the
+web, since an <code class="highlighter-rouge">iframe</code> of any other website can also be included. For example, 
+interactive maps can be shown from within an <code class="highlighter-rouge">iframe</code>:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">osm</span> <span class="o">=</span> <span class="s">"""
+&lt;iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-2.9662737250328064</span><span class="si">%2</span><span class="s">C53.400500637844594</span><span class="si">%2</span><span class="s">C-2.964626848697662</span><span class="si">%2</span><span class="s">C53.402550738394034&amp;amp;layer=mapnik" style="border: 1px solid black"&gt;&lt;/iframe&gt;&lt;br/&gt;&lt;small&gt;&lt;a href="http://www.openstreetmap.org/#map=19/53.40153/-2.96545"&gt;View Larger Map&lt;/a&gt;&lt;/small&gt;
+"""</span>
+<span class="n">display</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">osm</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+
+<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-2.9662737250328064%2C53.400500637844594%2C-2.964626848697662%2C53.402550738394034&amp;layer=mapnik" style="border: 1px solid black"></iframe><br /><small><a href="http://www.openstreetmap.org/#map=19/53.40153/-2.96545">View Larger Map</a></small>
+
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Sound content can also be included by providing an <code class="highlighter-rouge">iframe</code> over an audio website:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sound</span> <span class="o">=</span> <span class="s">'''
+&lt;iframe width="100</span><span class="si">%</span><span class="s">" height="450" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https</span><span class="si">%3</span><span class="s">A//api.soundcloud.com/tracks/178720725&amp;amp;auto_play=false&amp;amp;hide_related=false&amp;amp;show_comments=true&amp;amp;show_user=true&amp;amp;show_reposts=false&amp;amp;visual=true"&gt;&lt;/iframe&gt;
+'''</span>
+<span class="n">display</span><span class="o">.</span><span class="n">HTML</span><span class="p">(</span><span class="n">sound</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+
+<iframe width="100%" height="450" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/178720725&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe>
+
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>A more thorough exploration of these forms of rich content is available in
+<a href="http://jeffskinnerbox.me/notebooks/ipython's-rich-display-system.html">this</a>
+notebook.</p>
+
+<h3 id="exercise-to-work-on-your-own">Exercise to work on your own</h3>
+
+<p>Try to reproduce, using markdown and the different tools the notebook affords
+you, the following Wikipedia entry:</p>
+
+<p><a href="https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream">https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream</a>.</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">display</span><span class="o">.</span><span class="n">IFrame</span><span class="p">(</span><span class="s">'https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream'</span><span class="p">,</span> 
+              <span class="mi">700</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+
+        <iframe width="700" height="500" src="https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream" frameborder="0" allowfullscreen=""></iframe>
+        
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Pay special attention to getting the bold, italics, links, headlines and lists
+correctly formated, but don’t worry too much about the overall layout. Bonus if
+you manage to insert the image as well!</p>
+
+<h2 id="python">Python</h2>
+
+<p>The main component of this book relies on the <a href="https://www.python.org/">Python</a>
+programming language. Python is a <a href="https://en.wikipedia.org/wiki/High-level_programming_language">high-
+level</a>
+programming language used widely in data science. To give a couple of examples of its
+relevance, it powers <a href="https://www.quora.com/How-
+does-dropbox-use-python-What-features-are-implemented-in-it-any-tangentially-
+related-material?share=1">most of the company Dropbox’s main product</a>, and is also heavily
+<a href="https://www.python.org/about/success/usa/">used</a> to control satellites at NASA.
+A great deal of Science is also done in Python, from <a href="https://www.youtube.com/watch?v=mLuIB8aW2KA">research in
+astronomy</a> at UC Berkley, to
+<a href="https://lectures.quantecon.org/py/">courses in economics</a> by Nobel Prize-winning professors.</p>
+
+<p>This book uses Python because it is a good language for beginners and 
+high performance science alike. For this reason, it has emerged as one of the main
+and most solid options for Data Science. Python is widely used for data 
+processing and analysis both in academia and in industry. There is a vibrant and 
+growing scientific community (through the <a href="http://scipy.org/">Scientific Python</a> 
+library and the <a href="http://pydata.org/">PyData</a> organization), working in
+both universities and companies, to support and enhance the Python’s capabilities.
+New methods and usability improvements of existing packages (also known as libraries)
+are continuously being released. In geocomputation, Python is also very widely
+adopted: it is the language used for scripting in both the main proprietary enterprise
+geographic information system,
+<a href="http://www.esri.com/software/arcgis">ArcGIS</a>, 
+and the leading open geographic information system, <a href="http://qgis.org">QGIS</a>. All
+of this means that, whether you are thinking of continuing in Higher Education
+or trying to find a job in industry, Python will be an important asset, valuable to
+employers and scientists alike.</p>
+
+<p>Python code is “dynamically interpreted”, which means it is run on-the-fly without 
+needing to be compiled. This is in contrast to other kinds of programming
+languages, which require an additional non-interactive step where a program is 
+converted into a binary file, which is then run directly. With Python, one does
+not need to worry about this non-interactive compilation step. Instead, we can 
+simply write code, run code, fix any issues directly, and then re-run the code in a
+quick cycle. This makes Python a very productive tool for science, since you can
+prototype code quickly and directly. The rest of this tutorial covers
+some of the basic elements of the language, from conventions like how to comment
+your code, to the basic data structures available.</p>
+
+<h3 id="python-libraries">Python libraries</h3>
+
+<p>The standard Python language includes some data structures (such as lists and
+dictionaries) and allows many basic mathematical operations (e.g. sums, differences,
+products). For example, right out of the box, and without any further
+action needed, you can use Python as a calculator:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">3</span> <span class="o">+</span> <span class="mi">5</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>8
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.6666666666666666
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">/</span> <span class="mi">3</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>5.333333333333333
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>However, the strength of Python as a data analysis tool comes from additional
+software that adds functionality to the language itself. This additional software
+provides many more useful data structures and functions for data science. These
+come in the form of packages, also known as libraries, need to be installed separately 
+and must be explicitly included in order to be used. 
+In this course, we will be using many of the core libraries of the “PyData stack”,
+a set of heavily-used libraries that make Python a fully-fledged
+system for Data Science. We will introduce each package only as we need it for
+specific tasks. For now, though, let us have a look at the foundational library,
+<a href="http://www.numpy.org/">numpy</a> (short for <strong>num</strong>erical <strong>Py</strong>thon). Bringing 
+additional Python libraries into a session is called <em>importing</em> them, and is 
+done using the <code class="highlighter-rouge">import</code> statement:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span> <span class="c"># we rename it in the session as `np` by convention</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Note how we <code class="highlighter-rouge">import numpy</code>, introducing it into our Python session, <em>and</em> rename it
+in the session, suggesting that <code class="highlighter-rouge">numpy</code> be known as <code class="highlighter-rouge">np</code>, which is shorter and more convenient.</p>
+
+<p>Note also how comments work in Python:
+everything in a line <em>after</em> the <code class="highlighter-rouge">#</code> sign is ignored by Python when it evaluates
+the code. This allows you to insert comments that Python will ignore but that
+can help make your code more clear.</p>
+
+<p>Once imports are out of the way, let us start exploring what we can do with
+<code class="highlighter-rouge">numpy</code>. One of the most basic tasks is to create sequences of numbers:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">seq</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>The first thing to note is that, in line 1, we create the sequence by calling
+the function <code class="highlighter-rouge">arange</code> and assign it to an object called <code class="highlighter-rouge">seq</code>. <code class="highlighter-rouge">seq</code> is just a
+name we choose to call the result of the computation <code class="highlighter-rouge">np.arange(10)</code>. There are 
+many valid names we can use for variables in Python. Nearly any name is valid in Python, so
+long as they:</p>
+<ul>
+  <li>start with an alphabetical letter (e.g. <code class="highlighter-rouge">seq1</code> is valid, but <code class="highlighter-rouge">1seq</code> is not)</li>
+  <li>have no additional characters aside from alphanumerics and underscores
+Finally, the last line of the cell above prints the contents of <code class="highlighter-rouge">seq</code>. In Jupyter 
+notebooks, the contents of the last line in a cell will be shown if they are not
+assigned to a variable.</li>
+</ul>
+
+<p>Another interesting feature of Python is how it keeps track of what functionality
+comes from <code class="highlighter-rouge">numpy</code>, and what functionality dos not. Since we
+are calling a <code class="highlighter-rouge">numpy</code> function (<code class="highlighter-rouge">arange</code>), we put <code class="highlighter-rouge">np.</code> in front of <code class="highlighter-rouge">arange</code>. This
+means that we are using the <code class="highlighter-rouge">arange</code> function from inside the <code class="highlighter-rouge">np</code> <em>namespace</em>.
+This means that the function <code class="highlighter-rouge">arange</code> comes explicitly from <code class="highlighter-rouge">numpy</code>. To find out how
+necessary this is, you can try generating the sequence without <code class="highlighter-rouge">np</code>:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># NOTE: comment out to run the cell</span>
+<span class="c">#seq = arange(10)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>What you get instead is an error, also called a “traceback”. In particular,
+Python is telling that it cannot find a function named <code class="highlighter-rouge">arange</code> in the core
+library. This is because that particular function is only available in <code class="highlighter-rouge">numpy</code>,
+so we have to look under <code class="highlighter-rouge">np</code> to find <code class="highlighter-rouge">np.arange</code>.</p>
+
+<h3 id="variables">Variables</h3>
+
+<p>A fundamental feature of Python is the ability to assign a name to different “things”,
+or objects. These objects are also sometimes called “variables” as well. We have already seen
+one variable (<code class="highlighter-rouge">seq</code>) in the example above but let’s make things more explicit. 
+For example, an object can be a single number.:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">3</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Now, we’ve assigned an object (the number <code class="highlighter-rouge">3</code>) to a variable, <code class="highlighter-rouge">a</code>.</p>
+
+<p>Words or sentences can also be objects. In Python, we call this kind of text a “string,”
+and they are marked off from other text using either single or double quotation marks:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">b</span> <span class="o">=</span> <span class="s">'Hello World'</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>You can check what “type” of object is stored in a variable using the <code class="highlighter-rouge">type</code> function:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">type</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Here, <code class="highlighter-rouge">int</code> is short for “integer” which, roughly speaking, means a whole number. 
+In most cases, a number with a decimal in Python is called a “floating-point number,”
+or a “float” for short:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c</span> <span class="o">=</span> <span class="mf">1.5</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>float
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>As mentioned, what we understand as text in a wide sense (spaces and other
+symbols count as well) is called a “string” (<code class="highlighter-rouge">str</code> for short):</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">type</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>str
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<h3 id="help">Help</h3>
+
+<p>A very handy feature of Python is the ability to access on-the-spot help for functions. 
+This means that you can check what a function is supposed to do, or how to use it
+from directly inside your Python session. Of course, this
+also works handsomely inside a notebook, too. There are a couple of ways to access
+the help.</p>
+
+<p>Take the <code class="highlighter-rouge">numpy</code> function <code class="highlighter-rouge">arange</code> that we have used above. The
+easiest way to check its help dialog from within the notebook is to add a question
+mark after it:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="err">?</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0;31mDocstring:[0m
+arange([start,] stop[, step,], dtype=None)
+
+Return evenly spaced values within a given interval.
+
+Values are generated within the half-open interval ``[start, stop)``
+(in other words, the interval including `start` but excluding `stop`).
+For integer arguments the function is equivalent to the Python built-in
+`range &lt;http://docs.python.org/lib/built-in-funcs.html&gt;`_ function,
+but returns an ndarray rather than a list.
+
+When using a non-integer step, such as 0.1, the results will often not
+be consistent.  It is better to use ``linspace`` for these cases.
+
+Parameters
+----------
+start : number, optional
+    Start of interval.  The interval includes this value.  The default
+    start value is 0.
+stop : number
+    End of interval.  The interval does not include this value, except
+    in some cases where `step` is not an integer and floating point
+    round-off affects the length of `out`.
+step : number, optional
+    Spacing between values.  For any output `out`, this is the distance
+    between two adjacent values, ``out[i+1] - out[i]``.  The default
+    step size is 1.  If `step` is specified as a position argument,
+    `start` must also be given.
+dtype : dtype
+    The type of the output array.  If `dtype` is not given, infer the data
+    type from the other input arguments.
+
+Returns
+-------
+arange : ndarray
+    Array of evenly spaced values.
+
+    For floating point arguments, the length of the result is
+    ``ceil((stop - start)/step)``.  Because of floating point overflow,
+    this rule may result in the last element of `out` being greater
+    than `stop`.
+
+See Also
+--------
+linspace : Evenly spaced numbers with careful handling of endpoints.
+ogrid: Arrays of evenly spaced numbers in N-dimensions.
+mgrid: Grid-shaped arrays of evenly spaced numbers in N-dimensions.
+
+Examples
+--------
+&gt;&gt;&gt; np.arange(3)
+array([0, 1, 2])
+&gt;&gt;&gt; np.arange(3.0)
+array([ 0.,  1.,  2.])
+&gt;&gt;&gt; np.arange(3,7)
+array([3, 4, 5, 6])
+&gt;&gt;&gt; np.arange(3,7,2)
+array([3, 5])
+[0;31mType:[0m      builtin_function_or_method
+
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>As you can see, this brings up a sub-window in the browser with all the
+information you need.</p>
+
+<p>If, for whatever reason, you needed to print that info
+into the notebook itself, you can use the following <code class="highlighter-rouge">help</code> function instead:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">help</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Help on built-in function arange in module numpy.core.multiarray:
+
+arange(...)
+    arange([start,] stop[, step,], dtype=None)
+    
+    Return evenly spaced values within a given interval.
+    
+    Values are generated within the half-open interval ``[start, stop)``
+    (in other words, the interval including `start` but excluding `stop`).
+    For integer arguments the function is equivalent to the Python built-in
+    `range &lt;http://docs.python.org/lib/built-in-funcs.html&gt;`_ function,
+    but returns an ndarray rather than a list.
+    
+    When using a non-integer step, such as 0.1, the results will often not
+    be consistent.  It is better to use ``linspace`` for these cases.
+    
+    Parameters
+    ----------
+    start : number, optional
+        Start of interval.  The interval includes this value.  The default
+        start value is 0.
+    stop : number
+        End of interval.  The interval does not include this value, except
+        in some cases where `step` is not an integer and floating point
+        round-off affects the length of `out`.
+    step : number, optional
+        Spacing between values.  For any output `out`, this is the distance
+        between two adjacent values, ``out[i+1] - out[i]``.  The default
+        step size is 1.  If `step` is specified as a position argument,
+        `start` must also be given.
+    dtype : dtype
+        The type of the output array.  If `dtype` is not given, infer the data
+        type from the other input arguments.
+    
+    Returns
+    -------
+    arange : ndarray
+        Array of evenly spaced values.
+    
+        For floating point arguments, the length of the result is
+        ``ceil((stop - start)/step)``.  Because of floating point overflow,
+        this rule may result in the last element of `out` being greater
+        than `stop`.
+    
+    See Also
+    --------
+    linspace : Evenly spaced numbers with careful handling of endpoints.
+    ogrid: Arrays of evenly spaced numbers in N-dimensions.
+    mgrid: Grid-shaped arrays of evenly spaced numbers in N-dimensions.
+    
+    Examples
+    --------
+    &gt;&gt;&gt; np.arange(3)
+    array([0, 1, 2])
+    &gt;&gt;&gt; np.arange(3.0)
+    array([ 0.,  1.,  2.])
+    &gt;&gt;&gt; np.arange(3,7)
+    array([3, 4, 5, 6])
+    &gt;&gt;&gt; np.arange(3,7,2)
+    array([3, 5])
+
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<h3 id="control-flow-aka-for-loops-and-if-statements">Control flow (a.k.a. <code class="highlighter-rouge">for</code> loops and <code class="highlighter-rouge">if</code> statements)</h3>
+
+<p>Although this book is not intend to be a comprehensive introduction to computer
+programming or to general purpose Python (check the references for that, in
+particular Allen Downey’s
+<a href="http://www.greenteapress.com/thinkpython/thinkpython.html">book</a>), it is
+important to be aware of two building blocks of almost any computer program:
+<code class="highlighter-rouge">for</code> loops and <code class="highlighter-rouge">if</code> statements. It is possible that you will never require them
+for this book. This book is mainly based on existing methods and
+functions, but it is always useful to know how <code class="highlighter-rouge">for</code> and <code class="highlighter-rouge">if</code> work to be able to
+recognize them. They can also come in very handy in cases where you some extra
+functionality out of standard methods. So, let us have a look
+at these two flow control methods.</p>
+
+<h4 id="for-loops"><code class="highlighter-rouge">for</code> loops</h4>
+
+<p>Loops allow you to repeat a particular action or set of actions. In this case, 
+<code class="highlighter-rouge">for</code> loops allow you repeat an action over every element in a collection. For 
+example, you could print your name ten times without having to type it yourself every single time:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'my name'</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>my name
+my name
+my name
+my name
+my name
+my name
+my name
+my name
+my name
+my name
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>A couple of features in the loop are useful to note:</p>
+
+<ol>
+  <li>Loops are conducted <em>over</em> a sequence. In this
+particular case, we loop over the sequence of ten numbers created by <code class="highlighter-rouge">np.arange(10)</code>.</li>
+  <li>In
+every step, for every element of the sequence in this case, you repeat an
+action. Here we are printing the same text, <code class="highlighter-rouge">my name</code>.</li>
+  <li>Each of the elements you loop over can be accessed inside of 
+the loop as well. Although we did not use this feature in the loop above, this 
+can be extremely useful in some cases. For example, we could iterate over a list of
+names:</li>
+</ol>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Jane'</span><span class="p">,</span> <span class="s">'Robert'</span><span class="p">,</span> <span class="s">'Elise'</span><span class="p">,</span> <span class="s">'Reilly'</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Whose turn is it?"</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Whose turn is it? Jane
+Whose turn is it? Robert
+Whose turn is it? Elise
+Whose turn is it? Reilly
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>One more thing to note: it often makes sense to describe what you are iterating
+over directly like we did in <code class="highlighter-rouge">for name in names</code>. But, remember, <code class="highlighter-rouge">name</code> is arbitrary, 
+and we could have called it any valid Python variable name.</p>
+
+<h4 id="if-statements"><code class="highlighter-rouge">if</code> statements</h4>
+
+<p>We have just seen how <code class="highlighter-rouge">for</code> loops allow you to repeat an
+action over a sequence. However, sometimes you might not want to take an action
+every single time. Often, we might want to run a bit of code only if some conditions
+are satisfied. This “branching” behavior is provided by <code class="highlighter-rouge">if</code> statements, which
+select or restrict actions to only run when a condition (or many conditions) are met.</p>
+
+<p>For example, if you think of the loops written above,
+we might want to skip players whose name begins with ‘R’:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">"R"</span><span class="p">)):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"We are skipping "</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>We are skipping  Robert
+We are skipping  Reilly
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>We can also take an action only when our <code class="highlighter-rouge">if</code> statement is <em>not</em> satisfied by 
+using an <code class="highlighter-rouge">else</code> statement. 
+Together, these are sometimes called “ifelse” statements. For example,
+we could skip players whose names begin with “R”, but allow everyone else to go:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">"R"</span><span class="p">)):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"We are skipping "</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s">"gets to go"</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Jane gets to go
+We are skipping  Robert
+Elise gets to go
+We are skipping  Reilly
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<h3 id="data-structures">Data structures</h3>
+
+<p>The standard python you can access without importing any additional libraries
+contains a few core data structures that are very handy to know. Most of data
+analysis is done on top of other structures specifically designed for the
+purpose (<code class="highlighter-rouge">numpy</code> arrays and <code class="highlighter-rouge">pandas</code> dataframes, mostly. See the following sessions
+for more details), but some understanding of these core Python structures is
+very useful. In this context, we will look at three: values, lists, and
+dictionaries.</p>
+
+<h4 id="values">Values</h4>
+<p>These are the most basic elements to organize data and information
+in Python. You can think of them as numbers (integers or floats) or words
+(strings). Typically, these are the elements that will be stored in lists and
+dictionaries.</p>
+
+<p>An integer is a whole number:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">i</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>A float is a number that allows for decimals:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span> <span class="o">=</span> <span class="mf">5.2</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>float
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Note that a float can also not have decimals and still be stored as such:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">fw</span> <span class="o">=</span> <span class="mf">5.</span>
+<span class="nb">type</span><span class="p">(</span><span class="n">fw</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>float
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>However, they are different representations:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span> <span class="o">==</span> <span class="n">fw</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>False
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<h4 id="lists-1">Lists</h4>
+<p>A list is an ordered sequence of values that can be of mixed types.
+They are represented between squared brackets (<code class="highlighter-rouge">[]</code>) and, although not very
+efficient in memory terms, are very flexible and useful to “put things
+together”.</p>
+
+<p>For example, the following list of integers:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">l</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[1, 2, 3, 4, 5]
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">type</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>list
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Or the following mixed one:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m</span> <span class="o">=</span> <span class="p">[</span><span class="s">'a'</span><span class="p">,</span> <span class="s">'b'</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s">'c'</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+<span class="n">m</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['a', 'b', 5, 'c', 6, 7]
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Lists can be queried and sliced. For example, the first element can be retrieved
+by:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Or the second to the fourth:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['b', 5, 'c']
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Lists can be added:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span> <span class="o">+</span> <span class="n">m</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[1, 2, 3, 4, 5, 'a', 'b', 5, 'c', 6, 7]
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>New elements added:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">l</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[1, 2, 3, 4, 5, 4]
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Or modified:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s">'two'</span>
+<span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>'two'
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">l</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[1, 'two', 3, 4, 5, 4]
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<h4 id="dictionaries">Dictionaries</h4>
+<p>Dictionaries are unordered collections of “keys” and
+“values”. A key, which can be of any kind, is the element associated with a
+“value”, which can also be of any kind. Dictionaries are used when order is not
+important but you need fast and easy lookup. They are expressed in curly
+brackets, with keys and values being linked through columns.</p>
+
+<p>For example, we
+can think of a dictionary to store a series of names and the ages of the people
+they represent:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ages</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Ana'</span><span class="p">:</span> <span class="mi">24</span><span class="p">,</span> <span class="s">'John'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="s">'Li'</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="s">'Ivan'</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span> <span class="s">'Tali'</span><span class="p">:</span><span class="mi">33</span><span class="p">}</span>
+<span class="n">ages</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'Ana': 24, 'Ivan': 40, 'John': 20, 'Li': 27, 'Tali': 33}
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">type</span><span class="p">(</span><span class="n">ages</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dict
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Dictionaries can then be queried and values retrieved using their
+keys. For example, if we quickly want to know Li’s age:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ages</span><span class="p">[</span><span class="s">'Li'</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>27
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Similarly to lists, you can modify and assign new values:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ages</span><span class="p">[</span><span class="s">'Juan'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">73</span>
+<span class="n">ages</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'Ana': 24, 'Ivan': 40, 'John': 20, 'Juan': 73, 'Li': 27, 'Tali': 33}
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Using this property, you can create entirely empty dictionaries and fill them 
+with values later:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">newdict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">newdict</span><span class="p">[</span><span class="s">'key1'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">newdict</span><span class="p">[</span><span class="s">'key2'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">newdict</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'key1': 1, 'key2': 2}
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<h3 id="functions">Functions</h3>
+
+<p>The last part of this whirlwind tour on Python relates to functions, sometimes
+also called methods. Functions are the most basic unit of re-usable code.
+So far, we have only seen Python code that must be copied in its entirety in order
+to be used again. However, as we will see in more detail later in
+the course, one of the main reasons why you want to use Python for data
+analysis instead of a point-and-click graphical interface like SPSS is that you 
+can easily reuse code and re-run analyses easily. Code that does one thing can
+be written <em>one time</em>, in one place, and run wherever and whenever it is needed.
+Methods/functions help us accomplish this by encapsulating pieces of code that
+perform a one specific task, protecting them from changes that we might make 
+in other Python sessions or in other analyses. 
+Thus, a function provides a clean, separate space to describe one small piece
+of a larger analysis, and can simply be plugged into any other analysis.</p>
+
+<p>We have already <em>used</em>
+methods here. When we call <code class="highlighter-rouge">np.arange</code>, we are using the <code class="highlighter-rouge">arange</code> method in <code class="highlighter-rouge">numpy</code>. 
+Now, we will see how to <em>create</em> a method of our own that performs one specific task we want.
+For example, let us create a very simple method to reproduce the first
+loop we created above:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_simple_loop</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">None</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Already with this simple method, there is a bunch of interesting things going
+on:</p>
+
+<ul>
+  <li>First, note how we define a bit of code is a method, as oposed to plain
+Python: we use <code class="highlighter-rouge">def</code> followed by the name of our function (we have chosen
+<code class="highlighter-rouge">run_simple_loop</code>, but we could have chosen any valid python name.</li>
+  <li>Second, we append <code class="highlighter-rouge">()</code>
+after the name, and finish the line with a colon (<code class="highlighter-rouge">:</code>). This is necessary and
+will allow us to specify requirements for the function (see below).</li>
+  <li>Third,
+realize that everything inside a function needs to be indented. This is a core
+property of Python and, although some people find it odd, it enhances
+readability greatly.</li>
+  <li>Fourth, the piece of code to do the task we want,
+printing the sequence of numbers, is inside the function in the same way it was
+outside, only properly indented. Everything that is indented is considered “within” the method,
+and anything that is not indented will be considered “outside” of the method.</li>
+  <li>Fifth, we finish the method with a <code class="highlighter-rouge">return</code> statement. In this case, we are 
+returning a special value, <code class="highlighter-rouge">None</code>, but this will
+change as methods become more sophisticated. Essentially, this is the part of
+the method where you specify which elements you want it to return and save for
+later use.</li>
+</ul>
+
+<p>Once we have paid attention to these elements, we can see how the
+method can be <em>called</em> and hence the code inside it executed:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">run_simple_loop</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>This is the same way that we called <code class="highlighter-rouge">np.arange</code> before. Note how we do not
+include the colon (<code class="highlighter-rouge">:</code>). Instead, when we call a method, we only use the name of
+the method followed by the parenthesis.</p>
+
+<p>This is a very simple method. It does not interact with the rest of our program.
+We can just execute it without providing any additional information, and the
+code prints what we want it to and returns <code class="highlighter-rouge">None</code>. The rest of this section 
+relaxes these two aspects to allow us to build more complex, 
+but also more useful, methods.</p>
+
+<p>First, methods can take “arguments,” additional information that the method will use. 
+You can specify these arguments when the method is defined. Remember how
+we called <code class="highlighter-rouge">np.arange</code> and provided a number that determined the length of the sequence we
+wanted? We can do the same thing in our own function. The main aspect
+to pay attention to in this context is that the arguments are themselves <em>variables</em>,
+and not values. This is because they are simply names that <em>stand in</em> for whatever
+we will eventually provide to the function.</p>
+
+<p>For example, we can modify our method:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_simple_loopX</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">None</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>We have replaced the fixed length of the sequence (10) by a variable named <code class="highlighter-rouge">x</code>
+that allows us to specify <em>any value we want</em> when we call the method:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">run_simple_loopX</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0
+1
+2
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">run_simple_loopX</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0
+1
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>Another way you can build more flexibility into a method is by allowing it to
+return an output directly, instead of returning <code class="highlighter-rouge">None</code>. In the previous examples, our function
+performs a computation (i.e. printing values on the screen), but it does not
+return any value. This is in contrast with, for example, <code class="highlighter-rouge">np.arange</code> which does
+return an output, the sequence of values:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Our function does not save anything:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">b</span> <span class="o">=</span> <span class="n">run_simple_loopX</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0
+1
+2
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">b</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>We can modify this using the last line of a method. For example, let us assume
+we want to return a sequence as long as the series of numbers we print on the
+screen. One way to do this would be:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_simple_loopXout</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Note that the main difference now is that instead of returning <code class="highlighter-rouge">None</code>, we return
+the sequence we used in the <code class="highlighter-rouge">for</code> loop. We could be even more efficient, though,
+by assigning the sequence to a new object <em>inside of the method</em>, and using it first 
+in the loop and then returning it. The results are exactly the same, but there are less computations
+performed, since we only build the sequence one time. More critically, 
+we minimize the chances of making mistakes by referring to the same object every time:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_simple_loopXout</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">seq</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Either of these two new versions of the method return an output:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="n">run_simple_loopX</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">run_simple_loopXout</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0
+1
+2
+0
+1
+2
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">b</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([0, 1, 2])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>The advantage of methods, as oposed to straight code, is that they force us to
+think in a modular way, helping us identify the small components of what what we 
+are doing in our analysis overall.  Encapsulating these little atoms of
+functionality inside of methods allows us to write this functionality one time and
+use them everywhere. This code reuse saves us time and headaches in the long run.</p>
+
+<p>One final note on methods. It is important that, whenever you create a method,
+you include some documentation about what arguments it requires, what the method
+does more generally, and what values it returns. This is called the <em>docstring</em> 
+of a function, and it looks like one big quote that comes immediately following the 
+<code class="highlighter-rouge">def</code> statement. Although there are many ways formatting a docstring, one common format
+is:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">run_simple_loopXout</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="s">"""
+    Print out the values of a sequence of certain length
+    ...
+    
+    Arguments
+    ---------
+    x     : int
+            Length of the sequence to be printed out
+    
+    Returns
+    -------
+    seq   : np.array
+            Sequence of values printed out
+    """</span>
+    <span class="n">seq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">seq</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Docstrings, like other strings, is colored red in the notebook by default. Let us have
+a look at the structure and components of a well-made docstring:</p>
+
+<ul>
+  <li>It is encapsulated between triple commas (<code class="highlighter-rouge">"""</code>).</li>
+  <li>It begins with
+a short description of what the method does. The shorter the better, the more
+concise, the even better.</li>
+  <li>There is a section called “Arguments” that lists each
+element that the function expects.</li>
+  <li>Each argument is then listed, followed by
+its type. In this case it is an object <code class="highlighter-rouge">x</code> that, as we are told, needs to be an
+integer.</li>
+  <li>The arguments are followed by another section that specifies what the
+function returns, and of what type the output is.</li>
+</ul>
+
+<p>Docstrings are
+very useful to remember what a function does. They also to force you to
+write clearer code. A bonus is that, if you include documentation in this way,
+it can be checked with the standard <code class="highlighter-rouge">help</code> or <code class="highlighter-rouge">?</code> systems reviewed above:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">run_simple_loopXout</span><span class="err">?</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[0;31mSignature:[0m [0mrun_simple_loopXout[0m[0;34m([0m[0mx[0m[0;34m)[0m[0;34m[0m[0m
+[0;31mDocstring:[0m
+Print out the values of a sequence of certain length
+...
+
+Arguments
+---------
+x     : int
+        Length of the sequence to be printed out
+
+Returns
+-------
+seq   : np.array
+        Sequence of values printed out
+[0;31mFile:[0m      ~/Dropbox/g/gds/gdsbook/src/&lt;ipython-input-59-711822c9b574&gt;
+[0;31mType:[0m      function
+
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">help</span><span class="p">(</span><span class="n">run_simple_loopXout</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Help on function run_simple_loopXout in module __main__:
+
+run_simple_loopXout(x)
+    Print out the values of a sequence of certain length
+    ...
+    
+    Arguments
+    ---------
+    x     : int
+            Length of the sequence to be printed out
+    
+    Returns
+    -------
+    seq   : np.array
+            Sequence of values printed out
+
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<h3 id="exercise-to-work-on-your-own-1">Exercise to work on your own</h3>
+
+<p>Write a properly documented function that:</p>
+
+<ol>
+  <li>Has a single argument, an integer.</li>
+  <li>Creates a sequence of that length and an empty dictionary.</li>
+  <li>Then, loops over that sequence and</li>
+  <li>checks if each number is even or odd (Hint: <code class="highlighter-rouge">number % 2</code> will be <code class="highlighter-rouge">1</code> when <code class="highlighter-rouge">number</code> is odd, but zero when <code class="highlighter-rouge">number</code> is even.)</li>
+  <li>If the number is even, it should be stored in the dictionary as a key, with a value of “even”</li>
+  <li>If the number is odd, it should be stored in the dictionary as a key, with a value of “odd.”</li>
+  <li>Returns the now-filled dictionary.</li>
+</ol>
+
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
+
+
+              <nav class="c-page__nav">
+  
+    
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/intro_part_i">
+      〈 <span class="u-margin-right-tiny"></span> Part I - Building Blocks
+    </a>
+  
+
+  
+    
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/notebooks/02_spatial_data">
+      Spatial Data <span class="u-margin-right-tiny"></span> 〉
+    </a>
+  
+</nav>
+
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  </body>
+</html>

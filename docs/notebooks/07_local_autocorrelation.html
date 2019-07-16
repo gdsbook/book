@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,minimum-scale=1">
+
+  <title>Local Spatial Autocorrelation</title>
+  <meta name="description" content="Local Spatial Autocorrelation">
+
+  <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/07_local_autocorrelation.html">
+  <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
+
+  <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/07_local_autocorrelation.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Local Spatial Autocorrelation" />
+<meta property="og:description" content="Local Spatial Autocorrelation" />
+<meta property="og:image"       content="" />
+
+
+  <script type="application/ld+json">
+  {
+  "@context": "http://schema.org",
+  "@type": "NewsArticle",
+  "mainEntityOfPage":
+    "https://gdsbook.github.io/geographic-data-science/notebooks/07_local_autocorrelation.html",
+  "headline":
+    "Local Spatial Autocorrelation",
+  "datePublished":
+    "2019-07-16T20:45:30+00:00",
+  "dateModified":
+    "2019-07-16T20:45:30+00:00",
+  "description":
+    "Local Spatial Autocorrelation",
+  "author": {
+    "@type": "Person",
+    "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Data 100 at UC Berkeley",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://gdsbook.github.io/geographic-data-science",
+      "width": 60,
+      "height": 60
+    }
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://gdsbook.github.io/geographic-data-science",
+    "height": 60,
+    "width": 60
+  }
+}
+
+  </script>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css ">
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+
+  <!-- <link rel="manifest" href="/manifest.json"> -->
+  <!-- <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#efae0a"> -->
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <meta name="theme-color" content="#233947">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/x-icon" href="/images/logo/favicon.ico">
+
+  <!-- MathJax Config -->
+  <!-- Allow inline math using $ and automatically break long math lines -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    CommonHTML: {
+        linebreaks: {
+            automatic: true,
+        },
+    },
+});
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_CHTML' async></script>
+
+  <!-- DOM updating function -->
+  <script>
+const runWhenDOMLoaded = cb => {
+  if (document.readyState != 'loading') {
+    cb()
+  } else if (document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', cb)
+  } else {
+    document.attachEvent('onreadystatechange', function() {
+      if (document.readyState == 'complete') cb()
+    })
+  }
+}
+
+// Helper function to init things quickly
+initFunction = function(myfunc) {
+  runWhenDOMLoaded(myfunc);
+  document.addEventListener('turbolinks:load', myfunc);
+};
+</script>
+
+  <!-- Define some javascript variables that will be useful in other javascript -->
+  <script>
+    const site_basename = '';
+  </script>
+
+  <!-- Add AnchorJS to let headers be linked -->
+  <script src="/assets/js/anchor.min.js"  type="text/javascript"></script>
+  <script>
+
+initFunction(function () {
+    anchors.add("main h1, main h2, main h3, main h4")
+});
+
+</script>
+
+  <!-- Include Turbolinks to make page loads fast -->
+  <!-- https://github.com/turbolinks/turbolinks -->
+  <script src="/assets/js/turbolinks.js" async></script>
+  <meta name="turbolinks-cache-control" content="no-cache">
+
+  <!-- Load nbinteract for widgets -->
+  
+
+  <!-- Load Thebelab for interactive widgets -->
+  <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+<!-- Display Thebelab button in each code cell -->
+<script>
+/**
+ * Set up thebelab button for code blocks
+ */
+
+const thebelabCellButton = id =>
+  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
+    <img src="/assets/images/edit-button.svg" alt="Start interactive mode">
+  </a>`
+
+
+const addThebelabButtonToCodeCells =  () => {
+
+  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("thebelab-cell-button-" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
+    }
+  })
+}
+
+initFunction(addThebelabButtonToCodeCells);
+</script>
+
+
+
+<script type="text/x-thebe-config">
+    {
+      requestKernel: true,
+      binderOptions: {
+        repo: 'gdsbook/geographic-data-science',
+        ref: 'master',
+      },
+      codeMirrorConfig: {
+        theme: ""
+      },
+      kernelOptions: {
+        name: 'ana',
+      }
+    }
+</script>
+<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
+<script>
+    /**
+     * Add attributes to Thebelab blocks
+     */
+
+    const initThebelab = () => {
+        const addThebelabToCodeCells = () => {
+            console.log("Adding thebelab to code cells...");
+            // If Thebelab hasn't loaded, wait a bit and try again. This
+            // happens because we load ClipboardJS asynchronously.
+            if (window.thebelab === undefined) {
+                setTimeout(addThebelabToCodeCells, 250)
+            return
+            }
+
+            // If we already detect a Thebelab cell, don't re-run
+            if (document.querySelectorAll('div.thebelab-cell').length > 0) {
+                return;
+            }
+
+            // Find all code cells, replace with Thebelab interactive code cells
+            const codeCells = document.querySelectorAll('.input_area pre')
+            codeCells.forEach((codeCell, index) => {
+                const id = codeCellId(index)
+                codeCell.setAttribute('data-executable', 'true')
+
+                // Figure out the language it uses and add this too
+                var parentDiv = codeCell.parentElement.parentElement;
+                var arrayLength = parentDiv.classList.length;
+                for (var ii = 0; ii < arrayLength; ii++) {
+                    var parts = parentDiv.classList[ii].split('language-');
+                    if (parts.length === 2) {
+                        // If found, assign dataLanguage and break the loop
+                        var dataLanguage = parts[1];
+                        break;
+                    }
+                }
+                codeCell.setAttribute('data-language', dataLanguage)
+
+                // If the code cell is hidden, show it
+                var inputCheckbox = document.querySelector(`input#hidebtn${codeCell.id}`);
+                if (inputCheckbox !== null) {
+                    setCodeCellVisibility(inputCheckbox, 'visible');
+                }
+            });
+
+            // Remove the event listener from the page so keyboard press doesn't
+            // Change page
+            document.removeEventListener('keydown', initPageNav)
+            keyboardListener = false;
+
+            // Init thebelab
+            thebelab.bootstrap();
+
+            // Remove copy buttons since they won't work anymore
+            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
+            copyAndThebeButtons.forEach((button, index) => {
+                button.remove();
+            });
+
+            // Remove outputs since they'll be stale
+            const outputs = document.querySelectorAll('.output *, .output')
+            outputs.forEach((output, index) => {
+                output.remove();
+            });
+        }
+
+        // Add event listener for the function to modify code cells
+        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
+        thebelabButtons.forEach((thebelabButton,index) => {
+            if (thebelabButton === null) {
+                setTimeout(initThebelab, 250)
+                return
+            };
+            thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        });
+    }
+
+    // Initialize Thebelab
+    initFunction(initThebelab);
+</script>
+
+
+
+  <!-- Load the auto-generating TOC -->
+  <script src="/assets/js/tocbot.min.js"  type="text/javascript"></script>
+  <script>
+var initToc = function () {
+  tocbot.init({
+    tocSelector: 'nav.onthispage',
+    contentSelector: '.c-textbook__content',
+    headingSelector: 'h2, h3',
+    orderedList: false,
+    collapseDepth: 6,
+    listClass: 'toc__menu',
+    activeListItemClass: "",  // Not using
+    activeLinkClass: "", // Not using
+  });
+  tocbot.refresh();
+}
+initFunction(initToc);
+</script>
+
+  <!-- Google analytics -->
+  <script src="/assets/js/ga.js" async></script>
+
+  <!-- Clipboard copy button -->
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" async></script>
+
+  <!-- Load JS that depends on site variables -->
+  <script>
+/**
+ * Set up copy/paste for code blocks
+ */
+const codeCellId = index => `codecell${index}`
+
+const clipboardButton = id =>
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+    <img src="/assets/images/copy-button.svg" alt="Copy to clipboard">
+  </a>`
+
+// Clears selected text since ClipboardJS will select the text when copying
+const clearSelection = () => {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
+// Changes tooltip text for two seconds, then changes it back
+const temporarilyChangeTooltip = (el, newText) => {
+  const oldText = el.getAttribute('data-tooltip')
+  el.setAttribute('data-tooltip', newText)
+  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
+}
+
+const addCopyButtonToCodeCells = () => {
+  // If ClipboardJS hasn't loaded, wait a bit and try again. This
+  // happens because we load ClipboardJS asynchronously.
+  if (window.ClipboardJS === undefined) {
+    setTimeout(addCopyButtonToCodeCells, 250)
+    return
+  }
+
+  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("copy-button" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
+    }
+  })
+
+  const clipboard = new ClipboardJS('.copybtn')
+  clipboard.on('success', event => {
+    clearSelection()
+    temporarilyChangeTooltip(event.trigger, 'Copied!')
+  })
+
+  clipboard.on('error', event => {
+    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
+  })
+
+  // Get rid of clipboard before the next page visit to avoid memory leak
+  document.addEventListener('turbolinks:before-visit', () =>
+    clipboard.destroy()
+  )
+}
+
+initFunction(addCopyButtonToCodeCells);
+</script>
+
+
+  <!-- Hide cell code -->
+  <script>
+    /**
+    Add buttons to hide code cells
+    */
+
+
+    var setCodeCellVisibility = function (inputField, kind) {
+        // Update the image and class for hidden
+        var id = inputField.getAttribute('data-id');
+        var codeCell = document.querySelector(`#${id} div.highlight`);
+
+        if (kind === "visible") {
+            codeCell.classList.remove('hidden');
+            inputField.checked = true;
+        } else {
+            codeCell.classList.add('hidden');
+            inputField.checked = false;
+        }
+    }
+
+    var toggleCodeCellVisibility = function (event) {
+        // The label is clicked, and now we decide what to do based on the input field's clicked status
+        if (event.target.tagName === "LABEL") {
+            var inputField = event.target.previousElementSibling;
+        } else {
+            // It is the span inside the target
+            var inputField = event.target.parentElement.previousElementSibling;
+        }
+
+        if (inputField.checked === true) {
+            setCodeCellVisibility(inputField, "visible");
+        } else {
+            setCodeCellVisibility(inputField, "hidden");
+        }
+    }
+
+
+    // Button constructor
+    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
+
+    var addHideButton = function () {
+        // If a hide button is already added, don't add another
+        if (document.querySelector('div.hidecode input') !== null) {
+            return;
+        }
+
+        // Find the input cells and add a hide button
+        document.querySelectorAll('div.input_area').forEach(function (item, index) {
+            if (!item.classList.contains("hidecode")) {
+                // Skip the cell if it doesn't have a hidecode class
+                return;
+            }
+
+            const id = codeCellId(index)
+            item.setAttribute('id', id);
+            // Insert the button just inside the end of the next div
+            item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
+
+            // Set up the visibility toggle
+            hideLink = document.querySelector(`#${id} div.highlight + input + label`);
+            hideLink.addEventListener('click', toggleCodeCellVisibility)
+        });
+    }
+
+
+    // Initialize the hide buttos
+    var initHiddenCells = function () {
+        // Add hide buttons to the cells
+        addHideButton();
+
+        // Toggle the code cells that should be hidden
+        document.querySelectorAll('div.hidecode input').forEach(function (item) {
+            setCodeCellVisibility(item, 'hidden');
+            item.checked = true;
+        })
+    }
+
+    initFunction(initHiddenCells);
+
+</script>
+
+  <!-- Load custom website scripts -->
+  <script src="/assets/js/scripts.js" async></script>
+
+  <!-- Load custom user CSS and JS  -->
+  <script src="/assets/custom/custom.js" async></script>
+  <link rel="stylesheet" href="/assets/custom/custom.css">
+
+  <!-- Update interact links w/ REST param, is defined in includes so we can use templates -->
+  
+<script>
+/**
+  * To auto-embed hub URLs in interact links if given in a RESTful fashion
+ */
+
+function getJsonFromUrl(url) {
+  var query = url.split('?');
+  if (query.length < 2) {
+    // No queries so just return false
+    return false;
+  }
+  query = query[1];
+  // Collect REST params into a dictionary
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
+}
+    
+function dict2param(dict) {
+    params = Object.keys(dict).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(dict[k])
+    });
+    return params.join('&')
+}
+
+// Parse a Binder URL, converting it to the string needed for JupyterHub
+function binder2Jupyterhub(url) {
+  newUrl = {};
+  parts = url.split('v2/gh/')[1];
+  // Grab the base repo information
+  repoinfo = parts.split('?')[0];
+  var [org, repo, ref] = repoinfo.split('/');
+  newUrl['repo'] = ['https://github.com', org, repo].join('/');
+  newUrl['branch'] = ref
+  // Grab extra parameters passed
+  params = getJsonFromUrl(url);
+  if (params['filepath'] !== undefined) {
+    newUrl['subPath'] = params['filepath']
+  }
+  return dict2param(newUrl);
+}
+
+// Filter out potentially unsafe characters to prevent xss
+function safeUrl(url)
+{
+   return String(encodeURIComponent(url))
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
+
+function addParamToInternalLinks(hub) {
+  var links = document.querySelectorAll("a").forEach(function(link) {
+    var href = link.href;
+    // If the link is an internal link...
+    if (href.search("https://gdsbook.github.io/geographic-data-science") !== -1 || href.startsWith('/') || href.search("127.0.0.1:") !== -1) {
+      // Assume we're an internal link, add the hub param to it
+      var params = getJsonFromUrl(href);
+      if (params !== false) {
+        // We have REST params, so append a new one
+        params['jupyterhub'] = hub;
+      } else {
+        // Create the REST params
+        params = {'jupyterhub': hub};
+      }
+      // Update the link
+      var newHref = href.split('?')[0] + '?' + dict2param(params);
+      link.setAttribute('href', decodeURIComponent(newHref));
+    }
+  });
+  return false;
+}
+
+
+// Update interact links
+function updateInteractLink() {
+    // hack to make this work since it expects a ? in the URL
+    rest = getJsonFromUrl("?" + location.search.substr(1));
+    jupyterHubUrl = rest['jupyterhub'];
+    var hubType = null;
+    var hubUrl = null;
+    if (jupyterHubUrl !== undefined) {
+      hubType = 'jupyterhub';
+      hubUrl = jupyterHubUrl;
+    }
+
+    if (hubType !== null) {
+      // Sanitize the hubUrl
+      hubUrl = safeUrl(hubUrl);
+
+      // Add HTTP text if omitted
+      if (hubUrl.indexOf('http') < 0) {hubUrl = 'http://' + hubUrl;}
+      var interactButtons = document.querySelectorAll("button.interact-button")
+      var lastButton = interactButtons[interactButtons.length-1];
+      var link = lastButton.parentElement;
+
+      // If we've already run this, skip the link updating
+      if (link.nextElementSibling !== null) {
+        return;
+      }
+
+      // Update the link and add context div
+      var href = link.getAttribute('href');
+      if (lastButton.id === 'interact-button-binder') {
+        // If binder links exist, we need to re-work them for jupyterhub
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // If localhost, assume we're working from a local Jupyter server and remove `/hub`
+          first = [hubUrl, 'git-sync'].join('/')
+        } else {
+          first = [hubUrl, 'hub', 'user-redirect', 'git-sync'].join('/')
+        }
+        href = first + '?' + binder2Jupyterhub(href);
+      } else {
+        // If interact button isn't binderhub, assume it's jupyterhub
+        // If JupyterHub links, we only need to replace the hub url
+        href = href.replace("", hubUrl);
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // Assume we're working from a local Jupyter server and remove `/hub`
+          href = href.replace("/hub/user-redirect", "");
+        }
+      }
+      link.setAttribute('href', decodeURIComponent(href));
+
+      // Add text after interact link saying where we're launching
+      hubUrlNoHttp = decodeURIComponent(hubUrl).replace('http://', '').replace('https://', '');
+      link.insertAdjacentHTML('afterend', '<div class="interact-context">on ' + hubUrlNoHttp + '</div>');
+
+      // Update internal links so we retain the hub url
+      addParamToInternalLinks(hubUrl);
+    }
+}
+
+runWhenDOMLoaded(updateInteractLink)
+document.addEventListener('turbolinks:load', updateInteractLink)
+</script>
+
+
+  <!-- Lunr search code - will only be executed on the /search page -->
+  <script src="/assets/js/lunr/lunr.min.js" type="text/javascript"></script>
+  <script>var initQuery = function() {
+  // See if we have a search box
+  var searchInput = document.querySelector('input#lunr_search');
+  if (searchInput === null) {
+    return;
+  }
+
+  // Function to parse our lunr cache
+  var idx = lunr(function () {
+    this.field('title')
+    this.field('excerpt')
+    this.field('categories')
+    this.field('tags')
+    this.ref('id')
+
+    this.pipeline.remove(lunr.trimmer)
+
+    for (var item in store) {
+      this.add({
+        title: store[item].title,
+        excerpt: store[item].excerpt,
+        categories: store[item].categories,
+        tags: store[item].tags,
+        id: item
+      })
+    }
+  });
+
+  // Run search upon keyup
+  searchInput.addEventListener('keyup', function () {
+    var resultdiv = document.querySelector('#results');
+    var query = document.querySelector("input#lunr_search").value.toLowerCase();
+    var result =
+      idx.query(function (q) {
+        query.split(lunr.tokenizer.separator).forEach(function (term) {
+          q.term(term, { boost: 100 })
+          if(query.lastIndexOf(" ") != query.length-1){
+            q.term(term, {  usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING, boost: 10 })
+          }
+          if (term != ""){
+            q.term(term, {  usePipeline: false, editDistance: 1, boost: 1 })
+          }
+        })
+      });
+
+      // Empty the results div
+      while (resultdiv.firstChild) {
+        resultdiv.removeChild(resultdiv.firstChild);
+      }
+
+    resultdiv.insertAdjacentHTML('afterbegin', '<p class="results__found">'+result.length+' Result(s) found</p>');
+    for (var item in result) {
+      var ref = result[item].ref;
+      if(store[ref].teaser){
+        var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<div class="archive__item-teaser">'+
+                '<img src="'+store[ref].teaser+'" alt="">'+
+              '</div>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      else{
+    	  var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      resultdiv.insertAdjacentHTML('beforeend', searchitem);
+    }
+  });
+};
+
+initFunction(initQuery);
+</script>
+</head>
+
+  <body>
+    <!-- .js-show-sidebar shows sidebar by default -->
+    <div id="js-textbook" class="c-textbook js-show-sidebar">
+      
+
+
+
+<nav id="js-sidebar" class="c-textbook__sidebar">
+  <a href="https://github.com/gdsbook/geographic-data-science"><img src="/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
+  <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
+  <ul class="c-sidebar__chapters">
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro.html"
+        >
+          
+          Home
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+        <li class="c-sidebar__chapter"><a class="c-sidebar__entry" href="/search.html">Search</a></li>
+        
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/notebooks/00_toc.html"
+        >
+          
+          Table of Contents
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/01_geospatial_computational_environment.html"
+                >
+                  
+                  Geospatial Computational Environment
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/02_spatial_data.html"
+                >
+                  
+                  Spatial Data
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/03_spatial_data_processing.html"
+                >
+                  
+                  Spatial Data Processing
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/04_spatial_weights.html"
+                >
+                  
+                  Spatial Weights
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/05_choropleth.html"
+                >
+                  
+                  Choropleth Mapping
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/06_spatial_autocorrelation.html"
+                >
+                  
+                  Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry c-sidebar__entry--active"
+                  href="/notebooks/07_local_autocorrelation.html"
+                >
+                  
+                  Local Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/08_point_pattern_analysis.html"
+                >
+                  
+                  Point Pattern Analysis
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/09_spatial_inequality.html"
+                >
+                  
+                  Spatial Inequality
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/10_clustering_and_regionalization.html"
+                >
+                  
+                  Clustering & Regionalization
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/11_regression.html"
+                >
+                  
+                  Regression
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/12_feature_engineering.html"
+                >
+                  
+                  Spatial Feature Engineering
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+  </ul>
+  <p class="sidebar_footer">Powered by <a href="https://github.com/jupyter/jupyter-book">Jupyter Book</a></p>
+</nav>
+
+      
+      <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+      <aside class="sidebar__right">
+          <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
+          <nav class="onthispage">
+          </nav>
+      </aside>
+      
+      <main class="c-textbook__page" tabindex="-1">
+          <div class="o-wrapper">
+            <div class="c-sidebar-toggle">
+  <!-- We show the sidebar by default so we use .is-active -->
+  <button
+    id="js-sidebar-toggle"
+    class="hamburger hamburger--arrowalt is-active"
+  >
+    <span class="hamburger-box">
+      <span class="hamburger-inner"></span>
+    </span>
+    <span class="c-sidebar-toggle__label">Toggle Sidebar</span>
+  </button>
+</div>
+
+            
+<div class="buttons">
+
+<button id="interact-button-thebelab" class="interact-button">Thebelab</button>
+
+
+
+
+
+
+
+
+
+<a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?urlpath=lab/tree/content%2Fnotebooks%2F07_local_autocorrelation.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
+
+
+</div>
+
+
+            <div class="c-textbook__content">
+              <h1 id="local-spatial-autocorrelation">Local Spatial Autocorrelation</h1>
+
+<p>In the previous chapter we explored the use of global measures of spatial autocorrelation to ask the question of whether the overall spatial distribution of our attribute of interest was reflective of a geographically random process, or not. These statistics are useful as the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. In these cases formal modeling of the spatial dimensions of the processes should next be carried out. On the other hand, spatial autocorrelation can sometimes arise from data processing operations in which cases the dependence is a form of non-random noise rather than due to substantive processes. Irrespective of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical anaylsis.</p>
+
+<p>For these reasons the ability to determine whether  spatial autocorrelation is present in a geographically referenced data set is a critical component of the spatial data science toolbox. That said, the global measures of spatial autocorrelation are “whole map” statistics, meaning that the single statistic pertains to the complete data set. In other words, global autocorrelation statistics allow us to detect <em>clustering</em> in a geographically referenced dataset. For example,
+Moran’s I is good tool to summarize a dataset into a single value that informs about its degree of geographical clustering. However, it is not an appropriate measure to identify areas within the map where specific types of values (e.g. high, low) are located. In other words, Moran’s I can tell us values are clustered overall, but it will not inform us about where the <em>clusters</em> are. For that purpose, we need to use a local measure of spatial autocorrelation. Local measures consider each single observation and operate on them, as oposed to on the overall dataset, as global measures do. Because of that, they are not good at summarizing a map, but they allow to obtain further insights about interesting geographical subsets of the data. In this chapter, we consider Local Indicators of Spatial Association (LISAs), a local counter-part of global measures like Moran’s I.</p>
+
+<h2 id="an-empirical-illustration-the-eu-referendum">An empirical illustration: the EU Referendum</h2>
+
+<p>We continue with the same dataset we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Display graphics within the notebook</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>  <span class="c"># Graphics</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span>
+<span class="kn">import</span> <span class="nn">seaborn</span>            <span class="c"># Graphics</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>        <span class="c"># Spatial data manipulation</span>
+<span class="kn">import</span> <span class="nn">pandas</span>              <span class="c"># Tabular data manipulation</span>
+<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>               <span class="c"># Spatial analytics</span>
+<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
+<span class="kn">import</span> <span class="nn">contextily</span>        <span class="c"># Background tiles</span>
+<span class="c"># Stamen Terrain Background tiles</span>
+<span class="kn">from</span> <span class="nn">contextily.tile_providers</span> <span class="kn">import</span> <span class="n">ST_TERRAIN_BACKGROUND</span>
+<span class="kn">import</span> <span class="nn">bookdata</span>
+<span class="kn">from</span> <span class="nn">booktools</span> <span class="kn">import</span> <span class="n">choropleth</span>
+
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">brexit</span><span class="p">(),</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'Area_Code'</span><span class="p">)</span>
+<span class="n">ref</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+Index: 382 entries, E06000031 to E08000036
+Data columns (total 20 columns):
+id                         382 non-null int64
+Region_Code                382 non-null object
+Region                     382 non-null object
+Area                       382 non-null object
+Electorate                 382 non-null int64
+ExpectedBallots            382 non-null int64
+VerifiedBallotPapers       382 non-null int64
+Pct_Turnout                382 non-null float64
+Votes_Cast                 382 non-null int64
+Valid_Votes                382 non-null int64
+Remain                     382 non-null int64
+Leave                      382 non-null int64
+Rejected_Ballots           382 non-null int64
+No_official_mark           382 non-null int64
+Voting_for_both_answers    382 non-null int64
+Writing_or_mark            382 non-null int64
+Unmarked_or_void           382 non-null int64
+Pct_Remain                 382 non-null float64
+Pct_Leave                  382 non-null float64
+Pct_Rejected               382 non-null float64
+dtypes: float64(4), int64(13), object(3)
+memory usage: 62.7+ KB
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>Now let us bring in the spatial data:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">lads</span><span class="p">())</span>\
+                <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'lad16cd'</span><span class="p">)</span>
+<span class="n">lads</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+Index: 391 entries, E06000001 to W06000023
+Data columns (total 10 columns):
+objectid      391 non-null int64
+lad16nm       391 non-null object
+lad16nmw      22 non-null object
+bng_e         391 non-null int64
+bng_n         391 non-null int64
+long          391 non-null float64
+lat           391 non-null float64
+st_areasha    391 non-null float64
+st_lengths    391 non-null float64
+geometry      391 non-null object
+dtypes: float64(4), int64(3), object(3)
+memory usage: 33.6+ KB
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>And to “trim” the <code class="highlighter-rouge">DataFrame</code> so it only retains what we know we will need:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">lads</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ref</span><span class="p">[[</span><span class="s">'Pct_Leave'</span><span class="p">]]),</span> <span class="n">crs</span><span class="o">=</span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>\
+              <span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>\
+              <span class="p">[[</span><span class="s">'objectid'</span><span class="p">,</span> <span class="s">'lad16nm'</span><span class="p">,</span> <span class="s">'Pct_Leave'</span><span class="p">,</span> <span class="s">'geometry'</span><span class="p">]]</span>\
+              <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+Index: 380 entries, E06000001 to W06000023
+Data columns (total 4 columns):
+objectid     380 non-null int64
+lad16nm      380 non-null object
+Pct_Leave    380 non-null float64
+geometry     380 non-null object
+dtypes: float64(1), int64(1), object(2)
+memory usage: 14.8+ KB
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>Although there are several variables that could be considered, we will focus on <code class="highlighter-rouge">Pct_Leave</code>, which measures the proportion of votes for the Leave alternative. For convenience, let us merge this with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), which will allow us to combine them with contextual tiles.</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'init': 'epsg:4326'}
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Throughout the chapter, we will rely heavily on geovisualizations. To create more useful maps that bring geographical context to the spatial distribution of votes, we will use an image made up of tiles from a web map. Let us first download it on-the-fly. The image will be reused later on in several maps.</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Bounding box of the polygon layer</span>
+<span class="n">we</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">ea</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">total_bounds</span>
+<span class="c"># Download image and extent at zoom 6</span>
+<span class="n">img</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">contextily</span><span class="o">.</span><span class="n">bounds2img</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">ea</span><span class="p">,</span> <span class="n">no</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span>
+                         <span class="n">url</span><span class="o">=</span><span class="n">ST_TERRAIN_BACKGROUND</span><span class="p">)</span>
+<span class="c"># License text</span>
+<span class="n">lic</span> <span class="o">=</span> <span class="p">(</span><span class="s">"Map tiles by Stamen Design, under CC BY 3.0. "</span>\
+               <span class="s">"Data by OpenStreetMap, under ODbL."</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the <code class="highlighter-rouge">alpha</code> attribute) to make the final plot easier to read.</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">choropleth</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s">'Pct_Leave'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'quantiles'</span><span class="p">,</span>
+           <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">ext</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ext</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lic</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_14_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>The final piece we need before we can delve into spatial autocorrelation is the spatial weights matrix. We will use eight nearest neighbors for the sake of comparison with the previous chapter. We also row-standardize the weights:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Generate W from the GeoDataFrame</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="c"># Row-standardization</span>
+<span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s">'R'</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<h3 id="motivating-local-spatial-autocorrelation">Motivating Local Spatial Autocorrelation</h3>
+
+<p>To better understand the underpinning of local autorocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">])</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>And their respective standardized versions, where we substract the average and divide by the standard deviation:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave_std'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>\
+                    <span class="o">/</span> <span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave_std'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>\
+                    <span class="o">/</span> <span class="n">db</span><span class="p">[</span><span class="s">'w_Pct_Leave'</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup the figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="c"># Plot values</span>
+<span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'Pct_Leave_std'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'w_Pct_Leave_std'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="c"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_22_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>Using standardised values allows us to divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: above and below the average. This, in turn, divides a Moran Plot in four quadrants, depending on whether a given area displays a value above the mean (high) or below (low), and how its spatial lag behaves:</p>
+
+<ul>
+  <li>High-high (HH)</li>
+  <li>Low-high (LH)</li>
+  <li>Low-low (LL)</li>
+  <li>High-low (HL)</li>
+</ul>
+
+<p>Graphically, this can be captured as follows:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup the figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="c"># Plot values</span>
+<span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'Pct_Leave_std'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'w_Pct_Leave_std'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="c"># Add vertical and horizontal lines</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="c"># Add text labels for each quadrant</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s">"HH"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="s">"HL"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s">"LH"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="s">"LL"</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="c"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_24_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<h3 id="local-morans-i">Local Moran’s I</h3>
+
+<p>So far we have classified each observation in the dataset depending on its value and that of its neighbors. This is only half way into identifying areas of unusual concentration of values. To know whether each of the locations is a <em>statistically significant</em> cluster of a given kind, we again need to compare it with what we would expect if the data were allocated in a completely random way. After all, by definition, every observation will be of one kind of another, based on the comparison above. However, what we are interested in is whether the strength with which the values are concentrated is unusually high.</p>
+
+<p>This is exactly what LISAs are designed to do. A more detailed description of their statistical underpinnings is beyond the scope in this context, but we will provide some intuition about how they work. The core idea is to identify cases in which the comparison between the value of an observation and the average of its neighbors is either more similar (HH, LL) or dissimilar (HL, LH) than we would expect from pure chance. The mechanism to do this is similar to the one in the global Moran’s I, but applied in this case to each observation, resulting then in as many statistics as original observations. The formal representation of the statistic can be written as:</p>
+
+<script type="math/tex; mode=display">I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_i z_i^2}{n}</script>
+
+<p>where $m_2$ is the second moment (variance) of the distribution of values in the data, $z_i = y_i - \bar{y}$, $w_{i,j}$ is the spatial weight for the pair of observations $i$ and $j$, and $n$ is the number of observations.</p>
+
+<p>LISAs are widely used in many fields to identify clusters of values in space. They are a very useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For that, they have a prime place in the exploratory toolbox. Examples of contexts where LISAs can be useful include: identification of spatial clusters of poverty in regions, detection of ethnic enclaves, delineation of areas of particularly high/low activity of any phenomenon, etc.</p>
+
+<p><strong>We should come up with a consistent citation and bibliography scheme. When do we cite, when do we not cite, and when we do, how?</strong></p>
+
+<p>In Python, we can calculate LISAs in a very streamlined way thanks to <code class="highlighter-rouge">PySAL</code>:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lisa</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>All we need to pass is the variable of interest -proportion of Leave votes in this context- and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a lisa object that has a number of attibutes of interest. The local indicators themselves are in the <code class="highlighter-rouge">Is</code> attribute and we can get a sense of their distribution using seaborn:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">seaborn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">Is</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f1395ef2710&gt;
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_30_1.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>This reveals a rather skewed distribution due to the dominance of the positive forms of spatial association. Here it is important to keep in mind that the high positive values arise from value simularity in space, and this can be due to either high values being next to high values <em>or</em> low values next to low values. The local $I_i$ values themselves cannot distinguish between these two.</p>
+
+<p>The values in the left tail of the density represent locations displaying negative spatial association. There are also two forms, a high value surrounded by low values, or a low value surrounded by high valued neighboring observations. And, again, the  $I_i$ value cannot distinguish between the two cases.</p>
+
+<p>Because of their very nature, looking at the numerical result of LISAs is not always the most useful way to exploit all the information they can provide. Remember we are calculating a statistic for every single observation in the data so, if we have many of them, it will be difficult to extract any meaningful pattern. In this context, a choropleth can help. At first glance, this may seem to suggest that a map of the $I_i$  values would be a useful way to visualize the spatial distribution:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'Is'</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">Is</span>
+<span class="n">choropleth</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s">'Is'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'quantiles'</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">);</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_33_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>However, this does not inform us in any way about what type of spatial correlation each area is experiencing. For example, are the yellow areas in Scotland similar to those in the East cluster of high values too? Also, we know that values around zero will not be statistically significant. Which ones are thus significant and non-significant from a statistical point of view? In other words, which ones can be considered statistical clusters and which ones noise? To answer these questions, we need to bring in additional information that we have obtained when calculating the LISA statistics. Let us first build a four-plot figure that brings all these different perspectives together:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axes</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="c"># Make the axes accessible with single indexing</span>
+<span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+                    <span class="c"># Subplot 1 #</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">choropleth</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s">'Is'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'quantiles'</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+                    <span class="c"># Subplot 2 #</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">q_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Q1'</span><span class="p">,</span> <span class="s">'Q2'</span><span class="p">,</span> <span class="s">'Q3'</span><span class="p">,</span> <span class="s">'Q4'</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">q_labels</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">]</span>
+<span class="n">hmap</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">([</span> <span class="s">'red'</span><span class="p">,</span> <span class="s">'lightblue'</span><span class="p">,</span> <span class="s">'blue'</span><span class="p">,</span> <span class="s">'pink'</span><span class="p">])</span>
+<span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">cl</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'cl'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> \
+        <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">hmap</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> \
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+                    <span class="c"># Subplot 3 #</span>
+
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">hmap</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">([</span><span class="s">'grey'</span><span class="p">,</span><span class="s">'black'</span><span class="p">])</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">'non-sig.'</span><span class="p">,</span> <span class="s">'significant'</span><span class="p">]</span> 
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sig</span><span class="p">]</span>
+<span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">cl</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'cl'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> \
+        <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">hmap</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> \
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+                            
+                    <span class="c"># Subplot 4 #</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">hotspot</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">coldspot</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">doughnut</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">diamond</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">spots</span> <span class="o">=</span> <span class="n">hotspot</span> <span class="o">+</span> <span class="n">coldspot</span> <span class="o">+</span> <span class="n">doughnut</span> <span class="o">+</span> <span class="n">diamond</span>
+<span class="n">spot_labels</span> <span class="o">=</span> <span class="p">[</span> <span class="s">'0 ns'</span><span class="p">,</span> <span class="s">'1 hot spot'</span><span class="p">,</span> <span class="s">'2 doughnut'</span><span class="p">,</span> <span class="s">'3 cold spot'</span><span class="p">,</span> <span class="s">'4 diamond'</span><span class="p">]</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">spot_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">spots</span><span class="p">]</span>
+<span class="n">hmap</span> <span class="o">=</span> <span class="n">colors</span><span class="o">.</span><span class="n">ListedColormap</span><span class="p">([</span> <span class="s">'grey'</span><span class="p">,</span> <span class="s">'red'</span><span class="p">,</span> <span class="s">'lightblue'</span><span class="p">,</span> <span class="s">'blue'</span><span class="p">,</span> <span class="s">'pink'</span><span class="p">])</span>
+
+
+<span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">cl</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'cl'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> \
+        <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">hmap</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> \
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s">'white'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+
+<span class="c"># Display the figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_35_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>The figure in the upper-left replicates our first map above. The green and yellow locations have the largest values for the local statistics, yet this does not distinguish between positive association of low support for the Brexit vote and positive association of high support for Brexit.</p>
+
+<p>To distinguish between these two cases, the map in the upper-right shows the location of the LISA statistic in the quadrant of the Moran Scatter plot, which is recorded in the <code class="highlighter-rouge">q</code> attribute:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([1, 1, 1, 1, 1, 1, 4, 1, 4, 1])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>The correspondence between the numbers in the <code class="highlighter-rouge">q</code> attribute and the actual quadrants is as follows:</p>
+
+<ul>
+  <li>1: HH</li>
+  <li>2: LH</li>
+  <li>3: LL</li>
+  <li>4: HL</li>
+</ul>
+
+<p>Comparing the two maps in the top row reveals that the positive association in the north is due to low support for the Brexit vote, while the positive association in the south is of the high-support for Brexit. Overall, we can obtain counts of areas in each quadrant:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">counts</span> <span class="o">=</span> <span class="p">[(</span><span class="n">j</span><span class="p">,(</span><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="n">j</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">)]</span>
+<span class="n">counts</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[(1, 181), (2, 51), (3, 112), (4, 36)]
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>Showing that the high-high (1), and low-low (3), values are predominant.</p>
+
+<p>Care must be taken, however, in the interpretation of these first two maps, as the underlying statistical signifcance of the local values has not been considered.</p>
+
+<p>Instead, what is typically done is to create a map, a cluster map as it is usually called, that extracts the significant observations (those that are highly unlikely to have come from pure chance) and plots them with a specific color depending on their quadrant category.</p>
+
+<p>All of the needed pieces are contained inside the <code class="highlighter-rouge">lisa</code> object we have created above. But, to make the map making more straightforward, it is convenient to pull them out and insert them in the main data table:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span>
+<span class="n">db</span><span class="p">[</span><span class="s">'p-sim'</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span>
+<span class="n">db</span><span class="p">[</span><span class="s">'sig'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span>
+<span class="n">db</span><span class="p">[[</span><span class="s">'sig'</span><span class="p">,</span><span class="s">'p-sim'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sig</th>
+      <th>p-sim</th>
+    </tr>
+    <tr>
+      <th>lad16cd</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>E06000001</th>
+      <td>1</td>
+      <td>0.010</td>
+    </tr>
+    <tr>
+      <th>E06000002</th>
+      <td>1</td>
+      <td>0.015</td>
+    </tr>
+    <tr>
+      <th>E06000003</th>
+      <td>1</td>
+      <td>0.011</td>
+    </tr>
+    <tr>
+      <th>E06000004</th>
+      <td>1</td>
+      <td>0.014</td>
+    </tr>
+    <tr>
+      <th>E06000010</th>
+      <td>1</td>
+      <td>0.019</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[[</span><span class="s">'sig'</span><span class="p">,</span><span class="s">'p-sim'</span><span class="p">]]</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sig</th>
+      <th>p-sim</th>
+    </tr>
+    <tr>
+      <th>lad16cd</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>W06000018</th>
+      <td>0</td>
+      <td>0.490</td>
+    </tr>
+    <tr>
+      <th>W06000019</th>
+      <td>0</td>
+      <td>0.462</td>
+    </tr>
+    <tr>
+      <th>W06000021</th>
+      <td>0</td>
+      <td>0.295</td>
+    </tr>
+    <tr>
+      <th>W06000022</th>
+      <td>0</td>
+      <td>0.359</td>
+    </tr>
+    <tr>
+      <th>W06000023</th>
+      <td>0</td>
+      <td>0.306</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Thus, the first five values are statistically significant, while the last five observations are not.</p>
+
+<p>Let us stop for second on these two steps. First, the <code class="highlighter-rouge">significant</code> column. Similarly as with global Moran’s I, <code class="highlighter-rouge">PySAL</code> is automatically computing a p-value for each LISA. Because not every observation represents a statistically significant one, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar situation from pure chance. Following a similar reasoning as with global Moran’s I, we select 5% as the threshold for statistical significance. To identify these values, we create a variable, <code class="highlighter-rouge">significant</code>, that contains <code class="highlighter-rouge">True</code> if the p-value of the observation satisfies the condition, and <code class="highlighter-rouge">False</code> otherwise. We can check this is the case:</p>
+
+<p>Next we consider the <code class="highlighter-rouge">q</code> attribute signifying what quadrant the local value is, but now mask these values using are newly created signficance indicator:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">hotspot</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">coldspot</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">doughnut</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">diamond</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">sig</span> <span class="o">*</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="o">==</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">spots</span> <span class="o">=</span> <span class="n">hotspot</span> <span class="o">+</span> <span class="n">coldspot</span> <span class="o">+</span> <span class="n">doughnut</span> <span class="o">+</span> <span class="n">diamond</span>
+<span class="n">spot_labels</span> <span class="o">=</span> <span class="p">[</span> <span class="s">'0 ns'</span><span class="p">,</span> <span class="s">'1 hot spot'</span><span class="p">,</span> <span class="s">'2 doughnut'</span><span class="p">,</span> <span class="s">'3 cold spot'</span><span class="p">,</span> <span class="s">'4 diamond'</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>We also give descriptive labels to the five cases, where the locations with non-significant p-values for the LISAs are labeled as <code class="highlighter-rouge">ns</code>. Positive forms of local spatial autocorrelation are of two types: significant HH clustering, or so called ‘hot spot’s, or significant clustering of LL values, or ‘cold spot’s. Locations with significant, but negative, local autocorrelation are either ‘doughnut’s where a low value is neighbored by locations with high support for Brexit, or ‘diamonds in the rough’ where a high value is surrounded by low values.</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'labels'</span><span class="p">]</span> <span class="o">=</span> <span class="n">labels</span>
+<span class="p">[(</span><span class="n">spot_label</span><span class="p">,</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'labels'</span><span class="p">]</span><span class="o">==</span><span class="n">spot_label</span><span class="p">)</span><span class="o">.</span><span class="nb">sum</span><span class="p">())</span> <span class="k">for</span> <span class="n">spot_label</span> <span class="ow">in</span> <span class="n">spot_labels</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[('0 ns', 225),
+ ('1 hot spot', 77),
+ ('2 doughnut', 5),
+ ('3 cold spot', 69),
+ ('4 diamond', 4)]
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>The final cluster map in the lower right above displays the output of the LISA statistics for the percentage of Leave votes in English, Welsh and Scottish local authorities. In bright red, we find those with an unusual concentration of high Leave proportions surrounded also by high Leave results. This corresponds with areas in the East and center of the map. In light red, we find the first type of spatial outliers: areas that still voted to Leave in high proportions, despite being surrounded by areas with more modest support for Leave. These correspond with some of the peripheral areas of London and and adjacent to Oxford. In darker blue we can see the spatial clusters of low support for the Leave campaign, which include London, Oxford and most of Scotland. Finally, in light blue we find the other type of spatial outlier: areas with lower percentages of Leave votes nearby areas of high concentration of supporters for Leave.</p>
+
+<h3 id="other-local-indices">Other local indices</h3>
+
+<p>Similar to the global case, there are more local indicators of spatial correlation than the local Moran’s I. <code class="highlighter-rouge">PySAL</code> includes Getis and Ord’s $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Gi</span>
+<span class="n">gostats</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+<span class="c"># Gi*</span>
+<span class="n">gostars</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Pct_Leave'</span><span class="p">],</span> <span class="n">w</span><span class="p">,</span> <span class="n">star</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>As the local statistics they are, it is best to explore them by plotting them on a map. Unlike with LISA though, the $G$ statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.</p>
+
+<p>In this case, let us write a little function that generates the map so we can then easily use it to generate two maps, one for $G_i$ and one for $G_i^*$:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">geog</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+    <span class="s">'''
+    Create a cluster map
+    ...
+    
+    Arguments
+    ---------
+    g      : G_Local
+             Object from the computation of the G statistic
+    geog   : GeoDataFrame
+             Table aligned with values in `g` and containing 
+             the geometries to plot
+    img    : ndarray
+             Image for background
+    ax     : AxesSubplot
+             `matplotlib` axis to draw the map on
+
+    Returns
+    -------
+    ax     : AxesSubplot
+             Axis with the map drawn
+    '''</span>
+    <span class="n">ec</span> <span class="o">=</span> <span class="s">'0.8'</span>
+    
+    <span class="c"># Break observations into significant or not</span>
+    <span class="n">sig</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span>
+
+    <span class="c"># Plot background map</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+    <span class="c"># Plot non-significant clusters</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sig</span><span class="o">==</span><span class="bp">False</span><span class="p">,</span> <span class="s">'geometry'</span><span class="p">]</span>
+    <span class="n">ns</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'grey'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="c"># Plot HH clusters</span>
+    <span class="n">hh</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">g</span><span class="o">.</span><span class="n">Zs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sig</span><span class="o">==</span><span class="bp">True</span><span class="p">),</span> <span class="s">'geometry'</span><span class="p">]</span>
+    <span class="n">hh</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="c"># Plot LL clusters</span>
+    <span class="n">ll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">g</span><span class="o">.</span><span class="n">Zs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sig</span><span class="o">==</span><span class="bp">True</span><span class="p">),</span> <span class="s">'geometry'</span><span class="p">]</span>
+    <span class="n">ll</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'blue'</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="c"># Style and draw</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="s">''</span>
+    <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">star</span><span class="p">:</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="s">'*'</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'G</span><span class="si">%</span><span class="s">s statistic for Pct of Leave votes'</span><span class="o">%</span><span class="n">st</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ax</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup figure and axes</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="c"># Loop over the two statistics and generate the map</span>
+<span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">gostats</span><span class="p">,</span> <span class="n">gostars</span><span class="p">],</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">img</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
+<span class="c"># Render</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/07_local_autocorrelation_57_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>As you can see, the results are virtually the same for $G_i$ and $G_i^*$. Also, at first glance, these maps appear to be visually similar to the final LISA map from above, and this leads to the question of why use the $G$ statistics at all. The answer to this question is that the two sets of local statistics, Local $I$ and the local $G$, are complementary statistics. This is because the local $I$ by itself cannot distinguish between the two forms of positive spatial association while the G can. At the same time, the G statistic does not consider negative spatial association, while the local I statistic does.</p>
+
+<h1 id="questions">Questions</h1>
+<ol>
+  <li>Do the same Local Moran analysis done for <code class="highlighter-rouge">Pct_Leave</code>, but using <code class="highlighter-rouge">Pct_Turnout</code>. Is there a geography to how involved people were in different places? Where was turnout percentage (relatively) higher or lower?</li>
+  <li>Do the same Getis-Ord analysis done for <code class="highlighter-rouge">Pct_Leave</code>, but using <code class="highlighter-rouge">Pct_Turnout</code>.</li>
+  <li>Local Moran statistics are premised on a few distributional assumptions. One well-recognized concern with Moran statistics is when they are estimated for <em>rates</em>. Rate data is distinct from other kinds of data because it embeds the relationship between two quantities: the event and the population. For instance, in the case of Leave voting, the “event” is a person voting leave, and the “population” could be the number of eligible voters, the number of votes cast, or the total number of people. This usually only poses a problem for analysis when the event outcome is somehow dependent on the population.
+    <ol>
+      <li>Using our past analytical steps, build a new <code class="highlighter-rouge">db</code> dataframe from <code class="highlighter-rouge">ref</code> and <code class="highlighter-rouge">lads</code> that contains the <code class="highlighter-rouge">Electorate</code>, <code class="highlighter-rouge">Votes_Cast</code>, and <code class="highlighter-rouge">Leave</code> columns.
+        <ul>
+          <li>From this new dataframe, make scatterplots of:</li>
+        </ul>
+        <ul>
+          <li>the number of votes cast and the percent leave vote</li>
+          <li>the size of the electorate and the percent of leave vote</li>
+        </ul>
+      </li>
+      <li>Based on your answers to the previous point, does it appear that there is a relationship between the event and the population size? Use <code class="highlighter-rouge">scipy.stats.kendalltau</code> or <code class="highlighter-rouge">scipy.stats.pearsonr</code>  to confirm your visual intuition.
+        <ol>
+          <li>Using <code class="highlighter-rouge">esda.moran.Moran_Rate</code>, estimate a global Moran’s I that takes into account the rate structure of <code class="highlighter-rouge">Pct_Leave</code>, using the <code class="highlighter-rouge">Electorate</code> as the population. Is this estimate different from the one obtained without taking into account the rate structure? What about when <code class="highlighter-rouge">Votes_Cast</code> is used for the population?</li>
+        </ol>
+      </li>
+      <li>Using <code class="highlighter-rouge">esda.moran.Moran_Local_Rate</code>, estimate <em>local</em> Moran’s I treating Leave data as a rate.
+        <ul>
+          <li>does any site’s local I change? Make a scatterplot of the <code class="highlighter-rouge">lisa.Is</code> you estimated before and this new rate-based local Moran.</li>
+          <li>does any site’s local I change their outlier/statistical significance classifications? Use <code class="highlighter-rouge">pandas.crosstab</code> to examine how many classifications change between the two kinds of statistic. Make sure to consider observations’ statistical significances in addition to their quadrant classification.</li>
+        </ul>
+      </li>
+      <li>Make two maps, side by side, of the local statistics without rate correction and with rate correction. Does your interpretation of the maps change depending on the correction?</li>
+    </ol>
+  </li>
+  <li>Local statistics use <em>permutation-based</em> inference for their significance testing. This means that, to test the statistical significance of a local relationship, values of the observed variable are <em>shuffled</em> around the map. These large numbers of <em>random</em> maps are then used to compare against the observed map. Local inference requires some restrictions on how each shuffle occurs, since each observation must be “fixed” and compared to randomly-shuffle neighboring observations. The distribution of local statistics for each “shuffle” is contained in the <code class="highlighter-rouge">.rlisas</code> attribute of a Local Moran object.
+    <ul>
+      <li>For the first observation, make a <code class="highlighter-rouge">seaborn.distplot</code> of its shuffled local statistics. Add a vertical line to the histogram using <code class="highlighter-rouge">plt.axvline()</code>.</li>
+      <li>Do the same for the last observation as well.</li>
+      <li>Looking only at their permutation distributions, do you expect the first LISA statistic to be statistically-significant? Do you expect the last?</li>
+    </ul>
+  </li>
+  <li>LISAs have some amount of fundamental uncertainty due to their estimation. This is called the <code class="highlighter-rouge">standard error</code> of the statistic.
+    <ul>
+      <li>The standard errors are contained in the <code class="highlighter-rouge">.seI_sim</code> attribute. Make a map of the standard errors. Are there any areas of the map that appear to be more uncertain about their local statistics?</li>
+      <li>compute the standard deviation of each observation’s “shuffle” distribution, contained in the <code class="highlighter-rouge">.rlisas</code> attribute. Verify that the standard deviation of this shuffle distribution is the same as the standard errors in <code class="highlighter-rouge">seI_sim</code>.</li>
+    </ul>
+  </li>
+  <li>Local Getis-Ord statistics come in two forms. As discussed above, Getis-Ord $G_i$ statistics <em>omit</em> each site from their own local statistic. In contrast, $G_i^<em>$ statistics *include</em> the site in its own local statistic.
+    <ul>
+      <li>Make a scatterplot of the two types of statistic, contained in <code class="highlighter-rouge">gostats.Zs</code> and <code class="highlighter-rouge">gostars.Zs</code> to examine how similar the two forms of the Getis-Ord statistic are.</li>
+      <li>The two forms of the Getis-Ord statistic differ by their inclusion of the <em>site</em> value, $y_i$, in the value for the $G_i$ statistic at that site. So, make a scatterplot of the percent leave variable and the <em>difference</em> of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using <code class="highlighter-rouge">scipy.stats.kendalltau</code> or <code class="highlighter-rouge">scipy.stats.pearsonr</code>.</li>
+    </ul>
+  </li>
+</ol>
+
+<hr />
+
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
+
+
+              <nav class="c-page__nav">
+  
+    
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/notebooks/06_spatial_autocorrelation">
+      〈 <span class="u-margin-right-tiny"></span> Spatial Autocorrelation
+    </a>
+  
+
+  
+    
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/notebooks/08_point_pattern_analysis">
+      Point Pattern Analysis <span class="u-margin-right-tiny"></span> 〉
+    </a>
+  
+</nav>
+
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  </body>
+</html>

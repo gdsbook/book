@@ -34,6 +34,6 @@ cd host/tmp_book && make build
 echo "Moving build over to docs folder..."
 cd /home/jovyan
 rm -r host/docs
-mv host/tmp_book host/docs
+mv host/tmp_book/_site host/docs
 echo "All done!"
 
