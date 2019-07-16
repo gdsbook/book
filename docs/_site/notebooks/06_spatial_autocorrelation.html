@@ -10,10 +10,10 @@
   <title>Spatial Autocorrelation</title>
   <meta name="description" content="Global Spatial Autocorrelation">
 
-  <link rel="canonical" href="https://gdsbook.github.io//notebooks/06_spatial_autocorrelation.html">
-  <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io//feed.xml">
+  <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/06_spatial_autocorrelation.html">
+  <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
 
-  <meta property="og:url"         content="https://gdsbook.github.io//notebooks/06_spatial_autocorrelation.html" />
+  <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/06_spatial_autocorrelation.html" />
 <meta property="og:type"        content="article" />
 <meta property="og:title"       content="Spatial Autocorrelation" />
 <meta property="og:description" content="Global Spatial Autocorrelation" />
@@ -25,13 +25,13 @@
   "@context": "http://schema.org",
   "@type": "NewsArticle",
   "mainEntityOfPage":
-    "https://gdsbook.github.io//notebooks/06_spatial_autocorrelation.html",
+    "https://gdsbook.github.io/geographic-data-science/notebooks/06_spatial_autocorrelation.html",
   "headline":
     "Spatial Autocorrelation",
   "datePublished":
-    "2019-07-16T14:07:08+00:00",
+    "2019-07-16T20:27:28+00:00",
   "dateModified":
-    "2019-07-16T14:07:08+00:00",
+    "2019-07-16T20:27:28+00:00",
   "description":
     "Global Spatial Autocorrelation",
   "author": {
@@ -43,14 +43,14 @@
     "name": "Data 100 at UC Berkeley",
     "logo": {
       "@type": "ImageObject",
-      "url": "https://gdsbook.github.io/",
+      "url": "https://gdsbook.github.io/geographic-data-science",
       "width": 60,
       "height": 60
     }
   },
   "image": {
     "@type": "ImageObject",
-    "url": "https://gdsbook.github.io/",
+    "url": "https://gdsbook.github.io/geographic-data-science",
     "height": 60,
     "width": 60
   }
@@ -515,7 +515,7 @@ function addParamToInternalLinks(hub) {
   var links = document.querySelectorAll("a").forEach(function(link) {
     var href = link.href;
     // If the link is an internal link...
-    if (href.search("https://gdsbook.github.io/") !== -1 || href.startsWith('/') || href.search("127.0.0.1:") !== -1) {
+    if (href.search("https://gdsbook.github.io/geographic-data-science") !== -1 || href.startsWith('/') || href.search("127.0.0.1:") !== -1) {
       // Assume we're an internal link, add the hub param to it
       var params = getJsonFromUrl(href);
       if (params !== false) {
@@ -2087,6 +2087,68 @@ memory usage: 14.8+ KB
 <p>Moran, P. A. (1950). Notes on continuous stochastic phenomena. Biometrika, 37(1/2), 17-23.</p>
 
 <p>Tukey, J. W. (1977). Exploratory data analysis (Vol. 2).</p>
+
+<h2 id="questions">Questions</h2>
+
+<ol>
+  <li>Return to the original <code class="highlighter-rouge">ref</code> table and pull out the <code class="highlighter-rouge">Pct_Rejected</code>
+variable. Let us explore patterns in rejected votes:
+    <ul>
+      <li>Create a choropleth displaying its spatial distribution</li>
+      <li>Build a spatial weights matrix with 8 nearest neighbors for the Local
+Authorities</li>
+      <li>Create a Moran Scatter Plot</li>
+      <li>Calculate Moran’s I</li>
+      <li>Interpret what you find through this Moran’s analysis. What do we learn
+about the geography of vote rejection?</li>
+    </ul>
+  </li>
+  <li>Sometimes referendums require more than 50% to make the change they ask
+about. Let us imagine the EU referendum required 60% to succeed on leaving
+the EU.
+    <ul>
+      <li>Use <code class="highlighter-rouge">Pct_Leave</code> to create a binary variable that takes a value of 1 if
+the percentage was larger than 60, 0 otherwise.</li>
+      <li>Create a choropleth with the newly created variable. Are there any
+differences in the geographical pattern of the vote to leave the EU?</li>
+      <li>Re-compute the Join Counts statistic for this new variable. What can we
+conclude? Are there any notable changes in the extent to which “Leave”
+votes were distributed spatially?</li>
+    </ul>
+  </li>
+  <li>Let us explore the effect of different weights matrices by returning to the
+global analysis we performed for the <code class="highlighter-rouge">Leave</code> variable.
+    <ul>
+      <li>Create two additional KNN weights to those already built, one with four
+neighbours (you may call it <code class="highlighter-rouge">wk4</code>) and one with 12 neighbors (<code class="highlighter-rouge">wk12</code>)</li>
+      <li>Create a choropleth that displays the spatial lag of <code class="highlighter-rouge">Pct_Leave</code> using
+each of the two new matrices. How are they different? Why?</li>
+      <li>Now generate Moran Scatter Plots using <code class="highlighter-rouge">wk4</code> and <code class="highlighter-rouge">wk12</code>. Do they differ
+from the one we created earlier in the chapter? How? Why?</li>
+      <li>Calculate Moran’s I using all of the matrices and similarly compare
+results.</li>
+    </ul>
+  </li>
+  <li>Using the same spatial weights matrix throughout, calculate the following
+statistics of global spatial autocorrelation for the <code class="highlighter-rouge">Pct_Rejected</code>
+variable:
+    <ul>
+      <li>Moran’s I</li>
+      <li>Geary’s C</li>
+      <li>Getis &amp; Ord’s G</li>
+    </ul>
+
+    <p>Describe the results. Do you draw substantially different conclusions from
+each statistic? If so, why?</p>
+  </li>
+  <li>Drawing from the results found in Question 3 and your intuition, try to
+generalise the effect of a larger number of neighbors (ie. a more densely
+connected graph) in the spatial weights matrix when exploring global
+spatial autocorrelation.</li>
+  <li>Think whether it is possible to find cases when Moran’s I and Getis &amp; Ord’s
+G dissagree substantially. What could drive such a result? What does that
+mean for the use and interpretation of both statistics?</li>
+</ol>
 
 <hr />
 

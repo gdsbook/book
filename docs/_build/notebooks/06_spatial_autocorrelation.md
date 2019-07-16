@@ -1327,7 +1327,53 @@ Moran, P. A. (1950). Notes on continuous stochastic phenomena. Biometrika, 37(1/
 
 Tukey, J. W. (1977). Exploratory data analysis (Vol. 2).
 
+## Questions
 
+1. Return to the original `ref` table and pull out the `Pct_Rejected`
+   variable. Let us explore patterns in rejected votes:
+    - Create a choropleth displaying its spatial distribution
+    - Build a spatial weights matrix with 8 nearest neighbors for the Local
+      Authorities
+    - Create a Moran Scatter Plot
+    - Calculate Moran's I
+    - Interpret what you find through this Moran's analysis. What do we learn
+      about the geography of vote rejection?
+1. Sometimes referendums require more than 50% to make the change they ask
+   about. Let us imagine the EU referendum required 60% to succeed on leaving
+   the EU.
+    - Use `Pct_Leave` to create a binary variable that takes a value of 1 if
+      the percentage was larger than 60, 0 otherwise.
+    - Create a choropleth with the newly created variable. Are there any
+      differences in the geographical pattern of the vote to leave the EU?
+    - Re-compute the Join Counts statistic for this new variable. What can we
+      conclude? Are there any notable changes in the extent to which "Leave"
+      votes were distributed spatially?
+1. Let us explore the effect of different weights matrices by returning to the
+   global analysis we performed for the `Leave` variable.
+    - Create two additional KNN weights to those already built, one with four
+      neighbours (you may call it `wk4`) and one with 12 neighbors (`wk12`)
+    - Create a choropleth that displays the spatial lag of `Pct_Leave` using
+      each of the two new matrices. How are they different? Why?
+    - Now generate Moran Scatter Plots using `wk4` and `wk12`. Do they differ
+      from the one we created earlier in the chapter? How? Why?
+    - Calculate Moran's I using all of the matrices and similarly compare
+      results.
+1. Using the same spatial weights matrix throughout, calculate the following
+   statistics of global spatial autocorrelation for the `Pct_Rejected`
+   variable:
+    - Moran's I
+    - Geary's C
+    - Getis & Ord's G
+
+   Describe the results. Do you draw substantially different conclusions from
+   each statistic? If so, why?
+1. Drawing from the results found in Question 3 and your intuition, try to
+   generalise the effect of a larger number of neighbors (ie. a more densely
+   connected graph) in the spatial weights matrix when exploring global
+   spatial autocorrelation.
+1. Think whether it is possible to find cases when Moran's I and Getis & Ord's
+   G dissagree substantially. What could drive such a result? What does that
+   mean for the use and interpretation of both statistics?
 
 ---
 
