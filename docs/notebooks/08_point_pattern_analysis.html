@@ -1,0 +1,2522 @@
+<!DOCTYPE html>
+<html lang="en">
+  
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,minimum-scale=1">
+
+  <title>Point Pattern Analysis</title>
+  <meta name="description" content="Point Pattern Analysis">
+
+  <link rel="canonical" href="https://gdsbook.github.io//notebooks/08_point_pattern_analysis.html">
+  <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io//feed.xml">
+
+  <meta property="og:url"         content="https://gdsbook.github.io//notebooks/08_point_pattern_analysis.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Point Pattern Analysis" />
+<meta property="og:description" content="Point Pattern Analysis" />
+<meta property="og:image"       content="" />
+
+
+  <script type="application/ld+json">
+  {
+  "@context": "http://schema.org",
+  "@type": "NewsArticle",
+  "mainEntityOfPage":
+    "https://gdsbook.github.io//notebooks/08_point_pattern_analysis.html",
+  "headline":
+    "Point Pattern Analysis",
+  "datePublished":
+    "2019-07-16T20:43:40+00:00",
+  "dateModified":
+    "2019-07-16T20:43:40+00:00",
+  "description":
+    "Point Pattern Analysis",
+  "author": {
+    "@type": "Person",
+    "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Data 100 at UC Berkeley",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://gdsbook.github.io/",
+      "width": 60,
+      "height": 60
+    }
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://gdsbook.github.io/",
+    "height": 60,
+    "width": 60
+  }
+}
+
+  </script>
+  <link rel="stylesheet" href="/assets/css/styles.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css ">
+  <link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon-180x180.png">
+
+  <!-- <link rel="manifest" href="/manifest.json"> -->
+  <!-- <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#efae0a"> -->
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <meta name="theme-color" content="#233947">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/x-icon" href="/images/logo/favicon.ico">
+
+  <!-- MathJax Config -->
+  <!-- Allow inline math using $ and automatically break long math lines -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    CommonHTML: {
+        linebreaks: {
+            automatic: true,
+        },
+    },
+});
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_CHTML' async></script>
+
+  <!-- DOM updating function -->
+  <script>
+const runWhenDOMLoaded = cb => {
+  if (document.readyState != 'loading') {
+    cb()
+  } else if (document.addEventListener) {
+    document.addEventListener('DOMContentLoaded', cb)
+  } else {
+    document.attachEvent('onreadystatechange', function() {
+      if (document.readyState == 'complete') cb()
+    })
+  }
+}
+
+// Helper function to init things quickly
+initFunction = function(myfunc) {
+  runWhenDOMLoaded(myfunc);
+  document.addEventListener('turbolinks:load', myfunc);
+};
+</script>
+
+  <!-- Define some javascript variables that will be useful in other javascript -->
+  <script>
+    const site_basename = '';
+  </script>
+
+  <!-- Add AnchorJS to let headers be linked -->
+  <script src="/assets/js/anchor.min.js"  type="text/javascript"></script>
+  <script>
+
+initFunction(function () {
+    anchors.add("main h1, main h2, main h3, main h4")
+});
+
+</script>
+
+  <!-- Include Turbolinks to make page loads fast -->
+  <!-- https://github.com/turbolinks/turbolinks -->
+  <script src="/assets/js/turbolinks.js" async></script>
+  <meta name="turbolinks-cache-control" content="no-cache">
+
+  <!-- Load nbinteract for widgets -->
+  
+
+  <!-- Load Thebelab for interactive widgets -->
+  <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+<!-- Display Thebelab button in each code cell -->
+<script>
+/**
+ * Set up thebelab button for code blocks
+ */
+
+const thebelabCellButton = id =>
+  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
+    <img src="/assets/images/edit-button.svg" alt="Start interactive mode">
+  </a>`
+
+
+const addThebelabButtonToCodeCells =  () => {
+
+  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("thebelab-cell-button-" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
+    }
+  })
+}
+
+initFunction(addThebelabButtonToCodeCells);
+</script>
+
+
+
+<script type="text/x-thebe-config">
+    {
+      requestKernel: true,
+      binderOptions: {
+        repo: 'gdsbook/geographic-data-science',
+        ref: 'master',
+      },
+      codeMirrorConfig: {
+        theme: ""
+      },
+      kernelOptions: {
+        name: 'python3',
+      }
+    }
+</script>
+<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
+<script>
+    /**
+     * Add attributes to Thebelab blocks
+     */
+
+    const initThebelab = () => {
+        const addThebelabToCodeCells = () => {
+            console.log("Adding thebelab to code cells...");
+            // If Thebelab hasn't loaded, wait a bit and try again. This
+            // happens because we load ClipboardJS asynchronously.
+            if (window.thebelab === undefined) {
+                setTimeout(addThebelabToCodeCells, 250)
+            return
+            }
+
+            // If we already detect a Thebelab cell, don't re-run
+            if (document.querySelectorAll('div.thebelab-cell').length > 0) {
+                return;
+            }
+
+            // Find all code cells, replace with Thebelab interactive code cells
+            const codeCells = document.querySelectorAll('.input_area pre')
+            codeCells.forEach((codeCell, index) => {
+                const id = codeCellId(index)
+                codeCell.setAttribute('data-executable', 'true')
+
+                // Figure out the language it uses and add this too
+                var parentDiv = codeCell.parentElement.parentElement;
+                var arrayLength = parentDiv.classList.length;
+                for (var ii = 0; ii < arrayLength; ii++) {
+                    var parts = parentDiv.classList[ii].split('language-');
+                    if (parts.length === 2) {
+                        // If found, assign dataLanguage and break the loop
+                        var dataLanguage = parts[1];
+                        break;
+                    }
+                }
+                codeCell.setAttribute('data-language', dataLanguage)
+
+                // If the code cell is hidden, show it
+                var inputCheckbox = document.querySelector(`input#hidebtn${codeCell.id}`);
+                if (inputCheckbox !== null) {
+                    setCodeCellVisibility(inputCheckbox, 'visible');
+                }
+            });
+
+            // Remove the event listener from the page so keyboard press doesn't
+            // Change page
+            document.removeEventListener('keydown', initPageNav)
+            keyboardListener = false;
+
+            // Init thebelab
+            thebelab.bootstrap();
+
+            // Remove copy buttons since they won't work anymore
+            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
+            copyAndThebeButtons.forEach((button, index) => {
+                button.remove();
+            });
+
+            // Remove outputs since they'll be stale
+            const outputs = document.querySelectorAll('.output *, .output')
+            outputs.forEach((output, index) => {
+                output.remove();
+            });
+        }
+
+        // Add event listener for the function to modify code cells
+        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
+        thebelabButtons.forEach((thebelabButton,index) => {
+            if (thebelabButton === null) {
+                setTimeout(initThebelab, 250)
+                return
+            };
+            thebelabButton.addEventListener('click', addThebelabToCodeCells);
+        });
+    }
+
+    // Initialize Thebelab
+    initFunction(initThebelab);
+</script>
+
+
+
+  <!-- Load the auto-generating TOC -->
+  <script src="/assets/js/tocbot.min.js"  type="text/javascript"></script>
+  <script>
+var initToc = function () {
+  tocbot.init({
+    tocSelector: 'nav.onthispage',
+    contentSelector: '.c-textbook__content',
+    headingSelector: 'h2, h3',
+    orderedList: false,
+    collapseDepth: 6,
+    listClass: 'toc__menu',
+    activeListItemClass: "",  // Not using
+    activeLinkClass: "", // Not using
+  });
+  tocbot.refresh();
+}
+initFunction(initToc);
+</script>
+
+  <!-- Google analytics -->
+  <script src="/assets/js/ga.js" async></script>
+
+  <!-- Clipboard copy button -->
+  <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" async></script>
+
+  <!-- Load JS that depends on site variables -->
+  <script>
+/**
+ * Set up copy/paste for code blocks
+ */
+const codeCellId = index => `codecell${index}`
+
+const clipboardButton = id =>
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+    <img src="/assets/images/copy-button.svg" alt="Copy to clipboard">
+  </a>`
+
+// Clears selected text since ClipboardJS will select the text when copying
+const clearSelection = () => {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
+// Changes tooltip text for two seconds, then changes it back
+const temporarilyChangeTooltip = (el, newText) => {
+  const oldText = el.getAttribute('data-tooltip')
+  el.setAttribute('data-tooltip', newText)
+  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
+}
+
+const addCopyButtonToCodeCells = () => {
+  // If ClipboardJS hasn't loaded, wait a bit and try again. This
+  // happens because we load ClipboardJS asynchronously.
+  if (window.ClipboardJS === undefined) {
+    setTimeout(addCopyButtonToCodeCells, 250)
+    return
+  }
+
+  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
+  codeCells.forEach((codeCell, index) => {
+    const id = codeCellId(index)
+    codeCell.setAttribute('id', id)
+    if (document.getElementById("copy-button" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
+    }
+  })
+
+  const clipboard = new ClipboardJS('.copybtn')
+  clipboard.on('success', event => {
+    clearSelection()
+    temporarilyChangeTooltip(event.trigger, 'Copied!')
+  })
+
+  clipboard.on('error', event => {
+    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
+  })
+
+  // Get rid of clipboard before the next page visit to avoid memory leak
+  document.addEventListener('turbolinks:before-visit', () =>
+    clipboard.destroy()
+  )
+}
+
+initFunction(addCopyButtonToCodeCells);
+</script>
+
+
+  <!-- Hide cell code -->
+  <script>
+    /**
+    Add buttons to hide code cells
+    */
+
+
+    var setCodeCellVisibility = function (inputField, kind) {
+        // Update the image and class for hidden
+        var id = inputField.getAttribute('data-id');
+        var codeCell = document.querySelector(`#${id} div.highlight`);
+
+        if (kind === "visible") {
+            codeCell.classList.remove('hidden');
+            inputField.checked = true;
+        } else {
+            codeCell.classList.add('hidden');
+            inputField.checked = false;
+        }
+    }
+
+    var toggleCodeCellVisibility = function (event) {
+        // The label is clicked, and now we decide what to do based on the input field's clicked status
+        if (event.target.tagName === "LABEL") {
+            var inputField = event.target.previousElementSibling;
+        } else {
+            // It is the span inside the target
+            var inputField = event.target.parentElement.previousElementSibling;
+        }
+
+        if (inputField.checked === true) {
+            setCodeCellVisibility(inputField, "visible");
+        } else {
+            setCodeCellVisibility(inputField, "hidden");
+        }
+    }
+
+
+    // Button constructor
+    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
+
+    var addHideButton = function () {
+        // If a hide button is already added, don't add another
+        if (document.querySelector('div.hidecode input') !== null) {
+            return;
+        }
+
+        // Find the input cells and add a hide button
+        document.querySelectorAll('div.input_area').forEach(function (item, index) {
+            if (!item.classList.contains("hidecode")) {
+                // Skip the cell if it doesn't have a hidecode class
+                return;
+            }
+
+            const id = codeCellId(index)
+            item.setAttribute('id', id);
+            // Insert the button just inside the end of the next div
+            item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
+
+            // Set up the visibility toggle
+            hideLink = document.querySelector(`#${id} div.highlight + input + label`);
+            hideLink.addEventListener('click', toggleCodeCellVisibility)
+        });
+    }
+
+
+    // Initialize the hide buttos
+    var initHiddenCells = function () {
+        // Add hide buttons to the cells
+        addHideButton();
+
+        // Toggle the code cells that should be hidden
+        document.querySelectorAll('div.hidecode input').forEach(function (item) {
+            setCodeCellVisibility(item, 'hidden');
+            item.checked = true;
+        })
+    }
+
+    initFunction(initHiddenCells);
+
+</script>
+
+  <!-- Load custom website scripts -->
+  <script src="/assets/js/scripts.js" async></script>
+
+  <!-- Load custom user CSS and JS  -->
+  <script src="/assets/custom/custom.js" async></script>
+  <link rel="stylesheet" href="/assets/custom/custom.css">
+
+  <!-- Update interact links w/ REST param, is defined in includes so we can use templates -->
+  
+<script>
+/**
+  * To auto-embed hub URLs in interact links if given in a RESTful fashion
+ */
+
+function getJsonFromUrl(url) {
+  var query = url.split('?');
+  if (query.length < 2) {
+    // No queries so just return false
+    return false;
+  }
+  query = query[1];
+  // Collect REST params into a dictionary
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
+}
+    
+function dict2param(dict) {
+    params = Object.keys(dict).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(dict[k])
+    });
+    return params.join('&')
+}
+
+// Parse a Binder URL, converting it to the string needed for JupyterHub
+function binder2Jupyterhub(url) {
+  newUrl = {};
+  parts = url.split('v2/gh/')[1];
+  // Grab the base repo information
+  repoinfo = parts.split('?')[0];
+  var [org, repo, ref] = repoinfo.split('/');
+  newUrl['repo'] = ['https://github.com', org, repo].join('/');
+  newUrl['branch'] = ref
+  // Grab extra parameters passed
+  params = getJsonFromUrl(url);
+  if (params['filepath'] !== undefined) {
+    newUrl['subPath'] = params['filepath']
+  }
+  return dict2param(newUrl);
+}
+
+// Filter out potentially unsafe characters to prevent xss
+function safeUrl(url)
+{
+   return String(encodeURIComponent(url))
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
+
+function addParamToInternalLinks(hub) {
+  var links = document.querySelectorAll("a").forEach(function(link) {
+    var href = link.href;
+    // If the link is an internal link...
+    if (href.search("https://gdsbook.github.io/") !== -1 || href.startsWith('/') || href.search("127.0.0.1:") !== -1) {
+      // Assume we're an internal link, add the hub param to it
+      var params = getJsonFromUrl(href);
+      if (params !== false) {
+        // We have REST params, so append a new one
+        params['jupyterhub'] = hub;
+      } else {
+        // Create the REST params
+        params = {'jupyterhub': hub};
+      }
+      // Update the link
+      var newHref = href.split('?')[0] + '?' + dict2param(params);
+      link.setAttribute('href', decodeURIComponent(newHref));
+    }
+  });
+  return false;
+}
+
+
+// Update interact links
+function updateInteractLink() {
+    // hack to make this work since it expects a ? in the URL
+    rest = getJsonFromUrl("?" + location.search.substr(1));
+    jupyterHubUrl = rest['jupyterhub'];
+    var hubType = null;
+    var hubUrl = null;
+    if (jupyterHubUrl !== undefined) {
+      hubType = 'jupyterhub';
+      hubUrl = jupyterHubUrl;
+    }
+
+    if (hubType !== null) {
+      // Sanitize the hubUrl
+      hubUrl = safeUrl(hubUrl);
+
+      // Add HTTP text if omitted
+      if (hubUrl.indexOf('http') < 0) {hubUrl = 'http://' + hubUrl;}
+      var interactButtons = document.querySelectorAll("button.interact-button")
+      var lastButton = interactButtons[interactButtons.length-1];
+      var link = lastButton.parentElement;
+
+      // If we've already run this, skip the link updating
+      if (link.nextElementSibling !== null) {
+        return;
+      }
+
+      // Update the link and add context div
+      var href = link.getAttribute('href');
+      if (lastButton.id === 'interact-button-binder') {
+        // If binder links exist, we need to re-work them for jupyterhub
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // If localhost, assume we're working from a local Jupyter server and remove `/hub`
+          first = [hubUrl, 'git-sync'].join('/')
+        } else {
+          first = [hubUrl, 'hub', 'user-redirect', 'git-sync'].join('/')
+        }
+        href = first + '?' + binder2Jupyterhub(href);
+      } else {
+        // If interact button isn't binderhub, assume it's jupyterhub
+        // If JupyterHub links, we only need to replace the hub url
+        href = href.replace("", hubUrl);
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // Assume we're working from a local Jupyter server and remove `/hub`
+          href = href.replace("/hub/user-redirect", "");
+        }
+      }
+      link.setAttribute('href', decodeURIComponent(href));
+
+      // Add text after interact link saying where we're launching
+      hubUrlNoHttp = decodeURIComponent(hubUrl).replace('http://', '').replace('https://', '');
+      link.insertAdjacentHTML('afterend', '<div class="interact-context">on ' + hubUrlNoHttp + '</div>');
+
+      // Update internal links so we retain the hub url
+      addParamToInternalLinks(hubUrl);
+    }
+}
+
+runWhenDOMLoaded(updateInteractLink)
+document.addEventListener('turbolinks:load', updateInteractLink)
+</script>
+
+
+  <!-- Lunr search code - will only be executed on the /search page -->
+  <script src="/assets/js/lunr/lunr.min.js" type="text/javascript"></script>
+  <script>var initQuery = function() {
+  // See if we have a search box
+  var searchInput = document.querySelector('input#lunr_search');
+  if (searchInput === null) {
+    return;
+  }
+
+  // Function to parse our lunr cache
+  var idx = lunr(function () {
+    this.field('title')
+    this.field('excerpt')
+    this.field('categories')
+    this.field('tags')
+    this.ref('id')
+
+    this.pipeline.remove(lunr.trimmer)
+
+    for (var item in store) {
+      this.add({
+        title: store[item].title,
+        excerpt: store[item].excerpt,
+        categories: store[item].categories,
+        tags: store[item].tags,
+        id: item
+      })
+    }
+  });
+
+  // Run search upon keyup
+  searchInput.addEventListener('keyup', function () {
+    var resultdiv = document.querySelector('#results');
+    var query = document.querySelector("input#lunr_search").value.toLowerCase();
+    var result =
+      idx.query(function (q) {
+        query.split(lunr.tokenizer.separator).forEach(function (term) {
+          q.term(term, { boost: 100 })
+          if(query.lastIndexOf(" ") != query.length-1){
+            q.term(term, {  usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING, boost: 10 })
+          }
+          if (term != ""){
+            q.term(term, {  usePipeline: false, editDistance: 1, boost: 1 })
+          }
+        })
+      });
+
+      // Empty the results div
+      while (resultdiv.firstChild) {
+        resultdiv.removeChild(resultdiv.firstChild);
+      }
+
+    resultdiv.insertAdjacentHTML('afterbegin', '<p class="results__found">'+result.length+' Result(s) found</p>');
+    for (var item in result) {
+      var ref = result[item].ref;
+      if(store[ref].teaser){
+        var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<div class="archive__item-teaser">'+
+                '<img src="'+store[ref].teaser+'" alt="">'+
+              '</div>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      else{
+    	  var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      resultdiv.insertAdjacentHTML('beforeend', searchitem);
+    }
+  });
+};
+
+initFunction(initQuery);
+</script>
+</head>
+
+  <body>
+    <!-- .js-show-sidebar shows sidebar by default -->
+    <div id="js-textbook" class="c-textbook js-show-sidebar">
+      
+
+
+
+<nav id="js-sidebar" class="c-textbook__sidebar">
+  <a href="https://github.com/gdsbook/geographic-data-science"><img src="/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" data-turbolinks-permanent/></a>
+  <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
+  <ul class="c-sidebar__chapters">
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro.html"
+        >
+          
+          Home
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+        <li class="c-sidebar__chapter"><a class="c-sidebar__entry" href="/search.html">Search</a></li>
+        
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/notebooks/00_toc.html"
+        >
+          
+          Table of Contents
+        </a>
+
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/01_geospatial_computational_environment.html"
+                >
+                  
+                  Geospatial Computational Environment
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/02_spatial_data.html"
+                >
+                  
+                  Spatial Data
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/03_spatial_data_processing.html"
+                >
+                  
+                  Spatial Data Processing
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/04_spatial_weights.html"
+                >
+                  
+                  Spatial Weights
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/05_choropleth.html"
+                >
+                  
+                  Choropleth Mapping
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/06_spatial_autocorrelation.html"
+                >
+                  
+                  Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/07_local_autocorrelation.html"
+                >
+                  
+                  Local Spatial Autocorrelation
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry c-sidebar__entry--active"
+                  href="/notebooks/08_point_pattern_analysis.html"
+                >
+                  
+                  Point Pattern Analysis
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+      
+      
+
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter">
+        <a class="c-sidebar__entry "
+          href="/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+
+        
+
+          
+          
+          
+          
+
+          
+
+          <ul class="c-sidebar__sections ">
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/09_spatial_inequality.html"
+                >
+                  
+                  Spatial Inequality
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/10_clustering_and_regionalization.html"
+                >
+                  
+                  Clustering & Regionalization
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/11_regression.html"
+                >
+                  
+                  Regression
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+              
+              
+
+              <li class="c-sidebar__section">
+                <a class="c-sidebar__entry "
+                  href="/notebooks/12_feature_engineering.html"
+                >
+                  
+                  Spatial Feature Engineering
+                </a>
+
+                
+                
+
+              </li>
+              
+            
+          </ul>
+        
+      </li>
+
+      
+    
+  </ul>
+  <p class="sidebar_footer">Powered by <a href="https://github.com/jupyter/jupyter-book">Jupyter Book</a></p>
+</nav>
+
+      
+      <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+      <aside class="sidebar__right">
+          <header><h4 class="nav__title"><i class="fa fa-list"></i>   On this page</h4></header>
+          <nav class="onthispage">
+          </nav>
+      </aside>
+      
+      <main class="c-textbook__page" tabindex="-1">
+          <div class="o-wrapper">
+            <div class="c-sidebar-toggle">
+  <!-- We show the sidebar by default so we use .is-active -->
+  <button
+    id="js-sidebar-toggle"
+    class="hamburger hamburger--arrowalt is-active"
+  >
+    <span class="hamburger-box">
+      <span class="hamburger-inner"></span>
+    </span>
+    <span class="c-sidebar-toggle__label">Toggle Sidebar</span>
+  </button>
+</div>
+
+            
+<div class="buttons">
+
+<button id="interact-button-thebelab" class="interact-button">Thebelab</button>
+
+
+
+
+
+
+
+
+
+<a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?urlpath=lab/tree/content%2Fnotebooks%2F08_point_pattern_analysis.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
+
+
+</div>
+
+
+            <div class="c-textbook__content">
+              <h1 id="point-pattern-analysis">Point Pattern Analysis</h1>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="n">gpd</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">MultiPoint</span>
+<span class="kn">import</span> <span class="nn">pysal</span> <span class="k">as</span> <span class="n">ps</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">contextily</span> <span class="k">as</span> <span class="n">ctx</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">dbscan</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Points are spatial entities that can be understood in two fundamentally different ways. On the one hand, points can be seen as fixed objects in space, which is to say their location is taken as given (<em>exogenous</em>). In this case, analysis of points is very similar to that of other types of spatial data such as polygons and lines. On the other hand, points can be seen as the occurence of an event that could theoretically take place anywhere but only manifests in certain locations. This is the approach we will adopt in the rest of the chapter.</p>
+
+<p>When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a <em>point pattern</em>. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is crime events in a city: they could technically happen in many locations but we usually find crimes are committed only in a handful of them. Point patterns can be <em>marked</em>, if more attributes are provided with the location, or <em>unmarked</em>, if only the coordinates of where the event occured are provided. Continuing the crime example, an unmarked pattern would result if only the location where crimes were committed was used for analysis, while we would be speaking of a marked point pattern if other attributes, such as the type of crime, the extent of the damage, etc. was provided with the location.</p>
+
+<p>Point pattern analysis is thus concerned with the visualization, description, statistical characerization, and modeling of point patterns, focusing specially on the generating process that gives rise and explains the observed data. <em>What does the pattern look like?</em> <em>What’s the nature of the distribution of points?</em> <em>Is there any structure we can statistically discern in the way locations are arranged over space?</em> <em>Why do events occur in those places and not in others?</em> These are all questions that point pattern analysis is concerned with.</p>
+
+<p>At this point, it is useful to remind ourselves of an important disticntion, that between process and pattern. The former relates to the underlying mechanism that is at work to generate the outcome we end up observing. Because of its abstract nature, we do not get to see it. However, in many contexts, the key focus of any analysis is to learn about <em>what</em> determines a given phenomenon and <em>how</em> those factors combine to generate it. Process in this context is associated with the <em>how</em>. Pattern, on the other hand, relates to the result of that process. In some cases, it is the only trace of the process we can observe and thus the only input we have to work with in order to reconstruct it. Although directly observable and, arguably, easier to tackle, pattern is only a reflection of process. The real challenge in many applications is not to characterize the former but to use it to work out the latter.</p>
+
+<p>In this chapter, we will focus on an introduction to point patters through two distinct examples. The first vignette explores a list of world airports, while the second one uses geo-tagged Flickr photos from Tokyo. In both cases, we will treat the phenomena represented in the data as events: airports could theoretically be located in a large set of places on the surface of the earth, however we only find them in very specific places; similarly, photos could be taken of any place in Tokyo, but only certain locations are captured. Keep in mind this understanding of both photos and airports is not inmutable: one could conceive cases where it makes sense to take those locations as given and look at the properties of each of them ignoring their “event” aspect. However, in this context, we will focus on those questions that relate to location and the collective shape of locations. The use of these tools will allow us to transform a long list of unintelligible XY coordinates into tangible phenomena with a characteristic spatial structure, and to answer questions such as how the epicenter of airports differs between hemispheres, or what are the main clusters of attraction in Tokyo for Flickr users.</p>
+
+<h2 id="vignette-1-airports">Vignette #1: airports</h2>
+
+<p>Airports are interesting entities. They are nodes that connect a network of national and international flows, and are its most visible realization. Where they are located is a function of several factors such as the population they are trying to serve, their level of income, the demand for flying, etc. However their exact location is far from the only possible one. Physically speaking, an airport could be built in many more places than where it ends up. This make the process behind an interesting one to explore through the overall “appearance” of their locations; that is, through its pattern.</p>
+
+<p>In this vignette, we will use a preprocessed open dataset collecting XXX. Before we start playing with it, let us load it up:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Load GeoJSON file</span>
+<span class="n">air</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">'data/airports/airports_clean.geojson'</span><span class="p">)</span>
+<span class="c"># Check top of the table</span>
+<span class="n">air</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>abbrev</th>
+      <th>featurecla</th>
+      <th>gps_code</th>
+      <th>iata_code</th>
+      <th>location</th>
+      <th>name</th>
+      <th>natlscale</th>
+      <th>scalerank</th>
+      <th>type</th>
+      <th>wikipedia</th>
+      <th>x</th>
+      <th>y</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>LUH</td>
+      <td>Airport</td>
+      <td>VILD</td>
+      <td>LUH</td>
+      <td>terminal</td>
+      <td>Sahnewal</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>small</td>
+      <td>http://en.wikipedia.org/wiki/Sahnewal_Airport</td>
+      <td>8.455503e+06</td>
+      <td>3.613331e+06</td>
+      <td>POINT (8455502.603945348 3613330.732570527)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SSE</td>
+      <td>Airport</td>
+      <td>VASL</td>
+      <td>SSE</td>
+      <td>terminal</td>
+      <td>Solapur</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>mid</td>
+      <td>http://en.wikipedia.org/wiki/Solapur_Airport</td>
+      <td>8.452830e+06</td>
+      <td>1.993750e+06</td>
+      <td>POINT (8452829.548091328 1993750.242252399)</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>IXR</td>
+      <td>Airport</td>
+      <td>VERC</td>
+      <td>IXR</td>
+      <td>terminal</td>
+      <td>Birsa Munda</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>mid</td>
+      <td>http://en.wikipedia.org/wiki/Birsa_Munda_Airport</td>
+      <td>9.498179e+06</td>
+      <td>2.670488e+06</td>
+      <td>POINT (9498179.37479558 2670487.54343139)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>AWZ</td>
+      <td>Airport</td>
+      <td>OIAW</td>
+      <td>AWZ</td>
+      <td>terminal</td>
+      <td>Ahwaz</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>mid</td>
+      <td>http://en.wikipedia.org/wiki/Ahwaz_Airport</td>
+      <td>5.426503e+06</td>
+      <td>3.677395e+06</td>
+      <td>POINT (5426503.078078241 3677395.464003529)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>GWL</td>
+      <td>Airport</td>
+      <td>VIGR</td>
+      <td>GWL</td>
+      <td>terminal</td>
+      <td>Gwalior</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>mid and military</td>
+      <td>http://en.wikipedia.org/wiki/Gwalior_Airport</td>
+      <td>8.707101e+06</td>
+      <td>3.034483e+06</td>
+      <td>POINT (8707100.951900091 3034482.998676365)</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>A point pattern is essentially the collective shape a bunch of points create. Given the table contains the XY coordinates of each airport, the quickest way to get a first sense of what the data look like is to plot it raw:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Plot XY coordinates</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">air</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">air</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.collections.PathCollection at 0x1251c17b8&gt;
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_6_1.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>This is not very pretty but that is not the point. Our goal was to get a quick first picture and this approach has done the job. Things we can learn from this figure include the fact the overall shape should look familiar to anyone who’s seen a map of the world and that, thus, the data do not seem to have any obvious errors. We can then move on to do more interesting things with it.</p>
+
+<p>The first extension is to bring geographic context. Although the shape of the figure above might be familiar, it still takes some effort to identify where different dots are placed on the surface of the Earth. An easy solution to make this easier is to overlay it with a tile map downloaded from the internet. Let us do just that: first we’ll download the tiles into an image object, and the we will plot it together with the airports dataset.</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Download tiles for the bounding box of the airport's GeoDataFrame</span>
+<span class="o">%</span><span class="n">time</span> <span class="n">img</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">bounds2img</span><span class="p">(</span><span class="o">*</span><span class="n">air</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CPU times: user 71.9 ms, sys: 21 ms, total: 92.9 ms
+Wall time: 417 ms
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>The method <code class="highlighter-rouge">bounds2img</code> (from the library <code class="highlighter-rouge">contextily</code>, <code class="highlighter-rouge">ctx</code> for short) returns the image object (<code class="highlighter-rouge">img</code>) and also an auxilliary tuple with its exact geographic bounds:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ext</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(-20037508.342789244,
+ 20037508.342789244,
+ -10018754.171394624,
+ 20037508.342789244)
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>This allows us then to match it up with other data which is also expressed in the same coordinate reference system (CRS). Let us produce a slightly more useful image than above:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axes</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Display tile map</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+<span class="c"># Display airports on top</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">air</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">air</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'purple'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c"># Remove axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c"># Add title</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'World Airports Dataset'</span><span class="p">)</span>
+<span class="c"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_12_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>Now this looks a bit better!</p>
+
+<h3 id="centrography">Centrography</h3>
+
+<ul>
+  <li>
+    <p>Central tendency: (weighted) mean center –&gt; weight by <code class="highlighter-rouge">scalerank</code></p>
+  </li>
+  <li>
+    <p>Dispersion: std distance</p>
+  </li>
+  <li>
+    <p>Shape analysis: convex hull</p>
+  </li>
+</ul>
+
+<h3 id="point-in-polygon-visualization">Point-in-polygon visualization</h3>
+
+<p>Commonly, we either need or want to link points to areal geographies that allow us to augment their attribute list, or to look at the problem at hand from a new perspective. Maybe because the process we are interested in operates at a more aggregated level, or maybe because by aggregating we can obtain a view into the data that makes it simpler to understand.</p>
+
+<p>For example, the figure above gives us a good sense about how airports are distributed overall but, in particularly dense areas like Europe, it is hard to see much. By aggregating them to say the country geography, we can consider new sets of questions such as which countries have most airports or which ones have a larger density. This works because the geography we want to aggregate it to, countries, is meaningful. This means it has some inherent structure that confers value. In this case, countries are relevant entities and a crucial piece in arranging the world.</p>
+
+<p>The first thing we need to do to create a country map is to have country (spatial) data. Let us load up a cleaned table with countries:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Load up shapefile with countries</span>
+<span class="n">ctys</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">'data/airports/countries_clean/countries_clean.shp'</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>And, same as with any new dataset, let us have a quick look at what it looks like and how it stacks up with the other data we have collected along the way:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Add tile map</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+<span class="c"># Display country layer</span>
+<span class="n">ctys</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> \
+          <span class="n">edgecolor</span><span class="o">=</span><span class="s">'0.8'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'0.2'</span><span class="p">)</span>
+<span class="c"># Display airport locations</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">air</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">air</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'yellow'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+<span class="c"># Remove axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c"># Add title</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'World Airports Dataset'</span><span class="p">)</span>
+<span class="c"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_21_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>Again nothing new or too exciting from this figure, but this is good news: it means our data are aligned and match up nicely. So we can move on to more interesting ventures.</p>
+
+<p>The next thing that we might want to do to obtain country counts of airports is to link each airport with the country where it is located. Sometimes, we are lucky and the airport table will include a column with that information. In this case, we need to create it for ourselves. This is a well-known problem in geometry and GIS and is commonly known as point-in-polygon: to determine whether a given point is inside a polygon. With that operation solved, linking airports to countries amoutns to a bit of house keeping. We will first explore in pure Python how that algorithm can be easily implemented from scratch so it becomes clear what steps are involved; then we will see a much more efficient and fast implementation that we should probably use when need to perform this operation in other contexts.</p>
+
+<hr />
+<p><strong>NOTE</strong>: skip next if all you want to know is how to perform a standard spatial join</p>
+
+<p>Creating a manual, brute-force implementation of a spatial join is not very difficult, if one has solved the problem of checking whether a point is inside a polygon or not. Thanks to the library that provides geometry objects to <code class="highlighter-rouge">geopandas</code> (<code class="highlighter-rouge">shapely</code>), this is solved in Python. For example, we can easily check if the first dot on the airports table is inside the first polygon in the countries table:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Single out point</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="n">air</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'geometry'</span><span class="p">]</span>
+<span class="c"># Single out polygon</span>
+<span class="n">poly</span> <span class="o">=</span> <span class="n">ctys</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'geometry'</span><span class="p">]</span>
+<span class="c"># Check whether `poly` contains `pt`</span>
+<span class="n">poly</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>False
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>That easy. As we can see, the method <code class="highlighter-rouge">contains</code> in any <code class="highlighter-rouge">shapely</code> geometry makes it trivial. So, the first airport in the list is not in the first country of the list.</p>
+
+<p>To find which country every airport is in easily (albeit not very efficiently!), we need to sift through all possible combinations to see if any of them gives us a match. Once we find it for a given airport, we need to record that and move on, no need to keep checking. That is exactly what we do in the cell below:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%%</span><span class="n">time</span>
+<span class="c"># Set up an empty dictionary to populate it with the matches</span>
+<span class="n">airport2country</span> <span class="o">=</span> <span class="p">{</span><span class="n">aID</span><span class="p">:</span> <span class="bp">None</span> <span class="k">for</span> <span class="n">aID</span> <span class="ow">in</span> <span class="n">air</span><span class="o">.</span><span class="n">index</span><span class="p">}</span>
+<span class="c"># Loop over every airport</span>
+<span class="k">for</span> <span class="n">aID</span><span class="p">,</span> <span class="n">row_a</span> <span class="ow">in</span> <span class="n">air</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="c"># Single out location of the airport for convenience</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">row_a</span><span class="p">[</span><span class="s">'geometry'</span><span class="p">]</span>
+    <span class="c"># Loop over every country</span>
+    <span class="k">for</span> <span class="n">cID</span><span class="p">,</span> <span class="n">row_p</span> <span class="ow">in</span> <span class="n">ctys</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="c"># Single out country polygon for convenience</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="n">row_p</span><span class="p">[</span><span class="s">'geometry'</span><span class="p">]</span>
+        <span class="c"># Single out country name for convenience</span>
+        <span class="n">cty_nm</span> <span class="o">=</span> <span class="n">row_p</span><span class="p">[</span><span class="s">'ADMIN'</span><span class="p">]</span>
+        <span class="c"># Check if the country contains the airport</span>
+        <span class="k">if</span> <span class="n">poly</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">pt</span><span class="p">):</span>
+            <span class="c"># If so, store in the dictionary</span>
+            <span class="n">airport2country</span><span class="p">[</span><span class="n">aID</span><span class="p">]</span> <span class="o">=</span> <span class="n">cty_nm</span>
+            <span class="c"># Move on to the next airport, skipping remaining </span>
+            <span class="c"># countries (an airport cannot be in two countries </span>
+            <span class="c"># at the same time)</span>
+            <span class="k">break</span>
+<span class="n">airport2country</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">airport2country</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CPU times: user 47.4 s, sys: 333 ms, total: 47.7 s
+Wall time: 54.1 s
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<p>Once run, we can check the content of the dictionary we have created (after converting it to a <code class="highlighter-rouge">Series</code> for convenience):</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'Airport Name'</span><span class="p">:</span> <span class="n">air</span><span class="p">[</span><span class="s">'name'</span><span class="p">],</span> <span class="s">'Country'</span><span class="p">:</span> <span class="n">airport2country</span><span class="p">})</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Airport Name</th>
+      <th>Country</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Sahnewal</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Solapur</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Birsa Munda</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Ahwaz</td>
+      <td>Iran</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Gwalior</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Hodeidah Int'l</td>
+      <td>Yemen</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>Devi Ahilyabai Holkar Int'l</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>Gandhinagar</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>Chandigarh Int'l</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>Aurangabad</td>
+      <td>India</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<hr />
+
+<p>Although interesting from a pedagogical standpoint, in practive, very rarely do we have to write a spatial join algorithm from scratch. More commonly, we will use one of the already available packaged methods. As mentioned, this is a fairly standard GIS operation, and the GIS community has spent a lot of effort to build optimized algorithms that can conveniently do the job for us. In <code class="highlighter-rouge">GeoPandas</code>, this is as simple as calling <code class="highlighter-rouge">sjoin</code>:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Spatial join</span>
+<span class="o">%</span><span class="n">time</span> <span class="n">air_w_cty</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">air</span><span class="p">,</span> <span class="n">ctys</span><span class="p">)</span>
+<span class="n">air_w_cty</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CPU times: user 1.68 s, sys: 10.1 ms, total: 1.69 s
+Wall time: 2.07 s
+</code></pre></div>      </div>
+    </div>
+  </div>
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>abbrev</th>
+      <th>featurecla_left</th>
+      <th>gps_code</th>
+      <th>iata_code</th>
+      <th>location</th>
+      <th>name</th>
+      <th>natlscale</th>
+      <th>scalerank_left</th>
+      <th>type</th>
+      <th>wikipedia</th>
+      <th>...</th>
+      <th>TYPE</th>
+      <th>UN_A3</th>
+      <th>WB_A2</th>
+      <th>WB_A3</th>
+      <th>WIKIPEDIA</th>
+      <th>WOE_ID</th>
+      <th>WOE_ID_EH</th>
+      <th>WOE_NOTE</th>
+      <th>featurecla_right</th>
+      <th>scalerank_right</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>LUH</td>
+      <td>Airport</td>
+      <td>VILD</td>
+      <td>LUH</td>
+      <td>terminal</td>
+      <td>Sahnewal</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>small</td>
+      <td>http://en.wikipedia.org/wiki/Sahnewal_Airport</td>
+      <td>...</td>
+      <td>Sovereign country</td>
+      <td>356</td>
+      <td>IN</td>
+      <td>IND</td>
+      <td>-99.0</td>
+      <td>23424848.0</td>
+      <td>23424848.0</td>
+      <td>Exact WOE match as country</td>
+      <td>Admin-0 country</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>SSE</td>
+      <td>Airport</td>
+      <td>VASL</td>
+      <td>SSE</td>
+      <td>terminal</td>
+      <td>Solapur</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>mid</td>
+      <td>http://en.wikipedia.org/wiki/Solapur_Airport</td>
+      <td>...</td>
+      <td>Sovereign country</td>
+      <td>356</td>
+      <td>IN</td>
+      <td>IND</td>
+      <td>-99.0</td>
+      <td>23424848.0</td>
+      <td>23424848.0</td>
+      <td>Exact WOE match as country</td>
+      <td>Admin-0 country</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>IXR</td>
+      <td>Airport</td>
+      <td>VERC</td>
+      <td>IXR</td>
+      <td>terminal</td>
+      <td>Birsa Munda</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>mid</td>
+      <td>http://en.wikipedia.org/wiki/Birsa_Munda_Airport</td>
+      <td>...</td>
+      <td>Sovereign country</td>
+      <td>356</td>
+      <td>IN</td>
+      <td>IND</td>
+      <td>-99.0</td>
+      <td>23424848.0</td>
+      <td>23424848.0</td>
+      <td>Exact WOE match as country</td>
+      <td>Admin-0 country</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>GWL</td>
+      <td>Airport</td>
+      <td>VIGR</td>
+      <td>GWL</td>
+      <td>terminal</td>
+      <td>Gwalior</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>mid and military</td>
+      <td>http://en.wikipedia.org/wiki/Gwalior_Airport</td>
+      <td>...</td>
+      <td>Sovereign country</td>
+      <td>356</td>
+      <td>IN</td>
+      <td>IND</td>
+      <td>-99.0</td>
+      <td>23424848.0</td>
+      <td>23424848.0</td>
+      <td>Exact WOE match as country</td>
+      <td>Admin-0 country</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>IDR</td>
+      <td>Airport</td>
+      <td>VAID</td>
+      <td>IDR</td>
+      <td>terminal</td>
+      <td>Devi Ahilyabai Holkar Int'l</td>
+      <td>8.0</td>
+      <td>9</td>
+      <td>mid</td>
+      <td>http://en.wikipedia.org/wiki/Devi_Ahilyabai_Ho...</td>
+      <td>...</td>
+      <td>Sovereign country</td>
+      <td>356</td>
+      <td>IN</td>
+      <td>IND</td>
+      <td>-99.0</td>
+      <td>23424848.0</td>
+      <td>23424848.0</td>
+      <td>Exact WOE match as country</td>
+      <td>Admin-0 country</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 79 columns</p>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Instead of the $\approx$47 seconds it took our homemade algorithm, the one above did a full join in just over two seconds! Through this join also, it is not only the IDs that are matched, but the entire table. Let us quickly compare whether the names match up with our own:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Display only top six records of airport and country name</span>
+<span class="c"># Note that the order of the `sjoin`ed table is not the same</span>
+<span class="c"># as ours but it can easily be rearranged using original indices</span>
+<span class="n">air_w_cty</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="p">[</span><span class="s">'name'</span><span class="p">,</span> <span class="s">'ADMIN'</span><span class="p">]]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>name</th>
+      <th>ADMIN</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Sahnewal</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Solapur</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Birsa Munda</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Ahwaz</td>
+      <td>Iran</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Gwalior</td>
+      <td>India</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Hodeidah Int'l</td>
+      <td>Yemen</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<p>Voila! Both tables seem to match nicely.</p>
+
+<p>To finish this vignette, let us explore which countries have the most airports through a simple choropleth. The only additional step we need to take is to obtain counts per country. But this is pretty straightforward now we have them linked to each airport. To do this, we use the <code class="highlighter-rouge">groupby</code> operation which, well, groups by a given column in a table, and then we apply the method <code class="highlighter-rouge">size</code>, which tells us how many elements every group has:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Group airports by country and count by group</span>
+<span class="n">cty_counts</span> <span class="o">=</span> <span class="n">air_w_cty</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'ADMIN'</span><span class="p">)</span>\
+                      <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Then a choropleth is as simple as:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Index countries by the name, append the airport counts</span>
+<span class="c"># (which are themselves indexed on country names too),</span>
+<span class="c"># Fill any missing value in the count with zero (no counts</span>
+<span class="c"># in this context means zero airports), and display choropleth</span>
+<span class="c"># using quantiles</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">ctys</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'ADMIN'</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">airport_count</span><span class="o">=</span><span class="n">cty_counts</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'airport_count'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'Quantiles'</span><span class="p">,</span> \
+              <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c"># Display map</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_36_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>Maybe unsurprisingly, what we find after all of this is that larger countries such as Canada, US, or Russia, have more airports. However, we can also find interesting insights. Some countries with similar size, such as France or Germany and some African countries such as Namibia have very different numbers. This should trigger further questions as to why that is, and maybe even suggest some tentative answers.</p>
+
+<p>And additional view that might be of interest is to display airport counts, but weighted by the area of the country. In other words, to show airport density. The idea behind it is to explore the variation in probabilities of an airport to be located in a given country, irrespective of how large that country is. Let us first create the densities:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Airport density</span>
+<span class="c"># Note since the CRS we are working with is expressed in Sq. metres,</span>
+<span class="c"># we rescale it so the numbers are easier to read</span>
+<span class="n">airport_density</span> <span class="o">=</span> <span class="n">cty_counts</span> <span class="o">*</span> <span class="mf">1e12</span> <span class="o">/</span> <span class="n">ctys</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'ADMIN'</span><span class="p">)</span><span class="o">.</span><span class="n">area</span>
+
+<span class="n">airport_density</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ADMIN
+Afghanistan     1.069522
+Albania        19.990267
+Algeria         0.999154
+Angola          1.519744
+Argentina       3.009512
+dtype: float64
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>And now we are ready to plot!</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Index countries by the name, append the airport densities</span>
+<span class="c"># (which are themselves indexed on country names too),</span>
+<span class="c"># Fill any missing value in the count with zero (no number</span>
+<span class="c"># in this context means zero airports), and display choropleth</span>
+<span class="c"># using quantiles</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">ctys</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'ADMIN'</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">airport_dens</span><span class="o">=</span><span class="n">airport_density</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'airport_dens'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'Quantiles'</span><span class="p">,</span> \
+              <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c"># Display map</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_40_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>This map gives us a very different view. Very large countries are all of a sudden “penalized” and some smaller ones rise to the highest values. Again, how to read this map and whether its message is interesting or not depends on what we are after. But, together with the previous one, it does highlight important issues to consider when exploring uneven spatial data and what it means to display data (e.g. airports) through specific geographies (e.g. countries).</p>
+
+<h2 id="vignette-2-images-of-tokyo">Vignette #2: Images of Tokyo</h2>
+
+<p>The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, <a href="https://link.springer.com/article/10.1007%2Fs10708-007-9111-y">Goodchild, 2007</a>) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to <a href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let’s load the data first:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'data/tokyo_clean.csv'</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>The table we will use has been lightly processed from the raw data, and contains the user ID, the latitude and longitude, as well as those coordinates expressed in Pseudo Mercator, the timestamp when the photo was taken, and the url of th picture they refer to:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output output_html">
+<div>
+<style>
+    .dataframe thead tr:only-child th {
+        text-align: right;
+    }
+
+    .dataframe thead th {
+        text-align: left;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user_id</th>
+      <th>longitude</th>
+      <th>latitude</th>
+      <th>date_taken</th>
+      <th>photo/video_page_url</th>
+      <th>x</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>10727420@N00</td>
+      <td>139.700499</td>
+      <td>35.674000</td>
+      <td>2010-04-09 17:26:25.0</td>
+      <td>http://www.flickr.com/photos/10727420@N00/4545...</td>
+      <td>1.555139e+07</td>
+      <td>4.255856e+06</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8819274@N04</td>
+      <td>139.766521</td>
+      <td>35.709095</td>
+      <td>2007-02-10 16:08:40.0</td>
+      <td>http://www.flickr.com/photos/8819274@N04/26503...</td>
+      <td>1.555874e+07</td>
+      <td>4.260667e+06</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>62068690@N00</td>
+      <td>139.765632</td>
+      <td>35.694482</td>
+      <td>2008-12-21 15:45:31.0</td>
+      <td>http://www.flickr.com/photos/62068690@N00/3125...</td>
+      <td>1.555864e+07</td>
+      <td>4.258664e+06</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>49503094041@N01</td>
+      <td>139.784391</td>
+      <td>35.548589</td>
+      <td>2011-11-11 05:48:54.0</td>
+      <td>http://www.flickr.com/photos/49503094041@N01/6...</td>
+      <td>1.556073e+07</td>
+      <td>4.238684e+06</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>40443199@N00</td>
+      <td>139.768753</td>
+      <td>35.671521</td>
+      <td>2006-04-06 16:42:49.0</td>
+      <td>http://www.flickr.com/photos/40443199@N00/2482...</td>
+      <td>1.555899e+07</td>
+      <td>4.255517e+06</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<h3 id="visualization">Visualization</h3>
+
+<p>The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatter plot with a single line:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Generate scatter plot</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'longitude'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'latitude'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">);</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_47_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>This is a good start: we can see dots, far from randomly, tend to be concentrated in the center of the covered area; furthermore, within the broad patter, we can also see there seems to be more localised clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb.</p>
+
+<p>Start with the context. The easiest way to provide additional context is by ovelaying a tile map from the internet. Let us quickly call <code class="highlighter-rouge">contextily</code> for that. We first obtain the bounding box of the point pattern:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Extract bounding box from the `x` and `y` columns</span>
+<span class="n">bbox</span> <span class="o">=</span> <span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="nb">max</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="nb">max</span><span class="p">()]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>And then pull the tiles down:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Download map tiles</span>
+<span class="o">%</span><span class="n">time</span> <span class="n">img</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">bounds2img</span><span class="p">(</span><span class="o">*</span><span class="n">bbox</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CPU times: user 40.2 ms, sys: 11.6 ms, total: 51.8 ms
+Wall time: 460 ms
+</code></pre></div>      </div>
+    </div>
+  </div>
+</div>
+
+<h4 id="dots-on-a-map">Dots on a map</h4>
+
+<p>Adding them brings a lot more clarity to why the dots are distributed the way they are:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Add map tiles for context</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="c"># Plot photograph points</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'x'</span><span class="p">],</span> <span class="n">db</span><span class="p">[</span><span class="s">'y'</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_54_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<h4 id="hex-binning">Hex-binning</h4>
+
+<p>Let us now take care of the second problem: dense areas becoming a big blurb where it is hard to tell any pattern or see through to explore the characteristics of the area. For example, in the middle of the map, towards the right, there is the highest concentration of pictures taken; this sheer amount of dots on the maps in some parts obscures whether all of that area receives as many pics or whether, within there, some places receive a particularly high degree of attention.</p>
+
+<p>The first solution for this, which has become very popular in the last few years, is to generate a regular grid (either squared or hexagonal), count how many dots each polygons has, and present it as we would any other choropleth. This is attractive because it is simple, intuitive, and the regular grid removes some of the area distortions choropleths may imply. We will use hexagonal binning (also called hexbin) because it has slightly nicer properties than squared grids, such as larger flexibility in the shape and better connectivity between cells. Creating a hexbin is rather straightforward in Python:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Add map tiles for context</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c"># Generate and add hexbin with 50 hexagons in each </span>
+<span class="c"># dimension, not borderlines, half transparency,</span>
+<span class="c"># and the reverse viridis colormap</span>
+<span class="n">hb</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">hexbin</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'x'</span><span class="p">],</span> <span class="n">db</span><span class="p">[</span><span class="s">'y'</span><span class="p">],</span> \
+               <span class="n">gridsize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> \
+               <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis_r'</span><span class="p">)</span>
+<span class="c"># Add colorbar</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">hb</span><span class="p">)</span>
+<span class="c"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_56_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localised areas and that the previous map was obscuring this.</p>
+
+<h4 id="kernel-density-estimation-kde">Kernel Density Estimation (KDE)</h4>
+
+<p>Grids are the spatial equivalent of a histogram: the user decides how many “buckets”, and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretisation of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. <a href="https://books.google.co.uk/books?hl=en&amp;lr=&amp;id=e-xsrjsL7WkC&amp;oi=fnd&amp;pg=PR9&amp;dq=Silverman,+B.+W.+(1986)&amp;ots=ixJrnv0GXo&amp;sig=pMOnWU2UYmJ5SYpGWsnXtBgS_LI#v=onepage&amp;q=Silverman%2C%20B.%20W.%20(1986)&amp;f=false">Silverman 1986</a>), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a gaussian kernel in Python is rather straightfoward:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Add map tiles for context</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c"># Generate and add KDE with a shading of 50 gradients </span>
+<span class="c"># coloured contours, 75% of transparency,</span>
+<span class="c"># and the reverse viridis colormap</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'x'</span><span class="p">],</span> <span class="n">db</span><span class="p">[</span><span class="s">'y'</span><span class="p">],</span> \
+            <span class="n">n_levels</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> \
+            <span class="n">alpha</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis_r'</span><span class="p">)</span>
+<span class="c"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_59_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>The result is a much smoother output that captures the same structure of the hexbin but eases the transitions between different areas. This provides a better generalisation of the probability function which, in some cases, is useful.</p>
+
+<h3 id="testing-for-non-randomness">Testing for non-randomness</h3>
+
+<ul>
+  <li>quadrat</li>
+  <li>distance based</li>
+  <li>k-functions</li>
+  <li>bi-variate k</li>
+</ul>
+
+<h3 id="identifying-clusters">Identifying clusters</h3>
+
+<p>In this final section, we will learn a method to identify clusters of points, based on their density across space. To do this, we will use the widely used <code class="highlighter-rouge">DBSCAN</code> algorithm. For this method, a cluster is a concentration of at least <code class="highlighter-rouge">m</code> points, each of them within a distance of <code class="highlighter-rouge">r</code> of at least another point in the cluster. Points in the dataset are then divided into three categories:</p>
+
+<ul>
+  <li><em>Noise</em>, for those points outside a cluster.</li>
+  <li><em>Cores</em>, for those points inside a cluster whith at least <code class="highlighter-rouge">m</code> points in the cluster within distance <code class="highlighter-rouge">r</code>.</li>
+  <li><em>Borders</em> for points inside a cluster with less than <code class="highlighter-rouge">m</code> other points in the cluster within distance <code class="highlighter-rouge">r</code>.</li>
+</ul>
+
+<p>Both <code class="highlighter-rouge">m</code> and <code class="highlighter-rouge">r</code> need to be prespecified by the user before running <code class="highlighter-rouge">DBSCAN</code>. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing <code class="highlighter-rouge">DBSCAN</code> in Python.</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Compute DBSCAN</span>
+<span class="n">cs</span><span class="p">,</span> <span class="n">lbls</span> <span class="o">=</span> <span class="n">dbscan</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">]])</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>The function returns two objects, which we call <code class="highlighter-rouge">cs</code> and <code class="highlighter-rouge">lbls</code>. <code class="highlighter-rouge">cs</code> contains the indices (order, starting from zero) of each point which is classified as a <em>core</em>. We can have a peek into it to see what it looks like:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Print the first 5 elements of `cs`</span>
+<span class="n">cs</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([ 1, 22, 30, 36, 42])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as it is the 23rd, 31st, 36th, and 43rd. The object <code class="highlighter-rouge">cs</code> always has a variable length, depending on how many cores the algorithm finds.</p>
+
+<p>Now let us have a look at <code class="highlighter-rouge">lbls</code>, short for labels:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lbls</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([-1,  0, -1, -1, -1])
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>The labels object always has the same length as the number of points used to run <code class="highlighter-rouge">DBSCAN</code>. Each value represents the index of the cluster a point belongs to. If the point is classified as <em>noise</em>, it receives a -1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make thinks easier later on, let us turn <code class="highlighter-rouge">lbls</code> into a <code class="highlighter-rouge">Series</code> object that we can index in the same way as our collection of points:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lbls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">lbls</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<p>Now we already have the clusters, we can proceed to visualize them. There are many ways in which this can be done. We will start just by coloring points in a cluster in red and noise in grey:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Add base layer with tiles for context</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c"># Subset points that are not part of any cluster (noise)</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lbls</span><span class="o">==-</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">]]</span>
+<span class="c"># Plot noise in grey</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">noise</span><span class="p">[</span><span class="s">'x'</span><span class="p">],</span> <span class="n">noise</span><span class="p">[</span><span class="s">'y'</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'grey'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c"># Plot all points that are not noise in red</span>
+<span class="c"># NOTE how this is done through some fancy indexing, where</span>
+<span class="c">#      we take the index of all points (tw) and substract from</span>
+<span class="c">#      it the index of those that are noise</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s">'x'</span><span class="p">],</span> \
+           <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s">'y'</span><span class="p">],</span> \
+          <span class="n">c</span><span class="o">=</span><span class="s">'red'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c"># Display the figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_73_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<p>Although informative, the result of this run is not particularly satisfactory. XXX. This is because we have run <code class="highlighter-rouge">DBSCAN</code> with the default parameters. If you type <code class="highlighter-rouge">dbscan?</code>, you will get the help of the function and will be able to see what those are: a radious of 0.5 and a minimum of five points per cluster. Since our data is expressed in metres, a radius of half a metre will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs.</p>
+
+<p>Let us change those parameters to see if we can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Obtain the number of points 1% of the total represents</span>
+<span class="n">minp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="nb">round</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">minp</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>100.0
+</code></pre></div>      </div>
+
+    </div>
+  </div>
+</div>
+
+<p>At the same time, let us expand the maximum radious to say, 500 metres. Then we can re-run the algorithm and plot the output, all in the same cell this time:</p>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Rerun DBSCAN</span>
+<span class="n">cs</span><span class="p">,</span> <span class="n">lbls</span> <span class="o">=</span> <span class="n">dbscan</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">]],</span> <span class="n">eps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="n">minp</span><span class="p">)</span>
+<span class="c"># Turn labels into a Series</span>
+<span class="n">lbls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">lbls</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+<span class="c"># Setup figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Add base layer with tiles for context</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c"># Subset points that are not part of any cluster (noise)</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lbls</span><span class="o">==-</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">]]</span>
+<span class="c"># Plot noise in grey</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">noise</span><span class="p">[</span><span class="s">'x'</span><span class="p">],</span> <span class="n">noise</span><span class="p">[</span><span class="s">'y'</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'grey'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c"># Plot all points that are not noise in red</span>
+<span class="c"># NOTE how this is done through some fancy indexing, where</span>
+<span class="c">#      we take the index of all points (tw) and substract from</span>
+<span class="c">#      it the index of those that are noise</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s">'x'</span><span class="p">],</span> \
+           <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s">'y'</span><span class="p">],</span> \
+          <span class="n">c</span><span class="o">=</span><span class="s">'red'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c"># Display the figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_77_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<ul>
+  <li>Convex hull (<code class="highlighter-rouge">shapely</code>) of each cluster</li>
+</ul>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">chs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">cID</span> <span class="ow">in</span> <span class="n">lbls</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">cID</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">cluster</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lbls</span><span class="o">==</span><span class="n">cID</span><span class="p">]</span>
+        <span class="n">geom</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">[</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">]]</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span>\
+                                    <span class="k">lambda</span> <span class="n">xy</span><span class="p">:</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">xy</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+                                               <span class="p">)</span>
+        <span class="n">ch</span> <span class="o">=</span> <span class="n">MultiPoint</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span><span class="o">.</span><span class="n">convex_hull</span>
+        <span class="n">chs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ch</span><span class="p">)</span>
+<span class="n">chs</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">chs</span><span class="p">)</span>
+
+</code></pre></div>    </div>
+  </div>
+
+</div>
+
+<div class="cell code_cell">
+  <div class="input_area">
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Rerun DBSCAN</span>
+<span class="n">cs</span><span class="p">,</span> <span class="n">lbls</span> <span class="o">=</span> <span class="n">dbscan</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">]],</span> <span class="n">eps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="n">minp</span><span class="p">)</span>
+<span class="c"># Turn labels into a Series</span>
+<span class="n">lbls</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">lbls</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+<span class="c"># Setup figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c"># Add base layer with tiles for context</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c"># Subset points that are not part of any cluster (noise)</span>
+<span class="n">noise</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lbls</span><span class="o">==-</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="s">'x'</span><span class="p">,</span> <span class="s">'y'</span><span class="p">]]</span>
+<span class="c"># Plot noise in grey</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">noise</span><span class="p">[</span><span class="s">'x'</span><span class="p">],</span> <span class="n">noise</span><span class="p">[</span><span class="s">'y'</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s">'grey'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> \
+           <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="c"># Plot convex hulls</span>
+<span class="n">chs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+<span class="c"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c"># Display the figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div>    </div>
+  </div>
+
+  <div class="output_wrapper">
+    <div class="output_subarea">
+
+      <p class="output_png"><img src="../images/notebooks/08_point_pattern_analysis_80_0.png" alt="png" /></p>
+
+    </div>
+  </div>
+</div>
+
+<hr />
+
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
+
+
+              <nav class="c-page__nav">
+  
+    
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/notebooks/07_local_autocorrelation">
+      〈 <span class="u-margin-right-tiny"></span> Local Spatial Autocorrelation
+    </a>
+  
+
+  
+    
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/intro_part_iii">
+      Part III - Advanced Topics <span class="u-margin-right-tiny"></span> 〉
+    </a>
+  
+</nav>
+
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  </body>
+</html>
