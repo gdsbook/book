@@ -39,9 +39,9 @@
   "headline":
     "Regression",
   "datePublished":
-    "2019-07-26T12:36:10+00:00",
+    "2019-07-29T16:40:50+00:00",
   "dateModified":
-    "2019-07-26T12:36:10+00:00",
+    "2019-07-29T16:40:50+00:00",
   "description":
     "Spatial regression",
   "author": {
@@ -1121,7 +1121,6 @@ initFunction(initQuery);
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">geopandas</span>
-<span class="kn">import</span> <span class="nn">bookdata</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
 <span class="kn">import</span> <span class="nn">seaborn</span>
 
@@ -1168,7 +1167,7 @@ This dataset contains house intrinsic characteristics, both continuous (number o
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">regression_airbnbs</span><span class="p">())</span>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">'../data/airbnb/regression_db.geojson'</span><span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 
 </code></pre></div>    </div>
@@ -1419,7 +1418,7 @@ For this example, weâ€™ll start off with a $KNN$ matrix where $k=1$, meaning weâ
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">Distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 </code></pre></div>    </div>
   </div>
@@ -1529,7 +1528,7 @@ Indeed, this heterogeneity can have a large impact on how a process is understoo
   <div class="output_wrapper">
     <div class="output_subarea">
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x1a1ccc31d0&gt;
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f25fbb11ef0&gt;
 </code></pre></div>      </div>
 
     </div>
@@ -1696,7 +1695,7 @@ using <code class="highlighter-rouge">statsmodels</code>; and two, with <code cl
 ======================================================================================
 Model:                      OLS                    Adj. R-squared:           0.709    
 Dependent Variable:         log_price              AIC:                      7229.6640
-Date:                       2018-07-23 21:57       BIC:                      7599.1365
+Date:                       2019-07-29 16:39       BIC:                      7599.1365
 No. Observations:           6110                   Log-Likelihood:           -3559.8  
 Df Model:                   54                     F-statistic:              276.9    
 Df Residuals:               6055                   Prob (F-statistic):       0.00     
@@ -1991,7 +1990,8 @@ dtype: float64
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neighborhoods</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">san_diego_neighborhoods</span><span class="p">())</span>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sd_path</span> <span class="o">=</span> <span class="s">'../data/airbnb/neighbourhoods.geojson'</span>
+<span class="n">neighborhoods</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">sd_path</span><span class="p">)</span>
 
 </code></pre></div>    </div>
   </div>
@@ -2000,10 +2000,15 @@ dtype: float64
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">neighborhood_effects</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">,</span>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> 
+                        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">neighborhoods</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">neighborhood_effects</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">,</span>
                     <span class="n">left_on</span><span class="o">=</span><span class="s">'neighbourhood'</span><span class="p">,</span> 
-                    <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'fixed_effect'</span><span class="p">,</span>
-                                           <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+                    <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>\
+                  <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s">'fixed_effect'</span><span class="p">])</span>\
+                  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'fixed_effect'</span><span class="p">,</span>
+                        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"San Diego Neighborhood Fixed Effects"</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 
@@ -2311,7 +2316,7 @@ N. of iterations    :           1                Step1c computed       :        
 ------------------------------------------------------------------------------------
             Variable     Coefficient       Std.Error     z-Statistic     Probability
 ------------------------------------------------------------------------------------
-            CONSTANT       4.4262033       0.0217088     203.8898742       0.0000000
+            CONSTANT       4.4262033       0.0217088     203.8898740       0.0000000
         accommodates       0.0695536       0.0063268      10.9934495       0.0000000
            bathrooms       0.1614101       0.0151312      10.6673765       0.0000000
             bedrooms       0.1739251       0.0146697      11.8560847       0.0000000

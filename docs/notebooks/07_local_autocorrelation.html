@@ -39,9 +39,9 @@
   "headline":
     "Local Spatial Autocorrelation",
   "datePublished":
-    "2019-07-26T12:36:10+00:00",
+    "2019-07-29T16:40:50+00:00",
   "dateModified":
-    "2019-07-26T12:36:10+00:00",
+    "2019-07-29T16:40:50+00:00",
   "description":
     "Local Spatial Autocorrelation",
   "author": {
@@ -195,7 +195,7 @@ initFunction(addThebelabButtonToCodeCells);
         theme: "abcdef"
       },
       kernelOptions: {
-        name: 'ana',
+        name: 'python3',
       }
     }
 </script>
@@ -1125,17 +1125,15 @@ Moran’s I is good tool to summarize a dataset into a single value that informs
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>  <span class="c"># Graphics</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span>
-<span class="kn">import</span> <span class="nn">seaborn</span>            <span class="c"># Graphics</span>
-<span class="kn">import</span> <span class="nn">geopandas</span>        <span class="c"># Spatial data manipulation</span>
-<span class="kn">import</span> <span class="nn">pandas</span>              <span class="c"># Tabular data manipulation</span>
-<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>               <span class="c"># Spatial analytics</span>
+<span class="kn">import</span> <span class="nn">seaborn</span>                   <span class="c"># Graphics</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>                 <span class="c"># Spatial data manipulation</span>
+<span class="kn">import</span> <span class="nn">pandas</span>                    <span class="c"># Tabular data manipulation</span>
+<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>   <span class="c"># Exploratory Spatial analytics</span>
 <span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
-<span class="kn">import</span> <span class="nn">contextily</span>        <span class="c"># Background tiles</span>
+<span class="kn">import</span> <span class="nn">contextily</span>                <span class="c"># Background tiles</span>
 <span class="c"># Stamen Terrain Background tiles</span>
 <span class="kn">from</span> <span class="nn">contextily.tile_providers</span> <span class="kn">import</span> <span class="n">ST_TERRAIN_BACKGROUND</span>
-<span class="kn">import</span> <span class="nn">bookdata</span>
 <span class="kn">from</span> <span class="nn">booktools</span> <span class="kn">import</span> <span class="n">choropleth</span>
-
 
 </code></pre></div>    </div>
   </div>
@@ -1144,7 +1142,8 @@ Moran’s I is good tool to summarize a dataset into a single value that informs
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">brexit</span><span class="p">(),</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'Area_Code'</span><span class="p">)</span>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'../data/brexit_vote.csv'</span><span class="p">,</span> 
+                      <span class="n">index_col</span><span class="o">=</span><span class="s">'Area_Code'</span><span class="p">)</span>
 <span class="n">ref</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 
 </code></pre></div>    </div>
@@ -1186,7 +1185,12 @@ memory usage: 62.7+ KB
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">lads</span><span class="p">())</span>\
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads_path</span> <span class="o">=</span> <span class="p">(</span><span class="s">'../data/'</span>\
+             <span class="s">'Local_Authority_Districts_December_2016_'</span>\
+             <span class="s">'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'</span>\
+             <span class="s">'Local_Authority_Districts_December_2016_Generalised_'</span>\
+             <span class="s">'Clipped_Boundaries_in_the_UK_WGS84.shp'</span><span class="p">)</span>
+<span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">lads_path</span><span class="p">)</span>\
                 <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'lad16cd'</span><span class="p">)</span>
 <span class="n">lads</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 
@@ -1445,7 +1449,7 @@ memory usage: 14.8+ KB
   <div class="output_wrapper">
     <div class="output_subarea">
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f1395ef2710&gt;
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fab8f9e0ef0&gt;
 </code></pre></div>      </div>
 
     </div>
@@ -1663,17 +1667,17 @@ memory usage: 14.8+ KB
     <tr>
       <th>E06000001</th>
       <td>1</td>
-      <td>0.010</td>
+      <td>0.014</td>
     </tr>
     <tr>
       <th>E06000002</th>
       <td>1</td>
-      <td>0.015</td>
+      <td>0.007</td>
     </tr>
     <tr>
       <th>E06000003</th>
       <td>1</td>
-      <td>0.011</td>
+      <td>0.017</td>
     </tr>
     <tr>
       <th>E06000004</th>
@@ -1683,7 +1687,7 @@ memory usage: 14.8+ KB
     <tr>
       <th>E06000010</th>
       <td>1</td>
-      <td>0.019</td>
+      <td>0.011</td>
     </tr>
   </tbody>
 </table>
@@ -1736,27 +1740,27 @@ memory usage: 14.8+ KB
     <tr>
       <th>W06000018</th>
       <td>0</td>
-      <td>0.490</td>
+      <td>0.482</td>
     </tr>
     <tr>
       <th>W06000019</th>
       <td>0</td>
-      <td>0.462</td>
+      <td>0.481</td>
     </tr>
     <tr>
       <th>W06000021</th>
       <td>0</td>
-      <td>0.295</td>
+      <td>0.273</td>
     </tr>
     <tr>
       <th>W06000022</th>
       <td>0</td>
-      <td>0.359</td>
+      <td>0.365</td>
     </tr>
     <tr>
       <th>W06000023</th>
       <td>0</td>
-      <td>0.306</td>
+      <td>0.291</td>
     </tr>
   </tbody>
 </table>
@@ -1800,10 +1804,10 @@ memory usage: 14.8+ KB
   <div class="output_wrapper">
     <div class="output_subarea">
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[('0 ns', 225),
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[('0 ns', 222),
  ('1 hot spot', 77),
- ('2 doughnut', 5),
- ('3 cold spot', 69),
+ ('2 doughnut', 6),
+ ('3 cold spot', 71),
  ('4 diamond', 4)]
 </code></pre></div>      </div>
 
