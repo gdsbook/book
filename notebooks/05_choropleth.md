@@ -13,12 +13,10 @@ jupyter:
     name: python3
 ---
 
-```python
 # Choropleth mapping
 
 
 
-```
 
 ```python
 %matplotlib inline
