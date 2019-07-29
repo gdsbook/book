@@ -26,7 +26,6 @@ import statsmodels.formula.api as sm
 import numpy
 import pandas
 import geopandas
-import bookdata
 import matplotlib.pyplot as plt
 import seaborn
 ```
@@ -68,7 +67,7 @@ To learn a little more about how regression works, we'll examine some informatio
 This dataset contains house intrinsic characteristics, both continuous (number of beds as in `beds`) and categorical (type of renting or, in AirBnb jargon, property group as in the series of `pg_X` binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, `d2balboa` or neigbourhood id, `neighbourhood_cleansed`).
 
 ```python
-db = geopandas.read_file(bookdata.regression_airbnbs())
+db = geopandas.read_file('../data/airbnb/regression_db.geojson')
 db.info()
 ```
 
@@ -186,7 +185,7 @@ We cover spatial weights in detail in another chapter, so we will not repeat our
 For this example, we'll start off with a $KNN$ matrix where $k=1$, meaning we're focusing only on the linkages of each airbnb to their closest other listing.
 
 ```python
-knn = weights.Distance.KNN.from_dataframe(db, k=1)
+knn = weights.KNN.from_dataframe(db, k=1)
 ```
 
 This means that, when we compute the *spatial lag* of that knn weight and the residual, we get the residual of the airbnb listing closest to each observation.
@@ -359,14 +358,20 @@ neighborhood_effects.head()
 Good, we're back to our raw neighborhood names. Now, we can join them back up with the neighborhood shapes:
 
 ```python
-neighborhoods = geopandas.read_file(bookdata.san_diego_neighborhoods())
+sd_path = '../data/airbnb/neighbourhoods.geojson'
+neighborhoods = geopandas.read_file(sd_path)
 ```
 
 ```python
-ax = neighborhoods.merge(neighborhood_effects, how='left',
+ax = neighborhoods.plot(color='k', 
+                        alpha=0.5,
+                        figsize=(12,6))
+neighborhoods.merge(neighborhood_effects, how='left',
                     left_on='neighbourhood', 
-                    right_index=True).plot('fixed_effect',
-                                           figsize=(12,6))
+                    right_index=True)\
+                  .dropna(subset=['fixed_effect'])\
+                  .plot('fixed_effect',
+                        ax=ax)
 ax.set_title("San Diego Neighborhood Fixed Effects")
 plt.show()
 ```
