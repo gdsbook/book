@@ -35,9 +35,9 @@ Intro paragraph
 <!-- #endregion -->
 
 ```python deletable=true editable=true
-import pysal as ps
 import pandas as pd
-df = pd.read_csv("data/airports/world-airports.csv")
+import geopandas as gpd
+df = pd.read_csv("../data/airports/world-airports.csv")
 ```
 
 ```python
@@ -92,16 +92,10 @@ len(large)
 - spatial join - airports by countries
 <!-- #endregion -->
 
-```python deletable=true editable=true
-countries_shp = ps.pdio.read_files("data/airports/ne_10m_admin_0_countries/ne_10m_admin_0_countries.shp")
-```
-
 ```python
-
-```
-
-```python
-
+p = ('../data/airports/ne_10m_admin_0_countries/'\
+     'ne_10m_admin_0_countries.shp')
+countries_shp = gpd.read_file(p)
 ```
 
 <!-- #region {"deletable": true, "editable": true} -->
@@ -116,7 +110,7 @@ countries_shp = ps.pdio.read_files("data/airports/ne_10m_admin_0_countries/ne_10
 ## Vignette: House Prices
 
 ```python
-df = pd.read_csv('data/sandiego/listings.csv')
+df = pd.read_csv('../data/sandiego/listings.csv')
 len(df)
 ```
 
