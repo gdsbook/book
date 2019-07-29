@@ -22,17 +22,15 @@ borrowed from [GDS'17 - Lab
 
 ```python
 from pysal.explore.esda.moran import Moran
-from pysal.lib.api import Queen, KNN
-from pysal.lib.weights import Wsets
+import pysal.lib.weights.set_operations as Wsets
+from pysal.lib.weights import Queen, KNN
 from booktools import choropleth
 import seaborn 
 import pandas
 import geopandas 
-import data
 import numpy
 from sklearn.cluster import KMeans, AgglomerativeClustering
 import matplotlib.pyplot as plt
-
 ```
 
 ## Introduction
@@ -127,7 +125,7 @@ exploring the attribute names.
 
 ```python
 # Read file
-db = geopandas.read_file(data.san_diego_tracts())
+db = geopandas.read_file('../data/sandiego/sd_tracts_acs_clean.shp')
 # Print column names
 db.columns
 ```
@@ -792,7 +790,7 @@ where each observation is connected to its four nearest observations, instead
 of those it touches.
 
 ```python
-w = KNN.from_shapefile(data.san_diego_tracts(), k=4)
+w = KNN.from_shapefile('../data/sandiego/sd_tracts_acs_clean.shp', k=4)
 ```
 
 With this matrix connecting each tract to the four closest tracts, we can run 
