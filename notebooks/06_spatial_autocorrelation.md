@@ -50,7 +50,6 @@ from pysal.explore import esda
 from pysal.lib import weights
 from numpy.random import seed
 # Bespoke
-import bookdata
 from booktools import choropleth
 ```
 
@@ -62,14 +61,20 @@ In 2016, Great Britain ran a referendum to decide whether to remain in the Europ
 To load it up, we can use the `bookdata` utility, which pulls the path to the file on your local machine. The vote results are stored in a `csv` file:
 
 ```python
-ref = pandas.read_csv(bookdata.brexit(), index_col='Area_Code')
+brexit_data_path = '../data/brexit_vote.csv'
+ref = pandas.read_csv(brexit_data_path, index_col='Area_Code')
 ref.info()
 ```
 
 While the shapes of the geographical units (local authority districts, in this case) are stored in a compressed GeoJSON file. We can read it directly from the `.zip` file as follows:
 
 ```python
-lads = geopandas.read_file(bookdata.lads())\
+lads_path = ('../data/'\
+             'Local_Authority_Districts_December_2016_'\
+             'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'\
+             'Local_Authority_Districts_December_2016_Generalised_'\
+             'Clipped_Boundaries_in_the_UK_WGS84.shp')
+lads = geopandas.read_file(lads_path)\
                 .set_index('lad16cd')
 lads.info()
 ```
@@ -121,7 +126,7 @@ The final piece we need before we can delve into autocorrelation is the spatial 
 
 ```python
 # Generate W from the GeoDataFrame
-w = weights.Distance.KNN.from_dataframe(db, k=8)
+w = weights.KNN.from_dataframe(db, k=8)
 # Row-standardization
 w.transform = 'R'
 ```
@@ -427,7 +432,7 @@ min_thr
 For every local authority to have a neighbour, the distance band needs to at least be about 181 Km. This information can then be passed to the `DistanceBand` constructor:
 
 ```python
-w_db = weights.Distance.DistanceBand.from_dataframe(db_osgb, min_thr)
+w_db = weights.DistanceBand.from_dataframe(db_osgb, min_thr)
 ```
 
 At this point, we are ready to calculate the global $G$ statistic:
