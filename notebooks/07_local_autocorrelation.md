@@ -8,9 +8,9 @@ jupyter:
       format_version: '1.1'
       jupytext_version: 1.1.6
   kernelspec:
-    display_name: Analysis
+    display_name: Python 3
     language: python
-    name: ana
+    name: python3
 ---
 
 # Local Spatial Autocorrelation
@@ -34,28 +34,32 @@ We continue with the same dataset we examined in the previous chapter, and thus 
 
 import matplotlib.pyplot as plt  # Graphics
 from matplotlib import colors
-import seaborn            # Graphics
-import geopandas        # Spatial data manipulation
-import pandas              # Tabular data manipulation
-from pysal.explore import esda               # Spatial analytics
+import seaborn                   # Graphics
+import geopandas                 # Spatial data manipulation
+import pandas                    # Tabular data manipulation
+from pysal.explore import esda   # Exploratory Spatial analytics
 from pysal.lib import weights
-import contextily        # Background tiles
+import contextily                # Background tiles
 # Stamen Terrain Background tiles
 from contextily.tile_providers import ST_TERRAIN_BACKGROUND
-import bookdata
 from booktools import choropleth
-
 ```
 
 ```python
-ref = pandas.read_csv(bookdata.brexit(), index_col='Area_Code')
+ref = pandas.read_csv('../data/brexit_vote.csv', 
+                      index_col='Area_Code')
 ref.info()
 ```
 
 Now let us bring in the spatial data:
 
 ```python
-lads = geopandas.read_file(bookdata.lads())\
+lads_path = ('../data/'\
+             'Local_Authority_Districts_December_2016_'\
+             'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'\
+             'Local_Authority_Districts_December_2016_Generalised_'\
+             'Clipped_Boundaries_in_the_UK_WGS84.shp')
+lads = geopandas.read_file(lads_path)\
                 .set_index('lad16cd')
 lads.info()
 ```
@@ -451,7 +455,3 @@ As you can see, the results are virtually the same for $G_i$ and $G_i^*$. Also, 
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
-
-```python
-
-```
