@@ -50,7 +50,7 @@ In this vignette, we will use a preprocessed open dataset collecting XXX. Before
 
 ```python
 # Load GeoJSON file
-air = gpd.read_file('data/airports/airports_clean.geojson')
+air = gpd.read_file('../data/airports/airports_clean.geojson')
 # Check top of the table
 air.head()
 ```
@@ -119,7 +119,7 @@ The first thing we need to do to create a country map is to have country (spatia
 
 ```python
 # Load up shapefile with countries
-ctys = gpd.read_file('data/airports/countries_clean/countries_clean.shp')
+ctys = gpd.read_file('../data/airports/countries_clean/countries_clean.shp')
 ```
 
 And, same as with any new dataset, let us have a quick look at what it looks like and how it stacks up with the other data we have collected along the way:
@@ -284,7 +284,7 @@ This map gives us a very different view. Very large countries are all of a sudde
 The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, [Goodchild, 2007](https://link.springer.com/article/10.1007%2Fs10708-007-9111-y)) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let's load the data first:
 
 ```python
-db = pd.read_csv('data/tokyo_clean.csv')
+db = pd.read_csv('../data/tokyo_clean.csv')
 ```
 
 The table we will use has been lightly processed from the raw data, and contains the user ID, the latitude and longitude, as well as those coordinates expressed in Pseudo Mercator, the timestamp when the photo was taken, and the url of th picture they refer to:

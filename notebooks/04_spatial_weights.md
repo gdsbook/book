@@ -8,9 +8,9 @@ jupyter:
       format_version: '1.1'
       jupytext_version: 1.1.6
   kernelspec:
-    display_name: Analysis
+    display_name: Python 3
     language: python
-    name: ana
+    name: python3
 ---
 
 # Spatial Weights
@@ -37,7 +37,6 @@ from pysal.lib import weights
 from pysal.lib import cg as geometry
 import geopandas
 import seaborn
-import bookdata
 import pandas 
 import numpy
 import matplotlib.pyplot as plt
@@ -249,7 +248,7 @@ must construct it ourselves. Under the hood, PySAL uses efficient spatial indexi
 structures to extract these.
 
 ```python
-san_diego_tracts = geopandas.read_file(bookdata.san_diego_tracts())
+san_diego_tracts = geopandas.read_file('../data/sandiego/sd_tracts_acs_clean.shp')
 wq = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 ```
 
@@ -567,7 +566,7 @@ distance based weights for the case of counties in the state of Texas. First, le
 a KNN-4 object that ignores the curvature of the Earth's surface:
 
 ```python
-texas = geopandas.read_file(bookdata.texas())
+texas = geopandas.read_file('../data/texas.shp')
 knn4_bad = weights.distance.KNN.from_dataframe(texas, k=4) # ignore curvature of the earth
 ```
 
@@ -781,7 +780,7 @@ We first read in the data for Mexico:
 <!-- #endregion -->
 
 ```python
-mx = geopandas.read_file(bookdata.mexico())
+mx = geopandas.read_file('../data/mexicojoin.shp')
 mx.plot();
 ```
 
@@ -1175,7 +1174,3 @@ Griffith, D. A. 1996. “Some Guidelines for Specifying the Geographic Weights M
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
-
-```python
-
-```

@@ -39,9 +39,9 @@
   "headline":
     "Spatial Autocorrelation",
   "datePublished":
-    "2019-07-26T12:36:10+00:00",
+    "2019-07-29T16:40:50+00:00",
   "dateModified":
-    "2019-07-26T12:36:10+00:00",
+    "2019-07-29T16:40:50+00:00",
   "description":
     "Global Spatial Autocorrelation",
   "author": {
@@ -1141,7 +1141,6 @@ initFunction(initQuery);
 <span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">seed</span>
 <span class="c"># Bespoke</span>
-<span class="kn">import</span> <span class="nn">bookdata</span>
 <span class="kn">from</span> <span class="nn">booktools</span> <span class="kn">import</span> <span class="n">choropleth</span>
 
 </code></pre></div>    </div>
@@ -1160,7 +1159,8 @@ initFunction(initQuery);
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">brexit</span><span class="p">(),</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'Area_Code'</span><span class="p">)</span>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">brexit_data_path</span> <span class="o">=</span> <span class="s">'../data/brexit_vote.csv'</span>
+<span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">brexit_data_path</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'Area_Code'</span><span class="p">)</span>
 <span class="n">ref</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 
 </code></pre></div>    </div>
@@ -1202,7 +1202,12 @@ memory usage: 62.7+ KB
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">bookdata</span><span class="o">.</span><span class="n">lads</span><span class="p">())</span>\
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lads_path</span> <span class="o">=</span> <span class="p">(</span><span class="s">'../data/'</span>\
+             <span class="s">'Local_Authority_Districts_December_2016_'</span>\
+             <span class="s">'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'</span>\
+             <span class="s">'Local_Authority_Districts_December_2016_Generalised_'</span>\
+             <span class="s">'Clipped_Boundaries_in_the_UK_WGS84.shp'</span><span class="p">)</span>
+<span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">lads_path</span><span class="p">)</span>\
                 <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'lad16cd'</span><span class="p">)</span>
 <span class="n">lads</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 
@@ -1341,7 +1346,7 @@ memory usage: 14.8+ KB
 <div class="cell code_cell">
   <div class="input_area">
     <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Generate W from the GeoDataFrame</span>
-<span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">Distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="c"># Row-standardization</span>
 <span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s">'R'</span>
 
@@ -1644,7 +1649,7 @@ memory usage: 14.8+ KB
   <div class="output_wrapper">
     <div class="output_subarea">
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;pysal.explore.esda.join_counts.Join_Counts at 0x7fce32051828&gt;
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;pysal.explore.esda.join_counts.Join_Counts at 0x7f8c9dc2eeb8&gt;
 </code></pre></div>      </div>
 
     </div>
@@ -2039,7 +2044,7 @@ memory usage: 14.8+ KB
   <div class="output_wrapper">
     <div class="output_subarea">
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>181454.1951138063
+      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>181454.19511378484
 </code></pre></div>      </div>
 
     </div>
@@ -2050,7 +2055,7 @@ memory usage: 14.8+ KB
 
 <div class="cell code_cell">
   <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">w_db</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">Distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db_osgb</span><span class="p">,</span> <span class="n">min_thr</span><span class="p">)</span>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">w_db</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db_osgb</span><span class="p">,</span> <span class="n">min_thr</span><span class="p">)</span>
 
 </code></pre></div>    </div>
   </div>
