@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
   <title>Clustering &amp; Regionalization</title>
-  <meta name="description" content="Clustering and Regionalization">
+  <meta name="description" content="Clustering and Regionalization ">
 
   <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/10_clustering_and_regionalization.html">
   <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
@@ -26,8 +26,10 @@
   <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/10_clustering_and_regionalization.html" />
 <meta property="og:type"        content="article" />
 <meta property="og:title"       content="Clustering &amp; Regionalization" />
-<meta property="og:description" content="Clustering and Regionalization" />
-<meta property="og:image"       content="" />
+<meta property="og:description" content="Clustering and Regionalization " />
+<meta property="og:image"       content="https://gdsbook.github.io/geographic-data-science/images/logo/logo.png" />
+
+<meta name="twitter:card" content="summary">
 
 
   <script type="application/ld+json">
@@ -39,11 +41,11 @@
   "headline":
     "Clustering &amp; Regionalization",
   "datePublished":
-    "2019-07-29T16:40:50+00:00",
+    "2019-08-09T18:14:23+00:00",
   "dateModified":
-    "2019-07-29T16:40:50+00:00",
+    "2019-08-09T18:14:23+00:00",
   "description":
-    "Clustering and Regionalization",
+    "Clustering and Regionalization ",
   "author": {
     "@type": "Person",
     "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
@@ -148,6 +150,45 @@ initFunction(function () {
   <script src="/geographic-data-science/assets/js/turbolinks.js" async></script>
   <meta name="turbolinks-cache-control" content="no-cache">
 
+  <!-- Selectors for elements on the page -->
+  <script>
+/**
+ * Select various elements on the page for later use
+ */
+
+// IDs we'll attach to cells
+const codeCellId = index => `codecell${index}`
+const inputCellId = index => `inputcell${index}`
+
+pageElements = {}
+
+// All code cells
+findCodeCells = function() {
+    var codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre, div.text_cell_render div.highlight pre')
+    pageElements['codeCells'] = codeCells;
+
+    codeCells.forEach((codeCell, index) => {
+      const id = codeCellId(index)
+      codeCell.setAttribute('id', id)
+    })
+};
+
+initFunction(findCodeCells);
+
+
+findInputCells = function() {
+    var inputCells = document.querySelectorAll('div.jb_input')
+    pageElements['inputCells'] = inputCells;
+
+    inputCells.forEach((inputCell, index) => {
+        const id = inputCellId(index)
+        inputCell.setAttribute('id', id)
+    })
+};
+
+initFunction(findInputCells);
+</script>
+
   <!-- Load nbinteract for widgets -->
   
 
@@ -169,7 +210,7 @@ const thebelabCellButton = id =>
 
 const addThebelabButtonToCodeCells =  () => {
 
-  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  const codeCells = document.querySelectorAll('div.input_area > div.highlight:not(.output) pre')
   codeCells.forEach((codeCell, index) => {
     const id = codeCellId(index)
     codeCell.setAttribute('id', id)
@@ -308,153 +349,6 @@ initFunction(initToc);
 
   <!-- Clipboard copy button -->
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" async></script>
-
-  <!-- Load JS that depends on site variables -->
-  <script>
-/**
- * Set up copy/paste for code blocks
- */
-const codeCellId = index => `codecell${index}`
-
-const clipboardButton = id =>
-  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
-    <img src="/geographic-data-science/assets/images/copy-button.svg" alt="Copy to clipboard">
-  </a>`
-
-// Clears selected text since ClipboardJS will select the text when copying
-const clearSelection = () => {
-  if (window.getSelection) {
-    window.getSelection().removeAllRanges()
-  } else if (document.selection) {
-    document.selection.empty()
-  }
-}
-
-// Changes tooltip text for two seconds, then changes it back
-const temporarilyChangeTooltip = (el, newText) => {
-  const oldText = el.getAttribute('data-tooltip')
-  el.setAttribute('data-tooltip', newText)
-  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
-}
-
-const addCopyButtonToCodeCells = () => {
-  // If ClipboardJS hasn't loaded, wait a bit and try again. This
-  // happens because we load ClipboardJS asynchronously.
-  if (window.ClipboardJS === undefined) {
-    setTimeout(addCopyButtonToCodeCells, 250)
-    return
-  }
-
-  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
-  codeCells.forEach((codeCell, index) => {
-    const id = codeCellId(index)
-    codeCell.setAttribute('id', id)
-    if (document.getElementById("copy-button" + id) == null) {
-      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
-    }
-  })
-
-  const clipboard = new ClipboardJS('.copybtn')
-  clipboard.on('success', event => {
-    clearSelection()
-    temporarilyChangeTooltip(event.trigger, 'Copied!')
-  })
-
-  clipboard.on('error', event => {
-    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
-  })
-
-  // Get rid of clipboard before the next page visit to avoid memory leak
-  document.addEventListener('turbolinks:before-visit', () =>
-    clipboard.destroy()
-  )
-}
-
-initFunction(addCopyButtonToCodeCells);
-</script>
-
-
-  <!-- Hide cell code -->
-  <script>
-    /**
-    Add buttons to hide code cells
-    */
-
-
-    var setCodeCellVisibility = function (inputField, kind) {
-        // Update the image and class for hidden
-        var id = inputField.getAttribute('data-id');
-        var codeCell = document.querySelector(`#${id} div.highlight`);
-
-        if (kind === "visible") {
-            codeCell.classList.remove('hidden');
-            inputField.checked = true;
-        } else {
-            codeCell.classList.add('hidden');
-            inputField.checked = false;
-        }
-    }
-
-    var toggleCodeCellVisibility = function (event) {
-        // The label is clicked, and now we decide what to do based on the input field's clicked status
-        if (event.target.tagName === "LABEL") {
-            var inputField = event.target.previousElementSibling;
-        } else {
-            // It is the span inside the target
-            var inputField = event.target.parentElement.previousElementSibling;
-        }
-
-        if (inputField.checked === true) {
-            setCodeCellVisibility(inputField, "visible");
-        } else {
-            setCodeCellVisibility(inputField, "hidden");
-        }
-    }
-
-
-    // Button constructor
-    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
-
-    var addHideButton = function () {
-        // If a hide button is already added, don't add another
-        if (document.querySelector('div.hidecode input') !== null) {
-            return;
-        }
-
-        // Find the input cells and add a hide button
-        document.querySelectorAll('div.input_area').forEach(function (item, index) {
-            if (!item.classList.contains("hidecode")) {
-                // Skip the cell if it doesn't have a hidecode class
-                return;
-            }
-
-            const id = codeCellId(index)
-            item.setAttribute('id', id);
-            // Insert the button just inside the end of the next div
-            item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
-
-            // Set up the visibility toggle
-            hideLink = document.querySelector(`#${id} div.highlight + input + label`);
-            hideLink.addEventListener('click', toggleCodeCellVisibility)
-        });
-    }
-
-
-    // Initialize the hide buttos
-    var initHiddenCells = function () {
-        // Add hide buttons to the cells
-        addHideButton();
-
-        // Toggle the code cells that should be hidden
-        document.querySelectorAll('div.hidecode input').forEach(function (item) {
-            setCodeCellVisibility(item, 'hidden');
-            item.checked = true;
-        })
-    }
-
-    initFunction(initHiddenCells);
-
-</script>
 
   <!-- Load custom website scripts -->
   <script src="/geographic-data-science/assets/js/scripts.js" async></script>
@@ -693,6 +587,148 @@ document.addEventListener('turbolinks:load', updateInteractLink)
 };
 
 initFunction(initQuery);
+</script>
+
+  <!-- Load JS that depends on site variables -->
+  <script>
+/**
+ * Set up copy/paste for code blocks
+ */
+const clipboardButton = id =>
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+    <img src="/geographic-data-science/assets/images/copy-button.svg" alt="Copy to clipboard">
+  </a>`
+
+// Clears selected text since ClipboardJS will select the text when copying
+const clearSelection = () => {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
+// Changes tooltip text for two seconds, then changes it back
+const temporarilyChangeTooltip = (el, newText) => {
+  const oldText = el.getAttribute('data-tooltip')
+  el.setAttribute('data-tooltip', newText)
+  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
+}
+
+const addCopyButtonToCodeCells = () => {
+  // If ClipboardJS hasn't loaded, wait a bit and try again. This
+  // happens because we load ClipboardJS asynchronously.
+  if (window.ClipboardJS === undefined) {
+    setTimeout(addCopyButtonToCodeCells, 250)
+    return
+  }
+
+  pageElements['codeCells'].forEach((codeCell) => {
+    const id = codeCell.getAttribute('id')
+    if (document.getElementById("copy-button" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
+    }
+  })
+
+  const clipboard = new ClipboardJS('.copybtn')
+  clipboard.on('success', event => {
+    clearSelection()
+    temporarilyChangeTooltip(event.trigger, 'Copied!')
+  })
+
+  clipboard.on('error', event => {
+    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
+  })
+
+  // Get rid of clipboard before the next page visit to avoid memory leak
+  document.addEventListener('turbolinks:before-visit', () =>
+    clipboard.destroy()
+  )
+}
+
+initFunction(addCopyButtonToCodeCells);
+</script>
+
+
+  <!-- Hide cell code -->
+  <script>
+    /**
+    Add buttons to hide code cells
+    */
+
+
+    var setCodeCellVisibility = function (inputField, kind) {
+        // Update the image and class for hidden
+        var id = inputField.getAttribute('data-id');
+        var codeCell = document.querySelector(`#${id} div.highlight`);
+
+        if (kind === "visible") {
+            codeCell.classList.remove('hidden');
+            inputField.checked = true;
+        } else {
+            codeCell.classList.add('hidden');
+            inputField.checked = false;
+        }
+    }
+
+    var toggleCodeCellVisibility = function (event) {
+        // The label is clicked, and now we decide what to do based on the input field's clicked status
+        if (event.target.tagName === "LABEL") {
+            var inputField = event.target.previousElementSibling;
+        } else {
+            // It is the span inside the target
+            var inputField = event.target.parentElement.previousElementSibling;
+        }
+
+        if (inputField.checked === true) {
+            setCodeCellVisibility(inputField, "visible");
+        } else {
+            setCodeCellVisibility(inputField, "hidden");
+        }
+    }
+
+
+    // Button constructor
+    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
+
+    var addHideButton = function () {
+        // If a hide button is already added, don't add another
+        if (document.querySelector('div.hidecode input') !== null) {
+            return;
+        }
+
+        // Find the input cells and add a hide button
+        pageElements['inputCells'].forEach(function (inputCell) {
+            if (!inputCell.classList.contains("hidecode")) {
+                // Skip the cell if it doesn't have a hidecode class
+                return;
+            }
+            const id = inputCell.getAttribute('id')
+
+            // Insert the button just inside the end of the next div
+            inputCell.querySelector('div.input').insertAdjacentHTML('beforeend', hideCodeButton(id))
+
+            // Set up the visibility toggle
+            hideLink = document.querySelector(`#${id} div.inner_cell + input + label`);
+            hideLink.addEventListener('click', toggleCodeCellVisibility)
+        });
+    }
+
+
+    // Initialize the hide buttos
+    var initHiddenCells = function () {
+        // Add hide buttons to the cells
+        addHideButton();
+
+        // Toggle the code cells that should be hidden
+        document.querySelectorAll('div.hidecode input').forEach(function (item) {
+            setCodeCellVisibility(item, 'hidden');
+            item.checked = true;
+        })
+    }
+
+    initFunction(initHiddenCells);
+
 </script>
 </head>
 
@@ -1107,34 +1143,53 @@ initFunction(initQuery);
 
 
             <div class="c-textbook__content">
-              <h1 id="clustering-and-regionalization">Clustering and Regionalization</h1>
-<!--
+              <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Clustering-and-Regionalization">Clustering and Regionalization<a class="anchor-link" href="#Clustering-and-Regionalization"> </a></h1><!--
 **NOTE**: parts of this notebook have been
 borrowed from [GDS'17 - Lab
 6](http://darribas.org/gds17/content/labs/lab_06.html)
 -->
+</div>
+</div>
+</div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">pysal.explore.esda.moran</span> <span class="kn">import</span> <span class="n">Moran</span>
-<span class="kn">import</span> <span class="nn">pysal.lib.weights.set_operations</span> <span class="k">as</span> <span class="n">Wsets</span>
-<span class="kn">from</span> <span class="nn">pysal.lib.weights</span> <span class="kn">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">KNN</span>
-<span class="kn">from</span> <span class="nn">booktools</span> <span class="kn">import</span> <span class="n">choropleth</span>
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">pysal.explore.esda.moran</span> <span class="k">import</span> <span class="n">Moran</span>
+<span class="kn">import</span> <span class="nn">pysal.lib.weights.set_operations</span> <span class="k">as</span> <span class="nn">Wsets</span>
+<span class="kn">from</span> <span class="nn">pysal.lib.weights</span> <span class="k">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">KNN</span>
+<span class="kn">from</span> <span class="nn">booktools</span> <span class="k">import</span> <span class="n">choropleth</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> 
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">geopandas</span> 
 <span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span><span class="p">,</span> <span class="n">AgglomerativeClustering</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="k">import</span> <span class="n">KMeans</span><span class="p">,</span> <span class="n">AgglomerativeClustering</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
 </div>
 
-<h2 id="introduction">Introduction</h2>
 
-<p>The world’s hardest questions are complex and multi-faceted.
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction"> </a></h2><p>The world's hardest questions are complex and multi-faceted.
 Effective methods to learn from data should recognize this. Many questions
 and challenges are inherently multidimensional; they are affected, shaped, and
 defined by many different components all acting simultaneously. In statistical
@@ -1145,7 +1200,6 @@ from large, complex multivariate processes. It works by finding similarities amo
 many dimensions in a multivariate process, condensing them down into a simpler representation
 Thus, through clustering, a complex and difficult to understand process is recast into a simpler one
 that even non-technical audiences can look at and understand.</p>
-
 <p>Often, clustering involves sorting observations into groups. For these groups to be more
 meaningful than any single initial dimension, members of a group should be more
 similar to one another than they are to members of a different group.
@@ -1153,7 +1207,6 @@ Each group is referred to as a <em>cluster</em> while the process of assigning
 objects to groups is known as <em>clustering</em>. If done well, these clusters can be
 characterized by their <em>profile</em>, a simple summary of what members of a group
 are like in terms of the original multivariate process.</p>
-
 <p>Since a good cluster is more
 similar internally than it is to any other cluster, these cluster-level profiles
 provide a convenient shorthand to describe the original complex multivariate process.
@@ -1165,7 +1218,6 @@ having to consider all of the complexities of the original multivariate process 
 Throughout data science, and particularly in geographic data science, 
 clustering is widely used to provide insights on the
 geographic structure of complex multivariate spatial data.</p>
-
 <p>In the context of explicitly spatial questions, a related concept, the <em>region</em>,
 is also instrumental. A <em>region</em> is similar to a <em>cluster</em>, in the sense that
 all members of a region have been grouped together, and the region should provide 
@@ -1175,9 +1227,8 @@ display stronger similarity to each other than they do to the members of other r
 However, regions are more complex than clusters because they combine this
 similarity in profile with additional information about the geography of their members.
 In short, regions are like clusters (since they have a coherent profile), but they
-also have a coherent geography—members of a region should also be
+also have a coherent geography&mdash;members of a region should also be
 located near one another.</p>
-
 <p>The process of creating regions is called regionalization.
 A regionalization is a special kind of clustering where the objective is 
 to group observations which are similar in their statistical attributes,
@@ -1190,7 +1241,6 @@ that never leaves the region. These paths often model the spatial relationships
 in the data, such as contiguity or proximity. However, connectivity does not
 always need to hold for all regions, and in certain contexts it makes
 sense to relax connectivity or to impose different types of spatial constraints.</p>
-
 <p>In this chapter we consider clustering techniques and regionalization methods which will
 allow us to do exactly that. In the process, we will explore the characteristics
 of neighborhoods in San Diego.
@@ -1201,10 +1251,9 @@ multivariate data about San Diego by suggesting some ways to examine the
 statistical and spatial distribution of the data before carrying out any
  clustering. Focusing on the individual variables, as well as their pairwise
 associations, can help guide the subsequent application of clusterings or regionalizations.</p>
-
-<p>We then consider geodemographic approaches to clustering—the application
+<p>We then consider geodemographic approaches to clustering&mdash;the application
 of multivariate clustering to spatially referenced demographic data.
-Two popular clustering algorithms are employed: k-means and Ward’s hierarchical method.
+Two popular clustering algorithms are employed: k-means and Ward's hierarchical method.
 Mapping the spatial distribution of the resulting clusters 
 reveals interesting insights on the socioeconomic structure of the San Diego
 metropolitan area. We also see that in many cases, clusters are spatially 
@@ -1214,45 +1263,72 @@ This will illustrate why connectivity might be important when building insight
 about spatial data, since these clusters will not at all provide intelligible regions. 
 So, we then will move on to regionalization, exploring different approaches that
 incorporate geographical constraints into the exploration of the social structure of San Diego.</p>
-
-<h2 id="data">Data</h2>
-
-<p>The dataset we will use in this chapter comes from the American Community Survey
+<h2 id="Data">Data<a class="anchor-link" href="#Data"> </a></h2><p>The dataset we will use in this chapter comes from the American Community Survey
 (ACS). In particular, we examine data at the Census Tract level in San Diego,
 California in 2016. Let us begin by reading in the data as a GeoDataFrame and
 exploring the attribute names.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Read file</span>
-<span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">'../data/sandiego/sd_tracts_acs_clean.shp'</span><span class="p">)</span>
-<span class="c"># Print column names</span>
-<span class="n">db</span><span class="o">.</span><span class="n">columns</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Index(['GEOID', 'GEOID_x', 'Total Popu', 'White', 'Black', 'Hispanic',
-       'Med Age', 'Pop &lt; 18', 'Total Hous', 'In househo', 'Male house',
-       'Female hou', 'High Sch D', 'GED', 'Bachelor's', 'Travel tim',
-       'Income bel', 'Income Mal', ' Income Fe', 'Median HH', 'Cash publi',
-       'Lowest qui', 'Second qui', 'Third  qui', 'Fourth  qu', 'Lower limi',
-       'Gini index', 'Total Empl', 'In Labor F', 'Civilian L', 'Employed',
-       'Total Ho_1', 'Vacant', 'Owner Occu', 'Renter Occ', 'Median Num',
-       'Median Str', 'Median Gro', 'Median Val', 'state', 'county', 'tract',
-       'AREALAND', 'AREAWATER', 'BASENAME', 'CENTLAT', 'CENTLON', 'COUNTY_1',
-       'FUNCSTAT', 'GEOID_y', 'INTPTLAT', 'INTPTLON', 'LSADC', 'MTFCC', 'NAME',
-       'OBJECTID', 'OID', 'STATE_1', 'TRACT_1', 'renter_pct', 'geometry'],
-      dtype='object')
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Read file</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/sandiego/sd_tracts_acs_clean.shp&#39;</span><span class="p">)</span>
+<span class="c1"># Print column names</span>
+<span class="n">db</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;Total Popu&#39;, &#39;White&#39;, &#39;Black&#39;, &#39;Hispanic&#39;,
+       &#39;Med Age&#39;, &#39;Pop &lt; 18&#39;, &#39;Total Hous&#39;, &#39;In househo&#39;, &#39;Male house&#39;,
+       &#39;Female hou&#39;, &#39;High Sch D&#39;, &#39;GED&#39;, &#39;Bachelor&#39;s&#39;, &#39;Travel tim&#39;,
+       &#39;Income bel&#39;, &#39;Income Mal&#39;, &#39; Income Fe&#39;, &#39;Median HH&#39;, &#39;Cash publi&#39;,
+       &#39;Lowest qui&#39;, &#39;Second qui&#39;, &#39;Third  qui&#39;, &#39;Fourth  qu&#39;, &#39;Lower limi&#39;,
+       &#39;Gini index&#39;, &#39;Total Empl&#39;, &#39;In Labor F&#39;, &#39;Civilian L&#39;, &#39;Employed&#39;,
+       &#39;Total Ho_1&#39;, &#39;Vacant&#39;, &#39;Owner Occu&#39;, &#39;Renter Occ&#39;, &#39;Median Num&#39;,
+       &#39;Median Str&#39;, &#39;Median Gro&#39;, &#39;Median Val&#39;, &#39;state&#39;, &#39;county&#39;, &#39;tract&#39;,
+       &#39;AREALAND&#39;, &#39;AREAWATER&#39;, &#39;BASENAME&#39;, &#39;CENTLAT&#39;, &#39;CENTLON&#39;, &#39;COUNTY_1&#39;,
+       &#39;FUNCSTAT&#39;, &#39;GEOID_y&#39;, &#39;INTPTLAT&#39;, &#39;INTPTLON&#39;, &#39;LSADC&#39;, &#39;MTFCC&#39;, &#39;NAME&#39;,
+       &#39;OBJECTID&#39;, &#39;OID&#39;, &#39;STATE_1&#39;, &#39;TRACT_1&#39;, &#39;renter_pct&#39;, &#39;geometry&#39;],
+      dtype=&#39;object&#39;)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>While the ACS comes with a large number of attributes we can use for clustering
 and regionalization, we are not limited to the original variables at hand; we
 can construct additional variables. This is particularly useful when
@@ -1265,104 +1341,175 @@ and use them in addition to a subset of the original variables.
 Together, this set of constructed and received variables will to
 will be used for our clustering and regionalization.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Pull out total house units</span>
-<span class="n">total_units</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s">'Total Ho_1'</span><span class="p">]</span>
-<span class="c"># Calculate percentage of renter occupied units</span>
-<span class="n">pct_rental</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s">'Renter Occ'</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_units</span> <span class="o">+</span> <span class="p">(</span><span class="n">total_units</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
+</div>
+</div>
+</div>
 
-<span class="c"># Pull out total number of households</span>
-<span class="n">total_hh</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s">'Total Hous'</span><span class="p">]</span>
-<span class="c"># Calculate percentage of female households</span>
-<span class="n">pct_female_hh</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s">'Female hou'</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_hh</span> <span class="o">+</span> <span class="p">(</span><span class="n">total_hh</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="c"># Calculate percentage of population with a bachelor degree</span>
-<span class="n">pct_bachelor</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s">"Bachelor's"</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Total Popu'</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Total Popu'</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
-<span class="c"># Assign newly created variables to main table `db`</span>
-<span class="n">db</span><span class="p">[</span><span class="s">'pct_rental'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pct_rental</span>
-<span class="n">db</span><span class="p">[</span><span class="s">'pct_female_hh'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pct_female_hh</span>
-<span class="n">db</span><span class="p">[</span><span class="s">'pct_bachelor'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pct_bachelor</span>
-<span class="c"># Calculate percentage of population white</span>
-<span class="n">db</span><span class="p">[</span><span class="s">'pct_white'</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s">"White"</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Total Popu'</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s">'Total Popu'</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span><span class="p">)</span>
 
-</code></pre></div>    </div>
-  </div>
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Pull out total house units</span>
+<span class="n">total_units</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Total Ho_1&#39;</span><span class="p">]</span>
+<span class="c1"># Calculate percentage of renter occupied units</span>
+<span class="n">pct_rental</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Renter Occ&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_units</span> <span class="o">+</span> <span class="p">(</span><span class="n">total_units</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Pull out total number of households</span>
+<span class="n">total_hh</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Total Hous&#39;</span><span class="p">]</span>
+<span class="c1"># Calculate percentage of female households</span>
+<span class="n">pct_female_hh</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Female hou&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_hh</span> <span class="o">+</span> <span class="p">(</span><span class="n">total_hh</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Calculate percentage of population with a bachelor degree</span>
+<span class="n">pct_bachelor</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Bachelor&#39;s&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Total Popu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Total Popu&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Assign newly created variables to main table `db`</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;pct_rental&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pct_rental</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;pct_female_hh&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pct_female_hh</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;pct_bachelor&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pct_bachelor</span>
+<span class="c1"># Calculate percentage of population white</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;pct_white&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;White&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Total Popu&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Total Popu&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
 
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>To make things easier later on, let us collect the variables we will use to
 characterize Census tracts. These variables capture different aspects of the socio-
 economic reality of each area and, taken together, they provide a comprehensive
 characterization of San Diego as a whole:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cluster_variables</span> <span class="o">=</span>  <span class="p">[</span><span class="s">'Median Val'</span><span class="p">,</span>   <span class="c"># Median house value</span>
-                      <span class="s">'pct_white'</span><span class="p">,</span>    <span class="c"># Percent of tract population that is white</span>
-                      <span class="s">'pct_rental'</span><span class="p">,</span>   <span class="c"># Percent of households that are rented</span>
-                      <span class="s">'pct_female_hh'</span><span class="p">,</span><span class="c"># Percent of female-led households </span>
-                      <span class="s">'pct_bachelor'</span><span class="p">,</span> <span class="c"># Percent of tract population with a Bachelors degree</span>
-                      <span class="s">'Median Num'</span><span class="p">,</span>   <span class="c"># Median number of rooms in the tract's households</span>
-                      <span class="s">'Gini index'</span><span class="p">,</span>   <span class="c"># Gini index measuring tract wealth inequality</span>
-                      <span class="s">'Med Age'</span><span class="p">,</span>      <span class="c"># Median age of tract population</span>
-                      <span class="s">'Travel tim'</span>    <span class="c"># ???</span>
-                      <span class="p">]</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">cluster_variables</span> <span class="o">=</span>  <span class="p">[</span><span class="s1">&#39;Median Val&#39;</span><span class="p">,</span>   <span class="c1"># Median house value</span>
+                      <span class="s1">&#39;pct_white&#39;</span><span class="p">,</span>    <span class="c1"># Percent of tract population that is white</span>
+                      <span class="s1">&#39;pct_rental&#39;</span><span class="p">,</span>   <span class="c1"># Percent of households that are rented</span>
+                      <span class="s1">&#39;pct_female_hh&#39;</span><span class="p">,</span><span class="c1"># Percent of female-led households </span>
+                      <span class="s1">&#39;pct_bachelor&#39;</span><span class="p">,</span> <span class="c1"># Percent of tract population with a Bachelors degree</span>
+                      <span class="s1">&#39;Median Num&#39;</span><span class="p">,</span>   <span class="c1"># Median number of rooms in the tract&#39;s households</span>
+                      <span class="s1">&#39;Gini index&#39;</span><span class="p">,</span>   <span class="c1"># Gini index measuring tract wealth inequality</span>
+                      <span class="s1">&#39;Med Age&#39;</span><span class="p">,</span>      <span class="c1"># Median age of tract population</span>
+                      <span class="s1">&#39;Travel tim&#39;</span>    <span class="c1"># ???</span>
+                      <span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
 
-<h3 id="exploring-the-data">Exploring the data</h3>
 
-<p>Now let’s start building up our understanding of this
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Exploring-the-data">Exploring the data<a class="anchor-link" href="#Exploring-the-data"> </a></h3><p>Now let's start building up our understanding of this
 dataset through both visual and summary statistical measures.</p>
-
 <p>We will start by
 looking at the spatial distribution of each variable alone.
 This will help us draw a picture of the multi-faceted view of the tracts we
-want to capture with our clustering. Let’s use choropleth maps for the
+want to capture with our clustering. Let's use choropleth maps for the
 nine attributes and compare these choropleth maps side-by-side:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
-<span class="c"># Make the axes accessible with single indexing</span>
-<span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-<span class="c"># Start a loop over all the variables of interest</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cluster_variables</span><span class="p">):</span>
-    <span class="c"># select the axis where the map will go</span>
-    <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="c"># Plot the map</span>
-    <span class="c">#db.plot(column=col, ax=ax, scheme='Quantiles', </span>
-    <span class="c">#        linewidth=0, cmap='RdPu')</span>
-    <span class="n">choropleth</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'RdPu'</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-    <span class="c"># Remove axis clutter</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-    <span class="c"># Set the axis title to the name of variable being plotted</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
-<span class="c"># Display the figure</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_9_0.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="c1"># Make the axes accessible with single indexing</span>
+<span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="c1"># Start a loop over all the variables of interest</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cluster_variables</span><span class="p">):</span>
+    <span class="c1"># select the axis where the map will go</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="c1"># Plot the map</span>
+    <span class="c1">#db.plot(column=col, ax=ax, scheme=&#39;Quantiles&#39;, </span>
+    <span class="c1">#        linewidth=0, cmap=&#39;RdPu&#39;)</span>
+    <span class="n">choropleth</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">col</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdPu&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="c1"># Remove axis clutter</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+    <span class="c1"># Set the axis title to the name of variable being plotted</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+<span class="c1"># Display the figure</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_9_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Many visual patterns jump out from the maps, revealing both commonalities as
 well as differences across the spatial distributions of the individual variables.
 Several variables tend to increase in value from the east to the west
-(<code class="highlighter-rouge">pct_rental</code>, <code class="highlighter-rouge">Median Val</code>, <code class="highlighter-rouge">Median Num</code>, and <code class="highlighter-rouge">Travel tim</code>) while others
-have a spatial trend in the opposite direction (<code class="highlighter-rouge">pct_white</code>, <code class="highlighter-rouge">pct_female_hh</code>,
-<code class="highlighter-rouge">pct_bachelor</code>, <code class="highlighter-rouge">Med Age</code>). This is actually desirable; when variables have
+(<code>pct_rental</code>, <code>Median Val</code>, <code>Median Num</code>, and <code>Travel tim</code>) while others
+have a spatial trend in the opposite direction (<code>pct_white</code>, <code>pct_female_hh</code>,
+<code>pct_bachelor</code>, <code>Med Age</code>). This is actually desirable; when variables have
 different spatial distributions, each variable to contributes distinct 
 information to the profiles of each cluster. However, if all variables display very similar 
 spatial patterns, the amount of useful information across the maps is 
@@ -1370,97 +1517,210 @@ actually smaller than it appears, so cluster profiles may be much less useful as
 It is also important to consider whether the variables display any
 spatial autocorrelation, as this will affect the spatial structure of the
 resulting clusters.</p>
-
-<p>Recall from chapter XXX that Moran’s I is a commonly used
+<p>Recall from chapter XXX that Moran's I is a commonly used
 measure for global spatial autocorrelation. 
 Let us get a quick sense to what
 extent this is present in our dataset.
 First, we need to build a spatial weights matrix that encodes the spatial
 relationships in our San Diego data. We will start with queen contiguity:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">w_queen</span> <span class="o">=</span> <span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">w_queen</span> <span class="o">=</span> <span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
 
-<p>As the warning tells us, observation <code class="highlighter-rouge">103</code> is an <em>island</em>, a disconnected observation
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As the warning tells us, observation <code>103</code> is an <em>island</em>, a disconnected observation
 with no queen contiguity neighbors. To make sure that every observation
 has at least one neighbor, we can combine the queen contiguity matrix with a
 nearest neighbor matrix. This would ensure that every observation is neighbor 
 of at least the observation it is closest to, plus all the areas with which 
-it shares any border. Let’s first create the <code class="highlighter-rouge">KNN-1 W</code>:</p>
+it shares any border. Let's first create the <code>KNN-1 W</code>:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">w_k1</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">w_k1</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
 
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Now we can combine the queen and nearest neighbor matrices into a single representation
 with no disconnected observations. This full-connected connectivity matrix is the 
 one we will use for analysis:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">w</span> <span class="o">=</span> <span class="n">Wsets</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">w_queen</span><span class="p">,</span> <span class="n">w_k1</span><span class="p">)</span>
-
-</code></pre></div>    </div>
-  </div>
-
+</div>
+</div>
 </div>
 
-<p>As we ensured (thanks to the nearest neighbor connections),  <code class="highlighter-rouge">w</code> does not contain
-any islands:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">w</span><span class="o">.</span><span class="n">islands</span>
 
-</code></pre></div>    </div>
-  </div>
+<div class="cell border-box-sizing code_cell rendered">
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+<div class="jb_input" >
+<div class="input">
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[]
-</code></pre></div>      </div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">Wsets</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">w_queen</span><span class="p">,</span> <span class="n">w_k1</span><span class="p">)</span>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
-<p>Now let’s calculate Moran’s I for the variables being used. This will measure
+</div>
+
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As we ensured (thanks to the nearest neighbor connections),  <code>w</code> does not contain
+any islands:</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">islands</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[]</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now let's calculate Moran's I for the variables being used. This will measure
 the extent to which each variable contains spatial structure:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set seed for reproducibility</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set seed for reproducibility</span>
 <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
-<span class="c"># Calculate Moran's I for each variable</span>
+<span class="c1"># Calculate Moran&#39;s I for each variable</span>
 <span class="n">mi_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">Moran</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">variable</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">cluster_variables</span><span class="p">]</span>
-<span class="c"># Display on table</span>
+<span class="c1"># Display on table</span>
 <span class="n">table</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([(</span><span class="n">variable</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">I</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">p_sim</span><span class="p">)</span> <span class="k">for</span> <span class="n">variable</span><span class="p">,</span><span class="n">res</span> 
                       <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cluster_variables</span><span class="p">,</span> <span class="n">mi_results</span><span class="p">)],</span>
-                     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'Variable'</span><span class="p">,</span> <span class="s">"Moran's I"</span><span class="p">,</span> <span class="s">'P-value'</span><span class="p">])</span>\
-          <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'Variable'</span><span class="p">)</span>
+                     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Variable&#39;</span><span class="p">,</span> <span class="s2">&quot;Moran&#39;s I&quot;</span><span class="p">,</span> <span class="s1">&#39;P-value&#39;</span><span class="p">])</span>\
+          <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;Variable&#39;</span><span class="p">)</span>
 <span class="n">table</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output output_html">
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -1537,63 +1797,96 @@ the extent to which each variable contains spatial structure:</p>
 </div>
 </div>
 
-    </div>
-  </div>
+</div>
+</div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Each of the variables displays significant positive spatial autocorrelation,
-suggesting that Tobler’s law is alive and well in the socioeconomic geography of San
+suggesting that Tobler's law is alive and well in the socioeconomic geography of San
 Diego County. This means we also should expect the clusters we find will have
 a non random spatial distribution. In particular, we would expect clusters to have
 a modest amount of spatial coherence in addition to the coherence in their profiles,
 since there is strong positive autocorrelation in all of the input variables.</p>
-
 <p>Spatial autocorrelation only describes relationships between a single observation at a time.
 So, the fact that all of the clustering variables are positively autocorrelated does not tell us 
 about the way the attributes covary over space. For that, we need to consider the
 spatial correlation between variables. Here, we will measure this using the
 bivariate correlation in the maps of covariates themselves.</p>
-
 <p>Given the 9 maps, there are 36 pairs of maps that must be compared. This is too 
 many maps to process visually, so we can turn to an alternative tool to
 explicitly focus on the bivariate relations between each pair of attributes.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">_</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s">'reg'</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s">'kde'</span><span class="p">)</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_21_0.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_21_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Two different types of plots are contained in the scatterplot matrix. On the
 diagonal are the density functions for the nine attributes. These allow for an
-inspection of the overall morphology of the attribute’s value distribution.
+inspection of the overall morphology of the attribute's value distribution.
 Examining these we see that our selection of variables includes those that are
-negatively skewed (<code class="highlighter-rouge">pct_white</code> and <code class="highlighter-rouge">pct_female_hh</code>) as well as positively skewed
-(<code class="highlighter-rouge">while median_val</code>, <code class="highlighter-rouge">pct_bachelor</code>, and <code class="highlighter-rouge">travel_tim</code>).</p>
-
+negatively skewed (<code>pct_white</code> and <code>pct_female_hh</code>) as well as positively skewed
+(<code>while median_val</code>, <code>pct_bachelor</code>, and <code>travel_tim</code>).</p>
 <p>The second type of visualization lies in the off-diagonal cells of the matrix; 
 these are bi-variate scatterplots. Each cell shows the association between one
 pair of variables. Several of these cells indicate positive linear
-associations (<code class="highlighter-rouge">med_age</code> Vs. <code class="highlighter-rouge">median_value</code>, <code class="highlighter-rouge">median_value</code> Vs. <code class="highlighter-rouge">Median Num</code>)
-while other cells display negative correlation (<code class="highlighter-rouge">Median Val</code> Vs. <code class="highlighter-rouge">pct_rental</code>,
-<code class="highlighter-rouge">Median Num</code> Vs. <code class="highlighter-rouge">pct_rental</code>, and <code class="highlighter-rouge">Med Age</code> Vs. <code class="highlighter-rouge">pct_rental</code>). The one variable
+associations (<code>med_age</code> Vs. <code>median_value</code>, <code>median_value</code> Vs. <code>Median Num</code>)
+while other cells display negative correlation (<code>Median Val</code> Vs. <code>pct_rental</code>,
+<code>Median Num</code> Vs. <code>pct_rental</code>, and <code>Med Age</code> Vs. <code>pct_rental</code>). The one variable
 that tends to have consistenty weak association with the other variables is
-<code class="highlighter-rouge">Travel tim</code>, and in part this appears to reflect its rather concentrated 
+<code>Travel tim</code>, and in part this appears to reflect its rather concentrated 
 distribution as seen on the lower right diagonal corner cell.</p>
-
-<h2 id="geodemographic-clusters-in-san-diego-census-tracts">Geodemographic Clusters in San Diego Census Tracts</h2>
-
-<p>We now will move
+<h2 id="Geodemographic-Clusters-in-San-Diego-Census-Tracts">Geodemographic Clusters in San Diego Census Tracts<a class="anchor-link" href="#Geodemographic-Clusters-in-San-Diego-Census-Tracts"> </a></h2><p>We now will move
 beyond the implicitly bi-variate focus to consider the full multidimensional
 nature of this data set. Geodemographic analysis is a form of multivariate
 clustering where the observations represent geographical areas. The output
@@ -1601,17 +1894,14 @@ of these clusterings is nearly always mapped. Altogether, these methods use
 multivariate clustering algorithms to construct a known number of
 clusters ($k$), where the number of clusters is typically much smaller than the 
 number of observations to be clustered. Each cluster is given a unique label,
-and these labels are mapped. Using the clusters’ profile and label, the map of 
+and these labels are mapped. Using the clusters' profile and label, the map of 
 labels can be interpreted to get a sense of the spatial distribution of 
 sociodemographic traits. The power of (geodemographic) clustering comes
 from taking statistical variation across several dimensions and compressing it
 into a single categorical one that we can visualize through a map. To
 demonstrate the variety of approaches in clustering, we will show two
-distinct but very popular clustering algorithms: k-means and Ward’s hierarchical method.</p>
-
-<h3 id="k-means">K-means</h3>
-
-<p>K-means is probably the most widely used approach to
+distinct but very popular clustering algorithms: k-means and Ward's hierarchical method.</p>
+<h3 id="K-means">K-means<a class="anchor-link" href="#K-means"> </a></h3><p>K-means is probably the most widely used approach to
 cluster a dataset. The algorithm groups observations into a
 prespecified number of clusters so that that each observation is
 closer to the mean of its own cluster than it is to the mean of any other cluster.
@@ -1622,50 +1912,114 @@ Then, each observation is reassigned to the cluster with the closest mean.
 If the observation is already assigned to the cluster whose mean it is closest to,
 the observation remains in that cluster. This assignment-update process continues
 until no further reassignments are necessary.</p>
-
 <p>The nature of this algorithm requires us to select the number of clusters we 
 want to create. The right number of clusters is unknown in practice. For
-illustration, we will use $k=5$ in the <code class="highlighter-rouge">KMeans</code> implementation from
-<code class="highlighter-rouge">scikit-learn</code>. To proceed, we first create a <code class="highlighter-rouge">KMeans</code> clusterer:</p>
+illustration, we will use $k=5$ in the <code>KMeans</code> implementation from
+<code>scikit-learn</code>. To proceed, we first create a <code>KMeans</code> clusterer:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Initialise KMeans instance</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Initialise KMeans instance</span>
 <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
 </div>
 
-<p>Next, we call the <code class="highlighter-rouge">fit</code> method to actually apply the k-means algorithm to our data:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set the seed for reproducibility</span>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Next, we call the <code>fit</code> method to actually apply the k-means algorithm to our data:</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set the seed for reproducibility</span>
 <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
-<span class="c"># Run K-Means algorithm</span>
+<span class="c1"># Run K-Means algorithm</span>
 <span class="n">k5cls</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">])</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
 </div>
 
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Now that the clusters have been assigned, we can examine the label vector, which 
 records the cluster to which each observation is assigned:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">k5cls</span><span class="o">.</span><span class="n">labels_</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>array([3, 4, 4, 0, 0, 4, 0, 0, 0, 2, 0, 2, 2, 2, 4, 0, 2, 2, 2, 4, 4, 4,
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">k5cls</span><span class="o">.</span><span class="n">labels_</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([3, 4, 4, 0, 0, 4, 0, 0, 0, 2, 0, 2, 2, 2, 4, 0, 2, 2, 2, 4, 4, 4,
        0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 4, 0,
        0, 0, 2, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0,
        4, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2,
@@ -1693,25 +2047,28 @@ records the cluster to which each observation is assigned:</p>
        4, 4, 0, 4, 2, 2, 2, 0, 0, 0, 2, 2, 2, 0, 4, 2, 2, 0, 2, 2, 0, 2,
        2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 2, 2, 2, 0, 4, 2, 0, 4, 2, 2,
        2, 0, 4, 2, 0, 0, 4, 0, 0, 2, 0, 0, 0, 0, 2, 2, 0, 2, 2, 2, 4, 0,
-       0, 0, 4, 4, 4, 3, 3, 1, 2, 2, 4], dtype=int32)
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+       0, 0, 4, 4, 4, 3, 3, 1, 2, 2, 4], dtype=int32)</pre>
 </div>
 
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>In this case, the second and third observations are assigned to cluster 4, while
 the fourth and fifth observations have been placed in cluster 0. It is important
-to note that the integer labels should be viewed as denoting membership only —
+to note that the integer labels should be viewed as denoting membership only &mdash;
 the numerical differences between the values for the labels are meaningless.
 The profiles of the various clusters must be further explored by looking
 at the values of each dimension.</p>
-
-<p>But, before we do that, let’s make a map.</p>
-
-<h3 id="spatial-distribution-of-clusters">Spatial Distribution of Clusters</h3>
-
-<p>Having obtained the cluster labels, we can display the spatial
+<p>But, before we do that, let's make a map.</p>
+<h3 id="Spatial-Distribution-of-Clusters">Spatial Distribution of Clusters<a class="anchor-link" href="#Spatial-Distribution-of-Clusters"> </a></h3><p>Having obtained the cluster labels, we can display the spatial
 distribution of the clusters by using the labels as the categories in a
 choropleth map. This allows us to quickly grasp any sort of spatial pattern the 
 clusters might have. Since clusters represent areas with similar
@@ -1719,37 +2076,69 @@ characteristics, mapping their labels allows to see to what extent similar areas
 to have similar locations.
 Thus, this gives us one map that incorporates the information of from all nine covariates.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Assign labels into a column</span>
-<span class="n">db</span><span class="p">[</span><span class="s">'k5cls'</span><span class="p">]</span> <span class="o">=</span> <span class="n">k5cls</span><span class="o">.</span><span class="n">labels_</span>
-<span class="c"># Setup figure and ax</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c"># Plot unique values choropleth including a legend and with no boundary lines</span>
-<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'k5cls'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="c"># Remove axis</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="c"># Keep axes proportionate</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
-<span class="c"># Add title</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">r'Geodemographic Clusters (k-means, $k=5$)'</span><span class="p">)</span>
-<span class="c"># Display the map</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_29_0.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Assign labels into a column</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;k5cls&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k5cls</span><span class="o">.</span><span class="n">labels_</span>
+<span class="c1"># Setup figure and ax</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
+<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Remove axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c1"># Keep axes proportionate</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="c1"># Add title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Geodemographic Clusters (k-means, $k=5$)&#39;</span><span class="p">)</span>
+<span class="c1"># Display the map</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_29_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>The map provides a useful view of the clustering results; it allows for
-a visual inspection of the extent to which Tobler’s first law of geography is
+a visual inspection of the extent to which Tobler's first law of geography is
 reflected in the multivariate clusters. Recall that the law implies that nearby
 tracts should be more similar to one another than tracts that are geographically
 more distant from each other. We can see evidence of this in
@@ -1761,163 +2150,338 @@ seems to be true in terms of land area (and we will verify this below), there is
 more to the cluster pattern than this. Because the tract polygons are all 
 different sizes and shapes, we cannot solely rely on our eyes to interpret 
 the spatial distribution of clusters.</p>
-
-<h3 id="statistical-analysis-of-the-cluster-map">Statistical Analysis of the Cluster Map</h3>
-
-<p>To complement the geovisualization of the clusters, we can explore the
+<h3 id="Statistical-Analysis-of-the-Cluster-Map">Statistical Analysis of the Cluster Map<a class="anchor-link" href="#Statistical-Analysis-of-the-Cluster-Map"> </a></h3><p>To complement the geovisualization of the clusters, we can explore the
 statistical properties of the cluster map. This process allows us to delve
 into what observations are part of each cluster and what their
 characteristics are.
 This gives us the profile of each cluster so we can interpret the meaning of the
-labels we’ve obtained. We can start, for example, by
+labels we've obtained. We can start, for example, by
 considering cardinality, or the count of observations in each cluster:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Group data table by cluster label and count observations</span>
-<span class="n">k5sizes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'k5cls'</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Group data table by cluster label and count observations</span>
+<span class="n">k5sizes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 <span class="n">k5sizes</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k5cls
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>k5cls
 0    232
 1      8
 2    247
 3     24
 4    116
-dtype: int64
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+dtype: int64</pre>
 </div>
 
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>And we can get a visual representation of cardinality as well:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">_</span> <span class="o">=</span> <span class="n">k5sizes</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_33_0.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">k5sizes</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_33_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>There are substantial differences in the sizes of the five clusters, with two very
 large clusters (0, 2), one medium sized cluster (4), and two small clusters (1,
 3). Cluster 2 is the largest when measured by the number of assigned tracts.
 This confirms our intuition from the map above, where we got the visual impression
-that tracts in cluster 2 seemed to have the largest area. Let’s see if this is 
-the case. To do so we can use the <code class="highlighter-rouge">dissolve</code> operation in <code class="highlighter-rouge">geopandas</code>, which 
+that tracts in cluster 2 seemed to have the largest area. Let's see if this is 
+the case. To do so we can use the <code>dissolve</code> operation in <code>geopandas</code>, which 
 combines all tracts belonging to each cluster into a single
 polygon object. After we have dissolved all the members of the clusters,
 we report the total land area of the cluster:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Dissolve areas by Cluster, aggregate by summing, and keep column for area</span>
-<span class="n">areas</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'k5cls'</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s">'sum'</span><span class="p">)[</span><span class="s">'AREALAND'</span><span class="p">]</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Dissolve areas by Cluster, aggregate by summing, and keep column for area</span>
+<span class="n">areas</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)[</span><span class="s1">&#39;AREALAND&#39;</span><span class="p">]</span>
 <span class="n">areas</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k5cls
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>k5cls
 0    3445601816
 1      53860347
 2    5816736150
 3     220120882
 4     752511344
-Name: AREALAND, dtype: int64
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+Name: AREALAND, dtype: int64</pre>
 </div>
 
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>And, to show this visually:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">areas</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f069989c470&gt;
-</code></pre></div>      </div>
-
-    </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_37_1.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">areas</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f069989c470&gt;</pre>
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_37_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Our visual impression is confirmed: cluster 2 contains tracts that
 together comprise 5,816,736,150 square meters (approximately 2,245 square miles),
 which accounts for over half of the total land area in the county:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">areas</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">areas</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0.5653447326157774
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
-<p>Let’s move on to build the profiles for each cluster. Again, the profiles is what
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">areas</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">areas</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.5653447326157774</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's move on to build the profiles for each cluster. Again, the profiles is what
 provides the conceptual shorthand, moving from the arbitrary label to a meaningful
 collection of observations with similar attributes. To build a basic profile, we can
 compute the means of each of the attributes in every cluster:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Group table by cluster label, keep the variables used </span>
-<span class="c"># for clustering, and obtain their mean</span>
-<span class="n">k5means</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'k5cls'</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
+<span class="c1"># for clustering, and obtain their mean</span>
+<span class="n">k5means</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="n">k5means</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output output_html">
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -2019,35 +2583,64 @@ compute the means of each of the attributes in every cluster:</p>
 </div>
 </div>
 
-    </div>
-  </div>
+</div>
+</div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>We see that cluster 3, for example, is composed of tracts that have
-the highest average <code class="highlighter-rouge">Median_val</code>, while cluster 2 has the highest level of inequality
-(<code class="highlighter-rouge">Gini index</code>), and cluster 1 contains an older population (<code class="highlighter-rouge">Med Age</code>)
-who tend to live in housing units with more rooms (<code class="highlighter-rouge">Median Num</code>).
+the highest average <code>Median_val</code>, while cluster 2 has the highest level of inequality
+(<code>Gini index</code>), and cluster 1 contains an older population (<code>Med Age</code>)
+who tend to live in housing units with more rooms (<code>Median Num</code>).
 Average values, however, can hide a great deal of detail and, in some cases,
 give wrong impressions about the type of data distribution they represent. To
-obtain more detailed profiles, we can use the <code class="highlighter-rouge">describe</code> command in <code class="highlighter-rouge">pandas</code>, 
+obtain more detailed profiles, we can use the <code>describe</code> command in <code>pandas</code>, 
 after grouping our observations by their clusters:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Group table by cluster label, keep the variables used </span>
-<span class="c"># for clustering, and obtain their descriptive summary</span>
-<span class="n">k5desc</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'k5cls'</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
-<span class="c"># Loop over each cluster and print a table with descriptives</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
+<span class="c1"># for clustering, and obtain their descriptive summary</span>
+<span class="n">k5desc</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="c1"># Loop over each cluster and print a table with descriptives</span>
 <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">k5desc</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n\t</span><span class="s">---------</span><span class="se">\n\t</span><span class="s">Cluster </span><span class="si">%</span><span class="s">i'</span><span class="o">%</span><span class="n">cluster</span><span class="p">)</span>
-    <span class="k">print</span><span class="p">(</span><span class="n">k5desc</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span><span class="o">.</span><span class="n">unstack</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">---------</span><span class="se">\n\t</span><span class="s1">Cluster </span><span class="si">%i</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">cluster</span>)
+    <span class="nb">print</span><span class="p">(</span><span class="n">k5desc</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span><span class="o">.</span><span class="n">unstack</span><span class="p">())</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>
 	---------
 	Cluster 0
                count           mean           std          min            25%  \
@@ -2167,46 +2760,75 @@ Median Num          4.575000       5.900000       6.800000       8.300000
 Gini index          0.385800       0.424550       0.465100       0.586100  
 Med Age            36.850000      41.000000      47.125000      59.300000  
 Travel tim       1484.500000    2077.500000    2794.250000    8339.000000  
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>However, this approach quickly gets out of hand: more detailed profiles can simply
 return to an unwieldy mess of numbers. A better approach to constructing
-cluster profiles is be to draw the distributions of cluster members’ data.
-To do this we need to “tidy up” the dataset. A tidy dataset (<a href="https://www.jstatsoft.org/article/view/v059i10">Wickham,
+cluster profiles is be to draw the distributions of cluster members' data.
+To do this we need to "tidy up" the dataset. A tidy dataset (<a href="https://www.jstatsoft.org/article/view/v059i10">Wickham,
 2014</a>) is one where every row is
 an observation, and every column is a variable. Thus, a few steps are required 
 to tidy up our labelled data:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Index db on cluster ID</span>
-<span class="n">tidy_db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'k5cls'</span><span class="p">)</span>
-<span class="c"># Keep only variables used for clustering</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Index db on cluster ID</span>
+<span class="n">tidy_db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)</span>
+<span class="c1"># Keep only variables used for clustering</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">]</span>
-<span class="c"># Stack column names into a column, obtaining </span>
-<span class="c"># a "long" version of the dataset</span>
+<span class="c1"># Stack column names into a column, obtaining </span>
+<span class="c1"># a &quot;long&quot; version of the dataset</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
-<span class="c"># Take indices into proper columns</span>
+<span class="c1"># Take indices into proper columns</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="c"># Rename column names</span>
+<span class="c1"># Rename column names</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
-                        <span class="s">'level_1'</span><span class="p">:</span> <span class="s">'Attribute'</span><span class="p">,</span> 
-                        <span class="mi">0</span><span class="p">:</span> <span class="s">'Values'</span><span class="p">})</span>
-<span class="c"># Check out result</span>
+                        <span class="s1">&#39;level_1&#39;</span><span class="p">:</span> <span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> 
+                        <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;Values&#39;</span><span class="p">})</span>
+<span class="c1"># Check out result</span>
 <span class="n">tidy_db</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output output_html">
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -2264,42 +2886,78 @@ to tidy up our labelled data:</p>
 </div>
 </div>
 
-    </div>
-  </div>
+</div>
+</div>
+</div>
 </div>
 
-<p>Now we are ready to plot. Below, we’ll show the distribution of each cluster’s values
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now we are ready to plot. Below, we'll show the distribution of each cluster's values
 for each variable. This gives us the full distributional profile of each cluster:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup the facets</span>
-<span class="n">facets</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tidy_db</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s">'Attribute'</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'k5cls'</span><span class="p">,</span> \
-                  <span class="n">sharey</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="c"># Build the plot from `sns.kdeplot`</span>
-<span class="n">_</span> <span class="o">=</span> <span class="n">facets</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">seaborn</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">,</span> <span class="s">'Values'</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">add_legend</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_47_0.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Setup the facets</span>
+<span class="n">facets</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tidy_db</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> \
+                  <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="c1"># Build the plot from `sns.kdeplot`</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">facets</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">seaborn</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">add_legend</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_47_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>This allows us to see that, while some attributes such as the percentage of
-female households (<code class="highlighter-rouge">pct_female_hh</code>) display largely the same distribution for
-each cluster, others paint a much more divided picture (e.g. <code class="highlighter-rouge">Median Val</code>).
+female households (<code>pct_female_hh</code>) display largely the same distribution for
+each cluster, others paint a much more divided picture (e.g. <code>Median Val</code>).
 Taken altogether, these graphs allow us to start delving into the multidimensional 
 complexity of each cluster and the types of areas behind them.</p>
-
-<h2 id="hierarchical-clustering">Hierarchical Clustering</h2>
-
-<p>As mentioned above, k-means is only one clustering algorithm. There are
+<h2 id="Hierarchical-Clustering">Hierarchical Clustering<a class="anchor-link" href="#Hierarchical-Clustering"> </a></h2><p>As mentioned above, k-means is only one clustering algorithm. There are
 plenty more. In this section, we will take a similar look at the San Diego
 dataset using another staple of the clustering toolkit: agglomerative
 hierarchical clustering (AHC). Agglomerative clustering works by building a hierarchy of
@@ -2308,83 +2966,152 @@ cluster in itself) and ends with all observations assigned to the same cluster.
 These extremes are not very useful in themselves. But, in between, the hierarchy
 contains many distinct clustering solutions with varying levels of detail. 
 The intuition behind the algorithm is also rather straightforward:</p>
-
 <p>1) begin with everyone as part of its own cluster; 
 2) find the two closest observations based on a distance metric (e.g. euclidean); 
 3) join them into a new cluster; 
 4) repeat steps 2) and 3) until reaching the degree of aggregation desired.</p>
-
-<p>The algorithm is thus called “agglomerative”
-because it starts with individual clusters and “agglomerates” them into fewer
+<p>The algorithm is thus called "agglomerative"
+because it starts with individual clusters and "agglomerates" them into fewer
 and fewer clusters containing more and more observations each. Also, like with 
 k-means, AHC does require the user to specify a number of clusters in advance.
 This is because, following from the mechanism the method has to build clusters, 
 AHC can provide a solution with as many clusters as observations ($k=n$),
 or with a only one ($k=1$).</p>
+<p>Enough of theory, let's get coding! In Python, AHC can be run
+with <code>scikit-learn</code> in very much the same way we did for k-means in the previous
+section. In this case, we use the <code>AgglomerativeClustering</code> class and again 
+use the <code>fit</code> method to actually apply the clustering algorithm to our data:</p>
 
-<p>Enough of theory, let’s get coding! In Python, AHC can be run
-with <code class="highlighter-rouge">scikit-learn</code> in very much the same way we did for k-means in the previous
-section. In this case, we use the <code class="highlighter-rouge">AgglomerativeClustering</code> class and again 
-use the <code class="highlighter-rouge">fit</code> method to actually apply the clustering algorithm to our data:</p>
+</div>
+</div>
+</div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Set seed for reproducibility</span>
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set seed for reproducibility</span>
 <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="c"># Iniciate the algorithm</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s">'ward'</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-<span class="c"># Run clustering</span>
+<span class="c1"># Iniciate the algorithm</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1"># Run clustering</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">])</span>
-<span class="c"># Assign labels to main data table</span>
-<span class="n">db</span><span class="p">[</span><span class="s">'ward5'</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<span class="c1"># Assign labels to main data table</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
 </div>
 
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>As above, we can check the number of observations that fall within each cluster:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ward5sizes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'ward5'</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ward5sizes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ward5&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 <span class="n">ward5sizes</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ward5
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>ward5
 0    134
 1    326
 2     16
 3    145
 4      6
-dtype: int64
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+dtype: int64</pre>
 </div>
 
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Further, we can check the simple average profiles of our clusters:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ward5means</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'ward5'</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ward5means</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ward5&#39;</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="n">ward5means</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output output_html">
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -2486,40 +3213,68 @@ dtype: int64
 </div>
 </div>
 
-    </div>
-  </div>
+</div>
+</div>
+</div>
 </div>
 
-<p>And again, we can create a plot of the profiles’ distributions (after properly 
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And again, we can create a plot of the profiles' distributions (after properly 
 tidying up):</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Index db on cluster ID</span>
-<span class="n">tidy_db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s">'ward5'</span><span class="p">)</span>
-<span class="c"># Keep only variables used for clustering</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Index db on cluster ID</span>
+<span class="n">tidy_db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ward5&#39;</span><span class="p">)</span>
+<span class="c1"># Keep only variables used for clustering</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">]</span>
-<span class="c"># Stack column names into a column, obtaining </span>
-<span class="c"># a "long" version of the dataset</span>
+<span class="c1"># Stack column names into a column, obtaining </span>
+<span class="c1"># a &quot;long&quot; version of the dataset</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="o">.</span><span class="n">stack</span><span class="p">()</span>
-<span class="c"># Take indices into proper columns</span>
+<span class="c1"># Take indices into proper columns</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-<span class="c"># Rename column names</span>
+<span class="c1"># Rename column names</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
-                        <span class="s">'level_1'</span><span class="p">:</span> <span class="s">'Attribute'</span><span class="p">,</span> 
-                        <span class="mi">0</span><span class="p">:</span> <span class="s">'Values'</span><span class="p">})</span>
-<span class="c"># Check out result</span>
+                        <span class="s1">&#39;level_1&#39;</span><span class="p">:</span> <span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> 
+                        <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;Values&#39;</span><span class="p">})</span>
+<span class="c1"># Check out result</span>
 <span class="n">tidy_db</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output output_html">
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -2577,124 +3332,215 @@ tidying up):</p>
 </div>
 </div>
 
-    </div>
-  </div>
+</div>
+</div>
+</div>
 </div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Setup the facets</span>
-<span class="n">facets</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tidy_db</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s">'Attribute'</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'ward5'</span><span class="p">,</span> \
-                  <span class="n">sharey</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="c"># Build the plot as a `sns.kdeplot`</span>
-<span class="n">_</span> <span class="o">=</span> <span class="n">facets</span><span class="o">.</span><span class="nb">map</span><span class="p">(</span><span class="n">seaborn</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">,</span> <span class="s">'Values'</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span><span class="o">.</span><span class="n">add_legend</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_56_0.png" alt="png" /></p>
-
-    </div>
-  </div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Setup the facets</span>
+<span class="n">facets</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tidy_db</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;ward5&#39;</span><span class="p">,</span> \
+                  <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="c1"># Build the plot as a `sns.kdeplot`</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">facets</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">seaborn</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">add_legend</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_56_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>For the sake of brevity, we will not spend much time on the plots above.
 However, the interpretation is analogous to that of the k-means example.</p>
-
 <p>On the spatial side, we can explore the geographical dimension of the
 clustering solution by making a map the clusters:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'ward5'</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
-<span class="c"># Setup figure and ax</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c"># Plot unique values choropleth including a legend and with no boundary lines</span>
-<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'ward5'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="c"># Remove axis</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="c"># Keep axes proportionate</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
-<span class="c"># Add title</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Geodemographic Clusters (AHC, $k=5$)'</span><span class="p">)</span>
-<span class="c"># Display the map</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_58_0.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<span class="c1"># Setup figure and ax</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
+<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;ward5&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Remove axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c1"># Keep axes proportionate</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="c1"># Add title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Geodemographic Clusters (AHC, $k=5$)&#39;</span><span class="p">)</span>
+<span class="c1"># Display the map</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_58_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>And, to make comparisons simpler, we can display both the k-means and the AHC
 results side by side:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'ward5'</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
-<span class="c"># Setup figure and ax</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<span class="c1"># Setup figure and ax</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="c"># Plot unique values choropleth including a legend and with no boundary lines</span>
-<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'ward5'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Set2'</span><span class="p">,</span> 
-        <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="c"># Remove axis</span>
+<span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
+<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;ward5&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Set2&#39;</span><span class="p">,</span> 
+        <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Remove axis</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="c"># Keep axes proportionate</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
-<span class="c"># Add title</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'K-Means solution ($k=5$)'</span><span class="p">)</span>
+<span class="c1"># Keep axes proportionate</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="c1"># Add title</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;K-Means solution ($k=5$)&#39;</span><span class="p">)</span>
 
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="c"># Plot unique values choropleth including a legend and with no boundary lines</span>
-<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'k5cls'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'Set3'</span><span class="p">,</span>
-        <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="c"># Remove axis</span>
+<span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
+<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Set3&#39;</span><span class="p">,</span>
+        <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Remove axis</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="c"># Keep axes proportionate</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
-<span class="c"># Add title</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">'AHC solution ($k=5$)'</span><span class="p">)</span>
+<span class="c1"># Keep axes proportionate</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="c1"># Add title</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;AHC solution ($k=5$)&#39;</span><span class="p">)</span>
 
-<span class="c"># Display the map</span>
+<span class="c1"># Display the map</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_60_0.png" alt="png" /></p>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_60_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>While we must remember our earlier caveat about how irregular polygons can 
 baffle our visual intuition, a closer visual inspection of the cluster geography
 suggests a clear pattern: although they are not identical, both clusterings capture
 very similar overall spatial structure. Furthermore, both solutions slightly violate 
-Tobler’s law, since all of the clusters have disconnected components. The five
+Tobler's law, since all of the clusters have disconnected components. The five
 multivariate clusters in each case are actually composed of many disparate 
 geographical areas, strewn around the map according only to the structure of the
 data and not its geography. That is, in order to travel to
 every tract belonging to a cluster, we would have to journey through
 other clusters as well.</p>
-
-<h2 id="spatially-constrained-hierarchical-clustering">Spatially Constrained Hierarchical Clustering</h2>
-
-<p>Fragmented clusters are not intrinsically invalid, particularly if we are
+<h2 id="Spatially-Constrained-Hierarchical-Clustering">Spatially Constrained Hierarchical Clustering<a class="anchor-link" href="#Spatially-Constrained-Hierarchical-Clustering"> </a></h2><p>Fragmented clusters are not intrinsically invalid, particularly if we are
 interested in exploring the overall structure and geography of multivariate
 data. However, in some cases, the application we are interested in might
 require that all the observations in a class be spatially connected. For
@@ -2702,25 +3548,22 @@ example, when detecting communities or neighborhoods (as is sometimes needed whe
 drawing electoral or census boundaries), they are nearly always distinct 
 self-connected areas, unlike our clusters shown above. To ensure that clusters are
 not spatially fragmented, we turn to regionalization.</p>
-
 <p>Regionalization methods are clustering techniques that impose a spatial constraints
 on clusters. In other words, the result of a regionalization algorithm contains clusters with
 areas that are geographically coherent, in addition to having coherent data profiles. 
 Effectively, this means that regionalization methods construct clusters that are 
-all internally-connected; these are the <em>regions</em>. Thus, a regions’ members must
-be geographically <em>nested</em> within the region’s boundaries.</p>
-
+all internally-connected; these are the <em>regions</em>. Thus, a regions' members must
+be geographically <em>nested</em> within the region's boundaries.</p>
 <p>This type of nesting relationship is easy to identify
 in the real world. For example, counties nest within states, or, in the UK, 
 local super output areas (LSOAs) nest within middle super output areas (MSOAs). 
 The difference between these real-world nestings and the output of a regionalization
-algorithm is that the real-world nestings are aggregated according to administrative principles, but regions’ members are aggregated according to a statistical technique. In the same manner as the
+algorithm is that the real-world nestings are aggregated according to administrative principles, but regions' members are aggregated according to a statistical technique. In the same manner as the
 clustering techniques explored above, these regionalization methods aggregate 
 observations that are similar in their covariates; the profiles of regions are useful
 in a similar manner as the profiles of clusters. But, in regionalization, the 
 clustering is also spatially constrained, so the region profiles and members will
 likely be different from the unconstrained solutions.</p>
-
 <p>As in the non-spatial case, there are many different regionalization methods.
 Each has a different way to measure (dis)similarity, how the similarity is used
 to assign labels, how these labels are iteratively adjusted, and so on. However,
@@ -2729,77 +3572,135 @@ In particular, they all take a set of input attributes and a representation of
 spatial connectivity in the form of a binary spatial weights matrix. Depending 
 on the algorithm, they also require the desired number of output regions. For
 illustration, we will take the AHC algorithm we have just used above, and apply 
-an additional spatial constraint. In <code class="highlighter-rouge">scikit-learn</code>, this is done using
-our spatial weights matrix as a <code class="highlighter-rouge">connectivity</code> option.
+an additional spatial constraint. In <code>scikit-learn</code>, this is done using
+our spatial weights matrix as a <code>connectivity</code> option.
 This will force the agglomerative algorithm to only allow observations to be grouped
 in a cluster if they are also spatially connected:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s">'ward'</span><span class="p">,</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span>
                                             <span class="n">connectivity</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">sparse</span><span class="p">,</span>
                                             <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">])</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>AgglomerativeClustering(affinity='euclidean', compute_full_tree='auto',
-            connectivity=&lt;627x627 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>AgglomerativeClustering(affinity=&#39;euclidean&#39;, compute_full_tree=&#39;auto&#39;,
+            connectivity=&lt;627x627 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
 	with 3961 stored elements in Compressed Sparse Row format&gt;,
-            linkage='ward', memory=None, n_clusters=5,
-            pooling_func='deprecated')
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+            linkage=&#39;ward&#39;, memory=None, n_clusters=5,
+            pooling_func=&#39;deprecated&#39;)</pre>
 </div>
 
-<p>Let’s inspect the output:</p>
+</div>
+</div>
+</div>
+</div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'ward5wq'</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
-<span class="c"># Setup figure and ax</span>
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's inspect the output:</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5wq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<span class="c1"># Setup figure and ax</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c"># Plot unique values choropleth including a legend and with no boundary lines</span>
-<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'ward5wq'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="c"># Remove axis</span>
+<span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
+<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;ward5wq&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Remove axis</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="c"># Keep axes proportionate</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
-<span class="c"># Add title</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">r'Geodemographic Regions (Ward, $k=5$, Queen Contiguity)'</span><span class="p">)</span>
-<span class="c"># Display the map</span>
+<span class="c1"># Keep axes proportionate</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="c1"># Add title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Geodemographic Regions (Ward, $k=5$, Queen Contiguity)&#39;</span><span class="p">)</span>
+<span class="c1"># Display the map</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_64_0.png" alt="png" /></p>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_64_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Introducing the spatial constraint results in fully-connected clusters with much
 more concentrated spatial distributions. From an initial visual impression, it might
 appear that our spatial constraint has been violated: there are tracts for both cluster 0 and
 cluster 1 that appear to be disconnected from the rest of their clusters.
 However, closer inspection reveals that each of these tracts is indeed connected
 to another tract in its own cluster by very narrow shared boundaries.</p>
-
-<h3 id="changing-the-spatial-constraint">Changing the spatial constraint</h3>
-
-<p>The spatial constraint in regionalization algorithms is structured by the
+<h3 id="Changing-the-spatial-constraint">Changing the spatial constraint<a class="anchor-link" href="#Changing-the-spatial-constraint"> </a></h3><p>The spatial constraint in regionalization algorithms is structured by the
 spatial weights matrix we use. An interesting
 question is thus how the choice of weights influences the final region structure.
 Fortunately, we can directly explore the impact that a change in the spatial weights matrix has on
@@ -2808,73 +3709,156 @@ but replace the Queen contiguity matrix with a spatial k-nearest neighbor matrix
 where each observation is connected to its four nearest observations, instead
 of those it touches.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">w</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_shapefile</span><span class="p">(</span><span class="s">'../data/sandiego/sd_tracts_acs_clean.shp'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_shapefile</span><span class="p">(</span><span class="s1">&#39;../data/sandiego/sd_tracts_acs_clean.shp&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
 
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>With this matrix connecting each tract to the four closest tracts, we can run 
 another AHC regionalization:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s">'ward'</span><span class="p">,</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span>
                                             <span class="n">connectivity</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">sparse</span><span class="p">,</span>
                                             <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">])</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>AgglomerativeClustering(affinity='euclidean', compute_full_tree='auto',
-            connectivity=&lt;627x627 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
-	with 2508 stored elements in Compressed Sparse Row format&gt;,
-            linkage='ward', memory=None, n_clusters=5,
-            pooling_func='deprecated')
-</code></pre></div>      </div>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>AgglomerativeClustering(affinity=&#39;euclidean&#39;, compute_full_tree=&#39;auto&#39;,
+            connectivity=&lt;627x627 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+	with 2508 stored elements in Compressed Sparse Row format&gt;,
+            linkage=&#39;ward&#39;, memory=None, n_clusters=5,
+            pooling_func=&#39;deprecated&#39;)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>And plot the final regions:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'ward5wknn'</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
-<span class="c"># Setup figure and ax</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c"># Plot unique values choropleth including a legend and with no boundary lines</span>
-<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'ward5wknn'</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="c"># Remove axis</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="c"># Keep axes proportionate</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
-<span class="c"># Add title</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Geodemographic Regions (Ward, $k=5$, four nearest neighbors)'</span><span class="p">)</span>
-<span class="c"># Display the map</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/10_clustering_and_regionalization_70_0.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5wknn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<span class="c1"># Setup figure and ax</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
+<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;ward5wknn&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Remove axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c1"># Keep axes proportionate</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="c1"># Add title</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Geodemographic Regions (Ward, $k=5$, four nearest neighbors)&#39;</span><span class="p">)</span>
+<span class="c1"># Display the map</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/10_clustering_and_regionalization_70_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Even though we have specified a spatial constraint, the constraint applies to the
 connectivity graph modeled by our weights matrix. Therefore, using k-nearest neighbors
 to constrain the agglomerative clustering may not result in regions that are connected
@@ -2882,21 +3866,17 @@ according to a different connectivity rule, such as the queen contiguity rule us
 in the previous section. However, the regionalization here is fortuitous; even though
 we used the 4-nearest tracts to constrain connectivity, all but one of the clusters, 
 cluster 4, is <em>also</em> connected according to our earlier queen contiguity rule.</p>
-
 <p>At first glance, this may seem counter-intuitive. We did specify the spatial
 constraint, so our initial reaction is that the connectivity constraint is
 violated. However, this is not the case, since the constraint applies to the
 k-nearest neighbor graph, not the queen contiguity graph. Therefore, since tracts
 in this solution are considered as connected to their four closest neighbors,
-clusters can “leapfrog” over one another. Thus, it is important to recognize that
+clusters can "leapfrog" over one another. Thus, it is important to recognize that
 the apparent spatial structure of regionalizations will depend on how the 
 connectivity of observations is modeled.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>Overall, clustering and regionalization are two complementary tools to reduce the
+<h2 id="Conclusion">Conclusion<a class="anchor-link" href="#Conclusion"> </a></h2><p>Overall, clustering and regionalization are two complementary tools to reduce the
 complexity in multivariate data and build better understandings of the spatial structure 
-of data. Often, there is simply too much data to examine every variables’ map and its
+of data. Often, there is simply too much data to examine every variables' map and its
 relation to all other variable maps. 
 Thus, clustering reduces this complexity into a single conceptual shorthand by which 
 people can easily describe complex and multifaceted data. 
@@ -2905,8 +3885,8 @@ with coherent <em>profiles</em>, or distinct and internally-consistent
 distributional/descriptive characteristics. 
 These profiles are the conceptual shorthand, since members of each cluster should
 be more similar to the cluster at large than they are to any other cluster. 
-Many different clustering methods exist; they differ on how the “cluster at large” 
-is defined, and how “similar” members must be to clusters, or how these clusters
+Many different clustering methods exist; they differ on how the "cluster at large" 
+is defined, and how "similar" members must be to clusters, or how these clusters
 are obtained.
 Regionalization is a special kind of clustering with an additional geographic requirement. 
 Observations should be grouped so that each spatial cluster,
@@ -2916,7 +3896,6 @@ graph for data collected in areas; this ensures that the regions that are identi
 are fully internally-connected. 
 However, since many regionalization methods are defined for an arbitrary connectivity structure,
 these graphs can be constructed according to different rules as well, such as the k-nearest neighbor graph.</p>
-
 <p>In this chapter, we discussed the conceptual basis for clustering and regionalization, 
 as well showing why clustering is done. 
 Further, we have shown how to build clusters using spatial data science packages, 
@@ -2927,47 +3906,51 @@ Clustering and regionalization are intimately related to the analysis of spatial
 since the spatial structure and covariation in multivariate spatial data is what
 determines the spatial structure and data profile of discovered clusters or regions.
 Thus, clustering and regionalization are essential tools for the spatial data scientist.</p>
-
-<h2 id="questions">Questions</h2>
-
-<ol>
-  <li>What disciplines employ regionalization? Cite concrete examples for each discipline you list.</li>
-  <li>Contrast and compare  the concepts of <em>clusters</em> and <em>regions</em>?</li>
-  <li>In evaluating the quality of the solution to a regionalization problem, how might traditional measures of cluster evaluation be used? In what ways might those measures be limited and need expansion to consider the geographical dimensions of the problem?</li>
-  <li>Discuss the implications for the processes of regionalization that follow from the number of <em>connected components</em> in the spatial weights matrix that would be used.</li>
-  <li>True or false: The average silhouette score for a spatially constrained solution will be no larger than the average silhouette score for an unconstrained solution. Why, or why not? (add reference and  or explain silhouette)</li>
-  <li>Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook versus queen). How might this sparsity affect the quality of the clustering solution?</li>
-  <li>What are the challenges and opportunities that spatial dependence pose for spatial cluster formation?</li>
-  <li>In other areas of spatial analysis, the concept of multilevel modeling (cites) exploits the hierarchical nesting of spatial units at different levels of aggregation. How might such nesting be exploited in the implementation of regionalization algorithms? What are some possible limitations/challenges that such nesting imposes/represents in obtaining a regionalization solution.</li>
-  <li>Using a spatial weights object obtained as <code class="highlighter-rouge">w = libpysal.weights.lat2W(20,20)</code>, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for <code class="highlighter-rouge">w = libpysal.weights.lat2W(20,20, rook=False)</code> ?</li>
+<h2 id="Questions">Questions<a class="anchor-link" href="#Questions"> </a></h2><ol>
+<li>What disciplines employ regionalization? Cite concrete examples for each discipline you list.</li>
+<li>Contrast and compare  the concepts of <em>clusters</em> and <em>regions</em>?</li>
+<li>In evaluating the quality of the solution to a regionalization problem, how might traditional measures of cluster evaluation be used? In what ways might those measures be limited and need expansion to consider the geographical dimensions of the problem?</li>
+<li>Discuss the implications for the processes of regionalization that follow from the number of <em>connected components</em> in the spatial weights matrix that would be used.</li>
+<li>True or false: The average silhouette score for a spatially constrained solution will be no larger than the average silhouette score for an unconstrained solution. Why, or why not? (add reference and  or explain silhouette)</li>
+<li>Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook versus queen). How might this sparsity affect the quality of the clustering solution?</li>
+<li>What are the challenges and opportunities that spatial dependence pose for spatial cluster formation?</li>
+<li>In other areas of spatial analysis, the concept of multilevel modeling (cites) exploits the hierarchical nesting of spatial units at different levels of aggregation. How might such nesting be exploited in the implementation of regionalization algorithms? What are some possible limitations/challenges that such nesting imposes/represents in obtaining a regionalization solution.</li>
+<li>Using a spatial weights object obtained as <code>w = libpysal.weights.lat2W(20,20)</code>, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for <code>w = libpysal.weights.lat2W(20,20, rook=False)</code> ?</li>
 </ol>
-
-<hr />
-
+<hr>
 <p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
+
+</div>
+</div>
+</div>
+
+ 
 
 
               <nav class="c-page__nav">
   
     
-    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/geographic-data-science/notebooks/09_spatial_inequality">
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/geographic-data-science/notebooks/09_spatial_inequality.html">
       〈 <span class="u-margin-right-tiny"></span> Spatial Inequality
     </a>
   
 
   
     
-    <a id="js-page__nav__next" class="c-page__nav__next" href="/geographic-data-science/notebooks/11_regression">
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/geographic-data-science/notebooks/11_regression.html">
       Regression <span class="u-margin-right-tiny"></span> 〉
     </a>
   
 </nav>
 
             </div>
+            <footer>
+  <p class="footer"></p>
+</footer>
+
           </div>
         </div>
       </main>
     </div>
-
   </body>
 </html>

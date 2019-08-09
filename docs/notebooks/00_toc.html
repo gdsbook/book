@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
   <title>Table of Contents</title>
-  <meta name="description" content="Table of Contents">
+  <meta name="description" content="Table of Contents Part I: Building Blocks Geospatial Computational EnvironmentSpatial dataSpatial data processingSpatial weightsPart II: Spatial Data Analysi...">
 
   <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/00_toc.html">
   <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
@@ -26,8 +26,10 @@
   <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/00_toc.html" />
 <meta property="og:type"        content="article" />
 <meta property="og:title"       content="Table of Contents" />
-<meta property="og:description" content="Table of Contents" />
-<meta property="og:image"       content="" />
+<meta property="og:description" content="Table of Contents Part I: Building Blocks Geospatial Computational EnvironmentSpatial dataSpatial data processingSpatial weightsPart II: Spatial Data Analysi..." />
+<meta property="og:image"       content="https://gdsbook.github.io/geographic-data-science/images/logo/logo.png" />
+
+<meta name="twitter:card" content="summary">
 
 
   <script type="application/ld+json">
@@ -39,11 +41,11 @@
   "headline":
     "Table of Contents",
   "datePublished":
-    "2019-07-29T16:40:50+00:00",
+    "2019-08-09T18:14:23+00:00",
   "dateModified":
-    "2019-07-29T16:40:50+00:00",
+    "2019-08-09T18:14:23+00:00",
   "description":
-    "Table of Contents",
+    "Table of Contents Part I: Building Blocks Geospatial Computational EnvironmentSpatial dataSpatial data processingSpatial weightsPart II: Spatial Data Analysi...",
   "author": {
     "@type": "Person",
     "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
@@ -148,6 +150,45 @@ initFunction(function () {
   <script src="/geographic-data-science/assets/js/turbolinks.js" async></script>
   <meta name="turbolinks-cache-control" content="no-cache">
 
+  <!-- Selectors for elements on the page -->
+  <script>
+/**
+ * Select various elements on the page for later use
+ */
+
+// IDs we'll attach to cells
+const codeCellId = index => `codecell${index}`
+const inputCellId = index => `inputcell${index}`
+
+pageElements = {}
+
+// All code cells
+findCodeCells = function() {
+    var codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre, div.text_cell_render div.highlight pre')
+    pageElements['codeCells'] = codeCells;
+
+    codeCells.forEach((codeCell, index) => {
+      const id = codeCellId(index)
+      codeCell.setAttribute('id', id)
+    })
+};
+
+initFunction(findCodeCells);
+
+
+findInputCells = function() {
+    var inputCells = document.querySelectorAll('div.jb_input')
+    pageElements['inputCells'] = inputCells;
+
+    inputCells.forEach((inputCell, index) => {
+        const id = inputCellId(index)
+        inputCell.setAttribute('id', id)
+    })
+};
+
+initFunction(findInputCells);
+</script>
+
   <!-- Load nbinteract for widgets -->
   
 
@@ -169,7 +210,7 @@ const thebelabCellButton = id =>
 
 const addThebelabButtonToCodeCells =  () => {
 
-  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  const codeCells = document.querySelectorAll('div.input_area > div.highlight:not(.output) pre')
   codeCells.forEach((codeCell, index) => {
     const id = codeCellId(index)
     codeCell.setAttribute('id', id)
@@ -308,153 +349,6 @@ initFunction(initToc);
 
   <!-- Clipboard copy button -->
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" async></script>
-
-  <!-- Load JS that depends on site variables -->
-  <script>
-/**
- * Set up copy/paste for code blocks
- */
-const codeCellId = index => `codecell${index}`
-
-const clipboardButton = id =>
-  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
-    <img src="/geographic-data-science/assets/images/copy-button.svg" alt="Copy to clipboard">
-  </a>`
-
-// Clears selected text since ClipboardJS will select the text when copying
-const clearSelection = () => {
-  if (window.getSelection) {
-    window.getSelection().removeAllRanges()
-  } else if (document.selection) {
-    document.selection.empty()
-  }
-}
-
-// Changes tooltip text for two seconds, then changes it back
-const temporarilyChangeTooltip = (el, newText) => {
-  const oldText = el.getAttribute('data-tooltip')
-  el.setAttribute('data-tooltip', newText)
-  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
-}
-
-const addCopyButtonToCodeCells = () => {
-  // If ClipboardJS hasn't loaded, wait a bit and try again. This
-  // happens because we load ClipboardJS asynchronously.
-  if (window.ClipboardJS === undefined) {
-    setTimeout(addCopyButtonToCodeCells, 250)
-    return
-  }
-
-  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
-  codeCells.forEach((codeCell, index) => {
-    const id = codeCellId(index)
-    codeCell.setAttribute('id', id)
-    if (document.getElementById("copy-button" + id) == null) {
-      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
-    }
-  })
-
-  const clipboard = new ClipboardJS('.copybtn')
-  clipboard.on('success', event => {
-    clearSelection()
-    temporarilyChangeTooltip(event.trigger, 'Copied!')
-  })
-
-  clipboard.on('error', event => {
-    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
-  })
-
-  // Get rid of clipboard before the next page visit to avoid memory leak
-  document.addEventListener('turbolinks:before-visit', () =>
-    clipboard.destroy()
-  )
-}
-
-initFunction(addCopyButtonToCodeCells);
-</script>
-
-
-  <!-- Hide cell code -->
-  <script>
-    /**
-    Add buttons to hide code cells
-    */
-
-
-    var setCodeCellVisibility = function (inputField, kind) {
-        // Update the image and class for hidden
-        var id = inputField.getAttribute('data-id');
-        var codeCell = document.querySelector(`#${id} div.highlight`);
-
-        if (kind === "visible") {
-            codeCell.classList.remove('hidden');
-            inputField.checked = true;
-        } else {
-            codeCell.classList.add('hidden');
-            inputField.checked = false;
-        }
-    }
-
-    var toggleCodeCellVisibility = function (event) {
-        // The label is clicked, and now we decide what to do based on the input field's clicked status
-        if (event.target.tagName === "LABEL") {
-            var inputField = event.target.previousElementSibling;
-        } else {
-            // It is the span inside the target
-            var inputField = event.target.parentElement.previousElementSibling;
-        }
-
-        if (inputField.checked === true) {
-            setCodeCellVisibility(inputField, "visible");
-        } else {
-            setCodeCellVisibility(inputField, "hidden");
-        }
-    }
-
-
-    // Button constructor
-    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
-
-    var addHideButton = function () {
-        // If a hide button is already added, don't add another
-        if (document.querySelector('div.hidecode input') !== null) {
-            return;
-        }
-
-        // Find the input cells and add a hide button
-        document.querySelectorAll('div.input_area').forEach(function (item, index) {
-            if (!item.classList.contains("hidecode")) {
-                // Skip the cell if it doesn't have a hidecode class
-                return;
-            }
-
-            const id = codeCellId(index)
-            item.setAttribute('id', id);
-            // Insert the button just inside the end of the next div
-            item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
-
-            // Set up the visibility toggle
-            hideLink = document.querySelector(`#${id} div.highlight + input + label`);
-            hideLink.addEventListener('click', toggleCodeCellVisibility)
-        });
-    }
-
-
-    // Initialize the hide buttos
-    var initHiddenCells = function () {
-        // Add hide buttons to the cells
-        addHideButton();
-
-        // Toggle the code cells that should be hidden
-        document.querySelectorAll('div.hidecode input').forEach(function (item) {
-            setCodeCellVisibility(item, 'hidden');
-            item.checked = true;
-        })
-    }
-
-    initFunction(initHiddenCells);
-
-</script>
 
   <!-- Load custom website scripts -->
   <script src="/geographic-data-science/assets/js/scripts.js" async></script>
@@ -693,6 +587,148 @@ document.addEventListener('turbolinks:load', updateInteractLink)
 };
 
 initFunction(initQuery);
+</script>
+
+  <!-- Load JS that depends on site variables -->
+  <script>
+/**
+ * Set up copy/paste for code blocks
+ */
+const clipboardButton = id =>
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+    <img src="/geographic-data-science/assets/images/copy-button.svg" alt="Copy to clipboard">
+  </a>`
+
+// Clears selected text since ClipboardJS will select the text when copying
+const clearSelection = () => {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
+// Changes tooltip text for two seconds, then changes it back
+const temporarilyChangeTooltip = (el, newText) => {
+  const oldText = el.getAttribute('data-tooltip')
+  el.setAttribute('data-tooltip', newText)
+  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
+}
+
+const addCopyButtonToCodeCells = () => {
+  // If ClipboardJS hasn't loaded, wait a bit and try again. This
+  // happens because we load ClipboardJS asynchronously.
+  if (window.ClipboardJS === undefined) {
+    setTimeout(addCopyButtonToCodeCells, 250)
+    return
+  }
+
+  pageElements['codeCells'].forEach((codeCell) => {
+    const id = codeCell.getAttribute('id')
+    if (document.getElementById("copy-button" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
+    }
+  })
+
+  const clipboard = new ClipboardJS('.copybtn')
+  clipboard.on('success', event => {
+    clearSelection()
+    temporarilyChangeTooltip(event.trigger, 'Copied!')
+  })
+
+  clipboard.on('error', event => {
+    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
+  })
+
+  // Get rid of clipboard before the next page visit to avoid memory leak
+  document.addEventListener('turbolinks:before-visit', () =>
+    clipboard.destroy()
+  )
+}
+
+initFunction(addCopyButtonToCodeCells);
+</script>
+
+
+  <!-- Hide cell code -->
+  <script>
+    /**
+    Add buttons to hide code cells
+    */
+
+
+    var setCodeCellVisibility = function (inputField, kind) {
+        // Update the image and class for hidden
+        var id = inputField.getAttribute('data-id');
+        var codeCell = document.querySelector(`#${id} div.highlight`);
+
+        if (kind === "visible") {
+            codeCell.classList.remove('hidden');
+            inputField.checked = true;
+        } else {
+            codeCell.classList.add('hidden');
+            inputField.checked = false;
+        }
+    }
+
+    var toggleCodeCellVisibility = function (event) {
+        // The label is clicked, and now we decide what to do based on the input field's clicked status
+        if (event.target.tagName === "LABEL") {
+            var inputField = event.target.previousElementSibling;
+        } else {
+            // It is the span inside the target
+            var inputField = event.target.parentElement.previousElementSibling;
+        }
+
+        if (inputField.checked === true) {
+            setCodeCellVisibility(inputField, "visible");
+        } else {
+            setCodeCellVisibility(inputField, "hidden");
+        }
+    }
+
+
+    // Button constructor
+    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
+
+    var addHideButton = function () {
+        // If a hide button is already added, don't add another
+        if (document.querySelector('div.hidecode input') !== null) {
+            return;
+        }
+
+        // Find the input cells and add a hide button
+        pageElements['inputCells'].forEach(function (inputCell) {
+            if (!inputCell.classList.contains("hidecode")) {
+                // Skip the cell if it doesn't have a hidecode class
+                return;
+            }
+            const id = inputCell.getAttribute('id')
+
+            // Insert the button just inside the end of the next div
+            inputCell.querySelector('div.input').insertAdjacentHTML('beforeend', hideCodeButton(id))
+
+            // Set up the visibility toggle
+            hideLink = document.querySelector(`#${id} div.inner_cell + input + label`);
+            hideLink.addEventListener('click', toggleCodeCellVisibility)
+        });
+    }
+
+
+    // Initialize the hide buttos
+    var initHiddenCells = function () {
+        // Add hide buttons to the cells
+        addHideButton();
+
+        // Toggle the code cells that should be hidden
+        document.querySelectorAll('div.hidecode input').forEach(function (item) {
+            setCodeCellVisibility(item, 'hidden');
+            item.checked = true;
+        })
+    }
+
+    initFunction(initHiddenCells);
+
 </script>
 </head>
 
@@ -1107,59 +1143,59 @@ initFunction(initQuery);
 
 
             <div class="c-textbook__content">
-              <h1 id="table-of-contents">Table of Contents</h1>
-
-<h2 id="part-i-building-blocks">Part I: Building Blocks</h2>
-
-<ul>
-  <li><a href="01_geospatial_computational_environment">Geospatial Computational Environment</a></li>
-  <li><a href="02_spatial_data">Spatial data</a></li>
-  <li><a href="03_spatial_data_processing">Spatial data processing</a></li>
-  <li><a href="04_spatial_weights">Spatial weights</a></li>
+              <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Table-of-Contents">Table of Contents<a class="anchor-link" href="#Table-of-Contents"> </a></h1><h2 id="Part-I:-Building-Blocks">Part I: Building Blocks<a class="anchor-link" href="#Part-I:-Building-Blocks"> </a></h2><ul>
+<li><a href="01_geospatial_computational_environment">Geospatial Computational Environment</a></li>
+<li><a href="02_spatial_data">Spatial data</a></li>
+<li><a href="03_spatial_data_processing">Spatial data processing</a></li>
+<li><a href="04_spatial_weights">Spatial weights</a></li>
 </ul>
-
-<h2 id="part-ii-spatial-data-analysis">Part II: Spatial Data Analysis</h2>
-
-<ul>
-  <li><a href="05_choropleth">Choropleth Mapping</a></li>
-  <li><a href="06_spatial_autocorrelation">Spatial Autocorrelation</a></li>
-  <li><a href="07_local_autocorrelation">Local Spatial Autocorrelation</a></li>
-  <li><a href="08_point_pattern_analysis">Point Pattern Analysis</a></li>
+<h2 id="Part-II:-Spatial-Data-Analysis">Part II: Spatial Data Analysis<a class="anchor-link" href="#Part-II:-Spatial-Data-Analysis"> </a></h2><ul>
+<li><a href="05_choropleth">Choropleth Mapping</a></li>
+<li><a href="06_spatial_autocorrelation">Spatial Autocorrelation</a></li>
+<li><a href="07_local_autocorrelation">Local Spatial Autocorrelation</a></li>
+<li><a href="08_point_pattern_analysis">Point Pattern Analysis</a></li>
 </ul>
-
-<h2 id="part-iii-advanced-topics">Part III: Advanced Topics</h2>
-
-<ul>
-  <li><a href="09_spatial_inequality">Spatial Inequality</a></li>
-  <li><a href="10_clustering_and_regionalization">Clustering and Regionalization</a></li>
-  <li><a href="11_regression">Spatial Regression</a></li>
-  <li><a href="12_feature_engineering">Spatial Feature Engineering</a></li>
+<h2 id="Part-III:-Advanced-Topics">Part III: Advanced Topics<a class="anchor-link" href="#Part-III:-Advanced-Topics"> </a></h2><ul>
+<li><a href="09_spatial_inequality">Spatial Inequality</a></li>
+<li><a href="10_clustering_and_regionalization">Clustering and Regionalization</a></li>
+<li><a href="11_regression">Spatial Regression</a></li>
+<li><a href="12_feature_engineering">Spatial Feature Engineering</a></li>
 </ul>
-
 <p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
+
+</div>
+</div>
+</div>
+
+ 
 
 
               <nav class="c-page__nav">
   
     
-    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/geographic-data-science/intro">
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/geographic-data-science/intro.html">
       〈 <span class="u-margin-right-tiny"></span> Home
     </a>
   
 
   
     
-    <a id="js-page__nav__next" class="c-page__nav__next" href="/geographic-data-science/intro_part_i">
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/geographic-data-science/intro_part_i.html">
       Part I - Building Blocks <span class="u-margin-right-tiny"></span> 〉
     </a>
   
 </nav>
 
             </div>
+            <footer>
+  <p class="footer"></p>
+</footer>
+
           </div>
         </div>
       </main>
     </div>
-
   </body>
 </html>

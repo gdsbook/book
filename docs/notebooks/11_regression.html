@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
   <title>Regression</title>
-  <meta name="description" content="Spatial regression">
+  <meta name="description" content="Spatial regression ">
 
   <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/11_regression.html">
   <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
@@ -26,8 +26,10 @@
   <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/11_regression.html" />
 <meta property="og:type"        content="article" />
 <meta property="og:title"       content="Regression" />
-<meta property="og:description" content="Spatial regression" />
-<meta property="og:image"       content="" />
+<meta property="og:description" content="Spatial regression " />
+<meta property="og:image"       content="https://gdsbook.github.io/geographic-data-science/images/logo/logo.png" />
+
+<meta name="twitter:card" content="summary">
 
 
   <script type="application/ld+json">
@@ -39,11 +41,11 @@
   "headline":
     "Regression",
   "datePublished":
-    "2019-07-29T16:40:50+00:00",
+    "2019-08-09T18:14:23+00:00",
   "dateModified":
-    "2019-07-29T16:40:50+00:00",
+    "2019-08-09T18:14:23+00:00",
   "description":
-    "Spatial regression",
+    "Spatial regression ",
   "author": {
     "@type": "Person",
     "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
@@ -148,6 +150,45 @@ initFunction(function () {
   <script src="/geographic-data-science/assets/js/turbolinks.js" async></script>
   <meta name="turbolinks-cache-control" content="no-cache">
 
+  <!-- Selectors for elements on the page -->
+  <script>
+/**
+ * Select various elements on the page for later use
+ */
+
+// IDs we'll attach to cells
+const codeCellId = index => `codecell${index}`
+const inputCellId = index => `inputcell${index}`
+
+pageElements = {}
+
+// All code cells
+findCodeCells = function() {
+    var codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre, div.text_cell_render div.highlight pre')
+    pageElements['codeCells'] = codeCells;
+
+    codeCells.forEach((codeCell, index) => {
+      const id = codeCellId(index)
+      codeCell.setAttribute('id', id)
+    })
+};
+
+initFunction(findCodeCells);
+
+
+findInputCells = function() {
+    var inputCells = document.querySelectorAll('div.jb_input')
+    pageElements['inputCells'] = inputCells;
+
+    inputCells.forEach((inputCell, index) => {
+        const id = inputCellId(index)
+        inputCell.setAttribute('id', id)
+    })
+};
+
+initFunction(findInputCells);
+</script>
+
   <!-- Load nbinteract for widgets -->
   
 
@@ -169,7 +210,7 @@ const thebelabCellButton = id =>
 
 const addThebelabButtonToCodeCells =  () => {
 
-  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  const codeCells = document.querySelectorAll('div.input_area > div.highlight:not(.output) pre')
   codeCells.forEach((codeCell, index) => {
     const id = codeCellId(index)
     codeCell.setAttribute('id', id)
@@ -308,153 +349,6 @@ initFunction(initToc);
 
   <!-- Clipboard copy button -->
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" async></script>
-
-  <!-- Load JS that depends on site variables -->
-  <script>
-/**
- * Set up copy/paste for code blocks
- */
-const codeCellId = index => `codecell${index}`
-
-const clipboardButton = id =>
-  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
-    <img src="/geographic-data-science/assets/images/copy-button.svg" alt="Copy to clipboard">
-  </a>`
-
-// Clears selected text since ClipboardJS will select the text when copying
-const clearSelection = () => {
-  if (window.getSelection) {
-    window.getSelection().removeAllRanges()
-  } else if (document.selection) {
-    document.selection.empty()
-  }
-}
-
-// Changes tooltip text for two seconds, then changes it back
-const temporarilyChangeTooltip = (el, newText) => {
-  const oldText = el.getAttribute('data-tooltip')
-  el.setAttribute('data-tooltip', newText)
-  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
-}
-
-const addCopyButtonToCodeCells = () => {
-  // If ClipboardJS hasn't loaded, wait a bit and try again. This
-  // happens because we load ClipboardJS asynchronously.
-  if (window.ClipboardJS === undefined) {
-    setTimeout(addCopyButtonToCodeCells, 250)
-    return
-  }
-
-  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
-  codeCells.forEach((codeCell, index) => {
-    const id = codeCellId(index)
-    codeCell.setAttribute('id', id)
-    if (document.getElementById("copy-button" + id) == null) {
-      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
-    }
-  })
-
-  const clipboard = new ClipboardJS('.copybtn')
-  clipboard.on('success', event => {
-    clearSelection()
-    temporarilyChangeTooltip(event.trigger, 'Copied!')
-  })
-
-  clipboard.on('error', event => {
-    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
-  })
-
-  // Get rid of clipboard before the next page visit to avoid memory leak
-  document.addEventListener('turbolinks:before-visit', () =>
-    clipboard.destroy()
-  )
-}
-
-initFunction(addCopyButtonToCodeCells);
-</script>
-
-
-  <!-- Hide cell code -->
-  <script>
-    /**
-    Add buttons to hide code cells
-    */
-
-
-    var setCodeCellVisibility = function (inputField, kind) {
-        // Update the image and class for hidden
-        var id = inputField.getAttribute('data-id');
-        var codeCell = document.querySelector(`#${id} div.highlight`);
-
-        if (kind === "visible") {
-            codeCell.classList.remove('hidden');
-            inputField.checked = true;
-        } else {
-            codeCell.classList.add('hidden');
-            inputField.checked = false;
-        }
-    }
-
-    var toggleCodeCellVisibility = function (event) {
-        // The label is clicked, and now we decide what to do based on the input field's clicked status
-        if (event.target.tagName === "LABEL") {
-            var inputField = event.target.previousElementSibling;
-        } else {
-            // It is the span inside the target
-            var inputField = event.target.parentElement.previousElementSibling;
-        }
-
-        if (inputField.checked === true) {
-            setCodeCellVisibility(inputField, "visible");
-        } else {
-            setCodeCellVisibility(inputField, "hidden");
-        }
-    }
-
-
-    // Button constructor
-    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
-
-    var addHideButton = function () {
-        // If a hide button is already added, don't add another
-        if (document.querySelector('div.hidecode input') !== null) {
-            return;
-        }
-
-        // Find the input cells and add a hide button
-        document.querySelectorAll('div.input_area').forEach(function (item, index) {
-            if (!item.classList.contains("hidecode")) {
-                // Skip the cell if it doesn't have a hidecode class
-                return;
-            }
-
-            const id = codeCellId(index)
-            item.setAttribute('id', id);
-            // Insert the button just inside the end of the next div
-            item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
-
-            // Set up the visibility toggle
-            hideLink = document.querySelector(`#${id} div.highlight + input + label`);
-            hideLink.addEventListener('click', toggleCodeCellVisibility)
-        });
-    }
-
-
-    // Initialize the hide buttos
-    var initHiddenCells = function () {
-        // Add hide buttons to the cells
-        addHideButton();
-
-        // Toggle the code cells that should be hidden
-        document.querySelectorAll('div.hidecode input').forEach(function (item) {
-            setCodeCellVisibility(item, 'hidden');
-            item.checked = true;
-        })
-    }
-
-    initFunction(initHiddenCells);
-
-</script>
 
   <!-- Load custom website scripts -->
   <script src="/geographic-data-science/assets/js/scripts.js" async></script>
@@ -693,6 +587,148 @@ document.addEventListener('turbolinks:load', updateInteractLink)
 };
 
 initFunction(initQuery);
+</script>
+
+  <!-- Load JS that depends on site variables -->
+  <script>
+/**
+ * Set up copy/paste for code blocks
+ */
+const clipboardButton = id =>
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+    <img src="/geographic-data-science/assets/images/copy-button.svg" alt="Copy to clipboard">
+  </a>`
+
+// Clears selected text since ClipboardJS will select the text when copying
+const clearSelection = () => {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
+// Changes tooltip text for two seconds, then changes it back
+const temporarilyChangeTooltip = (el, newText) => {
+  const oldText = el.getAttribute('data-tooltip')
+  el.setAttribute('data-tooltip', newText)
+  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
+}
+
+const addCopyButtonToCodeCells = () => {
+  // If ClipboardJS hasn't loaded, wait a bit and try again. This
+  // happens because we load ClipboardJS asynchronously.
+  if (window.ClipboardJS === undefined) {
+    setTimeout(addCopyButtonToCodeCells, 250)
+    return
+  }
+
+  pageElements['codeCells'].forEach((codeCell) => {
+    const id = codeCell.getAttribute('id')
+    if (document.getElementById("copy-button" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
+    }
+  })
+
+  const clipboard = new ClipboardJS('.copybtn')
+  clipboard.on('success', event => {
+    clearSelection()
+    temporarilyChangeTooltip(event.trigger, 'Copied!')
+  })
+
+  clipboard.on('error', event => {
+    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
+  })
+
+  // Get rid of clipboard before the next page visit to avoid memory leak
+  document.addEventListener('turbolinks:before-visit', () =>
+    clipboard.destroy()
+  )
+}
+
+initFunction(addCopyButtonToCodeCells);
+</script>
+
+
+  <!-- Hide cell code -->
+  <script>
+    /**
+    Add buttons to hide code cells
+    */
+
+
+    var setCodeCellVisibility = function (inputField, kind) {
+        // Update the image and class for hidden
+        var id = inputField.getAttribute('data-id');
+        var codeCell = document.querySelector(`#${id} div.highlight`);
+
+        if (kind === "visible") {
+            codeCell.classList.remove('hidden');
+            inputField.checked = true;
+        } else {
+            codeCell.classList.add('hidden');
+            inputField.checked = false;
+        }
+    }
+
+    var toggleCodeCellVisibility = function (event) {
+        // The label is clicked, and now we decide what to do based on the input field's clicked status
+        if (event.target.tagName === "LABEL") {
+            var inputField = event.target.previousElementSibling;
+        } else {
+            // It is the span inside the target
+            var inputField = event.target.parentElement.previousElementSibling;
+        }
+
+        if (inputField.checked === true) {
+            setCodeCellVisibility(inputField, "visible");
+        } else {
+            setCodeCellVisibility(inputField, "hidden");
+        }
+    }
+
+
+    // Button constructor
+    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
+
+    var addHideButton = function () {
+        // If a hide button is already added, don't add another
+        if (document.querySelector('div.hidecode input') !== null) {
+            return;
+        }
+
+        // Find the input cells and add a hide button
+        pageElements['inputCells'].forEach(function (inputCell) {
+            if (!inputCell.classList.contains("hidecode")) {
+                // Skip the cell if it doesn't have a hidecode class
+                return;
+            }
+            const id = inputCell.getAttribute('id')
+
+            // Insert the button just inside the end of the next div
+            inputCell.querySelector('div.input').insertAdjacentHTML('beforeend', hideCodeButton(id))
+
+            // Set up the visibility toggle
+            hideLink = document.querySelector(`#${id} div.inner_cell + input + label`);
+            hideLink.addEventListener('click', toggleCodeCellVisibility)
+        });
+    }
+
+
+    // Initialize the hide buttos
+    var initHiddenCells = function () {
+        // Add hide buttons to the cells
+        addHideButton();
+
+        // Toggle the code cells that should be hidden
+        document.querySelectorAll('div.hidecode input').forEach(function (item) {
+            setCodeCellVisibility(item, 'hidden');
+            item.checked = true;
+        })
+    }
+
+    initFunction(initHiddenCells);
+
 </script>
 </head>
 
@@ -1107,75 +1143,109 @@ initFunction(initQuery);
 
 
             <div class="c-textbook__content">
-              <h1 id="spatial-regression">Spatial regression</h1>
+              <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Spatial-regression">Spatial regression<a class="anchor-link" href="#Spatial-regression"> </a></h1>
+</div>
+</div>
+</div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 
-<span class="kn">from</span> <span class="nn">pysal.model</span> <span class="kn">import</span> <span class="n">spreg</span>
-<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
-<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
-<span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="n">sm</span>
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">from</span> <span class="nn">pysal.model</span> <span class="k">import</span> <span class="n">spreg</span>
+<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="k">import</span> <span class="n">weights</span>
+<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="k">import</span> <span class="n">esda</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">stats</span>
+<span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">sm</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">geopandas</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">seaborn</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
 </div>
 
-<h1 id="introduction">Introduction</h1>
 
-<p><strong>NOTE</strong>: this chapter was written building from this <a href="http://darribas.org/spa_notes/sp_eco.html">Spatial Analysis note</a>.</p>
 
-<h2 id="what-is-spatial-regression-and-why-should-i-care"><em>What</em> is spatial regression and <em>why</em> should I care?</h2>
+</div>
 
-<p>Regression (and prediction more generally) provides us a perfect case to examine how spatial structure can help us understand and analyze our data. 
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Introduction">Introduction<a class="anchor-link" href="#Introduction"> </a></h1><p><strong>NOTE</strong>: this chapter was written building from this <a href="http://darribas.org/spa_notes/sp_eco.html">Spatial Analysis note</a>.</p>
+<h2 id="What-is-spatial-regression-and-why-should-I-care?"><em>What</em> is spatial regression and <em>why</em> should I care?<a class="anchor-link" href="#What-is-spatial-regression-and-why-should-I-care?"> </a></h2><p>Regression (and prediction more generally) provides us a perfect case to examine how spatial structure can help us understand and analyze our data. 
 Usually, spatial structure helps models in one of two ways. 
 The first (and most clear) way space can have an impact on our data is when the process <em>generating</em> the data is itself explicitly spatial.
 Here, think of something like the prices for single family homes. 
-It’s often the case that individuals pay a premium on their house price in order to live in a better school district for the same quality house. 
+It's often the case that individuals pay a premium on their house price in order to live in a better school district for the same quality house. 
 Alternatively, homes closer to noise or chemical polluters like waste water treatment plants, recycling facilities, or wide highways, may actually be cheaper than we would otherwise anticipate. 
 Finally, in cases like asthma incidence, the locations individuals tend to travel to throughout the day, such as their places of work or recreation, may have more impact on their health than their residential addresses. 
 In this case, it may be necessary to use data <em>from other sites</em> to predict the asthma incidence at a given site. 
 Regardless of the specific case at play, here, <em>geography is a feature</em>: it directly helps us make predictions about outcomes <em>because those outcomes obtain from geographical processes</em>.</p>
-
-<p>An alternative (and more skeptical understanding) reluctantly acknowledges geography’s instrumental value. 
+<p>An alternative (and more skeptical understanding) reluctantly acknowledges geography's instrumental value. 
 Often, in the analysis of predictive methods and classifiers, we are interested in analyzing what we get wrong.
 This is common in econometrics; an analyst may be concerned that the model <em>systematically</em> mis-predicts some types of observations.
 If we know our model routinely performs poorly on a known set of observations or type of input, we might make a better model if we can account for this. 
 Among other kinds of error diagnostics, geography provides us with an exceptionally-useful embedding to assess structure in our errors.
 Mapping classification/prediction error can help show whether or not there are <em>clusters of error</em> in our data.
-If we <em>know</em> that errors tend to be larger in some areas than in other areas (or if error is “contagious” between observations), then we might be able to exploit this structure to make better predictions.</p>
-
+If we <em>know</em> that errors tend to be larger in some areas than in other areas (or if error is "contagious" between observations), then we might be able to exploit this structure to make better predictions.</p>
 <p>Spatial structure in our errors might arise from when geography <em>should be</em> an attribute somehow, but we are not sure exactly how to include it in our model. 
 They might also arise because there is some <em>other</em> feature whose omission causes the spatial patterns in the error we see; if this additional feature were included, the structure would disappear. 
 Or, it might arise from the complex interactions and interdependences between the features that we have chosen to use as predictors, resulting in intrinsic structure in mis-prediction. 
 Most of the predictors we use in models of social processes contain <em>embodied</em> spatial information: patterning intrinsic to the feature that we get for free in the model. 
 If we intend to or not, using a spatially-patterned predictor in a model can result in spatially-patterned errors; using more than one can amplify this effect. 
 Thus, <em>regardless of whether or not the true process is explicitly geographic</em>, additional information about the spatial relationships between our observations or more information about nearby sites can make our predictions better.</p>
+<h2 id="The-Data:-San-Diego-AirBnB">The Data: San Diego AirBnB<a class="anchor-link" href="#The-Data:-San-Diego-AirBnB"> </a></h2><p>To learn a little more about how regression works, we'll examine some information about AirBnB in San Diego, CA. 
+This dataset contains house intrinsic characteristics, both continuous (number of beds as in <code>beds</code>) and categorical (type of renting or, in AirBnb jargon, property group as in the series of <code>pg_X</code> binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, <code>d2balboa</code> or neigbourhood id, <code>neighbourhood_cleansed</code>).</p>
 
-<h2 id="the-data-san-diego-airbnb">The Data: San Diego AirBnB</h2>
+</div>
+</div>
+</div>
 
-<p>To learn a little more about how regression works, we’ll examine some information about AirBnB in San Diego, CA. 
-This dataset contains house intrinsic characteristics, both continuous (number of beds as in <code class="highlighter-rouge">beds</code>) and categorical (type of renting or, in AirBnb jargon, property group as in the series of <code class="highlighter-rouge">pg_X</code> binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, <code class="highlighter-rouge">d2balboa</code> or neigbourhood id, <code class="highlighter-rouge">neighbourhood_cleansed</code>).</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">'../data/airbnb/regression_db.geojson'</span><span class="p">)</span>
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/airbnb/regression_db.geojson&#39;</span><span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
 RangeIndex: 6110 entries, 0 to 6109
 Data columns (total 20 columns):
 accommodates          6110 non-null int64
@@ -1200,65 +1270,130 @@ rt_Shared_room        6110 non-null int64
 geometry              6110 non-null object
 dtypes: float64(6), int64(12), object(2)
 memory usage: 954.8+ KB
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>These are the explanatory variables we will use throughout the chapter.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'accommodates'</span><span class="p">,</span> <span class="s">'bathrooms'</span><span class="p">,</span> <span class="s">'bedrooms'</span><span class="p">,</span> 
-                  <span class="s">'beds'</span><span class="p">,</span> <span class="s">'rt_Private_room'</span><span class="p">,</span> <span class="s">'rt_Shared_room'</span><span class="p">,</span>
-                  <span class="s">'pg_Condominium'</span><span class="p">,</span> <span class="s">'pg_House'</span><span class="p">,</span> 
-                  <span class="s">'pg_Other'</span><span class="p">,</span> <span class="s">'pg_Townhouse'</span><span class="p">]</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accommodates&#39;</span><span class="p">,</span> <span class="s1">&#39;bathrooms&#39;</span><span class="p">,</span> <span class="s1">&#39;bedrooms&#39;</span><span class="p">,</span> 
+                  <span class="s1">&#39;beds&#39;</span><span class="p">,</span> <span class="s1">&#39;rt_Private_room&#39;</span><span class="p">,</span> <span class="s1">&#39;rt_Shared_room&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;pg_Condominium&#39;</span><span class="p">,</span> <span class="s1">&#39;pg_House&#39;</span><span class="p">,</span> 
+                  <span class="s1">&#39;pg_Other&#39;</span><span class="p">,</span> <span class="s1">&#39;pg_Townhouse&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
 
-<h2 id="non-spatial-regression-a-very-quick-refresh">Non-spatial regression, a (very) quick refresh</h2>
 
-<p>Before we discuss how to explicitly include space into the linear regression framework, let us show how basic regression can be carried out in Python, and how one can begin to interpret the results. By no means is this a formal and complete introduction to regression so, if that is what you are looking for, we recommend Gelman &amp; Hill (2006), in particular chapters 3 and 4, which provide a fantastic, non-spatial introduction.</p>
 
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Non-spatial-regression,-a-(very)-quick-refresh">Non-spatial regression, a (very) quick refresh<a class="anchor-link" href="#Non-spatial-regression,-a-(very)-quick-refresh"> </a></h2><p>Before we discuss how to explicitly include space into the linear regression framework, let us show how basic regression can be carried out in Python, and how one can begin to interpret the results. By no means is this a formal and complete introduction to regression so, if that is what you are looking for, we recommend Gelman &amp; Hill (2006), in particular chapters 3 and 4, which provide a fantastic, non-spatial introduction.</p>
 <p>The core idea of linear regression is to explain the variation in a given (<em>dependent</em>) variable as a linear function of a collection of other (<em>explanatory</em>) variables. For example, in our case, we may want to express/explain the price of a house as a function of whether it is new and the degree of deprivation of the area where it is located. At the individual level, we can express this as:</p>
+$$
+P_i = \alpha + \sum_k \beta_k X_{ki} + \epsilon_i
+$$<p>where $P_i$ is the AirBnb price of house $i$, and $X$ is a set of covariates that we use to explain such price. $\beta$ is a vector of parameters that give us information about in which way and to what extent each variable is related to the price, and $\alpha$, the constant term, is the average house price when all the other variables are zero. The term $\epsilon_i$ is usually referred to as "error" and captures elements that influence the price of a house but are not included in $X$. We can also express this relation in matrix form, excluding subindices for $i$, which yields:</p>
+$$
+P = \alpha + \beta X + \epsilon
+$$<p>A regression can be seen as a multivariate extension of bivariate correlations. Indeed, one way to interpret the $\beta_k$ coefficients in the equation above is as the degree of correlation between the explanatory variable $k$ and the dependent variable, <em>keeping all the other explanatory variables constant</em>. When one calculates bivariate correlations, the coefficient of a variable is picking up the correlation between the variables, but it is also subsuming into it variation associated with other correlated variables -- also called confounding factors. Regression allows us to isolate the distinct effect that a single variable has on the dependent one, once we <em>control</em> for those other variables.</p>
+<p>Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. <code>statsmodels</code>, <code>scikit-learn</code>, <code>PySAL</code>). In the context of this chapter, it makes sense to start with <code>PySAL</code> as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with $X$ as the list defined, we only need the following line of code:</p>
 
-<script type="math/tex; mode=display">P_i = \alpha + \sum_k \beta_k X_{ki} + \epsilon_i</script>
+</div>
+</div>
+</div>
 
-<p>where $P_i$ is the AirBnb price of house $i$, and $X$ is a set of covariates that we use to explain such price. $\beta$ is a vector of parameters that give us information about in which way and to what extent each variable is related to the price, and $\alpha$, the constant term, is the average house price when all the other variables are zero. The term $\epsilon_i$ is usually referred to as “error” and captures elements that influence the price of a house but are not included in $X$. We can also express this relation in matrix form, excluding subindices for $i$, which yields:</p>
 
-<script type="math/tex; mode=display">P = \alpha + \beta X + \epsilon</script>
 
-<p>A regression can be seen as a multivariate extension of bivariate correlations. Indeed, one way to interpret the $\beta_k$ coefficients in the equation above is as the degree of correlation between the explanatory variable $k$ and the dependent variable, <em>keeping all the other explanatory variables constant</em>. When one calculates bivariate correlations, the coefficient of a variable is picking up the correlation between the variables, but it is also subsuming into it variation associated with other correlated variables – also called confounding factors. Regression allows us to isolate the distinct effect that a single variable has on the dependent one, once we <em>control</em> for those other variables.</p>
+<div class="cell border-box-sizing code_cell rendered">
 
-<p>Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. <code class="highlighter-rouge">statsmodels</code>, <code class="highlighter-rouge">scikit-learn</code>, <code class="highlighter-rouge">PySAL</code>). In the context of this chapter, it makes sense to start with <code class="highlighter-rouge">PySAL</code> as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with $X$ as the list defined, we only need the following line of code:</p>
+<div class="jb_input" >
+<div class="input">
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m1</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m1</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
 </div>
 
-<p>We use the command <code class="highlighter-rouge">OLS</code>, part of the <code class="highlighter-rouge">spreg</code> sub-package, and specify the dependent variable (the log of the price, so we can interpret results in terms of percentage change) and the explanatory ones. Note that both objects need to be arrays, so we extract them from the <code class="highlighter-rouge">pandas.DataFrame</code> object using <code class="highlighter-rouge">.values</code>.</p>
 
-<p>In order to inspect the results of the model, we can call <code class="highlighter-rouge">summary</code>:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</div>
 
-</code></pre></div>    </div>
-  </div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We use the command <code>OLS</code>, part of the <code>spreg</code> sub-package, and specify the dependent variable (the log of the price, so we can interpret results in terms of percentage change) and the explanatory ones. Note that both objects need to be arrays, so we extract them from the <code>pandas.DataFrame</code> object using <code>.values</code>.</p>
+<p>In order to inspect the results of the model, we can call <code>summary</code>:</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES
 -----------------------------------------
@@ -1304,276 +1439,549 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               10         322.532           0.0000
 Koenker-Bassett test             10         135.581           0.0000
 ================================ END OF REPORT =====================================
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
-<p>A full detailed explanation of the output is beyond the scope of this chapter, so we will focus on the relevant bits for our main purpose. This is concentrated on the <code class="highlighter-rouge">Coefficients</code> section, which gives us the estimates for $\beta_k$ in our model. In other words, these numbers express the relationship between each explanatory variable and the dependent one, once the effect of confounding factors has been accounted for. Keep in mind however that regression is no magic; we are only discounting the effect of confounding factors that we include in the model, not of <em>all</em> potentially confounding factors.</p>
+</div>
 
-<p>Results are largely as expected: houses tend to be significantly more expensive if they accommodate more people (<code class="highlighter-rouge">accommodates</code>), if they have more bathrooms and bedrooms and if they are a condominium or part of the “other” category of house type. Conversely, given a number of rooms, houses with more beds (ie. listings that are more “crowded”) tend to go for cheaper, as it is the case for properties where one does not rent the entire house but only a room (<code class="highlighter-rouge">rt_Private_room</code>) or even shares it (<code class="highlighter-rouge">rt_Shared_room</code>). Of course, you might conceptually doubt the assumption that it is possible to <em>arbitrarily</em> change the number of beds within an Airbnb without eventually changing the number of people it accommodates, but methods to address these concerns using <em>interaction effects</em> won’t be discussed here.</p>
 
-<h3 id="hidden-structures">Hidden Structures</h3>
 
-<p>In general, our model performs well, being able to predict slightly more than 65% ($R^2=0.67$) of the variation in the mean nightly price using the covariates we’ve discussed above.
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>A full detailed explanation of the output is beyond the scope of this chapter, so we will focus on the relevant bits for our main purpose. This is concentrated on the <code>Coefficients</code> section, which gives us the estimates for $\beta_k$ in our model. In other words, these numbers express the relationship between each explanatory variable and the dependent one, once the effect of confounding factors has been accounted for. Keep in mind however that regression is no magic; we are only discounting the effect of confounding factors that we include in the model, not of <em>all</em> potentially confounding factors.</p>
+<p>Results are largely as expected: houses tend to be significantly more expensive if they accommodate more people (<code>accommodates</code>), if they have more bathrooms and bedrooms and if they are a condominium or part of the "other" category of house type. Conversely, given a number of rooms, houses with more beds (ie. listings that are more "crowded") tend to go for cheaper, as it is the case for properties where one does not rent the entire house but only a room (<code>rt_Private_room</code>) or even shares it (<code>rt_Shared_room</code>). Of course, you might conceptually doubt the assumption that it is possible to <em>arbitrarily</em> change the number of beds within an Airbnb without eventually changing the number of people it accommodates, but methods to address these concerns using <em>interaction effects</em> won't be discussed here.</p>
+<h3 id="Hidden-Structures">Hidden Structures<a class="anchor-link" href="#Hidden-Structures"> </a></h3><p>In general, our model performs well, being able to predict slightly more than 65% ($R^2=0.67$) of the variation in the mean nightly price using the covariates we've discussed above.
 But, our model might display some clustering in errors. 
 To interrogate this, we can do a few things. 
 One simple concept might be to look at the correlation between the error in predicting an airbnb and the error in predicting its nearest neighbor. 
-To examine this, we first might want to split our data up by regions and see if we’ve got some spatial structure in our residuals. 
+To examine this, we first might want to split our data up by regions and see if we've got some spatial structure in our residuals. 
 One reasonable theory might be that our model does not include any information about <em>beaches</em>, a critical aspect of why people live and vacation in San Diego. 
-Therefore, we might want to see whether or not our errors are higher or lower depending on whether or not an airbnb is in a “beach” neighborhood, a neighborhood near the ocean:</p>
+Therefore, we might want to see whether or not our errors are higher or lower depending on whether or not an airbnb is in a "beach" neighborhood, a neighborhood near the ocean:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">is_coastal</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">coastal</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">is_coastal</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">coastal</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
 <span class="n">coastal</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">is_coastal</span><span class="p">]</span>
 <span class="n">not_coastal</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">~</span><span class="n">is_coastal</span><span class="p">]</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Coastal'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">not_coastal</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">'step'</span><span class="p">,</span>
-         <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Not Coastal'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">":"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Coastal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">not_coastal</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
+         <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Not Coastal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/11_regression_11_0.png" alt="png" /></p>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_11_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>While it appears that the neighborhoods on the coast have only slightly higher average errors (and have lower variance in their prediction errors), the two distributions are significantly distinct from one another when compared using a classic $t$ test:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> 
-             <span class="n">not_coastal</span><span class="p">,</span>
-<span class="c">#             permutations=9999 not yet available in scipy</span>
-             <span class="p">)</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Ttest_indResult(statistic=array([13.98193858]), pvalue=array([9.442438e-44]))
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> 
+             <span class="n">not_coastal</span><span class="p">,</span>
+<span class="c1">#             permutations=9999 not yet available in scipy</span>
+             <span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Ttest_indResult(statistic=array([13.98193858]), pvalue=array([9.442438e-44]))</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>There are more sophisticated (and harder to fool) tests that may be applicable for this data, however. We cover them in the <a href="#Challenge">Challenge</a> section.</p>
 
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Additionally, it might be the case that some neighborhoods are more desirable than other neighborhoods due to unmodeled latent preferences or marketing. 
 For instance, despite its presence close to the sea, living near Camp Pendleton -a Marine base in the North of the city- may incur some significant penalties on area desirability due to noise and pollution. 
 For us to determine whether this is the case, we might be interested in the full distribution of model residuals within each neighborhood.</p>
+<p>To make this more clear, we'll first sort the data by the median residual in that neighborhood, and then make a box plot, which shows the distribution of residuals in each neighborhood:</p>
 
-<p>To make this more clear, we’ll first sort the data by the median residual in that neighborhood, and then make a box plot, which shows the distribution of residuals in each neighborhood:</p>
+</div>
+</div>
+</div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="p">[</span><span class="s">'residual'</span><span class="p">]</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span>
-<span class="n">medians</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">"neighborhood"</span><span class="p">)</span><span class="o">.</span><span class="n">residual</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s">'hood_residual'</span><span class="p">)</span>
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;residual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span>
+<span class="n">medians</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;neighborhood&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">residual</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;hood_residual&#39;</span><span class="p">)</span>
 
 <span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-<span class="n">seaborn</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="s">'neighborhood'</span><span class="p">,</span> <span class="s">'residual'</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">medians</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">,</span>
-                              <span class="n">left_on</span><span class="o">=</span><span class="s">'neighborhood'</span><span class="p">,</span>
-                              <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-                   <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'hood_residual'</span><span class="p">),</span> <span class="n">palette</span><span class="o">=</span><span class="s">'bwr'</span><span class="p">)</span>
+<span class="n">seaborn</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">,</span> <span class="s1">&#39;residual&#39;</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">medians</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                              <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">,</span>
+                              <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                   <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;hood_residual&#39;</span><span class="p">),</span> <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span><span class="p">)</span>
 <span class="n">f</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/11_regression_16_0.png" alt="png" /></p>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_16_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>No neighborhood is disjoint from one another, but some do appear to be higher than others, such as the well-known downtown tourist neighborhoods areas of the Gaslamp Quarter, Little Italy, or The Core. 
 Thus, there may be a distinctive effect of intangible neighborhood fashionableness that matters in this model.</p>
-
 <p>Noting that many of the most over- and under-predicted neighborhoods are near one another in the city, it may also be the case that there is some sort of <em>contagion</em> or spatial spillovers in the nightly rent price. 
 This often is apparent when individuals seek to price their airbnb listings to compete with similar nearby listings. 
 Since our model is not aware of this behavior, its errors may tend to cluster. 
-One exceptionally simple way we can look into this structure is by examining the relationship between an observation’s residuals and its surrounding residuals.</p>
-
+One exceptionally simple way we can look into this structure is by examining the relationship between an observation's residuals and its surrounding residuals.</p>
 <p>To do this, we will use <em>spatial weights</em> to represent the geographic relationships between observations. 
 We cover spatial weights in detail in another chapter, so we will not repeat ourselves here.
-For this example, we’ll start off with a $KNN$ matrix where $k=1$, meaning we’re focusing only on the linkages of each airbnb to their closest other listing.</p>
-
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-</code></pre></div>    </div>
-  </div>
+For this example, we'll start off with a $KNN$ matrix where $k=1$, meaning we're focusing only on the linkages of each airbnb to their closest other listing.</p>
 
 </div>
+</div>
+</div>
 
-<p>This means that, when we compute the <em>spatial lag</em> of that knn weight and the residual, we get the residual of the airbnb listing closest to each observation.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
-                     <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'orangered'</span><span class="p">),</span>
-                     <span class="n">ci</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'Model Residuals - $u$'</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">'Spatial Lag of Model Residuals - $W u$'</span><span class="p">);</span>
 
-</code></pre></div>    </div>
-  </div>
+<div class="cell border-box-sizing code_cell rendered">
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+<div class="jb_input" >
+<div class="input">
 
-      <p class="output_png"><img src="../images/notebooks/11_regression_20_0.png" alt="png" /></p>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">knn</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
+</div>
+
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This means that, when we compute the <em>spatial lag</em> of that knn weight and the residual, we get the residual of the airbnb listing closest to each observation.</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
+                     <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">),</span>
+                     <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Model Residuals - $u$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Spatial Lag of Model Residuals - $W u$&#39;</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_20_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>In this plot, we see that our prediction errors tend to cluster!
 Above, we show the relationship between our prediction error at each site and the prediction error at the site nearest to it. 
-Here, we’re using this nearest site to stand in for the <em>surroundings</em> of that Airbnb. 
-This means that, when the model tends to overpredict a given Airbnb’s nightly log price, sites around that Airbnb are more likely to <em>also be overpredicted</em>.</p>
+Here, we're using this nearest site to stand in for the <em>surroundings</em> of that Airbnb. 
+This means that, when the model tends to overpredict a given Airbnb's nightly log price, sites around that Airbnb are more likely to <em>also be overpredicted</em>.</p>
 
-<p>An interesting property of this relationship is that it tends to stabilize as the number of nearest neighbors used to construct each Airbnb’s surroundings increases.
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>An interesting property of this relationship is that it tends to stabilize as the number of nearest neighbors used to construct each Airbnb's surroundings increases.
 Consult the <a href="#Challenge">Challenge</a> section for more on this property.</p>
-
-<p>Given this behavior, let’s look at the stable $k=20$ number of neighbors.
+<p>Given this behavior, let's look at the stable $k=20$ number of neighbors.
 Examining the relationship between this stable <em>surrounding</em> average and the focal Airbnb, we can even find clusters in our model error. 
 Recalling the <em>local Moran</em> statistics, we can identify certain areas where our predictions of the nightly (log) Airbnb price tend to be significantly off:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">knn</span><span class="o">.</span><span class="n">reweight</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">outliers</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">knn</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">9999</span><span class="p">)</span>
-<span class="n">error_clusters</span> <span class="o">=</span> <span class="p">(</span><span class="n">outliers</span><span class="o">.</span><span class="n">q</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="c"># only the cluster cores</span>
-<span class="n">error_clusters</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">outliers</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;=</span> <span class="o">.</span><span class="mo">001</span><span class="p">)</span> <span class="c"># filtering out non-significant clusters</span>
-<span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">error_clusters</span> <span class="o">=</span> <span class="n">error_clusters</span><span class="p">,</span>
-          <span class="n">local_I</span> <span class="o">=</span> <span class="n">outliers</span><span class="o">.</span><span class="n">Is</span><span class="p">)</span>\
-  <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s">"error_clusters"</span><span class="p">)</span>\
-  <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'local_I'</span><span class="p">)</span>\
-  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'local_I'</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'bwr'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">);</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/11_regression_23_0.png" alt="png" /></p>
-
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
-<p>Thus, these areas tend to be locations where our model significantly underpredicts the nightly airbnb price both for that specific observation and observations in its immediate surroundings. 
-This is critical since, if we can identify how these areas are structured — if they have a <em>consistent geography</em> that we can model — then we might make our predictions even better, or at least not systematically mis-predict prices in some areas while correctly predicting prices in other areas.</p>
 
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">knn</span><span class="o">.</span><span class="n">reweight</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">outliers</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">knn</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">9999</span><span class="p">)</span>
+<span class="n">error_clusters</span> <span class="o">=</span> <span class="p">(</span><span class="n">outliers</span><span class="o">.</span><span class="n">q</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># only the cluster cores</span>
+<span class="n">error_clusters</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">outliers</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;=</span> <span class="o">.</span><span class="mi">001</span><span class="p">)</span> <span class="c1"># filtering out non-significant clusters</span>
+<span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">error_clusters</span> <span class="o">=</span> <span class="n">error_clusters</span><span class="p">,</span>
+          <span class="n">local_I</span> <span class="o">=</span> <span class="n">outliers</span><span class="o">.</span><span class="n">Is</span><span class="p">)</span>\
+  <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;error_clusters&quot;</span><span class="p">)</span>\
+  <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;local_I&#39;</span><span class="p">)</span>\
+  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;local_I&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_23_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Thus, these areas tend to be locations where our model significantly underpredicts the nightly airbnb price both for that specific observation and observations in its immediate surroundings. 
+This is critical since, if we can identify how these areas are structured &mdash; if they have a <em>consistent geography</em> that we can model &mdash; then we might make our predictions even better, or at least not systematically mis-predict prices in some areas while correctly predicting prices in other areas.</p>
 <p>Since significant under- and over-predictions do appear to cluster in a highly structured way, we might be able to use a better model to fix the geography of our model errors.</p>
 
-<h2 id="bringing-space-into-the-regression-framework">Bringing space into the regression framework</h2>
+</div>
+</div>
+</div>
 
-<p>There are many different ways that spatial structure shows up in our models, predictions, and our data, even if we do not explicitly intend to study it.
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Bringing-space-into-the-regression-framework">Bringing space into the regression framework<a class="anchor-link" href="#Bringing-space-into-the-regression-framework"> </a></h2><p>There are many different ways that spatial structure shows up in our models, predictions, and our data, even if we do not explicitly intend to study it.
 Fortunately, there are nearly as many techniques, called <em>spatial regression</em> methods, that are designed to handle these sorts of structures.
 Spatial regression is about <em>explicitly</em> introducing space or geographical context into the statistical framework of a regression. 
 Conceptually, we want to introduce space into our model whenever we think it plays an important role in the process we are interested in, or when space can act as a reasonable proxy for other factors we cannot but should include in our model. 
 As an example of the former, we can imagine how houses at the seafront are probably more expensive than those in the second row, given their better views. 
-To illustrate the latter, we can think of how the character of a neighborhood is important in determining the price of a house; however, it is very hard to identify and quantify “character” <em>per se,</em> although it might be easier to get at its spatial variation, hence a case of space as a proxy.</p>
-
+To illustrate the latter, we can think of how the character of a neighborhood is important in determining the price of a house; however, it is very hard to identify and quantify "character" <em>per se,</em> although it might be easier to get at its spatial variation, hence a case of space as a proxy.</p>
 <p>Spatial regression is a large field of development in the econometrics and statistics literatures. 
 In this brief introduction, we will consider two related but very different processes that give rise to spatial effects: spatial heterogeneity and spatial dependence. 
 For more rigorous treatments of the topics introduced here, the reader is referred to [1-3].</p>
-
-<h3 id="spatial-feature-engineering">Spatial Feature Engineering</h3>
-
-<p>Using geographic information to “construct” new data is a common approach to bring in spatial information into geographic analysis. 
+<h3 id="Spatial-Feature-Engineering">Spatial Feature Engineering<a class="anchor-link" href="#Spatial-Feature-Engineering"> </a></h3><p>Using geographic information to "construct" new data is a common approach to bring in spatial information into geographic analysis. 
 Often, this reflects the fact that processes are not the same everywhere in the map of analysis. 
 Indeed, this heterogeneity can have a large impact on how a process is understood or modeled.</p>
+<p>Spatial heterogeneity (SH) arises when we cannot safely assume the process we are studying operates under the same "rules" throughout the geography of interest. In other words, we can observe SH when there are effects on the outcome variable that are intrinsically linked to specific locations. A good example of this is the case of seafront houses above: we are trying to model the price of a house and, the fact some houses are located under certain conditions (i.e. by the sea), makes their price behave differently.</p>
+<p>The abstract concept of SH can be made operational in a model in several ways. We will explore the following three: proximity variables, spatial fixed-effects (FE), and spatial regimes &mdash; which itself is a generalization of FE.</p>
+<h4 id="Proximity-variables">Proximity variables<a class="anchor-link" href="#Proximity-variables"> </a></h4><p>For a start, one relevant proximity-driven variable that could influence our model is based on the listings proximity to Balboa Park. A common tourist destination, Balboa park is a central recreation hub for the city of San Diego, containing many museums and the San Diego zoo. Thus, it could be the case that people searching for Airbnbs in San Diego are willing to pay a premium to live closer to the park. If this were true <em>and</em> we omitted this from our model, we may indeed see a significant spatial pattern caused by this distance decay effect.</p>
+<p>Therefore, this is sometimes called a <em>spatially-patterned omitted covariate</em>: geographic information our model needs to make good precitions which we have left out of our model. Therefore, let's build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize the structure of this distance covariate itself:</p>
 
-<p>Spatial heterogeneity (SH) arises when we cannot safely assume the process we are studying operates under the same “rules” throughout the geography of interest. In other words, we can observe SH when there are effects on the outcome variable that are intrinsically linked to specific locations. A good example of this is the case of seafront houses above: we are trying to model the price of a house and, the fact some houses are located under certain conditions (i.e. by the sea), makes their price behave differently.</p>
+</div>
+</div>
+</div>
 
-<p>The abstract concept of SH can be made operational in a model in several ways. We will explore the following three: proximity variables, spatial fixed-effects (FE), and spatial regimes — which itself is a generalization of FE.</p>
 
-<h4 id="proximity-variables">Proximity variables</h4>
 
-<p>For a start, one relevant proximity-driven variable that could influence our model is based on the listings proximity to Balboa Park. A common tourist destination, Balboa park is a central recreation hub for the city of San Diego, containing many museums and the San Diego zoo. Thus, it could be the case that people searching for Airbnbs in San Diego are willing to pay a premium to live closer to the park. If this were true <em>and</em> we omitted this from our model, we may indeed see a significant spatial pattern caused by this distance decay effect.</p>
+<div class="cell border-box-sizing code_cell rendered">
 
-<p>Therefore, this is sometimes called a <em>spatially-patterned omitted covariate</em>: geographic information our model needs to make good precitions which we have left out of our model. Therefore, let’s build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize the structure of this distance covariate itself:</p>
+<div class="jb_input" >
+<div class="input">
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'d2balboa'</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f25fbb11ef0&gt;
-</code></pre></div>      </div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;d2balboa&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
 
     </div>
-  </div>
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
+</div>
 
-      <p class="output_png"><img src="../images/notebooks/11_regression_26_1.png" alt="png" /></p>
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f25fbb11ef0&gt;</pre>
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_26_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">base_names</span> <span class="o">=</span> <span class="n">variable_names</span>
+<span class="n">balboa_names</span> <span class="o">=</span> <span class="n">variable_names</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;d2balboa&#39;</span><span class="p">]</span>
+</pre></div>
 
     </div>
-  </div>
 </div>
-
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">base_names</span> <span class="o">=</span> <span class="n">variable_names</span>
-<span class="n">balboa_names</span> <span class="o">=</span> <span class="n">variable_names</span> <span class="o">+</span> <span class="p">[</span><span class="s">'d2balboa'</span><span class="p">]</span>
-
-</code></pre></div>    </div>
-  </div>
+</div>
 
 </div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m2</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">balboa_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
-                  <span class="n">name_y</span> <span class="o">=</span> <span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span> <span class="o">=</span> <span class="n">balboa_names</span><span class="p">)</span>
 
-</code></pre></div>    </div>
-  </div>
 
 </div>
 
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m2</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">balboa_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+                  <span class="n">name_y</span> <span class="o">=</span> <span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span> <span class="o">=</span> <span class="n">balboa_names</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Unfortunately, when you inspect the regression diagnostics and output, you see that this covariate is not quite as helpful as we might anticipate. It is not statistically significant at conventional significance levels, the model fit does not substantially change:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES
 -----------------------------------------
@@ -1620,78 +2028,172 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               11         317.519           0.0000
 Koenker-Bassett test             11         132.860           0.0000
 ================================ END OF REPORT =====================================
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
-<p>And, there still appears to be spatial structure in our model’s errors:</p>
+</div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And, there still appears to be spatial structure in our model's errors:</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
-                <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'orangered'</span><span class="p">),</span>
-                <span class="n">ci</span><span class="o">=</span><span class="bp">None</span><span class="p">);</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/11_regression_32_0.png" alt="png" /></p>
+                <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">),</span>
+                <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">);</span>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_32_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is <em>positive</em>, meaning that people are paying a premium to be <em>further</em> from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this.</p>
 
-<h4 id="spatial-fixed-effects">Spatial Fixed-Effects</h4>
-
-<p>While we’ve stipulated that our proximity variable might stand in for a difficult-to-measure premium individuals pay when they’re close to a recreational zone. However, not all neighborhoods are created equal; some neighborhoods may be more lucrative than others, regardless of their proximity to Balboa Park. When this is the case, we need some way to account for the fact that each neighborhood may experience these kinds of <em>gestalt</em>, unique effects. One way to do this is through <em>spatial fixed effects</em>.</p>
-
-<p>To illustrate these, let us consider the house price example from the previous section to introduce a more general illustration that relates to the second motivation for spatial effects (“space as a proxy”). Given we are only including two explanatory variables in the model, it is likely we are missing some important factors that play a role at determining the price at which a house is sold. Some of them, however, are likely to vary systematically over space (e.g. different neighborhood characteristics). If that is the case, we can control for those unobserved factors by using traditional dummy variables but basing their creation on a spatial rule. For example, let us include a binary variable for every neighborhood, indicating whether a given house is located within such area (<code class="highlighter-rouge">1</code>) or not (<code class="highlighter-rouge">0</code>). Mathematically, we are now fitting the following equation:</p>
-
-<script type="math/tex; mode=display">\log{P_i} = \alpha_r + \sum_k \beta_k X_{ki} + \epsilon_i</script>
-
-<p>where the main difference is that we are now allowing the constant term, $\alpha$, to vary by neighbourhood $r$, $\alpha_r$.</p>
-
-<p>Programmatically, we will show two different ways can estimate this: one,
-using <code class="highlighter-rouge">statsmodels</code>; and two, with <code class="highlighter-rouge">PySAL</code>. First, we will use <code class="highlighter-rouge">statsmodels</code>. This package provides a formula-like API, which allows us to express the <em>equation</em> we wish to estimate directly:</p>
-
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">f</span> <span class="o">=</span> <span class="s">'log_price ~ '</span> <span class="o">+</span> <span class="s">' + '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variable_names</span><span class="p">)</span> <span class="o">+</span> <span class="s">' + neighborhood - 1'</span>
-<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>log_price ~ accommodates + bathrooms + bedrooms + beds + rt_Private_room + rt_Shared_room + pg_Condominium + pg_House + pg_Other + pg_Townhouse + neighborhood - 1
-</code></pre></div>      </div>
-    </div>
-  </div>
+</div>
+</div>
 </div>
 
-<p>The <em>tilde</em> operator in this statement is usually read as “log price is a function of …”, to account for the fact that many different model specifications can be fit according to that functional relationship between <code class="highlighter-rouge">log_price</code> and our covariate list. Critically, note that the trailing <code class="highlighter-rouge">-1</code> term means that we are fitting this model without an intercept term. This is necessary, since including an intercept term alongside unique means for every neighborhood would make the underlying system of equations underspecified.</p>
 
-<p>Using this expression, we can estimate the unique effects of each neighborhood, fitting the model in <code class="highlighter-rouge">statsmodels</code>:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m3</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-<span class="k">print</span><span class="p">(</span><span class="n">m3</span><span class="o">.</span><span class="n">summary2</span><span class="p">())</span>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Spatial-Fixed-Effects">Spatial Fixed-Effects<a class="anchor-link" href="#Spatial-Fixed-Effects"> </a></h4><p>While we've stipulated that our proximity variable might stand in for a difficult-to-measure premium individuals pay when they're close to a recreational zone. However, not all neighborhoods are created equal; some neighborhoods may be more lucrative than others, regardless of their proximity to Balboa Park. When this is the case, we need some way to account for the fact that each neighborhood may experience these kinds of <em>gestalt</em>, unique effects. One way to do this is through <em>spatial fixed effects</em>.</p>
+<p>To illustrate these, let us consider the house price example from the previous section to introduce a more general illustration that relates to the second motivation for spatial effects ("space as a proxy"). Given we are only including two explanatory variables in the model, it is likely we are missing some important factors that play a role at determining the price at which a house is sold. Some of them, however, are likely to vary systematically over space (e.g. different neighborhood characteristics). If that is the case, we can control for those unobserved factors by using traditional dummy variables but basing their creation on a spatial rule. For example, let us include a binary variable for every neighborhood, indicating whether a given house is located within such area (<code>1</code>) or not (<code>0</code>). Mathematically, we are now fitting the following equation:</p>
+$$
+\log{P_i} = \alpha_r + \sum_k \beta_k X_{ki} + \epsilon_i
+$$<p>where the main difference is that we are now allowing the constant term, $\alpha$, to vary by neighbourhood $r$, $\alpha_r$.</p>
+<p>Programmatically, we will show two different ways can estimate this: one,
+using <code>statsmodels</code>; and two, with <code>PySAL</code>. First, we will use <code>statsmodels</code>. This package provides a formula-like API, which allows us to express the <em>equation</em> we wish to estimate directly:</p>
 
-</code></pre></div>    </div>
-  </div>
+</div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                           Results: Ordinary least squares
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="s1">&#39;log_price ~ &#39;</span> <span class="o">+</span> <span class="s1">&#39; + &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">variable_names</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; + neighborhood - 1&#39;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>log_price ~ accommodates + bathrooms + bedrooms + beds + rt_Private_room + rt_Shared_room + pg_Condominium + pg_House + pg_Other + pg_Townhouse + neighborhood - 1
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The <em>tilde</em> operator in this statement is usually read as "log price is a function of ...", to account for the fact that many different model specifications can be fit according to that functional relationship between <code>log_price</code> and our covariate list. Critically, note that the trailing <code>-1</code> term means that we are fitting this model without an intercept term. This is necessary, since including an intercept term alongside unique means for every neighborhood would make the underlying system of equations underspecified.</p>
+<p>Using this expression, we can estimate the unique effects of each neighborhood, fitting the model in <code>statsmodels</code>:</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m3</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m3</span><span class="o">.</span><span class="n">summary2</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>                           Results: Ordinary least squares
 ======================================================================================
 Model:                      OLS                    Adj. R-squared:           0.709    
 Dependent Variable:         log_price              AIC:                      7229.6640
@@ -1765,31 +2267,60 @@ Skew:                      0.989                Prob(JB):                     0.
 Kurtosis:                  6.500                Condition No.:                132     
 ======================================================================================
 
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
-<p>The approach above shows how spatial FE are a particular case of a linear regression with a categorical  variable. Neighborhood membership is modeled using binary dummy variables. Thanks to the formula grammar used in <code class="highlighter-rouge">statsmodels</code>, we can express the model abstractly, and Python parses it, appropriately creating binary variables as required.</p>
+</div>
 
-<p>The second approach leverages <code class="highlighter-rouge">PySAL</code> Regimes functionality, which allows the user to specify which variables are to be estimated separately for each “regime”. In this case however, instead of describing the model in a formula, we need to pass each element of the model as separate arguments.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># PySAL implementation</span>
-<span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                       <span class="n">db</span><span class="p">[</span><span class="s">'neighborhood'</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-                       <span class="n">constant_regi</span><span class="o">=</span><span class="s">'many'</span><span class="p">,</span> <span class="n">cols2regi</span><span class="o">=</span><span class="p">[</span><span class="bp">False</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">variable_names</span><span class="p">),</span>
-                       <span class="n">regime_err_sep</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                       <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">m4</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 
-</code></pre></div>    </div>
-  </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The approach above shows how spatial FE are a particular case of a linear regression with a categorical  variable. Neighborhood membership is modeled using binary dummy variables. Thanks to the formula grammar used in <code>statsmodels</code>, we can express the model abstractly, and Python parses it, appropriately creating binary variables as required.</p>
+<p>The second approach leverages <code>PySAL</code> Regimes functionality, which allows the user to specify which variables are to be estimated separately for each "regime". In this case however, instead of describing the model in a formula, we need to pass each element of the model as separate arguments.</p>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># PySAL implementation</span>
+<span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                       <span class="n">db</span><span class="p">[</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                       <span class="n">constant_regi</span><span class="o">=</span><span class="s1">&#39;many&#39;</span><span class="p">,</span> <span class="n">cols2regi</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">variable_names</span><span class="p">),</span>
+                       <span class="n">regime_err_sep</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m4</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES - REGIMES
 ---------------------------------------------------
@@ -1885,58 +2416,115 @@ REGIMES DIAGNOSTICS - CHOW TEST
                  CONSTANT        44         913.016           0.0000
               Global test        44         913.016           0.0000
 ================================ END OF REPORT =====================================
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Econometrically speaking, what the neighborhood FEs we have introduced imply is that, instead of comparing all house prices across San Diego as equal, we only derive variation from within each postcode. Remember that the interpretation of $\beta_k$ is the effect of variable $k$, <em>given all the other explanatory variables included remain constant</em>. By including a single variable for each area, we are effectively forcing the model to compare as equal only house prices that share the same value for each variable; or, in other words, only houses located within the same area. Introducing FE affords a higher degree of isolation of the effects of the variables we introduce in the model because we can control for unobserved effects that align spatially with the distribution of the FE introduced (by postcode, in our case).</p>
-
 <p>To make a map of neighborhood fixed effects, we need to process the results from our model slightly.</p>
-
 <p>First, we extract only the effects pertaining to the neighborhoods:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">neighborhood_effects</span> <span class="o">=</span> <span class="n">m3</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="nb">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s">'neighborhood'</span><span class="p">)</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">neighborhood_effects</span> <span class="o">=</span> <span class="n">m3</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">)</span>
 <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output_data_text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>neighborhood[Balboa Park]          4.280766
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>neighborhood[Balboa Park]          4.280766
 neighborhood[Bay Ho]               4.198251
 neighborhood[Bay Park]             4.329223
 neighborhood[Carmel Valley]        4.389261
 neighborhood[City Heights West]    4.053518
-dtype: float64
-</code></pre></div>      </div>
-
-    </div>
-  </div>
+dtype: float64</pre>
 </div>
 
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Then, we need to extract just the neighborhood name from the index of this Series. A simple way to do this is to strip all the characters that come before and after our neighborhood names:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">stripped</span> <span class="o">=</span> <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">'neighborhood['</span><span class="p">)</span><span class="o">.</span><span class="nb">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">']'</span><span class="p">)</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">stripped</span> <span class="o">=</span> <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;neighborhood[&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span>
 <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">stripped</span>
-<span class="n">neighborhood_effects</span> <span class="o">=</span> <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s">'fixed_effect'</span><span class="p">)</span>
+<span class="n">neighborhood_effects</span> <span class="o">=</span> <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;fixed_effect&#39;</span><span class="p">)</span>
 <span class="n">neighborhood_effects</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
+</div>
 
-      <div class="output output_html">
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
 <div>
-<style scoped="">
+<style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
@@ -1982,75 +2570,144 @@ dtype: float64
 </div>
 </div>
 
-    </div>
-  </div>
+</div>
+</div>
+</div>
 </div>
 
-<p>Good, we’re back to our raw neighborhood names. Now, we can join them back up with the neighborhood shapes:</p>
+</div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sd_path</span> <span class="o">=</span> <span class="s">'../data/airbnb/neighbourhoods.geojson'</span>
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Good, we're back to our raw neighborhood names. Now, we can join them back up with the neighborhood shapes:</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sd_path</span> <span class="o">=</span> <span class="s1">&#39;../data/airbnb/neighbourhoods.geojson&#39;</span>
 <span class="n">neighborhoods</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">sd_path</span><span class="p">)</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
 </div>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ax</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> 
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> 
                         <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                         <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
-<span class="n">neighborhoods</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">neighborhood_effects</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'left'</span><span class="p">,</span>
-                    <span class="n">left_on</span><span class="o">=</span><span class="s">'neighbourhood'</span><span class="p">,</span> 
-                    <span class="n">right_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>\
-                  <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s">'fixed_effect'</span><span class="p">])</span>\
-                  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'fixed_effect'</span><span class="p">,</span>
+<span class="n">neighborhoods</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">neighborhood_effects</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbourhood&#39;</span><span class="p">,</span> 
+                    <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>\
+                  <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;fixed_effect&#39;</span><span class="p">])</span>\
+                  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;fixed_effect&#39;</span><span class="p">,</span>
                         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">"San Diego Neighborhood Fixed Effects"</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;San Diego Neighborhood Fixed Effects&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/11_regression_46_0.png" alt="png" /></p>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
-<h4 id="spatial-regimes">Spatial Regimes</h4>
+</div>
 
-<p>At the core of estimating spatial FEs is the idea that, instead of assuming the dependent variable behaves uniformly over space, there are systematic effects following a geographical pattern that affect its behaviour. In other words, spatial FEs introduce econometrically the notion of spatial heterogeneity. They do this in the simplest possible form: by allowing the constant term to vary geographically. The other elements of the regression are left untouched and hence apply uniformly across space. The idea of spatial regimes (SRs) is to generalize the spatial FE approach to allow not only the constant term to vary but also any other explanatory variable. This implies that the equation we will be estimating is:</p>
 
-<script type="math/tex; mode=display">\log{P_i} = \alpha_r + \sum_k \beta_{k-r} X_{ki} + \epsilon_i</script>
 
-<p>where we are not only allowing the constant term to vary by region ($\alpha_r$), but also every other parameter ($\beta_{k-r}$).</p>
+<div class="output_wrapper">
+<div class="output">
 
-<p>To illustrate this approach, we will use the “spatial differentiator” of whether a house is in a coastal neighbourhood or not (<code class="highlighter-rouge">coastal_neig</code>) to define the regimes. The rationale behind this choice is that renting a house close to the ocean might be a strong enough pull that people might be willing to pay at different <em>rates</em> for each of the house’s characteristics.</p>
+<div class="jb_output_wrapper">
+<div class="output_area">
 
-<p>To implement this in Python, we use the <code class="highlighter-rouge">OLS_Regimes</code> class in <code class="highlighter-rouge">PySAL</code>, which does most of the heavy lifting for us:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                          <span class="n">db</span><span class="p">[</span><span class="s">'coastal'</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-                          <span class="n">constant_regi</span><span class="o">=</span><span class="s">'many'</span><span class="p">,</span>
-                          <span class="n">regime_err_sep</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                          <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">m4</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 
-</code></pre></div>    </div>
-  </div>
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_46_0.png"
+>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Spatial-Regimes">Spatial Regimes<a class="anchor-link" href="#Spatial-Regimes"> </a></h4><p>At the core of estimating spatial FEs is the idea that, instead of assuming the dependent variable behaves uniformly over space, there are systematic effects following a geographical pattern that affect its behaviour. In other words, spatial FEs introduce econometrically the notion of spatial heterogeneity. They do this in the simplest possible form: by allowing the constant term to vary geographically. The other elements of the regression are left untouched and hence apply uniformly across space. The idea of spatial regimes (SRs) is to generalize the spatial FE approach to allow not only the constant term to vary but also any other explanatory variable. This implies that the equation we will be estimating is:</p>
+$$
+\log{P_i} = \alpha_r + \sum_k \beta_{k-r} X_{ki} + \epsilon_i
+$$<p>where we are not only allowing the constant term to vary by region ($\alpha_r$), but also every other parameter ($\beta_{k-r}$).</p>
+<p>To illustrate this approach, we will use the "spatial differentiator" of whether a house is in a coastal neighbourhood or not (<code>coastal_neig</code>) to define the regimes. The rationale behind this choice is that renting a house close to the ocean might be a strong enough pull that people might be willing to pay at different <em>rates</em> for each of the house's characteristics.</p>
+<p>To implement this in Python, we use the <code>OLS_Regimes</code> class in <code>PySAL</code>, which does most of the heavy lifting for us:</p>
+
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                          <span class="n">db</span><span class="p">[</span><span class="s1">&#39;coastal&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+                          <span class="n">constant_regi</span><span class="o">=</span><span class="s1">&#39;many&#39;</span><span class="p">,</span>
+                          <span class="n">regime_err_sep</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m4</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES - REGIMES
 ---------------------------------------------------
@@ -2123,14 +2780,20 @@ REGIMES DIAGNOSTICS - CHOW TEST
            rt_Shared_room         1           3.309           0.0689
               Global test        11         328.869           0.0000
 ================================ END OF REPORT =====================================
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
-<h3 id="spatial-dependence">Spatial Dependence</h3>
+</div>
 
-<p>As we have just discussed, SH is about effects of phenomena that are <em>explicitly linked</em>
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Spatial-Dependence">Spatial Dependence<a class="anchor-link" href="#Spatial-Dependence"> </a></h3><p>As we have just discussed, SH is about effects of phenomena that are <em>explicitly linked</em>
 to geography and that hence cause spatial variation and clustering. This
 encompasses many of the kinds of spatial effects we may be interested in when we fit
 linear regressions. However, in other cases, our focus is on the effect of the <em>spatial
@@ -2138,7 +2801,7 @@ configuration</em> of the observations, and the extent to which that has an effe
 outcome we are considering. For example, we might think that the price of a house not
 only depends on whether it is a townhouse or an appartment, but also on
 whether it is surrounded by many more townhouses than skyscrapers with more
-appartments. This, we could hypothesise, might be related to the different “look and feel” a
+appartments. This, we could hypothesise, might be related to the different "look and feel" a
 neighbourhood with low-height, historic buildings has as compared to one with
 modern highrises. To the extent these two different spatial configurations
 enter differently the house price determination process, we will be
@@ -2149,12 +2812,8 @@ from SH in that is it not related to inherent characteristics of the geography b
 to the characteristics of the observations in our dataset and, specially, to their spatial
 arrangement. We call this phenomenon by which the values of observations are related to
 each other through distance <em>spatial dependence</em> (<a href="https://books.google.co.uk/books/about/Spatial_Econometrics_Methods_and_Models.html?id=3dPIXClv4YYC&amp;redir_esc=y]">Anselin, 1988</a>).</p>
-
 <p>There are several ways to introduce spatial dependence in an econometric framework, with varying degrees of econometric sophistication (see <a href="http://onlinelibrary.wiley.com/doi/10.1111/j.1574-0862.2002.tb00120.x/abstract">Anselin, 2002</a> for a good overview). Common to all of them however is the way space is formally encapsulated: through <em>spatial weights matrices ($W$)</em>.</p>
-
-<h4 id="exogenous-effects">Exogenous effects</h4>
-
-<p>Let us come back to the house price example we have been working with. So far, we
+<h4 id="Exogenous-effects">Exogenous effects<a class="anchor-link" href="#Exogenous-effects"> </a></h4><p>Let us come back to the house price example we have been working with. So far, we
 have hypothesized that the price of a house rented in San Diego through AirBnb can
 be explained using information about its own characteristics as well as some 
 relating to its location such as the neighborhood or the distance to the main
@@ -2162,49 +2821,90 @@ park in the city. However, it is also reasonable to think that prospective rente
 care about the larger area around a house, not only about the house itself, and would
 be willing to pay more for a house that was surrounded by certain types of houses, 
 and less if it was located in the middle of other types. How could we test this idea?</p>
-
 <p>The most straightforward way to introduce spatial dependence in a regression is by 
 considering not only a given explanatory variable, but also its spatial lag. In our
-example case, in addition to including a dummy for the type of house (<code class="highlighter-rouge">pg_XXX</code>), we 
+example case, in addition to including a dummy for the type of house (<code>pg_XXX</code>), we 
 can also include the spatial lag of each type of house. This addition implies
 we are also including as explanatory factor of the price of a given house the proportion 
 neighbouring houses in each type. Mathematically, this implies estimating the following model:</p>
+$$
+\log(P) = \alpha + X\beta + WX\beta + \epsilon
+$$<p>where $WX\beta$ represents the spatial lag of (some of) the explanatory variables. In Python, 
+we can calculate the spatial lag of each variable whose name starts by <code>pg_</code>
+by first creating a list of all of those names, and then applying <code>PySAL</code>'s
+<code>lag_spatial</code> to each of them:</p>
 
-<script type="math/tex; mode=display">\log(P) = \alpha + X\beta + WX\beta + \epsilon</script>
+</div>
+</div>
+</div>
 
-<p>where $WX\beta$ represents the spatial lag of (some of) the explanatory variables. In Python, 
-we can calculate the spatial lag of each variable whose name starts by <code class="highlighter-rouge">pg_</code>
-by first creating a list of all of those names, and then applying <code class="highlighter-rouge">PySAL</code>’s
-<code class="highlighter-rouge">lag_spatial</code> to each of them:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">wx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">variable_names</span> <span class="k">if</span> <span class="s">'pg_'</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
-<span class="n">wx</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">wx</span><span class="p">]</span><span class="o">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>\
-           <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s">'w_'</span><span class="o">+</span><span class="n">c</span><span class="p">)</span>
 
-</code></pre></div>    </div>
-  </div>
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">wx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">variable_names</span> <span class="k">if</span> <span class="s1">&#39;pg_&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
+<span class="n">wx</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">wx</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>\
+           <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s1">&#39;w_&#39;</span><span class="o">+</span><span class="n">c</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
 
 </div>
 
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Once computed, we can run the model using OLS estimation because, in this
 context, the spatial  lags included do not violate any of the assumptions OLS
 relies on (they are essentially additional exogenous variables):</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
                   <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wx</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                  <span class="n">name_y</span><span class="o">=</span><span class="s">'l_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="o">+</span><span class="n">wx</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-<span class="k">print</span><span class="p">(</span><span class="n">m5</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+                  <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;l_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="o">+</span><span class="n">wx</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m5</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
 
-</code></pre></div>    </div>
-  </div>
+    </div>
+</div>
+</div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>REGRESSION
 ----------
 SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES
 -----------------------------------------
@@ -2254,54 +2954,79 @@ TEST                             DF        VALUE           PROB
 Breusch-Pagan test               14         393.052           0.0000
 Koenker-Bassett test             14         169.585           0.0000
 ================================ END OF REPORT =====================================
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>The way to interpret the table of results is similar to that of any other
 non-spatial regression. The variables we included in the original regression
 display similar behaviour, albeit with small changes in size, and can be
 interpreted also in a similar way. The spatial lag of each type of property
-(<code class="highlighter-rouge">w_pg_XXX</code>) is the new addition. We observe that, except for the case
-of townhouses (same as with the binary variable, <code class="highlighter-rouge">pg_Townhouse</code>), they are all
+(<code>w_pg_XXX</code>) is the new addition. We observe that, except for the case
+of townhouses (same as with the binary variable, <code>pg_Townhouse</code>), they are all
 significant, suggesting our initial hypothesis on the role of the surrounding
 houses might indeed be at work here. As an illustration, being a condominium increases
-the price, on average, 11% ($\beta_{pg_Condominium}=0.11$) with respect to the benchmark, which is set to apartments. More relevant to this section, any given house surrounded by condominiums <em>also</em> receives a price premium. In this case, the interpretation is slightly different because the variable is not a dummy but a proportion in the range [0, 1]. A 10% increase the proportion of neighbors that are condominiums translates into a 6% increase in the property house price ($\beta_{w_pg_Condominium = 0.6$). This interpretation comes from the following: increasing the prevalence of 
+the price, on average, 11% ($\beta_{pg\_Condominium}=0.11$) with respect to the benchmark, which is set to apartments. More relevant to this section, any given house surrounded by condominiums <em>also</em> receives a price premium. In this case, the interpretation is slightly different because the variable is not a dummy but a proportion in the range [0, 1]. A 10% increase the proportion of neighbors that are condominiums translates into a 6% increase in the property house price ($\beta_{w_pg\_Condominium = 0.6$). This interpretation comes from the following: increasing the prevalence of 
 condos in the area surrounding a house by ten percent is associated with a change in the
 log of the nightly rental price of about .06, which translates to around a 6% increase in the nightly
 rental price of the house. Similar interpretations can be derived for all other spatially lagged variables.</p>
-
 <p>Introducing a spatial lag of an explanatory variable, as we have just seen, is the most straightforward way of incorporating the notion of spatial dependence in a linear regression framework. It does not require additional changes, it can be estimated with OLS, and the interpretation is rather similar to interpreting non-spatial variables. The field of spatial econometrics however is a much broader one and has produced over the last decades many techniques to deal with spatial effects and spatial dependence in different ways. Although this might be an over simplification, one can say that most of such efforts for the case of a single cross-section are focused on two main variations: the spatial lag and the spatial error model. Both are similar to the case we have seen in that they are based on the introduction of a spatial lag, but they differ in the component of the model they modify and affect.</p>
-
-<h4 id="spatial-error">Spatial Error</h4>
-
-<p>The spatial error model includes a spatial lag in the <em>error</em> term of the equation:</p>
-
-<script type="math/tex; mode=display">\log{P_i} = \alpha + \sum_k \beta_k X_{ki} + u_i</script>
-
-<script type="math/tex; mode=display">u_i = \lambda u_{lag-i} + \epsilon_i</script>
-
-<p>where $u_{lag-i} = \sum_j w_{i,j} u_j$. 
+<h4 id="Spatial-Error">Spatial Error<a class="anchor-link" href="#Spatial-Error"> </a></h4><p>The spatial error model includes a spatial lag in the <em>error</em> term of the equation:</p>
+$$
+\log{P_i} = \alpha + \sum_k \beta_k X_{ki} + u_i
+$$$$
+u_i = \lambda u_{lag-i} + \epsilon_i
+$$<p>where $u_{lag-i} = \sum_j w_{i,j} u_j$. 
 Although it appears similar, this specification violates the assumptions about the
 error term in a classical OLS model. Hence, alternative estimation methods are
-required. <code class="highlighter-rouge">PySAL</code> incorporates functionality to estimate several of the most
+required. <code>PySAL</code> incorporates functionality to estimate several of the most
 advanced techniques developed by the literature on spatial econometrics. For
 example, we can use a general method of moments that account for 
 heterogeneity (Arraiz et al., 2010):</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m6</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Error_Het</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                           <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">m6</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m6</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Error_Het</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                           <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m6</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>REGRESSION
 ----------
 SUMMARY OF OUTPUT: SPATIALLY WEIGHTED LEAST SQUARES (HET)
 ---------------------------------------------------------
@@ -2330,40 +3055,67 @@ N. of iterations    :           1                Step1c computed       :        
               lambda       0.6448728       0.0186626      34.5543740       0.0000000
 ------------------------------------------------------------------------------------
 ================================ END OF REPORT =====================================
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
-<h4 id="spatial-lag">Spatial Lag</h4>
+</div>
 
-<p>The spatial lag model introduces a spatial lag of the <em>dependent</em> variable. In the example we have covered, this would translate into:</p>
 
-<script type="math/tex; mode=display">\log{P_i} = \alpha + \rho \log{P_{lag-i}} + \sum_k \beta_k X_{ki} + \epsilon_i</script>
 
-<p>Although it might not seem very different from the previous equation, this model violates 
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Spatial-Lag">Spatial Lag<a class="anchor-link" href="#Spatial-Lag"> </a></h4><p>The spatial lag model introduces a spatial lag of the <em>dependent</em> variable. In the example we have covered, this would translate into:</p>
+$$
+\log{P_i} = \alpha + \rho \log{P_{lag-i}} + \sum_k \beta_k X_{ki} + \epsilon_i
+$$<p>Although it might not seem very different from the previous equation, this model violates 
 the exogeneity assumption, crucial for OLS to work. 
-Put simply, this occurs when $P_i$ exists on both “sides” of the equals sign.
+Put simply, this occurs when $P_i$ exists on both "sides" of the equals sign.
 In theory, since $P_i$ is included in computing $P_{lag-i}$, exogeneity is violated. 
 Similarly to the case of
 the spatial error, several techniques have been proposed to overcome this
-limitation, and <code class="highlighter-rouge">PySAL</code> implements several of them. In the example below, we
+limitation, and <code>PySAL</code> implements several of them. In the example below, we
 use a two-stage least squares estimation (Anselin, 1988), where the spatial
 lag of all the explanatory variables is used as instrument for the endogenous
 lag:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">m7</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Lag</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s">'log_price'</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                     <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s">'log_price'</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">m7</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</div>
+</div>
+</div>
 
-</code></pre></div>    </div>
-  </div>
 
-  <div class="output_wrapper">
-    <div class="output_subarea">
-      <div class="output_stream highlighter-rouge"><div class="highlight"><pre class="highlight"><code>REGRESSION
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">m7</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Lag</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                     <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">m7</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>REGRESSION
 ----------
 SUMMARY OF OUTPUT: SPATIAL TWO STAGE LEAST SQUARES
 --------------------------------------------------
@@ -2396,127 +3148,217 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
              W_pg_Condominium, W_pg_House, W_pg_Other, W_pg_Townhouse,
              W_rt_Private_room, W_rt_Shared_room
 ================================ END OF REPORT =====================================
-</code></pre></div>      </div>
-    </div>
-  </div>
+</pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 
-<h4 id="other-ways-of-bringing-space-into-regression">Other ways of bringing space into regression</h4>
+</div>
 
-<p>While these are some kinds of spatial regressions, many other advanced spatial regression methods see routine use in statistics, data science, and applied analysis. For example, Generalized Additive Models [4,5] haven been used to apply spatial kernel smoothing directly within a regression function. Other similar smoothing methods, such as spatial Gaussian process models [6] or Kriging, conceptualize the dependence between locations as smooth as well. Other methods in spatial regression that consider graph-based geographies (rather than distance/kernel effects) include variations on conditional autoregressive model, which examines spatial relationships at locations <em>conditional</em> on their surroundings, rather than as jointly co-emergent with them. Full coverage of these topics is beyond the scope of this book, however, though [7] provides a detailed and comprehensive discussion.</p>
 
-<h3 id="challenge">Challenge</h3>
 
-<h4 id="the-random-coast">The random coast</h4>
-<p>In the section analyzing our naive model residuals, we ran a classic two-sample $t$-test to identify whether or not our coastal and not-coastal residential districts tended to have the same prediction errors. Often, though, it’s better to use straightforward, data-driven testing and simulation methods than assuming that the mathematical assumptions of the $t$-statistic are met.</p>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="Other-ways-of-bringing-space-into-regression">Other ways of bringing space into regression<a class="anchor-link" href="#Other-ways-of-bringing-space-into-regression"> </a></h4><p>While these are some kinds of spatial regressions, many other advanced spatial regression methods see routine use in statistics, data science, and applied analysis. For example, Generalized Additive Models [4,5] haven been used to apply spatial kernel smoothing directly within a regression function. Other similar smoothing methods, such as spatial Gaussian process models [6] or Kriging, conceptualize the dependence between locations as smooth as well. Other methods in spatial regression that consider graph-based geographies (rather than distance/kernel effects) include variations on conditional autoregressive model, which examines spatial relationships at locations <em>conditional</em> on their surroundings, rather than as jointly co-emergent with them. Full coverage of these topics is beyond the scope of this book, however, though [7] provides a detailed and comprehensive discussion.</p>
 
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Challenge">Challenge<a class="anchor-link" href="#Challenge"> </a></h3>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="The-random-coast">The random coast<a class="anchor-link" href="#The-random-coast"> </a></h4><p>In the section analyzing our naive model residuals, we ran a classic two-sample $t$-test to identify whether or not our coastal and not-coastal residential districts tended to have the same prediction errors. Often, though, it's better to use straightforward, data-driven testing and simulation methods than assuming that the mathematical assumptions of the $t$-statistic are met.</p>
 <p>To do this, we can shuffle our assignments to coast and not-coast, and check whether or not there are differences in the distributions of the <em>observed</em> residual distributions and random distributions. In this way, we shuffle the observations that are on the coast, and plot the resulting cumulative distributions.</p>
+<p>Below, we do this; running 100 simulated re-assignments of districts to either "coast" or "not coast," and comparing the distributions of randomly-assigned residuals to the observed distributions of residuals. Further, we do this plotting by the <em>empirical cumulative density function</em>, not the histogram directly. This is because the <em>empirical cumulative density function</em> is usually easier to examine visually, especially for subtle differences.</p>
+<p>Below, the black lines represent our simulations, and the colored patches below them represents the observed distribution of residuals. If the black lines tend to be on the left of the colored patch, then, the simulations (where prediction error is totally random with respect to our categories of "coastal" and "not coastal") tend to have more negative residuals than our actual model. If the black lines tend to be on the right, then they tend to have more positive residuals. As a refresher, positive residuals mean that our model is underpredicting, and negative residuals mean that our model is overpredicting. Below, our simulations provide direct evidence for the claim that our model may be systematically underpredicting coastal price and overpredicting non-coastal prices.</p>
 
-<p>Below, we do this; running 100 simulated re-assignments of districts to either “coast” or “not coast,” and comparing the distributions of randomly-assigned residuals to the observed distributions of residuals. Further, we do this plotting by the <em>empirical cumulative density function</em>, not the histogram directly. This is because the <em>empirical cumulative density function</em> is usually easier to examine visually, especially for subtle differences.</p>
+</div>
+</div>
+</div>
 
-<p>Below, the black lines represent our simulations, and the colored patches below them represents the observed distribution of residuals. If the black lines tend to be on the left of the colored patch, then, the simulations (where prediction error is totally random with respect to our categories of “coastal” and “not coastal”) tend to have more negative residuals than our actual model. If the black lines tend to be on the right, then they tend to have more positive residuals. As a refresher, positive residuals mean that our model is underpredicting, and negative residuals mean that our model is overpredicting. Below, our simulations provide direct evidence for the claim that our model may be systematically underpredicting coastal price and overpredicting non-coastal prices.</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">n_simulations</span> <span class="o">=</span> <span class="mi">100</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> 
-           <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Coastal'</span><span class="p">,</span> 
-           <span class="n">cumulative</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">not_coastal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'b'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span>
-           <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Not Coastal'</span><span class="p">,</span> 
-           <span class="n">cumulative</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_simulations</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> 
+           <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Coastal&#39;</span><span class="p">,</span> 
+           <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">not_coastal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span>
+           <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Not Coastal&#39;</span><span class="p">,</span> 
+           <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">simulation</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_simulations</span><span class="p">):</span>
     <span class="n">shuffled_residuals</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">n</span><span class="p">)]</span>
     <span class="n">random_coast</span><span class="p">,</span> <span class="n">random_notcoast</span> <span class="o">=</span> <span class="p">(</span><span class="n">shuffled_residuals</span><span class="p">[</span><span class="n">is_coastal</span><span class="p">],</span> 
                                      <span class="n">shuffled_residuals</span><span class="p">[</span><span class="o">~</span><span class="n">is_coastal</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">simulation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="s">'Simulations'</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Simulations&#39;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">random_coast</span><span class="p">,</span> 
-                <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
-                <span class="n">histtype</span><span class="o">=</span><span class="s">'step'</span><span class="p">,</span>
-                <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mo">05</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
+                <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">05</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
                 <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> 
-                <span class="n">cumulative</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">random_coast</span><span class="p">,</span> 
-                <span class="n">density</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
-                <span class="n">histtype</span><span class="o">=</span><span class="s">'step'</span><span class="p">,</span>
-                <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mo">05</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
+                <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+                <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">05</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
                 <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> 
-                <span class="n">cumulative</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/11_regression_60_0.png" alt="png" /></p>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
-<h4 id="the-k-neighbor-correlogram">The K-neighbor correlogram</h4>
+</div>
 
-<p>Further, it might be the case that spatial dependence in our mis-predictions only matters for sites that are extremely close to one another, and decays quickly with distance. 
-To investigate this, we can examine the correlation between each sites’ residual and the <em>average</em> of the $k$th nearest neighbors’ residuals, increasing $k$ until the estimate stabilizes. 
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_60_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="The-K-neighbor-correlogram">The K-neighbor correlogram<a class="anchor-link" href="#The-K-neighbor-correlogram"> </a></h4><p>Further, it might be the case that spatial dependence in our mis-predictions only matters for sites that are extremely close to one another, and decays quickly with distance. 
+To investigate this, we can examine the correlation between each sites' residual and the <em>average</em> of the $k$th nearest neighbors' residuals, increasing $k$ until the estimate stabilizes. 
 This main idea is central to the geostatistical concept, the <em>correlogram</em>, which gives the correlation between sites of an attribute being studied as distance increases.</p>
-
-<p>One quick way to check whether or not what we’ve seen is <em>unique</em> or <em>significant</em> is to compare it to what happens when we just assign neighbors randomly. 
+<p>One quick way to check whether or not what we've seen is <em>unique</em> or <em>significant</em> is to compare it to what happens when we just assign neighbors randomly. 
 If what we observe is substantially different from what emerges when neighbors are random, then the structure of the neighbors embeds a structure in the residuals. 
-We won’t spend too much time on this theory specifically, but we can quickly and efficiently compute the correlation between our observed residuals and the spatial lag of an increasing $k$-nearest neighbor set:</p>
+We won't spend too much time on this theory specifically, but we can quickly and efficiently compute the correlation between our observed residuals and the spatial lag of an increasing $k$-nearest neighbor set:</p>
 
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">correlations</span> <span class="o">=</span> <span class="p">[]</span>
+</div>
+</div>
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">correlations</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">nulls</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">order</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
-    <span class="n">knn</span><span class="o">.</span><span class="n">reweight</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="c">#operates in place, quickly and efficiently avoiding copies</span>
-    <span class="n">knn</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s">'r'</span>
+    <span class="n">knn</span><span class="o">.</span><span class="n">reweight</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">order</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1">#operates in place, quickly and efficiently avoiding copies</span>
+    <span class="n">knn</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
     <span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
     <span class="n">random_residual</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">))]</span> 
-    <span class="n">random_lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">random_residual</span><span class="p">)</span> <span class="c"># identical to random neighbors in KNN </span>
+    <span class="n">random_lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">random_residual</span><span class="p">)</span> <span class="c1"># identical to random neighbors in KNN </span>
     <span class="n">correlations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">nulls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">random_lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-
-</code></pre></div>    </div>
-  </div>
-
-</div>
-
-<div class="cell code_cell">
-  <div class="input_area">
-    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">correlations</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">nulls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'orangered'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">correlations</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]),</span><span class="o">*</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(),</span><span class="n">linestyle</span><span class="o">=</span><span class="s">':'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nulls</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]),</span><span class="o">*</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(),</span><span class="n">linestyle</span><span class="o">=</span><span class="s">':'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="s">'Long-Run Correlation: ${:.2f}$'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">correlations</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:])),</span> <span class="n">x</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span><span class="n">y</span><span class="o">=.</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="s">'Long-Run Null: ${:.2f}$'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nulls</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:])),</span> <span class="n">x</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mo">05</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'$K$: number of nearest neighbors'</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">"Correlation between site </span><span class="se">\n</span><span class="s"> and neighborhood average of size $K$"</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-
-</code></pre></div>    </div>
-  </div>
-
-  <div class="output_wrapper">
-    <div class="output_subarea">
-
-      <p class="output_png"><img src="../images/notebooks/11_regression_63_0.png" alt="png" /></p>
+</pre></div>
 
     </div>
-  </div>
+</div>
 </div>
 
-<p>Clearly, the two curves are different. The observed correlation reaches a peak around $r=.34$ when around 20 nearest listings are used. This means that adding more than 20 nearest neighbors does not significantly change the correlation in the residuals. Further, the lowest correlation is for the single nearest neighbor, and correlation rapidly increases as more neighbors are added close to the listing. Thus, this means that there does appear to be an unmeasured spatial structure in the residuals, since they are more similar to one another when they are near than when they are far apart. Further, while it’s not shown here (since computationally, it becomes intractable), as the number of nearest neighbors gets very large (approaching the number of observations in the dataset), the average of the $k$th nearest neighbors’ residuals goes to zero, the global average of residuals. This means that the correlation of the residuals and a vector that is nearly constant begins to approach zero.</p>
+</div>
 
+
+
+</div>
+
+
+
+<div class="cell border-box-sizing code_cell rendered">
+
+<div class="jb_input" >
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">correlations</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">51</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span> <span class="n">nulls</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">correlations</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]),</span><span class="o">*</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(),</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hlines</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nulls</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]),</span><span class="o">*</span><span class="n">plt</span><span class="o">.</span><span class="n">xlim</span><span class="p">(),</span><span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="s1">&#39;Long-Run Correlation: $</span><span class="si">{:.2f}</span><span class="s1">$&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">correlations</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:])),</span> <span class="n">x</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span><span class="n">y</span><span class="o">=.</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">s</span><span class="o">=</span><span class="s1">&#39;Long-Run Null: $</span><span class="si">{:.2f}</span><span class="s1">$&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">nulls</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:])),</span> <span class="n">x</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">y</span><span class="o">=.</span><span class="mi">05</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;$K$: number of nearest neighbors&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Correlation between site </span><span class="se">\n</span><span class="s2"> and neighborhood average of size $K$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../images/notebooks/11_regression_63_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Clearly, the two curves are different. The observed correlation reaches a peak around $r=.34$ when around 20 nearest listings are used. This means that adding more than 20 nearest neighbors does not significantly change the correlation in the residuals. Further, the lowest correlation is for the single nearest neighbor, and correlation rapidly increases as more neighbors are added close to the listing. Thus, this means that there does appear to be an unmeasured spatial structure in the residuals, since they are more similar to one another when they are near than when they are far apart. Further, while it's not shown here (since computationally, it becomes intractable), as the number of nearest neighbors gets very large (approaching the number of observations in the dataset), the average of the $k$th nearest neighbors' residuals goes to zero, the global average of residuals. This means that the correlation of the residuals and a vector that is nearly constant begins to approach zero.</p>
 <p>The null correlations, however, use randomly-chosen neighbors (without reassignment).
 Thus, since sampling is truly random in this case, each average of $k$ randomly-chosen neighbors is usually zero (the global mean). 
 So, the correlation between the observed residual and the average of $k$ randomly-chosen residuals is also usually zero. 
@@ -2524,49 +3366,65 @@ Thus, increasing the number of randomly-chosen neighbors does not significantly 
 Taken together, we can conclude that there is distinct positive spatial dependence in the error. 
 This means that our over- and under-predictions are likely to cluster.</p>
 
-<h1 id="references">References</h1>
-<p>[1] Anselin, L. Spatial externalities, spatial multipliers, and spatial econometrics. <em>International Regional Science Review</em> 26, 156–166 (2003).</p>
+</div>
+</div>
+</div>
 
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="References">References<a class="anchor-link" href="#References"> </a></h1><p>[1] Anselin, L. Spatial externalities, spatial multipliers, and spatial econometrics. <em>International Regional Science Review</em> 26, 156–166 (2003).</p>
 <p>[2] Anselin, L. &amp; Rey, S. J. <em>Modern Spatial Econometrics in Practice, a Guide to GeoDa, GeoDaSpace, and PySAL</em>. (GeoDa Press, 2014).</p>
-
 <p>[3] Gelman, A., &amp; Hill, J. (2006). Data analysis using regression and multilevel/hierarchical models. Cambridge university press.</p>
-
 <p>[4] Gibbons, S., Overman, H. G., &amp; Pattacchini, E. Chapter 3 - Spatial Methods. <em>Handbook of Regional and Urban Economics, Vol. 5</em>. (Elsevier, 2015): 115-168.</p>
-
 <p>[5] Wood, S. N. <em>Generalized additive models: an introduction with R.</em> Chapman and Hall/CRC, 2006.</p>
-
-<p>[6] Brunsdon, Chris, A. Stewart Fotheringham, and Martin E. Charlton. “Geographically weighted regression: a method for exploring spatial nonstationarity.” <em>Geographical Analysis</em> 28, vol. 4 (1996): 281-298.</p>
-
-<p>[7] Banerjee, S., A. E. Gelfand, A. O. Finley, and H. Sang. “Gaussian predictive process models for large spatial data sets.” Journal of the Royal Statistical Society: Series B (Statistical Methodology) 70, no. 4 (2008): 825-848.</p>
-
+<p>[6] Brunsdon, Chris, A. Stewart Fotheringham, and Martin E. Charlton. "Geographically weighted regression: a method for exploring spatial nonstationarity." <em>Geographical Analysis</em> 28, vol. 4 (1996): 281-298.</p>
+<p>[7] Banerjee, S., A. E. Gelfand, A. O. Finley, and H. Sang. "Gaussian predictive process models for large spatial data sets." Journal of the Royal Statistical Society: Series B (Statistical Methodology) 70, no. 4 (2008): 825-848.</p>
 <p>[8] Cressie, N., and Christopher K. W. <em>Statistics for spatio-temporal data.</em> (John Wiley &amp; Sons, 2015).</p>
 
-<hr />
+</div>
+</div>
+</div>
 
+
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr>
 <p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
+
+</div>
+</div>
+</div>
+
+ 
 
 
               <nav class="c-page__nav">
   
     
-    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/geographic-data-science/notebooks/10_clustering_and_regionalization">
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/geographic-data-science/notebooks/10_clustering_and_regionalization.html">
       〈 <span class="u-margin-right-tiny"></span> Clustering & Regionalization
     </a>
   
 
   
     
-    <a id="js-page__nav__next" class="c-page__nav__next" href="/geographic-data-science/notebooks/12_feature_engineering">
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/geographic-data-science/notebooks/12_feature_engineering.html">
       Spatial Feature Engineering <span class="u-margin-right-tiny"></span> 〉
     </a>
   
 </nav>
 
             </div>
+            <footer>
+  <p class="footer"></p>
+</footer>
+
           </div>
         </div>
       </main>
     </div>
-
   </body>
 </html>

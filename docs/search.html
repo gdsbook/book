@@ -27,7 +27,9 @@
 <meta property="og:type"        content="article" />
 <meta property="og:title"       content="Search the site" />
 <meta property="og:description" content="This book serves as an introduction to a whole new way of thinking systematically about geographic data, using geographical analysis and computation to unlock new insights hidden within data. The book is structured around the excellent data science environment in Python, with examples and worked analyses for you to replicate, adapt, extend, and improve." />
-<meta property="og:image"       content="" />
+<meta property="og:image"       content="https://gdsbook.github.io/geographic-data-science/images/logo/logo.png" />
+
+<meta name="twitter:card" content="summary">
 
 
   <script type="application/ld+json">
@@ -39,9 +41,9 @@
   "headline":
     "Search the site",
   "datePublished":
-    "2019-07-29T16:40:50+00:00",
+    "2019-08-09T18:14:23+00:00",
   "dateModified":
-    "2019-07-29T16:40:50+00:00",
+    "2019-08-09T18:14:23+00:00",
   "description":
     "This book serves as an introduction to a whole new way of thinking systematically about geographic data, using geographical analysis and computation to unlock new insights hidden within data. The book is structured around the excellent data science environment in Python, with examples and worked analyses for you to replicate, adapt, extend, and improve.",
   "author": {
@@ -148,6 +150,45 @@ initFunction(function () {
   <script src="/geographic-data-science/assets/js/turbolinks.js" async></script>
   <meta name="turbolinks-cache-control" content="no-cache">
 
+  <!-- Selectors for elements on the page -->
+  <script>
+/**
+ * Select various elements on the page for later use
+ */
+
+// IDs we'll attach to cells
+const codeCellId = index => `codecell${index}`
+const inputCellId = index => `inputcell${index}`
+
+pageElements = {}
+
+// All code cells
+findCodeCells = function() {
+    var codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre, div.text_cell_render div.highlight pre')
+    pageElements['codeCells'] = codeCells;
+
+    codeCells.forEach((codeCell, index) => {
+      const id = codeCellId(index)
+      codeCell.setAttribute('id', id)
+    })
+};
+
+initFunction(findCodeCells);
+
+
+findInputCells = function() {
+    var inputCells = document.querySelectorAll('div.jb_input')
+    pageElements['inputCells'] = inputCells;
+
+    inputCells.forEach((inputCell, index) => {
+        const id = inputCellId(index)
+        inputCell.setAttribute('id', id)
+    })
+};
+
+initFunction(findInputCells);
+</script>
+
   <!-- Load nbinteract for widgets -->
   
 
@@ -169,7 +210,7 @@ const thebelabCellButton = id =>
 
 const addThebelabButtonToCodeCells =  () => {
 
-  const codeCells = document.querySelectorAll('div.input_area > div.highlighter-rouge:not(.output) pre')
+  const codeCells = document.querySelectorAll('div.input_area > div.highlight:not(.output) pre')
   codeCells.forEach((codeCell, index) => {
     const id = codeCellId(index)
     codeCell.setAttribute('id', id)
@@ -308,153 +349,6 @@ initFunction(initToc);
 
   <!-- Clipboard copy button -->
   <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" async></script>
-
-  <!-- Load JS that depends on site variables -->
-  <script>
-/**
- * Set up copy/paste for code blocks
- */
-const codeCellId = index => `codecell${index}`
-
-const clipboardButton = id =>
-  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
-    <img src="/geographic-data-science/assets/images/copy-button.svg" alt="Copy to clipboard">
-  </a>`
-
-// Clears selected text since ClipboardJS will select the text when copying
-const clearSelection = () => {
-  if (window.getSelection) {
-    window.getSelection().removeAllRanges()
-  } else if (document.selection) {
-    document.selection.empty()
-  }
-}
-
-// Changes tooltip text for two seconds, then changes it back
-const temporarilyChangeTooltip = (el, newText) => {
-  const oldText = el.getAttribute('data-tooltip')
-  el.setAttribute('data-tooltip', newText)
-  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
-}
-
-const addCopyButtonToCodeCells = () => {
-  // If ClipboardJS hasn't loaded, wait a bit and try again. This
-  // happens because we load ClipboardJS asynchronously.
-  if (window.ClipboardJS === undefined) {
-    setTimeout(addCopyButtonToCodeCells, 250)
-    return
-  }
-
-  const codeCells = document.querySelectorAll('div.c-textbook__content > div.highlighter-rouge > div.highlight > pre, div.input_area pre')
-  codeCells.forEach((codeCell, index) => {
-    const id = codeCellId(index)
-    codeCell.setAttribute('id', id)
-    if (document.getElementById("copy-button" + id) == null) {
-      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
-    }
-  })
-
-  const clipboard = new ClipboardJS('.copybtn')
-  clipboard.on('success', event => {
-    clearSelection()
-    temporarilyChangeTooltip(event.trigger, 'Copied!')
-  })
-
-  clipboard.on('error', event => {
-    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
-  })
-
-  // Get rid of clipboard before the next page visit to avoid memory leak
-  document.addEventListener('turbolinks:before-visit', () =>
-    clipboard.destroy()
-  )
-}
-
-initFunction(addCopyButtonToCodeCells);
-</script>
-
-
-  <!-- Hide cell code -->
-  <script>
-    /**
-    Add buttons to hide code cells
-    */
-
-
-    var setCodeCellVisibility = function (inputField, kind) {
-        // Update the image and class for hidden
-        var id = inputField.getAttribute('data-id');
-        var codeCell = document.querySelector(`#${id} div.highlight`);
-
-        if (kind === "visible") {
-            codeCell.classList.remove('hidden');
-            inputField.checked = true;
-        } else {
-            codeCell.classList.add('hidden');
-            inputField.checked = false;
-        }
-    }
-
-    var toggleCodeCellVisibility = function (event) {
-        // The label is clicked, and now we decide what to do based on the input field's clicked status
-        if (event.target.tagName === "LABEL") {
-            var inputField = event.target.previousElementSibling;
-        } else {
-            // It is the span inside the target
-            var inputField = event.target.parentElement.previousElementSibling;
-        }
-
-        if (inputField.checked === true) {
-            setCodeCellVisibility(inputField, "visible");
-        } else {
-            setCodeCellVisibility(inputField, "hidden");
-        }
-    }
-
-
-    // Button constructor
-    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
-
-    var addHideButton = function () {
-        // If a hide button is already added, don't add another
-        if (document.querySelector('div.hidecode input') !== null) {
-            return;
-        }
-
-        // Find the input cells and add a hide button
-        document.querySelectorAll('div.input_area').forEach(function (item, index) {
-            if (!item.classList.contains("hidecode")) {
-                // Skip the cell if it doesn't have a hidecode class
-                return;
-            }
-
-            const id = codeCellId(index)
-            item.setAttribute('id', id);
-            // Insert the button just inside the end of the next div
-            item.querySelector('div').insertAdjacentHTML('beforeend', hideCodeButton(id))
-
-            // Set up the visibility toggle
-            hideLink = document.querySelector(`#${id} div.highlight + input + label`);
-            hideLink.addEventListener('click', toggleCodeCellVisibility)
-        });
-    }
-
-
-    // Initialize the hide buttos
-    var initHiddenCells = function () {
-        // Add hide buttons to the cells
-        addHideButton();
-
-        // Toggle the code cells that should be hidden
-        document.querySelectorAll('div.hidecode input').forEach(function (item) {
-            setCodeCellVisibility(item, 'hidden');
-            item.checked = true;
-        })
-    }
-
-    initFunction(initHiddenCells);
-
-</script>
 
   <!-- Load custom website scripts -->
   <script src="/geographic-data-science/assets/js/scripts.js" async></script>
@@ -693,6 +587,148 @@ document.addEventListener('turbolinks:load', updateInteractLink)
 };
 
 initFunction(initQuery);
+</script>
+
+  <!-- Load JS that depends on site variables -->
+  <script>
+/**
+ * Set up copy/paste for code blocks
+ */
+const clipboardButton = id =>
+  `<a id="copy-button-${id}" class="btn copybtn o-tooltip--left" data-tooltip="Copy" data-clipboard-target="#${id}">
+    <img src="/geographic-data-science/assets/images/copy-button.svg" alt="Copy to clipboard">
+  </a>`
+
+// Clears selected text since ClipboardJS will select the text when copying
+const clearSelection = () => {
+  if (window.getSelection) {
+    window.getSelection().removeAllRanges()
+  } else if (document.selection) {
+    document.selection.empty()
+  }
+}
+
+// Changes tooltip text for two seconds, then changes it back
+const temporarilyChangeTooltip = (el, newText) => {
+  const oldText = el.getAttribute('data-tooltip')
+  el.setAttribute('data-tooltip', newText)
+  setTimeout(() => el.setAttribute('data-tooltip', oldText), 2000)
+}
+
+const addCopyButtonToCodeCells = () => {
+  // If ClipboardJS hasn't loaded, wait a bit and try again. This
+  // happens because we load ClipboardJS asynchronously.
+  if (window.ClipboardJS === undefined) {
+    setTimeout(addCopyButtonToCodeCells, 250)
+    return
+  }
+
+  pageElements['codeCells'].forEach((codeCell) => {
+    const id = codeCell.getAttribute('id')
+    if (document.getElementById("copy-button" + id) == null) {
+      codeCell.insertAdjacentHTML('afterend', clipboardButton(id));
+    }
+  })
+
+  const clipboard = new ClipboardJS('.copybtn')
+  clipboard.on('success', event => {
+    clearSelection()
+    temporarilyChangeTooltip(event.trigger, 'Copied!')
+  })
+
+  clipboard.on('error', event => {
+    temporarilyChangeTooltip(event.trigger, 'Failed to copy')
+  })
+
+  // Get rid of clipboard before the next page visit to avoid memory leak
+  document.addEventListener('turbolinks:before-visit', () =>
+    clipboard.destroy()
+  )
+}
+
+initFunction(addCopyButtonToCodeCells);
+</script>
+
+
+  <!-- Hide cell code -->
+  <script>
+    /**
+    Add buttons to hide code cells
+    */
+
+
+    var setCodeCellVisibility = function (inputField, kind) {
+        // Update the image and class for hidden
+        var id = inputField.getAttribute('data-id');
+        var codeCell = document.querySelector(`#${id} div.highlight`);
+
+        if (kind === "visible") {
+            codeCell.classList.remove('hidden');
+            inputField.checked = true;
+        } else {
+            codeCell.classList.add('hidden');
+            inputField.checked = false;
+        }
+    }
+
+    var toggleCodeCellVisibility = function (event) {
+        // The label is clicked, and now we decide what to do based on the input field's clicked status
+        if (event.target.tagName === "LABEL") {
+            var inputField = event.target.previousElementSibling;
+        } else {
+            // It is the span inside the target
+            var inputField = event.target.parentElement.previousElementSibling;
+        }
+
+        if (inputField.checked === true) {
+            setCodeCellVisibility(inputField, "visible");
+        } else {
+            setCodeCellVisibility(inputField, "hidden");
+        }
+    }
+
+
+    // Button constructor
+    const hideCodeButton = id => `<input class="hidebtn" type="checkbox" id="hidebtn${id}" data-id="${id}"><label title="Toggle cell" for="hidebtn${id}" class="plusminus"><span class="pm_h"></span><span class="pm_v"></span></label>`
+
+    var addHideButton = function () {
+        // If a hide button is already added, don't add another
+        if (document.querySelector('div.hidecode input') !== null) {
+            return;
+        }
+
+        // Find the input cells and add a hide button
+        pageElements['inputCells'].forEach(function (inputCell) {
+            if (!inputCell.classList.contains("hidecode")) {
+                // Skip the cell if it doesn't have a hidecode class
+                return;
+            }
+            const id = inputCell.getAttribute('id')
+
+            // Insert the button just inside the end of the next div
+            inputCell.querySelector('div.input').insertAdjacentHTML('beforeend', hideCodeButton(id))
+
+            // Set up the visibility toggle
+            hideLink = document.querySelector(`#${id} div.inner_cell + input + label`);
+            hideLink.addEventListener('click', toggleCodeCellVisibility)
+        });
+    }
+
+
+    // Initialize the hide buttos
+    var initHiddenCells = function () {
+        // Add hide buttons to the cells
+        addHideButton();
+
+        // Toggle the code cells that should be hidden
+        document.querySelectorAll('div.hidecode input').forEach(function (item) {
+            setCodeCellVisibility(item, 'hidden');
+            item.checked = true;
+        })
+    }
+
+    initFunction(initHiddenCells);
+
 </script>
 </head>
 
@@ -1123,7 +1159,7 @@ initFunction(initQuery);
         "title": "Table of Contents",
         
         "excerpt":
-            "Table of Contents   Part I: Building Blocks      Geospatial Computational Environment   Spatial data   Spatial data processing   Spatial weights   Part II: Spatial Data Analysis      Choropleth Mapping   Spatial Autocorrelation   Local Spatial Autocorrelation   Point Pattern Analysis   Part III: Advanced Topics      Spatial Inequality   Clustering and Regionalization   Spatial Regression   Spatial Feature Engineering    This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.   ",
+            "  Table of Contents  Part I: Building Blocks   Geospatial Computational Environment Spatial data Spatial data processing Spatial weights  Part II: Spatial Data Analysis   Choropleth Mapping Spatial Autocorrelation Local Spatial Autocorrelation Point Pattern Analysis  Part III: Advanced Topics   Spatial Inequality Clustering and Regionalization Spatial Regression Spatial Feature Engineering   This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.          ",
         "categories": [],
         "tags": [],
         "url": "https://gdsbook.github.io/geographic-data-science/notebooks/00_toc.html",
@@ -1139,7 +1175,7 @@ initFunction(initQuery);
         "title": "Spatial Data",
         
         "excerpt":
-            "Spatial Data      This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.   ",
+            "  Spatial Data             This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.          ",
         "categories": [],
         "tags": [],
         "url": "https://gdsbook.github.io/geographic-data-science/notebooks/02_spatial_data.html",
@@ -1147,7 +1183,7 @@ initFunction(initQuery);
         "title": "Spatial Data Processing",
         
         "excerpt":
-            "Spatial Data Processing Intro paragraph deterministic spatial analysis (SG) Explain what we mean by dsa outline what we will cover below airports.csv Vignette: Airports Querying based on attributes (volume, lon/lat, etc.) import pandas as pd import geopandas as gpd df = pd.read_csv(\"../data/airports/world-airports.csv\") df.head() id ident type name latitude_deg longitude_deg elevation_ft continent iso_country iso_region municipality scheduled_service gps_code iata_code local_code home_link wikipedia_link keywords score last_updated 0 2434 EGLL large_airport London Heathrow Airport 51.470600 -0.461941 83.0 EU GB GB-ENG London 1 EGLL LHR NaN http://www.heathrowairport.com/ http://en.wikipedia.org/wiki/London_Heathrow_A... LON, Londres 1251675 2016-02-09T10:54:31+00:00 1 3632 KLAX large_airport Los Angeles International Airport 33.942501 -118.407997 125.0 NaN US...",
+            "Spatial Data Processing Intro paragraph deterministic spatial analysis (SG) Explain what we mean by dsa outline what we will cover below airports.csv Vignette: Airports Querying based on attributes (volume, lon/lat, etc.) import pandas as pd import geopandas as gpd df = pd.read_csv(&quot;../data/airports/world-airports.csv&quot;) df.head() id ident type name latitude_deg longitude_deg elevation_ft continent iso_country iso_region municipality scheduled_service gps_code iata_code local_code home_link wikipedia_link keywords score last_updated 0 2434 EGLL large_airport London Heathrow Airport 51.470600 -0.461941 83.0 EU GB GB-ENG London 1 EGLL LHR NaN http://www.heathrowairport.com/ http://en.wikipedia.org/wiki/London_Heathrow_A... LON, Londres 1251675 2016-02-09T10:54:31+00:00 1 3632 KLAX large_airport Los Angeles International Airport 33.942501 -118.407997 125.0 NaN US...",
         "categories": [],
         "tags": [],
         "url": "https://gdsbook.github.io/geographic-data-science/notebooks/03_spatial_data_processing.html",
@@ -1163,7 +1199,7 @@ initFunction(initQuery);
         "title": "Choropleth Mapping",
         
         "excerpt":
-            "Choropleth mapping %matplotlib inline import seaborn import pandas import geopandas import pysal import numpy from booktools import choropleth from pysal.viz.mapclassify import classifiers as mapclassify import matplotlib.pyplot as plt Principles Choropleth maps play a prominent role in geographic data science as they allow us to display non-geographic attributes or variables on a geographic map. The word choropleth stems from the root “choro”, meaning “region”. As such choropleth maps represent data at the region level, and are appropriate for areal unit data where each observation combines a value of an attribute and a geometric figure, usually a polygon. Choropleth maps derive from...",
+            "Choropleth mapping %matplotlib inline import seaborn import pandas import geopandas import pysal import numpy from booktools import choropleth from pysal.viz.mapclassify import classifiers as mapclassify import matplotlib.pyplot as plt Principles Choropleth maps play a prominent role in geographic data science as they allow us to display non-geographic attributes or variables on a geographic map. The word choropleth stems from the root \"choro\", meaning \"region\". As such choropleth maps represent data at the region level, and are appropriate for areal unit data where each observation combines a value of an attribute and a geometric figure, usually a polygon. Choropleth maps derive from...",
         "categories": [],
         "tags": [],
         "url": "https://gdsbook.github.io/geographic-data-science/notebooks/05_choropleth.html",
@@ -1171,7 +1207,7 @@ initFunction(initQuery);
         "title": "Spatial Autocorrelation",
         
         "excerpt":
-            "Global Spatial Autocorrelation Spatial autocorrelation The notion of spatial dependence or spatial autocorrelation relates to the existence of a “functional relationship between what happens at one point in space and what happens elsewhere” (Anselin, 1988). Spatial autocorrelation thus has to do with the degree to which the similarity in values between observations in a dataset is related to the similarity in locations of such observations. Not completely unlike (although there are some key differences) the traditional correlation between two variables -which informs us about how the values in one variable change as a function of those in the other- or...",
+            "Global Spatial Autocorrelation Spatial autocorrelation The notion of spatial dependence or spatial autocorrelation relates to the existence of a \"functional relationship between what happens at one point in space and what happens elsewhere\" (Anselin, 1988). Spatial autocorrelation thus has to do with the degree to which the similarity in values between observations in a dataset is related to the similarity in locations of such observations. Not completely unlike (although there are some key differences) the traditional correlation between two variables -which informs us about how the values in one variable change as a function of those in the other- or...",
         "categories": [],
         "tags": [],
         "url": "https://gdsbook.github.io/geographic-data-science/notebooks/06_spatial_autocorrelation.html",
@@ -1195,7 +1231,7 @@ initFunction(initQuery);
         "title": "Spatial Inequality",
         
         "excerpt":
-            "Spatial Inequality Analysis   Introduction      Regions are given here   Internal versus external homogeneity        Concentration versus composition       vignette: geodemographics            tracts       municipal boundaries       income inequality       inference                    permutations                       spatial gini decomposition?           vignette: raster (mexico city)            land cover       air quality       envl racism       municipal tracts       need a resolution for the raster lower than tract  http://due.esrin.esa.int/page_globcover.php              This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.   ",
+            "  Spatial Inequality Analysis           Introduction   Regions are given here Internal versus external homogeneity Concentration versus composition            vignette: geodemographics tracts municipal boundaries income inequality inference permutations   spatial gini decomposition?   vignette: raster (mexico city) land cover air quality envl racism municipal tracts need a resolution for the raster lower than tract http://due.esrin.esa.int/page_globcover.php               This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.          ",
         "categories": [],
         "tags": [],
         "url": "https://gdsbook.github.io/geographic-data-science/notebooks/09_spatial_inequality.html",
@@ -1203,7 +1239,7 @@ initFunction(initQuery);
         "title": "Clustering & Regionalization",
         
         "excerpt":
-            "Clustering and Regionalization from pysal.explore.esda.moran import Moran import pysal.lib.weights.set_operations as Wsets from pysal.lib.weights import Queen, KNN from booktools import choropleth import seaborn import pandas import geopandas import numpy from sklearn.cluster import KMeans, AgglomerativeClustering import matplotlib.pyplot as plt Introduction The world’s hardest questions are complex and multi-faceted. Effective methods to learn from data should recognize this. Many questions and challenges are inherently multidimensional; they are affected, shaped, and defined by many different components all acting simultaneously. In statistical terms, these processes are called multivariate processes, as opposed to univariate processes, where only a single variable acts at once. Clustering is a...",
+            "Clustering and Regionalization from pysal.explore.esda.moran import Moran import pysal.lib.weights.set_operations as Wsets from pysal.lib.weights import Queen, KNN from booktools import choropleth import seaborn import pandas import geopandas import numpy from sklearn.cluster import KMeans, AgglomerativeClustering import matplotlib.pyplot as plt Introduction The world's hardest questions are complex and multi-faceted. Effective methods to learn from data should recognize this. Many questions and challenges are inherently multidimensional; they are affected, shaped, and defined by many different components all acting simultaneously. In statistical terms, these processes are called multivariate processes, as opposed to univariate processes, where only a single variable acts at once. Clustering is a...",
         "categories": [],
         "tags": [],
         "url": "https://gdsbook.github.io/geographic-data-science/notebooks/10_clustering_and_regionalization.html",
@@ -1219,7 +1255,7 @@ initFunction(initQuery);
         "title": "Spatial Feature Engineering",
         
         "excerpt":
-            "Spatial feature engineering      This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.   ",
+            "  Spatial feature engineering             This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.          ",
         "categories": [],
         "tags": [],
         "url": "https://gdsbook.github.io/geographic-data-science/notebooks/12_feature_engineering.html",
@@ -1232,10 +1268,13 @@ initFunction(initQuery);
 </nav>
 
             </div>
+            <footer>
+  <p class="footer"></p>
+</footer>
+
           </div>
         </div>
       </main>
     </div>
-
   </body>
 </html>
