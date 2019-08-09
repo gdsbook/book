@@ -1,4 +1,4 @@
-FROM darribas/gds_py:2.0
+FROM darribas/gds_py:3.0
 
 LABEL maintainer="Dani Arribas-Bel <d.arribas-bel@liverpool.ac.uk>"
 
