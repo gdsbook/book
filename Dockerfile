@@ -10,5 +10,4 @@ COPY ./data ${HOME}/content/data
 # Fix permissions
 USER root
 RUN chown -R ${NB_UID} ${HOME}
-WORKDIR ${HOME}/content/notebooks
 USER ${NB_USER}
