@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.1.6
+      jupytext_version: 1.1.7
   kernelspec:
     display_name: Python 3
     language: python
@@ -99,7 +99,6 @@ db.crs
 
 Throughout the chapter, we will rely heavily on geovisualizations. To create more useful maps that bring geographical context to the spatial distribution of votes, we will use an image made up of tiles from a web map. Let us first download it on-the-fly using `contextily`. The image will be reused later on in several maps.
 
-**DA-B note**: update with `contextily.add_basemap` once it's released
 
 ```python
 we, so, ea, no = db.total_bounds
@@ -215,9 +214,16 @@ db[['Pct_Leave', 'Leave']].tail()
 Which we can visualise readily:
 
 ```python
-db.plot(column='Leave', categorical=True, legend=True, 
+f, ax = plt.subplots(1, figsize=(9, 9))
+db.plot(ax=ax, column='Leave', categorical=True, legend=True, 
         edgecolor='0.5', linewidth=0.25, cmap='Set3', 
         figsize=(9, 9));
+ax.set_axis_off()
+ax.set_title('Leave Majority')
+plt.axis('equal')
+plt.show()
+
+
 ```
 
 Visually, it appears that the map represents a clear case of positive spatial autocorrelation: overall, there are few visible cases where a given observation is surrounded by others in the opposite category. To formally explore this initial assessment, we can use what is called a "joint count" statistic (JC; Cliff & Ord 1981). Imagine a checkerboard with green (G, value 0) and yellow (Y, value 1) squares. The idea of the statistic is to count occurrences of green-green (GG), yellow-yellow (YY), or green-yellow/yellow-green (GY) joins (or neighboring pairs) on the map. In this context, both GG and YY reflect positive spatial autocorrelation, while GY captures its negative counterpart. The intuition of the statistic is to provide a baseline of how many GG, YY, and GY one would expect under the case of complete spatial randomness, and to compare this with the observed counts in the dataset. A situation where we observe more GG/YY than expected and less GY than expected would suggest positive spatial autocorrelation; while the oposite, more GY than GG/YY, would point towards negative spatial autocorrelation.
@@ -515,3 +521,4 @@ Tukey, J. W. (1977). Exploratory data analysis (Vol. 2).
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
