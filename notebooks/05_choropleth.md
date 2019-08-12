@@ -116,7 +116,6 @@ classification scheme.
 mx['PCGDP1940'].describe()
 ```
 
-### Classification schemes
 
 For quantitative attributes we first sort the data by their value,
 such that $x_0 \le x_2 \ldots \le x_{n-1}$. For a prespecified number of classes
@@ -162,7 +161,7 @@ min)/w.$$
 
 Below we present several approaches to create these break points that follow criteria that can be of interest in different contexts, as they focus on different priorities.
  
-#### Equal Intervals
+### Equal Intervals
 
 The Freedman-Diaconis approach provides a rule to determine the width and, in
 turn, the number of bins for the classification. This is a special case of a
@@ -191,7 +190,7 @@ in the Seaborn histogram displayed in Figure 1. It should also be noted that the
 in contrast to the general approach defined in Equation (1).
 
 
-#### Quantiles
+### Quantiles
 To avoid the potential problem of sparse classes, the quantiles of
 the distribution can be used to identify the class boundaries. Indeed, each
 class will have approximately $\mid\frac{n}{k}\mid$ observations using the quantile
@@ -214,7 +213,7 @@ While quantiles does avoid the pitfall of sparse classes, this classification is
 not problem free. The varying widths of the intervals can be markedly different
 which can lead to problems of interpretation. A second challenge facing quantiles
 arises when there are a large number of duplicate values in the distribution
-such that the limits for one or more classes become ambiguous. For example, if one had a variable with $n=20$ but 10 of the observations took on the same value which was the minimum observed, then for values of $k>2$, the class boundaries become ill-defined since a simple rule of splitting at the $n/k$ ranked observed value would depend upon how ties are tried when ranking.
+such that the limits for one or more classes become ambiguous. For example, if one had a variable with $n=20$ but 10 of the observations took on the same value which was the minimum observed, then for values of $k>2$, the class boundaries become ill-defined since a simple rule of splitting at the $n/k$ ranked observed value would depend upon how ties are treated when ranking.
 
 ```python
 numpy.random.seed(12345)
@@ -228,20 +227,70 @@ ties = mapclassify.Quantiles(x, k=5)
 ties
 ```
 
-Clearly this is not a uniform distribution of counts across five quintiles. 
-In this case, `mapclassify` has issued a warning alerting  us to the issue
-that this sample does not contain enough unique values to form the number of
-well-defined classes requested. More specifically, if the percentiles are taken across the sorted data, then scipy reports
-the percentiles as:
 ```python
+x
+```
+
+```python
+ux = numpy.unique(x)
+```
+
+```python
+ux
+```
+
+In this case, `mapclassify` will issue a warning alerting the user to the issue that this sample does not contain enough unique values to form 
+the number of well-defined classes requested.  It then forms a lower number of classes using pseudo quantiles, or quantiles defined on the unique values in the sample, and then uses the pseudo quantiles to classify all the values.
+
+```python
+np = numpy
 import scipy.stats as stats
-q = numpy.array([stats.scoreatpercentile(x, pct) for pct in numpy.arange(20, 120, 20)])
+```
+
+```python
+k = 5
+w = 100.0 / k
+p = np.arange(w, 100+w, w)
+p
+```
+
+```python
+q = np.array([stats.scoreatpercentile(x, pct) for pct in p])
 q
 ```
-with the 20th and 40th percentiles equal at (0). `Mapclassify`` then collapses the duplicate
-classes into a single class to form pseudo quantiles with reduced dimension.
 
-#### Maximum Breaks
+```python
+np.array([stats.scoreatpercentile(x, pct) for pct in np.arange(20, 120, 20)])
+```
+
+```python
+p
+```
+
+### Mean-standard deviation
+
+Our third classifer uses the sample mean $\bar{x} =
+\frac{1}{n} \sum_{i=1}^n x_i$ and sample standard deviation $s = \sqrt{
+\frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})  }$ to define class boundaries as
+some distance from the sample mean, with the distance being a multiple of the
+standard deviation. For example, a common definition for $k=5$ is to set the
+upper limit of the first class to two standard deviations ($c_{0}^u = \bar{x} - 2 s$), and the intermediate
+classes to have upper limits within one standard deviation ($c_{1}^u = \bar{x}-s,\ c_{2}^u = \bar{x}+s, \ c_{3}^u
+= \bar{x}+2s$). Any values greater (smaller) than two standard deviations above (below) the mean
+are placed into the top (bottom) class.
+
+```python
+msd = mapclassify.StdMean(mx['PCGDP1940'])
+msd
+```
+
+This classifier is best used when data is normally distributed or, at least, when the sample mean is a meaningful measure to anchor the classification around. Clearly this is
+not the case for our income data as the positive skew results in a loss of
+information when we use the standard deviation. The lack of symmetry leads to
+an inadmissible upper bound for the first  class as well as a concentration of the
+vast majority of values in the middle class.
+
+### Maximum Breaks
 
 The maximum breaks classifier decides where to set the break points between
 classes by considering the difference between sorted values. That is, rather
@@ -264,40 +313,7 @@ simplicitly can sometimes cause unexpected results. To the extent in only
 considers the top $k-1$ differences between consecutive values, other more nuanced
 within-group differences and dissimilarities can be ignored.
 
-#### Mean-standard deviation
-
-Our third classifer uses the sample mean $\bar{x} =
-\frac{1}{n} \sum_{i=1}^n x_i$ and sample standard deviation $s = \sqrt{
-\frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})^2  }$ to define class boundaries as
-some distance from the sample mean, with the distance being a multiple of the
-standard deviation. For example, a common definition for $k=4$ is to set the
-upper limits of the classes to be:
-$
-c_{0}^u = \bar{x} - 2s,
-c_{1}^u = \bar{x} - s,
-c_{2}^u = \bar{x} + s,
-c_{3}^u = \bar{x} + 2s
-$.
-
-```python
-msd = mapclassify.StdMean(mx['PCGDP1940'])
-msd
-```
-
-This classifier is best used when data is normally distributed or, at least,
-when the sample mean is a meaningful measure to anchor the classification
-around. Clearly this is not the case for our income data as the positive skew
-results in a loss of information when we use the standard deviation. The lack of
-symmetry leads to an inadmissible upper bound for the first class as well as a
-concentration of the vast majority of values in the middle class. On the other
-hand, this classifer can be useful in detecting outliers. Close inspection of
-the resulting classes based on our sample reveals five, not four, intervals. The
-additional interval is due to three values in the sample exceeding $
-c_{3}^u = \bar{x} + 2s$. In this case, `mapclassify` will append an additional
-class to capture the outlier.
-
-
-#### Box-Plot
+### Box-Plot
 
 The box-plot classification is a blend of the quantile and
 standard deviation classifiers. Here $k$ is predefined to six, with the upper limit of class 0 set
@@ -327,7 +343,7 @@ bp1
 Doing so will affect the definition of the outlier classes, as well as the
 neighboring internal classes.
 
-#### Head Tail Breaks
+### Head-Tail Breaks
 
 The head tail algorithm, introduced by Jiang (2013), is based on a recursive partioning of the data using splits around
 iterative means. The splitting process continues until the distributions within each of
@@ -344,7 +360,7 @@ For data with a heavy-tailed distribution, such as power law and log normal
 distributions, the head tail breaks classifier (Jiang 2015) can be particularly
 effective.
 
-#### Jenks Caspall
+### Jenks Caspall
 
 This approach, as well as the following two, tackles the calssification challenge from a heuristic perspective, rather than from deterministic one. Originally proposed by Jenks & Caspall (1971), this algorithm aims to minimize the sum of absolute deviations around
 class means. The approach begins with a prespecified number of classes and an
@@ -363,7 +379,7 @@ jc5 = mapclassify.JenksCaspall(mx['PCGDP1940'], k=5)
 jc5
 ```
 
-#### Fisher Jenks
+### Fisher Jenks
 
 The second optimal algorithm adopts a dynamic programming approach to minimize
 the sum of the absolute deviations around class medians. In contrast to the
@@ -376,7 +392,7 @@ fj5 = mapclassify.FisherJenks(mx['PCGDP1940'], k=5)
 fj5
 ```
 
-#### Max-p
+### Max-p
 
 Finally, the max-p classifiers adopts the algorithm underlying the max-p region
 building method (Duque, Anselin and Rey, 2012) to the case of map classification. It is similar in spirit to
@@ -496,7 +512,7 @@ states assigned to the first class. Indeed, the only observation that
 distinguishes the two classifiers is the treatment of Baja California Sur which
 is kept in class 1 in equal intervals, but assigned to class 2 by Fisher Jenks.
 
-### Color
+## Color
 
 Having considered the evaluation of the statisitcal distribution of
 the attribute values and the alternative classification approaches, the next
@@ -507,49 +523,75 @@ distribution of the attribute values.
 Let us start by refreshing the `mx` object and exploring the base polygons for the Mexican states:
 
 ```python
-mx = geopandas.read_file("../data/mexicojoin.shp")
-mx.plot(color='blue', edgecolor='y');
+mx = geopandas.read_file('../data/mexicojoin.shp')
+f, ax = plt.subplots(1, figsize=(9, 9))
+mx.plot(ax=ax, color='blue', edgecolor='grey')
+ax.set_axis_off()
+ax.set_title('Mexican States')
+plt.axis('equal')
+plt.show()
 ```
 
 Prior to examining the attribute values it is important to note that the
 spatial units for these states are far from homogenous in their shapes and
 sizes. This can have major impacts on our brain's pattern recognition capabilities
 as we tend to be drawn to the larger polygons. Yet, when we considered the
-statistical distribution above, each observation was given equal weight. Thus
+statistical distribution above, each observation was given equal weight. Thus,
 the spatial distribution becomes more complicated to evaluate from a visual and
 statistical perspective.
 
 With this qualification in mind, we will explore the construction of choropleth
-maps using PySAL and the helper method `choropleth`:
+maps using geopandas:
 
 ```python
-mx.plot(column='PCGDP1940', legend=True, scheme='Quantiles')
+mx = geopandas.read_file('../data/mexicojoin.shp')
+f, ax = plt.subplots(1, figsize=(9, 9))
+mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles')
+ax.set_axis_off()
+ax.set_title('PCGDP1940')
+plt.axis('equal')
+plt.show()
 ```
 
-```python
-mx.plot(column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}')
-```
+Note that the default for the legend is two report two decimal places. In our case this results in the legend overlapping with the map. We can override the default to adjust the legend:
 
 ```python
-mx.plot(column='PCGDP1940', legend=True, scheme='stdmean')
+f, ax = plt.subplots(1, figsize=(9, 9))
+mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}')
+ax.set_axis_off()
+ax.set_title('PCGDP1940')
+plt.axis('equal')
+plt.show()
 ```
 
-```python
-mx.plot(column='PCGDP1940', legend=True, scheme='stdmean', fmt='{:.0f}')
-```
+The default color map used by geopandas is viridis, which is a multi-hue sequential scheme, with the darker (ligher) hues representing lower (higher) values for the attribute in question. The choice of a color scheme for a choropleth map should be based on the type of variable underconsideration. Generally, a distinction is drawn between three types of numerical attributues:
+
+- sequential
+- diverging
+- qualitative
+
+
+### Sequential Color Schemes
+
+
+Our attribute is measured in dollars and is characterized as a *sequential* attribute. To choose an appropriate sequential scheme we can override the `cmap` parameter:
 
 ```python
-cuts = [2026, 17650, 25000]
-mx.plot(column='PCGDP1940', legend=True, scheme='UserDefined', classification_kwds={"bins":cuts}, fmt="{:.0f}") 
+mx.plot(column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}', \
+       cmap='Blues')
 ```
 
+which now uses a single-hue sequent,ial color map with the lighter shades representing lower values. One difficulty with this map is that the poor states in the southern portion of Mexico blend into the background of the map display. This can be adjusted by overriding the `edgecolor`:
+
 ```python
-PCGDP1940 = mx.PCGDP1940
-q5 = mapclassify.Quantiles(PCGDP1940)
-q5
+mx.plot(column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}', \
+       cmap='Blues', edgecolor='k')
 ```
 
 The resulting classifier object has a plot method takes a geopandas dataframe as an argument:
+
+
+q5.plot(mx)
 
 ```python
 q5.plot(mx)
@@ -568,61 +610,7 @@ _ = q5.plot(mx, cmap='Blues', axis_on=False, legend=True,
            legend_kwds={'loc': 'upper right'}, fmt='{:.0f}')
 ```
 
-```python
-stdm = mapclassify.StdMean(PCGDP1940)
-_ = stdm.plot(mx, cmap='Blues', axis_on=False, legend=True,
-           legend_kwds={'loc': 'upper right', 'title':'Std Mean'}, 
-           title='PCGDP 1940', fmt='{:.0f}')
-```
-
-```python
-stdm
-```
-
-```python
-bp = mapclassify.BoxPlot(PCGDP1940)
-_ = bp.plot(mx, cmap='Blues', axis_on=False, legend=True,
-           legend_kwds={'loc': 'upper right', 'title':'Box Plot'}, fmt='{:.0f}',
-           title='PCGDP 1940')
-```
-
-```python
-bp
-```
-
-We will continue to use the `Blues`
-colormap in what follows in order to examine the spatial distribution revealed by
-each of the k=5 classifiers:
-
-- Equal Interval
-- Quantiles
-- Mean-Standard deviation
-- Maximum breaks
-- Box-Plot
-- Head Tail
-- Jenks Caspall
-- Fisher Jenks
-
-
-
-```python
-ea5 = mapclassify.EqualInterval(PCGDP1940, k=5)
-ea5
-```
-
-```python
-_ = ea5.plot(mx, cmap='Blues', axis_on=False, legend=True,
-           legend_kwds={'loc': 'upper right'}, fmt='{:.0f}',
-            border_color='gray')
-```
-
-We also note that geopandas can be used to do the plotting here, and we add some customization to the legend to report the upper bounds of each class:
-
-```python
-### Fill in with example once `geopandas` is back in sync with PySAL 2.0
-```
-
-### Diverging Attributes
+### Diverging Color Schemes
 
 A slightly different type of attribute is the so-called "diverging" values attribute. This is
 useful when one wishes to place equal emphasis on mid-range critical values as
@@ -657,7 +645,7 @@ Here the red (blue) hues are states that have moved downwards (upwards) in the
 income distribution, with the darker hue representing a larger movement.
 
 
-## Qualitative Attributes
+### Qualitative Color Schemes
 
 The Mexico data set also has several variables that
 are on a nominal measurement scale. One of these is a region definition variable
@@ -747,15 +735,3 @@ Rey, S.J. and M.L. Guitierez. (2010)
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
-
-```python
-
-```
-
-```python
-
-```
-
-```python
-
-```
