@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.1.6
+      jupytext_version: 1.2.1
   kernelspec:
     display_name: Python 3
     language: python
@@ -15,26 +15,11 @@ jupyter:
 
 # Spatial regression
 
-```python
-%matplotlib inline
-
-from pysal.model import spreg
-from pysal.lib import weights
-from pysal.explore import esda
-from scipy import stats
-import statsmodels.formula.api as sm
-import numpy
-import pandas
-import geopandas
-import matplotlib.pyplot as plt
-import seaborn
-```
-
-# Introduction
+## Introduction
    
 **NOTE**: this chapter was written building from this [Spatial Analysis note](http://darribas.org/spa_notes/sp_eco.html).
 
-## *What* is spatial regression and *why* should I care?
+### *What* is spatial regression and *why* should I care?
 
 Regression (and prediction more generally) provides us a perfect case to examine how spatial structure can help us understand and analyze our data. 
 Usually, spatial structure helps models in one of two ways. 
@@ -61,10 +46,26 @@ Most of the predictors we use in models of social processes contain *embodied* s
 If we intend to or not, using a spatially-patterned predictor in a model can result in spatially-patterned errors; using more than one can amplify this effect. 
 Thus, *regardless of whether or not the true process is explicitly geographic*, additional information about the spatial relationships between our observations or more information about nearby sites can make our predictions better. 
 
-## The Data: San Diego AirBnB
+### The Data: San Diego AirBnB
 
 To learn a little more about how regression works, we'll examine some information about AirBnB in San Diego, CA. 
 This dataset contains house intrinsic characteristics, both continuous (number of beds as in `beds`) and categorical (type of renting or, in AirBnb jargon, property group as in the series of `pg_X` binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, `d2balboa` or neigbourhood id, `neighbourhood_cleansed`).
+
+```python
+%matplotlib inline
+
+from pysal.model import spreg
+from pysal.lib import weights
+from pysal.explore import esda
+from scipy import stats
+import statsmodels.formula.api as sm
+import numpy
+import pandas
+import geopandas
+import matplotlib.pyplot as plt
+import seaborn
+```
+
 
 ```python
 db = geopandas.read_file('../data/airbnb/regression_db.geojson')
@@ -475,7 +476,7 @@ interpreted also in a similar way. The spatial lag of each type of property
 of townhouses (same as with the binary variable, `pg_Townhouse`), they are all
 significant, suggesting our initial hypothesis on the role of the surrounding
 houses might indeed be at work here. As an illustration, being a condominium increases
-the price, on average, 11% ($\beta_{pg\_Condominium}=0.11$) with respect to the benchmark, which is set to apartments. More relevant to this section, any given house surrounded by condominiums *also* receives a price premium. In this case, the interpretation is slightly different because the variable is not a dummy but a proportion in the range [0, 1]. A 10% increase the proportion of neighbors that are condominiums translates into a 6% increase in the property house price ($\beta_{w_pg\_Condominium = 0.6$). This interpretation comes from the following: increasing the prevalence of 
+the price, on average, 11% ($\beta_{pg\_Condominium}=0.11$) with respect to the benchmark, which is set to apartments. More relevant to this section, any given house surrounded by condominiums *also* receives a price premium. In this case, the interpretation is slightly different because the variable is not a dummy but a proportion in the range [0, 1]. A 10% increase the proportion of neighbors that are condominiums translates into a 6% increase in the property house price ($\beta_{w_pg\_Condominium} = 0.6$). This interpretation comes from the following: increasing the prevalence of 
 condos in the area surrounding a house by ten percent is associated with a change in the
 log of the nightly rental price of about .06, which translates to around a 6% increase in the nightly
 rental price of the house. Similar interpretations can be derived for all other spatially lagged variables.
@@ -630,7 +631,7 @@ Taken together, we can conclude that there is distinct positive spatial dependen
 This means that our over- and under-predictions are likely to cluster. 
 
 
-# References
+## References
 [1] Anselin, L. Spatial externalities, spatial multipliers, and spatial econometrics. *International Regional Science Review* 26, 156–166 (2003).
 
 [2] Anselin, L. & Rey, S. J. *Modern Spatial Econometrics in Practice, a Guide to GeoDa, GeoDaSpace, and PySAL*. (GeoDa Press, 2014).
