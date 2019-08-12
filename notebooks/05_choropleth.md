@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.2.1
+      jupytext_version: 1.1.7
   kernelspec:
     display_name: Python 3
     language: python
@@ -553,7 +553,7 @@ plt.axis('equal')
 plt.show()
 ```
 
-Note that the default for the legend is two report two decimal places. In our case this results in the legend overlapping with the map. We can override the default to adjust the legend:
+Note that the default for the legend is two report two decimal places. If we desire, this can be changed by overriding the `fmt` parameter:
 
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -577,37 +577,26 @@ The default color map used by geopandas is viridis, which is a multi-hue sequent
 Our attribute is measured in dollars and is characterized as a *sequential* attribute. To choose an appropriate sequential scheme we can override the `cmap` parameter:
 
 ```python
-mx.plot(column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}', \
-       cmap='Blues')
+f, ax = plt.subplots(1, figsize=(9, 9))
+mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}', \
+         cmap='Blues')
+ax.set_axis_off()
+ax.set_title('PCGDP1940')
+plt.axis('equal')
+plt.show()
 ```
 
 which now uses a single-hue sequent,ial color map with the lighter shades representing lower values. One difficulty with this map is that the poor states in the southern portion of Mexico blend into the background of the map display. This can be adjusted by overriding the `edgecolor`:
 
-```python
-mx.plot(column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}', \
-       cmap='Blues', edgecolor='k')
-```
-
-The resulting classifier object has a plot method takes a geopandas dataframe as an argument:
-
-
-q5.plot(mx)
 
 ```python
-q5.plot(mx)
-```
-
-The default uses a `YlGnBu` color map from matplotlib. We can override the color map, as well as drop the axes, as follows:
-
-
-```python
-_ = q5.plot(mx, cmap='Blues', axis_on=False, legend=True,
-           legend_kwds={'loc': 'upper right'}, fmt='{:.2f}')
-```
-
-```python
-_ = q5.plot(mx, cmap='Blues', axis_on=False, legend=True,
-           legend_kwds={'loc': 'upper right'}, fmt='{:.0f}')
+f, ax = plt.subplots(1, figsize=(9, 9))
+mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}', \
+         cmap='Blues', edgecolor='k')
+ax.set_axis_off()
+ax.set_title('PCGDP1940')
+plt.axis('equal')
+plt.show()
 ```
 
 ### Diverging Color Schemes
@@ -637,8 +626,14 @@ any period has a rank of 1 and therefore when considering the change in ranks, a
 negative change reflects moving down the income distribution.
 
 ```python
-mx.assign(cl=cls).plot(column='cl', categorical=True, cmap='RdYlBu',
+f, ax = plt.subplots(1, figsize=(9, 9))
+mx.assign(cl=cls).plot(ax=ax, column='cl', categorical=True, cmap='RdYlBu',
            scheme='equal_interval', k=4)
+ax.set_axis_off()
+ax.set_title('PCGDP1940')
+plt.axis('equal')
+plt.show()
+
 ```
 
 Here the red (blue) hues are states that have moved downwards (upwards) in the
