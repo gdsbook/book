@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.1.6
+      jupytext_version: 1.1.7
   kernelspec:
     display_name: Python 3
     language: python
@@ -113,7 +113,7 @@ w = weights.distance.KNN.from_dataframe(db, k=8)
 w.transform = 'R'
 ```
 
-### Motivating Local Spatial Autocorrelation
+## Motivating Local Spatial Autocorrelation
 
 To better understand the underpinning of local autorocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:
 
@@ -167,7 +167,7 @@ plt.text(-1.5, -1.5, "LL", fontsize=25)
 plt.show()
 ```
 
-### Local Moran's I
+## Local Moran's I
 
 So far we have classified each observation in the dataset depending on its value and that of its neighbors. This is only half way into identifying areas of unusual concentration of values. To know whether each of the locations is a *statistically significant* cluster of a given kind, we again need to compare it with what we would expect if the data were allocated in a completely random way. After all, by definition, every observation will be of one kind of another, based on the comparison above. However, what we are interested in is whether the strength with which the values are concentrated is unusually high.
 
@@ -181,8 +181,6 @@ where $m_2$ is the second moment (variance) of the distribution of values in the
 
 LISAs are widely used in many fields to identify clusters of values in space. They are a very useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For that, they have a prime place in the exploratory toolbox. Examples of contexts where LISAs can be useful include: identification of spatial clusters of poverty in regions, detection of ethnic enclaves, delineation of areas of particularly high/low activity of any phenomenon, etc.
 
-
-**We should come up with a consistent citation and bibliography scheme. When do we cite, when do we not cite, and when we do, how?**
 
 
 In Python, we can calculate LISAs in a very streamlined way thanks to `PySAL`:
@@ -205,9 +203,13 @@ The values in the left tail of the density represent locations displaying negati
 Because of their very nature, looking at the numerical result of LISAs is not always the most useful way to exploit all the information they can provide. Remember we are calculating a statistic for every single observation in the data so, if we have many of them, it will be difficult to extract any meaningful pattern. In this context, a choropleth can help. At first glance, this may seem to suggest that a map of the $I_i$  values would be a useful way to visualize the spatial distribution:
 
 ```python
+f, ax = plt.subplots(1, figsize=(9,9))
+ax.imshow(img, extent=ext, alpha=0.5)
 db['Is'] = lisa.Is
 choropleth(db, column='Is', cmap='viridis', scheme='quantiles',
-        k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True);
+        k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True,ax=ax);
+plt.text(ext[0], ext[2], lic, size=8)
+ax.set_axis_off()
 ```
 
 However, this does not inform us in any way about what type of spatial correlation each area is experiencing. For example, are the yellow areas in Scotland similar to those in the East cluster of high values too? Also, we know that values around zero will not be statistically significant. Which ones are thus significant and non-significant from a statistical point of view? In other words, which ones can be considered statistical clusters and which ones noise? To answer these questions, we need to bring in additional information that we have obtained when calculating the LISA statistics. Let us first build a four-plot figure that brings all these different perspectives together:
@@ -350,7 +352,7 @@ db['labels'] = labels
 The final cluster map in the lower right above displays the output of the LISA statistics for the percentage of Leave votes in English, Welsh and Scottish local authorities. In bright red, we find those with an unusual concentration of high Leave proportions surrounded also by high Leave results. This corresponds with areas in the East and center of the map. In light red, we find the first type of spatial outliers: areas that still voted to Leave in high proportions, despite being surrounded by areas with more modest support for Leave. These correspond with some of the peripheral areas of London and and adjacent to Oxford. In darker blue we can see the spatial clusters of low support for the Leave campaign, which include London, Oxford and most of Scotland. Finally, in light blue we find the other type of spatial outlier: areas with lower percentages of Leave votes nearby areas of high concentration of supporters for Leave.
 
 
-### Other local indices
+## Other local indices
 
 Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `PySAL` includes Getis and Ord's $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:
 
@@ -426,7 +428,7 @@ plt.show()
 As you can see, the results are virtually the same for $G_i$ and $G_i^*$. Also, at first glance, these maps appear to be visually similar to the final LISA map from above, and this leads to the question of why use the $G$ statistics at all. The answer to this question is that the two sets of local statistics, Local $I$ and the local $G$, are complementary statistics. This is because the local $I$ by itself cannot distinguish between the two forms of positive spatial association while the G can. At the same time, the G statistic does not consider negative spatial association, while the local I statistic does.
 
 
-# Questions
+## Questions
 1. Do the same Local Moran analysis done for `Pct_Leave`, but using `Pct_Turnout`. Is there a geography to how involved people were in different places? Where was turnout percentage (relatively) higher or lower? 
 2. Do the same Getis-Ord analysis done for `Pct_Leave`, but using `Pct_Turnout`. 
 3. Local Moran statistics are premised on a few distributional assumptions. One well-recognized concern with Moran statistics is when they are estimated for *rates*. Rate data is distinct from other kinds of data because it embeds the relationship between two quantities: the event and the population. For instance, in the case of Leave voting, the "event" is a person voting leave, and the "population" could be the number of eligible voters, the number of votes cast, or the total number of people. This usually only poses a problem for analysis when the event outcome is somehow dependent on the population. 
