@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.2.1
+      jupytext_version: 1.1.7
   kernelspec:
     display_name: Python 3
     language: python
@@ -177,7 +177,7 @@ cluster_variables =  ['Median Val',   # Median house value
                       'Median Num',   # Median number of rooms in the tract's households
                       'Gini index',   # Gini index measuring tract wealth inequality
                       'Med Age',      # Median age of tract population
-                      'Travel tim'    # ???
+                      'Travel tim'    # Travel time to work 
                       ]
 ```
 
@@ -882,11 +882,23 @@ Thus, clustering and regionalization are essential tools for the spatial data sc
 3. In evaluating the quality of the solution to a regionalization problem, how might traditional measures of cluster evaluation be used? In what ways might those measures be limited and need expansion to consider the geographical dimensions of the problem?
 4. Discuss the implications for the processes of regionalization that follow from the number of *connected components* in the spatial weights matrix that would be used.
 5. True or false: The average silhouette score for a spatially constrained solution will be no larger than the average silhouette score for an unconstrained solution. Why, or why not? (add reference and  or explain silhouette)
-6. Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook versus queen). How might this sparsity affect the quality of the clustering solution?
-7. What are the challenges and opportunities that spatial dependence pose for spatial cluster formation?
-8. In other areas of spatial analysis, the concept of multilevel modeling (cites) exploits the hierarchical nesting of spatial units at different levels of aggregation. How might such nesting be exploited in the implementation of regionalization algorithms? What are some possible limitations/challenges that such nesting imposes/represents in obtaining a regionalization solution.
-9. Using a spatial weights object obtained as `w = libpysal.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = libpysal.weights.lat2W(20,20, rook=False)` ?
+6. Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook being more dense than Queen graphs). 
+    a. How might the sparsity of the weights matrix affect the quality of the clustering solution?
+    b. Using `pysal.lib.weights.higher_order`, construct a second-order adjacency matrix of the weights matrix used in this chapter. 
+    c. Compare the `pct_nonzero` for both matrices. 
+    d. Rerun the analysis from this chapter using this new second-order weights matrix. What changes? 
+7. The idea of spatial dependence, that near things tend to be more related than distant things, is an extensively-studied property of spatial data. How might solutions to clustering and regionalization problems change if dependence is very strong and positive? very weak? very strong and negative? 
+8. In other areas of spatial analysis, multilevel models [1] recognize that sometimes, geographical regions are more similar internally than they are externally. That is, two observations in the same region are probably more similar than two observations in different regions. If this kind of dependence is very strong, what would happen to clustering and regionalization solutions?
+9. Using a spatial weights object obtained as `w = pysal.lib.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = pysal.lib.weights.lat2W(20,20, rook=False)` ?
+
+# References
+
+[1] Gelman, A., & Hill, J. (2006). Data analysis using regression and multilevel/hierarchical models. Cambridge university press.
 
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+```python
+
+```
