@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.1.7
+      jupytext_version: 1.2.1
   kernelspec:
     display_name: Python 3
     language: python
@@ -14,7 +14,6 @@ jupyter:
 ---
 
 # Choropleth mapping
-
 
 
 
@@ -488,6 +487,12 @@ def highlight_values(val):
 ```python
 t = mxs[['NAME', 'PCGDP1940', 'q540', 'ei540', 'ht40', 'mb540', 'msd40', 'fj540', 'jc540']]
 t.style.applymap(highlight_values)
+```
+
+```python
+# write table out to tex
+with open('classtable.tex', 'w') as out:
+    t.to_latex(out)
 ```
 
 Inspection of this table reveals a number of interesting results. First, the
