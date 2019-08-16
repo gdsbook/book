@@ -12,6 +12,7 @@ cp host/infrastructure/booksite/_config.yml host/tmp_book/_config.yml
 # Copy notebooks/content
 mkdir host/tmp_book/content/notebooks/
 cp -r host/notebooks/*.ipynb host/tmp_book/content/notebooks/
+cp host/notebooks/00_toc.md host/tmp_book/content/notebooks/00_toc.md
 # Copy other contents of the book (intro, etc.)
 cp host/infrastructure/booksite/intro.md host/tmp_book/content/intro.md
 cp host/infrastructure/booksite/intro_part_*.md host/tmp_book/content/

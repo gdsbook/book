@@ -17,7 +17,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
-  <title>Geographic Data Science with Python</title>
+  <title>Geographic Data Science with PySAL and the PyData Stack</title>
   <meta name="description" content="This book serves as an introduction to a whole new way of thinking systematically about geographic data, using geographical analysis and computation to unlock new insights hidden within data. The book is structured around the excellent data science environment in Python, with examples and worked analyses for you to replicate, adapt, extend, and improve.">
 
   <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/content/intro.html">
@@ -25,7 +25,7 @@
 
   <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/content/intro.html" />
 <meta property="og:type"        content="article" />
-<meta property="og:title"       content="Geographic Data Science with Python" />
+<meta property="og:title"       content="Geographic Data Science with PySAL and the PyData Stack" />
 <meta property="og:description" content="This book serves as an introduction to a whole new way of thinking systematically about geographic data, using geographical analysis and computation to unlock new insights hidden within data. The book is structured around the excellent data science environment in Python, with examples and worked analyses for you to replicate, adapt, extend, and improve." />
 <meta property="og:image"       content="https://gdsbook.github.io/geographic-data-science/images/logo/logo.png" />
 
@@ -39,11 +39,11 @@
   "mainEntityOfPage":
     "https://gdsbook.github.io/geographic-data-science/content/intro.html",
   "headline":
-    "Geographic Data Science with Python",
+    "Geographic Data Science with PySAL and the PyData Stack",
   "datePublished":
-    "2019-08-09T18:14:23+00:00",
+    "2019-08-16T17:15:19+00:00",
   "dateModified":
-    "2019-08-09T18:14:23+00:00",
+    "2019-08-16T17:15:19+00:00",
   "description":
     "This book serves as an introduction to a whole new way of thinking systematically about geographic data, using geographical analysis and computation to unlock new insights hidden within data. The book is structured around the excellent data science environment in Python, with examples and worked analyses for you to replicate, adapt, extend, and improve.",
   "author": {
@@ -194,134 +194,6 @@ initFunction(findInputCells);
 
   <!-- Load Thebelab for interactive widgets -->
   <!-- Include Thebelab for interactive code if it's enabled -->
-
-
-<!-- Display Thebelab button in each code cell -->
-<script>
-/**
- * Set up thebelab button for code blocks
- */
-
-const thebelabCellButton = id =>
-  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
-    <img src="/geographic-data-science/assets/images/edit-button.svg" alt="Start interactive mode">
-  </a>`
-
-
-const addThebelabButtonToCodeCells =  () => {
-
-  const codeCells = document.querySelectorAll('div.input_area > div.highlight:not(.output) pre')
-  codeCells.forEach((codeCell, index) => {
-    const id = codeCellId(index)
-    codeCell.setAttribute('id', id)
-    if (document.getElementById("thebelab-cell-button-" + id) == null) {
-      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
-    }
-  })
-}
-
-initFunction(addThebelabButtonToCodeCells);
-</script>
-
-
-
-<script type="text/x-thebe-config">
-    {
-      requestKernel: true,
-      binderOptions: {
-        repo: 'gdsbook/geographic-data-science',
-        ref: 'master',
-      },
-      codeMirrorConfig: {
-        theme: "abcdef"
-      },
-      kernelOptions: {
-        name: 'python3',
-      }
-    }
-</script>
-<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
-<script>
-    /**
-     * Add attributes to Thebelab blocks
-     */
-
-    const initThebelab = () => {
-        const addThebelabToCodeCells = () => {
-            console.log("Adding thebelab to code cells...");
-            // If Thebelab hasn't loaded, wait a bit and try again. This
-            // happens because we load ClipboardJS asynchronously.
-            if (window.thebelab === undefined) {
-                setTimeout(addThebelabToCodeCells, 250)
-            return
-            }
-
-            // If we already detect a Thebelab cell, don't re-run
-            if (document.querySelectorAll('div.thebelab-cell').length > 0) {
-                return;
-            }
-
-            // Find all code cells, replace with Thebelab interactive code cells
-            const codeCells = document.querySelectorAll('.input_area pre')
-            codeCells.forEach((codeCell, index) => {
-                const id = codeCellId(index)
-                codeCell.setAttribute('data-executable', 'true')
-
-                // Figure out the language it uses and add this too
-                var parentDiv = codeCell.parentElement.parentElement;
-                var arrayLength = parentDiv.classList.length;
-                for (var ii = 0; ii < arrayLength; ii++) {
-                    var parts = parentDiv.classList[ii].split('language-');
-                    if (parts.length === 2) {
-                        // If found, assign dataLanguage and break the loop
-                        var dataLanguage = parts[1];
-                        break;
-                    }
-                }
-                codeCell.setAttribute('data-language', dataLanguage)
-
-                // If the code cell is hidden, show it
-                var inputCheckbox = document.querySelector(`input#hidebtn${codeCell.id}`);
-                if (inputCheckbox !== null) {
-                    setCodeCellVisibility(inputCheckbox, 'visible');
-                }
-            });
-
-            // Remove the event listener from the page so keyboard press doesn't
-            // Change page
-            document.removeEventListener('keydown', initPageNav)
-            keyboardListener = false;
-
-            // Init thebelab
-            thebelab.bootstrap();
-
-            // Remove copy buttons since they won't work anymore
-            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
-            copyAndThebeButtons.forEach((button, index) => {
-                button.remove();
-            });
-
-            // Remove outputs since they'll be stale
-            const outputs = document.querySelectorAll('.output *, .output')
-            outputs.forEach((output, index) => {
-                output.remove();
-            });
-        }
-
-        // Add event listener for the function to modify code cells
-        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
-        thebelabButtons.forEach((thebelabButton,index) => {
-            if (thebelabButton === null) {
-                setTimeout(initThebelab, 250)
-                return
-            };
-            thebelabButton.addEventListener('click', addThebelabToCodeCells);
-        });
-    }
-
-    // Initialize Thebelab
-    initFunction(initThebelab);
-</script>
 
 
 
@@ -1123,7 +995,7 @@ initFunction(addCopyButtonToCodeCells);
             
 
             <div class="c-textbook__content">
-              <h1 id="geographic-data-science-with-python">Geographic Data Science with Python</h1>
+              <h1 id="geographic-data-science-with-pysal-and-the-pydata-stack">Geographic Data Science with PySAL and the PyData Stack</h1>
 
 <ul>
   <li>Sergio J. Rey</li>
@@ -1131,7 +1003,55 @@ initFunction(addCopyButtonToCodeCells);
   <li>Levi J. Wolf</li>
 </ul>
 
-<p>Placeholder for the introduction to the book</p>
+<h2 id="introduction">Introduction</h2>
+
+<p>This book provides the tools, the methods, and the theory to meet
+the challenges of contemporary data science applied to geographic
+problems and data. Social media, new forms of data,
+and new computational techniques are revolutionizing social science.
+In the new world of pervasive, large, frequent, and rapid data, we have
+new opportunities to understand and analyze the role of geography in
+everyday life. The book provides the first comprehensive curriculum in
+geographic data science.</p>
+
+<p>Geographic data is ubiquitous. On the whole, social processes, physical
+contexts, and individual behaviors show striking regularity in their patterns,
+structures, and spacing. As data relating to these systems grows in scope,
+intensity, and depth, it becomes more important to extract meainingful
+insights from location, relation, and position.</p>
+
+<p>This book serves as an introduction to a new way of thinking about geographic
+challenges. Using geographical analysis and computational reasoning, it shows
+the reader how to unlock new insights hidden within data. The book is
+structured around the excellent data science environment in Python,
+providing examples and worked analyses for the reader to replicate,
+adapt, extend, and improve.</p>
+
+<h2 id="pedagogical-approach">Pedagogical approach</h2>
+
+<p>Geographic Data Science is a new field, but has many academic influences
+and precursors. Currently, curriculum development
+is forced to combine snippets of unpublished research code and vignettes
+together with various packages in the Python data science ecosystem.</p>
+
+<p>The present book considers students as learners of both analytical <em>and</em>
+computational methods. We provide accessible, open computational examples
+with high-quality narrative exposition. This combination is design to satisfy
+the two main requirements from students:</p>
+
+<ul>
+  <li>As learners of <em>analytical</em> methods, students want the narrative
+scaffolding, careful explanation, and intelligible writing provided by typical introductory textbooks.</li>
+  <li>As learners of <em>computational</em> approaches, students need worked examples
+of code alongside an explanation on how to get started even doing analysis.</li>
+</ul>
+
+<p>There are many hurdles over which students jump just to start the first
+example of many introductory textbooks. Our book provides a full view of
+Geographic Data Science, from setting up and organizing computational
+environments to preparing data, through to developing novel spatial insight
+and presenting it cogently to others. This kind of integrated approach is
+necessary for data science, but is missing in current market offerings.</p>
 
 <hr />
 

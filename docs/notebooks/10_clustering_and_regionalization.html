@@ -41,9 +41,9 @@
   "headline":
     "Clustering &amp; Regionalization",
   "datePublished":
-    "2019-08-09T18:14:23+00:00",
+    "2019-08-16T17:15:19+00:00",
   "dateModified":
-    "2019-08-09T18:14:23+00:00",
+    "2019-08-16T17:15:19+00:00",
   "description":
     "Clustering and Regionalization ",
   "author": {
@@ -194,134 +194,6 @@ initFunction(findInputCells);
 
   <!-- Load Thebelab for interactive widgets -->
   <!-- Include Thebelab for interactive code if it's enabled -->
-
-
-<!-- Display Thebelab button in each code cell -->
-<script>
-/**
- * Set up thebelab button for code blocks
- */
-
-const thebelabCellButton = id =>
-  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
-    <img src="/geographic-data-science/assets/images/edit-button.svg" alt="Start interactive mode">
-  </a>`
-
-
-const addThebelabButtonToCodeCells =  () => {
-
-  const codeCells = document.querySelectorAll('div.input_area > div.highlight:not(.output) pre')
-  codeCells.forEach((codeCell, index) => {
-    const id = codeCellId(index)
-    codeCell.setAttribute('id', id)
-    if (document.getElementById("thebelab-cell-button-" + id) == null) {
-      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
-    }
-  })
-}
-
-initFunction(addThebelabButtonToCodeCells);
-</script>
-
-
-
-<script type="text/x-thebe-config">
-    {
-      requestKernel: true,
-      binderOptions: {
-        repo: 'gdsbook/geographic-data-science',
-        ref: 'master',
-      },
-      codeMirrorConfig: {
-        theme: "abcdef"
-      },
-      kernelOptions: {
-        name: 'python3',
-      }
-    }
-</script>
-<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
-<script>
-    /**
-     * Add attributes to Thebelab blocks
-     */
-
-    const initThebelab = () => {
-        const addThebelabToCodeCells = () => {
-            console.log("Adding thebelab to code cells...");
-            // If Thebelab hasn't loaded, wait a bit and try again. This
-            // happens because we load ClipboardJS asynchronously.
-            if (window.thebelab === undefined) {
-                setTimeout(addThebelabToCodeCells, 250)
-            return
-            }
-
-            // If we already detect a Thebelab cell, don't re-run
-            if (document.querySelectorAll('div.thebelab-cell').length > 0) {
-                return;
-            }
-
-            // Find all code cells, replace with Thebelab interactive code cells
-            const codeCells = document.querySelectorAll('.input_area pre')
-            codeCells.forEach((codeCell, index) => {
-                const id = codeCellId(index)
-                codeCell.setAttribute('data-executable', 'true')
-
-                // Figure out the language it uses and add this too
-                var parentDiv = codeCell.parentElement.parentElement;
-                var arrayLength = parentDiv.classList.length;
-                for (var ii = 0; ii < arrayLength; ii++) {
-                    var parts = parentDiv.classList[ii].split('language-');
-                    if (parts.length === 2) {
-                        // If found, assign dataLanguage and break the loop
-                        var dataLanguage = parts[1];
-                        break;
-                    }
-                }
-                codeCell.setAttribute('data-language', dataLanguage)
-
-                // If the code cell is hidden, show it
-                var inputCheckbox = document.querySelector(`input#hidebtn${codeCell.id}`);
-                if (inputCheckbox !== null) {
-                    setCodeCellVisibility(inputCheckbox, 'visible');
-                }
-            });
-
-            // Remove the event listener from the page so keyboard press doesn't
-            // Change page
-            document.removeEventListener('keydown', initPageNav)
-            keyboardListener = false;
-
-            // Init thebelab
-            thebelab.bootstrap();
-
-            // Remove copy buttons since they won't work anymore
-            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
-            copyAndThebeButtons.forEach((button, index) => {
-                button.remove();
-            });
-
-            // Remove outputs since they'll be stale
-            const outputs = document.querySelectorAll('.output *, .output')
-            outputs.forEach((output, index) => {
-                output.remove();
-            });
-        }
-
-        // Add event listener for the function to modify code cells
-        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
-        thebelabButtons.forEach((thebelabButton,index) => {
-            if (thebelabButton === null) {
-                setTimeout(initThebelab, 250)
-                return
-            };
-            thebelabButton.addEventListener('click', addThebelabToCodeCells);
-        });
-    }
-
-    // Initialize Thebelab
-    initFunction(initThebelab);
-</script>
 
 
 
@@ -1126,7 +998,6 @@ initFunction(addCopyButtonToCodeCells);
 <button id="interact-button-download" class="interact-button">Download</button>
 </a>
 
-<button id="interact-button-thebelab" class="interact-button">Thebelab</button>
 
 
 
@@ -1414,7 +1285,7 @@ characterization of San Diego as a whole:</p>
                       <span class="s1">&#39;Median Num&#39;</span><span class="p">,</span>   <span class="c1"># Median number of rooms in the tract&#39;s households</span>
                       <span class="s1">&#39;Gini index&#39;</span><span class="p">,</span>   <span class="c1"># Gini index measuring tract wealth inequality</span>
                       <span class="s1">&#39;Med Age&#39;</span><span class="p">,</span>      <span class="c1"># Median age of tract population</span>
-                      <span class="s1">&#39;Travel tim&#39;</span>    <span class="c1"># ???</span>
+                      <span class="s1">&#39;Travel tim&#39;</span>    <span class="c1"># Travel time to work </span>
                       <span class="p">]</span>
 </pre></div>
 
@@ -3912,11 +3783,16 @@ Thus, clustering and regionalization are essential tools for the spatial data sc
 <li>In evaluating the quality of the solution to a regionalization problem, how might traditional measures of cluster evaluation be used? In what ways might those measures be limited and need expansion to consider the geographical dimensions of the problem?</li>
 <li>Discuss the implications for the processes of regionalization that follow from the number of <em>connected components</em> in the spatial weights matrix that would be used.</li>
 <li>True or false: The average silhouette score for a spatially constrained solution will be no larger than the average silhouette score for an unconstrained solution. Why, or why not? (add reference and  or explain silhouette)</li>
-<li>Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook versus queen). How might this sparsity affect the quality of the clustering solution?</li>
-<li>What are the challenges and opportunities that spatial dependence pose for spatial cluster formation?</li>
-<li>In other areas of spatial analysis, the concept of multilevel modeling (cites) exploits the hierarchical nesting of spatial units at different levels of aggregation. How might such nesting be exploited in the implementation of regionalization algorithms? What are some possible limitations/challenges that such nesting imposes/represents in obtaining a regionalization solution.</li>
-<li>Using a spatial weights object obtained as <code>w = libpysal.weights.lat2W(20,20)</code>, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for <code>w = libpysal.weights.lat2W(20,20, rook=False)</code> ?</li>
+<li>Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook being more dense than Queen graphs). 
+ a. How might the sparsity of the weights matrix affect the quality of the clustering solution?
+ b. Using <code>pysal.lib.weights.higher_order</code>, construct a second-order adjacency matrix of the weights matrix used in this chapter. 
+ c. Compare the <code>pct_nonzero</code> for both matrices. 
+ d. Rerun the analysis from this chapter using this new second-order weights matrix. What changes? </li>
+<li>The idea of spatial dependence, that near things tend to be more related than distant things, is an extensively-studied property of spatial data. How might solutions to clustering and regionalization problems change if dependence is very strong and positive? very weak? very strong and negative? </li>
+<li>In other areas of spatial analysis, multilevel models [1] recognize that sometimes, geographical regions are more similar internally than they are externally. That is, two observations in the same region are probably more similar than two observations in different regions. If this kind of dependence is very strong, what would happen to clustering and regionalization solutions?</li>
+<li>Using a spatial weights object obtained as <code>w = pysal.lib.weights.lat2W(20,20)</code>, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for <code>w = pysal.lib.weights.lat2W(20,20, rook=False)</code> ?</li>
 </ol>
+<h1 id="References">References<a class="anchor-link" href="#References"> </a></h1><p>[1] Gelman, A., &amp; Hill, J. (2006). Data analysis using regression and multilevel/hierarchical models. Cambridge university press.</p>
 <hr>
 <p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
 

@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
   <title>Table of Contents</title>
-  <meta name="description" content="Table of Contents Part I: Building Blocks Geospatial Computational EnvironmentSpatial dataSpatial data processingSpatial weightsPart II: Spatial Data Analysi...">
+  <meta name="description" content="Table of Contents">
 
   <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/00_toc.html">
   <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
@@ -26,7 +26,7 @@
   <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/00_toc.html" />
 <meta property="og:type"        content="article" />
 <meta property="og:title"       content="Table of Contents" />
-<meta property="og:description" content="Table of Contents Part I: Building Blocks Geospatial Computational EnvironmentSpatial dataSpatial data processingSpatial weightsPart II: Spatial Data Analysi..." />
+<meta property="og:description" content="Table of Contents" />
 <meta property="og:image"       content="https://gdsbook.github.io/geographic-data-science/images/logo/logo.png" />
 
 <meta name="twitter:card" content="summary">
@@ -41,11 +41,11 @@
   "headline":
     "Table of Contents",
   "datePublished":
-    "2019-08-09T18:14:23+00:00",
+    "2019-08-16T17:15:19+00:00",
   "dateModified":
-    "2019-08-09T18:14:23+00:00",
+    "2019-08-16T17:15:19+00:00",
   "description":
-    "Table of Contents Part I: Building Blocks Geospatial Computational EnvironmentSpatial dataSpatial data processingSpatial weightsPart II: Spatial Data Analysi...",
+    "Table of Contents",
   "author": {
     "@type": "Person",
     "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
@@ -194,134 +194,6 @@ initFunction(findInputCells);
 
   <!-- Load Thebelab for interactive widgets -->
   <!-- Include Thebelab for interactive code if it's enabled -->
-
-
-<!-- Display Thebelab button in each code cell -->
-<script>
-/**
- * Set up thebelab button for code blocks
- */
-
-const thebelabCellButton = id =>
-  `<a id="thebelab-cell-button-${id}" class="btn thebebtn o-tooltip--left" data-tooltip="Interactive Mode">
-    <img src="/geographic-data-science/assets/images/edit-button.svg" alt="Start interactive mode">
-  </a>`
-
-
-const addThebelabButtonToCodeCells =  () => {
-
-  const codeCells = document.querySelectorAll('div.input_area > div.highlight:not(.output) pre')
-  codeCells.forEach((codeCell, index) => {
-    const id = codeCellId(index)
-    codeCell.setAttribute('id', id)
-    if (document.getElementById("thebelab-cell-button-" + id) == null) {
-      codeCell.insertAdjacentHTML('afterend', thebelabCellButton(id));
-    }
-  })
-}
-
-initFunction(addThebelabButtonToCodeCells);
-</script>
-
-
-
-<script type="text/x-thebe-config">
-    {
-      requestKernel: true,
-      binderOptions: {
-        repo: 'gdsbook/geographic-data-science',
-        ref: 'master',
-      },
-      codeMirrorConfig: {
-        theme: "abcdef"
-      },
-      kernelOptions: {
-        name: 'python3',
-      }
-    }
-</script>
-<script src="https://unpkg.com/thebelab@0.4.0/lib/index.js"></script>
-<script>
-    /**
-     * Add attributes to Thebelab blocks
-     */
-
-    const initThebelab = () => {
-        const addThebelabToCodeCells = () => {
-            console.log("Adding thebelab to code cells...");
-            // If Thebelab hasn't loaded, wait a bit and try again. This
-            // happens because we load ClipboardJS asynchronously.
-            if (window.thebelab === undefined) {
-                setTimeout(addThebelabToCodeCells, 250)
-            return
-            }
-
-            // If we already detect a Thebelab cell, don't re-run
-            if (document.querySelectorAll('div.thebelab-cell').length > 0) {
-                return;
-            }
-
-            // Find all code cells, replace with Thebelab interactive code cells
-            const codeCells = document.querySelectorAll('.input_area pre')
-            codeCells.forEach((codeCell, index) => {
-                const id = codeCellId(index)
-                codeCell.setAttribute('data-executable', 'true')
-
-                // Figure out the language it uses and add this too
-                var parentDiv = codeCell.parentElement.parentElement;
-                var arrayLength = parentDiv.classList.length;
-                for (var ii = 0; ii < arrayLength; ii++) {
-                    var parts = parentDiv.classList[ii].split('language-');
-                    if (parts.length === 2) {
-                        // If found, assign dataLanguage and break the loop
-                        var dataLanguage = parts[1];
-                        break;
-                    }
-                }
-                codeCell.setAttribute('data-language', dataLanguage)
-
-                // If the code cell is hidden, show it
-                var inputCheckbox = document.querySelector(`input#hidebtn${codeCell.id}`);
-                if (inputCheckbox !== null) {
-                    setCodeCellVisibility(inputCheckbox, 'visible');
-                }
-            });
-
-            // Remove the event listener from the page so keyboard press doesn't
-            // Change page
-            document.removeEventListener('keydown', initPageNav)
-            keyboardListener = false;
-
-            // Init thebelab
-            thebelab.bootstrap();
-
-            // Remove copy buttons since they won't work anymore
-            const copyAndThebeButtons = document.querySelectorAll('.copybtn, .thebebtn')
-            copyAndThebeButtons.forEach((button, index) => {
-                button.remove();
-            });
-
-            // Remove outputs since they'll be stale
-            const outputs = document.querySelectorAll('.output *, .output')
-            outputs.forEach((output, index) => {
-                output.remove();
-            });
-        }
-
-        // Add event listener for the function to modify code cells
-        const thebelabButtons = document.querySelectorAll('[id^=thebelab], [id$=thebelab]')
-        thebelabButtons.forEach((thebelabButton,index) => {
-            if (thebelabButton === null) {
-                setTimeout(initThebelab, 250)
-                return
-            };
-            thebelabButton.addEventListener('click', addThebelabToCodeCells);
-        });
-    }
-
-    // Initialize Thebelab
-    initFunction(initThebelab);
-</script>
 
 
 
@@ -1121,56 +993,39 @@ initFunction(addCopyButtonToCodeCells);
 </div>
 
             
-<div class="buttons">
-<a href="/geographic-data-science/content/notebooks/00_toc.ipynb" download>
-<button id="interact-button-download" class="interact-button">Download</button>
-</a>
-
-<button id="interact-button-thebelab" class="interact-button">Thebelab</button>
-
-
-
-
-
-
-
-
-
-<a href="https://mybinder.org/v2/gh/gdsbook/geographic-data-science/master?filepath=content%2Fnotebooks%2F00_toc.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/geographic-data-science/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
-
-
-</div>
-
 
             <div class="c-textbook__content">
-              <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Table-of-Contents">Table of Contents<a class="anchor-link" href="#Table-of-Contents"> </a></h1><h2 id="Part-I:-Building-Blocks">Part I: Building Blocks<a class="anchor-link" href="#Part-I:-Building-Blocks"> </a></h2><ul>
-<li><a href="01_geospatial_computational_environment">Geospatial Computational Environment</a></li>
-<li><a href="02_spatial_data">Spatial data</a></li>
-<li><a href="03_spatial_data_processing">Spatial data processing</a></li>
-<li><a href="04_spatial_weights">Spatial weights</a></li>
-</ul>
-<h2 id="Part-II:-Spatial-Data-Analysis">Part II: Spatial Data Analysis<a class="anchor-link" href="#Part-II:-Spatial-Data-Analysis"> </a></h2><ul>
-<li><a href="05_choropleth">Choropleth Mapping</a></li>
-<li><a href="06_spatial_autocorrelation">Spatial Autocorrelation</a></li>
-<li><a href="07_local_autocorrelation">Local Spatial Autocorrelation</a></li>
-<li><a href="08_point_pattern_analysis">Point Pattern Analysis</a></li>
-</ul>
-<h2 id="Part-III:-Advanced-Topics">Part III: Advanced Topics<a class="anchor-link" href="#Part-III:-Advanced-Topics"> </a></h2><ul>
-<li><a href="09_spatial_inequality">Spatial Inequality</a></li>
-<li><a href="10_clustering_and_regionalization">Clustering and Regionalization</a></li>
-<li><a href="11_regression">Spatial Regression</a></li>
-<li><a href="12_feature_engineering">Spatial Feature Engineering</a></li>
-</ul>
-<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.</p>
+              <h1 id="table-of-contents">Table of Contents</h1>
 
-</div>
-</div>
-</div>
+<h2 id="part-i-building-blocks">Part I: Building Blocks</h2>
 
- 
+<ul>
+  <li><a href="01_geospatial_computational_environment">Geospatial Computational Environment</a></li>
+  <li><a href="02_spatial_data">Spatial data</a></li>
+  <li><a href="03_spatial_data_processing">Spatial data processing</a></li>
+  <li><a href="04_spatial_weights">Spatial weights</a></li>
+</ul>
 
+<h2 id="part-ii-spatial-data-analysis">Part II: Spatial Data Analysis</h2>
+
+<ul>
+  <li><a href="05_choropleth">Choropleth Mapping</a></li>
+  <li><a href="06_spatial_autocorrelation">Spatial Autocorrelation</a></li>
+  <li><a href="07_local_autocorrelation">Local Spatial Autocorrelation</a></li>
+  <li><a href="08_point_pattern_analysis">Point Pattern Analysis</a></li>
+</ul>
+
+<h2 id="part-iii-advanced-topics">Part III: Advanced Topics</h2>
+
+<ul>
+  <li><a href="09_spatial_inequality">Spatial Inequality</a></li>
+  <li><a href="10_clustering_and_regionalization">Clustering and Regionalization</a></li>
+  <li><a href="11_regression">Spatial Regression</a></li>
+  <li><a href="12_feature_engineering">Spatial Feature Engineering</a></li>
+</ul>
+
+<p><a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+<!-- #endregion --></p>
 
               <nav class="c-page__nav">
   
