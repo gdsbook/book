@@ -23,10 +23,13 @@ cp host/infrastructure/booksite/toc.yml host/tmp_book/_data/toc.yml
 #---------------------------
 # LICENSE
 cp host/infrastructure/booksite/LICENSE host/tmp_book/LICENSE
+# Logo
+cp host/infrastructure/booksite/logo/ico_256x256.png host/tmp_book/content/images/logo/logo.png
+cp host/infrastructure/booksite/logo/favicon.ico host/tmp_book/content/images/logo/favicon.ico
 # Code requirements
 # Bibliography
-# Build book
 #---------------------------
+# Build book
 echo "Building book..."
 jupyter-book build host/tmp_book
 echo "Building site HTML..."
