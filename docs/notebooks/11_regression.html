@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width,minimum-scale=1">
 
   <title>Regression</title>
-  <meta name="description" content="Spatial regression ">
+  <meta name="description" content="Spatial regression Introduction NOTE: this chapter was written building from this Spatial Analysis note.What is spatial regression and why should I care? Reg...">
 
   <link rel="canonical" href="https://gdsbook.github.io/geographic-data-science/notebooks/11_regression.html">
   <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://gdsbook.github.io/geographic-data-science/feed.xml">
@@ -26,7 +26,7 @@
   <meta property="og:url"         content="https://gdsbook.github.io/geographic-data-science/notebooks/11_regression.html" />
 <meta property="og:type"        content="article" />
 <meta property="og:title"       content="Regression" />
-<meta property="og:description" content="Spatial regression " />
+<meta property="og:description" content="Spatial regression Introduction NOTE: this chapter was written building from this Spatial Analysis note.What is spatial regression and why should I care? Reg..." />
 <meta property="og:image"       content="https://gdsbook.github.io/geographic-data-science/images/logo/logo.png" />
 
 <meta name="twitter:card" content="summary">
@@ -41,11 +41,11 @@
   "headline":
     "Regression",
   "datePublished":
-    "2019-08-16T17:15:19+00:00",
+    "2019-08-23T15:56:11+00:00",
   "dateModified":
-    "2019-08-16T17:15:19+00:00",
+    "2019-08-23T15:56:11+00:00",
   "description":
-    "Spatial regression ",
+    "Spatial regression Introduction NOTE: this chapter was written building from this Spatial Analysis note.What is spatial regression and why should I care? Reg...",
   "author": {
     "@type": "Person",
     "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
@@ -1016,7 +1016,32 @@ initFunction(addCopyButtonToCodeCells);
             <div class="c-textbook__content">
               <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Spatial-regression">Spatial regression<a class="anchor-link" href="#Spatial-regression"> </a></h1>
+<h1 id="Spatial-regression">Spatial regression<a class="anchor-link" href="#Spatial-regression"> </a></h1><h2 id="Introduction">Introduction<a class="anchor-link" href="#Introduction"> </a></h2><p><strong>NOTE</strong>: this chapter was written building from this <a href="http://darribas.org/spa_notes/sp_eco.html">Spatial Analysis note</a>.</p>
+<h3 id="What-is-spatial-regression-and-why-should-I-care?"><em>What</em> is spatial regression and <em>why</em> should I care?<a class="anchor-link" href="#What-is-spatial-regression-and-why-should-I-care?"> </a></h3><p>Regression (and prediction more generally) provides us a perfect case to examine how spatial structure can help us understand and analyze our data. 
+Usually, spatial structure helps models in one of two ways. 
+The first (and most clear) way space can have an impact on our data is when the process <em>generating</em> the data is itself explicitly spatial.
+Here, think of something like the prices for single family homes. 
+It's often the case that individuals pay a premium on their house price in order to live in a better school district for the same quality house. 
+Alternatively, homes closer to noise or chemical polluters like waste water treatment plants, recycling facilities, or wide highways, may actually be cheaper than we would otherwise anticipate. 
+Finally, in cases like asthma incidence, the locations individuals tend to travel to throughout the day, such as their places of work or recreation, may have more impact on their health than their residential addresses. 
+In this case, it may be necessary to use data <em>from other sites</em> to predict the asthma incidence at a given site. 
+Regardless of the specific case at play, here, <em>geography is a feature</em>: it directly helps us make predictions about outcomes <em>because those outcomes obtain from geographical processes</em>.</p>
+<p>An alternative (and more skeptical understanding) reluctantly acknowledges geography's instrumental value. 
+Often, in the analysis of predictive methods and classifiers, we are interested in analyzing what we get wrong.
+This is common in econometrics; an analyst may be concerned that the model <em>systematically</em> mis-predicts some types of observations.
+If we know our model routinely performs poorly on a known set of observations or type of input, we might make a better model if we can account for this. 
+Among other kinds of error diagnostics, geography provides us with an exceptionally-useful embedding to assess structure in our errors.
+Mapping classification/prediction error can help show whether or not there are <em>clusters of error</em> in our data.
+If we <em>know</em> that errors tend to be larger in some areas than in other areas (or if error is "contagious" between observations), then we might be able to exploit this structure to make better predictions.</p>
+<p>Spatial structure in our errors might arise from when geography <em>should be</em> an attribute somehow, but we are not sure exactly how to include it in our model. 
+They might also arise because there is some <em>other</em> feature whose omission causes the spatial patterns in the error we see; if this additional feature were included, the structure would disappear. 
+Or, it might arise from the complex interactions and interdependences between the features that we have chosen to use as predictors, resulting in intrinsic structure in mis-prediction. 
+Most of the predictors we use in models of social processes contain <em>embodied</em> spatial information: patterning intrinsic to the feature that we get for free in the model. 
+If we intend to or not, using a spatially-patterned predictor in a model can result in spatially-patterned errors; using more than one can amplify this effect. 
+Thus, <em>regardless of whether or not the true process is explicitly geographic</em>, additional information about the spatial relationships between our observations or more information about nearby sites can make our predictions better.</p>
+<h3 id="The-Data:-San-Diego-AirBnB">The Data: San Diego AirBnB<a class="anchor-link" href="#The-Data:-San-Diego-AirBnB"> </a></h3><p>To learn a little more about how regression works, we'll examine some information about AirBnB in San Diego, CA. 
+This dataset contains house intrinsic characteristics, both continuous (number of beds as in <code>beds</code>) and categorical (type of renting or, in AirBnb jargon, property group as in the series of <code>pg_X</code> binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, <code>d2balboa</code> or neigbourhood id, <code>neighbourhood_cleansed</code>).</p>
+
 </div>
 </div>
 </div>
@@ -1052,40 +1077,6 @@ initFunction(addCopyButtonToCodeCells);
 
 
 
-</div>
-
-
-
-<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Introduction">Introduction<a class="anchor-link" href="#Introduction"> </a></h1><p><strong>NOTE</strong>: this chapter was written building from this <a href="http://darribas.org/spa_notes/sp_eco.html">Spatial Analysis note</a>.</p>
-<h2 id="What-is-spatial-regression-and-why-should-I-care?"><em>What</em> is spatial regression and <em>why</em> should I care?<a class="anchor-link" href="#What-is-spatial-regression-and-why-should-I-care?"> </a></h2><p>Regression (and prediction more generally) provides us a perfect case to examine how spatial structure can help us understand and analyze our data. 
-Usually, spatial structure helps models in one of two ways. 
-The first (and most clear) way space can have an impact on our data is when the process <em>generating</em> the data is itself explicitly spatial.
-Here, think of something like the prices for single family homes. 
-It's often the case that individuals pay a premium on their house price in order to live in a better school district for the same quality house. 
-Alternatively, homes closer to noise or chemical polluters like waste water treatment plants, recycling facilities, or wide highways, may actually be cheaper than we would otherwise anticipate. 
-Finally, in cases like asthma incidence, the locations individuals tend to travel to throughout the day, such as their places of work or recreation, may have more impact on their health than their residential addresses. 
-In this case, it may be necessary to use data <em>from other sites</em> to predict the asthma incidence at a given site. 
-Regardless of the specific case at play, here, <em>geography is a feature</em>: it directly helps us make predictions about outcomes <em>because those outcomes obtain from geographical processes</em>.</p>
-<p>An alternative (and more skeptical understanding) reluctantly acknowledges geography's instrumental value. 
-Often, in the analysis of predictive methods and classifiers, we are interested in analyzing what we get wrong.
-This is common in econometrics; an analyst may be concerned that the model <em>systematically</em> mis-predicts some types of observations.
-If we know our model routinely performs poorly on a known set of observations or type of input, we might make a better model if we can account for this. 
-Among other kinds of error diagnostics, geography provides us with an exceptionally-useful embedding to assess structure in our errors.
-Mapping classification/prediction error can help show whether or not there are <em>clusters of error</em> in our data.
-If we <em>know</em> that errors tend to be larger in some areas than in other areas (or if error is "contagious" between observations), then we might be able to exploit this structure to make better predictions.</p>
-<p>Spatial structure in our errors might arise from when geography <em>should be</em> an attribute somehow, but we are not sure exactly how to include it in our model. 
-They might also arise because there is some <em>other</em> feature whose omission causes the spatial patterns in the error we see; if this additional feature were included, the structure would disappear. 
-Or, it might arise from the complex interactions and interdependences between the features that we have chosen to use as predictors, resulting in intrinsic structure in mis-prediction. 
-Most of the predictors we use in models of social processes contain <em>embodied</em> spatial information: patterning intrinsic to the feature that we get for free in the model. 
-If we intend to or not, using a spatially-patterned predictor in a model can result in spatially-patterned errors; using more than one can amplify this effect. 
-Thus, <em>regardless of whether or not the true process is explicitly geographic</em>, additional information about the spatial relationships between our observations or more information about nearby sites can make our predictions better.</p>
-<h2 id="The-Data:-San-Diego-AirBnB">The Data: San Diego AirBnB<a class="anchor-link" href="#The-Data:-San-Diego-AirBnB"> </a></h2><p>To learn a little more about how regression works, we'll examine some information about AirBnB in San Diego, CA. 
-This dataset contains house intrinsic characteristics, both continuous (number of beds as in <code>beds</code>) and categorical (type of renting or, in AirBnb jargon, property group as in the series of <code>pg_X</code> binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, <code>d2balboa</code> or neigbourhood id, <code>neighbourhood_cleansed</code>).</p>
-
-</div>
-</div>
 </div>
 
 
@@ -1374,7 +1365,7 @@ Therefore, we might want to see whether or not our errors are higher or lower de
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_11_0.png"
+<img src="../images/notebooks/11_regression_10_0.png"
 >
 </div>
 
@@ -1500,7 +1491,7 @@ For us to determine whether this is the case, we might be interested in the full
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_16_0.png"
+<img src="../images/notebooks/11_regression_15_0.png"
 >
 </div>
 
@@ -1595,7 +1586,7 @@ For this example, we'll start off with a $KNN$ matrix where $k=1$, meaning we're
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_20_0.png"
+<img src="../images/notebooks/11_regression_19_0.png"
 >
 </div>
 
@@ -1670,7 +1661,7 @@ Recalling the <em>local Moran</em> statistics, we can identify certain areas whe
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_23_0.png"
+<img src="../images/notebooks/11_regression_22_0.png"
 >
 </div>
 
@@ -1747,7 +1738,7 @@ Indeed, this heterogeneity can have a large impact on how a process is understoo
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f25fbb11ef0&gt;</pre>
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f2cf6b40940&gt;</pre>
 </div>
 
 </div>
@@ -1758,7 +1749,7 @@ Indeed, this heterogeneity can have a large impact on how a process is understoo
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_26_1.png"
+<img src="../images/notebooks/11_regression_25_1.png"
 >
 </div>
 
@@ -1950,7 +1941,7 @@ Koenker-Bassett test             11         132.860           0.0000
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_32_0.png"
+<img src="../images/notebooks/11_regression_31_0.png"
 >
 </div>
 
@@ -2068,7 +2059,7 @@ using <code>statsmodels</code>; and two, with <code>PySAL</code>. First, we will
 ======================================================================================
 Model:                      OLS                    Adj. R-squared:           0.709    
 Dependent Variable:         log_price              AIC:                      7229.6640
-Date:                       2019-07-29 16:39       BIC:                      7599.1365
+Date:                       2019-08-07 16:37       BIC:                      7599.1365
 No. Observations:           6110                   Log-Likelihood:           -3559.8  
 Df Model:                   54                     F-statistic:              276.9    
 Df Residuals:               6055                   Prob (F-statistic):       0.00     
@@ -2520,7 +2511,7 @@ dtype: float64</pre>
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_46_0.png"
+<img src="../images/notebooks/11_regression_45_0.png"
 >
 </div>
 
@@ -2846,7 +2837,7 @@ interpreted also in a similar way. The spatial lag of each type of property
 of townhouses (same as with the binary variable, <code>pg_Townhouse</code>), they are all
 significant, suggesting our initial hypothesis on the role of the surrounding
 houses might indeed be at work here. As an illustration, being a condominium increases
-the price, on average, 11% ($\beta_{pg\_Condominium}=0.11$) with respect to the benchmark, which is set to apartments. More relevant to this section, any given house surrounded by condominiums <em>also</em> receives a price premium. In this case, the interpretation is slightly different because the variable is not a dummy but a proportion in the range [0, 1]. A 10% increase the proportion of neighbors that are condominiums translates into a 6% increase in the property house price ($\beta_{w_pg\_Condominium = 0.6$). This interpretation comes from the following: increasing the prevalence of 
+the price, on average, 11% ($\beta_{pg\_Condominium}=0.11$) with respect to the benchmark, which is set to apartments. More relevant to this section, any given house surrounded by condominiums <em>also</em> receives a price premium. In this case, the interpretation is slightly different because the variable is not a dummy but a proportion in the range [0, 1]. A 10% increase the proportion of neighbors that are condominiums translates into a 6% increase in the property house price ($\beta_{w_pg\_Condominium} = 0.6$). This interpretation comes from the following: increasing the prevalence of 
 condos in the area surrounding a house by ten percent is associated with a change in the
 log of the nightly rental price of about .06, which translates to around a 6% increase in the nightly
 rental price of the house. Similar interpretations can be derived for all other spatially lagged variables.</p>
@@ -2912,7 +2903,7 @@ N. of iterations    :           1                Step1c computed       :        
 ------------------------------------------------------------------------------------
             Variable     Coefficient       Std.Error     z-Statistic     Probability
 ------------------------------------------------------------------------------------
-            CONSTANT       4.4262033       0.0217088     203.8898740       0.0000000
+            CONSTANT       4.4262033       0.0217088     203.8898738       0.0000000
         accommodates       0.0695536       0.0063268      10.9934495       0.0000000
            bathrooms       0.1614101       0.0151312      10.6673765       0.0000000
             bedrooms       0.1739251       0.0146697      11.8560847       0.0000000
@@ -2923,7 +2914,7 @@ N. of iterations    :           1                Step1c computed       :        
             pg_House       0.0308334       0.0147100       2.0960849       0.0360747
             pg_Other       0.0861768       0.0254942       3.3802547       0.0007242
         pg_Townhouse      -0.0074515       0.0292873      -0.2544285       0.7991646
-              lambda       0.6448728       0.0186626      34.5543740       0.0000000
+              lambda       0.6448728       0.0186626      34.5543739       0.0000000
 ------------------------------------------------------------------------------------
 ================================ END OF REPORT =====================================
 </pre>
@@ -3120,7 +3111,7 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_60_0.png"
+<img src="../images/notebooks/11_regression_59_0.png"
 >
 </div>
 
@@ -3214,7 +3205,7 @@ We won't spend too much time on this theory specifically, but we can quickly and
 
 
 <div class="output_png output_subarea ">
-<img src="../images/notebooks/11_regression_63_0.png"
+<img src="../images/notebooks/11_regression_62_0.png"
 >
 </div>
 
@@ -3245,7 +3236,7 @@ This means that our over- and under-predictions are likely to cluster.</p>
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="References">References<a class="anchor-link" href="#References"> </a></h1><p>[1] Anselin, L. Spatial externalities, spatial multipliers, and spatial econometrics. <em>International Regional Science Review</em> 26, 156–166 (2003).</p>
+<h2 id="References">References<a class="anchor-link" href="#References"> </a></h2><p>[1] Anselin, L. Spatial externalities, spatial multipliers, and spatial econometrics. <em>International Regional Science Review</em> 26, 156–166 (2003).</p>
 <p>[2] Anselin, L. &amp; Rey, S. J. <em>Modern Spatial Econometrics in Practice, a Guide to GeoDa, GeoDaSpace, and PySAL</em>. (GeoDa Press, 2014).</p>
 <p>[3] Gelman, A., &amp; Hill, J. (2006). Data analysis using regression and multilevel/hierarchical models. Cambridge university press.</p>
 <p>[4] Gibbons, S., Overman, H. G., &amp; Pattacchini, E. Chapter 3 - Spatial Methods. <em>Handbook of Regional and Urban Economics, Vol. 5</em>. (Elsevier, 2015): 115-168.</p>

@@ -41,9 +41,9 @@
   "headline":
     "Local Spatial Autocorrelation",
   "datePublished":
-    "2019-08-16T17:15:19+00:00",
+    "2019-08-23T15:56:11+00:00",
   "dateModified":
-    "2019-08-16T17:15:19+00:00",
+    "2019-08-23T15:56:11+00:00",
   "description":
     "Local Spatial Autocorrelation ",
   "author": {
@@ -1197,8 +1197,8 @@ long          391 non-null float64
 lat           391 non-null float64
 st_areasha    391 non-null float64
 st_lengths    391 non-null float64
-geometry      391 non-null object
-dtypes: float64(4), int64(3), object(3)
+geometry      391 non-null geometry
+dtypes: float64(4), geometry(1), int64(3), object(2)
 memory usage: 33.6+ KB
 </pre>
 </div>
@@ -1256,8 +1256,8 @@ Data columns (total 4 columns):
 objectid     380 non-null int64
 lad16nm      380 non-null object
 Pct_Leave    380 non-null float64
-geometry     380 non-null object
-dtypes: float64(1), int64(1), object(2)
+geometry     380 non-null geometry
+dtypes: float64(1), geometry(1), int64(1), object(1)
 memory usage: 14.8+ KB
 </pre>
 </div>
@@ -1450,7 +1450,7 @@ memory usage: 14.8+ KB
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Motivating-Local-Spatial-Autocorrelation">Motivating Local Spatial Autocorrelation<a class="anchor-link" href="#Motivating-Local-Spatial-Autocorrelation"> </a></h3><p>To better understand the underpinning of local autorocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:</p>
+<h2 id="Motivating-Local-Spatial-Autocorrelation">Motivating Local Spatial Autocorrelation<a class="anchor-link" href="#Motivating-Local-Spatial-Autocorrelation"> </a></h2><p>To better understand the underpinning of local autorocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:</p>
 
 </div>
 </div>
@@ -1642,7 +1642,7 @@ memory usage: 14.8+ KB
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Local-Moran's-I">Local Moran's I<a class="anchor-link" href="#Local-Moran's-I"> </a></h3><p>So far we have classified each observation in the dataset depending on its value and that of its neighbors. This is only half way into identifying areas of unusual concentration of values. To know whether each of the locations is a <em>statistically significant</em> cluster of a given kind, we again need to compare it with what we would expect if the data were allocated in a completely random way. After all, by definition, every observation will be of one kind of another, based on the comparison above. However, what we are interested in is whether the strength with which the values are concentrated is unusually high.</p>
+<h2 id="Local-Moran's-I">Local Moran's I<a class="anchor-link" href="#Local-Moran's-I"> </a></h2><p>So far we have classified each observation in the dataset depending on its value and that of its neighbors. This is only half way into identifying areas of unusual concentration of values. To know whether each of the locations is a <em>statistically significant</em> cluster of a given kind, we again need to compare it with what we would expect if the data were allocated in a completely random way. After all, by definition, every observation will be of one kind of another, based on the comparison above. However, what we are interested in is whether the strength with which the values are concentrated is unusually high.</p>
 <p>This is exactly what LISAs are designed to do. A more detailed description of their statistical underpinnings is beyond the scope in this context, but we will provide some intuition about how they work. The core idea is to identify cases in which the comparison between the value of an observation and the average of its neighbors is either more similar (HH, LL) or dissimilar (HL, LH) than we would expect from pure chance. The mechanism to do this is similar to the one in the global Moran's I, but applied in this case to each observation, resulting then in as many statistics as original observations. The formal representation of the statistic can be written as:</p>
 $$
 I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_i z_i^2}{n}
@@ -1734,7 +1734,7 @@ $$<p>where $m_2$ is the second moment (variance) of the distribution of values i
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fab8f9e0ef0&gt;</pre>
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fa0d736d978&gt;</pre>
 </div>
 
 </div>
@@ -1786,9 +1786,13 @@ $$<p>where $m_2$ is the second moment (variance) of the distribution of values i
 
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Is&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">Is</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">db</span><span class="p">[</span><span class="s1">&#39;Is&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">Is</span>
 <span class="n">choropleth</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s1">&#39;Is&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
-        <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">ext</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ext</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lic</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -2389,7 +2393,7 @@ $$<p>where $m_2$ is the second moment (variance) of the distribution of values i
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Other-local-indices">Other local indices<a class="anchor-link" href="#Other-local-indices"> </a></h3><p>Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. <code>PySAL</code> includes Getis and Ord's $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:</p>
+<h2 id="Other-local-indices">Other local indices<a class="anchor-link" href="#Other-local-indices"> </a></h2><p>Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. <code>PySAL</code> includes Getis and Ord's $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:</p>
 
 </div>
 </div>
@@ -2557,7 +2561,7 @@ $$<p>where $m_2$ is the second moment (variance) of the distribution of values i
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Questions">Questions<a class="anchor-link" href="#Questions"> </a></h1><ol>
+<h2 id="Questions">Questions<a class="anchor-link" href="#Questions"> </a></h2><ol>
 <li>Do the same Local Moran analysis done for <code>Pct_Leave</code>, but using <code>Pct_Turnout</code>. Is there a geography to how involved people were in different places? Where was turnout percentage (relatively) higher or lower? </li>
 <li>Do the same Getis-Ord analysis done for <code>Pct_Leave</code>, but using <code>Pct_Turnout</code>. </li>
 <li>Local Moran statistics are premised on a few distributional assumptions. One well-recognized concern with Moran statistics is when they are estimated for <em>rates</em>. Rate data is distinct from other kinds of data because it embeds the relationship between two quantities: the event and the population. For instance, in the case of Leave voting, the "event" is a person voting leave, and the "population" could be the number of eligible voters, the number of votes cast, or the total number of people. This usually only poses a problem for analysis when the event outcome is somehow dependent on the population. <ol>
