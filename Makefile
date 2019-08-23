@@ -13,7 +13,8 @@ booksite: sync
 		echo 'Swapping full site for _site' && \
 		mv host/docs/_site host/tmp && \
 		rm -r host/docs && \
-		mv host/tmp host/docs"
+		mv host/tmp host/docs && \
+		cp host/CNAME host/docs/CNAME"
 	#docker run --rm --user root -e NB_UID=1001 -e NB_GID=100 -v ${PWD}:/home/jovyan/host gdsbook/stack:3.0 start.sh sh -c "\
 		#sed -i -e 's/\r$$//' host/infrastructure/booksite/build.sh && \
 		#bash ./host/infrastructure/booksite/build.sh"
