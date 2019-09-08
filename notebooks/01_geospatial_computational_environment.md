@@ -15,34 +15,38 @@ jupyter:
 
 # Computational Tools for Geographic Data Science
 
-In this tutorial, we will introduce the main tools we will be working with
-throughout the rest of the book. Although very basic and seemingly abstract,
-everything showed here will become the basis on top of which we will build more
-sophisticated (and fun) tasks. But, before, let us get to know the tools that
-will power our data science. 
+- Open Science
+    - Computational notebooks
+    - Open source packages
+    - Reproducible platforms
+- This book
+    - Jupyter Notebooks and JupyterLab
+    - PySAL and the Pydata stack
+    - Docker
 
-## Open Source Software
+## Open Science
 
-This course will introduce you to a series of computational tools that make the
-life of the Data Scientist possible, and much easier. All of them are [open-
-source](https://en.wikipedia.org/wiki/Open_source), which means the creators of
-these pieces of software have made available the source code for people to use
-it, study it, modify it, and re-distribute it. This has produced a large eco-
-system that today represents the best option for scientific computing, and is
-used widely both in industry and academia. Thanks to this, this course can be
-taught with entirely freely available tools that you can install in any of your
-computers.
+### Computational notebooks
 
-If you want to learn more about open-source and free software, here
-are a few links:
+### Open source packages
 
-* **[Video]**: brief
-[explanation](https://www.youtube.com/watch?v=Tyd0FO0tko8) of open source.
-* **[Book]** [The Cathedral and the Bazaar](https://en.wikipedia.org/wiki/The_Cathedral_and_the_Bazaar): classic
-book, freely available, that documents the benefits and history of open-source
-software.
+### Reproducible platforms
 
-## `Jupyter` Notebook
+## This book
+
+### Jupyter Notebooks and JupyterLab
+
+### PySAL and the Pydata stack
+
+### Docker
+
+---
+
+[Original chapter from GDS course. Left here for now to pick bits as needed]
+
+## This Book
+
+### `Jupyter` Notebook
 
 The main computational tool you will be using during this course is the [Jupyter
 notebook](http://jupyter.org/). Notebooks are a convenient way to thread text,
@@ -50,7 +54,7 @@ code and the output it produces in a simple file that you can then share, edit
 and modify. You can think of notebooks as the Word document of Data Scientists,
 just much nicer.
 
-### Start a notebook
+#### Start a notebook
 
 Jupyter notebook is an app that must be started from a *command line*, a text-based
 interface that allows you to interact directly with programs through written
@@ -92,7 +96,7 @@ Whenever you want to save your work, you can save the notebook using
 (text, code, and the output from code) is saved into a single `.ipynb` file
 that you can open again to edit and run, share with others, or publish online. 
 
-### Cells
+#### Cells
 
 The main building block of Jupyter notebooks are called *cells*. These are 
 chunks of content that is all of the same "type." Cells
@@ -119,7 +123,7 @@ shortcuts. If you press the 'escape' key and then the 'b' key (or 'a' key), a ne
 created below (or above) the current cell. There is a whole bunch of shortcuts you can explore by
 pressing 'escape' and 'h' (press 'escape' again to leave the help).
 </div>
-### Code and its output
+#### Code and its output
 
 A particularly useful feature of notebooks is that you
 can save, in the same place, the code you use to generate any output (tables,
@@ -135,7 +139,7 @@ print("Hello, world!")
 Note how the notebook automatically colors the Python code in the code block?
 This makes the code much more readable and understandable. More on Python below.
 
-### Markdown
+#### Markdown
 
 Text cells in a notebook a *markup* language, [Github Flavored
 Markdown](https://help.github.com/articles/github-flavored-markdown/), to 
@@ -144,7 +148,7 @@ that it is written in plain, flat text, but is rendered into something that look
 more structured. The notebook does this automatically, rendering the more 
 visually appealing version any markdown you write. Let's see some examples:
 
-#### Text formatting
+##### Text formatting
 
 Bold an italic text can be obtained using asterisks. For example:
 
@@ -162,7 +166,7 @@ is rendered:
 
 This is *italic*.
 
-#### Lists
+##### Lists
 
 You can create bullet lists. For example:
 
@@ -214,7 +218,7 @@ You can also nest lists:
 
 This creates many opportunities to combine document elements in a nice way. 
 
-#### Hyperlinks
+##### Hyperlinks
 
 Markdown allows for hyperlinks to be inserted into text inline using a 
 combination of brackets and parentheses. For example:
@@ -225,7 +229,7 @@ becomes
 
 Consult [Wikipedia](https://www.wikipedia.org/) for more information.
 
-#### headings
+##### headings
 
 including `#` before a line causes it to render a heading.
 
@@ -262,7 +266,7 @@ More information about markdown is provided by:
 
 [https://help.github.com/articles/github-flavored-markdown](https://help.github.com/articles/github-flavored-markdown)
 
-### Rich content in a notebook
+#### Rich content in a notebook
 
 Notebooks can also include rich content from the web. For this, we need to
 import the `display` module from the
@@ -322,7 +326,7 @@ A more thorough exploration of these forms of rich content is available in
 [this](http://jeffskinnerbox.me/notebooks/ipython's-rich-display-system.html)
 notebook.
 
-### Exercise to work on your own
+#### Exercise to work on your own
 
 Try to reproduce, using markdown and the different tools the notebook affords
 you, the following Wikipedia entry:
