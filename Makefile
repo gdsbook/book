@@ -15,5 +15,5 @@ bookserve:
 	# serve docs folder locally
 	bash ./infrastructure/booksite/build.sh && \
 	cd ./docs && \
-	bundle exec jekyll serve --work 0.0.0.0
+	bundle exec jekyll serve --host 0.0.0.0
 
