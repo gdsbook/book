@@ -15,16 +15,87 @@ jupyter:
 
 # Computational Tools for Geographic Data Science
 
-- Open Science
-    - Computational notebooks
-    - Open source packages
-    - Reproducible platforms
-- This book
-    - Jupyter Notebooks and JupyterLab
-    - PySAL and the Pydata stack
-    - Docker
+```python
+from IPython.display import Image
+```
+
+**NOTE**: part of this chapter is based on ["Lecture 2 - GDS'19"](https://darribas.org/gds19/notes/Class_02.html).
+
+This chapter provides an overview of the scientific and computational context
+in which the book is framed. First, we will explore debates around Open
+Science, its origins, and how the computational community is responding to
+these. In particular, we will discuss computational notebooks, open-source
+packages, and reproducible platforms. Having covered the conceptual
+background, we will turn to a practical introduction of the key infrastructure
+that makes up this book: Jupyter Notebooks and JupyterLab, Python packages,
+and a containerised platform to run the book.
 
 ## Open Science
+
+The term Open Science has grown in popularity in recent years. Although it is
+used in a variety of contexts with slightly different meanings, a general
+sense of the intuition behind Open Science is the understanding that the
+scientific process, at its core, is meant to be transparent and accessible.
+In this context, the focus on openess is not to be seen as an "add-on" that
+changes the general approach only cosmetically, but as a key component of what
+makes science Science. Indeed the scientific process, understood as one where
+we "build on the shoulders of Giants" and progress through dialectic, can only
+work properly is there is enough transparency and accessibility that the
+community can access and study both results _and_ the process that created
+them.
+
+To better understand the argument behind modern Open Science, it is useful
+to take a historical perspective. The idea of openness was engrained at the
+core of early scientists. In fact that was one of the key differentials with
+their contemporary "alchemists" which, in many respects, were working on
+similar topics albeit in a much more opaque way (XXXcite?XXX). Scientists
+would record the field or lab experiments on paper notebooks or diaries,
+providing enough detail to, first, remember what they had done and how they
+had arrived at their results, but also to ensure other members of the
+scientific community could study, understand, and replicate their findings.
+One of the most famous of these annotations are Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars:
+
+```python
+url = ("https://upload.wikimedia.org/wikipedia/"\
+       "commons/c/ca/Medicean_Stars.png")
+Image(url)
+```
+
+There is a growing perception that much of the original ethos of Science to
+operate through transparency and accessibility has been lost. A series of
+recent big profile scandals have even prompted some to call it a state of
+crisis [XXXref?XXX]. Why is there a sense that Science is no longer open and
+transparent in the way Galileo's diaries were? Although certinaly not the only
+or even the most important one, technology plays a role. The process and workflow
+of original scientists relied on a set of "analog" technologies for which an
+"analog" parallel set of tools was developed to keep track and document
+progress. Hence the paper notebooks where biologists drew species, or chemists
+painstakingly detailed each step they took in the lab. In the case of social
+sciences, this was probably easier in the sense that quantitative data was not
+abundant and much of the analysis relied either on math or small datasets
+which could be documented in the original publications.
+However Science has evolved a great deal since then, and much of the
+experimental workflow is dominated by a variety of machinery, most
+prominently by computers. Most of the Science done today, at some
+point in the process, takes the form of operations mediated through software
+programs. In this context, the traditional approach of writing down in a paper
+notebook every step followed becomes dislocated from the medium in which most of
+the scientific work takes place.
+
+The current state in Science in terms of transparency and openness is prompting
+for action (XXXref?XXX). On the back of these debates, the term
+"reproducibility" is also gaining traction. Again, this is a rather general
+term but, in one variant or another, its definition alludes to the need of
+scientific results to be accompanied by enough information and detail so they
+could be reproduced by a third party. Since much of modern science is mediated
+through computers, reproducibility thus poses important challenges for the
+tools and practices the scientific community builds and relies on. Although
+there is a variety of approaches, in this book we focus on what we see as the
+emerging consensus. This framework enables to record and express entire
+workflows in a way that is both transparent and that fosters efficiency and
+collaboration. We structure its components along thre main layers, namely
+computational notebooks, open source packages, and what we term reproducible
+platforms.
 
 ### Computational notebooks
 
@@ -32,13 +103,13 @@ jupyter:
 
 ### Reproducible platforms
 
-## This book
+## The (computational) building blocks of this book
 
 ### Jupyter Notebooks and JupyterLab
 
 ### PySAL and the Pydata stack
 
-### Docker
+### Containerised platform
 
 ---
 
