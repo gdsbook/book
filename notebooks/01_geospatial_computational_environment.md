@@ -82,7 +82,7 @@ programs. In this context, the traditional approach of writing down in a paper
 notebook every step followed becomes dislocated from the medium in which most of
 the scientific work takes place.
 
-The current state in Science in terms of transparency and openness is prompting
+The current state of Science in terms of transparency and openness is prompting
 for action (XXXref?XXX). On the back of these debates, the term
 "reproducibility" is also gaining traction. Again, this is a rather general
 term but, in one variant or another, its definition alludes to the need of
@@ -93,11 +93,38 @@ tools and practices the scientific community builds and relies on. Although
 there is a variety of approaches, in this book we focus on what we see as the
 emerging consensus. This framework enables to record and express entire
 workflows in a way that is both transparent and that fosters efficiency and
-collaboration. We structure its components along thre main layers, namely
-computational notebooks, open source packages, and what we term reproducible
-platforms.
+collaboration.
+
+We structure our approach to reproducibility in three main layers that build on
+each other. At the top of this "stack" are _computational notebooks_; supporting
+the code written in notebooks are _open source packages_; and making possible to
+transfer computations across different hardware devices and/or architectures
+are what we term _reproducible platforms_. Let us delve into each of them with
+a bit more detail before we practically show how this book is built on this
+infrastructure (and how you too can reproduce it at home!).
 
 ### Computational notebooks
+
+Computational notebooks are the XXIst Century sibling of Galileo's notebooks.
+Like their predecessor, they allow researchers, (data) scientists, and
+computational practitioners to record their practices and steps taken as they
+are going about their work; unlike the pen and paper approach, computational
+notebooks are fully integrated in the technological paradigm in which research
+and computation takes place today. For these reasons, they are rapidly becoming the
+modern-day version of the traditional academic paper, the main vehicle on
+which (computational) knowledge is created, shared, and consumed.
+Computational notebooks (or notebooks, from now on) are also spreading their
+reach into industry practices, being used, for example, in reports.
+
+All implementations of notebooks share a series of 
+core features. A notebook comprises a single file that stores narrative text,
+computer code, and the output produced by code. All in a single file.
+
+- Single file that threads narrative text, code, and the output it creates
+- Allows for interactive development
+- Can be exported to other formats (interoperability)
+- How it's used in general (cite 10 rules paper)
+- In this book they are used for writing chapters
 
 ### Open source packages
 
