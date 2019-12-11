@@ -106,7 +106,7 @@ infrastructure (and how you too can reproduce it at home!).
 ### Computational notebooks
 
 Computational notebooks are the XXIst Century sibling of Galileo's notebooks.
-Like their predecessor, they allow researchers, (data) scientists, and
+Like their predecessors, they allow researchers, (data) scientists, and
 computational practitioners to record their practices and steps taken as they
 are going about their work; unlike the pen and paper approach, computational
 notebooks are fully integrated in the technological paradigm in which research
@@ -117,22 +117,109 @@ Computational notebooks (or notebooks, from now on) are also spreading their
 reach into industry practices, being used, for example, in reports.
 
 All implementations of notebooks share a series of 
-core features. A notebook comprises a single file that stores narrative text,
-computer code, and the output produced by code. All in a single file.
+core features. First, a notebook comprises a single file that stores narrative text,
+computer code, and the output produced by code. Allowing to store both
+narrative and computational work in a _single file_ means that the entire
+workflow can be recorded and documented in the same place, without having to 
+resort to ancillary devices (like a paper notebook). A second feature of
+notebooks is that they allow for _interactive work_. Modern computational work
+benefits from the ability to try, fail, tinker and iterate quickly until a
+working solution is found. Notebooks embody this quality and enable the user
+to work interactively. Whether the computation takes place on a laptop or
+on a data center, notebooks provide the same interface for interactive
+computing, lowering the cognitive load require to scale up. Third, notebooks
+have _interoperability_ built in. The notebook format is designed for
+recording and sharing computational work, but not necessarily for other stages
+of the research cycle. To widen the range of possibilities and
+applications, notebooks are designed to be easily convertible into other
+formats. For example, while most notebook file formats require a
+specific app to be opened and edited, it is easy to convert them into pdf
+files that can be read, printed, and annotated without the need of technical
+software.
 
-- Single file that threads narrative text, code, and the output it creates
-- Allows for interactive development
-- Can be exported to other formats (interoperability)
-- How it's used in general (cite 10 rules paper)
-- In this book they are used for writing chapters
+Notebooks represent the top layer on the reproducibility stack. They can capture
+in detail and reproducible ways work that is specific about a given project: 
+what data is used, how it is read and linked; what algorithms are used, how they
+are combined; how each figure in the project is generated, etc. Guidance on how
+to write notebooks in efficient ways is also emerging (e.g. [Rule et al.,
+2019](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1007007)).
 
 ### Open source packages
 
+To make notebooks an efficient medium to communicate computational work, it is
+important that they are concise and streamlined. One way to achieve this goal is
+to only include the parts of the work that are unique to the application being
+recorded in the notebook, and to avoid duplication. From this it follows that
+if a piece of code is used several times across the notebook, or even across
+several notebooks, that functionality should probably be taken out of the
+notebook and into a centralised place where it can be accessed whenever
+needed. In other words, such functionality should be turned into a package.
+
+Packages are modular, flexible and repurposable compilations of code. Unlike
+notebooks, they do not capture specific applications but abstractions of
+functionality that can be used in a variety of contexts. Their function is to
+avoid duplication "downstream" by encapsulating functionality in a way that
+can be accessed and used in a variety of contexts without having to re-write
+code every time it is needed. In doing so, packages (or libraries, an
+interchangeable term in this context) embody the famous hacker moto of D.R.Y.:
+"don't repeat yourself".
+
+Open source packages are packages whose code is available to inspect, modify
+and redistribute. They fulfill the same functions as any package in terms of
+modularising code, but they also enable transparency as any user can
+access the exposed functionality _and_ the underlying code that
+generates it. For this reason, for code packages to serve Open Science and
+reproducibility, they need to be open source.
+
 ### Reproducible platforms
+
+For computational work to be fully reproducible and open, it needs to be
+possible to replicate in a different (computational) environment than where it
+was originally created. This means that it is not sufficient to specify in a
+notebook the code that creates the final outputs, and to rely on open-source
+packages for more general functionality; the environment specified by those
+two components needs to be reproducible too. This statement, which might seem
+obvious and straightforward, is not always so due to the scale and complexity
+of modern computational workflows and infrastructures. The old saying of "if
+it works on my laptop, what's the problem?" is not enough any more, it needs
+to work on "any laptop" (or computer).
+
+Reproducible platforms encompass the more general aspects
+that enable open source packages and notebooks to be reproducible. A
+reproducible platform thus specifies the infrastructure required to ensure a
+notebook that uses certain open source packages can be successfully executed.
+Infrastructure, in this context, relates to lower-level aspects of the
+software stack, such as the operating system, and even some hardware
+requirements, such as the use of specific chips such as graphics processing
+units (GPU). Additionally, a reproducible platform will also specify the
+versions of packages that are required to recreate the results presented in a
+notebook.
+
+Unlike open source packages, the notion of reproducible platforms is not as
+widespread and generally agreed. Its necessity has only become apparent more
+recently, and work on providing them in standardised ways is less developed
+than in the case of notebook technology or code packaging and distribution.
+Nevertheless, some inroads are being made. One area which has experienced
+significant progress in recent years and hold great promise in this context is
+container technology. Containers are a lightweight version of a virtual
+machine, which is a program that enables an entire operating system to run
+compartimentalised on top of another operating system. Containers allow to
+encapsulate an entire environment (or platform) in a format that is easy to
+transfer and reproduce in a variety of computational contexts. The most
+popular technology for containers nowadays is Docker, and the opportunities
+that it provides to build transparent and transferrable infrastructure for
+data science are starting to be explored ([Cook, 2017](https://www.apress.com/gp/book/9781484230114)).
 
 ## The (computational) building blocks of this book
 
 ### Jupyter Notebooks and JupyterLab
+
+In this book, we use notebooks as the main format in which to create and
+distribute its content. Each chapter is written as a separate notebook and can
+be run interactively. At the same time, we collect all chapters and convert
+them into different formats for "static consumption" (ie. read only), either
+in HTML format for the web, or PDF to be printed in the physical copy of the
+book.
 
 ### PySAL and the Pydata stack
 
