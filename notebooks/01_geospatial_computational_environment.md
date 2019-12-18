@@ -499,31 +499,76 @@ supported and is not likely to disappear any time soon; second, it has also
 become a standard in the world of data science, which means foundational
 projects such as Jupyter create official containers for these packages; and
 third, because of the two previous reasons, building the platform that
-supports the book in Docker allows us to easily integrated in other contexts
-such as the cloud or local servers, which in turn has benefits in terms of
-easily and efficiently making the book available in more contexts.
+supports the book in Docker allows us to easily integrate it, for example, in
+the cloud or local servers, which in turn has benefits to
+easily and efficiently make the book available in more contexts.
 
 Docker allows us to create a "container" that includes all the tools required
 to access the content of the book interactively. But, what exactly is a 
-container? There are several ways to describe a container, from very technical
-to more intuitive ones. In this context, we will focus on a more general
-understanding of what a container does rather than on the technical details
-behind its magic. One can think of a container as, well, a box that includes
+container? There are several ways to describe it, from very technical
+to more intuitive ones. In this context, we will focus on a general
+understanding rather than on the technical details behind its magic. One can
+think of a container as, well, a box that includes
 _everything_ that is required to run a certain set of software. This box can
-be moved around, from one machine to another one, and the computations it can
-carry out will remain exactly the same. In fact, the content of the box
+be moved around, from machine to machine, and the computations it
+executes will remain exactly the same. In fact, the content of the box
 remains exactly the same, bit by bit. When we download a container into a
 computer, be it a laptop or a data center, we are not performing an install of
 the software it contains from the usual channels, for the platform on which we
 are going to run it on. Instead, we are downloading the software in the form
-that it was installed when the container was originally built and packaged,
-and for the operating system that was also packaged into the container
-originally. This is the real advantage of containers. Build once, run
-everywhere. For the experienced reader, this might sound very much like the
-older syster of containers: virtual machines. Although there are similarities
-between both technologies, containers are more lightweight and can be run much
-more swiftly than virtual machines.
+that was installed when the container was originally built and packaged,
+and for the operating system that was also packaged originally. This is the real
+advantage: build once, run everywhere. For the experienced reader,
+this might sound very much like their older syster: virtual machines. Although
+there are similarities between both technologies, containers are more lightweight 
+and can be run much more swiftly than virtual machines.
 
+"Containers are great but, how can I install and run one?", you might be
+asking yourself at this point. First, you will need to install Docker on your
+machine. This assumes you have administrative rights (ie. you can install
+software). If that is the case, you can go to the Docker website 
+([https://www.docker.com/])(https://www.docker.com/)) and install the version
+that suits your operating system. Note that, although container
+technology is Linux-based, Docker provides tools to run it smoothly in macOS
+and Windows. An install guide for Docker is beyond the scope of this chapter,
+but there is much documentation available on the web to this end. We
+personally recommend the official documentation 
+([https://docs.docker.com/](https://docs.docker.com/)), but you might find other
+resources that suit your needs better.
+
+Once you have Docker up and running on your computer, you can download the
+image we have prepared for the book. This operation is akin to installing the
+software you need to interact with the book, so you will only need to run it once.
+However, keep in mind that the image is relatively large (around 7GB), so you
+will need the space on your machine as well as a good internet connection. If
+you check those two boxes, you are ready to go. Here are the steps to take:
+
+1. Open a terminal or shell. How to do this will depend on your operating
+   system:
+
+   - `Windows`: we recommend PowerShell. Type "PowerShell" on the startup menu
+     and, when it comes up, hit enter. This will open a terminal for you.
+   - `macOS`: use the `Teminal.app`. You can find it on the Applications
+     folder, within the Utilities subfolder.
+   - `Linux`: if you are running Linux, you probably already have a terminal
+     application of preference. Almost any Linux distribution comes with a
+     terminal or shell app built in.
+
+2. Download, or "pull", our container. For this run on the terminal the
+   following command:
+
+   ```shell
+   docker pull gdsbook/stack
+   ```
+
+That's it! Once the command above completes, you have all the software you
+need to interact with this book.
+
+You can now run the container with the following command:
+
+    ```shell
+    docker run --rm -ti -p 8888:8888 -v ${PWD}:/home/jovyan/work gdsbook/stack
+    ```
 
 - Requirements/limitations
 - Use our built container
