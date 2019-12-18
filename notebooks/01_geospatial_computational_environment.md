@@ -520,8 +520,15 @@ that was installed when the container was originally built and packaged,
 and for the operating system that was also packaged originally. This is the real
 advantage: build once, run everywhere. For the experienced reader,
 this might sound very much like their older syster: virtual machines. Although
-there are similarities between both technologies, containers are more lightweight 
-and can be run much more swiftly than virtual machines.
+there are similarities between both technologies, containers are more 
+lightweight and can be run much more swiftly than virtual machines.
+This box that is isolated interacts with the rest of the computer through
+several links that connect the two. In the case of this book, since JupyterLab
+is a client-server application, the server runs inside the container and we
+connect to it through two main "doors": one, through the browser, we will
+access the main Lab interface; and two, we will "mount" a folder inside the
+container so we can use software inside the container to edit files that are
+stored outside in the host machine.
 
 "Containers are great but, how can I install and run one?", you might be
 asking yourself at this point. First, you will need to install Docker on your
@@ -535,6 +542,8 @@ but there is much documentation available on the web to this end. We
 personally recommend the official documentation 
 ([https://docs.docker.com/](https://docs.docker.com/)), but you might find other
 resources that suit your needs better.
+
+#### Run the book's container
 
 Once you have Docker up and running on your computer, you can download the
 image we have prepared for the book. This operation is akin to installing the
@@ -570,12 +579,72 @@ You can now run the container with the following command:
     docker run --rm -ti -p 8888:8888 -v ${PWD}:/home/jovyan/work gdsbook/stack
     ```
 
-- Requirements/limitations
-- Use our built container
-- How to obtain a built container
-- How to run the container
-- It's a box inside a computer, but it interfaces through two routes
-- Troubleshooting (if spaces in the path, if permissions)
+Let's unpick the command so we understand everything that is going on here to
+get further insight into how the container works:
+
+    - `docker run`: Docker does a lot of things, to communicate that we want to
+      _run_ a new container, we need specify it.
+    - `--rm`: this flag will ensure the container is removed when you close
+      it. This in turn makes sure every time you run it again, you start
+      afresh with the exact same set up.
+    - `-ti`: this flag further ensures that the container is not run in the
+      background but in an _i_nteractive mode.
+    - `-p 8888:8888`: with this, we ensure we forward the _port_ from inside
+      the container out to the host machine (ie. your laptop). This step is
+      crucial because it is the way that allows us to interact with the server
+      and for Jupyter to "send" JupyterLab across so we can access it on our
+      browser.
+    - `-v ${PWD}:/home/jovyan/work`: similarly, this flag "mounts" the folder
+      from where the command is being run in the terminal (`${PWD}`) into the
+      container so it is visible and editable from inside the container. Such
+      folder will be available at the container's `work` folder.
+    - `gdsbook/stack`: finally, we also need to specify which image we want to
+      run. In this case, we run the image created for this book.
+
+The command above will generate output that will look, more or less like the
+following:
+
+```shell
+Executing the command: jupyter notebook
+[I 14:45:34.681 NotebookApp] Writing notebook server cookie secret to /home/jovyan/.local/share/jupyter/runtime/notebook_cookie_secret
+[I 14:45:36.504 NotebookApp] Loading IPython parallel extension
+[I 14:45:36.730 NotebookApp] JupyterLab extension loaded from /opt/conda/lib/python3.7/site-packages/jupyterlab
+[I 14:45:36.731 NotebookApp] JupyterLab application directory is /opt/conda/share/jupyter/lab
+[I 14:45:36.738 NotebookApp] [Jupytext Server Extension] NotebookApp.contents_manager_class is (a subclass of) jupytext.TextFileContentsManager already - OK
+[I 14:45:37.718 NotebookApp] Serving notebooks from local directory: /home/jovyan
+[I 14:45:37.718 NotebookApp] The Jupyter Notebook is running at:
+[I 14:45:37.719 NotebookApp] http://0fb71d146102:8888/?token=ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c
+[I 14:45:37.719 NotebookApp]  or http://127.0.0.1:8888/?token=ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c
+[I 14:45:37.719 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 14:45:37.725 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///home/jovyan/.local/share/jupyter/runtime/nbserver-6-open.html
+    Or copy and paste one of these URLs:
+        http://0fb71d146102:8888/?token=ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c
+     or http://127.0.0.1:8888/?token=ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c
+```
+
+With this, you can then head to your browser of preference (ideally Mozilla
+Firefox or Google Chrome) and point it to `localhost:8888`. This should render
+a landing page that looks approximately like this one:
+
+```python
+path = ("../figures/jupyter_landing_page.png")
+display.Image(path)
+```
+
+To access the lab, copy the token from the terminal (in the example above,
+that would be `ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c`), enter it on
+the box and click on "Log in". Now you are in!
+
+#### Troubleshooting
+
+Containers make computations more transferable, but there is always a
+possibility of things not working for several reasons, mistakes and typos.
+Here we list a few we have found:
+
+[**DAB**: should we list running problems here or in a blog post?]
 
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
