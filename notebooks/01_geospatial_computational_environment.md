@@ -485,5 +485,52 @@ help(np.arange)
 
 ### Containerised platform
 
+As mentioned [earlier in this chapter](#Reproducible-platforms), 
+reproducible platforms encompass technology and practices that help 
+reproduce a set of analyses or computational work in a different environment
+than that in which it was produced. There are several approaches to implement
+this concept in a practical setting. For this book, we use a package called
+Docker. Docker is based on an obscure feature of Linux called containers,
+which allows to run processes in an isolated way within the operating system.
+We decided to settle on Docker for several reasons but, in particular, for
+three core ones: first, it is widely adopted as an industry standard (e.g.
+almost any website today runs on Docker containers), which means it is well
+supported and is not likely to disappear any time soon; second, it has also
+become a standard in the world of data science, which means foundational
+projects such as Jupyter create official containers for these packages; and
+third, because of the two previous reasons, building the platform that
+supports the book in Docker allows us to easily integrated in other contexts
+such as the cloud or local servers, which in turn has benefits in terms of
+easily and efficiently making the book available in more contexts.
+
+Docker allows us to create a "container" that includes all the tools required
+to access the content of the book interactively. But, what exactly is a 
+container? There are several ways to describe a container, from very technical
+to more intuitive ones. In this context, we will focus on a more general
+understanding of what a container does rather than on the technical details
+behind its magic. One can think of a container as, well, a box that includes
+_everything_ that is required to run a certain set of software. This box can
+be moved around, from one machine to another one, and the computations it can
+carry out will remain exactly the same. In fact, the content of the box
+remains exactly the same, bit by bit. When we download a container into a
+computer, be it a laptop or a data center, we are not performing an install of
+the software it contains from the usual channels, for the platform on which we
+are going to run it on. Instead, we are downloading the software in the form
+that it was installed when the container was originally built and packaged,
+and for the operating system that was also packaged into the container
+originally. This is the real advantage of containers. Build once, run
+everywhere. For the experienced reader, this might sound very much like the
+older syster of containers: virtual machines. Although there are similarities
+between both technologies, containers are more lightweight and can be run much
+more swiftly than virtual machines.
+
+
+- Requirements/limitations
+- Use our built container
+- How to obtain a built container
+- How to run the container
+- It's a box inside a computer, but it interfaces through two routes
+- Troubleshooting (if spaces in the path, if permissions)
+
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
