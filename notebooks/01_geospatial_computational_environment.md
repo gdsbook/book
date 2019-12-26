@@ -15,258 +15,261 @@ jupyter:
 
 # Computational Tools for Geographic Data Science
 
-In this tutorial, we will introduce the main tools we will be working with
-throughout the rest of the book. Although very basic and seemingly abstract,
-everything showed here will become the basis on top of which we will build more
-sophisticated (and fun) tasks. But, before, let us get to know the tools that
-will power our data science. 
+```python
+from IPython.display import Image
+```
 
-## Open Source Software
+**NOTE**: part of this chapter is based on ["Lecture 2 - GDS'19"](https://darribas.org/gds19/notes/Class_02.html).
 
-This course will introduce you to a series of computational tools that make the
-life of the Data Scientist possible, and much easier. All of them are [open-
-source](https://en.wikipedia.org/wiki/Open_source), which means the creators of
-these pieces of software have made available the source code for people to use
-it, study it, modify it, and re-distribute it. This has produced a large eco-
-system that today represents the best option for scientific computing, and is
-used widely both in industry and academia. Thanks to this, this course can be
-taught with entirely freely available tools that you can install in any of your
-computers.
+This chapter provides an overview of the scientific and computational context
+in which the book is framed. First, we will explore debates around Open
+Science, its origins, and how the computational community is responding to
+these. In particular, we will discuss computational notebooks, open-source
+packages, and reproducible platforms. Having covered the conceptual
+background, we will turn to a practical introduction of the key infrastructure
+that makes up this book: Jupyter Notebooks and JupyterLab, Python packages,
+and a containerised platform to run the book.
 
-If you want to learn more about open-source and free software, here
-are a few links:
+## Open Science
 
-* **[Video]**: brief
-[explanation](https://www.youtube.com/watch?v=Tyd0FO0tko8) of open source.
-* **[Book]** [The Cathedral and the Bazaar](https://en.wikipedia.org/wiki/The_Cathedral_and_the_Bazaar): classic
-book, freely available, that documents the benefits and history of open-source
+The term Open Science has grown in popularity in recent years. Although it is
+used in a variety of contexts with slightly different meanings, a general
+sense of the intuition behind Open Science is the understanding that the
+scientific process, at its core, is meant to be transparent and accessible.
+In this context, the focus on openess is not to be seen as an "add-on" that
+changes the general approach only cosmetically, but as a key component of what
+makes science Science. Indeed the scientific process, understood as one where
+we "build on the shoulders of Giants" and progress through dialectic, can only
+work properly is there is enough transparency and accessibility that the
+community can access and study both results _and_ the process that created
+them.
+
+To better understand the argument behind modern Open Science, it is useful
+to take a historical perspective. The idea of openness was engrained at the
+core of early scientists. In fact that was one of the key differentials with
+their contemporary "alchemists" which, in many respects, were working on
+similar topics albeit in a much more opaque way (XXXcite?XXX). Scientists
+would record the field or lab experiments on paper notebooks or diaries,
+providing enough detail to, first, remember what they had done and how they
+had arrived at their results, but also to ensure other members of the
+scientific community could study, understand, and replicate their findings.
+One of the most famous of these annotations are Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars:
+
+```python
+url = ("https://upload.wikimedia.org/wikipedia/"\
+       "commons/c/ca/Medicean_Stars.png")
+Image(url)
+```
+
+There is a growing perception that much of the original ethos of Science to
+operate through transparency and accessibility has been lost. A series of
+recent big profile scandals have even prompted some to call it a state of
+crisis [XXXref?XXX]. Why is there a sense that Science is no longer open and
+transparent in the way Galileo's diaries were? Although certinaly not the only
+or even the most important one, technology plays a role. The process and workflow
+of original scientists relied on a set of "analog" technologies for which an
+"analog" parallel set of tools was developed to keep track and document
+progress. Hence the paper notebooks where biologists drew species, or chemists
+painstakingly detailed each step they took in the lab. In the case of social
+sciences, this was probably easier in the sense that quantitative data was not
+abundant and much of the analysis relied either on math or small datasets
+which could be documented in the original publications.
+However Science has evolved a great deal since then, and much of the
+experimental workflow is dominated by a variety of machinery, most
+prominently by computers. Most of the Science done today, at some
+point in the process, takes the form of operations mediated through software
+programs. In this context, the traditional approach of writing down in a paper
+notebook every step followed becomes dislocated from the medium in which most of
+the scientific work takes place.
+
+The current state of Science in terms of transparency and openness is prompting
+for action (XXXref?XXX). On the back of these debates, the term
+"reproducibility" is also gaining traction. Again, this is a rather general
+term but, in one variant or another, its definition alludes to the need of
+scientific results to be accompanied by enough information and detail so they
+could be reproduced by a third party. Since much of modern science is mediated
+through computers, reproducibility thus poses important challenges for the
+tools and practices the scientific community builds and relies on. Although
+there is a variety of approaches, in this book we focus on what we see as the
+emerging consensus. This framework enables to record and express entire
+workflows in a way that is both transparent and that fosters efficiency and
+collaboration.
+
+We structure our approach to reproducibility in three main layers that build on
+each other. At the top of this "stack" are _computational notebooks_; supporting
+the code written in notebooks are _open source packages_; and making possible to
+transfer computations across different hardware devices and/or architectures
+are what we term _reproducible platforms_. Let us delve into each of them with
+a bit more detail before we practically show how this book is built on this
+infrastructure (and how you too can reproduce it at home!).
+
+### Computational notebooks
+
+Computational notebooks are the XXIst Century sibling of Galileo's notebooks.
+Like their predecessors, they allow researchers, (data) scientists, and
+computational practitioners to record their practices and steps taken as they
+are going about their work; unlike the pen and paper approach, computational
+notebooks are fully integrated in the technological paradigm in which research
+and computation takes place today. For these reasons, they are rapidly becoming the
+modern-day version of the traditional academic paper, the main vehicle on
+which (computational) knowledge is created, shared, and consumed.
+Computational notebooks (or notebooks, from now on) are also spreading their
+reach into industry practices, being used, for example, in reports.
+
+All implementations of notebooks share a series of 
+core features. First, a notebook comprises a single file that stores narrative text,
+computer code, and the output produced by code. Allowing to store both
+narrative and computational work in a _single file_ means that the entire
+workflow can be recorded and documented in the same place, without having to 
+resort to ancillary devices (like a paper notebook). A second feature of
+notebooks is that they allow for _interactive work_. Modern computational work
+benefits from the ability to try, fail, tinker and iterate quickly until a
+working solution is found. Notebooks embody this quality and enable the user
+to work interactively. Whether the computation takes place on a laptop or
+on a data center, notebooks provide the same interface for interactive
+computing, lowering the cognitive load require to scale up. Third, notebooks
+have _interoperability_ built in. The notebook format is designed for
+recording and sharing computational work, but not necessarily for other stages
+of the research cycle. To widen the range of possibilities and
+applications, notebooks are designed to be easily convertible into other
+formats. For example, while most notebook file formats require a
+specific app to be opened and edited, it is easy to convert them into pdf
+files that can be read, printed, and annotated without the need of technical
 software.
 
-## `Jupyter` Notebook
+Notebooks represent the top layer on the reproducibility stack. They can capture
+in detail and reproducible ways work that is specific about a given project: 
+what data is used, how it is read and linked; what algorithms are used, how they
+are combined; how each figure in the project is generated, etc. Guidance on how
+to write notebooks in efficient ways is also emerging (e.g. [Rule et al.,
+2019](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1007007)).
 
-The main computational tool you will be using during this course is the [Jupyter
-notebook](http://jupyter.org/). Notebooks are a convenient way to thread text,
-code and the output it produces in a simple file that you can then share, edit
-and modify. You can think of notebooks as the Word document of Data Scientists,
-just much nicer.
+### Open source packages
 
-### Start a notebook
+To make notebooks an efficient medium to communicate computational work, it is
+important that they are concise and streamlined. One way to achieve this goal is
+to only include the parts of the work that are unique to the application being
+recorded in the notebook, and to avoid duplication. From this it follows that
+if a piece of code is used several times across the notebook, or even across
+several notebooks, that functionality should probably be taken out of the
+notebook and into a centralised place where it can be accessed whenever
+needed. In other words, such functionality should be turned into a package.
 
-Jupyter notebook is an app that must be started from a *command line*, a text-based
-interface that allows you to interact directly with programs through written
-commands. This is how you can fire up a terminal:
+Packages are modular, flexible and repurposable compilations of code. Unlike
+notebooks, they do not capture specific applications but abstractions of
+functionality that can be used in a variety of contexts. Their function is to
+avoid duplication "downstream" by encapsulating functionality in a way that
+can be accessed and used in a variety of contexts without having to re-write
+code every time it is needed. In doing so, packages (or libraries, an
+interchangeable term in this context) embody the famous hacker moto of D.R.Y.:
+"don't repeat yourself".
 
-* If you are
-on a **Windows** computer, you can start the "Anaconda Command Prompt" from the
-Start menu. 
-* On a **Mac**, use the Terminal.app, in Utilities. 
-* In **Linux**, use any of the terminals available, such as GNOME Terminal, 
-Konsole, or XTerm, or any other terminal you find easy to use. 
+Open source packages are packages whose code is available to inspect, modify
+and redistribute. They fulfill the same functions as any package in terms of
+modularising code, but they also enable transparency as any user can
+access the exposed functionality _and_ the underlying code that
+generates it. For this reason, for code packages to serve Open Science and
+reproducibility, they need to be open source.
 
-Once the terminal is opened, you should be greeted with a text interface, like other
-common text entry fields. There, type the following command and press enter:
+### Reproducible platforms
 
-`source activate gds`
+For computational work to be fully reproducible and open, it needs to be
+possible to replicate in a different (computational) environment than where it
+was originally created. This means that it is not sufficient to specify in a
+notebook the code that creates the final outputs, and to rely on open-source
+packages for more general functionality; the environment specified by those
+two components needs to be reproducible too. This statement, which might seem
+obvious and straightforward, is not always so due to the scale and complexity
+of modern computational workflows and infrastructures. The old saying of "if
+it works on my laptop, what's the problem?" is not enough any more, it needs
+to work on "any laptop" (or computer).
 
-**NOTE**: ignore `source` if you are on Windows and
-simply type `activate gds`.
+Reproducible platforms encompass the more general aspects
+that enable open source packages and notebooks to be reproducible. A
+reproducible platform thus specifies the infrastructure required to ensure a
+notebook that uses certain open source packages can be successfully executed.
+Infrastructure, in this context, relates to lower-level aspects of the
+software stack, such as the operating system, and even some hardware
+requirements, such as the use of specific chips such as graphics processing
+units (GPU). Additionally, a reproducible platform will also specify the
+versions of packages that are required to recreate the results presented in a
+notebook.
 
-Then, after you run that command, launch `Jupyter` by typing the following 
-command and pressing enter again:
+Unlike open source packages, the notion of reproducible platforms is not as
+widespread and generally agreed. Its necessity has only become apparent more
+recently, and work on providing them in standardised ways is less developed
+than in the case of notebook technology or code packaging and distribution.
+Nevertheless, some inroads are being made. One area which has experienced
+significant progress in recent years and holds great promise in this context is
+container technology. Containers are a lightweight version of a virtual
+machine, which is a program that enables an entire operating system to run
+compartimentalised on top of another operating system. Containers allow to
+encapsulate an entire environment (or platform) in a format that is easy to
+transfer and reproduce in a variety of computational contexts. The most
+popular technology for containers nowadays is Docker, and the opportunities
+that it provides to build transparent and transferrable infrastructure for
+data science are starting to be explored ([Cook, 2017](https://www.apress.com/gp/book/9781484230114)).
 
-`jupyter notebook`
+## The (computational) building blocks of this book
 
-This should bring up a web browser window
-with a home page that shows a list of files and folders in the location where the 
-`jupyter notebook` was started. It should look something like like this:
+### Jupyter Notebooks and JupyterLab
 
-![Jupyter home](figs/lab01_jupyter_home.png)
+#### Notebooks
 
-Clicking on the folders in the file browser, go to the folder where you have 
-placed the `lab_01.ipynb` file for this tutorial and click on it. 
-This will open the notebook on a different tab. You are now in the notebook, which
-you can both run like a computer program and edit like a word document. 
+This book uses notebooks as the main format in which its content is created and
+distributed. Each chapter is written as a separate notebook and can
+be run interactively. At the same time, we collect all chapters and convert
+them into different formats for "static consumption" (ie. read only), either
+in HTML format for the web, or PDF to be printed in a physical copy.
+This section will present the specific flavor of notebooks we use, and
+illustrate its building blocks in a way that allows you to then follow the
+rest of the book interactively.
 
-Whenever you want to save your work, you can save the notebook using
-`File -> Save and Checkpoint`. Everything you do in the notebook 
-(text, code, and the output from code) is saved into a single `.ipynb` file
-that you can open again to edit and run, share with others, or publish online. 
+Our choice of notebook is Jupyter (XXXcite?XXX). A Jupyter notebook is a plain
+text file with the `.ipynb` extension, which means that it is an easy file to
+move around, sync, and track over time. Internally, it is structured as a
+JSON file, so they also integrate well with a host of modern web technologies.
+The atomic element that makes up a notebook is called a _cell_. Cells are 
+consistent chunks of content that contain either text or code. In fact, a
+notebook can be thought of as an ordered collection of cells. Cells can be of
+two types: _text_ and _code_.
 
-### Cells
+#### Cells
 
-The main building block of Jupyter notebooks are called *cells*. These are 
-chunks of content that is all of the same "type." Cells
-can be of two types:
+Text cells contain text written in the Markdown markup language. Markdown is a
+popular set of rules to create rich content (e.g. headers, lists, links) from
+flat, plain text files without being as complex and sophisticated as other
+typesetting approaches. The notebook will then render markdown
+automatically. For more demanding or specific tasks, text cells can further 
+integrate $\LaTeX$ notation. This means we can write most forms of narrative
+relying on markdown, which is more straighforward, and rely on $\LaTeX$ for
+more sophisticated parts, such as equations. Covering Markdown rules in detail
+is beyond the scope of this chapter, but the interested reader can inspect the
+[official Github specification](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax) 
+of the so-called Github-flavored markdown, the one adopted by the notebook.
 
-* **Text**, like the one where this is written.
-*
-**Code**, like the following one below:
+Code cells are text boxes that contain computer code. In the case of this
+book, all code will be Python, but Jupyter notebooks are flexible enough to
+work with other languages (see the offical list of Jupyter-supported kernels
+[here](https://github.com/jupyter/jupyter/wiki/Jupyter-kernels)).
+Aesthetically, code cells look as follows:
 
 ```python attributes={"classes": [], "id": "", "n": "1"}
 # This is a code cell
 ```
 
-You can create a new cell by clicking `Insert` -> `Cell Above`/`Below` in the
-top menu. By default, this will be a code cell, but you can change that on the
-`Cell` -> `Cell Type` menu. Choose `Markdown` for a text cell. Once a new cell
-is created, you can edit it by clicking on it, which will create the cursor bar
-inside for you to start typing. Cells can also be cut, pasted, moved, inserted,
-and deleted in a notebook. Think of them like computational paragraphs that can
-be mixed around to form larger or longer thoughts.
+A code cell can be run to execute the code it contains. If such code produces
+an output (e.g. a table or a figure), this will be printed as a cell output.
+Every time a cell is run, its counter will go up once.
 
-<div class="alert alert-info" style="font-size:110%"> <b>Pro tip</b>: cells can also be created with
-shortcuts. If you press the 'escape' key and then the 'b' key (or 'a' key), a new cell will be
-created below (or above) the current cell. There is a whole bunch of shortcuts you can explore by
-pressing 'escape' and 'h' (press 'escape' again to leave the help).
-</div>
-### Code and its output
+#### Rich Content
 
-A particularly useful feature of notebooks is that you
-can save, in the same place, the code you use to generate any output (tables,
-figures, etc.). As an example, the cell below contains a snipet of Python that
-returns a printed statement. This statement is then printed below and recorded
-in the notebook as output:
-
-```python attributes={"classes": [], "id": "", "n": "2"}
-print("Hello, world!")
-```
-
-<!-- #region -->
-Note how the notebook automatically colors the Python code in the code block?
-This makes the code much more readable and understandable. More on Python below.
-
-### Markdown
-
-Text cells in a notebook a *markup* language, [Github Flavored
-Markdown](https://help.github.com/articles/github-flavored-markdown/), to 
-express many commonly-used structures in documents. One strength of Markdown is 
-that it is written in plain, flat text, but is rendered into something that looks
-more structured. The notebook does this automatically, rendering the more 
-visually appealing version any markdown you write. Let's see some examples:
-
-#### Text formatting
-
-Bold an italic text can be obtained using asterisks. For example:
-
-`This is **bold**.`
-
-is rendered:
-
-This is **bold**.
-
-and
-
-`This is *italic*.`
-
-is rendered:
-
-This is *italic*.
-
-#### Lists
-
-You can create bullet lists. For example:
-
-`* Item 1`
-`* Item 2`
-`* ...`
-
-will produce:
-* Item 1
-* Item 2
-* ...
-
-Or, you can create numbered lists using
-
-
-`1. First element`
-`1. Second element`
-`1. ...`
-
-which renders into:
-
-1. First element
-1. Second element
-1.
-...
-
-Note that you don't have to write the actual number of the element. Markdown will
-keep track of how many elements are in a given list and number them appropriately.
-So, if you want, you can simply use `1.` for each element while writing, and Markdown
-will render it into a simple sequence of numbered entries. 
-
-You can also nest lists:
-
-`*First unnumbered element, which can be split into:`
-``
-`  1. One numbered element`
-`  2. Another numbered element`
-``
-`* Second element.`
-`* ...`
-
-* First unnumbered element, which can be split into:
-
-  1. One numbered element
-  2. Another numbered element
-
-* Second element.
-* ...
-
-This creates many opportunities to combine document elements in a nice way. 
-
-#### Hyperlinks
-
-Markdown allows for hyperlinks to be inserted into text inline using a 
-combination of brackets and parentheses. For example:
-
-`Consult [Wikipedia](https://www.wikipedia.org/) for more information.`
-
-becomes
-
-Consult [Wikipedia](https://www.wikipedia.org/) for more information.
-
-#### headings
-
-including `#` before a line causes it to render a heading.
-
----
-`# This is Header 1`
-
-Turns into:
-
-# This is Header 1
-
----
-
-`## This is Header
-2`
-
-Turns into:
-
-## This is Header 2
-
----
-
-`### This is Header 3`
-
-Turns into:
-### This is Header 3
-
-And so on.
-
----
-
-More information about markdown is provided by:
-
-[https://help.github.com/articles/markdown-basics](https://help.github.com/articles/markdown-basics)
-
-[https://help.github.com/articles/github-flavored-markdown](https://help.github.com/articles/github-flavored-markdown)
-
-### Rich content in a notebook
-
-Notebooks can also include rich content from the web. For this, we need to
-import the `display` module from the
-<!-- #endregion -->
+Code cells in a notebook also enable the embedding of rich (web) content. The
+`IPython` package provides methods to access as series of media and bring them
+directly to the notebook environment. Let us see how this can be done
+practically. To be able to demonstrate it, we will need to _import_ the
+`display` module (skip to the next section if you want to learn more about
+importing packages):
 
 ```python attributes={"classes": [], "id": "", "n": "3"}
 import IPython.display as display
@@ -299,8 +302,8 @@ display.HTML("""<table>
 ```
 
 Note that this opens the door for including a large number of elements from the
-web, since an `iframe` of any other website can also be included. For example, 
-interactive maps can be shown from within an `iframe`:
+web, since an `iframe` of any other website can also be included. Of more relevance
+for this book, for example, we can embed interactive maps with an `iframe`:
 
 ```python attributes={"classes": [], "id": "", "n": "6"}
 osm = """
@@ -309,44 +312,64 @@ osm = """
 display.HTML(osm)
 ```
 
-Sound content can also be included by providing an `iframe` over an audio website:
+Finally, using a similar approach, we can also load and display local 
+images, which we will so throughout the book. For that, we use the `Image`
+method:
 
-```python attributes={"classes": [], "id": "", "n": "7"}
-sound = '''
-<iframe width="100%" height="450" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/178720725&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe>
-'''
-display.HTML(sound)
+```python
+path = ("../infrastructure/booksite/logo/"\
+        "logo_transparent-bg.png")
+display.Image(path)
 ```
 
-A more thorough exploration of these forms of rich content is available in
-[this](http://jeffskinnerbox.me/notebooks/ipython's-rich-display-system.html)
-notebook.
+#### Jupyter Lab
 
-### Exercise to work on your own
+Our recommended way to interact with Jupyter notebooks is through Jupyter Lab.
+Jupyter Lab is an interface to the Jupyter ecosystem that brings together
+several tools for data science into a consistent front that enables the user
+to accomplish most of her workflows. It is built as a web app following a
+client-server architechture. This means the computation is decoupled from the
+interface. This decoupling allows each to be hosted in the most convenient and
+efficient solution. For example, you might be following this book
+interactively in your laptop. In this case, it is likely both the server that
+runs all the Python computations you specify in code cells (what we call the
+_kernel_) is running locally, and you are interacting with it through your
+browser of preference. But the same technology could power a situation where
+your kernel is running in a cloud data center, and you interact with Jupyter
+Lab from a tablet.
 
-Try to reproduce, using markdown and the different tools the notebook affords
-you, the following Wikipedia entry:
+Jupyter Lab' interface has three main areas:
 
-[https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream](https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream).
-
-```python attributes={"classes": [], "id": "", "n": "8"}
-display.IFrame('https://en.wikipedia.org/wiki/Chocolate_chip_cookie_dough_ice_cream', 
-              700, 500)
+```python
+path = ("../figures/jupyter_lab.png")
+display.Image(path)
 ```
 
-Pay special attention to getting the bold, italics, links, headlines and lists
-correctly formated, but don't worry too much about the overall layout. Bonus if
-you manage to insert the image as well!
+At the top we find a menu bar (red box in the figure) that allows us to open,
+create and interact with files, as well as to modify the appearance and 
+behaviour of Jupyter Lab. The largest real estate is occupied by the main
+pane (blue box). By default, there is an option to create a new notebook, open
+a console, a terminal session, a (markdown) text file, and a window for
+contextual help. Jupyter Lab provides a flexible workspace in that the user
+can open as many windows as needed and rearrange them as desired by dragging
+and dropping. Finally, on the left of the main pane we find the side pane
+(green box),
+which has several tabs that toggle on and off different auxilliary information.
+By default, we find a file browser based on the folder from where the session
+has been launched. But we can also switch to a pane that lists all the
+currently open kernels and terminal sessions, a list of all the commands in the
+menu (the command _palette_), and a list of all the open windows inside the
+lab.
 
-## Python
+### Python and Open Source Packages
+
+#### Python
 
 The main component of this book relies on the [Python](https://www.python.org/)
 programming language. Python is a [high-
 level](https://en.wikipedia.org/wiki/High-level_programming_language)
 programming language used widely in data science. To give a couple of examples of its
-relevance, it powers [most of the company Dropbox's main product](https://www.quora.com/How-
-does-dropbox-use-python-What-features-are-implemented-in-it-any-tangentially-
-related-material?share=1), and is also heavily
+relevance, it powers [most of the company Dropbox's main product](https://www.quora.com/How-does-dropbox-use-python-What-features-are-implemented-in-it-any-tangentially-related-material?share=1), and is also heavily
 [used](https://www.python.org/about/success/usa/) to control satellites at NASA.
 A great deal of Science is also done in Python, from [research in
 astronomy](https://www.youtube.com/watch?v=mLuIB8aW2KA) at UC Berkley, to
@@ -380,7 +403,8 @@ prototype code quickly and directly. The rest of this tutorial covers
 some of the basic elements of the language, from conventions like how to comment
 your code, to the basic data structures available.
 
-### Python libraries
+
+#### Open Source Packages
 
 The standard Python language includes some data structures (such as lists and
 dictionaries) and allows many basic mathematical operations (e.g. sums, differences,
@@ -400,109 +424,39 @@ action needed, you can use Python as a calculator:
 ```
 
 However, the strength of Python as a data analysis tool comes from additional
-software that adds functionality to the language itself. This additional software
-provides many more useful data structures and functions for data science. These
-come in the form of packages, also known as libraries, need to be installed separately 
-and must be explicitly included in order to be used. 
-In this course, we will be using many of the core libraries of the "PyData stack",
+packages, software that adds functionality to the language itself.
+In this book, we will introduce and use many of the core libraries of the "PyData stack",
 a set of heavily-used libraries that make Python a fully-fledged
-system for Data Science. We will introduce each package only as we need it for
-specific tasks. For now, though, let us have a look at the foundational library,
-[numpy](http://www.numpy.org/) (short for **num**erical **Py**thon). Bringing 
-additional Python libraries into a session is called *importing* them, and is 
-done using the `import` statement:
+system for (Geographic) Data Science. We will introduce each package as we use them 
+throughout the chapters. For now, we will show how an installed package can be
+loaded into a session so its functionality can be accessed. This loading of
+a package, in Python, is called _importing_. We will use the library `geopandas` as
+an example. The simplest way to import a library is by typing the following:
 
 ```python attributes={"classes": [], "id": "", "n": "12"}
-import numpy as np # we rename it in the session as `np` by convention
+import geopandas
 ```
 
-Note how we `import numpy`, introducing it into our Python session, *and* rename it
-in the session, suggesting that `numpy` be known as `np`, which is shorter and more convenient.
+This brings on the session the entire library of methods and clases, which we
+can call by prepending `geopandas.` to the name of the function we want.
+Sometimes, however, we will want to shorten the name to save keystrokes. This
+approach, called _aliasing_, can be done as follows:
 
-Note also how comments work in Python:
-everything in a line *after* the `#` sign is ignored by Python when it evaluates
-the code. This allows you to insert comments that Python will ignore but that
-can help make your code more clear.
-
-Once imports are out of the way, let us start exploring what we can do with
-`numpy`. One of the most basic tasks is to create sequences of numbers:
-
-```python attributes={"classes": [], "id": "", "n": "13"}
-seq = np.arange(10)
-seq
+```python attributes={"classes": [], "id": "", "n": "12"}
+import geopandas as gpd
 ```
 
-The first thing to note is that, in line 1, we create the sequence by calling
-the function `arange` and assign it to an object called `seq`. `seq` is just a
-name we choose to call the result of the computation `np.arange(10)`. There are 
-many valid names we can use for variables in Python. Nearly any name is valid in Python, so
-long as they:
-- start with an alphabetical letter (e.g. `seq1` is valid, but `1seq` is not)
-- have no additional characters aside from alphanumerics and underscores
-Finally, the last line of the cell above prints the contents of `seq`. In Jupyter 
-notebooks, the contents of the last line in a cell will be shown if they are not
-assigned to a variable. 
+Now, every time we want to access a function from `geopandas`, all we need to
+type before the function's name is `gpd.`. However sometimes we rather import
+only parts of a library. For example, we might only want to use one function.
+In this case, it might be cleaner and more efficient to bring the function
+itself only:
 
-Another interesting feature of Python is how it keeps track of what functionality
-comes from `numpy`, and what functionality dos not. Since we
-are calling a `numpy` function (`arange`), we put `np.` in front of `arange`. This
-means that we are using the `arange` function from inside the `np` *namespace*.
-This means that the function `arange` comes explicitly from `numpy`. To find out how
-necessary this is, you can try generating the sequence without `np`:
-
-```python attributes={"classes": [], "id": "", "n": "14"}
-# NOTE: comment out to run the cell
-#seq = arange(10)
+```python attributes={"classes": [], "id": "", "n": "12"}
+from geopandas import read_file
 ```
 
-What you get instead is an error, also called a "traceback". In particular,
-Python is telling that it cannot find a function named `arange` in the core
-library. This is because that particular function is only available in `numpy`,
-so we have to look under `np` to find `np.arange`. 
-
-### Variables
-
-A fundamental feature of Python is the ability to assign a name to different "things",
-or objects. These objects are also sometimes called "variables" as well. We have already seen
-one variable (`seq`) in the example above but let's make things more explicit. 
-For example, an object can be a single number.:
-
-```python attributes={"classes": [], "id": "", "n": "15"}
-a = 3
-```
-
-Now, we've assigned an object (the number `3`) to a variable, `a`. 
-
-Words or sentences can also be objects. In Python, we call this kind of text a "string,"
-and they are marked off from other text using either single or double quotation marks:
-
-```python attributes={"classes": [], "id": "", "n": "16"}
-b = 'Hello World'
-```
-
-You can check what "type" of object is stored in a variable using the `type` function:
-
-```python attributes={"classes": [], "id": "", "n": "17"}
-type(a)
-```
-
-Here, `int` is short for "integer" which, roughly speaking, means a whole number. 
-In most cases, a number with a decimal in Python is called a "floating-point number,"
-or a "float" for short:
-
-```python attributes={"classes": [], "id": "", "n": "18"}
-c = 1.5
-type(c)
-```
-
-As mentioned, what we understand as text in a wide sense (spaces and other
-symbols count as well) is called a "string" (`str` for short):
-
-```python attributes={"classes": [], "id": "", "n": "19"}
-type(b)
-```
-
-### Help
+This allows us to use `read_file` directly in the current session.
 
 A very handy feature of Python is the ability to access on-the-spot help for functions. 
 This means that you can check what a function is supposed to do, or how to use it
@@ -510,16 +464,17 @@ from directly inside your Python session. Of course, this
 also works handsomely inside a notebook, too. There are a couple of ways to access
 the help. 
 
-Take the `numpy` function `arange` that we have used above. The
-easiest way to check its help dialog from within the notebook is to add a question
-mark after it:
+Take the `read_file` function we have imported above. One way to check its help
+dialog from within the notebook is to add a question mark after it:
 
 ```python attributes={"classes": [], "id": "", "n": "20"}
-np.arange?
+read_file?
 ```
 
 As you can see, this brings up a sub-window in the browser with all the
-information you need.
+information you need. Additionally, Jupyter Lab offers the "Contextual Help"
+box in the initial launcher. If you open it, the help of every function where
+your cursor lands will be dynamically displayed in the contextual help.
 
 If, for whatever reason, you needed to print that info
 into the notebook itself, you can use the following `help` function instead:
@@ -528,471 +483,168 @@ into the notebook itself, you can use the following `help` function instead:
 help(np.arange)
 ```
 
-### Control flow (a.k.a. `for` loops and `if` statements)
-
-Although this book is not intend to be a comprehensive introduction to computer
-programming or to general purpose Python (check the references for that, in
-particular Allen Downey's
-[book](http://www.greenteapress.com/thinkpython/thinkpython.html)), it is
-important to be aware of two building blocks of almost any computer program:
-`for` loops and `if` statements. It is possible that you will never require them
-for this book. This book is mainly based on existing methods and
-functions, but it is always useful to know how `for` and `if` work to be able to
-recognize them. They can also come in very handy in cases where you some extra
-functionality out of standard methods. So, let us have a look
-at these two flow control methods. 
-
-#### `for` loops
-
-Loops allow you to repeat a particular action or set of actions. In this case, 
-`for` loops allow you repeat an action over every element in a collection. For 
-example, you could print your name ten times without having to type it yourself every single time:
-
-```python attributes={"classes": [], "id": "", "n": "22"}
-for i in np.arange(10):
-    print('my name')
-```
-
-A couple of features in the loop are useful to note:
-
-1. Loops are conducted *over* a sequence. In this
-particular case, we loop over the sequence of ten numbers created by `np.arange(10)`.
-1. In
-every step, for every element of the sequence in this case, you repeat an
-action. Here we are printing the same text, `my name`.
-1. Each of the elements you loop over can be accessed inside of 
-the loop as well. Although we did not use this feature in the loop above, this 
-can be extremely useful in some cases. For example, we could iterate over a list of
-names:
-
-```python attributes={"classes": [], "id": "", "n": "23"}
-names = ['Jane', 'Robert', 'Elise', 'Reilly']
-for name in names:
-    print("Whose turn is it?", name)
-```
-
-One more thing to note: it often makes sense to describe what you are iterating
-over directly like we did in `for name in names`. But, remember, `name` is arbitrary, 
-and we could have called it any valid Python variable name.
-
-#### `if` statements
-
-We have just seen how `for` loops allow you to repeat an
-action over a sequence. However, sometimes you might not want to take an action
-every single time. Often, we might want to run a bit of code only if some conditions
-are satisfied. This "branching" behavior is provided by `if` statements, which
-select or restrict actions to only run when a condition (or many conditions) are met.
-
-For example, if you think of the loops written above,
-we might want to skip players whose name begins with 'R':
-
-```python attributes={"classes": [], "id": "", "n": "25"}
-for name in names:
-    if (name.startswith("R")):
-        print("We are skipping ", name)
-```
-
-We can also take an action only when our `if` statement is *not* satisfied by 
-using an `else` statement. 
-Together, these are sometimes called "ifelse" statements. For example,
-we could skip players whose names begin with "R", but allow everyone else to go:
-
-```python attributes={"classes": [], "id": "", "n": "26"}
-for name in names:
-    if (name.startswith("R")):
-        print("We are skipping ", name)
-    else:
-        print(name, "gets to go")
-```
-
-### Data structures
-
-The standard python you can access without importing any additional libraries
-contains a few core data structures that are very handy to know. Most of data
-analysis is done on top of other structures specifically designed for the
-purpose (`numpy` arrays and `pandas` dataframes, mostly. See the following sessions
-for more details), but some understanding of these core Python structures is
-very useful. In this context, we will look at three: values, lists, and
-dictionaries.
-
-#### Values
-These are the most basic elements to organize data and information
-in Python. You can think of them as numbers (integers or floats) or words
-(strings). Typically, these are the elements that will be stored in lists and
-dictionaries.
-
-An integer is a whole number:
-
-```python attributes={"classes": [], "id": "", "n": "27"}
-i = 5
-type(i)
-```
-
-A float is a number that allows for decimals:
-
-```python attributes={"classes": [], "id": "", "n": "28"}
-f = 5.2
-type(f)
-```
-
-Note that a float can also not have decimals and still be stored as such:
-
-```python attributes={"classes": [], "id": "", "n": "29"}
-fw = 5.
-type(fw)
-```
-
-However, they are different representations:
-
-```python attributes={"classes": [], "id": "", "n": "30"}
-f == fw
-```
-
-#### Lists
-A list is an ordered sequence of values that can be of mixed types.
-They are represented between squared brackets (`[]`) and, although not very
-efficient in memory terms, are very flexible and useful to "put things
-together".
-
-For example, the following list of integers:
-
-```python attributes={"classes": [], "id": "", "n": "31"}
-l = [1, 2, 3, 4, 5]
-l
-```
-
-```python attributes={"classes": [], "id": "", "n": "32"}
-type(l)
-```
-
-Or the following mixed one:
-
-```python attributes={"classes": [], "id": "", "n": "33"}
-m = ['a', 'b', 5, 'c', 6, 7]
-m
-```
-
-Lists can be queried and sliced. For example, the first element can be retrieved
-by:
-
-```python attributes={"classes": [], "id": "", "n": "34"}
-l[0]
-```
-
-Or the second to the fourth:
-
-```python attributes={"classes": [], "id": "", "n": "35"}
-m[1:4]
-```
-
-Lists can be added:
-
-```python attributes={"classes": [], "id": "", "n": "36"}
-l + m
-```
-
-New elements added:
-
-```python attributes={"classes": [], "id": "", "n": "37"}
-l.append(4)
-l
-```
-
-Or modified:
-
-```python attributes={"classes": [], "id": "", "n": "38"}
-l[1]
-```
-
-```python attributes={"classes": [], "id": "", "n": "39"}
-l[1] = 'two'
-l[1]
-```
-
-```python attributes={"classes": [], "id": "", "n": "40"}
-l
-```
-
-#### Dictionaries
-Dictionaries are unordered collections of "keys" and
-"values". A key, which can be of any kind, is the element associated with a
-"value", which can also be of any kind. Dictionaries are used when order is not
-important but you need fast and easy lookup. They are expressed in curly
-brackets, with keys and values being linked through columns.
-
-For example, we
-can think of a dictionary to store a series of names and the ages of the people
-they represent:
-
-```python attributes={"classes": [], "id": "", "n": "41"}
-ages = {'Ana': 24, 'John': 20, 'Li': 27, 'Ivan': 40, 'Tali':33}
-ages
-```
-
-```python attributes={"classes": [], "id": "", "n": "42"}
-type(ages)
-```
-
-Dictionaries can then be queried and values retrieved using their
-keys. For example, if we quickly want to know Li's age:
-
-```python attributes={"classes": [], "id": "", "n": "43"}
-ages['Li']
-```
-
-Similarly to lists, you can modify and assign new values:
-
-```python attributes={"classes": [], "id": "", "n": "44"}
-ages['Juan'] = 73
-ages
-```
-
-Using this property, you can create entirely empty dictionaries and fill them 
-with values later:
-
-```python attributes={"classes": [], "id": "", "n": "45"}
-newdict = {}
-newdict['key1'] = 1
-newdict['key2'] = 2
-newdict
-```
-
-### Functions
-
-The last part of this whirlwind tour on Python relates to functions, sometimes
-also called methods. Functions are the most basic unit of re-usable code.
-So far, we have only seen Python code that must be copied in its entirety in order
-to be used again. However, as we will see in more detail later in
-the course, one of the main reasons why you want to use Python for data
-analysis instead of a point-and-click graphical interface like SPSS is that you 
-can easily reuse code and re-run analyses easily. Code that does one thing can
-be written *one time*, in one place, and run wherever and whenever it is needed.
-Methods/functions help us accomplish this by encapsulating pieces of code that
-perform a one specific task, protecting them from changes that we might make 
-in other Python sessions or in other analyses. 
-Thus, a function provides a clean, separate space to describe one small piece
-of a larger analysis, and can simply be plugged into any other analysis. 
-
-We have already *used*
-methods here. When we call `np.arange`, we are using the `arange` method in `numpy`. 
-Now, we will see how to *create* a method of our own that performs one specific task we want.
-For example, let us create a very simple method to reproduce the first
-loop we created above:
-
-```python attributes={"classes": [], "id": "", "n": "46"}
-def run_simple_loop():
-    for i in np.arange(10):
-        print(i)
-    return None
-```
-
-Already with this simple method, there is a bunch of interesting things going
-on:
-
-* First, note how we define a bit of code is a method, as oposed to plain
-Python: we use `def` followed by the name of our function (we have chosen
-`run_simple_loop`, but we could have chosen any valid python name. 
-* Second, we append `()`
-after the name, and finish the line with a colon (`:`). This is necessary and
-will allow us to specify requirements for the function (see below).
-* Third,
-realize that everything inside a function needs to be indented. This is a core
-property of Python and, although some people find it odd, it enhances
-readability greatly. 
-* Fourth, the piece of code to do the task we want,
-printing the sequence of numbers, is inside the function in the same way it was
-outside, only properly indented. Everything that is indented is considered "within" the method,
-and anything that is not indented will be considered "outside" of the method.
-* Fifth, we finish the method with a `return` statement. In this case, we are 
-returning a special value, `None`, but this will
-change as methods become more sophisticated. Essentially, this is the part of
-the method where you specify which elements you want it to return and save for
-later use.
-
-Once we have paid attention to these elements, we can see how the
-method can be *called* and hence the code inside it executed:
-
-```python attributes={"classes": [], "id": "", "n": "47"}
-run_simple_loop()
-```
-
-This is the same way that we called `np.arange` before. Note how we do not
-include the colon (`:`). Instead, when we call a method, we only use the name of
-the method followed by the parenthesis.
-
-This is a very simple method. It does not interact with the rest of our program.
-We can just execute it without providing any additional information, and the
-code prints what we want it to and returns `None`. The rest of this section 
-relaxes these two aspects to allow us to build more complex, 
-but also more useful, methods.
-
-First, methods can take "arguments," additional information that the method will use. 
-You can specify these arguments when the method is defined. Remember how
-we called `np.arange` and provided a number that determined the length of the sequence we
-wanted? We can do the same thing in our own function. The main aspect
-to pay attention to in this context is that the arguments are themselves *variables*,
-and not values. This is because they are simply names that *stand in* for whatever
-we will eventually provide to the function.
-
-For example, we can modify our method:
-
-```python attributes={"classes": [], "id": "", "n": "48"}
-def run_simple_loopX(x):
-    for i in np.arange(x):
-        print(i)
-    return None
-```
-
-We have replaced the fixed length of the sequence (10) by a variable named `x`
-that allows us to specify *any value we want* when we call the method:
-
-```python attributes={"classes": [], "id": "", "n": "49"}
-run_simple_loopX(3)
-```
-
-```python attributes={"classes": [], "id": "", "n": "50"}
-run_simple_loopX(2)
-```
-
-Another way you can build more flexibility into a method is by allowing it to
-return an output directly, instead of returning `None`. In the previous examples, our function
-performs a computation (i.e. printing values on the screen), but it does not
-return any value. This is in contrast with, for example, `np.arange` which does
-return an output, the sequence of values:
-
-```python attributes={"classes": [], "id": "", "n": "51"}
-a = np.arange(10)
-```
-
-```python attributes={"classes": [], "id": "", "n": "52"}
-a
-```
-
-Our function does not save anything:
-
-```python attributes={"classes": [], "id": "", "n": "53"}
-b = run_simple_loopX(3)
-```
-
-```python attributes={"classes": [], "id": "", "n": "54"}
-b
-```
-
-We can modify this using the last line of a method. For example, let us assume
-we want to return a sequence as long as the series of numbers we print on the
-screen. One way to do this would be:
-
-```python attributes={"classes": [], "id": "", "n": "55"}
-def run_simple_loopXout(x):
-    for i in np.arange(x):
-        print(i)
-    return np.arange(x)
-```
-
-Note that the main difference now is that instead of returning `None`, we return
-the sequence we used in the `for` loop. We could be even more efficient, though,
-by assigning the sequence to a new object *inside of the method*, and using it first 
-in the loop and then returning it. The results are exactly the same, but there are less computations
-performed, since we only build the sequence one time. More critically, 
-we minimize the chances of making mistakes by referring to the same object every time:
-
-```python attributes={"classes": [], "id": "", "n": "60"}
-def run_simple_loopXout(x):
-    seq = np.arange(x)
-    for i in seq:
-        print(i)
-    return seq
-```
-
-Either of these two new versions of the method return an output:
-
-```python attributes={"classes": [], "id": "", "n": "61"}
-a = run_simple_loopX(3)
-b = run_simple_loopXout(3)
-```
-
-```python attributes={"classes": [], "id": "", "n": "62"}
-a
-```
-
-```python attributes={"classes": [], "id": "", "n": "63"}
-b
-```
-
-The advantage of methods, as oposed to straight code, is that they force us to
-think in a modular way, helping us identify the small components of what what we 
-are doing in our analysis overall.  Encapsulating these little atoms of
-functionality inside of methods allows us to write this functionality one time and
-use them everywhere. This code reuse saves us time and headaches in the long run.
-
-One final note on methods. It is important that, whenever you create a method,
-you include some documentation about what arguments it requires, what the method
-does more generally, and what values it returns. This is called the *docstring* 
-of a function, and it looks like one big quote that comes immediately following the 
-`def` statement. Although there are many ways formatting a docstring, one common format
-is:
-
-```python attributes={"classes": [], "id": "", "n": "64"}
-def run_simple_loopXout(x):
-    """
-    Print out the values of a sequence of certain length
-    ...
+### Containerised platform
+
+As mentioned [earlier in this chapter](#Reproducible-platforms), 
+reproducible platforms encompass technology and practices that help 
+reproduce a set of analyses or computational work in a different environment
+than that in which it was produced. There are several approaches to implement
+this concept in a practical setting. For this book, we use a package called
+Docker. Docker is based on an obscure feature of Linux called containers,
+which allows to run processes in an isolated way within the operating system.
+We decided to settle on Docker for several reasons but, in particular, for
+three core ones: first, it is widely adopted as an industry standard (e.g.
+almost any website today runs on Docker containers), which means it is well
+supported and is not likely to disappear any time soon; second, it has also
+become a standard in the world of data science, which means foundational
+projects such as Jupyter create official containers for these packages; and
+third, because of the two previous reasons, building the platform that
+supports the book in Docker allows us to easily integrate it, for example, in
+the cloud or local servers, which in turn has benefits to
+easily and efficiently make the book available in more contexts.
+
+Docker allows us to create a "container" that includes all the tools required
+to access the content of the book interactively. But, what exactly is a 
+container? There are several ways to describe it, from very technical
+to more intuitive ones. In this context, we will focus on a general
+understanding rather than on the technical details behind its magic. One can
+think of a container as, well, a box that includes
+_everything_ that is required to run a certain set of software. This box can
+be moved around, from machine to machine, and the computations it
+executes will remain exactly the same. In fact, the content of the box
+remains exactly the same, bit by bit. When we download a container into a
+computer, be it a laptop or a data center, we are not performing an install of
+the software it contains from the usual channels, for the platform on which we
+are going to run it on. Instead, we are downloading the software in the form
+that was installed when the container was originally built and packaged,
+and for the operating system that was also packaged originally. This is the real
+advantage: build once, run everywhere. For the experienced reader,
+this might sound very much like their older syster: virtual machines. Although
+there are similarities between both technologies, containers are more 
+lightweight and can be run much more swiftly than virtual machines.
+This box that is isolated interacts with the rest of the computer through
+several links that connect the two. In the case of this book, since JupyterLab
+is a client-server application, the server runs inside the container and we
+connect to it through two main "doors": one, through the browser, we will
+access the main Lab interface; and two, we will "mount" a folder inside the
+container so we can use software inside the container to edit files that are
+stored outside in the host machine.
+
+"Containers are great but, how can I install and run one?", you might be
+asking yourself at this point. First, you will need to install Docker on your
+machine. This assumes you have administrative rights (ie. you can install
+software). If that is the case, you can go to the Docker website 
+([https://www.docker.com/])(https://www.docker.com/)) and install the version
+that suits your operating system. Note that, although container
+technology is Linux-based, Docker provides tools to run it smoothly in macOS
+and Windows. An install guide for Docker is beyond the scope of this chapter,
+but there is much documentation available on the web to this end. We
+personally recommend the official documentation 
+([https://docs.docker.com/](https://docs.docker.com/)), but you might find other
+resources that suit your needs better.
+
+#### Run the book's container
+
+Once you have Docker up and running on your computer, you can download the
+image we have prepared for the book. This operation is akin to installing the
+software you need to interact with the book, so you will only need to run it once.
+However, keep in mind that the image is relatively large (around 7GB), so you
+will need the space on your machine as well as a good internet connection. If
+you check those two boxes, you are ready to go. Here are the steps to take:
+
+1. Open a terminal or shell. How to do this will depend on your operating
+   system:
+
+   - `Windows`: we recommend PowerShell. Type "PowerShell" on the startup menu
+     and, when it comes up, hit enter. This will open a terminal for you.
+   - `macOS`: use the `Teminal.app`. You can find it on the Applications
+     folder, within the Utilities subfolder.
+   - `Linux`: if you are running Linux, you probably already have a terminal
+     application of preference. Almost any Linux distribution comes with a
+     terminal or shell app built in.
+
+2. Download, or "pull", our container. For this run on the terminal the
+   following command:
+
+   ```shell
+   docker pull gdsbook/stack
+   ```
+
+That's it! Once the command above completes, you have all the software you
+need to interact with this book.
+
+You can now run the container with the following command:
+
+    ```shell
+    docker run --rm -ti -p 8888:8888 -v ${PWD}:/home/jovyan/work gdsbook/stack
+    ```
+
+Let's unpick the command so we understand everything that is going on here to
+get further insight into how the container works:
+
+    - `docker run`: Docker does a lot of things, to communicate that we want to
+      _run_ a new container, we need specify it.
+    - `--rm`: this flag will ensure the container is removed when you close
+      it. This in turn makes sure every time you run it again, you start
+      afresh with the exact same set up.
+    - `-ti`: this flag further ensures that the container is not run in the
+      background but in an _i_nteractive mode.
+    - `-p 8888:8888`: with this, we ensure we forward the _port_ from inside
+      the container out to the host machine (ie. your laptop). This step is
+      crucial because it is the way that allows us to interact with the server
+      and for Jupyter to "send" JupyterLab across so we can access it on our
+      browser.
+    - `-v ${PWD}:/home/jovyan/work`: similarly, this flag "mounts" the folder
+      from where the command is being run in the terminal (`${PWD}`) into the
+      container so it is visible and editable from inside the container. Such
+      folder will be available at the container's `work` folder.
+    - `gdsbook/stack`: finally, we also need to specify which image we want to
+      run. In this case, we run the image created for this book.
+
+The command above will generate output that will look, more or less like the
+following:
+
+```shell
+Executing the command: jupyter notebook
+[I 14:45:34.681 NotebookApp] Writing notebook server cookie secret to /home/jovyan/.local/share/jupyter/runtime/notebook_cookie_secret
+[I 14:45:36.504 NotebookApp] Loading IPython parallel extension
+[I 14:45:36.730 NotebookApp] JupyterLab extension loaded from /opt/conda/lib/python3.7/site-packages/jupyterlab
+[I 14:45:36.731 NotebookApp] JupyterLab application directory is /opt/conda/share/jupyter/lab
+[I 14:45:36.738 NotebookApp] [Jupytext Server Extension] NotebookApp.contents_manager_class is (a subclass of) jupytext.TextFileContentsManager already - OK
+[I 14:45:37.718 NotebookApp] Serving notebooks from local directory: /home/jovyan
+[I 14:45:37.718 NotebookApp] The Jupyter Notebook is running at:
+[I 14:45:37.719 NotebookApp] http://0fb71d146102:8888/?token=ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c
+[I 14:45:37.719 NotebookApp]  or http://127.0.0.1:8888/?token=ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c
+[I 14:45:37.719 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 14:45:37.725 NotebookApp] 
     
-    Arguments
-    ---------
-    x     : int
-            Length of the sequence to be printed out
-    
-    Returns
-    -------
-    seq   : np.array
-            Sequence of values printed out
-    """
-    seq = np.arange(x)
-    for i in seq:
-        print(i)
-    return seq
+    To access the notebook, open this file in a browser:
+        file:///home/jovyan/.local/share/jupyter/runtime/nbserver-6-open.html
+    Or copy and paste one of these URLs:
+        http://0fb71d146102:8888/?token=ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c
+     or http://127.0.0.1:8888/?token=ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c
 ```
 
-Docstrings, like other strings, is colored red in the notebook by default. Let us have
-a look at the structure and components of a well-made docstring:
+With this, you can then head to your browser of preference (ideally Mozilla
+Firefox or Google Chrome) and point it to `localhost:8888`. This should render
+a landing page that looks approximately like this one:
 
-* It is encapsulated between triple commas (`"""`).
-* It begins with
-a short description of what the method does. The shorter the better, the more
-concise, the even better.
-* There is a section called "Arguments" that lists each
-element that the function expects. 
-* Each argument is then listed, followed by
-its type. In this case it is an object `x` that, as we are told, needs to be an
-integer.
-* The arguments are followed by another section that specifies what the
-function returns, and of what type the output is.
-
-Docstrings are
-very useful to remember what a function does. They also to force you to
-write clearer code. A bonus is that, if you include documentation in this way,
-it can be checked with the standard `help` or `?` systems reviewed above:
-
-```python attributes={"classes": [], "id": "", "n": "65"}
-run_simple_loopXout?
+```python
+path = ("../figures/jupyter_landing_page.png")
+display.Image(path)
 ```
 
-```python attributes={"classes": [], "id": "", "n": "66"}
-help(run_simple_loopXout)
-```
+To access the lab, copy the token from the terminal (in the example above,
+that would be `ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c`), enter it on
+the box and click on "Log in". Now you are in!
 
-### Exercise to work on your own
+#### Troubleshooting
 
-Write a properly documented function that:
+Containers make computations more transferable, but there is always a
+possibility of things not working for several reasons, mistakes and typos.
+Here we list a few we have found:
 
-1. Has a single argument, an integer.
-2. Creates a sequence of that length and an empty dictionary. 
-3. Then, loops over that sequence and
-  1. checks if each number is even or odd (Hint: `number % 2` will be `1` when `number` is odd, but zero when `number` is even.)
-  2. If the number is even, it should be stored in the dictionary as a key, with a value of "even"
-  3. If the number is odd, it should be stored in the dictionary as a key, with a value of "odd."
-4. Returns the now-filled dictionary.
+[**DAB**: should we list running problems here or in a blog post?]
 
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
