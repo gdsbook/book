@@ -480,9 +480,10 @@ If, for whatever reason, you needed to print that info
 into the notebook itself, you can use the following `help` function instead:
 
 ```python attributes={"classes": [], "id": "", "n": "21"}
-help(np.arange)
+help(geopandas.read_file)
 ```
 
+<!-- #region -->
 ### Containerised platform
 
 As mentioned [earlier in this chapter](#Reproducible-platforms), 
@@ -575,36 +576,36 @@ need to interact with this book.
 
 You can now run the container with the following command:
 
-    ```shell
-    docker run --rm -ti -p 8888:8888 -v ${PWD}:/home/jovyan/work gdsbook/stack
-    ```
+```shell
+docker run --rm -ti -p 8888:8888 -v ${PWD}:/home/jovyan/work gdsbook/stack
+```
 
 Let's unpick the command so we understand everything that is going on here to
 get further insight into how the container works:
 
-    - `docker run`: Docker does a lot of things, to communicate that we want to
-      _run_ a new container, we need specify it.
-    - `--rm`: this flag will ensure the container is removed when you close
-      it. This in turn makes sure every time you run it again, you start
-      afresh with the exact same set up.
-    - `-ti`: this flag further ensures that the container is not run in the
-      background but in an _i_nteractive mode.
-    - `-p 8888:8888`: with this, we ensure we forward the _port_ from inside
-      the container out to the host machine (ie. your laptop). This step is
-      crucial because it is the way that allows us to interact with the server
-      and for Jupyter to "send" JupyterLab across so we can access it on our
-      browser.
-    - `-v ${PWD}:/home/jovyan/work`: similarly, this flag "mounts" the folder
-      from where the command is being run in the terminal (`${PWD}`) into the
-      container so it is visible and editable from inside the container. Such
-      folder will be available at the container's `work` folder.
-    - `gdsbook/stack`: finally, we also need to specify which image we want to
-      run. In this case, we run the image created for this book.
+- `docker run`: Docker does a lot of things, to communicate that we want to
+  _run_ a new container, we need specify it.
+- `--rm`: this flag will ensure the container is removed when you close
+  it. This in turn makes sure every time you run it again, you start
+  afresh with the exact same set up.
+- `-ti`: this flag further ensures that the container is not run in the
+  background but in an _i_nteractive mode.
+- `-p 8888:8888`: with this, we ensure we forward the _port_ from inside
+  the container out to the host machine (ie. your laptop). This step is
+  crucial because it is the way that allows us to interact with the server
+  and for Jupyter to "send" JupyterLab across so we can access it on our
+  browser.
+- `-v ${PWD}:/home/jovyan/work`: similarly, this flag "mounts" the folder
+  from where the command is being run in the terminal (`${PWD}`) into the
+  container so it is visible and editable from inside the container. Such
+  folder will be available at the container's `work` folder.
+- `gdsbook/stack`: finally, we also need to specify which image we want to
+  run. In this case, we run the image created for this book.
 
 The command above will generate output that will look, more or less like the
 following:
 
-```shell
+```
 Executing the command: jupyter notebook
 [I 14:45:34.681 NotebookApp] Writing notebook server cookie secret to /home/jovyan/.local/share/jupyter/runtime/notebook_cookie_secret
 [I 14:45:36.504 NotebookApp] Loading IPython parallel extension
@@ -628,6 +629,7 @@ Executing the command: jupyter notebook
 With this, you can then head to your browser of preference (ideally Mozilla
 Firefox or Google Chrome) and point it to `localhost:8888`. This should render
 a landing page that looks approximately like this one:
+<!-- #endregion -->
 
 ```python
 path = ("../figures/jupyter_landing_page.png")
