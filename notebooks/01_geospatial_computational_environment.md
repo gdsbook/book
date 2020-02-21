@@ -63,12 +63,12 @@ Image(url)
 
 There is a growing perception that much of the original ethos of Science to
 operate through transparency and accessibility has been lost. A series of
-recent big profile scandals have even prompted some to call it a state of
+recent high profile scandals have even prompted some to call it a state of
 crisis [XXXref?XXX]. Why is there a sense that Science is no longer open and
 transparent in the way Galileo's diaries were? Although certinaly not the only
 or even the most important one, technology plays a role. The process and workflow
 of original scientists relied on a set of "analog" technologies for which an
-"analog" parallel set of tools was developed to keep track and document
+"analog** parallel set of tools was developed to keep track and document
 progress. Hence the paper notebooks where biologists drew species, or chemists
 painstakingly detailed each step they took in the lab. In the case of social
 sciences, this was probably easier in the sense that quantitative data was not
@@ -82,16 +82,19 @@ programs. In this context, the traditional approach of writing down in a paper
 notebook every step followed becomes dislocated from the medium in which most of
 the scientific work takes place.
 
+**SR: I'm not fully understanding the main point of the previous paragraph, particularly the last sentence.
+It isn't clear what the actual  problem is you are driving at.**
+
 The current state of Science in terms of transparency and openness is prompting
 for action (XXXref?XXX). On the back of these debates, the term
 "reproducibility" is also gaining traction. Again, this is a rather general
 term but, in one variant or another, its definition alludes to the need of
 scientific results to be accompanied by enough information and detail so they
-could be reproduced by a third party. Since much of modern science is mediated
+could be repeated by a third party. Since much of modern science is mediated
 through computers, reproducibility thus poses important challenges for the
 tools and practices the scientific community builds and relies on. Although
 there is a variety of approaches, in this book we focus on what we see as the
-emerging consensus. This framework enables to record and express entire
+emerging consensus. This framework captures entire
 workflows in a way that is both transparent and that fosters efficiency and
 collaboration.
 
@@ -118,12 +121,12 @@ reach into industry practices, being used, for example, in reports.
 
 All implementations of notebooks share a series of 
 core features. First, a notebook comprises a single file that stores narrative text,
-computer code, and the output produced by code. Allowing to store both
+computer code, and the output produced by code. Storing both
 narrative and computational work in a _single file_ means that the entire
 workflow can be recorded and documented in the same place, without having to 
 resort to ancillary devices (like a paper notebook). A second feature of
 notebooks is that they allow for _interactive work_. Modern computational work
-benefits from the ability to try, fail, tinker and iterate quickly until a
+benefits from the ability to try, fail, tinker, and iterate quickly until a
 working solution is found. Notebooks embody this quality and enable the user
 to work interactively. Whether the computation takes place on a laptop or
 on a data center, notebooks provide the same interface for interactive
@@ -132,14 +135,13 @@ have _interoperability_ built in. The notebook format is designed for
 recording and sharing computational work, but not necessarily for other stages
 of the research cycle. To widen the range of possibilities and
 applications, notebooks are designed to be easily convertible into other
-formats. For example, while most notebook file formats require a
-specific app to be opened and edited, it is easy to convert them into pdf
-files that can be read, printed, and annotated without the need of technical
-software.
+formats. For example, while a specific application is required to open and edit
+most notebook file formats, no additional software is required for conversion
+into pdf files that can be read, printed, and annotated.
 
 Notebooks represent the top layer on the reproducibility stack. They can capture
-in detail and reproducible ways work that is specific about a given project: 
-what data is used, how it is read and linked; what algorithms are used, how they
+in detailed and reproducible ways work that is specific about a given project: 
+what data is used, how it is read, cleaned, transformed, and linked; what algorithms are used, how they
 are combined; how each figure in the project is generated, etc. Guidance on how
 to write notebooks in efficient ways is also emerging (e.g. [Rule et al.,
 2019](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1007007)).
@@ -176,7 +178,7 @@ reproducibility, they need to be open source.
 For computational work to be fully reproducible and open, it needs to be
 possible to replicate in a different (computational) environment than where it
 was originally created. This means that it is not sufficient to specify in a
-notebook the code that creates the final outputs, and to rely on open-source
+notebook the code that creates the final outputs, and to rely on open source
 packages for more general functionality; the environment specified by those
 two components needs to be reproducible too. This statement, which might seem
 obvious and straightforward, is not always so due to the scale and complexity
@@ -190,13 +192,13 @@ reproducible platform thus specifies the infrastructure required to ensure a
 notebook that uses certain open source packages can be successfully executed.
 Infrastructure, in this context, relates to lower-level aspects of the
 software stack, such as the operating system, and even some hardware
-requirements, such as the use of specific chips such as graphics processing
+requirements, such as the use of specific chips and graphics processing
 units (GPU). Additionally, a reproducible platform will also specify the
 versions of packages that are required to recreate the results presented in a
 notebook.
 
 Unlike open source packages, the notion of reproducible platforms is not as
-widespread and generally agreed. Its necessity has only become apparent more
+widespread and generally agreed upon. Its necessity has only become apparent more
 recently, and work on providing them in standardised ways is less developed
 than in the case of notebook technology or code packaging and distribution.
 Nevertheless, some inroads are being made. One area which has experienced
@@ -219,16 +221,18 @@ data science are starting to be explored ([Cook, 2017](https://www.apress.com/gp
 This book uses notebooks as the main format in which its content is created and
 distributed. Each chapter is written as a separate notebook and can
 be run interactively. At the same time, we collect all chapters and convert
-them into different formats for "static consumption" (ie. read only), either
-in HTML format for the web, or PDF to be printed in a physical copy.
+them into different formats for "static consumption" (ie. read only**, either
+in HTML format for the web, or PDF to be printed  in a physical copy.
 This section will present the specific flavor of notebooks we use, and
 illustrate its building blocks in a way that allows you to then follow the
 rest of the book interactively.
 
+**SR we might want to be careful here as we agreed not to make public how to go to pdf from the notebook in our discussions with the publisher.**
+
 Our choice of notebook is Jupyter (XXXcite?XXX). A Jupyter notebook is a plain
 text file with the `.ipynb` extension, which means that it is an easy file to
 move around, sync, and track over time. Internally, it is structured as a
-JSON file, so they also integrate well with a host of modern web technologies.
+JavaScript Object Notation (JSON) file, so they also integrate well with a host of modern web technologies.
 The atomic element that makes up a notebook is called a _cell_. Cells are 
 consistent chunks of content that contain either text or code. In fact, a
 notebook can be thought of as an ordered collection of cells. Cells can be of
@@ -242,7 +246,7 @@ flat, plain text files without being as complex and sophisticated as other
 typesetting approaches. The notebook will then render markdown
 automatically. For more demanding or specific tasks, text cells can further 
 integrate $\LaTeX$ notation. This means we can write most forms of narrative
-relying on markdown, which is more straighforward, and rely on $\LaTeX$ for
+relying on markdown, which is more straightforward, and rely on $\LaTeX$ for
 more sophisticated parts, such as equations. Covering Markdown rules in detail
 is beyond the scope of this chapter, but the interested reader can inspect the
 [official Github specification](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax) 
@@ -259,8 +263,10 @@ Aesthetically, code cells look as follows:
 ```
 
 A code cell can be run to execute the code it contains. If such code produces
-an output (e.g. a table or a figure), this will be printed as a cell output.
+an output (e.g. a table or a figure**, this will be printed as a cell output.
 Every time a cell is run, its counter will go up once.
+
+**SR: should we detail how to execute a cell? Execute and add versus execute and stay in the cell?**
 
 #### Rich Content
 
@@ -326,7 +332,7 @@ display.Image(path)
 
 Our recommended way to interact with Jupyter notebooks is through Jupyter Lab.
 Jupyter Lab is an interface to the Jupyter ecosystem that brings together
-several tools for data science into a consistent front that enables the user
+several tools for data science into a consistent front-end that enables the user
 to accomplish most of her workflows. It is built as a web app following a
 client-server architechture. This means the computation is decoupled from the
 interface. This decoupling allows each to be hosted in the most convenient and
@@ -376,7 +382,7 @@ astronomy](https://www.youtube.com/watch?v=mLuIB8aW2KA) at UC Berkley, to
 [courses in economics](https://lectures.quantecon.org/py/) by Nobel Prize-winning professors. 
 
 This book uses Python because it is a good language for beginners and 
-high performance science alike. For this reason, it has emerged as one of the main
+high performance science alike. For these reasons, it has emerged as one of the main
 and most solid options for Data Science. Python is widely used for data 
 processing and analysis both in academia and in industry. There is a vibrant and 
 growing scientific community (through the [Scientific Python](http://scipy.org/) 
@@ -392,7 +398,7 @@ of this means that, whether you are thinking of continuing in Higher Education
 or trying to find a job in industry, Python will be an important asset, valuable to
 employers and scientists alike. 
 
-Python code is "dynamically interpreted", which means it is run on-the-fly without 
+Python code is "dynamically interpreted**, which means it is run on-the-fly without 
 needing to be compiled. This is in contrast to other kinds of programming
 languages, which require an additional non-interactive step where a program is 
 converted into a binary file, which is then run directly. With Python, one does
@@ -402,6 +408,7 @@ quick cycle. This makes Python a very productive tool for science, since you can
 prototype code quickly and directly. The rest of this tutorial covers
 some of the basic elements of the language, from conventions like how to comment
 your code, to the basic data structures available.
+**SR: Maybe strike the last sentence?**
 
 
 #### Open Source Packages
@@ -437,7 +444,7 @@ an example. The simplest way to import a library is by typing the following:
 import geopandas
 ```
 
-This brings on the session the entire library of methods and clases, which we
+We now have access to the entire library of methods and clases, which we
 can call by prepending `geopandas.` to the name of the function we want.
 Sometimes, however, we will want to shorten the name to save keystrokes. This
 approach, called _aliasing_, can be done as follows:
@@ -492,9 +499,9 @@ reproduce a set of analyses or computational work in a different environment
 than that in which it was produced. There are several approaches to implement
 this concept in a practical setting. For this book, we use a package called
 Docker. Docker is based on an obscure feature of Linux called containers,
-which allows to run processes in an isolated way within the operating system.
-We decided to settle on Docker for several reasons but, in particular, for
-three core ones: first, it is widely adopted as an industry standard (e.g.
+which  run processes in an isolated way within the operating system.
+We decided to settle on Docker for  for
+three main reasons: first, it is widely adopted as an industry standard (e.g.
 almost any website today runs on Docker containers), which means it is well
 supported and is not likely to disappear any time soon; second, it has also
 become a standard in the world of data science, which means foundational
@@ -523,10 +530,10 @@ advantage: build once, run everywhere. For the experienced reader,
 this might sound very much like their older syster: virtual machines. Although
 there are similarities between both technologies, containers are more 
 lightweight and can be run much more swiftly than virtual machines.
-This box that is isolated interacts with the rest of the computer through
+This container that is isolated interacts with the host computer through
 several links that connect the two. In the case of this book, since JupyterLab
 is a client-server application, the server runs inside the container and we
-connect to it through two main "doors": one, through the browser, we will
+connect to it through two main "doors" on the host: one, through the browser, we will
 access the main Lab interface; and two, we will "mount" a folder inside the
 container so we can use software inside the container to edit files that are
 stored outside in the host machine.
@@ -580,7 +587,7 @@ You can now run the container with the following command:
 docker run --rm -ti -p 8888:8888 -v ${PWD}:/home/jovyan/work gdsbook/stack
 ```
 
-Let's unpick the command so we understand everything that is going on here to
+Let's unpack the command so we understand everything that is going on here to
 get further insight into how the container works:
 
 - `docker run`: Docker does a lot of things, to communicate that we want to
@@ -591,11 +598,11 @@ get further insight into how the container works:
 - `-ti`: this flag further ensures that the container is not run in the
   background but in an _i_nteractive mode.
 - `-p 8888:8888`: with this, we ensure we forward the _port_ from inside
-  the container out to the host machine (ie. your laptop). This step is
-  crucial because it is the way that allows us to interact with the server
-  and for Jupyter to "send" JupyterLab across so we can access it on our
+  the container out to the host machine (i.e. your laptop). This step is
+  crucial because it  allows us to interact with the server
+  and for Jupyter to "send" JupyterLab across so we can access through our
   browser.
-- `-v ${PWD}:/home/jovyan/work`: similarly, this flag "mounts" the folder
+- `-v ${PWD}:/home/jovyan/work`: similarly, this flag "mounts" the host folder
   from where the command is being run in the terminal (`${PWD}`) into the
   container so it is visible and editable from inside the container. Such
   folder will be available at the container's `work` folder.
