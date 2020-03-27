@@ -5,8 +5,8 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.1'
-      jupytext_version: 1.2.1
+      format_version: '1.2'
+      jupytext_version: 1.3.4
   kernelspec:
     display_name: Python 3
     language: python
@@ -767,7 +767,7 @@ We first read in the data for Mexico:
 <!-- #endregion -->
 
 ```python
-mx = geopandas.read_file('../data/mexicojoin.shp')
+mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax)
 ax.set_axis_off()

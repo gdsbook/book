@@ -5,8 +5,8 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.1'
-      jupytext_version: 1.2.1
+      format_version: '1.2'
+      jupytext_version: 1.3.4
   kernelspec:
     display_name: Python 3
     language: python
@@ -96,7 +96,7 @@ To illustrate these considerations, we will examine regional income data for the
 for 1940 (PCGDP1940):
 
 ```python
-mx = geopandas.read_file("../data/mexicojoin.shp")
+mx = geopandas.read_file("../data/mexico/mexicojoin.shp")
 mx[['NAME', 'PCGDP1940']].head()
 ```
 
@@ -528,7 +528,7 @@ distribution of the attribute values.
 Let us start by refreshing the `mx` object and exploring the base polygons for the Mexican states:
 
 ```python
-mx = geopandas.read_file('../data/mexicojoin.shp')
+mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax, color='blue', edgecolor='grey')
 ax.set_axis_off()
@@ -549,7 +549,7 @@ With this qualification in mind, we will explore the construction of choropleth
 maps using geopandas:
 
 ```python
-mx = geopandas.read_file('../data/mexicojoin.shp')
+mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles')
 ax.set_axis_off()
