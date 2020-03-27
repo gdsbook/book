@@ -558,7 +558,7 @@ distance based weights for the case of counties in the state of Texas. First, le
 a KNN-4 object that ignores the curvature of the Earth's surface:
 
 ```python
-texas = geopandas.read_file('../data/texas.shp')
+texas = geopandas.read_file('../data/texas/texas.shp')
 knn4_bad = weights.distance.KNN.from_dataframe(texas, k=4) # ignore curvature of the earth
 ```
 
