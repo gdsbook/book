@@ -74,7 +74,7 @@ rcParams['figure.figsize'] = 10, 5
 
 ```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
 
-gdf = geopandas.read_file('../data/inequality/usincome_final.shp')
+gdf = geopandas.read_file('../data/us_county_income/usincome_final.shp')
 gdf.head()
 
 ```
@@ -479,6 +479,8 @@ the second  component.
 **Note:** The regional decomposition does not involve weighting the regions by their respective population. See  [Gluschenko (2018)](https://webvpn.ucr.edu/+CSCO+0075676763663A2F2F6A6A6A2E676E6171736261797661722E70627A++/doi/full/10.1080/17421772.2017.1343491) for further details. 
 
 <!-- #endregion -->
+
+
 
 
 
