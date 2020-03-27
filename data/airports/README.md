@@ -1,27 +1,11 @@
-# San Diego Dataset
+# Airports data
 
+This dataset contains locations of airports around the world.
 
-## Listings
+- `Source`: Natural Earth
+- `URL`
 
-- point
-- 6608 observations
+> [https://www.naturalearthdata.com/downloads/10m-cultural-vectors/airports/](https://www.naturalearthdata.com/downloads/10m-cultural-vectors/airports/)
 
-
-Source: [Inside Airbnb](http://data.insideairbnb.com/united-states/ca/san-diego/2016-07-07/data/listings.csv.gz)
-
-Downloaded: 2017-03-01, Compiled 2016-07-07
-
-## Geodemographics
-
-- polygons
-- XXXX tracts
-
-- Source: [cenpy]
-
-
-## Elevation
-
-- raster
-- XXXX cells
-
-- Source: [USGS](http://data.geocomm.com/dem/)
+- `Processing`: transformations documented in `airports_cleaning.ipynb`
+    - Clean file: `airports_clean.geojson`
