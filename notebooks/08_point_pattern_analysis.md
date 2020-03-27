@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.1'
-      jupytext_version: 1.2.1
+      jupytext_version: 1.1.7
   kernelspec:
-    display_name: Python 3
+    display_name: Analysis
     language: python
-    name: python3
+    name: ana
 ---
 
 # Point Pattern Analysis
@@ -21,7 +21,6 @@ jupyter:
 import numpy
 import pandas
 import geopandas
-from shapely.geometry import Point, MultiPoint
 import pysal
 import seaborn
 import contextily
@@ -190,7 +189,8 @@ Centrography is the analysis of centrality in a point pattern. By "centrality," 
 For instance, one common measure of central tendency for a point pattern is its *center of mass*. For marked point patterns, the center of mass identifies a central point close to observations that have higher values in their marked attribute. For unmarked point patterns, the center of mass is equivalent to the *mean center*, or average of the coordinate values. In addition, the *median center* is analogous to the *median* elsewhere, and represents a point where half of the data is above or below the point & half is to its left or right. We can analyze the mean center with our flickr point pattern using the `pointpats` package in Python. 
 
 ```python
-from pointpats import centrography
+from pysal.explore import pointpats
+from pysal.explore.pointpats import centrography
 ```
 
 ```python
@@ -262,64 +262,183 @@ ax.legend()
 plt.show()
 ```
 
-Finally, another collection of measures about point patterns characterize the extent of a point cloud. Four shapes are useful, and reflect varying levels of how "tightly" they bind the pattern. In order of tightness:
+Finally, another collection of measures about point patterns characterize the extent of a point cloud. Four shapes are useful, and reflect varying levels of how "tightly" they bind the pattern. 
 
-1. The **minimum alpha shape** reflects the tightest polygon that can be drawn around the data that contains all of the points. This is implemented, for instance, in the `libpysal.cg` module.
-2. The **convex hull** reflects the tightest *convex* polygon that can be drawn around the data that contains all of the points. By *convex*, we mean that the shape never "doubles back" on itself; it has no divets, valleys, crenelations, or holes. All of its interior angles are smaller than 180 degrees. 
-3. The **minimum bounding rectangle** reflects the tightest *rectangle* that can be drawn around the data that contains all of the points. In `pointpats`, this is computed using the `mbr` function and is the "straight" rectangle, meaning it is not rotated. However, this rectangle can often be *rotated* to achieve a smaller area. This **minimum rotated rectangle** provides a tighter rectangular bound on the point pattern. (While the minimum rotated rectangle is not currently implemented in `pointpats`, it is implemented in common python packages, such as `OpenCV`'s `cv.minAreaRect` function.)
+Below, we'll walk through how to construct each example and visualize them at the end. 
+
+```python
+from cv2 import (minAreaRect as minimum_rotated_rectangle,
+                 boxPoints as mrr_to_rect)
+```
+
+To make things more clear, we'll use the flickr photos for the most prolific user in the dataset to show how different these results can be.
+
+```python
+user = db.query('user_id == "95795770@N00"')
+coordinates = user[['x','y']].values
+```
+
+First, we'll compute the **alpha shape**, which is the tightest hull that encloses the user's photos. This is computed using the `alpha_shape_auto` function in `pysal.lib.cg`. 
+
+```python
+alpha_shape = pysal.lib.cg.alpha_shape_auto(coordinates)
+```
+
+<!-- #region -->
+Second, we'll compute the **convex hull**, which is the tighest *convex* shape that encloses the user's photos. By *convex*, we mean that the shape never "doubles back" on itself; it has no divets, valleys, crenelations, or holes. All of its interior angles are smaller than 180 degrees.  This is computed using the `centrography.hull` method.
+
+
+
 4. The **minimum bounding circle** is the smallest circle that can be drawn to enclose the entire dataset. Often, this circle is bigger than the minimum bounding rectangle. This tends to be somewhat more computationally challenging than the minimum rotated rectangle, and is implemented in the `skyum` function in `pointpats`. 
-
-To show how to compute all of these, we can compute them each using their functions:
+<!-- #endregion -->
 
 ```python
-#from cv import minAreaRect as minimum_rotated_rectangle
-from libpysal.cg import alpha_shape_auto
+convex_hull_vertices = centrography.hull(coordinates)
 ```
 
-```python
-coordinates = db[['x','y']].values
-alpha_shape = alpha_shape_auto(coordinates)
-```
+Next, we'll consider two kinds of **minimum bounding rectangles**. They both are constructed as the tightest *rectangle* that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the **minimum rotated rectangle** provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated. 
+
+For the minimum rotated rectangle, we will use `OpenCV`'s `cv.minAreaRect` function. 
 
 ```python
-convex_hull = centrography.hull(coordinates)
-min_rect = centrography.mbr(coordinates)
-#min_rot_rect = minimum_rotated_rectangle(coordinates)
-(min_circ_r,min_circ_center), *_ = centrography.skyum(coordinates)
+min_rot_rect_raw = minimum_rotated_rectangle(coordinates.astype(numpy.float32))
+min_rot_rect_vertices = mrr_to_rect(min_rot_rect_raw)
 ```
 
-```python
-from matplotlib.patches import Circle, Rectangle, Polygon
-```
+And, for the minimum bounding rectangle without rotation, we will use the `mbr` function from the `pointpats` package.
 
 ```python
-f,ax = plt.subplots(1)
+min_rect_vertices = centrography.mbr(coordinates)
+```
+
+Finally, we'll compute the **minimum bounding circle**, which is the smallest circle that encloses the user's photos.
+
+```python
+(min_circ_radius, min_circ_center), *_ = centrography.skyum(coordinates)
+```
+
+Now, to visualize these, we'll convert the raw vertices into matplotlib patches: 
+
+```python
+from matplotlib.patches import Polygon, Circle, Rectangle
+from descartes import PolygonPatch
+
+
+alpha_shape_patch = PolygonPatch(alpha_shape, 
+                                 edgecolor='purple', facecolor='none', 
+                                 linewidth=2,
+                                 label='Alpha Shape')
+
+convex_hull_patch = Polygon(convex_hull_vertices, 
+                            closed=True, 
+                            edgecolor='blue', facecolor='none', 
+                            linestyle=':', linewidth=2,
+                            label='Convex Hull')
+
+min_rot_rect_patch = Polygon(min_rot_rect_vertices, 
+                             closed=True, 
+                             edgecolor='green', facecolor='none', 
+                             linestyle='--', 
+                             label='Min Rotated Rectangle', linewidth=2)
+
+min_rect_width = min_rect_vertices[2] - min_rect_vertices[0]
+min_rect_height = min_rect_vertices[2] - min_rect_vertices[0]
+
+min_rect_patch = Rectangle(min_rect_vertices[0:2], 
+                           width=min_rect_width, 
+                           height = min_rect_height,
+                           edgecolor='goldenrod', facecolor='none', 
+                           linestyle='dashed', linewidth=2, 
+                           label='Min Bounding Rectangle', )
+
+circ_patch = Circle(min_circ_center, radius=min_circ_radius,
+                    edgecolor='red', facecolor='none', linewidth=2,
+                    label='Min Bounding Circle')
+```
+
+Finally, we'll plot the patches together with the photographs below:
+
+```python
+f,ax = plt.subplots(1, figsize=(10,10))
 ax.imshow(basemap, extent=basemap_extent, interpolation='bilinear')
-ch = Polygon(convex_hull, closed=False, edgecolor='blue', facecolor='none', 
-             label='Convex Hull')
-rect = Rectangle(min_rect[0:2], width=min_rect[2] - min_rect[0], 
-                 height = min_rect[3] - min_rect[1],
-                 edgecolor='r', facecolor='none', 
-                 label='Minimum Bounding Rectangle', linestyle='dashed')
-circ = Circle(min_circ_center, radius=min_circ_r,
-              edgecolor='green', facecolor='none', 
-              label='Minimum Bounding Circle')
-ax.add_patch(ch)
-ax.add_patch(rect)
-ax.add_patch(circ)
-ax.scatter(db.x, db.y, s=.75)
-ax.legend(ncol=2)
+
+ax.add_patch(alpha_shape_patch)
+ax.add_patch(convex_hull_patch)
+ax.add_patch(min_rot_rect_patch)
+ax.add_patch(min_rect_patch)
+ax.add_patch(circ_patch)
+
+ax.scatter(db.x, db.y, s=.75, color='grey')
+ax.scatter(user.x, user.y, s=100, color='r', marker='x')
+ax.legend(ncol=1, loc='center left')
 plt.show()
 ```
 
-### Testing for non-randomness
+Each gives a different impression of the area enclosing the user's range of photographs. In this, you can see that the the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle & circle are the "loosest" shapes, in that they contain the most area outside of the user's typical area. But, they're also the simplest shapes to draw and understand. 
 
 
-- quadrat
-- distance based
-- k-functions
-- bi-variate k
+# Randomness & clustering
 
+
+Beyond questions of centrality and extent, spatial statistics on point patterns are often concerned with how *even* a distribution of points is. By this, we might want to inquire about whether points tend to all cluster near one another or whether they disperse evenly throughout the problem area. Questions like this refer to the *intensity* or *dispersion* of the point pattern overall. 
+
+Many methods in spatial statistics are interested in this kind of clustering. We will cover a few of the methods useful for identifying clustering in locations of points across the flickr photographs in Tokyo. The first set of techniques, **quadrat** statistics, splits the data up into small areas and then examines the uniformity of counts across areas. The second set of techniques all derive from Ripley (1988), and involve measurements of the distance between points in a point pattern. 
+
+In order for us to explore these patterns, we will need to first construct a `PointPattern` object which records the positions and provides some necessary helper functions and transformations for these statistics. 
+
+```python
+pattern = pointpats.PointPattern(coordinates)
+```
+
+For the purposes of illustration, it also helps to provide a pattern derived from a known *completely spatially random* process. That is, the location and number of points is totally random; there is neither clustering nor dispersion. 
+
+```python
+window = pointpats.Window([(db.x.min(), db.y.min()),
+                           (db.x.min(), db.y.max()),
+                           (db.x.max(), db.y.max()),
+                           (db.x.max(), db.y.min())])
+```
+
+```python
+random = pointpats.PoissonPointProcess(window = window, 
+                                       n=len(coordinates), 
+                                       samples=1).realizations[0]
+random = pointpats.PointPattern(random)
+```
+
+## Quadrat statistics
+
+Quadrat statistics examine the spatial distribution of points in an area in terms of the count of observations that fall within a given cell. By examining whether observations are spread *evenly* over cells, the quadrat approach aims to estimate whether points are spread out, or if they are clustered into a few cells. Strictly speaking, quadrat statistics examine the *evenness* of the distribution over cells using a $\chi^2$ statistical test common in the analysis of contingency tables. 
+
+```python
+qstat = pointpats.QStatistic(pattern)
+```
+
+```python
+qstat.plot()
+```
+
+```python
+qstat_null = pointpats.QStatistic(random)
+qstat_null.plot()
+```
+
+```python
+qstat = pointpats.QStatistic(pattern, nx=10, ny=10)
+```
+
+```python
+qstat.plot()
+```
+
+## Ripley's alphabet functions
+
+```python
+pointpats.F(pattern) # function describing the empty space, asks are gaps consistent/even? 
+pointpats.G(pattern) # function describing nearest neighbor distance, asks are 1-th nearest neighbors closer than expected?
+pointpats.K(pattern) # function describing expected count of neighbors within a distance band, asks if there are more/less than expected? 
+pointpats.L(pattern) # variance-standardized version of the K function
+```
 
 ### Identifying clusters
 
@@ -458,6 +577,12 @@ ax.set_axis_off()
 # Display the figure
 plt.show()
 ```
+
+# References
+
+
+Ripley, B. D. (1988). *Statistical Inference for Spatial Processes.* Cambridge: Cambridge University Press. doi: 10.1017/CBO9780511624131
+
 
 ---
 
