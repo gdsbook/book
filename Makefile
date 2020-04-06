@@ -13,7 +13,7 @@ booksite: sync
 	cp ./CNAME ./docs/CNAME
 bookserve:
 	# serve docs folder locally
-	bash ./infrastructure/booksite/build.sh && \
+	bash ./infrastructure/booksite/build.sh
 	cd ./docs && \
 	bundle exec jekyll serve --host 0.0.0.0
 
