@@ -5,8 +5,8 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.1'
-      jupytext_version: 1.2.1
+      format_version: '1.2'
+      jupytext_version: 1.3.4
   kernelspec:
     display_name: Python 3
     language: python
@@ -483,7 +483,6 @@ into the notebook itself, you can use the following `help` function instead:
 help(geopandas.read_file)
 ```
 
-<!-- #region -->
 ### Containerised platform
 
 As mentioned [earlier in this chapter](#Reproducible-platforms), 
@@ -629,7 +628,6 @@ Executing the command: jupyter notebook
 With this, you can then head to your browser of preference (ideally Mozilla
 Firefox or Google Chrome) and point it to `localhost:8888`. This should render
 a landing page that looks approximately like this one:
-<!-- #endregion -->
 
 ```python
 path = ("../figures/jupyter_landing_page.png")
