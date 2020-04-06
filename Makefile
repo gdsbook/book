@@ -2,6 +2,8 @@ container:
 	docker build -t gdsbook/stack:3.0 ./infrastructure/docker/
 lab:
 	docker run --rm -p 4000:4000 -p 8888:8888 -v ${PWD}:/home/jovyan/work gdsbook/stack:3.0
+labosx:
+	docker run --rm -p 4000:4000 -p 8888:8888 -v ${PWD}:/home/jovyan/work:delegated gdsbook/stack:3.0
 sync: 
 	jupytext --sync ./notebooks/*.ipynb
 booksite: sync
