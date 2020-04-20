@@ -6,8 +6,10 @@ sync:
 	jupytext --sync ./notebooks/*.ipynb
 booksite: sync
 	bash ./infrastructure/booksite/build.sh && \
-	echo 'Swapping full site for _site' && \
-	mv ./docs/_build ./tmp && \
+	echo 'Swapping full site for _site'
+	cd ./docs && \
+	bundle exec jekyll build
+	mv ./docs/_site ./tmp && \
 	rm -r ./docs && \
 	mv ./tmp ./docs && \
 	cp ./CNAME ./docs/CNAME

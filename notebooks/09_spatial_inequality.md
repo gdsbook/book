@@ -507,6 +507,12 @@ the second  component.
 
 
 
+
+
+
+
+
+
 ```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
 pci_df.columns
 ```
