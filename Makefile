@@ -7,7 +7,7 @@ sync:
 booksite: sync
 	bash ./infrastructure/booksite/build.sh && \
 	echo 'Swapping full site for _site' && \
-	mv ./docs/_site ./tmp && \
+	mv ./docs/_build ./tmp && \
 	rm -r ./docs && \
 	mv ./tmp ./docs && \
 	cp ./CNAME ./docs/CNAME

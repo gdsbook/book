@@ -16,6 +16,9 @@ cp ./infrastructure/booksite/toc.yml ./tmp_book/_data/toc.yml
 mkdir ./tmp_book/content/notebooks/
 cp -r ./notebooks/*.ipynb ./tmp_book/content/notebooks/
 cp ./notebooks/00_toc.md ./tmp_book/content/notebooks/00_toc.md
+# Copy data/content
+mkdir ./tmp_book/content/data/
+cp -r ./data ./tmp_book/content/
 # Copy other contents of the book (intro, etc.)
 cp ./infrastructure/booksite/intro.md ./tmp_book/content/intro.md
 cp ./infrastructure/booksite/intro_part_*.md ./tmp_book/content/

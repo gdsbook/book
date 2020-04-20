@@ -1,0 +1,1185 @@
+---
+redirect_from:
+  - "/data/airbnb/regression-cleaning"
+interact_link: content/data/airbnb/regression_cleaning.ipynb
+kernel_name: python3
+kernel_path: content/data/airbnb
+has_widgets: false
+title: |-
+  AirBnb
+pagenum: 18
+prev_page:
+  url: /data/README.html
+next_page:
+  url: /data/airports/airports_cleaning.html
+suffix: .ipynb
+search: download c neighborhood file geopy type airbnb neighborhoods distance park www openstreetmap org map keep regressiondb geojson data cleaning files detailed listings calendar prices variable setup parse price geodataframe variables pool balboa iframe width height frameborder scrolling marginheight marginwidth src export embed html bbox amplayer mapnikampmarker style border px solid black iframebr smalla href mlat ampmlon view larger small github com its location just name into locator calculate house elevation coastal note still mistakes seems neighborhoodcleansed works much better large only observations houses fe sense list dummies room property
+
+comment: "***PROGRAMMATICALLY GENERATED, DO NOT EDIT. SEE ORIGINAL FILES IN /content***"
+---
+
+    <main class="jupyter-page">
+    <div id="page-info"><div id="page-title">AirBnb</div>
+</div>
+    <div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Data-cleaning-of-AirBnb">Data cleaning of AirBnb<a class="anchor-link" href="#Data-cleaning-of-AirBnb"> </a></h1>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display_markdown</span>
+
+<span class="n">display_markdown</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;README.md&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h1 id="AirBnb-data">AirBnb data<a class="anchor-link" href="#AirBnb-data"> </a></h1><p>This dataset is based on the 2016-07-07 San Diego extract from Inside Airbnb. The original set includes AirBnb property listings with characteristics and price, and this is extended to additional variables based on each property's location.</p>
+<ul>
+<li><code>Source</code>: Inside AirBnb</li>
+<li><code>URL</code></li>
+</ul>
+<blockquote><p><a href="http://insideairbnb.com/">http://insideairbnb.com/</a></p>
+</blockquote>
+<ul>
+<li><code>Processing</code>: download of the original files and addition of new variables is documented in <code>regression_cleaning.ipynb</code><ul>
+<li>Clean file: <code>regression_db.geojson</code></li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="c1">#import googlemaps</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cdist</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Download-files">Download files<a class="anchor-link" href="#Download-files"> </a></h2>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Download detailed listings file:</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://data.insideairbnb.com/united-states/&#39;</span>\
+      <span class="s1">&#39;ca/san-diego/2016-07-07/data/&#39;</span>\
+      <span class="s1">&#39;listings.csv.gz&#39;</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;listings.csv.gz&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
+    <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Download calendar file with prices</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://data.insideairbnb.com/united-states/&#39;</span>\
+      <span class="s1">&#39;ca/san-diego/2016-07-07/data/&#39;</span>\
+      <span class="s1">&#39;calendar.csv.gz&#39;</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;calendar.csv.gz&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
+    <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Download neighborhoods</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://data.insideairbnb.com/united-states/&#39;</span>\
+      <span class="s1">&#39;ca/san-diego/2016-07-07/visualisations/&#39;</span>\
+      <span class="s1">&#39;neighbourhoods.geojson&#39;</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;neighbourhoods.geojson&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
+    <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Variable-setup">Variable setup<a class="anchor-link" href="#Variable-setup"> </a></h2>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Parse-price">Parse price<a class="anchor-link" href="#Parse-price"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lst</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;listings.csv.gz&#39;</span><span class="p">)</span>
+<span class="n">lst</span><span class="p">[</span><span class="s1">&#39;priceN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>\
+                                    <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>\
+                                    <span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)))</span>
+<span class="n">lst</span><span class="p">[</span><span class="s1">&#39;l_price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lst</span><span class="p">[</span><span class="s1">&#39;priceN&#39;</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="GeoDataFrame"><code>GeoDataFrame</code><a class="anchor-link" href="#GeoDataFrame"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="n">xys</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[[</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">]]</span>\
+        <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gdb</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">lst</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">xys</span><span class="p">),</span>
+                       <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;+init=epsg:4326&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Variables">Variables<a class="anchor-link" href="#Variables"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Pool</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ams</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;pool&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gdb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">gdb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;amenities&#39;</span><span class="p">]</span>
+    <span class="n">pcs</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="n">ams</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pcs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;Pool&#39;</span> <span class="ow">in</span> <span class="n">pcs</span><span class="p">:</span>
+        <span class="n">gdb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;pool&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nb">set</span><span class="p">(</span><span class="n">ams</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;&#39;,
+ &#39;&#34;24-Hour Check-in&#34;&#39;,
+ &#39;&#34;Air Conditioning&#34;&#39;,
+ &#39;&#34;Buzzer/Wireless Intercom&#34;&#39;,
+ &#39;&#34;Cable TV&#34;&#39;,
+ &#39;&#34;Carbon Monoxide Detector&#34;&#39;,
+ &#39;&#34;Elevator in Building&#34;&#39;,
+ &#39;&#34;Family/Kid Friendly&#34;&#39;,
+ &#39;&#34;Fire Extinguisher&#34;&#39;,
+ &#39;&#34;First Aid Kit&#34;&#39;,
+ &#39;&#34;Free Parking on Premises&#34;&#39;,
+ &#39;&#34;Hair Dryer&#34;&#39;,
+ &#39;&#34;Hot Tub&#34;&#39;,
+ &#39;&#34;Indoor Fireplace&#34;&#39;,
+ &#39;&#34;Laptop Friendly Workspace&#34;&#39;,
+ &#39;&#34;Lock on Bedroom Door&#34;&#39;,
+ &#39;&#34;Other pet(s)&#34;&#39;,
+ &#39;&#34;Pets Allowed&#34;&#39;,
+ &#39;&#34;Pets live on this property&#34;&#39;,
+ &#39;&#34;Safety Card&#34;&#39;,
+ &#39;&#34;Smoke Detector&#34;&#39;,
+ &#39;&#34;Smoking Allowed&#34;&#39;,
+ &#39;&#34;Suitable for Events&#34;&#39;,
+ &#39;&#34;Wheelchair Accessible&#34;&#39;,
+ &#39;&#34;Wireless Internet&#34;&#39;,
+ &#39;&#34;translation missing: en.hosting_amenity_49&#34;&#39;,
+ &#39;&#34;translation missing: en.hosting_amenity_50&#34;&#39;,
+ &#39;Breakfast&#39;,
+ &#39;Cat(s)&#39;,
+ &#39;Dog(s)&#39;,
+ &#39;Doorman&#39;,
+ &#39;Dryer&#39;,
+ &#39;Essentials&#39;,
+ &#39;Gym&#39;,
+ &#39;Hangers&#39;,
+ &#39;Heating&#39;,
+ &#39;Internet&#39;,
+ &#39;Iron&#39;,
+ &#39;Kitchen&#39;,
+ &#39;Pool&#39;,
+ &#39;Shampoo&#39;,
+ &#39;TV&#39;,
+ &#39;Washer&#39;}</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Distance to Balboa park</li>
+</ul>
+<p><iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-117.16953277587892%2C32.63070127641626%2C-117.12335586547853%2C32.82983681046287&amp;layer=mapnik&amp;marker=32.73030211394726%2C-117.14649954999999" style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/?mlat=32.7303&amp;mlon=-117.1465#map=13/32.7303/-117.1465">View Larger Map</a></small></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can use <a href="https://github.com/geopy/geopy"><code>geopy</code></a> to find out its location:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">geopy.geocoders</span> <span class="kn">import</span> <span class="n">Nominatim</span>
+<span class="n">geolocator</span> <span class="o">=</span> <span class="n">Nominatim</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Just type the name into the locator:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bp</span> <span class="o">=</span> <span class="n">geolocator</span><span class="o">.</span><span class="n">geocode</span><span class="p">(</span><span class="s2">&quot;Balboa Park, San Diego, US&quot;</span><span class="p">)</span>
+<span class="n">bp</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Location(Balboa Park, North Park, San Diego, San Diego County, California, 92102, United States of America, (32.73135675, -117.146526555704, 0.0))</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">b_ll</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">bp</span><span class="o">.</span><span class="n">latitude</span>
+<span class="n">b_ll</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(-117.146526555704, 32.73135675)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then calculate distance to the park from each house:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># USA Contiguous Albers Equal Area (m.)</span>
+<span class="c1"># http://epsg.io/102003</span>
+<span class="n">tgt_crs</span> <span class="o">=</span> <span class="s2">&quot;+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 &quot;</span>\
+          <span class="s2">&quot;+lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs&quot;</span>
+
+<span class="n">b_xy</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">b_ll</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">gdb</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">tgt_crs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">b_xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">b_xy</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b_xy</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="c1"># Calculate distance in Km.</span>
+<span class="n">d2b</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">pt</span><span class="p">:</span> <span class="n">cdist</span><span class="p">([(</span><span class="n">pt</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">y</span><span class="p">)],</span> <span class="p">[</span><span class="n">b_xy</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;d2balboa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">tgt_crs</span><span class="p">)</span>\
+                                 <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">d2b</span><span class="p">)</span>
+<span class="n">gdb</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;d2balboa&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+         <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis_r&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f2dae1f1ef0&gt;</pre>
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../../images/data/airbnb/regression_cleaning_26_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Elevation</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../google_maps_key&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">gmaps</span> <span class="o">=</span> <span class="n">googlemaps</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Google takes lat/lon instead of lon/lat</span>
+<span class="n">gmaps</span><span class="o">.</span><span class="n">elevation</span><span class="p">([</span><span class="n">b_ll</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[{&#39;elevation&#39;: 89.00752258300781,
+  &#39;location&#39;: {&#39;lat&#39;: 32.73136, &#39;lng&#39;: -117.14653},
+  &#39;resolution&#39;: 4.771975994110107}]</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pts</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">pt</span><span class="p">:</span> <span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
+<span class="o">%</span><span class="k">time</span> ele = gmaps.elevation(pts.head().tolist())
+<span class="n">ele</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 4 ms, sys: 0 ns, total: 4 ms
+Wall time: 309 ms
+</pre>
+</div>
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[{&#39;elevation&#39;: 95.95661163330078,
+  &#39;location&#39;: {&#39;lat&#39;: 32.58188, &#39;lng&#39;: -117.00194},
+  &#39;resolution&#39;: 4.771975994110107},
+ {&#39;elevation&#39;: 171.3590698242188,
+  &#39;location&#39;: {&#39;lat&#39;: 32.65303, &#39;lng&#39;: -116.97681},
+  &#39;resolution&#39;: 4.771975994110107},
+ {&#39;elevation&#39;: 177.8932495117188,
+  &#39;location&#39;: {&#39;lat&#39;: 32.66148, &#39;lng&#39;: -116.97181},
+  &#39;resolution&#39;: 4.771975994110107},
+ {&#39;elevation&#39;: 184.3952026367188,
+  &#39;location&#39;: {&#39;lat&#39;: 32.63869, &#39;lng&#39;: -116.95125},
+  &#39;resolution&#39;: 4.771975994110107},
+ {&#39;elevation&#39;: 185.0911254882812,
+  &#39;location&#39;: {&#39;lat&#39;: 32.63894000000001, &#39;lng&#39;: -116.93889},
+  &#39;resolution&#39;: 4.771975994110107}]</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">extract_ele</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span>
+<span class="n">eleS</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">ele</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">extract_ele</span><span class="p">)</span>
+<span class="n">eleS</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0     95.956612
+1    171.359070
+2    177.893250
+3    184.395203
+4    185.091125
+dtype: float64</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Coastal neighborhood?</li>
+</ul>
+<p><strong>NOTE</strong>: Still some mistakes it seems but <code>neighborhood_cleansed</code> works much better than <code>neighborhood</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">coastal_neighborhoods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Wooded Area&#39;</span><span class="p">,</span> <span class="s1">&#39;Ocean Beach&#39;</span><span class="p">,</span> <span class="s1">&#39;Pacific Beach&#39;</span><span class="p">,</span> \
+                         <span class="s1">&#39;La Jolla&#39;</span><span class="p">,</span> <span class="s1">&#39;Torrey Pines&#39;</span><span class="p">,</span> <span class="s1">&#39;Del Mar Heighs&#39;</span><span class="p">,</span> \
+                         <span class="s1">&#39;Mission Bay&#39;</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">coastal</span><span class="p">(</span><span class="n">neigh</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">neigh</span> <span class="ow">in</span> <span class="n">coastal_neighborhoods</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+<span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;coastal_neig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;neighbourhood_cleansed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">coastal</span><span class="p">)</span>
+
+<span class="n">gdb</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;coastal_neig&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+         <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../../images/data/airbnb/regression_cleaning_33_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Large neighborhood</li>
+</ul>
+<p>We keep only observations in neighborhoods with more than 25 AirBnb houses so FE on neighborhood make sense.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lrg_nei</span> <span class="o">=</span> <span class="n">gdb</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;neighbourhood_cleansed&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">25</span>
+<span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;lrg_nei&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;neighbourhood_cleansed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">lrg_nei</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>List to keep</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accommodates&#39;</span><span class="p">,</span> <span class="s1">&#39;bathrooms&#39;</span><span class="p">,</span> <span class="s1">&#39;bedrooms&#39;</span><span class="p">,</span> 
+      <span class="s1">&#39;beds&#39;</span><span class="p">,</span> <span class="s1">&#39;neighbourhood_cleansed&#39;</span><span class="p">,</span> <span class="s1">&#39;pool&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;d2balboa&#39;</span><span class="p">,</span> <span class="s1">&#39;coastal_neig&#39;</span><span class="p">,</span> <span class="s1">&#39;lrg_nei&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;priceN&#39;</span><span class="p">,</span> <span class="s1">&#39;l_price&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Dummies">Dummies<a class="anchor-link" href="#Dummies"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Room type</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;room_type&#39;</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Property type</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">simplify</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="n">bigs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;House&#39;</span><span class="p">,</span> <span class="s1">&#39;Apartment&#39;</span><span class="p">,</span> <span class="s1">&#39;Condominium&#39;</span><span class="p">,</span> <span class="s1">&#39;Townhouse&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">bigs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">p</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Other&#39;</span>
+
+<span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;property_group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;property_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">simplify</span><span class="p">)</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;property_group&#39;</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;pg&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Write-out">Write out<a class="anchor-link" href="#Write-out"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gdb</span><span class="p">[[</span><span class="s1">&#39;lrg_nei&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 6608 entries, 0 to 6607
+Data columns (total 1 columns):
+lrg_nei    6608 non-null bool
+dtypes: bool(1)
+memory usage: 6.5 KB
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span> rm <span class="s1">&#39;regression_db.geojson&#39;</span>
+<span class="n">final</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="n">xs</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>\
+               <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rt</span><span class="p">)</span>\
+               <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;priceN&#39;</span><span class="p">:</span> <span class="s1">&#39;price&#39;</span><span class="p">})</span>\
+               <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;lrg_nei&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span><span class="p">,</span> <span class="p">:]</span>\
+               <span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;lrg_nei&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+               <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+Int64Index: 6110 entries, 19 to 6607
+Data columns (total 20 columns):
+accommodates              6110 non-null int64
+bathrooms                 6110 non-null float64
+bedrooms                  6110 non-null float64
+beds                      6110 non-null float64
+neighbourhood_cleansed    6110 non-null object
+pool                      6110 non-null int64
+d2balboa                  6110 non-null float64
+coastal_neig              6110 non-null int64
+price                     6110 non-null float64
+l_price                   6110 non-null float64
+geometry                  6110 non-null object
+id                        6110 non-null int64
+pg_Apartment              6110 non-null uint8
+pg_Condominium            6110 non-null uint8
+pg_House                  6110 non-null uint8
+pg_Other                  6110 non-null uint8
+pg_Townhouse              6110 non-null uint8
+rt_Entire_home/apt        6110 non-null uint8
+rt_Private_room           6110 non-null uint8
+rt_Shared_room            6110 non-null uint8
+dtypes: float64(6), int64(4), object(2), uint8(8)
+memory usage: 668.3+ KB
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">final</span> <span class="o">=</span> <span class="n">final</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">neighbourhood_cleansed</span><span class="o">=</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">,</span> 
+                          <span class="n">coastal_neig</span><span class="o">=</span><span class="s1">&#39;coastal&#39;</span><span class="p">,</span>
+                          <span class="n">l_price</span> <span class="o">=</span> <span class="s1">&#39;log_price&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>rm regression_db.geojson
+<span class="n">final</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s1">&#39;regression_db.geojson&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GeoJSON&#39;</span><span class="p">)</span>
+<span class="n">final</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>rm: cannot remove &#39;airbnb/regression_db.geojson&#39;: No such file or directory
+&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+RangeIndex: 6110 entries, 0 to 6109
+Data columns (total 20 columns):
+accommodates          6110 non-null int64
+bathrooms             6110 non-null float64
+bedrooms              6110 non-null float64
+beds                  6110 non-null float64
+neighborhood          6110 non-null object
+pool                  6110 non-null int64
+d2balboa              6110 non-null float64
+coastal               6110 non-null int64
+price                 6110 non-null float64
+log_price             6110 non-null float64
+id                    6110 non-null int64
+pg_Apartment          6110 non-null int64
+pg_Condominium        6110 non-null int64
+pg_House              6110 non-null int64
+pg_Other              6110 non-null int64
+pg_Townhouse          6110 non-null int64
+rt_Entire_home/apt    6110 non-null int64
+rt_Private_room       6110 non-null int64
+rt_Shared_room        6110 non-null int64
+geometry              6110 non-null object
+dtypes: float64(6), int64(12), object(2)
+memory usage: 954.8+ KB
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr>
+<p><a href="regression_db.geojson">[Download the <code>regression_db.geojson</code> file]</a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+ 
+
+
+    </main>
+    
