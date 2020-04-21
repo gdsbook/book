@@ -48,10 +48,10 @@ In this chapter, we will focus on an introduction to point patters through geo-t
 
 ## Location, Location, Location
 
-The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, [Goodchild, 2007](https://link.springer.com/article/10.1007%2Fs10708-007-9111-y)) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let's load the flickr data first:
+The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, [1]) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let's load the flickr data first:
 
 ```python
-db = pandas.read_csv('../data/tokyo_clean.csv')
+db = pandas.read_csv('../data/tokyo/tokyo_clean.csv')
 ```
 
 This table has been lightly processed from the raw data. It contains the user ID, the latitude and longitude, as well as those coordinates expressed in Pseudo Mercator, the timestamp when the photo was taken, and the url of the picture they refer to:
@@ -278,25 +278,48 @@ user = db.query('user_id == "95795770@N00"')
 coordinates = user[['x','y']].values
 ```
 
-First, we'll compute the **alpha shape**, which is the tightest hull that encloses the user's photos. This is computed using the `alpha_shape_auto` function in `pysal.lib.cg`. 
-
-```python
-alpha_shape = pysal.lib.cg.alpha_shape_auto(coordinates)
-```
-
-<!-- #region -->
-Second, we'll compute the **convex hull**, which is the tighest *convex* shape that encloses the user's photos. By *convex*, we mean that the shape never "doubles back" on itself; it has no divets, valleys, crenelations, or holes. All of its interior angles are smaller than 180 degrees.  This is computed using the `centrography.hull` method.
-
-
-
-4. The **minimum bounding circle** is the smallest circle that can be drawn to enclose the entire dataset. Often, this circle is bigger than the minimum bounding rectangle. This tends to be somewhat more computationally challenging than the minimum rotated rectangle, and is implemented in the `skyum` function in `pointpats`. 
-<!-- #endregion -->
+First, we'll compute the **convex hull**, which is the tighest *convex* shape that encloses the user's photos. By *convex*, we mean that the shape never "doubles back" on itself; it has no divets, valleys, crenelations, or holes. All of its interior angles are smaller than 180 degrees.  This is computed using the `centrography.hull` method.
 
 ```python
 convex_hull_vertices = centrography.hull(coordinates)
 ```
 
-Next, we'll consider two kinds of **minimum bounding rectangles**. They both are constructed as the tightest *rectangle* that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the **minimum rotated rectangle** provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated. 
+Second, we'll compute the **alpha shape**, which is like a "tighter" version of the convex hull. One way to think of a convex hull is that it's the space left over when rolling a **really** large ball or circle all the way around the shape. The ball is so large relative to the shape, its radius is actually infinite, and the lines forming the convex hull are actually just straight lines! 
+
+In contrast, you can think of an alpha shape as the space made from rolling a *small* balls around the shape. Since the ball is smaller, it rolls into the dips & valleys created between points. As that ball gets bigger, the alpha shape becomes the convex hull. But, for small balls, the shape can get very tight indeed. In fact, if alpha gets too small, it "slips" through the points, resulting in *more than one hull!* As such, the `pysal` package has an `alpha_shape_auto` function to find the smallest *single* alpha shape, so that you don't have to guess at how big the ball needs to be. 
+
+```python
+# TODO: Change this to use July 2020 release of PySAL with this function in libpysal
+import libpysal
+alpha_shape, alpha, circs = libpysal.cg.alpha_shape_auto(coordinates, return_circles=True)
+```
+
+To illustrate, the figure below has the tightest single alpha shape shown in green and the original source points shown in black. The "bounding" circles shown in the figure all have a radius of $8652$. The circles are plotted where our "bounding" disk touches two or three of the points in the point cloud. You can see that the circles "cut into" the convex hull, shown in blue dashed lines, up until they touch two (or three) points. Any tighter, and the circle would disconnect one of the points on the boundary of the alpha shape. 
+
+```python
+from descartes import PolygonPatch
+f,ax = plt.subplots(1,1, figsize=(9,9))
+ax.add_patch(PolygonPatch(alpha_shape, edgecolor='green', 
+                          facecolor='green', alpha=.2, label = 'Tighest alpha shape'))
+ax.scatter(*coordinates.T, color='k', marker='.', label='Source Points')
+ax.imshow(basemap, extent=basemap_extent)
+[ax.add_patch(plt.Circle(c, radius=alpha, facecolor='none', edgecolor='r'))
+ for c in circs]
+ax.add_patch(plt.Circle(circs[0], radius=alpha, 
+                        facecolor='none', edgecolor='r', label='Bounding Circles'))
+
+ax.add_patch(plt.Polygon(convex_hull_vertices, 
+                            closed=True, 
+                            edgecolor='blue', facecolor='none', 
+                            linestyle=':', linewidth=2,
+                            label='Convex Hull'))
+
+
+plt.legend()
+
+```
+
+The remaining three bounding shapes are all rectangles or circles. First, we'll consider two kinds of **minimum bounding rectangles**. They both are constructed as the tightest *rectangle* that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the **minimum rotated rectangle** provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated. 
 
 For the minimum rotated rectangle, we will use `OpenCV`'s `cv.minAreaRect` function. 
 
@@ -311,7 +334,7 @@ And, for the minimum bounding rectangle without rotation, we will use the `mbr` 
 min_rect_vertices = centrography.mbr(coordinates)
 ```
 
-Finally, we'll compute the **minimum bounding circle**, which is the smallest circle that encloses the user's photos.
+Finally, the **minimum bounding circle** is the smallest circle that can be drawn to enclose the entire dataset. Often, this circle is bigger than the minimum bounding rectangle. This tends to be somewhat more computationally challenging than the minimum rotated rectangle, and is implemented in the `skyum` function in `pointpats`. 
 
 ```python
 (min_circ_radius, min_circ_center), *_ = centrography.skyum(coordinates)
@@ -410,40 +433,222 @@ random = pointpats.PointPattern(random)
 
 Quadrat statistics examine the spatial distribution of points in an area in terms of the count of observations that fall within a given cell. By examining whether observations are spread *evenly* over cells, the quadrat approach aims to estimate whether points are spread out, or if they are clustered into a few cells. Strictly speaking, quadrat statistics examine the *evenness* of the distribution over cells using a $\chi^2$ statistical test common in the analysis of contingency tables. 
 
-```python
-qstat = pointpats.QStatistic(pattern)
-```
+In the `pointpats` package, you can visualize the results using the following `QStatistic.plot()` method. This shows the grid used to count the events, as well as the underlying pattern:
 
 ```python
+qstat = pointpats.QStatistic(pattern)
 qstat.plot()
 ```
+
+In this case, for the default of a three by three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small p-value:
+
+```python
+qstat.chi2_pvalue
+```
+
+In contrast, our totally random point process will have nearly the same points in every cell:
 
 ```python
 qstat_null = pointpats.QStatistic(random)
 qstat_null.plot()
 ```
 
+This means its p-value will be large, and likely not significant:
+
 ```python
-qstat = pointpats.QStatistic(pattern, nx=10, ny=10)
+qstat_null.chi2_pvalue
+```
+
+Further, you can change the spatial scale of the gridding to ensure that the cells are not too large or too small. Generally speaking, you should seek to avoid empty cells from becoming the majority, and you should ensure that any spatial symmetry in your data is well-covered when testing patterns that exhibit strong regional structure.
+
+```python
+qstat_detailed = pointpats.QStatistic(pattern, nx=20, ny=20)
 ```
 
 ```python
-qstat.plot()
+qstat_detailed.plot()
+```
+
+```python
+qstat_detailed.chi2_pvalue
 ```
 
 ## Ripley's alphabet functions
 
+
+Beyond quadrat statistics, a large branch of spatial statistics focuses on the distributions of three quantities in a point pattern. They derive from earlier work by Ripley [2] on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases. 
+
+The first function, Ripley's $G$ function, focuses on the distribution of nearest neighbor distances. That is, the $G$ function summarises the distances between each point in the point pattern to their nearest neighbor in the pattern. 
+
+In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are *mutual* nearest neighbors (and so have arrows going in both directions) but some are not. 
+
 ```python
-pointpats.F(pattern) # function describing the empty space, asks are gaps consistent/even? 
-pointpats.G(pattern) # function describing nearest neighbor distance, asks are 1-th nearest neighbors closer than expected?
-pointpats.K(pattern) # function describing expected count of neighbors within a distance band, asks if there are more/less than expected? 
-pointpats.L(pattern) # variance-standardized version of the K function
+# this code should be hidden in the book, and only the plot visible!
+f,ax = plt.subplots(1,2,figsize=(8,4), sharex=True, sharey=True)
+ax[0].scatter(*random.points.values.T, color='red')
+ax[1].scatter(*random.points.values.T, color='red',
+              zorder=100, marker='.', label='Points')
+nn_ixs, nn_ds = random.knn(1)
+first = True
+for coord, nn_ix, nn_d in zip(random.points.values, nn_ixs, nn_ds):
+    dx, dy = random.points.values[nn_ix].squeeze() - coord
+    arrow = ax[1].arrow(*coord, dx,dy, 
+                length_includes_head=True, 
+                overhang=0, head_length=300*3,
+                head_width=300*3, width=50*3,
+                linewidth=0, facecolor='k',
+                head_starts_at_zero=False)
+    if first:
+        plt.plot((1e100, 1e101), (0,1), color='k', 
+                 marker='<', markersize=10,
+                 label='Nearest Neighbor to Point')
+    first = False
+
+ax[0].axis([1.554e7, 1.556e7, 4240000, 4260000])
+ax[0].set_xticklabels([])
+ax[0].set_yticklabels([])
+ax[0].set_xticks([])
+ax[0].set_yticks([])
+f.tight_layout()
+ax[1].legend(bbox_to_anchor = (.5,-.06), fontsize=16)
+plt.show()
 ```
+
+Then, the distribution of these distances has a distinctive pattern under completely spatially random processes. We can compute the distribution of nearest neighbor distances of the observed pattern and compare it to the distribution for a set of simulated patterns that have been simulated according to a known spatially-random process, such as a spatial Poisson point process. 
+
+To do this in `pysal`, we can use the `Genv` function, which computes both the `G` function for the empirical data *and* these hypothetical replications under a completely spatially random process.
+
+```python
+realizations = pointpats.PoissonPointProcess(pattern.window,
+                                             pattern.n, 
+                                             samples = 1000,
+                                             asPP=True)
+genv = pointpats.Genv(pattern, intervals=40, realizations=realizations)
+```
+
+Thinking about these distributions of distances, a "clustered" pattern must have more points near one another than a pattern that is "dispersed", and a completely random pattern should have something in between. Therefore, if the $G$ function increases *rapidly* with distance, we probably have a clustered pattern. If it increases *slowly* with distance, we have a dispersed pattern. Something in the middle will be difficult to distinguish from pure chance.
+
+We can visualize this below. On the left, we plot the $G(d)$ function, with distance-to-point ($d$) on the horizontal axis and the fraction of nearest neighbor distances smaller than $d$ on the right axis. In red, the empirical cumulative distribution of nearest neighbor distances is shown. In blue, simulations (like the `random` pattern shown in the previous section) are shown. The bright blue line represents the average of all simulations, and the darker blue band around it represents the middle 95% of simulations. 
+
+In this plot, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user's flickr photographs are *closer* to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is *clustered.*
+
+```python
+f,ax = plt.subplots(1,2,figsize=(9,3), 
+                    gridspec_kw=dict(width_ratios=(6,3)))
+
+# plot the middle 95% 
+ax[0].fill_between(genv.d, genv.low, genv.high, alpha=.5, 
+                 label='95% of simulations')
+
+# show the average of simulations
+ax[0].plot(genv.d, genv.mean, color='cyan', 
+         label='mean of simulations')
+
+# and the observed pattern's G function
+ax[0].plot(*genv.observed.T,
+         label = 'observed', color='red')
+
+# clean up labels and axes
+ax[0].set_xlabel('distance')
+ax[0].set_ylabel('% of nearest neighbor\ndistances shorter')
+ax[0].legend()
+ax[0].set_xlim(0,2000)
+ax[0].set_title(r"Ripley's $G(d)$ function")
+
+# plot the pattern itself on the next frame
+ax[1].scatter(*coordinates.T)
+
+# and clean up labels and axes there, too
+ax[1].set_xticks([])
+ax[1].set_yticks([])
+ax[1].set_xticklabels([])
+ax[1].set_yticklabels([])
+ax[1].set_title('Pattern')
+f.tight_layout()
+plt.show()
+```
+
+Another way to measure dispersion is to examine the *gaps* in the pattern. That is, where the $G$ function works by analyzing the distance *between* points in the pattern, the *F* function works by analyzing the distance *to* points in the pattern from locations in empty space. That is why the $F$ function is called the "the empty space function," since it characterizes the typical distance from arbitrary points in empty space to the point pattern. If the pattern has large gaps or empty areas, the $F$ function will increase slowly. But, if the pattern is highly dispersed, then the $F$ function will increase rapidly. 
+
+We can use similar tooling to investigate the $F$ function, since it is so mathematically similar to the $G$ function. This is implemented identically using the `Fenv` function in `pointpats`. Since the $F$ function estimated for the observed pattern increases *much* more slowly than the $F$ functions for the simulated patterns, we can be confident that there are many gaps in our pattern; i.e. the pattern is *clustered*. 
+
+```python
+fenv = pointpats.Fenv(pattern, intervals=40, realizations=realizations)
+```
+
+```python
+f,ax = plt.subplots(1,2,figsize=(9,3), 
+                    gridspec_kw=dict(width_ratios=(6,3)))
+
+# plot the middle 95% 
+ax[0].fill_between(fenv.d, fenv.low, fenv.high, alpha=.5, 
+                 label='95% of simulations')
+
+# show the average of simulations
+ax[0].plot(fenv.d, fenv.mean, color='cyan', 
+         label='mean of simulations')
+
+# and the observed pattern's G function
+ax[0].plot(*fenv.observed.T,
+         label = 'observed', color='red')
+
+# clean up labels and axes
+ax[0].set_xlabel('distance')
+ax[0].set_ylabel('% of nearest neighbor\ndistances shorter')
+ax[0].set_title(r"Ripley's $F(d)$ function")
+ax[0].legend()
+
+# plot the pattern itself on the next frame
+ax[1].scatter(*coordinates.T)
+
+# and clean up labels and axes there, too
+ax[1].set_xticks([])
+ax[1].set_yticks([])
+ax[1].set_xticklabels([])
+ax[1].set_yticklabels([])
+ax[1].set_title('Pattern')
+f.tight_layout()
+plt.show()
+```
+
+Another function, the $K$ function, is used to measure *counts*, rather than distances. The $K$ function measures the count of points in the pattern within a circle of increasing radius. Patterns with clustering will exhibit a steep rise, whereas patterns with dispersion will exhibit a much slower rise. As before, we can compute a "reference" using simulations based on a completely spatially random process. 
+
+```python
+# todo: broken upstream
+# kenv = pointpats.Kenv(pattern, intervals=40, realizations=realizations)
+```
+
+```python
+# f,ax = plt.subplots(1,2,figsize=(9,3), 
+#                     gridspec_kw=dict(width_ratios=(6,3)))
+# ax[1].scatter(*coordinates.T)
+# ax[0].fill_between(kenv.d, kenv.low, kenv.high, alpha=.5, 
+#                  label='95% of simulations')
+# ax[0].plot(kenv.d, fenv.mean, color='cyan', 
+#          label='mean of simulations')
+# ax[0].plot(*kenv.observed.T,
+#          label = 'observed', color='red')
+# ax[0].set_xlabel('distance')
+# ax[0].set_ylabel('% of nearest neighbor\ndistances shorter')
+# ax[0].legend()
+# ax[1].set_xticks([])
+# ax[1].set_yticks([])
+# ax[1].set_xticklabels([])
+# ax[1].set_yticklabels([])
+# ax[1].set_title('Pattern')
+# ax[0].set_title(r"Ripley's $K(d)$ function")
+# f.tight_layout()
+```
+
+There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the `pointpats` documentation for more information on how this can be done in Python, or the book by Baddeley on *Spatial Point Patterns* in R[3].
+
 
 ### Identifying clusters
 
 
-In this final section, we will learn a method to identify clusters of points, based on their density across space. To do this, we will use the widely used `DBSCAN` algorithm. For this method, a cluster is a concentration of at least `m` points, each of them within a distance of `r` of at least another point in the cluster. Points in the dataset are then divided into three categories:
+The previous two sections on exploratory spatial analysis of point patterns provides methods to characterize whether point patterns are dispersed or clustered in space. However, knowing that a point pattern *is* clustered does not necessarily give us information about *where* that cluster resides. To do this, we must learn a method to identify clusters of points, based on their density across space. 
+
+There are many spatial point clustering algorithms. Here, will cover the widely used `DBSCAN` algorithm. For this method, a cluster is a concentration of at least `m` points, each of them within a distance of `r` of at least another point in the cluster. Points in the dataset are then divided into three categories:
 
 * *Noise*, for those points outside a cluster.
 * *Cores*, for those points inside a cluster whith at least `m` points in the cluster within distance `r`.
@@ -474,7 +679,7 @@ lbls[:5]
 The labels object always has the same length as the number of points used to run `DBSCAN`. Each value represents the index of the cluster a point belongs to. If the point is classified as *noise*, it receives a -1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make thinks easier later on, let us turn `lbls` into a `Series` object that we can index in the same way as our collection of points:
 
 ```python
-lbls = pd.Series(lbls, index=db.index)
+lbls = pandas.Series(lbls, index=db.index)
 ```
 
 Now we already have the clusters, we can proceed to visualize them. There are many ways in which this can be done. We will start just by coloring points in a cluster in red and noise in grey:
@@ -483,7 +688,7 @@ Now we already have the clusters, we can proceed to visualize them. There are ma
 # Setup figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Add base layer with tiles for context
-ax.imshow(img, extent=ext, alpha=0.75)
+ax.imshow(basemap, extent=basemap_extent)
 # Subset points that are not part of any cluster (noise)
 noise = db.loc[lbls==-1, ['x', 'y']]
 # Plot noise in grey
@@ -501,7 +706,9 @@ ax.set_axis_off()
 plt.show()
 ```
 
-Although informative, the result of this run is not particularly satisfactory. XXX. This is because we have run `DBSCAN` with the default parameters. If you type `dbscan?`, you will get the help of the function and will be able to see what those are: a radious of 0.5 and a minimum of five points per cluster. Since our data is expressed in metres, a radius of half a metre will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs. 
+Although informative, the result of this run is not particularly satisfactory. There are *way* too many points that are classified as "noise".
+
+This is because we have run `DBSCAN` with the default parameters. If you type `dbscan?`, you will get the help of the function and will be able to see what those are: a radious of 0.5 and a minimum of five points per cluster. Since our data is expressed in metres, a radius of half a metre will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs. 
 
 Let us change those parameters to see if we can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:
 
@@ -540,48 +747,22 @@ ax.set_axis_off()
 plt.show()
 ```
 
-- Convex hull (`shapely`) of each cluster
+# Conclusion
 
-```python
-chs = []
-for cID in lbls.unique():
-    if cID != -1:
-        cluster = db.loc[lbls==cID]
-        geom = cluster.loc[:, ['x', 'y']].apply(\
-                                    lambda xy: Point(*xy), axis=1
-                                               )
-        ch = MultiPoint(geom.tolist()).convex_hull
-        chs.append(ch)
-chs = gpd.GeoSeries(chs)
-```
+Overall, this chapter has provided an overview of methods to analyze point patterns. From measuring their location, central tendency, and extent, to observing how they cluster or disperse and locating where the clusters are, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about many point patterns. Further, we will cover *modelling* point patterns, such as describing their properties or future locations, in subsequent chapters. 
 
-```python
-# Rerun DBSCAN
-cs, lbls = dbscan(db[['x', 'y']], eps=500, min_samples=minp)
-# Turn labels into a Series
-lbls = pd.Series(lbls, index=db.index)
 
-# Setup figure and axis
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Add base layer with tiles for context
-ax.imshow(img, extent=ext, alpha=0.75)
-# Subset points that are not part of any cluster (noise)
-noise = db.loc[lbls==-1, ['x', 'y']]
-# Plot noise in grey
-ax.scatter(noise['x'], noise['y'], c='grey', s=5, \
-           linewidth=0, alpha=0.75)
-# Plot convex hulls
-chs.plot(ax=ax, color='red', alpha=0.5, linewidth=0.)
-# Remove axes
-ax.set_axis_off()
-# Display the figure
-plt.show()
-```
+# Questions
+
 
 # References
 
 
-Ripley, B. D. (1988). *Statistical Inference for Spatial Processes.* Cambridge: Cambridge University Press. doi: 10.1017/CBO9780511624131
+[1] Goodchild, M.F. (2007) "Citizens as sensors: the world of volunteered geography." *GeoJournal* 69, 211-221. 
+
+[2] Ripley, B. D. (1988). *Statistical Inference for Spatial Processes.* Cambridge: Cambridge University Press. doi: 10.1017/CBO9780511624131
+
+[3] Baddeley, A., E. Rubak, and R. Turner. 2015. *Spatial Point Patterns: Methodology and Applications with R* Boca Raton, FL: Chapman & Hall/CRC Press. 
 
 
 ---
