@@ -1,5 +1,8 @@
-# License for this book
+Geographic Data Science with PySAL and the PyData Stack
+=======================================================
 
-All content in this book (ie, any files and content in the `content/` folder)
-is licensed under the [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/)
-(CC BY-SA 4.0) license.
+This project is released under a Creative Commons BY-NC-ND license. 
+
+For more information, please visit:
+
+https://creativecommons.org/licenses/by-nc-nd/4.0/

@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,minimum-scale=1">
+
+  <title>AirBnb</title>
+  <meta name="description" content="        AirBnb    Data cleaning of AirBnb     from IPython.display import display_markdowndisplay_markdown(open(&quot;README.md&quot;).read(), raw=True)    A...">
+
+  <link rel="canonical" href="https://geographicdata.science/book/data/airbnb/regression_cleaning.html">
+  <link rel="alternate" type="application/rss+xml" title="Geographic Data Science with Python" href="https://geographicdata.science/book/feed.xml">
+
+  <meta property="og:url"         content="https://geographicdata.science/book/data/airbnb/regression_cleaning.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="AirBnb" />
+<meta property="og:description" content="        AirBnb    Data cleaning of AirBnb     from IPython.display import display_markdowndisplay_markdown(open(&quot;README.md&quot;).read(), raw=True)    A..." />
+<meta property="og:image"       content="https://geographicdata.science/book/images/logo/logo.png" />
+
+<meta name="twitter:card" content="summary">
+
+
+  <script type="application/ld+json">
+  {
+  "@context": "http://schema.org",
+  "@type": "NewsArticle",
+  "mainEntityOfPage": "https://geographicdata.science/book/data/airbnb/regression_cleaning.html",
+  "headline": "AirBnb",
+  "datePublished": "2020-04-20T17:12:24+00:00",
+  "dateModified": "2020-04-20T17:12:24+00:00",
+  "description": "        AirBnb    Data cleaning of AirBnb     from IPython.display import display_markdowndisplay_markdown(open(&quot;README.md&quot;).read(), raw=True)    A...",
+  "author": {
+    "@type": "Person",
+    "name": "Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Data 100 at UC Berkeley",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://geographicdata.science/book",
+      "width": 60,
+      "height": 60
+    }
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://geographicdata.science/book",
+    "height": 60,
+    "width": 60
+  }
+}
+
+  </script>
+  <link rel="stylesheet" href="/book/assets/css/styles.css">
+
+  <!-- <link rel="manifest" href="/manifest.json"> -->
+  <!-- <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#efae0a"> -->
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+  <meta name="theme-color" content="#233947">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" type="image/x-icon" href="/book/images/logo/favicon.ico">
+
+  <!-- MathJax Config -->
+  <!-- Allow inline math using $ and automatically break long math lines -->
+<!-- (mostly) copied from nbconvert configuration -->
+<!-- https://github.com/jupyter/nbconvert/blob/master/nbconvert/templates/html/mathjax.tpl -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true,
+        processEnvironments: true
+    },
+    // Center justify equations in code and markdown cells. Elsewhere
+    // we use CSS to left justify single line equations in code cells.
+    displayAlign: 'center',
+    "HTML-CSS": {
+        styles: {'.MathJax_Display': {"margin": 0}},
+        linebreaks: { automatic: true },
+    },
+    
+});
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_HTML' async></script>
+
+
+  <!-- DOM updating function -->
+  <script src="/book/assets/js/page/dom-update.js"></script>
+
+  <!-- Selectors for elements on the page -->
+  <script src="/book/assets/js/page/documentSelectors.js"></script>
+
+  <!-- Define some javascript variables that will be useful in other javascript -->
+  <script>
+    const site_basename = '/book';
+  </script>
+
+  <!-- Add AnchorJS to let headers be linked -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.2.0/anchor.min.js" async></script>
+  <script src="/book/assets/js/page/anchors.js" async></script>
+
+  <!-- Include Turbolinks to make page loads fast -->
+  <!-- https://github.com/turbolinks/turbolinks -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/turbolinks/5.2.0/turbolinks.js" async></script>
+  <meta name="turbolinks-cache-control" content="no-cache">
+
+  <!-- Load nbinteract for widgets -->
+  
+
+  <!-- Load Thebelab for interactive widgets -->
+  <!-- Include Thebelab for interactive code if it's enabled -->
+
+
+
+  <!-- Load the auto-generating TOC (non-async otherwise the TOC won't load w/ turbolinks) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.8.1/tocbot.min.js" async></script>
+  <script src="/book/assets/js/page/tocbot.js"></script>
+
+  <!-- Google analytics -->
+  
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-146598819-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-146598819-1');
+</script>
+
+
+
+  <!-- Clipboard copy button -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" async></script>
+
+  <!-- Load custom website scripts -->
+  <script src="/book/assets/js/scripts.js" async></script>
+
+  <!-- Load custom user CSS and JS  -->
+  <script src="/book/assets/custom/custom.js" async></script>
+  <link rel="stylesheet" href="/book/assets/custom/custom.css">
+
+  <!-- Update interact links w/ REST param, is defined in includes so we can use templates -->
+  
+<script>
+/**
+  * To auto-embed hub URLs in interact links if given in a RESTful fashion
+ */
+
+function getJsonFromUrl(url) {
+  var query = url.split('?');
+  if (query.length < 2) {
+    // No queries so just return false
+    return false;
+  }
+  query = query[1];
+  // Collect REST params into a dictionary
+  var result = {};
+  query.split("&").forEach(function(part) {
+    var item = part.split("=");
+    result[item[0]] = decodeURIComponent(item[1]);
+  });
+  return result;
+}
+    
+function dict2param(dict) {
+    params = Object.keys(dict).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(dict[k])
+    });
+    return params.join('&')
+}
+
+// Parse a Binder URL, converting it to the string needed for JupyterHub
+function binder2Jupyterhub(url) {
+  newUrl = {};
+  parts = url.split('v2/gh/')[1];
+  // Grab the base repo information
+  repoinfo = parts.split('?')[0];
+  var [org, repo, ref] = repoinfo.split('/');
+  newUrl['repo'] = ['https://github.com', org, repo].join('/');
+  newUrl['branch'] = ref
+  // Grab extra parameters passed
+  params = getJsonFromUrl(url);
+  if (params['filepath'] !== undefined) {
+    newUrl['subPath'] = params['filepath']
+  }
+  return dict2param(newUrl);
+}
+
+// Filter out potentially unsafe characters to prevent xss
+function safeUrl(url)
+{
+   return String(encodeURIComponent(url))
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
+
+function addParamToInternalLinks(hub) {
+  var links = document.querySelectorAll("a").forEach(function(link) {
+    var href = link.href;
+    // If the link is an internal link...
+    if (href.search("https://geographicdata.science") !== -1 || href.startsWith('/') || href.search("127.0.0.1:") !== -1) {
+      // Assume we're an internal link, add the hub param to it
+      var params = getJsonFromUrl(href);
+      if (params !== false) {
+        // We have REST params, so append a new one
+        params['jupyterhub'] = hub;
+      } else {
+        // Create the REST params
+        params = {'jupyterhub': hub};
+      }
+      // Update the link
+      var newHref = href.split('?')[0] + '?' + dict2param(params);
+      link.setAttribute('href', decodeURIComponent(newHref));
+    }
+  });
+  return false;
+}
+
+
+// Update interact links
+function updateInteractLink() {
+    // hack to make this work since it expects a ? in the URL
+    rest = getJsonFromUrl("?" + location.search.substr(1));
+    jupyterHubUrl = rest['jupyterhub'];
+    var hubType = null;
+    var hubUrl = null;
+    if (jupyterHubUrl !== undefined) {
+      hubType = 'jupyterhub';
+      hubUrl = jupyterHubUrl;
+    }
+
+    if (hubType !== null) {
+      // Sanitize the hubUrl
+      hubUrl = safeUrl(hubUrl);
+
+      // Add HTTP text if omitted
+      if (hubUrl.indexOf('http') < 0) {hubUrl = 'http://' + hubUrl;}
+      var interactButtons = document.querySelectorAll("button.interact-button")
+      var lastButton = interactButtons[interactButtons.length-1];
+      var link = lastButton.parentElement;
+
+      // If we've already run this, skip the link updating
+      if (link.nextElementSibling !== null) {
+        return;
+      }
+
+      // Update the link and add context div
+      var href = link.getAttribute('href');
+      if (lastButton.id === 'interact-button-binder') {
+        // If binder links exist, we need to re-work them for jupyterhub
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // If localhost, assume we're working from a local Jupyter server and remove `/hub`
+          first = [hubUrl, 'git-sync'].join('/')
+        } else {
+          first = [hubUrl, 'hub', 'user-redirect', 'git-sync'].join('/')
+        }
+        href = first + '?' + binder2Jupyterhub(href);
+      } else {
+        // If interact button isn't binderhub, assume it's jupyterhub
+        // If JupyterHub links, we only need to replace the hub url
+        href = href.replace("", hubUrl);
+        if (hubUrl.indexOf('http%3A%2F%2Flocalhost') > -1) {
+          // Assume we're working from a local Jupyter server and remove `/hub`
+          href = href.replace("/hub/user-redirect", "");
+        }
+      }
+      link.setAttribute('href', decodeURIComponent(href));
+
+      // Add text after interact link saying where we're launching
+      hubUrlNoHttp = decodeURIComponent(hubUrl).replace('http://', '').replace('https://', '');
+      link.insertAdjacentHTML('afterend', '<div class="interact-context">on ' + hubUrlNoHttp + '</div>');
+
+      // Update internal links so we retain the hub url
+      addParamToInternalLinks(hubUrl);
+    }
+}
+
+runWhenDOMLoaded(updateInteractLink)
+document.addEventListener('turbolinks:load', updateInteractLink)
+</script>
+
+
+  <!-- Lunr search code - will only be executed on the /search page -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/2.3.6/lunr.min.js" async></script>
+  <script>var initQuery = function() {
+  // See if we have a search box
+  var searchInput = document.querySelector('input#lunr_search');
+  if (searchInput === null) {
+    return;
+  }
+
+  // Function to parse our lunr cache
+  var idx = lunr(function () {
+    this.field('title')
+    this.field('excerpt')
+    this.field('categories')
+    this.field('tags')
+    this.ref('id')
+
+    this.pipeline.remove(lunr.trimmer)
+
+    for (var item in store) {
+      this.add({
+        title: store[item].title,
+        excerpt: store[item].excerpt,
+        categories: store[item].categories,
+        tags: store[item].tags,
+        id: item
+      })
+    }
+  });
+
+  // Run search upon keyup
+  searchInput.addEventListener('keyup', function () {
+    var resultdiv = document.querySelector('#results');
+    var query = document.querySelector("input#lunr_search").value.toLowerCase();
+    var result =
+      idx.query(function (q) {
+        query.split(lunr.tokenizer.separator).forEach(function (term) {
+          q.term(term, { boost: 100 })
+          if(query.lastIndexOf(" ") != query.length-1){
+            q.term(term, {  usePipeline: false, wildcard: lunr.Query.wildcard.TRAILING, boost: 10 })
+          }
+          if (term != ""){
+            q.term(term, {  usePipeline: false, editDistance: 1, boost: 1 })
+          }
+        })
+      });
+
+      // Empty the results div
+      while (resultdiv.firstChild) {
+        resultdiv.removeChild(resultdiv.firstChild);
+      }
+
+    resultdiv.insertAdjacentHTML('afterbegin', '<p class="results__found">'+result.length+' Result(s) found</p>');
+    for (var item in result) {
+      var ref = result[item].ref;
+      if(store[ref].teaser){
+        var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<div class="archive__item-teaser">'+
+                '<img src="'+store[ref].teaser+'" alt="">'+
+              '</div>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      else{
+    	  var searchitem =
+          '<div class="list__item">'+
+            '<article class="archive__item" itemscope itemtype="https://schema.org/CreativeWork">'+
+              '<h2 class="archive__item-title" itemprop="headline">'+
+                '<a href="'+store[ref].url+'" rel="permalink">'+store[ref].title+'</a>'+
+              '</h2>'+
+              '<p class="archive__item-excerpt" itemprop="description">'+store[ref].excerpt.split(" ").splice(0,20).join(" ")+'...</p>'+
+            '</article>'+
+          '</div>';
+      }
+      resultdiv.insertAdjacentHTML('beforeend', searchitem);
+    }
+  });
+};
+
+initFunction(initQuery);
+</script>
+
+  <!-- Load JS that depends on site variables -->
+  <script src="/book/assets/js/page/copy-button.js" async></script>
+
+  <!-- Hide cell code -->
+  <script src="/book/assets/js/page/hide-cell.js" async></script>
+
+  <!-- Printing the screen -->
+  <!-- Include nbinteract for interactive widgets -->
+<script src="https://printjs-4de6.kxcdn.com/print.min.js" async></script>
+<script>
+printContent = () => {
+    // MathJax displays a second version of any math for assistive devices etc.
+    // This prevents double-rendering in the PDF output.
+    var ignoreAssistList = [];
+    assistives = document.querySelectorAll('.MathJax_Display span.MJX_Assistive_MathML').forEach((element, index) => {
+        var thisId = 'MathJax-assistive-' + index.toString();
+        element.setAttribute('id', thisId);
+        ignoreAssistList.push(thisId)
+    });
+
+    // Print the actual content object
+    printJS({
+        printable: 'textbook_content',
+        type: 'html',
+        css: "/book/assets/css/styles.css",
+        style: "#textbook_content {padding-top: 40px};",
+        scanStyles: false,
+        targetStyles: ["*"],
+        ignoreElements: ignoreAssistList,
+        documentTitle: "Geographic Data Science - The Book"
+    })
+};
+
+initPrint = () => {
+    document.querySelector('#interact-button-print').addEventListener('click', printContent)
+}
+
+initFunction(initPrint)
+</script>
+
+</head>
+
+  <body>
+    <!-- Include the ThebeLab config so it gets reloaded on each page -->
+    <script type="text/x-thebe-config">{
+    requestKernel: true,
+    binderOptions: {
+    repo: "gdsbook/book",
+    ref: "master",
+    },
+    codeMirrorConfig: {
+    theme: "abcdef",
+    mode: "python"
+    },
+    kernelOptions: {
+    kernelName: "python3",
+    path: "content/data/airbnb"
+    }
+}
+</script>
+
+    <!-- .js-show-sidebar shows sidebar by default -->
+    <div id="js-textbook" class="c-textbook js-show-sidebar">
+      
+
+
+
+<nav id="js-sidebar" class="c-textbook__sidebar">
+  <a href="https://geographicdata.science"><img src="/book/images/logo/logo.png" class="textbook_logo" id="sidebar-logo" alt="textbook logo" data-turbolinks-permanent/></a>
+  <h2 class="c-sidebar__title">Geographic Data Science with Python</h2>
+  <ul class="c-sidebar__chapters">
+    
+      
+      
+
+      
+      
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter" data-url="/intro">
+        <a class="c-sidebar__entry"
+          href="/book/intro.html"
+        >
+          
+          Home
+        </a>
+      </li>
+
+      
+      
+
+      
+
+      
+      
+
+      
+
+      
+    
+      
+      
+
+      
+      
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter" data-url="/notebooks/00_toc">
+        <a class="c-sidebar__entry"
+          href="/book/notebooks/00_toc.html"
+        >
+          
+          Table of Contents
+        </a>
+      </li>
+
+      
+      
+
+      
+
+      
+      
+
+      
+
+      
+    
+      
+      
+        <li class="c-sidebar__divider"></li>
+        
+      
+      
+
+      
+      
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter" data-url="/intro_part_i">
+        <a class="c-sidebar__entry"
+          href="/book/intro_part_i.html"
+        >
+          
+          Part I - Building Blocks
+        </a>
+      </li>
+
+      
+      
+
+      
+
+      
+      
+
+      
+        
+
+        
+
+        <ul class="c-sidebar__sections">
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/01_geospatial_computational_environment">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/01_geospatial_computational_environment.html"
+              >
+                
+                Geospatial Computational Environment
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/02_spatial_data">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/02_spatial_data.html"
+              >
+                
+                Spatial Data
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/03_spatial_data_processing">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/03_spatial_data_processing.html"
+              >
+                
+                Spatial Data Processing
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/04_spatial_weights">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/04_spatial_weights.html"
+              >
+                
+                Spatial Weights
+              </a>
+            </li>
+            
+            
+          
+        </ul>
+      
+
+      
+    
+      
+      
+        <li class="c-sidebar__divider"></li>
+        
+      
+      
+
+      
+      
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter" data-url="/intro_part_ii">
+        <a class="c-sidebar__entry"
+          href="/book/intro_part_ii.html"
+        >
+          
+          Part II - Spatial Data Analysis
+        </a>
+      </li>
+
+      
+      
+
+      
+
+      
+      
+
+      
+        
+
+        
+
+        <ul class="c-sidebar__sections">
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/05_choropleth">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/05_choropleth.html"
+              >
+                
+                Choropleth Mapping
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/06_spatial_autocorrelation">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/06_spatial_autocorrelation.html"
+              >
+                
+                Spatial Autocorrelation
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/07_local_autocorrelation">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/07_local_autocorrelation.html"
+              >
+                
+                Local Spatial Autocorrelation
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/08_point_pattern_analysis">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/08_point_pattern_analysis.html"
+              >
+                
+                Point Pattern Analysis
+              </a>
+            </li>
+            
+            
+          
+        </ul>
+      
+
+      
+    
+      
+      
+        <li class="c-sidebar__divider"></li>
+        
+      
+      
+
+      
+      
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter" data-url="/intro_part_iii">
+        <a class="c-sidebar__entry"
+          href="/book/intro_part_iii.html"
+        >
+          
+          Part III - Advanced Topics
+        </a>
+      </li>
+
+      
+      
+
+      
+
+      
+      
+
+      
+        
+
+        
+
+        <ul class="c-sidebar__sections">
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/09_spatial_inequality">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/09_spatial_inequality.html"
+              >
+                
+                Spatial Inequality
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/10_clustering_and_regionalization">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/10_clustering_and_regionalization.html"
+              >
+                
+                Clustering & Regionalization
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/11_regression">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/11_regression.html"
+              >
+                
+                Regression
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/notebooks/12_feature_engineering">
+              <a class="c-sidebar__entry"
+                href="/book/notebooks/12_feature_engineering.html"
+              >
+                
+                Spatial Feature Engineering
+              </a>
+            </li>
+            
+            
+          
+        </ul>
+      
+
+      
+    
+      
+      
+        <li class="c-sidebar__divider"></li>
+        
+      
+      
+
+      
+      
+      
+      
+
+      
+      
+      <li class="c-sidebar__chapter" data-url="/data/README">
+        <a class="c-sidebar__entry"
+          href="/book/data/README.html"
+        >
+          
+          Datasets
+        </a>
+      </li>
+
+      
+      
+
+      
+
+      
+      
+
+      
+        
+
+        
+
+        <ul class="c-sidebar__sections">
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/airbnb/regression_cleaning">
+              <a class="c-sidebar__entry"
+                href="/book/data/airbnb/regression_cleaning.html"
+              >
+                
+                AirBnb
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/airports/airports_cleaning">
+              <a class="c-sidebar__entry"
+                href="/book/data/airports/airports_cleaning.html"
+              >
+                
+                Airports
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/brexit/README">
+              <a class="c-sidebar__entry"
+                href="/book/data/brexit/README.html"
+              >
+                
+                Brexit
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/countries/countries_cleaning">
+              <a class="c-sidebar__entry"
+                href="/book/data/countries/countries_cleaning.html"
+              >
+                
+                Countries
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/h3_grid/build_sd_h3_grid">
+              <a class="c-sidebar__entry"
+                href="/book/data/h3_grid/build_sd_h3_grid.html"
+              >
+                
+                H3 Grid
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/mexico/README">
+              <a class="c-sidebar__entry"
+                href="/book/data/mexico/README.html"
+              >
+                
+                Mexico
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/nasadem/build_nasadem_sd">
+              <a class="c-sidebar__entry"
+                href="/book/data/nasadem/build_nasadem_sd.html"
+              >
+                
+                NASA DEM
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/texas/README">
+              <a class="c-sidebar__entry"
+                href="/book/data/texas/README.html"
+              >
+                
+                Texas
+              </a>
+            </li>
+            
+            
+          
+            
+            
+
+            
+            
+            
+            
+
+            <li class="c-sidebar__section" data-url="/data/tokyo/tokyo_cleaning">
+              <a class="c-sidebar__entry"
+                href="/book/data/tokyo/tokyo_cleaning.html"
+              >
+                
+                Tokyo Photographs
+              </a>
+            </li>
+            
+            
+          
+        </ul>
+      
+
+      
+    
+  </ul>
+  <p class="sidebar_footer">Powered by <a href="https://github.com/jupyter/jupyter-book">Jupyter Book</a></p>
+</nav>
+
+      
+      <div class="c-topbar" id="top-navbar">
+  <!-- We show the sidebar by default so we use .is-active -->
+  <div class="c-topbar__buttons">
+    <button
+      id="js-sidebar-toggle"
+      class="hamburger hamburger--arrowalt is-active"
+    >
+      <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+      </span>
+    </button>
+    <div class="buttons">
+<div class="download-buttons-dropdown">
+    <button id="dropdown-button-trigger" class="interact-button"><img src="/book/assets/images/download-solid.svg" alt="Download" /></button>
+    <div class="download-buttons">
+        <a href="/book/content/data/airbnb/regression_cleaning.ipynb" download>
+        <button id="interact-button-download" class="interact-button">.ipynb</button>
+        </a>
+        
+        <a id="interact-button-print"><button id="interact-button-download" class="interact-button">.pdf</button></a>
+    </div>
+</div>
+
+
+  
+  
+  
+
+
+
+
+
+
+<a href="https://mybinder.org/v2/gh/gdsbook/book/master?filepath=content%2Fdata%2Fairbnb%2Fregression_cleaning.ipynb"><button class="interact-button" id="interact-button-binder"><img class="interact-button-logo" src="/book/assets/images/logo_binder.svg" alt="Interact" />Interact</button></a>
+  
+
+
+</div>
+
+  </div>
+  <!-- Empty sidebar placeholder that we'll auto-fill with javascript -->
+  <aside class="sidebar__right">
+    <header><h4 class="nav__title"><img src="/book/assets/images/list-solid.svg" alt="Search" />   On this page</h4></header>
+    <nav class="onthispage">
+    </nav>
+  </aside>
+  <a href="/book/search.html" class="topbar-right-button" id="search-button">
+    <img src="/book/assets/images/search-solid.svg" alt="Search" />
+  </a>
+</div>
+
+      <main class="c-textbook__page" tabindex="-1">
+            <div class="c-textbook__content" id="textbook_content">
+                  <main class="jupyter-page">
+    <div id="page-info"><div id="page-title">AirBnb</div>
+</div>
+    <div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Data-cleaning-of-AirBnb">Data cleaning of AirBnb<a class="anchor-link" href="#Data-cleaning-of-AirBnb"> </a></h1>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display_markdown</span>
+
+<span class="n">display_markdown</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;README.md&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">raw</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+<div class="output_markdown rendered_html output_subarea ">
+<h1 id="AirBnb-data">AirBnb data<a class="anchor-link" href="#AirBnb-data"> </a></h1><p>This dataset is based on the 2016-07-07 San Diego extract from Inside Airbnb. The original set includes AirBnb property listings with characteristics and price, and this is extended to additional variables based on each property's location.</p>
+<ul>
+<li><code>Source</code>: Inside AirBnb</li>
+<li><code>URL</code></li>
+</ul>
+<blockquote><p><a href="http://insideairbnb.com/">http://insideairbnb.com/</a></p>
+</blockquote>
+<ul>
+<li><code>Processing</code>: download of the original files and addition of new variables is documented in <code>regression_cleaning.ipynb</code><ul>
+<li>Clean file: <code>regression_db.geojson</code></li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="c1">#import googlemaps</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial.distance</span> <span class="kn">import</span> <span class="n">cdist</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Download-files">Download files<a class="anchor-link" href="#Download-files"> </a></h2>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Download detailed listings file:</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://data.insideairbnb.com/united-states/&#39;</span>\
+      <span class="s1">&#39;ca/san-diego/2016-07-07/data/&#39;</span>\
+      <span class="s1">&#39;listings.csv.gz&#39;</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;listings.csv.gz&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
+    <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Download calendar file with prices</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://data.insideairbnb.com/united-states/&#39;</span>\
+      <span class="s1">&#39;ca/san-diego/2016-07-07/data/&#39;</span>\
+      <span class="s1">&#39;calendar.csv.gz&#39;</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;calendar.csv.gz&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
+    <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Download neighborhoods</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;http://data.insideairbnb.com/united-states/&#39;</span>\
+      <span class="s1">&#39;ca/san-diego/2016-07-07/visualisations/&#39;</span>\
+      <span class="s1">&#39;neighbourhoods.geojson&#39;</span>
+<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;neighbourhoods.geojson&#39;</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fo</span><span class="p">:</span>
+    <span class="n">fo</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Variable-setup">Variable setup<a class="anchor-link" href="#Variable-setup"> </a></h2>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Parse-price">Parse price<a class="anchor-link" href="#Parse-price"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lst</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;listings.csv.gz&#39;</span><span class="p">)</span>
+<span class="n">lst</span><span class="p">[</span><span class="s1">&#39;priceN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>\
+                                    <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>\
+                                    <span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;$&#39;</span><span class="p">)))</span>
+<span class="n">lst</span><span class="p">[</span><span class="s1">&#39;l_price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">lst</span><span class="p">[</span><span class="s1">&#39;priceN&#39;</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="GeoDataFrame"><code>GeoDataFrame</code><a class="anchor-link" href="#GeoDataFrame"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="n">xys</span> <span class="o">=</span> <span class="n">lst</span><span class="p">[[</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">]]</span>\
+        <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">Point</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">gdb</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">lst</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">xys</span><span class="p">),</span>
+                       <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;+init=epsg:4326&quot;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Variables">Variables<a class="anchor-link" href="#Variables"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Pool</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ams</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;pool&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gdb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">gdb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;amenities&#39;</span><span class="p">]</span>
+    <span class="n">pcs</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;{&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;}&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+    <span class="n">ams</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">pcs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;Pool&#39;</span> <span class="ow">in</span> <span class="n">pcs</span><span class="p">:</span>
+        <span class="n">gdb</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">&#39;pool&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="nb">set</span><span class="p">(</span><span class="n">ams</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;&#39;,
+ &#39;&#34;24-Hour Check-in&#34;&#39;,
+ &#39;&#34;Air Conditioning&#34;&#39;,
+ &#39;&#34;Buzzer/Wireless Intercom&#34;&#39;,
+ &#39;&#34;Cable TV&#34;&#39;,
+ &#39;&#34;Carbon Monoxide Detector&#34;&#39;,
+ &#39;&#34;Elevator in Building&#34;&#39;,
+ &#39;&#34;Family/Kid Friendly&#34;&#39;,
+ &#39;&#34;Fire Extinguisher&#34;&#39;,
+ &#39;&#34;First Aid Kit&#34;&#39;,
+ &#39;&#34;Free Parking on Premises&#34;&#39;,
+ &#39;&#34;Hair Dryer&#34;&#39;,
+ &#39;&#34;Hot Tub&#34;&#39;,
+ &#39;&#34;Indoor Fireplace&#34;&#39;,
+ &#39;&#34;Laptop Friendly Workspace&#34;&#39;,
+ &#39;&#34;Lock on Bedroom Door&#34;&#39;,
+ &#39;&#34;Other pet(s)&#34;&#39;,
+ &#39;&#34;Pets Allowed&#34;&#39;,
+ &#39;&#34;Pets live on this property&#34;&#39;,
+ &#39;&#34;Safety Card&#34;&#39;,
+ &#39;&#34;Smoke Detector&#34;&#39;,
+ &#39;&#34;Smoking Allowed&#34;&#39;,
+ &#39;&#34;Suitable for Events&#34;&#39;,
+ &#39;&#34;Wheelchair Accessible&#34;&#39;,
+ &#39;&#34;Wireless Internet&#34;&#39;,
+ &#39;&#34;translation missing: en.hosting_amenity_49&#34;&#39;,
+ &#39;&#34;translation missing: en.hosting_amenity_50&#34;&#39;,
+ &#39;Breakfast&#39;,
+ &#39;Cat(s)&#39;,
+ &#39;Dog(s)&#39;,
+ &#39;Doorman&#39;,
+ &#39;Dryer&#39;,
+ &#39;Essentials&#39;,
+ &#39;Gym&#39;,
+ &#39;Hangers&#39;,
+ &#39;Heating&#39;,
+ &#39;Internet&#39;,
+ &#39;Iron&#39;,
+ &#39;Kitchen&#39;,
+ &#39;Pool&#39;,
+ &#39;Shampoo&#39;,
+ &#39;TV&#39;,
+ &#39;Washer&#39;}</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Distance to Balboa park</li>
+</ul>
+<p><iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-117.16953277587892%2C32.63070127641626%2C-117.12335586547853%2C32.82983681046287&amp;layer=mapnik&amp;marker=32.73030211394726%2C-117.14649954999999" style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/?mlat=32.7303&amp;mlon=-117.1465#map=13/32.7303/-117.1465">View Larger Map</a></small></p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We can use <a href="https://github.com/geopy/geopy"><code>geopy</code></a> to find out its location:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">geopy.geocoders</span> <span class="kn">import</span> <span class="n">Nominatim</span>
+<span class="n">geolocator</span> <span class="o">=</span> <span class="n">Nominatim</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Just type the name into the locator:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bp</span> <span class="o">=</span> <span class="n">geolocator</span><span class="o">.</span><span class="n">geocode</span><span class="p">(</span><span class="s2">&quot;Balboa Park, San Diego, US&quot;</span><span class="p">)</span>
+<span class="n">bp</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>Location(Balboa Park, North Park, San Diego, San Diego County, California, 92102, United States of America, (32.73135675, -117.146526555704, 0.0))</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">b_ll</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">bp</span><span class="o">.</span><span class="n">latitude</span>
+<span class="n">b_ll</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(-117.146526555704, 32.73135675)</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then calculate distance to the park from each house:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># USA Contiguous Albers Equal Area (m.)</span>
+<span class="c1"># http://epsg.io/102003</span>
+<span class="n">tgt_crs</span> <span class="o">=</span> <span class="s2">&quot;+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 &quot;</span>\
+          <span class="s2">&quot;+lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs&quot;</span>
+
+<span class="n">b_xy</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">b_ll</span><span class="p">),</span> <span class="n">crs</span><span class="o">=</span><span class="n">gdb</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">tgt_crs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">b_xy</span> <span class="o">=</span> <span class="p">(</span><span class="n">b_xy</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">b_xy</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="c1"># Calculate distance in Km.</span>
+<span class="n">d2b</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">pt</span><span class="p">:</span> <span class="n">cdist</span><span class="p">([(</span><span class="n">pt</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">y</span><span class="p">)],</span> <span class="p">[</span><span class="n">b_xy</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">1000</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;d2balboa&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">tgt_crs</span><span class="p">)</span>\
+                                 <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">d2b</span><span class="p">)</span>
+<span class="n">gdb</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;d2balboa&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
+         <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis_r&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f2dae1f1ef0&gt;</pre>
+</div>
+
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../../images/data/airbnb/regression_cleaning_26_1.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Elevation</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">key</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;../google_maps_key&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">gmaps</span> <span class="o">=</span> <span class="n">googlemaps</span><span class="o">.</span><span class="n">Client</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Google takes lat/lon instead of lon/lat</span>
+<span class="n">gmaps</span><span class="o">.</span><span class="n">elevation</span><span class="p">([</span><span class="n">b_ll</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[{&#39;elevation&#39;: 89.00752258300781,
+  &#39;location&#39;: {&#39;lat&#39;: 32.73136, &#39;lng&#39;: -117.14653},
+  &#39;resolution&#39;: 4.771975994110107}]</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pts</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">pt</span><span class="p">:</span> <span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">pt</span><span class="o">.</span><span class="n">x</span><span class="p">))</span>
+<span class="o">%</span><span class="k">time</span> ele = gmaps.elevation(pts.head().tolist())
+<span class="n">ele</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>CPU times: user 4 ms, sys: 0 ns, total: 4 ms
+Wall time: 309 ms
+</pre>
+</div>
+</div>
+</div>
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>[{&#39;elevation&#39;: 95.95661163330078,
+  &#39;location&#39;: {&#39;lat&#39;: 32.58188, &#39;lng&#39;: -117.00194},
+  &#39;resolution&#39;: 4.771975994110107},
+ {&#39;elevation&#39;: 171.3590698242188,
+  &#39;location&#39;: {&#39;lat&#39;: 32.65303, &#39;lng&#39;: -116.97681},
+  &#39;resolution&#39;: 4.771975994110107},
+ {&#39;elevation&#39;: 177.8932495117188,
+  &#39;location&#39;: {&#39;lat&#39;: 32.66148, &#39;lng&#39;: -116.97181},
+  &#39;resolution&#39;: 4.771975994110107},
+ {&#39;elevation&#39;: 184.3952026367188,
+  &#39;location&#39;: {&#39;lat&#39;: 32.63869, &#39;lng&#39;: -116.95125},
+  &#39;resolution&#39;: 4.771975994110107},
+ {&#39;elevation&#39;: 185.0911254882812,
+  &#39;location&#39;: {&#39;lat&#39;: 32.63894000000001, &#39;lng&#39;: -116.93889},
+  &#39;resolution&#39;: 4.771975994110107}]</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">extract_ele</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">x</span><span class="p">)[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span>
+<span class="n">eleS</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">ele</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">extract_ele</span><span class="p">)</span>
+<span class="n">eleS</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0     95.956612
+1    171.359070
+2    177.893250
+3    184.395203
+4    185.091125
+dtype: float64</pre>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Coastal neighborhood?</li>
+</ul>
+<p><strong>NOTE</strong>: Still some mistakes it seems but <code>neighborhood_cleansed</code> works much better than <code>neighborhood</code>.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">coastal_neighborhoods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Wooded Area&#39;</span><span class="p">,</span> <span class="s1">&#39;Ocean Beach&#39;</span><span class="p">,</span> <span class="s1">&#39;Pacific Beach&#39;</span><span class="p">,</span> \
+                         <span class="s1">&#39;La Jolla&#39;</span><span class="p">,</span> <span class="s1">&#39;Torrey Pines&#39;</span><span class="p">,</span> <span class="s1">&#39;Del Mar Heighs&#39;</span><span class="p">,</span> \
+                         <span class="s1">&#39;Mission Bay&#39;</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">coastal</span><span class="p">(</span><span class="n">neigh</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">neigh</span> <span class="ow">in</span> <span class="n">coastal_neighborhoods</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+<span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;coastal_neig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;neighbourhood_cleansed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">coastal</span><span class="p">)</span>
+
+<span class="n">gdb</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;coastal_neig&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+         <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+
+
+<div class="output_png output_subarea ">
+<img src="../../images/data/airbnb/regression_cleaning_33_0.png"
+>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Large neighborhood</li>
+</ul>
+<p>We keep only observations in neighborhoods with more than 25 AirBnb houses so FE on neighborhood make sense.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lrg_nei</span> <span class="o">=</span> <span class="n">gdb</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;neighbourhood_cleansed&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">25</span>
+<span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;lrg_nei&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;neighbourhood_cleansed&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">lrg_nei</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>List to keep</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">xs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accommodates&#39;</span><span class="p">,</span> <span class="s1">&#39;bathrooms&#39;</span><span class="p">,</span> <span class="s1">&#39;bedrooms&#39;</span><span class="p">,</span> 
+      <span class="s1">&#39;beds&#39;</span><span class="p">,</span> <span class="s1">&#39;neighbourhood_cleansed&#39;</span><span class="p">,</span> <span class="s1">&#39;pool&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;d2balboa&#39;</span><span class="p">,</span> <span class="s1">&#39;coastal_neig&#39;</span><span class="p">,</span> <span class="s1">&#39;lrg_nei&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;priceN&#39;</span><span class="p">,</span> <span class="s1">&#39;l_price&#39;</span><span class="p">,</span>
+      <span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Dummies">Dummies<a class="anchor-link" href="#Dummies"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Room type</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rt</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;room_type&#39;</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;rt&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>Property type</li>
+</ul>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">simplify</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="n">bigs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;House&#39;</span><span class="p">,</span> <span class="s1">&#39;Apartment&#39;</span><span class="p">,</span> <span class="s1">&#39;Condominium&#39;</span><span class="p">,</span> <span class="s1">&#39;Townhouse&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">bigs</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">p</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Other&#39;</span>
+
+<span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;property_group&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;property_type&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">simplify</span><span class="p">)</span>
+<span class="n">pg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;property_group&#39;</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;pg&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Write-out">Write out<a class="anchor-link" href="#Write-out"> </a></h3>
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">gdb</span><span class="p">[[</span><span class="s1">&#39;lrg_nei&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 6608 entries, 0 to 6607
+Data columns (total 1 columns):
+lrg_nei    6608 non-null bool
+dtypes: bool(1)
+memory usage: 6.5 KB
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span> rm <span class="s1">&#39;regression_db.geojson&#39;</span>
+<span class="n">final</span> <span class="o">=</span> <span class="n">gdb</span><span class="p">[</span><span class="n">xs</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pg</span><span class="p">)</span>\
+               <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rt</span><span class="p">)</span>\
+               <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;priceN&#39;</span><span class="p">:</span> <span class="s1">&#39;price&#39;</span><span class="p">})</span>\
+               <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">gdb</span><span class="p">[</span><span class="s1">&#39;lrg_nei&#39;</span><span class="p">]</span><span class="o">==</span><span class="kc">True</span><span class="p">,</span> <span class="p">:]</span>\
+               <span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;lrg_nei&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+               <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+Int64Index: 6110 entries, 19 to 6607
+Data columns (total 20 columns):
+accommodates              6110 non-null int64
+bathrooms                 6110 non-null float64
+bedrooms                  6110 non-null float64
+beds                      6110 non-null float64
+neighbourhood_cleansed    6110 non-null object
+pool                      6110 non-null int64
+d2balboa                  6110 non-null float64
+coastal_neig              6110 non-null int64
+price                     6110 non-null float64
+l_price                   6110 non-null float64
+geometry                  6110 non-null object
+id                        6110 non-null int64
+pg_Apartment              6110 non-null uint8
+pg_Condominium            6110 non-null uint8
+pg_House                  6110 non-null uint8
+pg_Other                  6110 non-null uint8
+pg_Townhouse              6110 non-null uint8
+rt_Entire_home/apt        6110 non-null uint8
+rt_Private_room           6110 non-null uint8
+rt_Shared_room            6110 non-null uint8
+dtypes: float64(6), int64(4), object(2), uint8(8)
+memory usage: 668.3+ KB
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">final</span> <span class="o">=</span> <span class="n">final</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">neighbourhood_cleansed</span><span class="o">=</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">,</span> 
+                          <span class="n">coastal_neig</span><span class="o">=</span><span class="s1">&#39;coastal&#39;</span><span class="p">,</span>
+                          <span class="n">l_price</span> <span class="o">=</span> <span class="s1">&#39;log_price&#39;</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">!</span>rm regression_db.geojson
+<span class="n">final</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s1">&#39;regression_db.geojson&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GeoJSON&#39;</span><span class="p">)</span>
+<span class="n">final</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="jb_output_wrapper }}">
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>rm: cannot remove &#39;airbnb/regression_db.geojson&#39;: No such file or directory
+&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+RangeIndex: 6110 entries, 0 to 6109
+Data columns (total 20 columns):
+accommodates          6110 non-null int64
+bathrooms             6110 non-null float64
+bedrooms              6110 non-null float64
+beds                  6110 non-null float64
+neighborhood          6110 non-null object
+pool                  6110 non-null int64
+d2balboa              6110 non-null float64
+coastal               6110 non-null int64
+price                 6110 non-null float64
+log_price             6110 non-null float64
+id                    6110 non-null int64
+pg_Apartment          6110 non-null int64
+pg_Condominium        6110 non-null int64
+pg_House              6110 non-null int64
+pg_Other              6110 non-null int64
+pg_Townhouse          6110 non-null int64
+rt_Entire_home/apt    6110 non-null int64
+rt_Private_room       6110 non-null int64
+rt_Shared_room        6110 non-null int64
+geometry              6110 non-null object
+dtypes: float64(6), int64(12), object(2)
+memory usage: 954.8+ KB
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr>
+<p><a href="regression_db.geojson">[Download the <code>regression_db.geojson</code> file]</a></p>
+
+</div>
+</div>
+</div>
+</div>
+
+ 
+
+
+    </main>
+    
+            </div>
+            <div class="c-textbook__footer" id="textbook_footer">
+              
+<nav class="c-page__nav">
+  
+    
+    
+
+    <a id="js-page__nav__prev" class="c-page__nav__prev" href="/book/data/README.html">
+      〈 <span class="u-margin-right-tiny"></span> Datasets
+    </a>
+  
+
+  
+    
+
+    
+    <a id="js-page__nav__next" class="c-page__nav__next" href="/book/data/airports/airports_cleaning.html">
+      Airports <span class="u-margin-right-tiny"></span> 〉
+    </a>
+  
+</nav>
+
+              <footer>
+  <p class="footer"><a href="https://geographicdata.science/">Geographic Data Science with PySAL and the PyData Stack</a></p>
+</footer>
+
+            </div>
+
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
