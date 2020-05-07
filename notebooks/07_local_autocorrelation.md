@@ -5,8 +5,8 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.1'
-      jupytext_version: 1.2.1
+      format_version: '1.2'
+      jupytext_version: 1.4.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -46,7 +46,7 @@ from booktools import choropleth
 ```
 
 ```python
-ref = pandas.read_csv('../data/brexit_vote.csv', 
+ref = pandas.read_csv('../data/brexit/brexit_vote.csv', 
                       index_col='Area_Code')
 ref.info()
 ```
@@ -54,7 +54,7 @@ ref.info()
 Now let us bring in the spatial data:
 
 ```python
-lads_path = ('../data/'\
+lads_path = ('../data/brexit/'\
              'Local_Authority_Districts_December_2016_'\
              'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'\
              'Local_Authority_Districts_December_2016_Generalised_'\
@@ -356,7 +356,7 @@ The final cluster map in the lower right above displays the output of the LISA s
 
 Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `PySAL` includes Getis and Ord's $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:
 
-```python
+```python jupyter={"outputs_hidden": true}
 # Gi
 gostats = esda.getisord.G_Local(db['Pct_Leave'], w)
 # Gi*

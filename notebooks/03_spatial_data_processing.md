@@ -5,15 +5,15 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.1'
-      jupytext_version: 1.2.1
+      format_version: '1.2'
+      jupytext_version: 1.4.2
   kernelspec:
     display_name: Python 3
     language: python
     name: python3
 ---
 
-<!-- #region {"deletable": true, "editable": true} -->
+<!-- #region deletable=true editable=true -->
 # Spatial Data Processing
 
 Intro paragraph
@@ -26,11 +26,11 @@ Intro paragraph
  airports.csv
 <!-- #endregion -->
 
-<!-- #region {"deletable": true, "editable": true} -->
+<!-- #region deletable=true editable=true -->
 ## Vignette: Airports
 <!-- #endregion -->
 
-<!-- #region {"deletable": true, "editable": true} -->
+<!-- #region deletable=true editable=true -->
 - Querying based on attributes (volume, lon/lat, etc.)
 <!-- #endregion -->
 
@@ -50,7 +50,7 @@ Let's use pandas to query for the airports within the `large_airport` class:
 df[df.type == 'large_airport']
 ```
 
-<!-- #region {"deletable": true, "editable": true} -->
+<!-- #region deletable=true editable=true -->
 Since both latitude and longitude are columns in the dataframe we can use pandas to carry out a limited number of geospatial queries. For example, extract all the airports in the northern hemisphere:
 <!-- #endregion -->
 
@@ -58,7 +58,7 @@ Since both latitude and longitude are columns in the dataframe we can use pandas
 df[df.latitude_deg > 0.0]
 ```
 
-<!-- #region {"deletable": true, "editable": true} -->
+<!-- #region deletable=true editable=true -->
 - Subsetting (querying but return dataframe not just indices)
 <!-- #endregion -->
 
@@ -88,7 +88,7 @@ len(medium)
 len(large)
 ```
 
-<!-- #region {"deletable": true, "editable": true} -->
+<!-- #region deletable=true editable=true -->
 - spatial join - airports by countries
 <!-- #endregion -->
 
@@ -98,7 +98,7 @@ p = ('../data/airports/ne_10m_admin_0_countries/'\
 countries_shp = gpd.read_file(p)
 ```
 
-<!-- #region {"deletable": true, "editable": true} -->
+<!-- #region deletable=true editable=true -->
 - derived features - point sequence to line for the routes
 - spatial join - does route pass through a country
 - crs: contextily example, 
@@ -118,7 +118,7 @@ len(df)
 df.columns
 ```
 
-<!-- #region {"deletable": true, "editable": true} -->
+<!-- #region deletable=true editable=true -->
 - keyword table join (census)
 (keyword comes from spatial join with polygon shown below)
 

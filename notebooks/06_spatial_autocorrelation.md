@@ -5,8 +5,8 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.1'
-      jupytext_version: 1.2.1
+      format_version: '1.2'
+      jupytext_version: 1.4.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -61,7 +61,7 @@ In 2016, Great Britain ran a referendum to decide whether to remain in the Europ
 To load it up, we can use the `bookdata` utility, which pulls the path to the file on your local machine. The vote results are stored in a `csv` file:
 
 ```python
-brexit_data_path = '../data/brexit_vote.csv'
+brexit_data_path = '../data/brexit/brexit_vote.csv'
 ref = pandas.read_csv(brexit_data_path, index_col='Area_Code')
 ref.info()
 ```
@@ -69,7 +69,7 @@ ref.info()
 While the shapes of the geographical units (local authority districts, in this case) are stored in a compressed GeoJSON file. We can read it directly from the `.zip` file as follows:
 
 ```python
-lads_path = ('../data/'\
+lads_path = ('../data/brexit/'\
              'Local_Authority_Districts_December_2016_'\
              'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'\
              'Local_Authority_Districts_December_2016_Generalised_'\
