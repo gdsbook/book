@@ -22,8 +22,7 @@ jupyter:
 
 At the time this is being written, the topic of inequality is at the top of
 agenda of policy makers and is drawing considerable attention in academic
-circles. This is due to historic levels of inequality across the globe
-(references). Much of the focus has been on *interpersonal income inequality*,
+circles. This is due to historic levels of inequality across the globe. Much of the focus has been on *interpersonal income inequality*,
 yet there is a growing recognition that the question of *interregional income
 inequality* requires further attention as the growing gaps between poor and rich
 regions have been identified as key drivers of political polarization in
@@ -128,7 +127,7 @@ sns.distplot(pci_df['1969'])
 ```
 
 
-The long right tail is a prominent feature of the distribution, and is common in the study of incomes. A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate - a county. By contrast, in the wider inequality literature the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced. (Say something about averaging effect for regional distributions).
+The long right tail is a prominent feature of the distribution, and is common in the study of incomes. A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate - a county. By contrast, in the wider inequality literature the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced, and this is because the regional distributions are based on averages obtained from the individual distributions.
 
 
 The density is a powerful summary device that captures the overall morphology of the *value* distribution. At the same time, the density is silent on the underlying *spatial distribution* of county incomes. We can look at this second view of the distribution using a choropleth map:
@@ -149,7 +148,6 @@ _= pci_df.plot(column='1969', scheme='Quantiles', legend=True,
                          'bbox_to_anchor':(1.5, 0.0)}, figsize=(12, 12))
 ```
 
-SAY SOMETHING ABOUT CLUSTERING AND PATTERN
 The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. These are useful for developing an understanding of the overall  To gain more specific insights on the level of inequality in the distribution, we turn to a number of inequality indices.
 
 
@@ -474,9 +472,6 @@ the second  component.
 
 
 
-
-
-
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.columns
 ```
@@ -620,10 +615,7 @@ res_df[['bgr_share', 'bgs_share']].plot()
 res_df[['bgr_share', 'bgs_share','T']].corr()
 ```
 
-- inequality between the states is larger than inequality between regions
-- inequality within states is smaller than inequality within regions
-- time series of the between component are similar for regional and state partitions of the counties
-- correlation of between share and overall inequality is higher at the state level than the region level
+A few patterns emerge from these figures. First, inequality between the states is larger than inequality between regions. Second, inequality within states is smaller than inequality within regions. Third, the time series patterns for the interregional components are similar for the BEA regions and state partitions of the counties. Finally, the correlation of between share and overall inequality is higher at the state level than for the BEA region level
 
 
 ### Intraregional inequality
@@ -698,7 +690,7 @@ Tr = Tr.rename(columns=dict([(i,name) for i,name in enumerate(region_names)]))
 ```
 
 ```python
-pinned0 = Tr.divide(Tr.ix[0])
+pinned0 = Tr.divide(Tr.iloc[0])
 ```
 
 ```python
@@ -759,13 +751,25 @@ We now turn to two newer spatial analytics that extend a selction of the classic
 
 #### Spatial Gini
 
-The first spatial extension was introduced by [2] and is designed to consider the role of adjacency in a decomposition of the Gini index of inequality. More specifically, The Gini in mean xxx is rewritten.
+The first spatial extension was introduced by [2] and is designed to consider
+the role of adjacency in a decomposition of the Gini index of inequality. More
+specifically, The Gini in mean  is
+$$G = \frac{\sum_i \sum_j \left | x_i - x_j \right|}{2 n^2 \bar{x}} $$
+and the spatial decomposition focuses on the numerator
+$$
+\sum_i \sum_j \left |x_i - x_j \right | = \sum_i \sum_j \left( w_{i,j} \left |x_i - x_j \right | \right ) + \left( (1-w_{i,j})  \left |x_i - x_j \right | \right )
+$$
+where $w_{i,j}$ is an element of a binary spatial weights matrix indicating if observations $i$ and $j$ are spatial neighbors. This results in
 
-- point out theil decomposition ignores spatial interactions between counties, both within a region and between region
-- spatial gini as a complement
+$$G = \frac{\sum_i \sum_j w_{i,j}\left | x_i - x_j \right|}{2 n^2 \bar{x}} +   \frac{\sum_i \sum_j \left (1-w_{i,j} )| x_i - x_j \right|}{2 n^2 \bar{x}}. $$
+
+The spatial Iini allows for a consideration of the spatial dependence in inequality. As this dependence increases, the second term of the spatial Gini can be expected to grow relative to the case where incomes are randomly distributed in space. Inference on the spatial Gini can be based on random spatial permutations of the income values, as we have seen elsewhere in this book.
+
+
+The spatial Gini also provides a useful complement to the regional decomposition used in the Theil statistic. The latter does not consider pair-wise relationships between observations, while the spatial Gini does.
 
 ```python
-from pysal.explore.inequality.gini import Gini_Spatial
+from inequality.gini import Gini_Spatial
 ```
 
 ```python
@@ -823,7 +827,7 @@ for year in years:
 ```
 
 
-```python
+```python jupyter={"outputs_hidden": false}
 ridx_20 = int(.2 * 3077)
 ridx_80 = int(.8 * 3077)
 ridx_20, ridx_80
@@ -833,11 +837,11 @@ ridx_20, ridx_80
 df = pci_df
 ```
 
-```python
+```python jupyter={"outputs_hidden": false}
 df['1969_rank']
 ```
 
-```python
+```python jupyter={"outputs_hidden": false}
 df.index[df['1969_rank']==615].tolist()
 ```
 
@@ -913,9 +917,6 @@ for idx in idxs:
     distances.append(d)
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-distances
-```
 Visualizing the  plot the of the 20:20 distances, reveals a secular decline in the distances separating these pair of counties over time:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
@@ -936,7 +937,7 @@ A final analytic that we use to examine the spatial distribution of inequality a
 The rank path traces out the migration of a particular rank in the county income distribution over time [3]. To construct the rank paths for the 20:20 counties, we first plot the centroids:
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" slideshow={"slide_type": "-"}
+```python ein.tags="worksheet-0" slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
 idxs = numpy.array(list(zip(idx_20, idx_80)))
 ```
 
@@ -1006,64 +1007,8 @@ plt.show()
 ```
 
 
-```python
-idxs.shape
-```
+Overall, there is a general north-south split for the 20 and 80 rank paths, with the wealthier part of the distribution being located more often in the northern section of the country.
 
-```python
-cents =    gdf.loc[idxs[:,0],:].centroid
-
-```
-
-```python
-cents.iloc[0]
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-#for i in range(43):
-for i in range(2):
-
-    j = i + 5
-    fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
-    gdf.plot(ax=ax,edgecolor='gray', alpha=0.2)
-    gdf.loc[idxs[:,0],:].centroid.iloc[[i]].plot(ax=ax, color='r')
-    gdf.loc[idxs[:,1],:].centroid.iloc[[i]].plot(ax=ax, color='b')
-
-    ls20 = geopandas.GeoSeries(LineString(df.loc[idxs[:,0],:].centroid.tolist()[i:j]))
-    ls20.plot(ax=ax, color='r', label='20p')
-    ls80 = geopandas.GeoSeries(LineString(df.loc[idxs[:,1],:].centroid.tolist()[i:j]))
-    ls80.plot(ax=ax, color='b', label='20p')
-    
-    title = f'20:20 Rank Path {1969+i}-{1969+j} (80p Blue, 20p Red)'
-    plt.title(title)
-    ax.set_axis_off()
-plt.show()
-```
-
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-for i in range(2,48):
-    #print(0,i)
-    fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
-    ls20 = geopandas.GeoSeries(LineString(df.loc[idxs[:,0],:].centroid.tolist()[0:i]))
-    ls20.plot(ax=ax, color='r', label='20p')
-    ls80 = geopandas.GeoSeries(LineString(df.loc[idxs[:,1],:].centroid.tolist()[0:i]))
-    ls80.plot(ax=ax, color='b', label='20p')
-    
-    #ls80.plot(ax=ax, color='b')
-    #gdf.plot(ax=ax,edgecolor='gray', alpha=0.2)
-    title = '20:20 Rank Paths 1969-{} (80p Blue, 20p Red)'.format(1969+i-1)
-    plt.title(title)
-    ax.set_axis_off()
-
-    
-```
-
-```python
-#big_lakes['geom_gen'] = big_lakes.simplify(tolerance=300)
-
-
-```
 
 <!-- #region {"ein.hycell": false, "ein.tags": "worksheet-0", "jupyter": {"outputs_hidden": false}, "slideshow": {"slide_type": "-"}} -->
 ## References
