@@ -937,7 +937,7 @@ A final analytic that we use to examine the spatial distribution of inequality a
 The rank path traces out the migration of a particular rank in the county income distribution over time [3]. To construct the rank paths for the 20:20 counties, we first plot the centroids:
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 idxs = numpy.array(list(zip(idx_20, idx_80)))
 ```
 

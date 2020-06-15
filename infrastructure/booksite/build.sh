@@ -35,12 +35,11 @@ cp ./infrastructure/booksite/logo/favicon.ico ./tmp_book/content/images/logo/fav
 echo "Building book..."
 jupyter-book build tmp_book
 echo "Building site HTML..."
-cd tmp_book && make build
+cd tmp_book && make build && cd ..
 # Move over to docs folder to be served online
 echo "Moving build over to docs folder..."
-cd /home/jovyan/work
-rm -r ./docs
+rm -rf ./docs
 mv tmp_book/ docs
-rm -r tmp_book
+rm -rf tmp_book
 echo "All done!"
 
