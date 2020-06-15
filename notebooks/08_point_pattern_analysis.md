@@ -86,7 +86,6 @@ basemap, basemap_extent = contextily.bounds2img(*bounding_box, zoom=11,
                                                 url = contextily.tile_providers.ST_TONER_LITE)
 ```
 
-<!-- #region -->
 Now, `basemap` is an array containing the raw image data for a basemap of Tokyo, and the `extent` is the boundary of that image, in terms of the same pseudo-Mercator projection the data uses. However, it is important to note that many of the mapping tools in spatial analysis express their bounding box in **corner form**:
 ```
 left, bottom, right, top
@@ -98,7 +97,6 @@ left, right, bottom, top
 This can be confusing. We will be consistent in referring to a **corner form** boundary as a `bounding_box`, whereas an `extent` will refer to an **edge form** boundary. 
 
 You can see this practically by comparing our original `bounding_box` to the `basemap_extent` returned from `contextily`. Since the `basemap_extent` is used in plotting, it is in edge form. But, since `contextily` takes its input from geographical data, it expects a `bounding_box` in corner form, as input. 
-<!-- #endregion -->
 
 ```python
 bounding_box

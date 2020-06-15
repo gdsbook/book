@@ -26,8 +26,8 @@
   "@type": "NewsArticle",
   "mainEntityOfPage": "https://geographicdata.science/book/notebooks/03_spatial_data_processing.html",
   "headline": "Spatial Data Processing",
-  "datePublished": "2020-06-15T08:25:51+00:00",
-  "dateModified": "2020-06-15T08:25:51+00:00",
+  "datePublished": "2020-06-15T08:38:28+00:00",
+  "dateModified": "2020-06-15T08:38:28+00:00",
   "description": "        Spatial Data Processing    Spatial Data Processing Intro paragraphdeterministic spatial analysis (SG)Explain what we mean by dsaoutline what we will ...",
   "author": {
     "@type": "Person",
@@ -4832,6 +4832,577 @@ initFunction(initPrint)
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<hr>
+<h2 id="Vignette:-Airports-(text-from-point-processing)">Vignette: Airports (text from point processing)<a class="anchor-link" href="#Vignette:-Airports-(text-from-point-processing)"> </a></h2><p><strong>TODO: Merge with previous section</strong></p>
+<p>Airports are interesting entities. They are nodes that connect a network of national and international flows, and are its most visible realization. Where they are located is a function of several factors such as the population they are trying to serve, their level of income, the demand for flying, etc. However their exact location is far from the only possible one. Physically speaking, an airport could be built in many more places than where it ends up. This make the process behind an interesting one to explore through the overall "appearance" of their locations; that is, through its pattern.</p>
+<p>In this vignette, we will use a preprocessed open dataset. This dataset provides the location of airports in many different countries, alongside an indication of their size and importance to the air transit network. Before we start analyzing it, we need to load it:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Load GeoJSON file</span>
+<span class="n">air</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/airports/airports_clean.geojson&#39;</span><span class="p">)</span>
+<span class="c1"># Check top of the table</span>
+<span class="n">air</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>At first brush, a point pattern is essentially the collective shape a bunch of points create. Given the table contains the coordinates of each airport in a map projection, the quickest way to get a first sense of what the data look like is to plot the coordinates of airports as points, like a scatterplot:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Plot XY coordinates</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">air</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">air</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This is not very pretty but that is not our purpose. Our goal was to get a quick first picture and this approach has done the job. Things we can learn from this figure include the fact the overall shape should look familiar to anyone who's seen a map of the world and that, thus, the data do not seem to have any obvious errors. We can then move on to do more interesting things with it.</p>
+<p>The first extension is to bring geographic context. Although the shape of the figure above might be familiar, it still takes some effort to identify where different dots are placed on the surface of the Earth. An easy solution to make this easier is to overlay it with a tile map downloaded from the internet. Let us do just that.</p>
+<p>First, we'll download the tiles into an image object, and then we will plot it together with the airports dataset.</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Download tiles for the bounding box of the airport&#39;s GeoDataFrame</span>
+<span class="o">%</span><span class="k">time</span> img, ext = ctx.bounds2img(*air.total_bounds, 2)
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The method <code>bounds2img</code> (from the library <code>contextily</code>, <code>ctx</code> for short) returns the image object (<code>img</code>) and also an auxilliary tuple with its exact geographic bounds:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">ext</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This allows us then to match it up with other data which is also expressed in the same coordinate reference system (CRS). Let us produce a slightly more useful image than above:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set up figure and axes</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Display tile map</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+<span class="c1"># Display airports on top</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">air</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">air</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># Remove axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c1"># Add title</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;World Airports Dataset&#39;</span><span class="p">)</span>
+<span class="c1"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now this looks a bit better!</p>
+<h3 id="Point-in-polygon-visualization">Point-in-polygon visualization<a class="anchor-link" href="#Point-in-polygon-visualization"> </a></h3><p>Commonly, we either need or want to link points to areal geographies that allow us to augment their attribute list, or to look at the problem at hand from a new perspective. Maybe because the process we are interested in operates at a more aggregated level, or maybe because by aggregating we can obtain a view into the data that makes it simpler to understand.</p>
+<p>For example, the figure above gives us a good sense about how airports are distributed overall but, in particularly dense areas like Europe, it is hard to see much. By aggregating them to say the country geography, we can consider new sets of questions such as which countries have most airports or which ones have a larger density. This works because the geography we want to aggregate it to, countries, is meaningful. This means it has some inherent structure that confers value. In this case, countries are relevant entities and a crucial piece in arranging the world.</p>
+<p>The first thing we need to do to create a country map is to have country (spatial) data. Let us load up a cleaned table with countries:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Load up shapefile with countries</span>
+<span class="n">ctys</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/airports/countries_clean/countries_clean.shp&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And, same as with any new dataset, let us have a quick look at what it looks like and how it stacks up with the other data we have collected along the way:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Add tile map</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">)</span>
+<span class="c1"># Display country layer</span>
+<span class="n">ctys</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> \
+          <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;0.8&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;0.2&#39;</span><span class="p">)</span>
+<span class="c1"># Display airport locations</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">air</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">air</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;yellow&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+<span class="c1"># Remove axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c1"># Add title</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;World Airports Dataset&#39;</span><span class="p">)</span>
+<span class="c1"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Again nothing new or too exciting from this figure, but this is good news: it means our data are aligned and match up nicely. So we can move on to more interesting ventures.</p>
+<p>The next thing that we might want to do to obtain country counts of airports is to link each airport with the country where it is located. Sometimes, we are lucky and the airport table will include a column with that information. In this case, we need to create it for ourselves. This is a well-known problem in geometry and GIS and is commonly known as point-in-polygon: to determine whether a given point is inside a polygon. With that operation solved, linking airports to countries amoutns to a bit of house keeping. We will first explore in pure Python how that algorithm can be easily implemented from scratch so it becomes clear what steps are involved; then we will see a much more efficient and fast implementation that we should probably use when need to perform this operation in other contexts.</p>
+<hr>
+<p><strong>NOTE</strong>: skip next if all you want to know is how to perform a standard spatial join</p>
+<p>Creating a manual, brute-force implementation of a spatial join is not very difficult, if one has solved the problem of checking whether a point is inside a polygon or not. Thanks to the library that provides geometry objects to <code>geopandas</code> (<code>shapely</code>), this is solved in Python. For example, we can easily check if the first dot on the airports table is inside the first polygon in the countries table:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Single out point</span>
+<span class="n">pt</span> <span class="o">=</span> <span class="n">air</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+<span class="c1"># Single out polygon</span>
+<span class="n">poly</span> <span class="o">=</span> <span class="n">ctys</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+<span class="c1"># Check whether `poly` contains `pt`</span>
+<span class="n">poly</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>That easy. As we can see, the method <code>contains</code> in any <code>shapely</code> geometry makes it trivial. So, the first airport in the list is not in the first country of the list.</p>
+<p>To find which country every airport is in easily (albeit not very efficiently!), we need to sift through all possible combinations to see if any of them gives us a match. Once we find it for a given airport, we need to record that and move on, no need to keep checking. That is exactly what we do in the cell below:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
+<span class="c1"># Set up an empty dictionary to populate it with the matches</span>
+<span class="n">airport2country</span> <span class="o">=</span> <span class="p">{</span><span class="n">aID</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">aID</span> <span class="ow">in</span> <span class="n">air</span><span class="o">.</span><span class="n">index</span><span class="p">}</span>
+<span class="c1"># Loop over every airport</span>
+<span class="k">for</span> <span class="n">aID</span><span class="p">,</span> <span class="n">row_a</span> <span class="ow">in</span> <span class="n">air</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="c1"># Single out location of the airport for convenience</span>
+    <span class="n">pt</span> <span class="o">=</span> <span class="n">row_a</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+    <span class="c1"># Loop over every country</span>
+    <span class="k">for</span> <span class="n">cID</span><span class="p">,</span> <span class="n">row_p</span> <span class="ow">in</span> <span class="n">ctys</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="c1"># Single out country polygon for convenience</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="n">row_p</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+        <span class="c1"># Single out country name for convenience</span>
+        <span class="n">cty_nm</span> <span class="o">=</span> <span class="n">row_p</span><span class="p">[</span><span class="s1">&#39;ADMIN&#39;</span><span class="p">]</span>
+        <span class="c1"># Check if the country contains the airport</span>
+        <span class="k">if</span> <span class="n">poly</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">pt</span><span class="p">):</span>
+            <span class="c1"># If so, store in the dictionary</span>
+            <span class="n">airport2country</span><span class="p">[</span><span class="n">aID</span><span class="p">]</span> <span class="o">=</span> <span class="n">cty_nm</span>
+            <span class="c1"># Move on to the next airport, skipping remaining </span>
+            <span class="c1"># countries (an airport cannot be in two countries </span>
+            <span class="c1"># at the same time)</span>
+            <span class="k">break</span>
+<span class="n">airport2country</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">airport2country</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Once run, we can check the content of the dictionary we have created (after converting it to a <code>Series</code> for convenience):</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Airport Name&#39;</span><span class="p">:</span> <span class="n">air</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="s1">&#39;Country&#39;</span><span class="p">:</span> <span class="n">airport2country</span><span class="p">})</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Although interesting from a pedagogical standpoint, in practive, very rarely do we have to write a spatial join algorithm from scratch. More commonly, we will use one of the already available packaged methods. As mentioned, this is a fairly standard GIS operation, and the GIS community has spent a lot of effort to build optimized algorithms that can conveniently do the job for us. In <code>GeoPandas</code>, this is as simple as calling <code>sjoin</code>:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Spatial join</span>
+<span class="o">%</span><span class="k">time</span> air_w_cty = gpd.sjoin(air, ctys)
+<span class="n">air_w_cty</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Instead of the $\approx$47 seconds it took our homemade algorithm, the one above did a full join in just over two seconds! Through this join also, it is not only the IDs that are matched, but the entire table. Let us quickly compare whether the names match up with our own:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Display only top six records of airport and country name</span>
+<span class="c1"># Note that the order of the `sjoin`ed table is not the same</span>
+<span class="c1"># as ours but it can easily be rearranged using original indices</span>
+<span class="n">air_w_cty</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="mi">6</span><span class="p">),</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;ADMIN&#39;</span><span class="p">]]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Voila! Both tables seem to match nicely.</p>
+<p>To finish this vignette, let us explore which countries have the most airports through a simple choropleth. The only additional step we need to take is to obtain counts per country. But this is pretty straightforward now we have them linked to each airport. To do this, we use the <code>groupby</code> operation which, well, groups by a given column in a table, and then we apply the method <code>size</code>, which tells us how many elements every group has:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Group airports by country and count by group</span>
+<span class="n">cty_counts</span> <span class="o">=</span> <span class="n">air_w_cty</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ADMIN&#39;</span><span class="p">)</span>\
+                      <span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Then a choropleth is as simple as:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Index countries by the name, append the airport counts</span>
+<span class="c1"># (which are themselves indexed on country names too),</span>
+<span class="c1"># Fill any missing value in the count with zero (no counts</span>
+<span class="c1"># in this context means zero airports), and display choropleth</span>
+<span class="c1"># using quantiles</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">ctys</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ADMIN&#39;</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">airport_count</span><span class="o">=</span><span class="n">cty_counts</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;airport_count&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;Quantiles&#39;</span><span class="p">,</span> \
+              <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Display map</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Maybe unsurprisingly, what we find after all of this is that larger countries such as Canada, US, or Russia, have more airports. However, we can also find interesting insights. Some countries with similar size, such as France or Germany and some African countries such as Namibia have very different numbers. This should trigger further questions as to why that is, and maybe even suggest some tentative answers.</p>
+<p>And additional view that might be of interest is to display airport counts, but weighted by the area of the country. In other words, to show airport density. The idea behind it is to explore the variation in probabilities of an airport to be located in a given country, irrespective of how large that country is. Let us first create the densities:</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Airport density</span>
+<span class="c1"># Note since the CRS we are working with is expressed in Sq. metres,</span>
+<span class="c1"># we rescale it so the numbers are easier to read</span>
+<span class="n">airport_density</span> <span class="o">=</span> <span class="n">cty_counts</span> <span class="o">*</span> <span class="mf">1e12</span> <span class="o">/</span> <span class="n">ctys</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ADMIN&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">area</span>
+
+<span class="n">airport_density</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>And now we are ready to plot!</p>
+
+</div>
+</div>
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Index countries by the name, append the airport densities</span>
+<span class="c1"># (which are themselves indexed on country names too),</span>
+<span class="c1"># Fill any missing value in the count with zero (no number</span>
+<span class="c1"># in this context means zero airports), and display choropleth</span>
+<span class="c1"># using quantiles</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">ctys</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ADMIN&#39;</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">airport_dens</span><span class="o">=</span><span class="n">airport_density</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;airport_dens&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;Quantiles&#39;</span><span class="p">,</span> \
+              <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Display map</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="jb_cell">
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This map gives us a very different view. Very large countries are all of a sudden "penalized" and some smaller ones rise to the highest values. Again, how to read this map and whether its message is interesting or not depends on what we are after. But, together with the previous one, it does highlight important issues to consider when exploring uneven spatial data and what it means to display data (e.g. airports) through specific geographies (e.g. countries).</p>
+<hr>
 <h2 id="Vignette:-House-Prices">Vignette: House Prices<a class="anchor-link" href="#Vignette:-House-Prices"> </a></h2>
 </div>
 </div>
