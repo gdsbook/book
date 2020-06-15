@@ -59,7 +59,7 @@ period  1969-2017.
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ---
 <!-- #endregion -->
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 %matplotlib inline
 
 import seaborn
@@ -73,7 +73,7 @@ from pylab import rcParams
 rcParams['figure.figsize'] = 10, 5
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 
 gdf = geopandas.read_file('../data/us_county_income/usincome_final.shp')
 gdf.head()
@@ -86,23 +86,23 @@ This format is an example of a [*wide* longitudinal data set](https://www.theana
 
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 gdf[['LineCode', 'Descriptio']].head()
 
 ```
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df = gdf[gdf.LineCode == 3]
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.head()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.shape
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df[['1969', 'STATEFP', 'COUNTYFP', 'geometry']].head()
 ```
 
@@ -116,7 +116,7 @@ In general terms, measures of inequality focus on the dispersion present in an i
 To get a sense for the value distribution for per capita income, we can first discretize the distribution:
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 import seaborn  as sns
 sns.set()
 sns.distplot(pci_df['1969'])
@@ -129,16 +129,16 @@ The long right tail is a prominent feature of the distribution, and is common in
 
 The density is a powerful summary device that captures the overall morphology of the *value* distribution. At the same time, the density is silent on the underlying *spatial distribution* of county incomes. We can look at this second view of the distribution using a choropleth map:
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 from pysal.viz import mapclassify
 pci_1969 = pci_df['1969']
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 q5_1969 = mapclassify.Quantiles(pci_df['1969'])
 
 ```
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 _= pci_df.plot(column='1969', scheme='Quantiles', legend=True,
                  edgecolor='none',
              legend_kwds={'loc': 'lower right',
@@ -153,12 +153,12 @@ The choropleth and the kernel density provide different visual depictions of the
 
 One commonly used measure of inequality in a distribution is the so called 20:20 ratio, which is defined as the ratio of the incomes at the 80th percentile over that at the 20th percentile: 
 <!-- #endregion -->
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 q5_1969.bins
 ```
 
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 i_20_20 = q5_1969.bins[-2]/q5_1969.bins[0]
 i_20_20
 ```
@@ -168,7 +168,7 @@ In 1969 the richest 20% of the counties had an income that was 1.5 times the poo
 We can examine the dynamics of this global inequality measure by creating a simple function to apply to all years in our time series:
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 def ineq_2020(values):
     q5 = mapclassify.Quantiles(values)
     return q5.bins[-2]/q5.bins[0]
@@ -176,7 +176,7 @@ def ineq_2020(values):
     
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 years = list(range(1969, 2018))
 i_20_20_all = numpy.array([ ineq_2020(pci_df[str(year)]) for year in years])
 _ = plt.plot(years, i_20_20_all)
@@ -194,7 +194,7 @@ The ratio has a U-shaped pattern over time, bottoming out around 1994 after a lo
 For other classic measures of inequality, we will use the `inequality` package from `pysal`:
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 from pysal.explore import inequality
 ```
 
@@ -273,33 +273,33 @@ for c in lorenz_curves:
 
 The compression of the Lorenze curves makes it difficult to ascertain the temporal pattern in inequality. Focusing explicilty on the Gini coefficients may shed more light on this evolution:
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 g69 = inequality.gini.Gini(pci_df['1969'].values)
 
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 g69.g
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 years = [str(y) for y in range(1969, 2018)]
 ginis = numpy.array([inequality.gini.Gini(pci_df[year].values).g for year in years])
 years = numpy.array([int(y) for y in years])
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 gini_df = pandas.DataFrame(data = numpy.hstack([[years, ginis]]).T, columns=['Year', 'Gini'])
 gini_df['Year'] = gini_df['Year'].astype(int)
 gini_df.head()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 gini_df.index = pandas.to_datetime(gini_df['Year'], format="%Y")
 gini_df = gini_df.drop(columns=["Year"])
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 gini_df.plot(y=["Gini"])
 ```
 
@@ -314,11 +314,11 @@ A third commonly used measure of inequality is Theil's $T$ given as:
 $$T = \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\sum_{i=1}^m y_i}\right] \right)$$
 where $y_i$ is per-capita income in area $i$ among $m$ areas. In PySAL, we can calculate this index each year as:
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 gini_df['T'] = [inequality.theil.Theil(pci_df[str(y)]).T for y in years]
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 #gini_df.plot(figsize=(15,4))
 gini_df.plot(subplots=True, figsize=(15,6))
 #gini_df.plot(y=['Gini', 'T'], figsize=(15,4))
@@ -405,19 +405,19 @@ chapter XX. We use a queen spatial weights matrix to calculate Moran's I for
 each year in the sample.
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 wq = pysal.lib.weights.Queen.from_dataframe(pci_df)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 wq.n
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 MI = [pysal.explore.esda.moran.Moran(pci_df[str(y)], wq) for y in years]
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 res = np.array([ (mi.I, mi.p_sim) for mi in MI])
 ```
 ```python
@@ -428,7 +428,7 @@ res.shape
 res
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 res_df = gini_df
 res_df['I'] = res[:,0]
 res_df['I pvalue'] = res[:,1]
@@ -513,48 +513,54 @@ the second  component.
 
 
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+
+
+
+
+
+
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.columns
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pandas.unique(pci_df['Region'])
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.plot(column='Region', categorical=True, linewidth=0.1)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 region_df = pci_df.dissolve(by='STATEFP')
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pandas.unique(region_df.Region)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 region_df.plot(column='Region', categorical=True)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 for region in range(1, 9):
     pci_df[pci_df.Region==region].plot()
 
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 region_names = ["New England",
                'Mideast', 'Great Lakes', 'Plains',
                'Southeast', 'Southwest', 'Rocky Mountain',
                 'Far West']
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.groupby('Region').mean()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 regimes = pci_df['Region']
 ys = [str(y) for y in years]
 ```
@@ -585,26 +591,26 @@ rdf.columns
 theil_dr = pysal.explore.inequality.theil.TheilD(pci_df[ys].values, regimes)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 theil_dr.bg
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 res_df['bgr'] = theil_dr.bg
 res_df['wgr'] = theil_dr.wg
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 res_df.plot(subplots=True, figsize=(15,6))
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 
 numpy.random.seed(12345)
 theil_drs = pysal.explore.inequality.theil.TheilDSim(pci_df[ys].values, regimes, 999)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 res_df['bgr_pvalue'] = theil_drs.bg_pvalue
 res_df.plot(subplots=True, figsize=(15,6))
 ```
@@ -658,7 +664,7 @@ Theil applied to each of the regions.
 Plot the eight series
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 region_df.plot(column='Region', categorical=True)
 ```
 
@@ -772,47 +778,47 @@ ax.legend(ax.get_lines(), df.columns, loc='best')
 ```
 Unpacking the intraregional inequality term reveals that the original decomposition of inequality into within and between regions actually masks a great deal of heterogeneity in the internal inequality dynamics across the eight regions. Put another way, the overall trend in the aggregate within region component above is an average of the trends exhibited in each of the eight regions. There are two distinct groups of regions in this regard. The first consists of regions where the inequality between counties within each region has been increasing over the sample period. This group is composed of the New England,  Mideast, Far West, and Rocky Mountains regions. The second group are those regions where intraregional inequality has remained stable, or even decreased, over time. The Great Lakes, Southeast, and Southwest regions compose this group. The one outlier region is the Plains which does not fall neatly into either of these two groups.
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 theil_ds = pysal.explore.inequality.theil.TheilDSim(rdf[ys].values, rdf.STATEFP, 999)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 len(theil_ds.bg[0])
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 theil_ds.bg[0]
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 theil_ds.bg_pvalue
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 theil_ds.T
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 theil_ds.bg/theil_ds.T
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 wgp_ds = theil_ds.wg[0]/theil_ds.T
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 wgp_dr = theil_ds.wg[0]/theil_ds.T
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 wgp_dr.shape
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 res_df.shape
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 wgp_ds.shape = (49, 1)
 res_df['wgp_ds'] = wgp_ds
 wgp_dr.shape = (49, 1)
@@ -822,11 +828,11 @@ res_df['wgp_dr'] = wgp_dr
 res_df.plot(subplots=True, figsize=(15,6))
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 res_df.plot(y=['wgp_ds','wgp_dr'])
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 res_df.head()
 ```
 
@@ -947,35 +953,35 @@ res_df.plot(y=['z_wcg'])
 #### Spatial 20:20
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 ranks = pci_df.rank()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 for year in years:
     pci_df["{}_rank".format(year)] = pci_df[str(year)].rank(method='first')
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 ridx_20 = int(.2 * 3077)
 ridx_80 = int(.8 * 3077)
 ridx_20, ridx_80
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 df = pci_df
 df['1969_rank']
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 df[df['1969_rank']==615]
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 df.index[df['1969_rank']==615].tolist()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 idx_20 = []
 idx_80 = []
 for year in years:
@@ -986,27 +992,27 @@ for year in years:
     idx_80.extend(idx_80_i)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 len(idx_20)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 len(years)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 idx_20[0], idx_80[0]
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 df.loc[[8999, 2561], :].plot()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 df.loc[[idx_20[-1], idx_80[-1]], :].plot()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 import geopandas as gpd
 from shapely.geometry import Point,Polygon
 geom=[Point(xy) for xy in zip([117.454361,117.459880],[38.8459879,38.846255])]
@@ -1016,40 +1022,40 @@ l=gdf.distance(ldf.shift())
 print(l)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 ldf = df.to_crs({'init':'epsg:4326'})
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 ldf.loc[[idx_20[-1], idx_80[-1]], :].plot()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 ldf.to_crs(epsg=3310,inplace=True)
 
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 ldf.loc[[idx_20[-1], idx_80[-1]], :].plot()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 small = ldf.loc[[idx_20[-1], idx_80[-1]], :]
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 small
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 small.distance(small.shift()).values[-1]
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 small.geometry.centroid
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 idxs = zip(idx_20, idx_80)
 distances = []
 for idx in idxs:
@@ -1060,35 +1066,35 @@ for idx in idxs:
     distances.append(d)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 distances
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 idxs = zip(idx_20, idx_80)
 
 len(distances), len(years), len(list(idxs))
 gini_df['s_dist'] = numpy.array(distances)
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 gini_df.plot(y=["s_dist"])
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 idxs = numpy.array(list(zip(idx_20, idx_80)))
 idxs
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 df.loc[idxs[:,0],:].centroid.plot()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 df.loc[idxs[:,1],:].centroid.plot()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 
 fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
 df.loc[idxs[:,0],:].centroid.plot(ax=ax, color='r')
@@ -1098,7 +1104,7 @@ ax.set_axis_off()
 
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 
 fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
 df.loc[idxs[:,0],:].centroid.plot(ax=ax, color='r')
@@ -1113,16 +1119,16 @@ ax.set_axis_off()
 ## Rank paths
 <!-- #endregion -->
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 from shapely.geometry import LineString
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 ls20 = geopandas.GeoSeries(LineString(df.loc[idxs[:,0],:].centroid.tolist()))
 ls80 = geopandas.GeoSeries(LineString(df.loc[idxs[:,1],:].centroid.tolist()))
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 
 fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
 ls20.plot(ax=ax, color='r', label='20p')
@@ -1134,7 +1140,7 @@ ax.set_axis_off()
 
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 columns = 4
 rows = 12
 fig, ax_array = plt.subplots(rows, columns, squeeze=False, figsize=(15,15))
@@ -1156,7 +1162,7 @@ for i,ax_row in enumerate(ax_array):
 plt.show()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 columns = 4
 rows = 12
 fig, ax_array = plt.subplots(rows, columns, squeeze=False, figsize=(15,15))
@@ -1178,7 +1184,7 @@ for i,ax_row in enumerate(ax_array):
 plt.show()
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 for i in range(2,48):
     #print(0,i)
     fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
@@ -1196,7 +1202,7 @@ for i in range(2,48):
     
 ```
 
-```python ein.tags="worksheet-0" ein.hycell=false slideshow={"slide_type": "-"} jupyter={"outputs_hidden": false}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 
 ```
 
