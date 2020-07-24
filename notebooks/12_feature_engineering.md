@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.3.4
+      jupytext_version: 1.5.1
   kernelspec:
     display_name: Python 3
     language: python
@@ -41,12 +41,14 @@ import matplotlib.pyplot as plt
 import numpy
 import osmnx
 import rasterio
+from rasterio.plot import show as rioshow
 ```
 
 Throughout this chapter, we will use a common dataset to which we want to append more information through geography. For the illustration, we will use the set of [AirBnb properties](../data/airbnb/regression_cleaning). Let's read it:
 
 ```python
-airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')
+airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')\
+                   .set_index("id")
 ```
 
 ## Feature Engineering Using Map Matching
@@ -72,7 +74,7 @@ Now we can use this polygon as query for OpenStreetMap (note this step requires 
 ```python
 %%time
 pois = osmnx.pois_from_polygon(airbnbs_ch,
-                               amenities=['restaurant', 'bar']
+                               tags={"amenity": ['restaurant', 'bar']}
                               )
 ```
 
@@ -88,14 +90,9 @@ To retain only those under `restaurant` and `bar`, we can query further our tabl
 pois = pois.query('amenity in ("restaurant", "bar")')
 ```
 
-`DAB` stop point
-
----
-
-
 Once loaded into `pois` as a `GeoDataFrame`, let's take a peak at their location, as compared with AirBnb spots:
 
-```python jupyter={"outputs_hidden": true}
+```python
 f,ax = plt.subplots(1,figsize=(12, 12))
 airbnbs.plot(ax=ax, marker='.')
 pois.plot(ax=ax, color='r')
@@ -105,20 +102,181 @@ contextily.add_basemap(ax,
                       )
 ```
 
-To connect AirBnb properties to nearby restaurant and bars
+Now our intention is to create a new feature for the AirBnb dataset --a new column in `airbnbs`-- that incorporates information about how many POIs are *nearby* each property. Let us first walk through what we need to do conceptually:
+
+1. Decide what is *nearby*, which will dictate how far we go from each AirBnb to find POIs and count them. For this example, we will consider 500m
+2. Find, for each AirBnb, POIs *within* that radious
+3. Count how many POIs are withing the specified radious of each AirBnb
+
+Let us now translate the list above into code. For 1., we need to be able to measure distances in metres. `airbnbs` is originally expressed in degrees:
 
 ```python
-pois_per_listing = geopandas.sjoin(airbnbs.set_geometry(airbnbs.buffer(.01)), 
-                                   pois, op='intersects').groupby('id').id.count()
+airbnbs.crs
+```
+
+So are the POIs, so we need to convert both into a projection on metres, NAD83 for example:
+
+```python
+airbnbs_nad83 = airbnbs.to_crs("EPSG:6350")
+pois_nad83 = pois.to_crs("EPSG:6350")
+```
+
+We can create the radious of 500m around each AirBnb by drawing a buffer of that length:
+
+```python
+abb_buffer = airbnbs_nad83.buffer(500)
+```
+
+These buffers can be intersected with our POIs through a spatial join, which links geometries based on spatial relationships (or predicates). What we are aiming to is linking,  to every POI, the ID of the AirBnb for which the buffer contains the POI:
+
+```python
+j = geopandas.sjoin(pois_nad83,
+                    airbnbs_nad83.set_geometry(abb_buffer)\
+                                 .reset_index()\
+                                 [["id", "geometry"]],
+                    op="within"
+                   )
+```
+
+The resulting joined object `j` contains a row for every pair of POI and AirBnb that are linked. From there, we can apply a group-by operation, using the AirBnb ID, and count how many POIs each AirBnb has within 500m of distance:
+
+```python
+poi_count = j.groupby("id")["osmid"].count()
+poi_count.head()
+```
+
+The resulting `Series` is indexed on the AirBnb IDs, so we can assign it to the original `airbnbs` table. In this case, we know by construction that missing AirBnbs in `poi_count` do not have any POI within 500m, so we can fill missing values in the column with zeros.
+
+```python
+airbnbs_w_counts = airbnbs.assign(poi_count=poi_count)\
+                          .fillna({"poi_count": 0})
+```
+
+We can visualise now the distribution of counts to get a sense of how "well-served" AirBnb properties are arranged over space (for good measure, we'll also add a legendgram):
+
+```python
+f, ax = plt.subplots(1, figsize=(9, 9))
+airbnbs_w_counts.plot(column="poi_count",
+                      scheme="quantiles",
+                      alpha=0.5,
+                      legend=True,
+                      ax=ax
+                     )
+contextily.add_basemap(ax, 
+                       crs=airbnbs.crs.to_string(), 
+                       source=contextily.providers.Stamen.Toner
+                      )
+```
+
+---
+
+```python
+f, axs = plt.subplots(1, 3, figsize=(18, 6))
+
+airbnbs.plot(ax=axs[0], markersize=0.5)
+
+pois.plot(ax=axs[1], color="green", markersize=0.5)
+
+airbnbs_w_counts.plot(column="poi_count",
+                      scheme="quantiles",
+                      markersize=0.5,
+                      legend=True,
+                      ax=axs[2]
+                     )
+
+axs[1].set_xlim(axs[0].get_xlim())
+axs[1].set_ylim(axs[0].get_ylim())
+
+plt.show()
+```
+
+### Assigning point values from surfaces: elevation of AirBnbs
+
+
+We have just seen how to count points around each observation in a point dataset. In other cases, we might be confronted with a related but different challenge: transfering the value of a particular point in a surface to a point in a different dataset. 
+
+To make this more accessible, let us illustrate the context with an example question: *what is the elevation of each AirBnb property?* To answer it, we require, at least, the following:
+
+1. A sample of AirBnb property locations.
+1. A dataset of elevation. We will use here the [NASA DEM](../data/nasadem/README.md) surface for the San Diego area.
+
+Let us bring the elevation surface:
+
+```python
+dem = rasterio.open("../data/nasadem/nasadem_sd.tif")
+rioshow(dem)
+```
+
+Let's first check the CRS is aligned with our sample of point locations:
+
+```python
+dem.crs
+```
+
+We have opened the file with `rasterio`, which has not read the entire dataset just yet. This feature allows us to use this approach with files that are potentially very large, as only requested data is read into memory.
+
+To extract a discrete set of values from the elevation surface in `dem`, we can use `sample`. For a single location, this is how it works:
+
+```python
+list(dem.sample([(-117.24592208862305, 32.761619109301606)]))
+```
+
+Now, we can take this logic and apply it to a sequence of coordinates. For that, we need to extract them from the `geometry` object:
+
+```python
+abb_xys = pandas.DataFrame({"X": airbnbs.geometry.x, 
+                            "Y": airbnbs.geometry.y
+                           }).to_records(index=False)
 ```
 
 ```python
-airbnbs.merge(pois_per_listing.to_frame('n_pois'), left_on='id', right_index=True).plot('n_pois')
+elevation = pandas.DataFrame(dem.sample(abb_xys),
+                             columns=["Elevation"],
+                             index=airbnbs.index
+                            )
+elevation.head()
 ```
 
-# DEM sampling for a regression covariate
+Now we have a table with the elevation of each  AirBnb property, we can plot it on a map for visual inspection:
 
+```python
+f, ax = plt.subplots(1, figsize=(9, 9))
+airbnbs.join(elevation)\
+       .plot(column="Elevation",
+             scheme="quantiles",
+             legend=True,
+             alpha=0.5,
+             ax=ax
+            )
+contextily.add_basemap(ax, 
+                       crs=airbnbs.crs.to_string(), 
+                       source=contextily.providers.Stamen.TerrainBackground,
+                       alpha=0.5
+                      )
+```
 
+---
+
+```python
+f, axs = plt.subplots(1, 3, figsize=(18, 6))
+
+rioshow(dem, ax=axs[0])
+
+airbnbs.plot(ax=axs[1], markersize=0.5)
+
+airbnbs.join(elevation)\
+       .plot(column="Elevation",
+             scheme="quantiles",
+             markersize=0.5,
+             legend=True,
+             ax=axs[2]
+            )
+
+axs[0].set_xlim(axs[1].get_xlim())
+axs[0].set_ylim(axs[1].get_ylim())
+
+plt.show()
+```
 
 ### distance banding counts & distance-to a secondary feature
 - osmnx pois
