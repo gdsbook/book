@@ -6,34 +6,23 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.1
+      jupytext_version: 1.5.2
   kernelspec:
-    display_name: Python 3
+    display_name: analysis
     language: python
-    name: python3
+    name: analysis
 ---
 
-# Spatial feature engineering
+# Geographic feature engineering
 
 
-Ways to "stick" space into models that are not necessarily spatial.
+In machine learning and data science, we are often equipped with *tons* of data. Indeed, given the constellation of packages to query data services, free and open source data sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful *features* from this rich and deep sea of data. 
 
-<!-- #region -->
-**spatial feature engineering**: synthesizing information using spatial relationships either within the data or across data. 
+Where data is available, but not yet directly *usable*, we must use *feature engineering* to construct useful data for modelling a given phenomenon of interest. Often, feature engineering involves applying additional *domain knowledge* to raw information in order to structure it in a manner that is meaningful for a model. Often, this involves some sort of *transformation* of the original dataset, which is a well-studied concept in both classical statistics and remains so in machine learning methods. While *feature engineering* always relies on this implicit domain knowledge, it is an extremely important part of adapting general-purpose algorithms to unique or distinctive problems facing the every-day data scientist. 
 
-This is one way of "spatializing" data that is included in models. This is not about fitting *spatial models* that use
-> the kohonen quote about spatially-correlated learning in SOMs
+Geography is one of the most high-quality, ubiquitous ways to introduce *domain knowledge* into a problem: everything has a position in both *space* and *time*. And, while things that happen near to one another *in time* do not necessarily have a fundamental relationship, things that are *near* one another are often related. Thus, space is the ultimate *linkage key*, allowing us to connect different datasets together in order to improve our models and our predictions. This means that, even for *aspatial*, "non-geographic" data, you can use *spatial feature engineering* to create useful, highly-relevant features for your analysis. 
 
-it is about figuring out representations of geographical relationships and using them in typical non-spatial models. 
-
-
-
-Geographying
-
-Spatializing
-
-*(note: fit the distinction between using spatialized data vs. using spatial models into the regression chapter, ch. 11)*. 
-<!-- #endregion -->
+At its core, *spatial feature engineering* is the process of developing additional information from raw data using *geographic knowledge*. This synthesis could occur *between* datasets, where geography is used to link samples in separate datasets together; or *within* datasets, where geography can be used to borrow information from nearby samples. Building linkages *between* datasets is often called "Map Matching", while we use the term "Map Synthesis" to describe the use of geographical structure to derive new features from existing data. Both kinds of geographic feature engineering will be covered in this chapter, starting first with various methods for Map Matching when modelling Airbnb nightly rental prices in San Diego.
 
 ```python
 import geopandas, pandas, libpysal.weights as weights, contextily
@@ -47,8 +36,7 @@ from rasterio.plot import show as rioshow
 Throughout this chapter, we will use a common dataset to which we want to append more information through geography. For the illustration, we will use the set of [AirBnb properties](../data/airbnb/regression_cleaning). Let's read it:
 
 ```python
-airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')\
-                   .set_index("id")
+airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')
 ```
 
 ## Feature Engineering Using Map Matching
@@ -62,14 +50,14 @@ airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')\
 
 A first, conceptually straightforward, approach is to augment our dataset by counting how many points of a different dataset are in the vicinity of each observation. For example, we might want to know how many bars and restaurants each AirBnb has within a given radious. This count can then become an additional  feature of our dataset, stored in a new column of `airbnbs`.
 
-To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require to get a polygon that covers all our `airbnbs` points; an easy approach is a convex hull:
+To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require to get a polygon that covers all our `airbnbs` points. From Chapter 8, we can recall that there are a few different hulls that can be used. We'll use the Convex Hull here, which is the smallest convex polygon that covers all of the points in the set. 
 
 ```python
 airbnbs_ch = airbnbs.unary_union.convex_hull
 airbnbs_ch
 ```
 
-Now we can use this polygon as query for OpenStreetMap (note this step requires internet connection as it is querying a remote server):
+Using this polygon, we can use the `osmnx` package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we'll request POIs within San Diego that are "restaurants" or "bars," according to their metadata stored in OpenStreetMap. (*note: this step requires internet connection as it is querying a remote server*):
 
 ```python
 %%time
@@ -78,19 +66,13 @@ pois = osmnx.pois_from_polygon(airbnbs_ch,
                               )
 ```
 
-This returns every location where the words "restaurant" and "bar" are in its label. However, this includes more options:
+This provides us with every location within our convex hull that is tagged as a "restaurant" or "bar" its metadata on OpenStreteMap. Overall, this provides us with about 1300 points of interest: 
 
 ```python
-pois["amenity"].unique()
+pois.groupby('amenity').amenity.count()
 ```
 
-To retain only those under `restaurant` and `bar`, we can query further our table:
-
-```python
-pois = pois.query('amenity in ("restaurant", "bar")')
-```
-
-Once loaded into `pois` as a `GeoDataFrame`, let's take a peak at their location, as compared with AirBnb spots:
+Once loaded into `pois` as a `GeoDataFrame`, let's take a peek at their location, as compared with AirBnb spots:
 
 ```python
 f,ax = plt.subplots(1,figsize=(12, 12))
@@ -102,53 +84,69 @@ contextily.add_basemap(ax,
                       )
 ```
 
-Now our intention is to create a new feature for the AirBnb dataset --a new column in `airbnbs`-- that incorporates information about how many POIs are *nearby* each property. Let us first walk through what we need to do conceptually:
+Now, for some feature engineering, it may be extremely useful to know whether an Airbnb is located in a "hot" location, with a lot of restaurants and bars to choose from. Alternatively, if Airbnbs are very remote, they might not be as lucrative for short, expensive "city-break" reservations. That is, Airbnb users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be *willing to pay more* for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the Airbnb. 
 
-1. Decide what is *nearby*, which will dictate how far we go from each AirBnb to find POIs and count them. For this example, we will consider 500m
-2. Find, for each AirBnb, POIs *within* that radious
-3. Count how many POIs are withing the specified radious of each AirBnb
+Thus, we can *engineer features* in the Airbnb data using the nearby POIs. To do this, we can create a new feature for the AirBnb dataset --that is, a new column in `airbnbs`-- which incorporates information about how many POIs are *nearby* each property. This kind of "feature counting" is useful in applications where the mere presence of nearby features can affect the quantity we are modelling. 
 
-Let us now translate the list above into code. For 1., we need to be able to measure distances in metres. `airbnbs` is originally expressed in degrees:
+To do this kind of feature engineering, let us first walk through what we need to do at a conceptual level: 
+
+1. Decide what is *nearby*. This will dictate how far we go from each AirBnb when counting the number of "nearby" bars & restaurants. For this example, we will use 500 meter buffer, which is approximately the distance of a leisurely ten-minute walk.
+2. For each AirBnb, determine whether POIs are *within* a leisurely 10-minute walk. 
+3. Count how many POIs are withing the specified radius of each AirBnb.
+
+At the end of this procedure, we have the number of bars & restuarants that are within a leisurely walk of the AirBnb, which might be useful in predicting the price of each AirBnb. 
+
+With this, let us now translate the list above into code. For part 1., we need to be able to measure distances in metres. However, `airbnbs` is originally expressed in degrees, since it is provided in terms of locations in latitude and longitude:
 
 ```python
 airbnbs.crs
 ```
 
-So are the POIs, so we need to convert both into a projection on metres, NAD83 for example:
+In addition, the `pois` are also provided in terms of their latitude & longitude:
 
 ```python
-airbnbs_nad83 = airbnbs.to_crs("EPSG:6350")
-pois_nad83 = pois.to_crs("EPSG:6350")
+pois.crs
 ```
 
-We can create the radious of 500m around each AirBnb by drawing a buffer of that length:
+Therefore, we need to convert this into a coordinate system that is easier to work with. Here, we will use a projection common for mapping in California, the California Albers projection:
 
 ```python
-abb_buffer = airbnbs_nad83.buffer(500)
+airbnbs = airbnbs.to_crs(epsg=3311)
+pois = pois.to_crs(epsg=3311)
 ```
 
-These buffers can be intersected with our POIs through a spatial join, which links geometries based on spatial relationships (or predicates). What we are aiming to is linking,  to every POI, the ID of the AirBnb for which the buffer contains the POI:
+```python
+pois.crs
+```
+
+With this, we can create the radius of 500m around each AirBnb. This is often called *buffering*, where a shape is dilated by a given radius.
 
 ```python
-j = geopandas.sjoin(pois_nad83,
-                    airbnbs_nad83.set_geometry(abb_buffer)\
-                                 .reset_index()\
-                                 [["id", "geometry"]],
+airbnbs['buffer_500m'] = airbnbs.buffer(500)
+```
+
+Now, `abb_buffer` contains a 500-meter circle around each Airbnb.
+
+Using these, we can count the number of POIs that are within these areas using a *spatial join*. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: `pois within airbnb_buffers`, where `within` is the predicate relating `pois` to `airbnb_buffers`. Predicates are not always *reversible*: no `airbnb_buffer` can be `within` a `poi`. In `geopandas`, we can compute all pairs of relations between the `pois` and `airbnb_buffers` efficiently using the `sjoin` function, which takes a `predicate` argument defining the requested relationship between the first & second argument. 
+
+```python
+joined = geopandas.sjoin(pois,
+                    airbnbs.set_geometry('buffer_500m')[['id', 'buffer_500m']],
                     op="within"
                    )
 ```
 
-The resulting joined object `j` contains a row for every pair of POI and AirBnb that are linked. From there, we can apply a group-by operation, using the AirBnb ID, and count how many POIs each AirBnb has within 500m of distance:
+The resulting joined object `joined` contains a row for every pair of POI and AirBnb that are linked. From there, we can apply a group-by operation, using the AirBnb ID, and count how many POIs each AirBnb has within 500m of distance:
 
 ```python
-poi_count = j.groupby("id")["osmid"].count()
+poi_count = joined.groupby("id")["osmid"].count().to_frame('poi_count')
 poi_count.head()
 ```
 
 The resulting `Series` is indexed on the AirBnb IDs, so we can assign it to the original `airbnbs` table. In this case, we know by construction that missing AirBnbs in `poi_count` do not have any POI within 500m, so we can fill missing values in the column with zeros.
 
 ```python
-airbnbs_w_counts = airbnbs.assign(poi_count=poi_count)\
+airbnbs_w_counts = airbnbs.merge(poi_count, left_on='id', right_index=True)\
                           .fillna({"poi_count": 0})
 ```
 
@@ -278,10 +276,6 @@ axs[0].set_ylim(axs[1].get_ylim())
 plt.show()
 ```
 
-### distance banding counts & distance-to a secondary feature
-- osmnx pois
-- flicker data
-
 ### Point Interpolation using sklearn 
 - (streetscore averaging from nearest sites)
 - air quality?
@@ -292,13 +286,6 @@ plt.show()
 ### tobler? area to area interpolation
 
 - census geographies vs. h3
-
-### raster engineering to vector features
-
-- Elevation: https://blog.mapbox.com/global-elevation-data-6689f1d0ba65
-- DEM from USGS? Public domain? https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1-arc?qt-science_center_objects=0#qt-science_center_objects
-- air quality
-- night light - served through nasa, using - contextily
 
 
 ## Feature Engineering using Map Synthesis
