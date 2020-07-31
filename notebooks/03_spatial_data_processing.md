@@ -403,6 +403,21 @@ Before we analyze the spatial distribution of the listings, we have to convert
 the data type of the listing column as it is currently encoded as a string:
 
 ```python
+gdf.price
+```
+
+```python
+gdf['price'] = gdf['price'].apply(lambda x: x.replace('$', '').replace(',', '')).astype(float)
+```
+
+```python
+gdf.price
+```
+
+
+
+
+```python
 crs = {'init': 'epsg:4326'}
 gdf.crs = crs
 ```
@@ -410,6 +425,10 @@ gdf.crs = crs
 
 With the listing variable converted, we can now proceed to visualize the
 spatial distribution:
+
+```python
+gdf.plot(column='price', legend=True, scheme='quantiles', figsize=(16,16))
+```
 
 
 This is somewhat informative, but there are several issues with approaching the
@@ -447,11 +466,14 @@ sd_tracts = tracts[tracts.COUNTYFP=='073']
 sd_tracts.plot()
 ```
 
-Visual examination of the tracts reveals one idiosyncratic tract. The elognaged
+Visual examination of the tracts reveals one idiosyncratic tract. The elongated
 coastal tract actually has a boundary that extends in to the Pacific Ocean.
 This will induce visual noise in any subsequent analysis, so let's remove it.
 
 The question is how, to remove it? 
+
+Fortunately for this case, the tract in question is the extreme west tract, so
+we can exploit this information to find, and remove, the row in the dataframe:
 
 
 ```python
@@ -482,6 +504,9 @@ sd_tracts[bounds.minx!=bounds.minx.min()].plot()
 sd_tracts = sd_tracts[bounds.minx!=bounds.minx.min()]
 ```
 
+Having removed the coastal tract, we can now do a spatial join to associate a
+tract with each listing point:
+
 ```python
  gdf.geometry
 ```
@@ -489,6 +514,13 @@ sd_tracts = sd_tracts[bounds.minx!=bounds.minx.min()]
 ```python
 j = gpd.sjoin(gdf, sd_tracts, how='inner', op='within')
 ```
+
+We see a warning that alerts to a problem with the coordinate reference systems
+being different between the two dataframes. Since our spatial join is based on
+the spatial relationship of containment (`within`), the CRS have to be
+identical for this to be correct.
+
+Let's fix this and continue on:
 
 ```python
 gdf = gdf.to_crs(sd_tracts.crs)
@@ -502,6 +534,24 @@ j = gpd.sjoin(gdf, sd_tracts, how='inner', op='within')
 j.shape
 ```
 
+The result of the spatial join is that the listings dataframe has now been
+extended to add a tract column that identifies the census tract that contains
+the point for the listing.
+
+
+From the perspective of an individual listing point, this is a *one-to-one* spatial
+relationship. That is, a point can be within only one census tract, since the
+census tracts are [planar
+enforced](https://books.google.com/books?id=-FbVI-2tSuYC&pg=PA186&lpg=PA186&dq=planar+enforcement+theobald&source=bl&ots=SpOsACcrbP&sig=ACfU3U1CPniL-YpWCt0ml--XIP5_d3fkWA&hl=en&sa=X&ved=2ahUKEwjC-5LX1_fqAhWEHzQIHcNwC-8Q6AEwDXoECAoQAQ#v=onepage&q=planar%20enforcement%20theobald&f=false)
+and do not overlap.
+
+However, from the perspective of the census tracts, the relationship can be of a
+*one-to-many* form, since one census tract can contain multiple listings. 
+And, it is this cardinality that we want to leverage in aggregating the listing
+information by tract. For example, we can get the number of listings within
+each census tract using a `grouby` method on the dataframe:
+
+
 ```python
 j.groupby(by='GEOID').count()
 ```
@@ -510,25 +560,31 @@ j.groupby(by='GEOID').count()
 j[['price', 'GEOID']]
 ```
 
-```python
-j['price'] = j['price'].apply(lambda x: x.replace('$', '').replace(',', '')).astype(float)
-```
+Here we have used the `count` method on the dataframe that is generated from
+the group by. If we change the `count` method to `mean`, we will get the
+average listing price by census tract:
 
 ```python
 j[['price','GEOID']].groupby(by='GEOID').mean()
 ```
+
+We then can add this new variable to the tract dataframe:
 
 ```python
 tract_mean = j[['price','GEOID']].groupby(by='GEOID').mean()
 ```
 
 ```python
-sd_tracts.merge(tract_mean, on='GEOID').plot(column='price',legend=True)
-```
-
-```python
 sd_tracts = sd_tracts.merge(tract_mean, on='GEOID')
 ```
+
+and plot the average listing price by census tract:
+
+```python
+sd_tracts.plot(column='price',legend=True, figsize=(16,16), scheme='quantiles')
+```
+
+Let's add in a basemap for some context:
 
 ```python
 west, south, east, north = sd_tracts.total_bounds
@@ -567,7 +623,7 @@ f, ax = plt.subplots(1, figsize=(16, 16))
 ax.imshow(img, extent=ext)
 # Display airports on top
 sd_tracts.plot(ax=ax, alpha=0.6, edgecolor='lightgrey',
-              column='price', legend=True)
+              column='price', legend=True, scheme='quantiles')
 #listings.plot(ax=ax, c='green')
 #ax.scatter(air.x, air.y, c='purple', s=2)
 # Remove axis
@@ -579,31 +635,31 @@ plt.show()
 
 ```
 
-```python
+The visual analysis of the listing prices at the tract scale has addressed the
+problems we encountered in analyzing the points layer directly. There is of
+course, a trade-off as we switch from the point to areal unit layers, as the
+latter results from an aggregation of the information in the former. In
+subsequent chapters, we will be introducing methods that are appropriate for the
+deeper statistical analysis of these different types of spatial support. Here
+we only wanted to introduce methods of spatial data processing that allow us to
+construct the variables and layers that would feed into those analyses. 
 
-```
 
-```python
 
-```
+## Cafe Sheds
 
-```python
+We close this chapter with the application of a final set of deterministic
+spatial analytical methods that provide insights on the market structure of
+cafes in the San Diego region.
 
-```
-
-```python
-
-```
-
-```python
-
-```
-
-## Cafes
+Our data come from OpenStreetMap and have been extracted using QGIS and the OSM
+plugin to create a geopackage that we read in here:
 
 ```python
 cafes = gpd.read_file('../data/sandiego/sdcafes.gpkg')
 ```
+
+We can explore this data frame through some plotting and introspection:
 
 ```python
 cafes.plot()
@@ -613,8 +669,11 @@ cafes.plot()
 cafes.crs
 ```
 
+Again, we grab a basemap for context:
+
 ```python
 west, south, east, north = cafes.total_bounds
+
 ```
 
 ```python
@@ -628,6 +687,9 @@ ext
 ```python
 cafes.total_bounds
 ```
+and we need to set the CRS of our cafes, and listings, to web mercator so we
+can plot them together with our basemap to get a better understanding of the
+spatial relationships between the cafes and the airbnb listings:
 
 ```python
 cafes = cafes.to_crs(epsg=3857)
@@ -654,6 +716,9 @@ ax.set_title('San Diego Cafes (Purple) and Air BnB Listings (Green)')
 plt.show()
 
 ```
+
+We see that the spatial extent of the cafes is much larger than that of the
+listings, so let's subset our cafes to those within the extent of the listings:
 
 ```python
 listings.total_bounds
@@ -691,6 +756,30 @@ plt.show()
 
 ```
 
+Plotting the two point sets together, we encounter the same occlusion problem
+but now it takes on a more complex form since listings can occlude other
+listings, cafes can occlude other cafes, and cafes can occlude listings (since
+cafes are drawn last).
+
+One way around these issues is to ask more particular questions about the
+spatial relationships between the two point sets. For example, one very
+important question (from the perspective of  your coffee addict author) we may
+want to answer is to find the closest cafe for each airbnb listing.
+
+To answer this question we develop [Voronoi polygons](http://jwilson.coe.uga.edu/EMAT6680Fa08/Kuzle/Math%20in%20Context/Voronoi%20diagrams.html) for each cafe. These
+polygons generate a tessellation of the extent such that there is one polygon
+for each cafe, and these polygons define the set of points for which that cafe
+is the closest of all cafes in San Diego. 
+
+Because these polygons are planar enforced, we know that each of our listings
+will be contained by one, and only one, of the Voronoi polygons. Once we know
+which polygon a listing is within, we also know which cafe is closet to that
+listing - and that will be the cafe that is the generator point for the polygon.
+
+
+We construct the Voronoi polygons using **libpysal**:
+
+
 ```python
 import libpysal
 ```
@@ -700,8 +789,10 @@ sheds, generators = libpysal.cg.voronoi.voronoi_frames(list(zip(cafes.geometry.x
 ```
 
 ```python
-sheds.plot()
+sheds.plot(figsize=(16,16))
 ```
+
+and add these "cafe sheds" together with our basemap:
 
 ```python
 sheds.crs = 'epsg:3857'
@@ -711,29 +802,7 @@ sheds.crs = 'epsg:3857'
 w,s,e,n = sheds.total_bounds
 ```
 
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, alpha=.9)
-cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
 
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafes')
-# Display
-#ax.set_xlim(w,e)
-#ax.set_ylim(s,n)
-plt.show()
-
-```
 
 ```python
 # Set up figure and axes
@@ -761,46 +830,16 @@ plt.show()
 
 ```
 
-```python
-ext
-```
+### Closest cafe
 
-```python
-w
-```
-
-```python
-e
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, alpha=.9)
-ax.scatter(cafes.geometry.x, cafes.geometry.y, c='yellow', s=2, linewidth=0.)
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
-
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafes')
-# Display
-plt.show()
-
-```
+To find the closest cafe to each listing, we do a spatial join of the listings
+dataframe with the coffee sheds (voronoi polygons):
 
 ```python
 sheds.crs = 'epsg:3857'
 ```
 
-### Closest cafe
+
 
 ```python
 cc = gpd.sjoin(listings.drop(['index_right'], axis=1), sheds, how='inner', op='within')
@@ -821,28 +860,39 @@ cc.rename(columns={'index_right': 'cafe'}, inplace=True)
 ```python
 cc.head()
 ```
+This new dataframe has one record for each listing, and records the coffee shed
+that contains the listing.
 
-## Choropleth of Demand  in Coffee Shed
+## Choropleth of Demand by Coffee Shed
+
+From the perspective of an airbnb renter, we have given them what they need -
+the identification of their closest cafe. For the owners of the cafe, what
+would be of interest is how many such renters are within their Voronoi polygon.
+We can determine this number for each cafe in the data set in a similar fashion
+to what we've done above for the airports and listing by tract: do a groupby of
+the listings in each shed polygon:
+
 
 ```python
 cc.groupby(by='cafe').count()
 ```
 
+Here the `id` column is the count of the number of listings within the polygon
+associated with the cafe in the first column. Essentially this is counting up
+how many times a particular cafe appears in the `cafe` column:
+
 ```python
 cc.cafe
 ```
+and we can find out how many cafes (out of all cafes in San Diego) are the
+nearest cafe to at least one listing:
 
 ```python
 generators.iloc[cc.cafe.unique()] # cafes that are a nearest neighbor to at least 1 listing
 ```
 
-```python
-import mapclassify
-```
-
-```python
-mapclassify.__version__
-```
+Now we are in a position to visualize the spatial distribution of coffee demand
+across the sheds. Let's first rename our dataframe:
 
 ```python
 demand = cc[['cafe', 'listing_url']].groupby(by='cafe').count()
@@ -861,6 +911,9 @@ demand.shape
 demand.index
 ```
 
+We can join the demand dataframe to the sheds dataframe. This adds the demand
+column to the shed dataframe:
+
 ```python
 sheds = sheds.join(demand)
 ```
@@ -873,6 +926,9 @@ sheds.head()
 sheds
 ```
 
+There are cafes with sheds that do not contain any listings and these have a
+`Nan` in their demand column. We can set these values to 0:
+
 ```python
 sheds = sheds.fillna(0)
 ```
@@ -881,73 +937,7 @@ sheds = sheds.fillna(0)
 sheds
 ```
 
-```python
-cafes.shape
-```
-
-```python
-cafes['sheds'] = sheds.geometry
-```
-
-```python
-cafes.columns
-```
-
-```python
-cafes.plot()
-```
-
-```python
-cafes.set_geometry('sheds', inplace=True)
-```
-
-```python
-cafes.plot()
-```
-
-```python
-cafes.iloc[0:3].plot()
-```
-
-```python
-cafes.set_geometry('geometry', inplace=True)
-```
-
-```python
-cafes.iloc[0:3].plot()
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Display tile map
-#ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-cafes.set_geometry('sheds', inplace=True)
-cafes.iloc[0:3].plot(ax=ax)
-cafes.set_geometry( 'geometry', inplace=True)
-cafes.iloc[0:3].plot(ax=ax,c='yellow')
-
-#sheds.plot(ax=ax, alpha=.9)
-#ax.scatter(cafes.geometry.x, cafes.geometry.y, c='yellow', s=2, linewidth=0.)
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
-
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafes')
-# Display
-plt.show()
-
-```
-
-```python
-sheds.plot(column='listings')
-```
+And finally, we can map the number of airbnb listings in each coffee shed:
 
 ```python
 # Set up figure and axes
@@ -956,7 +946,7 @@ f, ax = plt.subplots(1, figsize=(16,16))
 ax.imshow(img, extent=ext)
 # Display airports on top
 #listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, alpha=.7, edgecolor='white', column='listings')
+sheds.plot(ax=ax, alpha=.7, edgecolor='white', column='listings', legend=True, scheme='quantiles')
 #cafes.plot(ax=ax, c='purple', alpha=0.5)
 #listings.plot(ax=ax, c='green')
 
@@ -975,120 +965,15 @@ plt.show()
 
 ```
 
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, edgecolor='grey', column='listings', legend=True)
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
 
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafe Sheds')
-# Display
-ax.set_xlim((w,e))
-ax.set_ylim((s,n))
-ax.set_axis_off()
-
-plt.show()
-
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, edgecolor='grey', column='listings', legend=True,
-          scheme='quantiles')
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
-
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafe Sheds')
-# Display
-ax.set_xlim((w,e))
-ax.set_ylim((s,n))
-ax.set_axis_off()
-
-plt.show()
-
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, edgecolor='grey', column='listings', legend=True,
-          scheme='fisher_jenks')
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
-
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafe Sheds')
-# Display
-ax.set_xlim((w,e))
-ax.set_ylim((s,n))
-ax.set_axis_off()
-
-plt.show()
-
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, edgecolor='grey', column='listings', legend=True,
-          scheme='fisher_jenks',
-          classification_kwds={'k':10})
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
-
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Listings by Cafe Sheds')
-# Display
-ax.set_xlim((w,e))
-ax.set_ylim((s,n))
-ax.set_axis_off()
-
-plt.show()
-
-```
 
 ## Exercises
 
-1. Which coffeeshed has the highest listing price?
+1. Which coffee shed has the highest listing price?
 
 2. How distant are the highest and lowest listings?
-3. Generate a choropleth that expresses listing intensity (listings per square kilometer) by coffeeshed.
+3. Generate a choropleth that expresses listing intensity (listings per square
+   kilometer) by coffee shed.
 
 ```python
 sheds.geometry
