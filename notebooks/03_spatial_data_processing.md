@@ -34,9 +34,10 @@ Intro paragraph
 - Querying based on attributes (volume, lon/lat, etc.)
 <!-- #endregion -->
 
-```python deletable=true editable=true
+```python deletable=true editable=true jupyter={"outputs_hidden": false}
 import pandas as pd
 import geopandas as gpd
+import contextily as ctx
 df = pd.read_csv("../data/airports/world-airports.csv")
 ```
 
@@ -46,7 +47,7 @@ df.head()
 
 Let's use pandas to query for the airports within the `large_airport` class:
 
-```python
+```python jupyter={"outputs_hidden": false}
 df[df.type == 'large_airport']
 ```
 
@@ -54,7 +55,7 @@ df[df.type == 'large_airport']
 Since both latitude and longitude are columns in the dataframe we can use pandas to carry out a limited number of geospatial queries. For example, extract all the airports in the northern hemisphere:
 <!-- #endregion -->
 
-```python
+```python jupyter={"outputs_hidden": false}
 df[df.latitude_deg > 0.0]
 ```
 
@@ -62,11 +63,11 @@ df[df.latitude_deg > 0.0]
 - Subsetting (querying but return dataframe not just indices)
 <!-- #endregion -->
 
-```python
+```python jupyter={"outputs_hidden": false}
 gb = df.groupby('type')
 ```
 
-```python
+```python jupyter={"outputs_hidden": false}
 gb.all()
 ```
 
@@ -76,15 +77,15 @@ medium = df[df.type=='medium_airport']
 large = df[df.type=='large_airport']
 ```
 
-```python
+```python jupyter={"outputs_hidden": false}
 len(small)
 ```
 
-```python
+```python jupyter={"outputs_hidden": false}
 len(medium)
 ```
 
-```python
+```python jupyter={"outputs_hidden": false}
 len(large)
 ```
 
@@ -125,6 +126,7 @@ At first brush, a point pattern is essentially the collective shape a bunch of p
 
 ```python
 # Plot XY coordinates
+import matplotlib.pyplot as plt
 plt.scatter(air.x, air.y)
 ```
 
@@ -174,7 +176,7 @@ The first thing we need to do to create a country map is to have country (spatia
 
 ```python
 # Load up shapefile with countries
-ctys = gpd.read_file('../data/airports/countries_clean/countries_clean.shp')
+ctys = gpd.read_file('../data/countries/countries_clean.gpkg')
 ```
 
 And, same as with any new dataset, let us have a quick look at what it looks like and how it stacks up with the other data we have collected along the way:
@@ -333,20 +335,12 @@ plt.show()
 
 This map gives us a very different view. Very large countries are all of a sudden "penalized" and some smaller ones rise to the highest values. Again, how to read this map and whether its message is interesting or not depends on what we are after. But, together with the previous one, it does highlight important issues to consider when exploring uneven spatial data and what it means to display data (e.g. airports) through specific geographies (e.g. countries).
 
+
 --- 
 
 ## Vignette: House Prices
 
-```python
-df = pd.read_csv('../data/sandiego/listings.csv')
-len(df)
-```
-
-```python
-df.columns
-```
-
-<!-- #region deletable=true editable=true -->
+<!-- #region editable=true -->
 - keyword table join (census)
 (keyword comes from spatial join with polygon shown below)
 
@@ -361,6 +355,814 @@ df.columns
 message is, if you have the column in the table use it, but many cases you do not have the column and need to go the spatial join route
 <!-- #endregion -->
 
+We begin by reading in the Airbnb listings for San Diego which are stored in a
+comma separated file (csv):
+
+
+```python
+df = pd.read_csv('../data/sandiego/listings.csv')
+len(df)
+
+```
+
+Examination of the dataframe reveals that the location information is encoded
+in the columns `longitude` and `latitude`.  We will use these columns together
+with the `Point` class from **shapely** to create a geodataframe:
+
+```python
+from shapely.geometry import Point
+```
+
+```python jupyter={"outputs_hidden": false}
+geometry = [Point(xy) for xy in zip(df['longitude'], df['latitude'])]
+```
+
+```python
+import geopandas as gpd
+```
+
+```python
+gdf = gpd.GeoDataFrame(df)
+```
+
+```python
+gdf['geometry'] = geometry
+```
+
+```python
+gdf.plot()
+```
+
+The listings are represented as point objects, and what we are interested in is
+the spatial distribution of the listing prices across the market. So unlike the
+airport dataset above where we were focusing on the locations of the points,
+here we extend the analysis to consider the locations and an attribute that is
+measured at each of the locations.
+
+Before we analyze the spatial distribution of the listings, we have to convert
+the data type of the listing column as it is currently encoded as a string:
+
+```python
+crs = {'init': 'epsg:4326'}
+gdf.crs = crs
+```
+
+
+With the listing variable converted, we can now proceed to visualize the
+spatial distribution:
+
+
+This is somewhat informative, but there are several issues with approaching the
+analysis in this fashion. Chief among these is the occlusion of listings in
+areas with high density. The size of the points also makes it challenging to
+develop a systematic view of the spatial variation in the listing prices.
+
+We can address these issues through spatial aggregation. That is, similar to
+what we did for the airport dataset we can use a spatial join to associate each
+listing with its enclosing  polygon. Once we have that information, we can use
+database methods to perform aggregation queries to get the average listing
+price per polygon.
+
+
+For our polygons we will use census tracts that we have downloaded for the
+state of California:
+
+```python
+tracts = '../data/sandiego/tl_2019_06_tract.shp'
+tracts = gpd.read_file(tracts)
+```
+
+```python
+tracts.plot()
+```
+
+This gives us all the tracts for the state, our market analysis is focusing on
+the case of San Diego, so we can use a Pandas query to create a more focused dataframe:
+
+```python
+sd_tracts = tracts[tracts.COUNTYFP=='073']
+```
+
+```python
+sd_tracts.plot()
+```
+
+Visual examination of the tracts reveals one idiosyncratic tract. The elognaged
+coastal tract actually has a boundary that extends in to the Pacific Ocean.
+This will induce visual noise in any subsequent analysis, so let's remove it.
+
+The question is how, to remove it? 
+
+
+```python
+bounds = sd_tracts.bounds
+```
+
+```python
+bounds
+```
+
+```python
+bounds.minx.min()
+```
+
+```python
+bounds[bounds.minx==bounds.minx.min()]
+```
+
+```python
+sd_tracts[bounds.minx==bounds.minx.min()].plot()
+```
+
+```python
+sd_tracts[bounds.minx!=bounds.minx.min()].plot()
+```
+
+```python
+sd_tracts = sd_tracts[bounds.minx!=bounds.minx.min()]
+```
+
+```python
+ gdf.geometry
+```
+
+```python
+j = gpd.sjoin(gdf, sd_tracts, how='inner', op='within')
+```
+
+```python
+gdf = gdf.to_crs(sd_tracts.crs)
+```
+
+```python
+j = gpd.sjoin(gdf, sd_tracts, how='inner', op='within')
+```
+
+```python
+j.shape
+```
+
+```python
+j.groupby(by='GEOID').count()
+```
+
+```python
+j[['price', 'GEOID']]
+```
+
+```python
+j['price'] = j['price'].apply(lambda x: x.replace('$', '').replace(',', '')).astype(float)
+```
+
+```python
+j[['price','GEOID']].groupby(by='GEOID').mean()
+```
+
+```python
+tract_mean = j[['price','GEOID']].groupby(by='GEOID').mean()
+```
+
+```python
+sd_tracts.merge(tract_mean, on='GEOID').plot(column='price',legend=True)
+```
+
+```python
+sd_tracts = sd_tracts.merge(tract_mean, on='GEOID')
+```
+
+```python
+west, south, east, north = sd_tracts.total_bounds
+```
+
+```python
+%time img, ext = ctx.bounds2img(west, south, east, north, ll=True, zoom=11)
+```
+
+```python
+sd_tracts = sd_tracts.to_crs(epsg=3857)
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16, 16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+sd_tracts.plot(ax=ax, alpha=0.6, color='green',edgecolor='lightgrey')
+#listings.plot(ax=ax, c='green')
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Tracts with Listings')
+# Display
+plt.show()
+
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16, 16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+sd_tracts.plot(ax=ax, alpha=0.6, edgecolor='lightgrey',
+              column='price', legend=True)
+#listings.plot(ax=ax, c='green')
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Tracts Listing Prices')
+# Display
+plt.show()
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+```python
+
+```
+
+## Cafes
+
+```python
+cafes = gpd.read_file('../data/sandiego/sdcafes.gpkg')
+```
+
+```python
+cafes.plot()
+```
+
+```python
+cafes.crs
+```
+
+```python
+west, south, east, north = cafes.total_bounds
+```
+
+```python
+%time img, ext = ctx.bounds2img(west, south, east, north, ll=True, zoom=11)
+```
+
+```python
+ext
+```
+
+```python
+cafes.total_bounds
+```
+
+```python
+cafes = cafes.to_crs(epsg=3857)
+```
+
+```python
+listings = j.to_crs(epsg=3857)
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(9, 9))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+cafes.plot(ax=ax, c='purple')
+listings.plot(ax=ax, c='green')
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafes (Purple) and Air BnB Listings (Green)')
+# Display
+plt.show()
+
+```
+
+```python
+listings.total_bounds
+```
+
+```python
+%time img, ext = ctx.bounds2img(*listings.total_bounds, zoom=11)
+```
+
+```python
+w,s,e,n = listings.total_bounds
+```
+
+```python
+cafes = cafes.cx[w:e,s:n]
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(9, 9))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+listings.plot(ax=ax, c='green')
+cafes.plot(ax=ax, c='purple', alpha=0.5)
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafes (Purple) and Air BnB Listings (Green)')
+
+# Display
+plt.show()
+
+```
+
+```python
+import libpysal
+```
+
+```python
+sheds, generators = libpysal.cg.voronoi.voronoi_frames(list(zip(cafes.geometry.x.values, cafes.geometry.y.values)))
+```
+
+```python
+sheds.plot()
+```
+
+```python
+sheds.crs = 'epsg:3857'
+```
+
+```python
+w,s,e,n = sheds.total_bounds
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(9, 9))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, alpha=.9)
+cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafes')
+# Display
+#ax.set_xlim(w,e)
+#ax.set_ylim(s,n)
+plt.show()
+
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16,16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, alpha=.7, edgecolor='white')
+cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafe Sheds')
+# Display
+ax.set_xlim((w,e))
+ax.set_ylim((s,n))
+ax.set_axis_off()
+
+plt.show()
+
+```
+
+```python
+ext
+```
+
+```python
+w
+```
+
+```python
+e
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(9, 9))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, alpha=.9)
+ax.scatter(cafes.geometry.x, cafes.geometry.y, c='yellow', s=2, linewidth=0.)
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafes')
+# Display
+plt.show()
+
+```
+
+```python
+sheds.crs = 'epsg:3857'
+```
+
+### Closest cafe
+
+```python
+cc = gpd.sjoin(listings.drop(['index_right'], axis=1), sheds, how='inner', op='within')
+```
+
+```python
+cc.head()
+```
+
+```python
+cc.shape
+```
+
+```python
+cc.rename(columns={'index_right': 'cafe'}, inplace=True)
+```
+
+```python
+cc.head()
+```
+
+## Choropleth of Demand  in Coffee Shed
+
+```python
+cc.groupby(by='cafe').count()
+```
+
+```python
+cc.cafe
+```
+
+```python
+generators.iloc[cc.cafe.unique()] # cafes that are a nearest neighbor to at least 1 listing
+```
+
+```python
+import mapclassify
+```
+
+```python
+mapclassify.__version__
+```
+
+```python
+demand = cc[['cafe', 'listing_url']].groupby(by='cafe').count()
+demand.rename(columns={'listing_url':'listings'}, inplace=True)
+```
+
+```python
+demand.head()
+```
+
+```python
+demand.shape
+```
+
+```python
+demand.index
+```
+
+```python
+sheds = sheds.join(demand)
+```
+
+```python
+sheds.head()
+```
+
+```python
+sheds
+```
+
+```python
+sheds = sheds.fillna(0)
+```
+
+```python
+sheds
+```
+
+```python
+cafes.shape
+```
+
+```python
+cafes['sheds'] = sheds.geometry
+```
+
+```python
+cafes.columns
+```
+
+```python
+cafes.plot()
+```
+
+```python
+cafes.set_geometry('sheds', inplace=True)
+```
+
+```python
+cafes.plot()
+```
+
+```python
+cafes.iloc[0:3].plot()
+```
+
+```python
+cafes.set_geometry('geometry', inplace=True)
+```
+
+```python
+cafes.iloc[0:3].plot()
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(9, 9))
+# Display tile map
+#ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+cafes.set_geometry('sheds', inplace=True)
+cafes.iloc[0:3].plot(ax=ax)
+cafes.set_geometry( 'geometry', inplace=True)
+cafes.iloc[0:3].plot(ax=ax,c='yellow')
+
+#sheds.plot(ax=ax, alpha=.9)
+#ax.scatter(cafes.geometry.x, cafes.geometry.y, c='yellow', s=2, linewidth=0.)
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafes')
+# Display
+plt.show()
+
+```
+
+```python
+sheds.plot(column='listings')
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16,16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, alpha=.7, edgecolor='white', column='listings')
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafe Sheds')
+# Display
+ax.set_xlim((w,e))
+ax.set_ylim((s,n))
+ax.set_axis_off()
+
+plt.show()
+
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16,16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, edgecolor='grey', column='listings', legend=True)
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafe Sheds')
+# Display
+ax.set_xlim((w,e))
+ax.set_ylim((s,n))
+ax.set_axis_off()
+
+plt.show()
+
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16,16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, edgecolor='grey', column='listings', legend=True,
+          scheme='quantiles')
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafe Sheds')
+# Display
+ax.set_xlim((w,e))
+ax.set_ylim((s,n))
+ax.set_axis_off()
+
+plt.show()
+
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16,16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, edgecolor='grey', column='listings', legend=True,
+          scheme='fisher_jenks')
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafe Sheds')
+# Display
+ax.set_xlim((w,e))
+ax.set_ylim((s,n))
+ax.set_axis_off()
+
+plt.show()
+
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16,16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, edgecolor='grey', column='listings', legend=True,
+          scheme='fisher_jenks',
+          classification_kwds={'k':10})
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Listings by Cafe Sheds')
+# Display
+ax.set_xlim((w,e))
+ax.set_ylim((s,n))
+ax.set_axis_off()
+
+plt.show()
+
+```
+
+## Exercises
+
+1. Which coffeeshed has the highest listing price?
+
+2. How distant are the highest and lowest listings?
+3. Generate a choropleth that expresses listing intensity (listings per square kilometer) by coffeeshed.
+
+```python
+sheds.geometry
+```
+
+```python
+sheds.geometry.area
+```
+
+```python
+sheds['area'] = sheds.geometry.area / 1000000
+```
+
+```python
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16,16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, edgecolor='grey', column='area', legend=True,
+          scheme='fisher_jenks',
+          classification_kwds={'k':10})
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Cafe Sheds Area (km2)')
+# Display
+ax.set_xlim((w,e))
+ax.set_ylim((s,n))
+ax.set_axis_off()
+
+plt.show()
+
+```
+
+```python
+sheds['lintensity'] = sheds['listings'] / sheds['area']
+# Set up figure and axes
+f, ax = plt.subplots(1, figsize=(16,16))
+# Display tile map
+ax.imshow(img, extent=ext)
+# Display airports on top
+#listings.plot(ax=ax, c='green')
+sheds.plot(ax=ax, edgecolor='grey', column='lintensity', legend=True,
+          scheme='fisher_jenks',
+          classification_kwds={'k':10})
+#cafes.plot(ax=ax, c='purple', alpha=0.5)
+#listings.plot(ax=ax, c='green')
+
+
+#ax.scatter(air.x, air.y, c='purple', s=2)
+# Remove axis
+#ax.set_axis_off()
+# Add title
+ax.set_title('San Diego Listings Intensity by Cafe Sheds')
+# Display
+ax.set_xlim((w,e))
+ax.set_ylim((s,n))
+ax.set_axis_off()
+
+plt.show()
+
+```
+
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+```python
+
+```
