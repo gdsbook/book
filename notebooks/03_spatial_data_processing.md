@@ -13,103 +13,46 @@ jupyter:
     name: python3
 ---
 
-<!-- #region deletable=true editable=true -->
 # Spatial Data Processing
 
-Intro paragraph
-* deterministic spatial analysis (SG)
+As we have seen in the previous chapter, spatial data comes in a wide variety
+of forms. Much of  the power of spatial analysis flows from the ability
+to consider the spatial relationships between processes reflected in different
+geographical datasets. We can also leverage spatatial analysis to consider the
+geographical relationships between observations from the *same* dataset.
+**Deterministic spatial analysis** formalizes these spatial relationships.
+ By deterministic we mean that the geometric coordinates of the
+spatial objects are free from any noise, error, or random variation. The focus
+of deterministic analysis is then on the spatial predicates, topologically
+invariant binary-spatial relationships, between spatial entities. These spatial
+predicates power spatial database systems such
+as PostGIS, Oracle Spatial, and others.  
 
-* Explain what we mean by dsa
-* outline what we will cover below
 
+The types of questions/queries that deterministic analysis can answer include:
 
- airports.csv
-<!-- #endregion -->
+- *Given two data series, one of points and one of polygons, find the polygon
+  that containing each point*.
+- *How many points from the first series, does each polygon in the second
+  series contain*?
+- *Given a set of coffee shops, represented as  points in a city, and a list of
+  addresses for rental properties, determine the
+  closest coffee shop for each rental property*
 
-<!-- #region deletable=true editable=true -->
-## Vignette: Airports
-<!-- #endregion -->
+In this chapter we explore the use of several different forms of deterministic
+spatial analysis, through two example *Vignettes*. We begin with a point
+dataset that reports the location of airports across the world. Using the
+airports, we will explore different types of spatial queries that filter the
+data by regions. We also combine the point data set with a polygonal dataset
+for countries and carry out a spatial join that defines the country for each
+airport. The second vignette focuses on a point dataset representing Airbnb
+listings in San Diego, California. We explore the listing prices across the
+point set and then use spatial joins to aggregate the prices by census tracts.
+We also combine the Airbnb data with a second point set on cafe locations in
+the region to carry out a market analysis of potential demand for each cafe
+using spatial tessellations.
 
-<!-- #region deletable=true editable=true -->
-- Querying based on attributes (volume, lon/lat, etc.)
-<!-- #endregion -->
-
-```python deletable=true editable=true jupyter={"outputs_hidden": false}
-import pandas as pd
-import geopandas as gpd
-import contextily as ctx
-df = pd.read_csv("../data/airports/world-airports.csv")
-```
-
-```python
-df.head()
-```
-
-Let's use pandas to query for the airports within the `large_airport` class:
-
-```python jupyter={"outputs_hidden": false}
-df[df.type == 'large_airport']
-```
-
-<!-- #region deletable=true editable=true -->
-Since both latitude and longitude are columns in the dataframe we can use pandas to carry out a limited number of geospatial queries. For example, extract all the airports in the northern hemisphere:
-<!-- #endregion -->
-
-```python jupyter={"outputs_hidden": false}
-df[df.latitude_deg > 0.0]
-```
-
-<!-- #region deletable=true editable=true -->
-- Subsetting (querying but return dataframe not just indices)
-<!-- #endregion -->
-
-```python jupyter={"outputs_hidden": false}
-gb = df.groupby('type')
-```
-
-```python jupyter={"outputs_hidden": false}
-gb.all()
-```
-
-```python
-small = df[df.type=='small_airport']
-medium = df[df.type=='medium_airport']
-large = df[df.type=='large_airport']
-```
-
-```python jupyter={"outputs_hidden": false}
-len(small)
-```
-
-```python jupyter={"outputs_hidden": false}
-len(medium)
-```
-
-```python jupyter={"outputs_hidden": false}
-len(large)
-```
-
-<!-- #region deletable=true editable=true -->
-- spatial join - airports by countries
-<!-- #endregion -->
-
-```python
-p = ('../data/airports/ne_10m_admin_0_countries/'\
-     'ne_10m_admin_0_countries.shp')
-countries_shp = gpd.read_file(p)
-```
-
-<!-- #region deletable=true editable=true -->
-- derived features - point sequence to line for the routes
-- spatial join - does route pass through a country
-- crs: contextily example, 
-- knn analysis - find most isolated airport
-- voronoi - whats my closest airport
-- dissolve - dissovle boundaries in europe
-<!-- #endregion -->
----
-## Vignette: Airports (text from point processing)
-**TODO: Merge with previous section**
+## Vignette: Airports 
 
 Airports are interesting entities. They are nodes that connect a network of national and international flows, and are its most visible realization. Where they are located is a function of several factors such as the population they are trying to serve, their level of income, the demand for flying, etc. However their exact location is far from the only possible one. Physically speaking, an airport could be built in many more places than where it ends up. This make the process behind an interesting one to explore through the overall "appearance" of their locations; that is, through its pattern.
 
@@ -203,8 +146,6 @@ Again nothing new or too exciting from this figure, but this is good news: it me
 
 The next thing that we might want to do to obtain country counts of airports is to link each airport with the country where it is located. Sometimes, we are lucky and the airport table will include a column with that information. In this case, we need to create it for ourselves. This is a well-known problem in geometry and GIS and is commonly known as point-in-polygon: to determine whether a given point is inside a polygon. With that operation solved, linking airports to countries amoutns to a bit of house keeping. We will first explore in pure Python how that algorithm can be easily implemented from scratch so it becomes clear what steps are involved; then we will see a much more efficient and fast implementation that we should probably use when need to perform this operation in other contexts.
 
----
-**NOTE**: skip next if all you want to know is how to perform a standard spatial join
 
 Creating a manual, brute-force implementation of a spatial join is not very difficult, if one has solved the problem of checking whether a point is inside a polygon or not. Thanks to the library that provides geometry objects to `geopandas` (`shapely`), this is solved in Python. For example, we can easily check if the first dot on the airports table is inside the first polygon in the countries table:
 
@@ -336,27 +277,12 @@ plt.show()
 This map gives us a very different view. Very large countries are all of a sudden "penalized" and some smaller ones rise to the highest values. Again, how to read this map and whether its message is interesting or not depends on what we are after. But, together with the previous one, it does highlight important issues to consider when exploring uneven spatial data and what it means to display data (e.g. airports) through specific geographies (e.g. countries).
 
 
---- 
 
-## Vignette: House Prices
+## Vignette: Airbnb Prices in San Diego
 
-<!-- #region editable=true -->
-- keyword table join (census)
-(keyword comes from spatial join with polygon shown below)
-
-- groupby: avg house price by census polygon
-- buffer: deriving dummies for houses within x of an amenity
-- spatial join: create keyword that we use for the table
-- raster/clip with shape: elevation or pollution by tract, or by house, or  noise
-- voronoi - what's my closest coffee shop
-
-- Sets: union, intersection, difference: point out that these are really implied by the buffer used to define regimes (intersection dummy = 1, difference dummy=0)
-
-message is, if you have the column in the table use it, but many cases you do not have the column and need to go the spatial join route
-<!-- #endregion -->
-
-We begin by reading in the Airbnb listings for San Diego which are stored in a
-comma separated file (csv):
+Our second vignette changes the spatial scale to examine the distribution of
+Airbnb listings in San Diego California. We begin by reading the listings, 
+ which are stored in a comma separated file (csv):
 
 
 ```python
@@ -437,7 +363,7 @@ areas with high density. The size of the points also makes it challenging to
 develop a systematic view of the spatial variation in the listing prices.
 
 We can address these issues through spatial aggregation. That is, similar to
-what we did for the airport dataset we can use a spatial join to associate each
+what we did for the airport dataset, we can use a spatial join to associate each
 listing with its enclosing  polygon. Once we have that information, we can use
 database methods to perform aggregation queries to get the average listing
 price per polygon.
@@ -455,8 +381,8 @@ tracts = gpd.read_file(tracts)
 tracts.plot()
 ```
 
-This gives us all the tracts for the state, our market analysis is focusing on
-the case of San Diego, so we can use a Pandas query to create a more focused dataframe:
+This gives us all the tracts for the state, but our market analysis is focusing on
+the case of San Diego. We can use a Pandas query to create a more focused dataframe:
 
 ```python
 sd_tracts = tracts[tracts.COUNTYFP=='073']
@@ -467,10 +393,10 @@ sd_tracts.plot()
 ```
 
 Visual examination of the tracts reveals one idiosyncratic tract. The elongated
-coastal tract actually has a boundary that extends in to the Pacific Ocean.
+coastal tract actually has a boundary that extends into the Pacific Ocean.
 This will induce visual noise in any subsequent analysis, so let's remove it.
 
-The question is how, to remove it? 
+The question is how to remove it? 
 
 Fortunately for this case, the tract in question is the extreme west tract, so
 we can exploit this information to find, and remove, the row in the dataframe:
@@ -515,9 +441,9 @@ tract with each listing point:
 j = gpd.sjoin(gdf, sd_tracts, how='inner', op='within')
 ```
 
-We see a warning that alerts to a problem with the coordinate reference systems
+We see a warning that alerts us to a problem with the coordinate reference systems
 being different between the two dataframes. Since our spatial join is based on
-the spatial relationship of containment (`within`), the CRS have to be
+the spatial relationship of containment (`within`), the CRSs have to be
 identical for this to be correct.
 
 Let's fix this and continue on:
@@ -535,7 +461,7 @@ j.shape
 ```
 
 The result of the spatial join is that the listings dataframe has now been
-extended to add a tract column that identifies the census tract that contains
+extended to add a column that identifies the census tract that contains
 the point for the listing.
 
 
@@ -545,7 +471,7 @@ census tracts are [planar
 enforced](https://books.google.com/books?id=-FbVI-2tSuYC&pg=PA186&lpg=PA186&dq=planar+enforcement+theobald&source=bl&ots=SpOsACcrbP&sig=ACfU3U1CPniL-YpWCt0ml--XIP5_d3fkWA&hl=en&sa=X&ved=2ahUKEwjC-5LX1_fqAhWEHzQIHcNwC-8Q6AEwDXoECAoQAQ#v=onepage&q=planar%20enforcement%20theobald&f=false)
 and do not overlap.
 
-However, from the perspective of the census tracts, the relationship can be of a
+From the perspective of the census tracts, the relationship is of a
 *one-to-many* form, since one census tract can contain multiple listings. 
 And, it is this cardinality that we want to leverage in aggregating the listing
 information by tract. For example, we can get the number of listings within
@@ -561,7 +487,7 @@ j[['price', 'GEOID']]
 ```
 
 Here we have used the `count` method on the dataframe that is generated from
-the group by. If we change the `count` method to `mean`, we will get the
+the `groupby`. If we change the `count` method to `mean`, we will get the
 average listing price by census tract:
 
 ```python
@@ -636,17 +562,17 @@ plt.show()
 ```
 
 The visual analysis of the listing prices at the tract scale has addressed the
-problems we encountered in analyzing the points layer directly. There is of
-course, a trade-off as we switch from the point to areal unit layers, as the
-latter results from an aggregation of the information in the former. In
-subsequent chapters, we will be introducing methods that are appropriate for the
-deeper statistical analysis of these different types of spatial support. Here
-we only wanted to introduce methods of spatial data processing that allow us to
-construct the variables and layers that would feed into those analyses. 
+problems we encountered in analyzing the points layer directly. There is a
+trade-off as we switch from the point to areal unit layers, as the latter
+results from an aggregation of the information in the former. In subsequent
+chapters, we will be introducing methods that are appropriate for the deeper
+statistical analysis of these different types of spatial support. Here we only
+wanted to introduce methods of spatial data processing that allow us to
+construct the variables and layers that would feed into those analyses.
 
 
 
-## Cafe Sheds
+### Cafe Sheds
 
 We close this chapter with the application of a final set of deterministic
 spatial analytical methods that provide insights on the market structure of
@@ -687,7 +613,7 @@ ext
 ```python
 cafes.total_bounds
 ```
-and we need to set the CRS of our cafes, and listings, to web mercator so we
+and we need to set the CRS of our cafes, and listings, to web mercator so that we
 can plot them together with our basemap to get a better understanding of the
 spatial relationships between the cafes and the airbnb listings:
 
@@ -756,20 +682,20 @@ plt.show()
 
 ```
 
-Plotting the two point sets together, we encounter the same occlusion problem
-but now it takes on a more complex form since listings can occlude other
+Plotting the two point sets together, we encounter the same occlusion problem,
+only now it takes on a more complex form since listings can occlude other
 listings, cafes can occlude other cafes, and cafes can occlude listings (since
 cafes are drawn last).
 
 One way around these issues is to ask more particular questions about the
 spatial relationships between the two point sets. For example, one very
-important question (from the perspective of  your coffee addict author) we may
-want to answer is to find the closest cafe for each airbnb listing.
+important question (from the perspective of  a coffee aficionado) we may
+want to answer is "what is the closest cafe to my listing?"
 
-To answer this question we develop [Voronoi polygons](http://jwilson.coe.uga.edu/EMAT6680Fa08/Kuzle/Math%20in%20Context/Voronoi%20diagrams.html) for each cafe. These
-polygons generate a tessellation of the extent such that there is one polygon
-for each cafe, and these polygons define the set of points for which that cafe
-is the closest of all cafes in San Diego. 
+To answer this question we develop [Voronoi polygons](http://jwilson.coe.uga.edu/EMAT6680Fa08/Kuzle/Math%20in%20Context/Voronoi%20diagrams.html)
+for each cafe. These polygons comprise a tessellation of the extent such that
+there is one polygon for each cafe, and these polygons define the set of points
+for which that cafe is the closest of all cafes in San Diego.
 
 Because these polygons are planar enforced, we know that each of our listings
 will be contained by one, and only one, of the Voronoi polygons. Once we know
@@ -860,7 +786,8 @@ cc.rename(columns={'index_right': 'cafe'}, inplace=True)
 ```python
 cc.head()
 ```
-This new dataframe has one record for each listing, and records the coffee shed
+This new dataframe has one record for each listing, and records the coffee
+shed, or Voronoi polygon,
 that contains the listing.
 
 ## Choropleth of Demand by Coffee Shed
@@ -955,7 +882,7 @@ sheds.plot(ax=ax, alpha=.7, edgecolor='white', column='listings', legend=True, s
 # Remove axis
 #ax.set_axis_off()
 # Add title
-ax.set_title('San Diego Cafe Sheds')
+ax.set_title('Number of Airbnb Listings by San Diego Cafe Sheds')
 # Display
 ax.set_xlim((w,e))
 ax.set_ylim((s,n))
