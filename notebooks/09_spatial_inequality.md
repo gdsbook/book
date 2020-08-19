@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -472,6 +472,8 @@ the second  component.
 
 
 
+
+
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.columns
 ```
@@ -546,7 +548,15 @@ rmeans.columns = region_names
 ```
 
 ```python
-rmeans.plot()
+rmeans.head()
+```
+
+```python
+rmeans = pandas.DataFrame(rmeans)
+```
+
+```python
+rmeans.plot.line()
 ```
 
 ## Regional Decomposition of Inequality
