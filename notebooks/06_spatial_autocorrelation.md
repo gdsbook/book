@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -49,8 +49,7 @@ import pandas
 from pysal.explore import esda
 from pysal.lib import weights
 from numpy.random import seed
-# Bespoke
-from booktools import choropleth
+
 ```
 
 In 2016, Great Britain ran a referendum to decide whether to remain in the European Union or to leave the club, the so called "Brexit" vote. We will use the official data from the Electoral Comission at the local authority level on percentage of votes for the Remain and Leave campains. There are two distinct datasets we will combine:
@@ -114,7 +113,7 @@ And with this elements, we can generate a choropleth to get a quick sense of the
 f, ax = plt.subplots(1, figsize=(9, 9))
 ax.imshow(img, extent=ext, alpha=0.5)
 
-choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
+db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax)
 
 plt.text(ext[0],ext[2], lic, size=8)
@@ -181,14 +180,14 @@ f, axs = plt.subplots(1, 2, figsize=(12, 6))
 ax1, ax2 = axs
 
 ax1.imshow(img, extent=ext, alpha=0.5)
-choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
+db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax1)
 ax1.text(ext[0],ext[2], lic, size=8)
 ax1.set_axis_off()
 ax1.set_title("% Leave")
 
 ax2.imshow(img, extent=ext, alpha=0.5)
-choropleth(db, column='Pct_Leave_lag', cmap='viridis', scheme='quantiles',
+db.plot(column='Pct_Leave_lag', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax2)
 ax2.text(ext[0],ext[2], lic, size=8)
 ax2.set_axis_off()

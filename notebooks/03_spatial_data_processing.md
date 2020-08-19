@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -59,6 +59,8 @@ Airports are interesting entities. They are nodes that connect a network of nati
 In this vignette, we will use a preprocessed open dataset. This dataset provides the location of airports in many different countries, alongside an indication of their size and importance to the air transit network. Before we start analyzing it, we need to load it:
 
 ```python
+import pandas as pd
+import geopandas as gpd
 # Load GeoJSON file
 air = gpd.read_file('../data/airports/airports_clean.geojson')
 # Check top of the table
@@ -80,6 +82,7 @@ The first extension is to bring geographic context. Although the shape of the fi
 First, we'll download the tiles into an image object, and then we will plot it together with the airports dataset.
 
 ```python
+import contextily as ctx
 # Download tiles for the bounding box of the airport's GeoDataFrame
 %time img, ext = ctx.bounds2img(*air.total_bounds, 2)
 ```

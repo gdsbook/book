@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -150,7 +150,9 @@ bound of 5985.8 which contains 17 observations.
 The determination of the
 interval width ($w$) and the number of bins in `seaborn` is based on the Freedman-Diaconis rule:
 
-$$w = 2 * IQR * n^{-1/3}$$
+$$
+w = 2 * IQR * n^{-1/3}
+$$
 
 where $IQR$ is the inter quartile
 range of the attribute values. Given $w$ the number of bins ($k$) is:
@@ -489,12 +491,6 @@ t = mxs[['NAME', 'PCGDP1940', 'q540', 'ei540', 'ht40', 'mb540', 'msd40', 'fj540'
 t.style.applymap(highlight_values)
 ```
 
-```python
-# write table out to tex
-with open('classtable.tex', 'w') as out:
-    t.to_latex(out)
-```
-
 Inspection of this table reveals a number of interesting results. First, the
 only Mexican state that is treated consistantly across the k=5 classifiers is
 Baja California Norte which is placed in the highest class by all classifiers.
@@ -562,7 +558,7 @@ Note that the default for the legend is two report two decimal places. If we des
 
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
-mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}')
+mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', legend_kwds={'fmt':'{:.0f}'})
 ax.set_axis_off()
 ax.set_title('PCGDP1940')
 plt.axis('equal')
@@ -583,7 +579,7 @@ Our attribute is measured in dollars and is characterized as a *sequential* attr
 
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
-mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}', \
+mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', legend_kwds={'fmt':'{:.0f}'}, \
          cmap='Blues')
 ax.set_axis_off()
 ax.set_title('PCGDP1940')
@@ -596,7 +592,7 @@ which now uses a single-hue sequent,ial color map with the lighter shades repres
 
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
-mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', fmt='{:.0f}', \
+mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', legend_kwds={'fmt':'{:.0f}'}, \
          cmap='Blues', edgecolor='k')
 ax.set_axis_off()
 ax.set_title('PCGDP1940')

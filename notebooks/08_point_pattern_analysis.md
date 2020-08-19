@@ -8,9 +8,9 @@ jupyter:
       format_version: '1.2'
       jupytext_version: 1.5.2
   kernelspec:
-    display_name: analysis
+    display_name: Python 3
     language: python
-    name: analysis
+    name: python3
 ---
 
 # Point Pattern Analysis
