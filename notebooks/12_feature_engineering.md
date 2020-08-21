@@ -291,17 +291,53 @@ In the previous example, we have transfered information from a surface (stored i
 
 ### Polygon to point
 
-We now move on to a case where the information we are interested in matching to our set of points is stored for a polygon geography. For example, we would like to know some of the census demographics of the area each of our AirBnb properties is located at, and "transfer" that information to each AirBnb record.
+We now move on to a case where the information we are interested in matching to our set of points is stored for a polygon geography. For example, we would like to know the population density of the neighborhood in which each AirBnb is located. To that, we will download population estimates at the Census tract level, and "transfer" those estimates over to each AirBnb point. Geographically, the only challenge here is finding within which tract every point falls, and the performing what is spatial databases parlance is called a "spatial join", by which we connect the two layers through their spatial connection.
 
-Let us pull down the number of graduatesfrom the Census for the tracts in San Diego:
+Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:
 
 ```python
 %%time
-census = cenpy.products.Decennial2010()
-race_sd = census.from_msa("San Diego, CA",
-                          level = "tract",
-                          variables=['PlaceHolder for the code']
-                         )
+acs = cenpy.products.ACS()
+sd_pop = acs.from_msa("San Diego, CA",
+                      level = "tract",
+                      variables=['B02001_001E']
+                     )
+```
+
+And calculate population density:
+
+```python
+sd_pop["density"] = sd_pop["B02001_001E"] / sd_pop.to_crs(epsg=3311).area
+```
+
+Now, to "transfer" density estimates to each AirBnb, we can rely on the spatial join in `geopandas`:
+
+```python
+j = geopandas.sjoin(airbnbs, sd_pop.to_crs(airbnbs.crs))
+```
+
+The result is a table with one row per AirBnb and one column for each attribute we originally had for properties, *as well as* those of the tract where the area is located:
+
+```python
+j.info()
+```
+
+---
+
+```python
+f, axs = plt.subplots(1, 3, figsize=(18, 6))
+
+sd_pop.plot(column="density", scheme="quantiles", ax=axs[0])
+
+airbnbs.plot(ax=axs[1], markersize=0.5)
+
+j.plot(column="density",
+       scheme="quantiles",
+       markersize=0.5,
+       ax=axs[2]
+      )
+
+plt.show()
 ```
 
 ### Area to area interpolation
@@ -312,8 +348,13 @@ There is a large literature around this problem under the umbrella of dasymetric
 
 To implement dasymetric mapping in Python, the best option is `tobler`, a package from the PySAL federation designed exactly for this goal. We will show here the simplest case, that of areal interpolation where apportioning is estimated based on area, but the package provides also more sophisticated approaches.
 
-For the example, we need two polygon layers. We will use
+For the example, we need two polygon layers. We will stick with San Diego and use the set of Census Tracts and the [H3 hexagonal grid layer](../data/h3_grid/README.md). Our goal will be to create population estimates for each hexagon.
 
+First, let us pull down population information for the Census tracts in San Diego:
+
+```python
+
+```
 
 ## Feature Engineering using Map Synthesis
 *Using spatial relationships within a single dataset to synthesize new features for a model.*
