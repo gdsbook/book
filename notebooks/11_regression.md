@@ -83,7 +83,7 @@ variable_names = ['accommodates', 'bathrooms', 'bedrooms',
 
 ## Non-spatial regression, a (very) quick refresh
 
-Before we discuss how to explicitly include space into the linear regression framework, let us show how basic regression can be carried out in Python, and how one can begin to interpret the results. By no means is this a formal and complete introduction to regression so, if that is what you are looking for, we recommend Gelman & Hill (2006), in particular chapters 3 and 4, which provide a fantastic, non-spatial introduction.
+Before we discuss how to explicitly include space into the linear regression framework, let us show how basic regression can be carried out in Python, and how one can begin to interpret the results. By no means is this a formal and complete introduction to regression so, if that is what you are looking for, we recommend {cite}`Gelman_2006`, in particular chapters 3 and 4, which provide a fantastic, non-spatial introduction.
 
 The core idea of linear regression is to explain the variation in a given (*dependent*) variable as a linear function of a collection of other (*explanatory*) variables. For example, in our case, we may want to express/explain the price of a house as a function of whether it is new and the degree of deprivation of the area where it is located. At the individual level, we can express this as:
 
@@ -243,7 +243,8 @@ To illustrate the latter, we can think of how the character of a neighborhood is
 
 Spatial regression is a large field of development in the econometrics and statistics literatures. 
 In this brief introduction, we will consider two related but very different processes that give rise to spatial effects: spatial heterogeneity and spatial dependence. 
-For more rigorous treatments of the topics introduced here, the reader is referred to [1-3].
+For more rigorous treatments of the topics introduced here, the reader is
+referred to {cite}`Anselin_2003,Anselin_2014,Gelman_2006`.
 
 ### Spatial Feature Engineering
 
@@ -420,9 +421,13 @@ This kind of spatial effect is fundamentally different
 from SH in that is it not related to inherent characteristics of the geography but relates 
 to the characteristics of the observations in our dataset and, specially, to their spatial
 arrangement. We call this phenomenon by which the values of observations are related to
-each other through distance *spatial dependence* ([Anselin, 1988](https://books.google.co.uk/books/about/Spatial_Econometrics_Methods_and_Models.html?id=3dPIXClv4YYC&redir_esc=y])).
+each other through distance *spatial dependence* {cite}`Anselin_1988`.
 
-There are several ways to introduce spatial dependence in an econometric framework, with varying degrees of econometric sophistication (see [Anselin, 2002](http://onlinelibrary.wiley.com/doi/10.1111/j.1574-0862.2002.tb00120.x/abstract) for a good overview). Common to all of them however is the way space is formally encapsulated: through *spatial weights matrices ($W$)*.
+
+There are several ways to introduce spatial dependence in an econometric
+framework, with varying degrees of econometric sophistication (see
+{cite}`Anselin_2002` for a good overview). Common to all of them however is the way space is
+formally encapsulated: through *spatial weights matrices ($W$)*.
 
 #### Exogenous effects
 
@@ -536,7 +541,7 @@ print(m7.summary)
 
 #### Other ways of bringing space into regression
 
-While these are some kinds of spatial regressions, many other advanced spatial regression methods see routine use in statistics, data science, and applied analysis. For example, Generalized Additive Models [4,5] haven been used to apply spatial kernel smoothing directly within a regression function. Other similar smoothing methods, such as spatial Gaussian process models [6] or Kriging, conceptualize the dependence between locations as smooth as well. Other methods in spatial regression that consider graph-based geographies (rather than distance/kernel effects) include variations on conditional autoregressive model, which examines spatial relationships at locations *conditional* on their surroundings, rather than as jointly co-emergent with them. Full coverage of these topics is beyond the scope of this book, however, though [7] provides a detailed and comprehensive discussion. 
+While these are some kinds of spatial regressions, many other advanced spatial regression methods see routine use in statistics, data science, and applied analysis. For example, Generalized Additive Models {cite}`Gibbons_2015,Wood_2006` haven been used to apply spatial kernel smoothing directly within a regression function. Other similar smoothing methods, such as spatial Gaussian process models {cite}`Brunsdon_2010` or Kriging, conceptualize the dependence between locations as smooth as well. Other methods in spatial regression that consider graph-based geographies (rather than distance/kernel effects) include variations on conditional autoregressive model, which examines spatial relationships at locations *conditional* on their surroundings, rather than as jointly co-emergent with them. Full coverage of these topics is beyond the scope of this book, however, though {cite}`Banerjee_2008` provides a detailed and comprehensive discussion. 
 
 
 ### Challenge
@@ -632,20 +637,7 @@ This means that our over- and under-predictions are likely to cluster.
 
 
 ## References
-[1] Anselin, L. Spatial externalities, spatial multipliers, and spatial econometrics. *International Regional Science Review* 26, 156–166 (2003).
-
-[2] Anselin, L. & Rey, S. J. *Modern Spatial Econometrics in Practice, a Guide to GeoDa, GeoDaSpace, and PySAL*. (GeoDa Press, 2014).
-
-[3] Gelman, A., & Hill, J. (2006). Data analysis using regression and multilevel/hierarchical models. Cambridge university press.
-
-[4] Gibbons, S., Overman, H. G., & Pattacchini, E. Chapter 3 - Spatial Methods. *Handbook of Regional and Urban Economics, Vol. 5*. (Elsevier, 2015): 115-168.
-
-[5] Wood, S. N. *Generalized additive models: an introduction with R.* Chapman and Hall/CRC, 2006. 
-
-[6] Brunsdon, Chris, A. Stewart Fotheringham, and Martin E. Charlton. "Geographically weighted regression: a method for exploring spatial nonstationarity." *Geographical Analysis* 28, vol. 4 (1996): 281-298.
-
-[7] Banerjee, S., A. E. Gelfand, A. O. Finley, and H. Sang. "Gaussian predictive process models for large spatial data sets." Journal of the Royal Statistical Society: Series B (Statistical Methodology) 70, no. 4 (2008): 825-848.
-
+<!-- Not sure if we are missing a cite or if this was for further reading -->
 [8] Cressie, N., and Christopher K. W. *Statistics for spatio-temporal data.* (John Wiley & Sons, 2015).
 
 

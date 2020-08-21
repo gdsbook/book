@@ -17,7 +17,9 @@ bookserve:
 	bash ./infrastructure/booksite/build.sh
 	cd ./docs && \
 	bundle exec jekyll serve --host 0.0.0.0
-jb-gds:
-	cp notebooks/*.md book/.
+jb-convert:
+	./convert_jb.py
 	cp notebooks/references.bib book/.
+jb-build:
+	jb build book/
 
