@@ -26,6 +26,7 @@ At its core, *spatial feature engineering* is the process of developing addition
 
 ```python
 import geopandas, pandas, libpysal.weights as weights, contextily
+from tobler.area_weighted import area_interpolate
 import matplotlib.pyplot as plt
 import cenpy
 import numpy
@@ -350,10 +351,90 @@ To implement dasymetric mapping in Python, the best option is `tobler`, a packag
 
 For the example, we need two polygon layers. We will stick with San Diego and use the set of Census Tracts and the [H3 hexagonal grid layer](../data/h3_grid/README.md). Our goal will be to create population estimates for each hexagon.
 
-First, let us pull down population information for the Census tracts in San Diego:
+First, let us load the H3 grid:
 
 ```python
+h3 = geopandas.read_file("../data/h3_grid/sd_h3_grid.gpkg")
+```
 
+We are ready to interpolate:
+
+```python
+interpolated = area_interpolate(source_df=sd_pop.to_crs(epsg=3311),
+                                target_df=h3.to_crs(epsg=3311),
+                                extensive_variables=["B02001_001E"],
+                                intensive_variables=["density"]
+                               )
+```
+
+There is quite a bit going on in the cell above, let us unpack it:
+
+- Remember this method apportions data values based on area, so it makes sense to have an accurate estimate for the extent of each polygon. To do that, we convert each geography to Albers Equal (`EPSG:3311`), which is expressed in metres, using `to_crs`.
+- The method `area_interpolate` then takes the source and the target `GeoDataFrame` objects using the same naming convention we have in our explanation. 
+- In addition, we need to specify which variables we would like to interpolate. here, Tobler makes a distinction:
+    - *Extensive* variables, or absolute values such as counts, aggregates, etc. (which we use for population, `B02001_001E`)
+    - *Intensive* variables, such as rates, ratios, etc. (which we select for density as it is the ratio of population over area)
+
+A good first approach to examine the output is by comparing the source and the target visually. Here is total population:
+
+```python
+f, axs = plt.subplots(1, 3, figsize=(18, 6))
+
+minX, minY, maxX, maxY = interpolated.total_bounds
+sd_pop.to_crs(epsg=3311)\
+      .cx[minX:maxX, minY:maxY]\
+      .plot(column="B02001_001E", 
+            scheme="quantiles", 
+            k=10,
+            ax=axs[0]
+           )
+
+h3.to_crs(epsg=3311)\
+  .plot(ax=axs[1], markersize=0.5)
+
+interpolated.plot(column="B02001_001E",
+                  scheme="quantiles",
+                  k=10,
+                  ax=axs[2]
+                 )
+
+axs[0].set_xlim(minX, maxX)
+axs[0].set_ylim(minY, maxY)
+
+f.suptitle("Population")
+
+plt.show()
+```
+
+And density:
+
+```python
+f, axs = plt.subplots(1, 3, figsize=(18, 6))
+
+minX, minY, maxX, maxY = interpolated.total_bounds
+sd_pop.to_crs(epsg=3311)\
+      .cx[minX:maxX, minY:maxY]\
+      .plot(column="density", 
+            scheme="quantiles", 
+            k=10,
+            ax=axs[0]
+           )
+
+h3.to_crs(epsg=3311)\
+  .plot(ax=axs[1], markersize=0.5)
+
+interpolated.plot(column="density",
+                  scheme="quantiles",
+                  k=10,
+                  ax=axs[2]
+                 )
+
+axs[0].set_xlim(minX, maxX)
+axs[0].set_ylim(minY, maxY)
+
+f.suptitle("Population Density")
+
+plt.show()
 ```
 
 ## Feature Engineering using Map Synthesis
