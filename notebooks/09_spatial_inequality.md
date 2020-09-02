@@ -349,11 +349,9 @@ In regional studies, the intraregional personal income distribution is typically
 not available. As a result, the assumption is often made that intraregional
 personal inequality is zero. In other words, all individuals in the same region
 have identical incomes. With this assumption in hand, the first term vanishes:
-$Y_l -y_i = 0$, leading to: **FOOTNOTE:** It should also be noted that even at
-the national scale, the analysis of interpersonal income inequality also relies
-on aggregate data grouping individuals into income cohorts. See, for example,
-Piketty, T. and E. Saez (2003) "Income inequality in the United States,
-1913-1998", The Quarterly Journal of Economics, 118: 1-41.
+$Y_l -y_i = 0$, leading to:[^reg] 
+
+[^reg]: It should also be noted that even at the national scale, the analysis of interpersonal income inequality also relies on aggregate data grouping individuals into income cohorts. See, for example, {cite}`Piketty_2003`.
 
 $$
 \begin{aligned}
@@ -365,6 +363,7 @@ TSS &= \sum_{l=1}^N (Y_l - \bar{y})^2 \\
     &= \sum_{i=1}^m  [N_i(y_i - \bar{y})]^2
 \end{aligned}
 $$
+
 This means that each individual in a region has an equal contribution to the
 overall level of national interpersonal inequality, given by $(y_i - \bar{y})$,
 while the region in question contributes $N_i(y_i - \bar{y})$. While it may seem
@@ -451,27 +450,17 @@ $$
 
 where $s_g = \frac{\sum_{i \in g} y_i}{\sum_i y_i}$, and   $s_{i,g} = y_i / \sum_{i \in g} y_i$. 
 
-The first term is the between regions inequality component, and the second is the within regions inequality component.
-The within region term is a weighted average of inequality between economies belonging to the same region.
-Similar to what is done above for the case of interpersonal inequality, the
-estimate of the between region (group) component of the decomposition is based on
-setting the incomes of all economies (individuals )belonging to a region (group) equal to that of the
-regional (group) average of these per capita incomes. Now, however, intraregional
-inequality between economies within the same region is explicitly considered in
-the second  component.
+The first term is the between regions inequality component, and the second is
+the within regions inequality component. The within region term is a weighted
+average of inequality between economies belonging to the same region. Similar
+to what is done above for the case of interpersonal inequality, the estimate of
+the between region (group) component of the decomposition is based on setting
+the incomes of all economies (individuals )belonging to a region (group) equal
+to that of the regional (group) average of these per capita incomes. Now,
+however, intraregional inequality between economies within the same region is
+explicitly considered in the second component.[^weight]
 
-
-<!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-**Note:** The regional decomposition does not involve weighting the regions by their respective population. See  [Gluschenko (2018)](https://webvpn.ucr.edu/+CSCO+0075676763663A2F2F6A6A6A2E676E6171736261797661722E70627A++/doi/full/10.1080/17421772.2017.1343491) for further details. 
-
-<!-- #endregion -->
-
-
-
-
-
-
-
+[^weight]: The regional decomposition does not involve weighting the regions by their respective population. See  {cite}`Gluschenko_2018` for further details. 
 
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
