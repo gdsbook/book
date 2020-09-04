@@ -13,7 +13,7 @@ jupyter:
     name: python3
 ---
 
-# Choropleth mapping
+# Choropleth Mapping
 
 
 
@@ -80,9 +80,11 @@ measurement scale of the attribute in question. For quantitative attributes
 (ordinal, interval, ratio scales) the classes will have an explicit ordering.
 More formally, the classification problem is to define class boundaries such
 that
+
 $$
 c_j < y_i \le  c_{j+1} \ \forall y_i \in C_{j}
 $$
+
 where $y_i$ is the
 value of the attribute for spatial location $i$, $j$ is a class index, and $c_j$
 represents the lower bound of interval $j$.
@@ -92,7 +94,7 @@ boundaries. The choice of the classification scheme should take into
 consideration the statistical distribution of the attribute values.
 
 To illustrate these considerations, we will examine regional income data for the
-32 Mexican states. The variable we focus on is per capita gross domestic product
+32 Mexican states used in the paper by {cite}`Rey_2010`. The variable we focus on is per capita gross domestic product
 for 1940 (PCGDP1940):
 
 ```python
@@ -346,7 +348,7 @@ neighboring internal classes.
 
 ### Head-Tail Breaks
 
-The head tail algorithm, introduced by Jiang (2013), is based on a recursive partioning of the data using splits around
+The head tail algorithm {cite}`Jiang_2013` is based on a recursive partioning of the data using splits around
 iterative means. The splitting process continues until the distributions within each of
 the classes no longer display a heavy-tailed distribution in the sense that
 there is a balance between the number of smaller and larger values assigned to
@@ -358,21 +360,24 @@ ht
 ```
 
 For data with a heavy-tailed distribution, such as power law and log normal
-distributions, the head tail breaks classifier (Jiang 2015) can be particularly
+distributions, the head tail breaks classifier  can be particularly
 effective.
 
 ### Jenks Caspall
 
-This approach, as well as the following two, tackles the calssification challenge from a heuristic perspective, rather than from deterministic one. Originally proposed by Jenks & Caspall (1971), this algorithm aims to minimize the sum of absolute deviations around
-class means. The approach begins with a prespecified number of classes and an
-arbitrary initial set of class breaks - for example using quintiles. The
-algorithm attempts to improve the objective function by considering the movement
-of observations between adjacent classes. For example, the largest value in the
-lowest quintile would be considered for movement into the second quintile, while
-the lowest value in the second quintile would be considered for a possible move
-into the first quintile. The candidate move resulting in the largest reduction
-in the objective function would be made, and the process continues until no
-other improving moves are possible.
+This approach, as well as the following two, tackles the classification
+challenge from a heuristic perspective, rather than from deterministic one.
+Originally proposed by {cite}`Jenks_1971`, this algorithm aims to minimize
+the sum of absolute deviations around class means. The approach begins with a
+prespecified number of classes and an arbitrary initial set of class breaks -
+for example using quintiles. The algorithm attempts to improve the objective
+function by considering the movement of observations between adjacent classes.
+For example, the largest value in the lowest quintile would be considered for
+movement into the second quintile, while the lowest value in the second
+quintile would be considered for a possible move into the first quintile. The
+candidate move resulting in the largest reduction in the objective function
+would be made, and the process continues until no other improving moves are
+possible.
 
 ```python
 numpy.random.seed(12345)
@@ -396,7 +401,7 @@ fj5
 ### Max-p
 
 Finally, the max-p classifiers adopts the algorithm underlying the max-p region
-building method (Duque, Anselin and Rey, 2012) to the case of map classification. It is similar in spirit to
+building method {cite}`Duque_2011` to the case of map classification. It is similar in spirit to
 Jenks Caspall in that it considers greedy swapping between adjacent classes to
 improve the objective function. It is a heuristic, however, so unlike
 Fisher-Jenks, there is no optimial solution guaranteed:
@@ -565,7 +570,12 @@ plt.axis('equal')
 plt.show()
 ```
 
-The default color map used by geopandas is viridis, which is a multi-hue sequential scheme, with the darker (ligher) hues representing lower (higher) values for the attribute in question. The choice of a color scheme for a choropleth map should be based on the type of variable underconsideration. Generally, a distinction is drawn between three types of numerical attributues:
+The default color map used by geopandas is viridis, which is a multi-hue
+sequential scheme, with the darker (ligher) hues representing lower (higher)
+values for the attribute in question. The choice of a color scheme for a
+choropleth map should be based on the type of variable under consideration
+{cite}`brewer1997mapping`. Generally, a distinction is drawn between three
+types of numerical attributes:
 
 - sequential
 - diverging
@@ -711,21 +721,6 @@ packages in the data stack that the user can turn to.
 7. Discuss the similarities between  the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?
 8. The Fisher-Jenks classifier will always dominate other k-classifiers for a given data set, with respect to statistical fit. Given this, why might one decide on choosing a different k-classifier for a particular data set?
 
-
-## References
-
-Duque, J.C., L. Anselin, and S.J. Rey. (2012) "The max-p regions problem." *Journal of Regional Science*, 52:397-419.
-
-Jenks, G. F., & Caspall, F. C. (1971). Error on choroplethic maps: definition, measurement, reduction. Annals of the Association of American Geographers, 61(2), 217-244.
-
-Jian, B. (2013) "Head/Tail Breaks: A New Classification Scheme for Data with a Heavy-Tailed Distribution." *The Professional Geographer*, 65(3): 482-494.
-
-Jiang, Bin. (2015) "Head/tail breaks for visualization of city
-structure and dynamics." *Cities*, 43: 69-77.
-
-Rey, S.J. and M.L. Guitierez. (2010)
-"Interregional inequality dynamics in Mexico." *Spatial Economic Analysis*, 5:
-277-298.
 
 
 ---
