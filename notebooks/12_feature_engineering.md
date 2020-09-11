@@ -8,9 +8,9 @@ jupyter:
       format_version: '1.2'
       jupytext_version: 1.5.2
   kernelspec:
-    display_name: Python 3
+    display_name: analysis
     language: python
-    name: python3
+    name: analysis
 ---
 
 # Geographic feature engineering
@@ -31,6 +31,7 @@ import matplotlib.pyplot as plt
 import cenpy
 import numpy
 import osmnx
+import seaborn
 import rasterio
 from rasterio.plot import show as rioshow
 ```
@@ -40,6 +41,18 @@ Throughout this chapter, we will use a common dataset to which we want to append
 ```python
 airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')
 ```
+
+# What is spatial feature engineering? 
+
+At its core, *spatial feature engineering* is the process of developing additional information from raw data using *geographic knowledge*. This synthesis could occur *between* datasets, where geography is used to link samples in separate datasets together; or *within* datasets, where geography can be used to borrow information from nearby samples. Building linkages *between* datasets is often called "Map Matching", while we use the term "Map Synthesis" to describe the use of geographical structure to derive new features from existing data. Both kinds of geographic feature engineering will be covered in this chapter, starting first with various methods for Map Matching when modelling Airbnb nightly rental prices in San Diego.
+
+To help us discuss this, a vocabulary is helpful. We will cover a few different kinds of features in this chapter, both of which can be constructed in either Map Synthesis or Map Matching operations: 
+- A *spatial summary feature* measures the attributes of observations that have some pre-specified spatial relationship with our target observations. This includes 
+    - taking the average or median value of features within a neighborhood of each target observation. 
+    - the *spatial lag*, used in previous chapters of this book (e.g. Chapters 3, 6, and 11), is a kind of spatial summary feature, since it reflects the average value of the data in the neighborhood around each point. 
+    - Other kinds of spatial summary features might include the count of observations within a given distance or the standard deviation of ten nearest observations. 
+    - Summary features generally include *interpolated features* which involve a transfer of information from one spatial support to another, such as when the target locations are not the same as the locations in our anciliary data. Interpolated features become significantly more complex as well when the data is *areal*, as will be discussed later in this chapter.
+- A *proximity feature* measures the distance from a target observation to some other observation or position in the map. This might be done in a map matching context, as we did before with the distance to Balboa Park, or it might be done in a map synthesis context by measuring the distance to the nearest other observation. 
 
 ## Feature Engineering Using Map Matching
 
@@ -440,11 +453,105 @@ plt.show()
 ```
 
 ## Feature Engineering using Map Synthesis
-*Using spatial relationships within a single dataset to synthesize new features for a model.*
-### generalize distanceband/buffer counting into a re-explanation of WX models under different weights
-### KNN-engineering, adding features by distances
-### distance-banding
-### eigenvectors feature engineering
+
+Feature engineering with map matching is most helpful when you have additional information to use in the analysis. And, with the wealth of freely available data from censuses, satellites, and open volunteered geographic information vendors such as OpenStreetMap, map matching can be a very powerful tool for enriching and improving your analyses. However, it is sometimes *also* useful to only examine the data you've got, and use the spatial structure within to build better features or better models. While this might be done using spatially-explicit models (like those covered in Chapter 11), it is also possible to use map synthesis to build spatial feature and improve your predictions.
+
+There is an extensive amount of map synthesis features. In addition to the two kinds of features discussed in map matching, there are other kinds of useful features that can be used in map synthesis that will be discussed below. First, we will return to spatial summary features. Second, we will examine some *regionalization features*, which detect and leverage geographical clusters in the data to improve prediction. 
+
+### Spatial Summary Features in Map Synthesis
+
+
+Just like in map matching, you can use spatial summary features in map synthesis to make better predictions. One clear method involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we can now refer only to the data on hand. Thus, we may want to determine whether nearby Airbnbs are "competing" with each airbnb. We might do this by finding the distance to the nearest Airbnb with the same number of bedrooms, since two nearby listings that *also* sleep the same number of people likely will compete with one another for tenants. 
+
+We might do this by building a `DistanceBand` weight object, which considers Airbnb as "neighbors" if they are within the distance threshold. 
+
+```python
+d500_w = weights.DistanceBand.from_dataframe(airbnbs_albers, threshold=500, silence_warnings=True)
+```
+
+Now, we can get the average size of surrounding Airbnbs directly as the spatial lag:
+
+```python
+d500_w.transform = 'r'
+```
+
+```python
+local_average_bedrooms = weights.lag_spatial(d500_w, airbnbs_albers[['bedrooms']].values)
+```
+
+While related, these features contain quite distinct pieces of information, and both may prove useful in modelling: 
+
+```python
+plt.scatter(airbnbs_albers[['bedrooms']].values, local_average_bedrooms)
+plt.xlabel("Number of bedrooms")
+plt.ylabel("Average of nearby\n listings' bedrooms")
+```
+
+If we were instead interested in the most common number of bedrooms, rather than the average, we could use the `lag_categorical` function:
+
+```python
+local_mode = weights.lag_categorical(d500_w, airbnbs_albers[['bedrooms']].values)
+```
+
+Since we are now treating these features as discrete, it helps to use `pandas.crosstab` to visualize their distribution:
+
+```python
+crosstab = pandas.crosstab(airbnbs_albers.bedrooms, 
+                           local_mode.flatten())
+crosstab.columns.name = "nearby"
+crosstab
+```
+
+If more complicated statistics are required. it can help to re-express the construction of summary statistics as a *reduction* of the *adjacency list* representation of our weights, as done in Chapter 3. For instance, constructing the local median involves building the adjacency list:
+
+```python
+adjlist = d500_w.to_adjlist()
+```
+
+```python
+adjlist.head()
+```
+
+merging in the relevant information:
+
+```python
+adjlist = adjlist.merge(airbnbs_albers[['bedrooms']], left_on='neighbor', right_index=True, how='left')
+```
+
+and then grouping by the `focal` and summarizing:
+
+```python
+adjlist.groupby("focal").bedrooms.median()
+```
+
+In most cases, however, `lag_spatial` and `lag_categorical` can construct most of the common features used in day-to-day analysis. 
+
+Sometimes, analysts might build multiple "bands" of features by increasing the `threshold` in a `DistanceBand` or the `k` in a K-nearest neighbors application. That is to build another average of the area within 1 kilometer, you can repeat the above analysis with a different threshold:
+
+```python
+average_within_500 = weights.lag_spatial(d500_w, airbnbs_albers[['bedrooms']].values)
+
+d1k_w = weights.DistanceBand.from_dataframe(airbnbs_albers, threshold=1000, silence_warnings=True)
+d1k_w.transform = 'r'
+average_within_1km = weights.lag_spatial(d1k_w, airbnbs_albers[['bedrooms']].values)
+```
+
+In some cases, an *exclusive* average is preferred. That is, we may want the 1 kilometer average to include only the data from 500m to 1km and *disregard* the values before it. 
+
+While this is somewhat more challenging, it can be done efficiently using the `weights.set_operations` module:
+
+```python
+d1k_no_500_w = weights.set_operations.w_difference(d1k_w, d500_w)
+```
+
+```python
+average_between = weights.lag_spatial(d1k_no_500_w, airbnbs_albers[['bedrooms']].values)
+```
+
+```python
+
+```
+
 ### preclustering points into groups for group-based regressions
 ### use spatially-constrained clustering to build categorical variables for regression
 
