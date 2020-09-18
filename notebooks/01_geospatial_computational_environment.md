@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -18,8 +18,6 @@ jupyter:
 ```python
 from IPython.display import Image
 ```
-
-**NOTE**: part of this chapter is based on ["Lecture 2 - GDS'19"](https://darribas.org/gds19/notes/Class_02.html).
 
 This chapter provides an overview of the scientific and computational context
 in which the book is framed. First, we will explore debates around Open
@@ -48,7 +46,7 @@ To better understand the argument behind modern Open Science, it is useful
 to take a historical perspective. The idea of openness was engrained at the
 core of early scientists. In fact that was one of the key differentials with
 their contemporary "alchemists" which, in many respects, were working on
-similar topics albeit in a much more opaque way (XXXcite?XXX). Scientists
+similar topics albeit in a much more opaque way. Scientists
 would record the field or lab experiments on paper notebooks or diaries,
 providing enough detail to, first, remember what they had done and how they
 had arrived at their results, but also to ensure other members of the
@@ -64,7 +62,7 @@ Image(url)
 There is a growing perception that much of the original ethos of Science to
 operate through transparency and accessibility has been lost. A series of
 recent big profile scandals have even prompted some to call it a state of
-crisis [XXXref?XXX]. Why is there a sense that Science is no longer open and
+crisis [1]. Why is there a sense that Science is no longer open and
 transparent in the way Galileo's diaries were? Although certinaly not the only
 or even the most important one, technology plays a role. The process and workflow
 of original scientists relied on a set of "analog" technologies for which an
@@ -83,7 +81,7 @@ notebook every step followed becomes dislocated from the medium in which most of
 the scientific work takes place.
 
 The current state of Science in terms of transparency and openness is prompting
-for action (XXXref?XXX). On the back of these debates, the term
+for action. On the back of these debates, the term
 "reproducibility" is also gaining traction. Again, this is a rather general
 term but, in one variant or another, its definition alludes to the need of
 scientific results to be accompanied by enough information and detail so they
@@ -141,8 +139,7 @@ Notebooks represent the top layer on the reproducibility stack. They can capture
 in detail and reproducible ways work that is specific about a given project: 
 what data is used, how it is read and linked; what algorithms are used, how they
 are combined; how each figure in the project is generated, etc. Guidance on how
-to write notebooks in efficient ways is also emerging (e.g. [Rule et al.,
-2019](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1007007)).
+to write notebooks in efficient ways is also emerging (e.g. [2]).
 
 ### Open source packages
 
@@ -208,7 +205,7 @@ encapsulate an entire environment (or platform) in a format that is easy to
 transfer and reproduce in a variety of computational contexts. The most
 popular technology for containers nowadays is Docker, and the opportunities
 that it provides to build transparent and transferrable infrastructure for
-data science are starting to be explored ([Cook, 2017](https://www.apress.com/gp/book/9781484230114)).
+data science are starting to be explored [3].
 
 ## The (computational) building blocks of this book
 
@@ -225,7 +222,7 @@ This section will present the specific flavor of notebooks we use, and
 illustrate its building blocks in a way that allows you to then follow the
 rest of the book interactively.
 
-Our choice of notebook is Jupyter (XXXcite?XXX). A Jupyter notebook is a plain
+Our choice of notebook is Jupyter [4]. A Jupyter notebook is a plain
 text file with the `.ipynb` extension, which means that it is an easy file to
 move around, sync, and track over time. Internally, it is structured as a
 JSON file, so they also integrate well with a host of modern web technologies.
@@ -534,7 +531,7 @@ stored outside in the host machine.
 asking yourself at this point. First, you will need to install Docker on your
 machine. This assumes you have administrative rights (ie. you can install
 software). If that is the case, you can go to the Docker website 
-([https://www.docker.com/])(https://www.docker.com/)) and install the version
+([https://www.docker.com/](https://www.docker.com/)) and install the version
 that suits your operating system. Note that, although container
 technology is Linux-based, Docker provides tools to run it smoothly in macOS
 and Windows. An install guide for Docker is beyond the scope of this chapter,
@@ -641,10 +638,16 @@ the box and click on "Log in". Now you are in!
 #### Troubleshooting
 
 Containers make computations more transferable, but there is always a
-possibility of things not working for several reasons, mistakes and typos.
-Here we list a few we have found:
+possibility of things not working for several reasons, mistakes and typos. Issues with the book or any tooling required to run the book can be found on the book's website ([https://github.com/gdsbook/book/issues](https://github.com/gdsbook/book/issues)).
 
-[**DAB**: should we list running problems here or in a blog post?]
+# Reference
+
+[1] Fanelli, D. (2018). "Is science really facing a reproducibility crisis?" *Proceedings of the National Academy of Sciences* 115(11): 2628-2631; DOI: 10.1073/pnas.1708272114
+[2] Rule, A., A. Birmingham, C. Zuniga,  I. Altintas, S. Huang, R. Knight, N. Moshiri, M. Ngyuen, S.B. Rosenthal, F. Perez, P. W. Rose. (2019). "Ten simple rules for writing and sharing computational analyses in Jupyter Notebooks." *PLOS Computational Biology* 15(7) DOI: 10.1371/journal.pcbi.1007007
+[3] Cook, J. (2017). *Docker for Data Science: Building Scalable and Extensible Data Infrastructure around the Jupyter Notebook Server.* Apress: New York. 
+[4] Kluyver, T., B. Ragan-Kelley, F. Perez, B. Granger, M. Boussonier, J. Frederic, K. Kelley, J. Hamrick, J. Grout, S. Corlay, P. Ivanov, D. Avila, S. Abdalla, C. Willing, and Jupyter Development Team. "Jupyter Notebooks-a publishing format for reproducibile computational workflows." in *Positioning and Power in Academic Publishing: Players, Agents, and Agendas,* F. Loizides and B. Schmidt (Eds.). IOS Press: Amsterdam, 87-91. DOI: 10.3233/978-1-61499-649-1-87
+
+---
 
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
