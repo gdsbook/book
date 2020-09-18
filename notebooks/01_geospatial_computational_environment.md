@@ -23,13 +23,11 @@ from IPython.display import Image
 This chapter provides an overview of the scientific and computational context
 in which the book is framed. First, we will explore debates around Open
 Science, its origins, and how the computational community is responding to
-these.[^dab] In particular, we will discuss computational notebooks, open-source
+these. In particular, we will discuss computational notebooks, open-source
 packages, and reproducible platforms. Having covered the conceptual
 background, we will turn to a practical introduction of the key infrastructure
 that makes up this book: Jupyter Notebooks and JupyterLab, Python packages,
 and a containerised platform to run the book.
-
-[^dab]: Part of this chapter is based on ["Lecture 2 - GDS'19"](https://darribas.org/gds19/notes/Class_02.html).
 
 
 ## Open Science
@@ -66,7 +64,12 @@ Image(url)
 There is a growing perception that much of the original ethos of Science to
 operate through transparency and accessibility has been lost. A series of
 recent big profile scandals have even prompted some to call it a state of
-crisis {cite}`Ioannidis_2007`. Why is there a sense that Science is no longer open and
+crisis {cite}`Ioannidis_2007`. This "crisis" arises because the analyses that scientists conduct
+are difficult to repeat, let alone understand. Both article length and publication
+volume has grown immensely since the early days of science, and this has 
+affected our ability to understand our literature as a whole. 
+
+Why is there a sense that Science is no longer open and
 transparent in the way Galileo's diaries were? Although certinaly not the only
 or even the most important one, technology plays a role. The process and workflow
 of original scientists relied on a set of "analog" technologies for which an
@@ -76,6 +79,7 @@ painstakingly detailed each step they took in the lab. In the case of social
 sciences, this was probably easier in the sense that quantitative data was not
 abundant and much of the analysis relied either on math or small datasets
 which could be documented in the original publications.
+
 However Science has evolved a great deal since then, and much of the
 experimental workflow is dominated by a variety of machinery, most
 prominently by computers. Most of the Science done today, at some
@@ -643,9 +647,5 @@ the box and click on "Log in". Now you are in!
 
 Containers make computations more transferable, but there is always a
 possibility of things not working for several reasons, mistakes and typos.
-Here we list a few we have found:
-
-```{margin}  **DAB**
-Should we list running problems here or in a blog post?
-```
-
+A list of a few that we have found will be maintained on `https://geographicdata.science` 
+for you to examine. 
