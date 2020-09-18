@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -19,16 +19,17 @@ jupyter:
 from IPython.display import Image
 ```
 
-**NOTE**: part of this chapter is based on ["Lecture 2 - GDS'19"](https://darribas.org/gds19/notes/Class_02.html).
-
 This chapter provides an overview of the scientific and computational context
 in which the book is framed. First, we will explore debates around Open
 Science, its origins, and how the computational community is responding to
-these. In particular, we will discuss computational notebooks, open-source
+these.[^dab] In particular, we will discuss computational notebooks, open-source
 packages, and reproducible platforms. Having covered the conceptual
 background, we will turn to a practical introduction of the key infrastructure
 that makes up this book: Jupyter Notebooks and JupyterLab, Python packages,
 and a containerised platform to run the book.
+
+[^dab]: Part of this chapter is based on ["Lecture 2 - GDS'19"](https://darribas.org/gds19/notes/Class_02.html).
+
 
 ## Open Science
 
@@ -48,7 +49,7 @@ To better understand the argument behind modern Open Science, it is useful
 to take a historical perspective. The idea of openness was engrained at the
 core of early scientists. In fact that was one of the key differentials with
 their contemporary "alchemists" which, in many respects, were working on
-similar topics albeit in a much more opaque way (XXXcite?XXX). Scientists
+similar topics albeit in a much more opaque way {cite}`Nielsen_2020`. Scientists
 would record the field or lab experiments on paper notebooks or diaries,
 providing enough detail to, first, remember what they had done and how they
 had arrived at their results, but also to ensure other members of the
@@ -64,7 +65,7 @@ Image(url)
 There is a growing perception that much of the original ethos of Science to
 operate through transparency and accessibility has been lost. A series of
 recent big profile scandals have even prompted some to call it a state of
-crisis [XXXref?XXX]. Why is there a sense that Science is no longer open and
+crisis {cite}`Ioannidis_2007`. Why is there a sense that Science is no longer open and
 transparent in the way Galileo's diaries were? Although certinaly not the only
 or even the most important one, technology plays a role. The process and workflow
 of original scientists relied on a set of "analog" technologies for which an
@@ -83,7 +84,7 @@ notebook every step followed becomes dislocated from the medium in which most of
 the scientific work takes place.
 
 The current state of Science in terms of transparency and openness is prompting
-for action (XXXref?XXX). On the back of these debates, the term
+for action {cite}`Rey_2009`. On the back of these debates, the term
 "reproducibility" is also gaining traction. Again, this is a rather general
 term but, in one variant or another, its definition alludes to the need of
 scientific results to be accompanied by enough information and detail so they
@@ -141,8 +142,7 @@ Notebooks represent the top layer on the reproducibility stack. They can capture
 in detail and reproducible ways work that is specific about a given project: 
 what data is used, how it is read and linked; what algorithms are used, how they
 are combined; how each figure in the project is generated, etc. Guidance on how
-to write notebooks in efficient ways is also emerging (e.g. [Rule et al.,
-2019](https://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1007007)).
+to write notebooks in efficient ways is also emerging (e.g. {cite}`Rule_2019`).
 
 ### Open source packages
 
@@ -208,7 +208,7 @@ encapsulate an entire environment (or platform) in a format that is easy to
 transfer and reproduce in a variety of computational contexts. The most
 popular technology for containers nowadays is Docker, and the opportunities
 that it provides to build transparent and transferrable infrastructure for
-data science are starting to be explored ([Cook, 2017](https://www.apress.com/gp/book/9781484230114)).
+data science are starting to be explored {cite}`Cook_2017`.
 
 ## The (computational) building blocks of this book
 
@@ -225,7 +225,7 @@ This section will present the specific flavor of notebooks we use, and
 illustrate its building blocks in a way that allows you to then follow the
 rest of the book interactively.
 
-Our choice of notebook is Jupyter (XXXcite?XXX). A Jupyter notebook is a plain
+Our choice of notebook is Jupyter {cite}`kluyver2016jupyter`. A Jupyter notebook is a plain
 text file with the `.ipynb` extension, which means that it is an easy file to
 move around, sync, and track over time. Internally, it is structured as a
 JSON file, so they also integrate well with a host of modern web technologies.
@@ -644,7 +644,10 @@ Containers make computations more transferable, but there is always a
 possibility of things not working for several reasons, mistakes and typos.
 Here we list a few we have found:
 
-[**DAB**: should we list running problems here or in a blog post?]
+```{margin}  **DAB**
+Should we list running problems here or in a blog post?
+```
+
 
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.

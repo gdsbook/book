@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -42,7 +42,7 @@ from pysal.lib import weights
 import contextily                # Background tiles
 # Stamen Terrain Background tiles
 from contextily.tile_providers import ST_TERRAIN_BACKGROUND
-from booktools import choropleth
+
 ```
 
 ```python
@@ -98,7 +98,7 @@ And with this elements, we can generate a choropleth to get a quick sense of the
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
 ax.imshow(img, extent=ext, alpha=0.5)
-choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
+db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
            k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True, ax=ax)
 plt.text(ext[0],ext[2], lic, size=8)
 ax.set_axis_off()
@@ -206,7 +206,7 @@ Because of their very nature, looking at the numerical result of LISAs is not al
 f, ax = plt.subplots(1, figsize=(9,9))
 ax.imshow(img, extent=ext, alpha=0.5)
 db['Is'] = lisa.Is
-choropleth(db, column='Is', cmap='viridis', scheme='quantiles',
+db.plot(column='Is', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True,ax=ax);
 plt.text(ext[0], ext[2], lic, size=8)
 ax.set_axis_off()
@@ -222,7 +222,7 @@ axs = axs.flatten()
 
                     # Subplot 1 #
 ax = axs[0]
-choropleth(db, column='Is', cmap='viridis', scheme='quantiles',
+db.plot(column='Is', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True, ax=ax)
 ax.set_aspect('equal')
 ax.set_axis_off()
@@ -356,7 +356,7 @@ The final cluster map in the lower right above displays the output of the LISA s
 
 Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `PySAL` includes Getis and Ord's $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:
 
-```python jupyter={"outputs_hidden": true}
+```python
 # Gi
 gostats = esda.getisord.G_Local(db['Pct_Leave'], w)
 # Gi*

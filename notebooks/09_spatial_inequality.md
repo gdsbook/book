@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -26,7 +26,7 @@ circles. This is due to historic levels of inequality across the globe. Much of 
 yet there is a growing recognition that the question of *interregional income
 inequality* requires further attention as the growing gaps between poor and rich
 regions have been identified as key drivers of political polarization in
-developing and developed countries [1].
+developing and developed countries {cite}`Rodriguez_Pose_2018`.
 
 Indeed, while the two literatures, personal and regional inequality, are
 related, they have developed in a largely parallel fashion with limited
@@ -349,11 +349,9 @@ In regional studies, the intraregional personal income distribution is typically
 not available. As a result, the assumption is often made that intraregional
 personal inequality is zero. In other words, all individuals in the same region
 have identical incomes. With this assumption in hand, the first term vanishes:
-$Y_l -y_i = 0$, leading to: **FOOTNOTE:** It should also be noted that even at
-the national scale, the analysis of interpersonal income inequality also relies
-on aggregate data grouping individuals into income cohorts. See, for example,
-Piketty, T. and E. Saez (2003) "Income inequality in the United States,
-1913-1998", The Quarterly Journal of Economics, 118: 1-41.
+$Y_l -y_i = 0$, leading to:[^reg] 
+
+[^reg]: It should also be noted that even at the national scale, the analysis of interpersonal income inequality also relies on aggregate data grouping individuals into income cohorts. See, for example, {cite}`Piketty_2003`.
 
 $$
 \begin{aligned}
@@ -365,6 +363,7 @@ TSS &= \sum_{l=1}^N (Y_l - \bar{y})^2 \\
     &= \sum_{i=1}^m  [N_i(y_i - \bar{y})]^2
 \end{aligned}
 $$
+
 This means that each individual in a region has an equal contribution to the
 overall level of national interpersonal inequality, given by $(y_i - \bar{y})$,
 while the region in question contributes $N_i(y_i - \bar{y})$. While it may seem
@@ -451,25 +450,17 @@ $$
 
 where $s_g = \frac{\sum_{i \in g} y_i}{\sum_i y_i}$, and   $s_{i,g} = y_i / \sum_{i \in g} y_i$. 
 
-The first term is the between regions inequality component, and the second is the within regions inequality component.
-The within region term is a weighted average of inequality between economies belonging to the same region.
-Similar to what is done above for the case of interpersonal inequality, the
-estimate of the between region (group) component of the decomposition is based on
-setting the incomes of all economies (individuals )belonging to a region (group) equal to that of the
-regional (group) average of these per capita incomes. Now, however, intraregional
-inequality between economies within the same region is explicitly considered in
-the second  component.
+The first term is the between regions inequality component, and the second is
+the within regions inequality component. The within region term is a weighted
+average of inequality between economies belonging to the same region. Similar
+to what is done above for the case of interpersonal inequality, the estimate of
+the between region (group) component of the decomposition is based on setting
+the incomes of all economies (individuals )belonging to a region (group) equal
+to that of the regional (group) average of these per capita incomes. Now,
+however, intraregional inequality between economies within the same region is
+explicitly considered in the second component.[^weight]
 
-
-<!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-**Note:** The regional decomposition does not involve weighting the regions by their respective population. See  [Gluschenko (2018)](https://webvpn.ucr.edu/+CSCO+0075676763663A2F2F6A6A6A2E676E6171736261797661722E70627A++/doi/full/10.1080/17421772.2017.1343491) for further details. 
-
-<!-- #endregion -->
-
-
-
-
-
+[^weight]: The regional decomposition does not involve weighting the regions by their respective population. See  {cite}`Gluschenko_2018` for further details. 
 
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
@@ -546,7 +537,15 @@ rmeans.columns = region_names
 ```
 
 ```python
-rmeans.plot()
+rmeans.head()
+```
+
+```python
+rmeans = pandas.DataFrame(rmeans)
+```
+
+```python
+rmeans.plot.line()
 ```
 
 ## Regional Decomposition of Inequality
@@ -751,7 +750,7 @@ We now turn to two newer spatial analytics that extend a selction of the classic
 
 #### Spatial Gini
 
-The first spatial extension was introduced by [2] and is designed to consider
+The first spatial extension was introduced by {cite}`Rey_2012` and is designed to consider
 the role of adjacency in a decomposition of the Gini index of inequality. More
 specifically, The Gini in mean  is
 $$G = \frac{\sum_i \sum_j \left | x_i - x_j \right|}{2 n^2 \bar{x}} $$
@@ -934,7 +933,7 @@ gini_df.plot(y=["s_dist"])
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ## Rank paths
 A final analytic that we use to examine the spatial distribution of inequality across US counties is the evolution of the rank paths for the 20:20 ratio.
-The rank path traces out the migration of a particular rank in the county income distribution over time [3]. To construct the rank paths for the 20:20 counties, we first plot the centroids:
+The rank path traces out the migration of a particular rank in the county income distribution over time {cite}`Rey_2020`. To construct the rank paths for the 20:20 counties, we first plot the centroids:
 <!-- #endregion -->
 
 ```python ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
@@ -1010,15 +1009,6 @@ plt.show()
 Overall, there is a general north-south split for the 20 and 80 rank paths, with the wealthier part of the distribution being located more often in the northern section of the country.
 
 
-<!-- #region {"ein.hycell": false, "ein.tags": "worksheet-0", "jupyter": {"outputs_hidden": false}, "slideshow": {"slide_type": "-"}} -->
-## References
-
-[1] Rodriguez-Pose, A. (2017) The revenge of places that don't matter (and what to do about it). *Cambridge Journal of Regions, Economy and Society*, 11 (1): 189-209.
-
-[2] Rey, S.J. and R. Smith (2013) A spatial decomposition of the Gini coefficient. *Letters in Spatial and Resource Sciences*, 6: 55–70.
-
-[3] Rey, S.J., S. Han, W. Kang, R. Cortes, and E. Knaap (2020) A visual analytics system for space-time dynamics of regional income distributions utilizing animated flow maps and rank-based Markov chains. *Geographical Analysis*, Forthcoming.
-<!-- #endregion -->
 
 ---
 

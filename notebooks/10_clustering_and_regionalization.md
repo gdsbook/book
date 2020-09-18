@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -24,7 +24,6 @@ borrowed from [GDS'17 - Lab
 from pysal.explore.esda.moran import Moran
 import pysal.lib.weights.set_operations as Wsets
 from pysal.lib.weights import Queen, KNN
-from booktools import choropleth
 import seaborn 
 import pandas
 import geopandas 
@@ -201,9 +200,8 @@ for i, col in enumerate(cluster_variables):
     # select the axis where the map will go
     ax = axs[i]
     # Plot the map
-    #db.plot(column=col, ax=ax, scheme='Quantiles', 
-    #        linewidth=0, cmap='RdPu')
-    choropleth(db, col, cmap='RdPu', ax=ax)
+    db.plot(column=col, ax=ax, scheme='Quantiles', 
+            linewidth=0, cmap='RdPu')
     # Remove axis clutter
     ax.set_axis_off()
     # Set the axis title to the name of variable being plotted
@@ -898,7 +896,3 @@ Thus, clustering and regionalization are essential tools for the spatial data sc
 ---
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
-
-```python
-
-```
