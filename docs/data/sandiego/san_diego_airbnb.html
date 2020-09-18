@@ -1,0 +1,5138 @@
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read airbnb listings &#8212; Geographic Data Science with Python</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="../../_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/sphinx-book-theme.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/mystnb.js"></script>
+    <script src="../../_static/sphinx-book-theme.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://geographicdata.science/book/data/sandiego/san_diego_airbnb.html" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="https://geographicdata.science/book/data/sandiego/san_diego_airbnb.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Read airbnb listings" />
+<meta property="og:description" content="Read airbnb listings  listings = pd.read_csv('listings.csv') lon = listings['longitude'] lat = listings['latitude'] mbr = [ lon.min(), lat.min(), lon.max(), lat" />
+<meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
+
+<meta name="twitter:card" content="summary">
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../index.html">
+  
+  <img src="../../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Geographic Data Science with Python</h1>
+  
+</a>
+</div>
+
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro.html">
+   Geographic Data Science with PySAL and the PyData Stack
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part I - Building Blocks
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_i.html">
+   Part I - Building Blocks
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/01_geospatial_computational_environment.html">
+   Computational Tools for Geographic Data Science
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/02_spatial_data.html">
+   Spatial Data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/03_spatial_data_processing.html">
+   Spatial Data Processing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/04_spatial_weights.html">
+   Spatial Weights
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part II - Spatial Data Analysis
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_ii.html">
+   Part II - Spatial Data Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/05_choropleth.html">
+   Choropleth Mapping
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/06_spatial_autocorrelation.html">
+   Global Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/07_local_autocorrelation.html">
+   Local Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html">
+   Point Pattern Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html#randomness-clustering">
+   Randomness &amp; clustering
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html#conclusion">
+   Conclusion
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html#questions">
+   Questions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html#references">
+   References
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part III - Advanced Topics
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_ii.html">
+   Part II - Spatial Data Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/09_spatial_inequality.html">
+   Spatial Inequality Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/10_clustering_and_regionalization.html">
+   Clustering and Regionalization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/11_regression.html">
+   Spatial regression
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/12_feature_engineering.html">
+   Spatial feature engineering
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Datasets
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../README.html">
+   Datasets
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../airbnb/regression_cleaning.html">
+   Data cleaning of AirBnb
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../airports/airports_cleaning.html">
+   Airports Dataset Processing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../brexit/README.html">
+   Brexit data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../countries/countries_cleaning.html">
+   Cleaning of countries dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../h3_grid/build_sd_h3_grid.html">
+   Build a
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     H3
+    </span>
+   </code>
+   grid for the San Diego region
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../mexico/README.html">
+   Mexico data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../nasadem/build_nasadem_sd.html">
+   Build the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     nasadem_sd
+    </span>
+   </code>
+   extract
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../texas/README.html">
+   Texas data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tokyo/tokyo_cleaning.html">
+   Tokyo Dataset
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+ <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/data/sandiego/san_diego_airbnb.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+    
+</div>
+        <!-- Source interaction buttons -->
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/gdsbook/book/master?urlpath=lab/tree/data/sandiego/san_diego_airbnb.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/gdsbook/book/blob/master/data/sandiego/san_diego_airbnb.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> On this page
+        </div>
+        <nav id="bd-toc-nav">
+            
+        </nav>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="c1">#import cenpy as cen</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># previously: newdata.to_pickle(&#39;sd_df.pkl&#39;)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s1">&#39;sd_df.pkl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>GEOID</th>
+      <th>GEOID_x</th>
+      <th>B01003_001E</th>
+      <th>B02001_002E</th>
+      <th>B02001_003E</th>
+      <th>B03003_003E</th>
+      <th>B01002_001E</th>
+      <th>B09001_001E</th>
+      <th>B09019_001E</th>
+      <th>B09019_002E</th>
+      <th>...</th>
+      <th>INTPTLAT</th>
+      <th>INTPTLON</th>
+      <th>LSADC</th>
+      <th>MTFCC</th>
+      <th>NAME</th>
+      <th>OBJECTID</th>
+      <th>OID</th>
+      <th>STATE</th>
+      <th>TRACT</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>343</th>
+      <td>06073000100</td>
+      <td>14000US06073000100</td>
+      <td>2716</td>
+      <td>2549</td>
+      <td>0</td>
+      <td>262</td>
+      <td>55.7</td>
+      <td>433</td>
+      <td>2716</td>
+      <td>2711</td>
+      <td>...</td>
+      <td>+32.7530051</td>
+      <td>-117.1858954</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 1</td>
+      <td>32868</td>
+      <td>20755676340566</td>
+      <td>06</td>
+      <td>000100</td>
+      <td>POLYGON ((-13046077.0368 3862535.43, -13046055...</td>
+    </tr>
+    <tr>
+      <th>176</th>
+      <td>06073000201</td>
+      <td>14000US06073000201</td>
+      <td>2223</td>
+      <td>1983</td>
+      <td>27</td>
+      <td>383</td>
+      <td>47.1</td>
+      <td>253</td>
+      <td>2223</td>
+      <td>2223</td>
+      <td>...</td>
+      <td>+32.7540028</td>
+      <td>-117.1733775</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 2.01</td>
+      <td>21905</td>
+      <td>207553717294854</td>
+      <td>06</td>
+      <td>000201</td>
+      <td>POLYGON ((-13044291.8062 3863180.058499999, -1...</td>
+    </tr>
+    <tr>
+      <th>167</th>
+      <td>06073000202</td>
+      <td>14000US06073000202</td>
+      <td>4683</td>
+      <td>4147</td>
+      <td>79</td>
+      <td>750</td>
+      <td>34.3</td>
+      <td>627</td>
+      <td>4683</td>
+      <td>4624</td>
+      <td>...</td>
+      <td>+32.7453947</td>
+      <td>-117.1751539</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 2.02</td>
+      <td>21350</td>
+      <td>207553717294578</td>
+      <td>06</td>
+      <td>000202</td>
+      <td>POLYGON ((-13044867.9959 3861599.656400003, -1...</td>
+    </tr>
+    <tr>
+      <th>133</th>
+      <td>06073000300</td>
+      <td>14000US06073000300</td>
+      <td>4875</td>
+      <td>4013</td>
+      <td>148</td>
+      <td>671</td>
+      <td>40.8</td>
+      <td>246</td>
+      <td>4875</td>
+      <td>4682</td>
+      <td>...</td>
+      <td>+32.7447827</td>
+      <td>-117.1623035</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 3</td>
+      <td>15150</td>
+      <td>20755676338501</td>
+      <td>06</td>
+      <td>000300</td>
+      <td>POLYGON ((-13043153.8983 3862030.870700002, -1...</td>
+    </tr>
+    <tr>
+      <th>134</th>
+      <td>06073000400</td>
+      <td>14000US06073000400</td>
+      <td>3606</td>
+      <td>2683</td>
+      <td>95</td>
+      <td>472</td>
+      <td>34.5</td>
+      <td>216</td>
+      <td>3606</td>
+      <td>3304</td>
+      <td>...</td>
+      <td>+32.7533382</td>
+      <td>-117.1630702</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 4</td>
+      <td>15151</td>
+      <td>20755676338495</td>
+      <td>06</td>
+      <td>000400</td>
+      <td>POLYGON ((-13043401.2502 3863312.430100001, -1...</td>
+    </tr>
+    <tr>
+      <th>63</th>
+      <td>06073000500</td>
+      <td>14000US06073000500</td>
+      <td>2873</td>
+      <td>2338</td>
+      <td>122</td>
+      <td>428</td>
+      <td>36.5</td>
+      <td>257</td>
+      <td>2873</td>
+      <td>2867</td>
+      <td>...</td>
+      <td>+32.7606651</td>
+      <td>-117.1521746</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 5</td>
+      <td>9781</td>
+      <td>20755676341496</td>
+      <td>06</td>
+      <td>000500</td>
+      <td>POLYGON ((-13042359.4111 3863345.258400001, -1...</td>
+    </tr>
+    <tr>
+      <th>64</th>
+      <td>06073000600</td>
+      <td>14000US06073000600</td>
+      <td>2904</td>
+      <td>2360</td>
+      <td>201</td>
+      <td>542</td>
+      <td>38.4</td>
+      <td>206</td>
+      <td>2904</td>
+      <td>2876</td>
+      <td>...</td>
+      <td>+32.7529930</td>
+      <td>-117.1519053</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 6</td>
+      <td>9782</td>
+      <td>20755676341174</td>
+      <td>06</td>
+      <td>000600</td>
+      <td>POLYGON ((-13042283.8252 3863262.525799997, -1...</td>
+    </tr>
+    <tr>
+      <th>584</th>
+      <td>06073000700</td>
+      <td>14000US06073000700</td>
+      <td>4576</td>
+      <td>3970</td>
+      <td>65</td>
+      <td>704</td>
+      <td>36.6</td>
+      <td>187</td>
+      <td>4576</td>
+      <td>4576</td>
+      <td>...</td>
+      <td>+32.7447605</td>
+      <td>-117.1513507</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 7</td>
+      <td>62459</td>
+      <td>20755676341881</td>
+      <td>06</td>
+      <td>000700</td>
+      <td>POLYGON ((-13041814.3909 3860986.745099999, -1...</td>
+    </tr>
+    <tr>
+      <th>571</th>
+      <td>06073000800</td>
+      <td>14000US06073000800</td>
+      <td>3927</td>
+      <td>3168</td>
+      <td>322</td>
+      <td>860</td>
+      <td>41.1</td>
+      <td>424</td>
+      <td>3927</td>
+      <td>3927</td>
+      <td>...</td>
+      <td>+32.7447819</td>
+      <td>-117.1420278</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 8</td>
+      <td>62205</td>
+      <td>20755676340720</td>
+      <td>06</td>
+      <td>000800</td>
+      <td>POLYGON ((-13040676.7057 3861694.950999998, -1...</td>
+    </tr>
+    <tr>
+      <th>585</th>
+      <td>06073000900</td>
+      <td>14000US06073000900</td>
+      <td>5184</td>
+      <td>3791</td>
+      <td>626</td>
+      <td>1338</td>
+      <td>38.3</td>
+      <td>371</td>
+      <td>5184</td>
+      <td>5184</td>
+      <td>...</td>
+      <td>+32.7518529</td>
+      <td>-117.1419570</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 9</td>
+      <td>62460</td>
+      <td>20755676340714</td>
+      <td>06</td>
+      <td>000900</td>
+      <td>POLYGON ((-13040674.368 3862861.710900001, -13...</td>
+    </tr>
+    <tr>
+      <th>302</th>
+      <td>06073001000</td>
+      <td>14000US06073001000</td>
+      <td>5470</td>
+      <td>4295</td>
+      <td>192</td>
+      <td>1123</td>
+      <td>33.4</td>
+      <td>541</td>
+      <td>5470</td>
+      <td>5411</td>
+      <td>...</td>
+      <td>+32.7603326</td>
+      <td>-117.1417318</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 10</td>
+      <td>29114</td>
+      <td>20755676340834</td>
+      <td>06</td>
+      <td>001000</td>
+      <td>POLYGON ((-13040665.2398 3862913.069499999, -1...</td>
+    </tr>
+    <tr>
+      <th>303</th>
+      <td>06073001100</td>
+      <td>14000US06073001100</td>
+      <td>3545</td>
+      <td>2773</td>
+      <td>369</td>
+      <td>1043</td>
+      <td>33.7</td>
+      <td>529</td>
+      <td>3545</td>
+      <td>3540</td>
+      <td>...</td>
+      <td>+32.7652836</td>
+      <td>-117.1335163</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 11</td>
+      <td>29115</td>
+      <td>20755676341181</td>
+      <td>06</td>
+      <td>001100</td>
+      <td>POLYGON ((-13039893.1278 3864510.725400001, -1...</td>
+    </tr>
+    <tr>
+      <th>136</th>
+      <td>06073001200</td>
+      <td>14000US06073001200</td>
+      <td>6064</td>
+      <td>4403</td>
+      <td>375</td>
+      <td>2382</td>
+      <td>31.6</td>
+      <td>763</td>
+      <td>6064</td>
+      <td>6036</td>
+      <td>...</td>
+      <td>+32.7580741</td>
+      <td>-117.1317985</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 12</td>
+      <td>17590</td>
+      <td>20755676340870</td>
+      <td>06</td>
+      <td>001200</td>
+      <td>POLYGON ((-13039700.3225 3863424.020499997, -1...</td>
+    </tr>
+    <tr>
+      <th>137</th>
+      <td>06073001300</td>
+      <td>14000US06073001300</td>
+      <td>6329</td>
+      <td>4564</td>
+      <td>602</td>
+      <td>1806</td>
+      <td>31.7</td>
+      <td>862</td>
+      <td>6329</td>
+      <td>6324</td>
+      <td>...</td>
+      <td>+32.7512721</td>
+      <td>-117.1323173</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 13</td>
+      <td>17591</td>
+      <td>20755676340876</td>
+      <td>06</td>
+      <td>001300</td>
+      <td>POLYGON ((-13039696.8716 3862866.740800001, -1...</td>
+    </tr>
+    <tr>
+      <th>138</th>
+      <td>06073001400</td>
+      <td>14000US06073001400</td>
+      <td>3286</td>
+      <td>2535</td>
+      <td>196</td>
+      <td>842</td>
+      <td>34.9</td>
+      <td>441</td>
+      <td>3286</td>
+      <td>3281</td>
+      <td>...</td>
+      <td>+32.7447400</td>
+      <td>-117.1330809</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 14</td>
+      <td>17592</td>
+      <td>20755676340853</td>
+      <td>06</td>
+      <td>001400</td>
+      <td>POLYGON ((-13039732.8277 3861000.773800001, -1...</td>
+    </tr>
+    <tr>
+      <th>144</th>
+      <td>06073001500</td>
+      <td>14000US06073001500</td>
+      <td>3836</td>
+      <td>3047</td>
+      <td>220</td>
+      <td>1399</td>
+      <td>36.4</td>
+      <td>624</td>
+      <td>3836</td>
+      <td>3823</td>
+      <td>...</td>
+      <td>+32.7437341</td>
+      <td>-117.1233871</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 15</td>
+      <td>17868</td>
+      <td>20755676340841</td>
+      <td>06</td>
+      <td>001500</td>
+      <td>POLYGON ((-13038655.3664 3861852.983000003, -1...</td>
+    </tr>
+    <tr>
+      <th>576</th>
+      <td>06073001600</td>
+      <td>14000US06073001600</td>
+      <td>5292</td>
+      <td>3161</td>
+      <td>772</td>
+      <td>2837</td>
+      <td>34.7</td>
+      <td>957</td>
+      <td>5292</td>
+      <td>5292</td>
+      <td>...</td>
+      <td>+32.7521608</td>
+      <td>-117.1213220</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 16</td>
+      <td>65535</td>
+      <td>20755676340887</td>
+      <td>06</td>
+      <td>001600</td>
+      <td>POLYGON ((-13038457.4403 3862836.561099999, -1...</td>
+    </tr>
+    <tr>
+      <th>577</th>
+      <td>06073001700</td>
+      <td>14000US06073001700</td>
+      <td>4487</td>
+      <td>3245</td>
+      <td>341</td>
+      <td>2022</td>
+      <td>32.4</td>
+      <td>793</td>
+      <td>4487</td>
+      <td>4487</td>
+      <td>...</td>
+      <td>+32.7582458</td>
+      <td>-117.1207158</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 17</td>
+      <td>65536</td>
+      <td>20755676340858</td>
+      <td>06</td>
+      <td>001700</td>
+      <td>POLYGON ((-13038510.5397 3863626.818599999, -1...</td>
+    </tr>
+    <tr>
+      <th>331</th>
+      <td>06073001800</td>
+      <td>14000US06073001800</td>
+      <td>5392</td>
+      <td>3492</td>
+      <td>935</td>
+      <td>1714</td>
+      <td>31.2</td>
+      <td>922</td>
+      <td>5392</td>
+      <td>5392</td>
+      <td>...</td>
+      <td>+32.7628808</td>
+      <td>-117.1186103</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 18</td>
+      <td>31797</td>
+      <td>20755676340847</td>
+      <td>06</td>
+      <td>001800</td>
+      <td>POLYGON ((-13038577.4428 3863900.442699999, -1...</td>
+    </tr>
+    <tr>
+      <th>582</th>
+      <td>06073001900</td>
+      <td>14000US06073001900</td>
+      <td>3171</td>
+      <td>2751</td>
+      <td>38</td>
+      <td>576</td>
+      <td>42.7</td>
+      <td>410</td>
+      <td>3171</td>
+      <td>3152</td>
+      <td>...</td>
+      <td>+32.7696239</td>
+      <td>-117.1198088</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 19</td>
+      <td>65316</td>
+      <td>20755676340507</td>
+      <td>06</td>
+      <td>001900</td>
+      <td>POLYGON ((-13039008.5831 3864925.100199997, -1...</td>
+    </tr>
+    <tr>
+      <th>173</th>
+      <td>06073002001</td>
+      <td>14000US06073002001</td>
+      <td>3273</td>
+      <td>2989</td>
+      <td>89</td>
+      <td>207</td>
+      <td>51.9</td>
+      <td>452</td>
+      <td>3273</td>
+      <td>3273</td>
+      <td>...</td>
+      <td>+32.7699228</td>
+      <td>-117.1043481</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 20.01</td>
+      <td>21631</td>
+      <td>20755676340921</td>
+      <td>06</td>
+      <td>002001</td>
+      <td>POLYGON ((-13036947.5028 3865095.090800002, -1...</td>
+    </tr>
+    <tr>
+      <th>383</th>
+      <td>06073002002</td>
+      <td>14000US06073002002</td>
+      <td>2597</td>
+      <td>2005</td>
+      <td>259</td>
+      <td>332</td>
+      <td>37.6</td>
+      <td>540</td>
+      <td>2597</td>
+      <td>2597</td>
+      <td>...</td>
+      <td>+32.7645565</td>
+      <td>-117.0929249</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 20.02</td>
+      <td>33142</td>
+      <td>20755676340928</td>
+      <td>06</td>
+      <td>002002</td>
+      <td>POLYGON ((-13035650.8533 3863279.469400004, -1...</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>06073002100</td>
+      <td>14000US06073002100</td>
+      <td>4842</td>
+      <td>3164</td>
+      <td>718</td>
+      <td>1520</td>
+      <td>36.2</td>
+      <td>537</td>
+      <td>4842</td>
+      <td>4817</td>
+      <td>...</td>
+      <td>+32.7586876</td>
+      <td>-117.1084657</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 21</td>
+      <td>4933</td>
+      <td>20755676340916</td>
+      <td>06</td>
+      <td>002100</td>
+      <td>POLYGON ((-13037266.6557 3862909.8926, -130372...</td>
+    </tr>
+    <tr>
+      <th>293</th>
+      <td>06073002201</td>
+      <td>14000US06073002201</td>
+      <td>3705</td>
+      <td>1706</td>
+      <td>823</td>
+      <td>2262</td>
+      <td>26.8</td>
+      <td>1052</td>
+      <td>3705</td>
+      <td>3705</td>
+      <td>...</td>
+      <td>+32.7524807</td>
+      <td>-117.1124957</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 22.01</td>
+      <td>28565</td>
+      <td>20755676340899</td>
+      <td>06</td>
+      <td>002201</td>
+      <td>POLYGON ((-13037269.5501 3862653.101899996, -1...</td>
+    </tr>
+    <tr>
+      <th>294</th>
+      <td>06073002202</td>
+      <td>14000US06073002202</td>
+      <td>5388</td>
+      <td>3061</td>
+      <td>353</td>
+      <td>3778</td>
+      <td>28.6</td>
+      <td>1550</td>
+      <td>5388</td>
+      <td>5327</td>
+      <td>...</td>
+      <td>+32.7523973</td>
+      <td>-117.1051018</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 22.02</td>
+      <td>28566</td>
+      <td>20755676340954</td>
+      <td>06</td>
+      <td>002202</td>
+      <td>POLYGON ((-13036558.1072 3862173.685800001, -1...</td>
+    </tr>
+    <tr>
+      <th>126</th>
+      <td>06073002301</td>
+      <td>14000US06073002301</td>
+      <td>3130</td>
+      <td>1458</td>
+      <td>691</td>
+      <td>1208</td>
+      <td>30.2</td>
+      <td>792</td>
+      <td>3130</td>
+      <td>3130</td>
+      <td>...</td>
+      <td>+32.7573492</td>
+      <td>-117.0947635</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 23.01</td>
+      <td>14493</td>
+      <td>20755676340814</td>
+      <td>06</td>
+      <td>002301</td>
+      <td>POLYGON ((-13035601.6501 3862896.523500003, -1...</td>
+    </tr>
+    <tr>
+      <th>127</th>
+      <td>06073002302</td>
+      <td>14000US06073002302</td>
+      <td>6620</td>
+      <td>3324</td>
+      <td>832</td>
+      <td>3365</td>
+      <td>29.7</td>
+      <td>1903</td>
+      <td>6620</td>
+      <td>6590</td>
+      <td>...</td>
+      <td>+32.7525425</td>
+      <td>-117.0963988</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 23.02</td>
+      <td>14494</td>
+      <td>20755676340942</td>
+      <td>06</td>
+      <td>002302</td>
+      <td>POLYGON ((-13035609.6651 3862164.420599997, -1...</td>
+    </tr>
+    <tr>
+      <th>128</th>
+      <td>06073002401</td>
+      <td>14000US06073002401</td>
+      <td>4824</td>
+      <td>3524</td>
+      <td>433</td>
+      <td>2641</td>
+      <td>30.2</td>
+      <td>1165</td>
+      <td>4824</td>
+      <td>4824</td>
+      <td>...</td>
+      <td>+32.7470743</td>
+      <td>-117.1151992</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 24.01</td>
+      <td>14495</td>
+      <td>20755676340894</td>
+      <td>06</td>
+      <td>002401</td>
+      <td>POLYGON ((-13038019.2868 3861987.722099997, -1...</td>
+    </tr>
+    <tr>
+      <th>518</th>
+      <td>06073002402</td>
+      <td>14000US06073002402</td>
+      <td>5236</td>
+      <td>3484</td>
+      <td>514</td>
+      <td>3783</td>
+      <td>26.2</td>
+      <td>1741</td>
+      <td>5236</td>
+      <td>5227</td>
+      <td>...</td>
+      <td>+32.7468136</td>
+      <td>-117.1052325</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 24.02</td>
+      <td>55654</td>
+      <td>20755676340911</td>
+      <td>06</td>
+      <td>002402</td>
+      <td>POLYGON ((-13036665.9758 3861389.4815, -130366...</td>
+    </tr>
+    <tr>
+      <th>519</th>
+      <td>06073002501</td>
+      <td>14000US06073002501</td>
+      <td>6024</td>
+      <td>4098</td>
+      <td>591</td>
+      <td>3981</td>
+      <td>29.0</td>
+      <td>1832</td>
+      <td>6024</td>
+      <td>5993</td>
+      <td>...</td>
+      <td>+32.7400368</td>
+      <td>-117.1096435</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 25.01</td>
+      <td>55655</td>
+      <td>20755676340882</td>
+      <td>06</td>
+      <td>002501</td>
+      <td>POLYGON ((-13037660.1701 3861458.171800002, -1...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>06073020708</td>
+      <td>14000US06073020708</td>
+      <td>3644</td>
+      <td>2773</td>
+      <td>213</td>
+      <td>757</td>
+      <td>38.5</td>
+      <td>909</td>
+      <td>3644</td>
+      <td>3617</td>
+      <td>...</td>
+      <td>+33.0880785</td>
+      <td>-117.0664710</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 207.08</td>
+      <td>4853</td>
+      <td>20755676338783</td>
+      <td>06</td>
+      <td>020708</td>
+      <td>POLYGON ((-13032462.3292 3907370.195200004, -1...</td>
+    </tr>
+    <tr>
+      <th>221</th>
+      <td>06073020709</td>
+      <td>14000US06073020709</td>
+      <td>8184</td>
+      <td>6295</td>
+      <td>293</td>
+      <td>2260</td>
+      <td>38.4</td>
+      <td>2065</td>
+      <td>8184</td>
+      <td>8089</td>
+      <td>...</td>
+      <td>+33.1311558</td>
+      <td>-116.9769969</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 207.09</td>
+      <td>23124</td>
+      <td>20755676338778</td>
+      <td>06</td>
+      <td>020709</td>
+      <td>POLYGON ((-13029476.9631 3912060.394599997, -1...</td>
+    </tr>
+    <tr>
+      <th>243</th>
+      <td>06073020710</td>
+      <td>14000US06073020710</td>
+      <td>1577</td>
+      <td>1422</td>
+      <td>27</td>
+      <td>264</td>
+      <td>52.1</td>
+      <td>233</td>
+      <td>1577</td>
+      <td>1577</td>
+      <td>...</td>
+      <td>+33.0785891</td>
+      <td>-117.0160101</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 207.10</td>
+      <td>23339</td>
+      <td>20755676338772</td>
+      <td>06</td>
+      <td>020710</td>
+      <td>POLYGON ((-13032361.3624 3902729.692199998, -1...</td>
+    </tr>
+    <tr>
+      <th>412</th>
+      <td>06073020801</td>
+      <td>14000US06073020801</td>
+      <td>5436</td>
+      <td>4990</td>
+      <td>75</td>
+      <td>856</td>
+      <td>50.1</td>
+      <td>1120</td>
+      <td>5436</td>
+      <td>5183</td>
+      <td>...</td>
+      <td>+33.0051954</td>
+      <td>-116.9384176</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.01</td>
+      <td>38922</td>
+      <td>20755676338765</td>
+      <td>06</td>
+      <td>020801</td>
+      <td>POLYGON ((-13022085.2376 3893996.746299997, -1...</td>
+    </tr>
+    <tr>
+      <th>193</th>
+      <td>06073020805</td>
+      <td>14000US06073020805</td>
+      <td>3643</td>
+      <td>2997</td>
+      <td>369</td>
+      <td>1076</td>
+      <td>36.1</td>
+      <td>996</td>
+      <td>3643</td>
+      <td>3632</td>
+      <td>...</td>
+      <td>+33.0328550</td>
+      <td>-116.8935925</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.05</td>
+      <td>23125</td>
+      <td>20755676338758</td>
+      <td>06</td>
+      <td>020805</td>
+      <td>POLYGON ((-13014919.1567 3898901.853399999, -1...</td>
+    </tr>
+    <tr>
+      <th>194</th>
+      <td>06073020806</td>
+      <td>14000US06073020806</td>
+      <td>5999</td>
+      <td>5117</td>
+      <td>22</td>
+      <td>1931</td>
+      <td>31.3</td>
+      <td>1797</td>
+      <td>5999</td>
+      <td>5999</td>
+      <td>...</td>
+      <td>+33.0384857</td>
+      <td>-116.8766106</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.06</td>
+      <td>23126</td>
+      <td>20755676338752</td>
+      <td>06</td>
+      <td>020806</td>
+      <td>POLYGON ((-13012950.5828 3902566.195, -1301294...</td>
+    </tr>
+    <tr>
+      <th>229</th>
+      <td>06073020807</td>
+      <td>14000US06073020807</td>
+      <td>2453</td>
+      <td>2298</td>
+      <td>33</td>
+      <td>395</td>
+      <td>48.0</td>
+      <td>399</td>
+      <td>2453</td>
+      <td>2411</td>
+      <td>...</td>
+      <td>+33.0729131</td>
+      <td>-116.8231124</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.07</td>
+      <td>23076</td>
+      <td>20755676338747</td>
+      <td>06</td>
+      <td>020807</td>
+      <td>POLYGON ((-13015528.0743 3906335.713, -1301552...</td>
+    </tr>
+    <tr>
+      <th>195</th>
+      <td>06073020809</td>
+      <td>14000US06073020809</td>
+      <td>8129</td>
+      <td>6058</td>
+      <td>18</td>
+      <td>2809</td>
+      <td>36.3</td>
+      <td>1998</td>
+      <td>8129</td>
+      <td>8005</td>
+      <td>...</td>
+      <td>+33.0396539</td>
+      <td>-116.8524089</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.09</td>
+      <td>23127</td>
+      <td>20755676338733</td>
+      <td>06</td>
+      <td>020809</td>
+      <td>POLYGON ((-13010371.7555 3904036.158399999, -1...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>06073020810</td>
+      <td>14000US06073020810</td>
+      <td>5086</td>
+      <td>4908</td>
+      <td>0</td>
+      <td>756</td>
+      <td>45.0</td>
+      <td>1094</td>
+      <td>5086</td>
+      <td>5075</td>
+      <td>...</td>
+      <td>+33.0348099</td>
+      <td>-116.7875799</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.10</td>
+      <td>1576</td>
+      <td>207553717294636</td>
+      <td>06</td>
+      <td>020810</td>
+      <td>POLYGON ((-13009524.1688 3896636.946800001, -1...</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>06073020811</td>
+      <td>14000US06073020811</td>
+      <td>5642</td>
+      <td>5091</td>
+      <td>172</td>
+      <td>555</td>
+      <td>42.2</td>
+      <td>1429</td>
+      <td>5642</td>
+      <td>5623</td>
+      <td>...</td>
+      <td>+33.0026375</td>
+      <td>-116.7739839</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.11</td>
+      <td>1581</td>
+      <td>207553717294762</td>
+      <td>06</td>
+      <td>020811</td>
+      <td>POLYGON ((-13007080.2607 3895046.861900002, -1...</td>
+    </tr>
+    <tr>
+      <th>217</th>
+      <td>06073020902</td>
+      <td>14000US06073020902</td>
+      <td>2190</td>
+      <td>1995</td>
+      <td>32</td>
+      <td>151</td>
+      <td>42.3</td>
+      <td>481</td>
+      <td>2190</td>
+      <td>2086</td>
+      <td>...</td>
+      <td>+32.9425014</td>
+      <td>-116.6067743</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 209.02</td>
+      <td>23083</td>
+      <td>20755676340648</td>
+      <td>06</td>
+      <td>020902</td>
+      <td>POLYGON ((-13001033.4973 3883654.181000002, -1...</td>
+    </tr>
+    <tr>
+      <th>119</th>
+      <td>06073020903</td>
+      <td>14000US06073020903</td>
+      <td>2926</td>
+      <td>2043</td>
+      <td>31</td>
+      <td>427</td>
+      <td>50.4</td>
+      <td>498</td>
+      <td>2926</td>
+      <td>2762</td>
+      <td>...</td>
+      <td>+33.2564808</td>
+      <td>-116.6970824</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 209.03</td>
+      <td>14469</td>
+      <td>20755676338726</td>
+      <td>06</td>
+      <td>020903</td>
+      <td>POLYGON ((-13030207.5529 3951863.370200001, -1...</td>
+    </tr>
+    <tr>
+      <th>356</th>
+      <td>06073020904</td>
+      <td>14000US06073020904</td>
+      <td>2591</td>
+      <td>2329</td>
+      <td>4</td>
+      <td>308</td>
+      <td>49.0</td>
+      <td>539</td>
+      <td>2591</td>
+      <td>2566</td>
+      <td>...</td>
+      <td>+33.0526794</td>
+      <td>-116.6289158</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 209.04</td>
+      <td>33067</td>
+      <td>20755676338720</td>
+      <td>06</td>
+      <td>020904</td>
+      <td>POLYGON ((-12995534.0918 3893829.787699997, -1...</td>
+    </tr>
+    <tr>
+      <th>570</th>
+      <td>06073021000</td>
+      <td>14000US06073021000</td>
+      <td>3498</td>
+      <td>3093</td>
+      <td>116</td>
+      <td>844</td>
+      <td>53.2</td>
+      <td>576</td>
+      <td>3498</td>
+      <td>3487</td>
+      <td>...</td>
+      <td>+33.1084280</td>
+      <td>-116.2508174</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 210</td>
+      <td>61783</td>
+      <td>20755676338714</td>
+      <td>06</td>
+      <td>021000</td>
+      <td>POLYGON ((-12981895.8957 3945471.9846, -129818...</td>
+    </tr>
+    <tr>
+      <th>226</th>
+      <td>06073021100</td>
+      <td>14000US06073021100</td>
+      <td>7178</td>
+      <td>5814</td>
+      <td>269</td>
+      <td>2788</td>
+      <td>38.6</td>
+      <td>1814</td>
+      <td>7178</td>
+      <td>6832</td>
+      <td>...</td>
+      <td>+32.7026541</td>
+      <td>-116.4568740</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 211</td>
+      <td>23062</td>
+      <td>20755676341402</td>
+      <td>06</td>
+      <td>021100</td>
+      <td>POLYGON ((-12998236.0385 3838014.074299999, -1...</td>
+    </tr>
+    <tr>
+      <th>186</th>
+      <td>06073021202</td>
+      <td>14000US06073021202</td>
+      <td>3463</td>
+      <td>2951</td>
+      <td>55</td>
+      <td>640</td>
+      <td>38.2</td>
+      <td>847</td>
+      <td>3463</td>
+      <td>3238</td>
+      <td>...</td>
+      <td>+32.8235355</td>
+      <td>-116.6501149</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 212.02</td>
+      <td>21761</td>
+      <td>20755676340654</td>
+      <td>06</td>
+      <td>021202</td>
+      <td>POLYGON ((-12996693.5957 3868387.222199999, -1...</td>
+    </tr>
+    <tr>
+      <th>361</th>
+      <td>06073021204</td>
+      <td>14000US06073021204</td>
+      <td>5591</td>
+      <td>5255</td>
+      <td>61</td>
+      <td>660</td>
+      <td>49.0</td>
+      <td>1113</td>
+      <td>5591</td>
+      <td>5591</td>
+      <td>...</td>
+      <td>+32.8078835</td>
+      <td>-116.7641321</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 212.04</td>
+      <td>33071</td>
+      <td>20755676340666</td>
+      <td>06</td>
+      <td>021204</td>
+      <td>POLYGON ((-13005320.077 3867725.358800001, -13...</td>
+    </tr>
+    <tr>
+      <th>537</th>
+      <td>06073021205</td>
+      <td>14000US06073021205</td>
+      <td>7425</td>
+      <td>6620</td>
+      <td>83</td>
+      <td>1691</td>
+      <td>37.9</td>
+      <td>1676</td>
+      <td>7425</td>
+      <td>7260</td>
+      <td>...</td>
+      <td>+32.8287974</td>
+      <td>-116.7811501</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 212.05</td>
+      <td>56680</td>
+      <td>207553717294564</td>
+      <td>06</td>
+      <td>021205</td>
+      <td>POLYGON ((-13003157.4732 3874654.256399997, -1...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>06073021206</td>
+      <td>14000US06073021206</td>
+      <td>2656</td>
+      <td>2349</td>
+      <td>47</td>
+      <td>181</td>
+      <td>50.6</td>
+      <td>423</td>
+      <td>2656</td>
+      <td>2640</td>
+      <td>...</td>
+      <td>+32.8633016</td>
+      <td>-116.7519651</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 212.06</td>
+      <td>1582</td>
+      <td>207553717294763</td>
+      <td>06</td>
+      <td>021206</td>
+      <td>POLYGON ((-13002757.8362 3875229.320100002, -1...</td>
+    </tr>
+    <tr>
+      <th>109</th>
+      <td>06073021302</td>
+      <td>14000US06073021302</td>
+      <td>7862</td>
+      <td>6199</td>
+      <td>950</td>
+      <td>2861</td>
+      <td>36.1</td>
+      <td>1423</td>
+      <td>7862</td>
+      <td>4443</td>
+      <td>...</td>
+      <td>+32.6637754</td>
+      <td>-116.7818507</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 213.02</td>
+      <td>14461</td>
+      <td>20755676340545</td>
+      <td>06</td>
+      <td>021302</td>
+      <td>POLYGON ((-13017519.9139 3842077.573200002, -1...</td>
+    </tr>
+    <tr>
+      <th>230</th>
+      <td>06073021303</td>
+      <td>14000US06073021303</td>
+      <td>8713</td>
+      <td>5999</td>
+      <td>365</td>
+      <td>2696</td>
+      <td>42.8</td>
+      <td>2170</td>
+      <td>8713</td>
+      <td>8661</td>
+      <td>...</td>
+      <td>+32.7240315</td>
+      <td>-116.9028283</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 213.03</td>
+      <td>23079</td>
+      <td>20755676340426</td>
+      <td>06</td>
+      <td>021303</td>
+      <td>POLYGON ((-13020637.6389 3850852.846600004, -1...</td>
+    </tr>
+    <tr>
+      <th>285</th>
+      <td>06073021304</td>
+      <td>14000US06073021304</td>
+      <td>2590</td>
+      <td>2324</td>
+      <td>59</td>
+      <td>656</td>
+      <td>49.8</td>
+      <td>416</td>
+      <td>2590</td>
+      <td>2585</td>
+      <td>...</td>
+      <td>+32.6847916</td>
+      <td>-116.8687112</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 213.04</td>
+      <td>28341</td>
+      <td>20755676340473</td>
+      <td>06</td>
+      <td>021304</td>
+      <td>POLYGON ((-13017436.5356 3850087.640900001, -1...</td>
+    </tr>
+    <tr>
+      <th>531</th>
+      <td>06073021400</td>
+      <td>14000US06073021400</td>
+      <td>7079</td>
+      <td>5166</td>
+      <td>375</td>
+      <td>1217</td>
+      <td>32.0</td>
+      <td>1613</td>
+      <td>7079</td>
+      <td>6512</td>
+      <td>...</td>
+      <td>+32.7323398</td>
+      <td>-117.2199521</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 214</td>
+      <td>56415</td>
+      <td>207553717294602</td>
+      <td>06</td>
+      <td>021400</td>
+      <td>POLYGON ((-13050501.43 3858660.460100003, -130...</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>06073021500</td>
+      <td>14000US06073021500</td>
+      <td>9433</td>
+      <td>5782</td>
+      <td>128</td>
+      <td>807</td>
+      <td>40.2</td>
+      <td>3022</td>
+      <td>9433</td>
+      <td>9433</td>
+      <td>...</td>
+      <td>+32.9511013</td>
+      <td>-117.1889566</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 215</td>
+      <td>1583</td>
+      <td>207553717294764</td>
+      <td>06</td>
+      <td>021500</td>
+      <td>POLYGON ((-13048525.0638 3888073.160800003, -1...</td>
+    </tr>
+    <tr>
+      <th>190</th>
+      <td>06073021600</td>
+      <td>14000US06073021600</td>
+      <td>3689</td>
+      <td>3111</td>
+      <td>190</td>
+      <td>721</td>
+      <td>27.1</td>
+      <td>880</td>
+      <td>3689</td>
+      <td>2836</td>
+      <td>...</td>
+      <td>+32.6572021</td>
+      <td>-117.1561371</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 216</td>
+      <td>21775</td>
+      <td>207553717294614</td>
+      <td>06</td>
+      <td>021600</td>
+      <td>POLYGON ((-13046060.5616 3853479.808399998, -1...</td>
+    </tr>
+    <tr>
+      <th>191</th>
+      <td>06073021800</td>
+      <td>14000US06073021800</td>
+      <td>2381</td>
+      <td>2314</td>
+      <td>11</td>
+      <td>86</td>
+      <td>50.9</td>
+      <td>563</td>
+      <td>2381</td>
+      <td>2381</td>
+      <td>...</td>
+      <td>+32.6870934</td>
+      <td>-117.1840314</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 218</td>
+      <td>21776</td>
+      <td>207553717294631</td>
+      <td>06</td>
+      <td>021800</td>
+      <td>POLYGON ((-13045922.1914 3853785.470100001, -1...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>06073021900</td>
+      <td>14000US06073021900</td>
+      <td>5506</td>
+      <td>3452</td>
+      <td>887</td>
+      <td>2076</td>
+      <td>24.7</td>
+      <td>437</td>
+      <td>5506</td>
+      <td>1777</td>
+      <td>...</td>
+      <td>+32.6564826</td>
+      <td>-117.1150589</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 219</td>
+      <td>1577</td>
+      <td>207553717294641</td>
+      <td>06</td>
+      <td>021900</td>
+      <td>POLYGON ((-13039455.5309 3852722.632299997, -1...</td>
+    </tr>
+    <tr>
+      <th>521</th>
+      <td>06073022000</td>
+      <td>14000US06073022000</td>
+      <td>4324</td>
+      <td>1404</td>
+      <td>172</td>
+      <td>1757</td>
+      <td>37.7</td>
+      <td>1070</td>
+      <td>4324</td>
+      <td>4235</td>
+      <td>...</td>
+      <td>+32.6798478</td>
+      <td>-117.0871838</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 220</td>
+      <td>54713</td>
+      <td>207553717294632</td>
+      <td>06</td>
+      <td>022000</td>
+      <td>POLYGON ((-13034837.2192 3853844.8574, -130348...</td>
+    </tr>
+    <tr>
+      <th>533</th>
+      <td>06073022100</td>
+      <td>14000US06073022100</td>
+      <td>9172</td>
+      <td>7224</td>
+      <td>0</td>
+      <td>1908</td>
+      <td>38.6</td>
+      <td>2674</td>
+      <td>9172</td>
+      <td>9172</td>
+      <td>...</td>
+      <td>+33.1242620</td>
+      <td>-117.2924294</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 221</td>
+      <td>56416</td>
+      <td>207553717294633</td>
+      <td>06</td>
+      <td>022100</td>
+      <td>POLYGON ((-13061528.8501 3914476.931000002, -1...</td>
+    </tr>
+    <tr>
+      <th>451</th>
+      <td>06073990100</td>
+      <td>14000US06073990100</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>+32.9297194</td>
+      <td>-117.3297174</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 9901</td>
+      <td>47945</td>
+      <td>207553717294801</td>
+      <td>06</td>
+      <td>990100</td>
+      <td>POLYGON ((-13092400.9731 3939737.911399998, -1...</td>
+    </tr>
+  </tbody>
+</table>
+<p>628 rows × 60 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;,
+       &#39;B03003_003E&#39;, &#39;B01002_001E&#39;, &#39;B09001_001E&#39;, &#39;B09019_001E&#39;,
+       &#39;B09019_002E&#39;, &#39;B09019_005E&#39;, &#39;B09019_006E&#39;, &#39;B15003_017E&#39;,
+       &#39;B15003_018E&#39;, &#39;B15003_002E&#39;, &#39;B08303_001E&#39;, &#39;B17001_002E&#39;,
+       &#39;B17001_003E&#39;, &#39;B17001_017E&#39;, &#39;B19013_001E&#39;, &#39;B19058_002E&#39;,
+       &#39;B19080_001E&#39;, &#39;B19080_002E&#39;, &#39;B19080_003E&#39;, &#39;B19080_004E&#39;,
+       &#39;B19080_005E&#39;, &#39;B19083_001E&#39;, &#39;B23025_001E&#39;, &#39;B23025_002E&#39;,
+       &#39;B23025_003E&#39;, &#39;B23025_004E&#39;, &#39;B25001_001E&#39;, &#39;B25002_002E&#39;,
+       &#39;B25003_002E&#39;, &#39;B25003_003E&#39;, &#39;B25018_001E&#39;, &#39;B25035_001E&#39;,
+       &#39;B25064_001E&#39;, &#39;B25077_001E&#39;, &#39;state&#39;, &#39;county&#39;, &#39;tract&#39;, &#39;AREALAND&#39;,
+       &#39;AREAWATER&#39;, &#39;BASENAME&#39;, &#39;CENTLAT&#39;, &#39;CENTLON&#39;, &#39;COUNTY&#39;, &#39;FUNCSTAT&#39;,
+       &#39;GEOID_y&#39;, &#39;INTPTLAT&#39;, &#39;INTPTLON&#39;, &#39;LSADC&#39;, &#39;MTFCC&#39;, &#39;NAME&#39;, &#39;OBJECTID&#39;,
+       &#39;OID&#39;, &#39;STATE&#39;, &#39;TRACT&#39;, &#39;geometry&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in less_equal
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
+  r = func(a, **kwargs)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe57d6e19b0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_4_2.png" src="../../_images/san_diego_airbnb_4_2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25035_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in less_equal
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
+  r = func(a, **kwargs)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe57a2c5d30&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_5_2.png" src="../../_images/san_diego_airbnb_5_2.png" />
+</div>
+</div>
+<div class="section" id="read-airbnb-listings">
+<h1>Read airbnb listings<a class="headerlink" href="#read-airbnb-listings" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;listings.csv&#39;</span><span class="p">)</span>
+<span class="n">lon</span> <span class="o">=</span> <span class="n">listings</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
+<span class="n">lat</span> <span class="o">=</span> <span class="n">listings</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
+<span class="n">mbr</span> <span class="o">=</span> <span class="p">[</span> <span class="n">lon</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">lat</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">lon</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">lat</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mbr</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[-117.2811702358256, 32.532180849938193, -116.93475188940502, 33.0831073612827]
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="convert-mbr-from-lat-lon-to-web-mercator">
+<h1>Convert mbr from lat lon to web mercator<a class="headerlink" href="#convert-mbr-from-lat-lon-to-web-mercator" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># source http://www.neercartography.com/latitudelongitude-tofrom-web-mercator/</span>
+<span class="kn">import</span> <span class="nn">math</span>
+ 
+<span class="k">def</span> <span class="nf">toWGS84</span><span class="p">(</span><span class="n">xLon</span><span class="p">,</span> <span class="n">yLat</span><span class="p">):</span>
+    <span class="c1"># Check if coordinate out of range for Latitude/Longitude</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">xLon</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">180</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">yLat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">):</span>
+        <span class="k">return</span>
+ 
+    <span class="c1"># Check if coordinate out of range for Web Mercator</span>
+    <span class="c1"># 20037508.3427892 is full extent of Web Mercator</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">xLon</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">20037508.3427892</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">yLat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">20037508.3427892</span><span class="p">):</span>
+        <span class="k">return</span>
+ 
+    <span class="n">semimajorAxis</span> <span class="o">=</span> <span class="mf">6378137.0</span>  <span class="c1"># WGS84 spheriod semimajor axis</span>
+ 
+    <span class="n">latitude</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.5707963267948966</span> <span class="o">-</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">atan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">((</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">yLat</span><span class="p">)</span> <span class="o">/</span> <span class="n">semimajorAxis</span><span class="p">))))</span> <span class="o">*</span> <span class="p">(</span><span class="mi">180</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">longitude</span> <span class="o">=</span> <span class="p">((</span><span class="n">xLon</span> <span class="o">/</span> <span class="n">semimajorAxis</span><span class="p">)</span> <span class="o">*</span> <span class="mf">57.295779513082323</span><span class="p">)</span> <span class="o">-</span> <span class="p">((</span><span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">((((</span><span class="n">xLon</span> <span class="o">/</span> <span class="n">semimajorAxis</span><span class="p">)</span> <span class="o">*</span> <span class="mf">57.295779513082323</span><span class="p">)</span> <span class="o">+</span> <span class="mf">180.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">360.0</span><span class="p">))</span> <span class="o">*</span> <span class="mf">360.0</span><span class="p">)</span>
+ 
+    <span class="k">return</span> <span class="p">[</span><span class="n">longitude</span><span class="p">,</span> <span class="n">latitude</span><span class="p">]</span>
+ 
+<span class="k">def</span> <span class="nf">toWebMercator</span><span class="p">(</span><span class="n">xLon</span><span class="p">,</span> <span class="n">yLat</span><span class="p">):</span>
+    <span class="c1"># Check if coordinate out of range for Latitude/Longitude</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">xLon</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">yLat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">):</span>
+        <span class="k">return</span>
+ 
+    <span class="n">semimajorAxis</span> <span class="o">=</span> <span class="mf">6378137.0</span>  <span class="c1"># WGS84 spheriod semimajor axis</span>
+    <span class="n">east</span> <span class="o">=</span> <span class="n">xLon</span> <span class="o">*</span> <span class="mf">0.017453292519943295</span>
+    <span class="n">north</span> <span class="o">=</span> <span class="n">yLat</span> <span class="o">*</span> <span class="mf">0.017453292519943295</span>
+ 
+    <span class="n">northing</span> <span class="o">=</span> <span class="mf">3189068.5</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">north</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">north</span><span class="p">)))</span>
+    <span class="n">easting</span> <span class="o">=</span> <span class="n">semimajorAxis</span> <span class="o">*</span> <span class="n">east</span>
+ 
+    <span class="k">return</span> <span class="p">[</span><span class="n">easting</span><span class="p">,</span> <span class="n">northing</span><span class="p">]</span>
+ 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mbr_wm</span> <span class="o">=</span> <span class="n">toWebMercator</span><span class="p">(</span><span class="o">*</span><span class="n">mbr</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">mbr_wm</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">toWebMercator</span><span class="p">(</span><span class="o">*</span><span class="n">mbr</span><span class="p">[</span><span class="mi">2</span><span class="p">:]))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mbr_wm</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[-13055680.150291337,
+ 3833372.1574297235,
+ -13017117.036366353,
+ 3906340.2781921686]
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="hit-test-for-mbr-and-tracts">
+<h1>Hit test for mbr and tracts<a class="headerlink" href="#hit-test-for-mbr-and-tracts" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;,
+       &#39;B03003_003E&#39;, &#39;B01002_001E&#39;, &#39;B09001_001E&#39;, &#39;B09019_001E&#39;,
+       &#39;B09019_002E&#39;, &#39;B09019_005E&#39;, &#39;B09019_006E&#39;, &#39;B15003_017E&#39;,
+       &#39;B15003_018E&#39;, &#39;B15003_002E&#39;, &#39;B08303_001E&#39;, &#39;B17001_002E&#39;,
+       &#39;B17001_003E&#39;, &#39;B17001_017E&#39;, &#39;B19013_001E&#39;, &#39;B19058_002E&#39;,
+       &#39;B19080_001E&#39;, &#39;B19080_002E&#39;, &#39;B19080_003E&#39;, &#39;B19080_004E&#39;,
+       &#39;B19080_005E&#39;, &#39;B19083_001E&#39;, &#39;B23025_001E&#39;, &#39;B23025_002E&#39;,
+       &#39;B23025_003E&#39;, &#39;B23025_004E&#39;, &#39;B25001_001E&#39;, &#39;B25002_002E&#39;,
+       &#39;B25003_002E&#39;, &#39;B25003_003E&#39;, &#39;B25018_001E&#39;, &#39;B25035_001E&#39;,
+       &#39;B25064_001E&#39;, &#39;B25077_001E&#39;, &#39;state&#39;, &#39;county&#39;, &#39;tract&#39;, &#39;AREALAND&#39;,
+       &#39;AREAWATER&#39;, &#39;BASENAME&#39;, &#39;CENTLAT&#39;, &#39;CENTLON&#39;, &#39;COUNTY&#39;, &#39;FUNCSTAT&#39;,
+       &#39;GEOID_y&#39;, &#39;INTPTLAT&#39;, &#39;INTPTLON&#39;, &#39;LSADC&#39;, &#39;MTFCC&#39;, &#39;NAME&#39;, &#39;OBJECTID&#39;,
+       &#39;OID&#39;, &#39;STATE&#39;, &#39;TRACT&#39;, &#39;geometry&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">geometries</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g0</span> <span class="o">=</span> <span class="n">geometries</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
+<span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">mbr_wm</span>
+<span class="n">mbr</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">([</span> <span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">),</span> <span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">),</span> <span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>  <span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g0</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">mbr</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>False
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g0</span><span class="o">.</span><span class="n">boundary</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/san_diego_airbnb_19_0.svg" src="../../_images/san_diego_airbnb_19_0.svg" /></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g0</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">xy</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(array(&#39;d&#39;, [-13039282.2064, -13039273.1896, -13039272.8556, -13039269.738699999, -13039268.0689, -13039263.059500001, -13039261.501, -13039260.0539, -13039256.0464, -13039255.267099999, -13039255.0445, -13039254.5992, -13039254.5992, -13039254.7105, -13039254.821899999, -13039254.9332, -13039255.267099999, -13039255.3785, -13039255.489799999, -13039255.8237, -13039256.0464, -13039256.0464, -13039256.3803, -13039256.4916, -13039256.4916, -13039256.4916, -13039256.603, -13039238.1239, -13039188.1415, -13039183.0208, -13039164.653099999, -13039157.7513, -13039137.3798, -13039130.5893, -13039117.1196, -13039076.7107, -13039070.4768, -13039063.241, -13039053.1109, -13039022.9434, -13039012.9246, -13039002.9058, -13038972.960900001, -13038963.0535, -13038951.031, -13038949.138500001, -13038907.6164, -13038893.8127, -13038887.022300001, -13038866.873399999, -13038860.1943, -13038842.6058, -13038831.9191, -13038789.840300001, -13038772.251899999, -13038772.1405, -13038772.1405, -13038772.1405, -13038748.429499999, -13038712.028, -13038677.7416, -13038654.1419, -13038629.9856, -13038593.2501, -13038557.6279, -13038533.582899999, -13038509.6492, -13038473.804299999, -13038437.9594, -13038414.1371, -13038390.425999999, -13038354.024500001, -13038319.6268, -13038296.0271, -13038296.249699999, -13038297.029, -13038297.3629, -13038297.5856, -13038298.6987, -13038299.0327, -13038299.144000001, -13038299.5893, -13038299.811900001, -13038300.1459, -13038300.3685, -13038300.7025, -13038301.259100001, -13038301.7044, -13038301.8157, -13038302.5949, -13038302.8176, -13038302.9289, -13038303.4855, -13038303.819400001, -13038303.819400001, -13038304.5987, -13038306.7138, -13038307.493, -13038307.6043, -13038308.3835, -13038308.717500001, -13038308.6062, -13038308.6062, -13038309.2741, -13038309.6081, -13038310.498599999, -13038313.1703, -13038314.1722, -13038314.2835, -13038314.9514, -13038315.173999999, -13038316.3985, -13038320.5174, -13038321.964499999, -13038322.0758, -13038322.632399999, -13038322.8551, -13038323.634300001, -13038324.6362, -13038326.0833, -13038326.862599999, -13038375.063900001, -13038520.001899999, -13038568.3146, -13038615.7367, -13038758.002999999, -13038805.425099999, -13038818.338100001, -13038857.3, -13038870.3243, -13038890.3618, -13038950.474399999, -13038970.5119, -13038988.7683, -13039043.5375, -13039061.7939, -13039063.575, -13039069.2523, -13039071.1447, -13039113.8914, -13039242.5767, -13039285.434700001, -13039282.2064]),
+ array(&#39;d&#39;, [3859531.026299998, 3859695.7782000005, 3859701.336199999, 3859758.1066000015, 3859786.5582000017, 3859872.1777999997, 3859900.7619000003, 3859926.9641000032, 3860005.7031999975, 3860022.112800002, 3860032.0380000025, 3860059.034500003, 3860078.6202000007, 3860218.764899999, 3860265.612499997, 3860313.386699997, 3860456.9750000015, 3860504.882299997, 3860552.789800003, 3860696.5133000016, 3860744.5539000034, 3860790.741899997, 3860929.5715999976, 3860975.8927000016, 3860978.407300003, 3860986.3479999974, 3860988.994900003, 3860988.8625999987, 3860988.8625999987, 3860988.8625999987, 3860989.1273000017, 3860988.994900003, 3860988.597900003, 3860988.730300002, 3860988.597900003, 3860988.465599999, 3860988.465599999, 3860988.465599999, 3860988.2009000033, 3860988.2009000033, 3860988.2009000033, 3860988.2009000033, 3860988.2009000033, 3860988.3332, 3860988.0684999973, 3860988.0684999973, 3860988.0684999973, 3860988.0684999973, 3860987.8038000017, 3860987.6714999974, 3860987.6714999974, 3860987.539099999, 3860987.539099999, 3860987.406800002, 3860987.406800002, 3860985.9509999976, 3860981.7158999965, 3860980.3923999965, 3860980.2600999996, 3860980.2600999996, 3860980.2600999996, 3860980.3923999965, 3860980.2600999996, 3860980.1278000027, 3860979.9953999966, 3860980.2600999996, 3860979.9953999966, 3860979.9953999966, 3860979.9953999966, 3860980.1278000027, 3860979.9953999966, 3860979.9953999966, 3860979.9953999966, 3860980.1278000027, 3860933.1450000033, 3860792.3301, 3860745.4804000035, 3860697.307400003, 3860553.186800003, 3860505.411600001, 3860481.3255999982, 3860443.343999997, 3860409.3325999975, 3860385.3791000023, 3860361.0287000015, 3860324.9001, 3860288.3747000024, 3860264.156800002, 3860240.335900001, 3860168.8737000003, 3860145.1854000017, 3860122.291199997, 3860054.4026999995, 3860033.626000002, 3860031.905699998, 3860012.849399999, 3859973.678199999, 3859960.8417000026, 3859946.1525000036, 3859902.217600003, 3859887.6608000025, 3859882.7644999996, 3859881.4411000013, 3859868.472400002, 3859863.7084000036, 3859844.652400002, 3859788.0138000026, 3859769.0901999995, 3859765.1203000024, 3859753.8720000014, 3859750.166699998, 3859722.112300001, 3859638.3464, 3859610.4245999977, 3859606.454599999, 3859595.603500001, 3859591.8982999995, 3859567.6818000004, 3859540.5540999994, 3859495.6943000033, 3859471.742700003, 3859472.0073999986, 3859472.8012999967, 3859473.0659999996, 3859473.1982999966, 3859473.8599999994, 3859474.2569999993, 3859474.2569999993, 3859474.2569999993, 3859474.5216000006, 3859474.5216000006, 3859474.9186000004, 3859475.0508999974, 3859475.0508999974, 3859475.3156000003, 3859475.4478999972, 3859475.3156000003, 3859475.5803000033, 3859475.7126, 3859475.3156000003, 3859474.5216000006, 3859474.2569999993, 3859531.026299998]))
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mbr</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">coords</span><span class="o">.</span><span class="n">xy</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(array(&#39;d&#39;, [-13055680.150291337, -13055680.150291337, -13017117.036366353, -13017117.036366353, -13055680.150291337]),
+ array(&#39;d&#39;, [3833372.1574297235, 3906340.2781921686, 3906340.2781921686, 3833372.1574297235, 3833372.1574297235]))
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ot</span> <span class="o">=</span> <span class="p">[</span> <span class="n">tract</span> <span class="k">for</span> <span class="n">tract</span> <span class="ow">in</span> <span class="n">geometries</span> <span class="k">if</span> <span class="n">tract</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">mbr</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">ot</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>476
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">geometries</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>628
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="using-df-and-geometry-query">
+<h1>Using df and geometry query<a class="headerlink" href="#using-df-and-geometry-query" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hits</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">mbr</span><span class="p">))]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">hits</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>476
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hits</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe571ad8940&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_28_1.png" src="../../_images/san_diego_airbnb_28_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">toWebMercator</span><span class="p">(</span><span class="n">lo</span><span class="p">,</span><span class="n">lat</span><span class="p">)</span> <span class="k">for</span> <span class="n">lo</span><span class="p">,</span><span class="n">lat</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span><span class="n">lat</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wms</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>array([[-13024596.42379476,   3839936.35085843],
+       [-13021799.1592044 ,   3849339.39301893],
+       [-13021242.71116443,   3850456.36567262],
+       ..., 
+       [-13053003.22759353,   3892586.13171735],
+       [-13053276.13697758,   3893326.09491095],
+       [-13053180.91131656,   3892708.06395958]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;wms_x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wms</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">listings</span><span class="p">[</span><span class="s1">&#39;wms_y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wms</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>id</th>
+      <th>listing_url</th>
+      <th>scrape_id</th>
+      <th>last_scraped</th>
+      <th>name</th>
+      <th>summary</th>
+      <th>space</th>
+      <th>description</th>
+      <th>experiences_offered</th>
+      <th>neighborhood_overview</th>
+      <th>...</th>
+      <th>license</th>
+      <th>jurisdiction_names</th>
+      <th>instant_bookable</th>
+      <th>cancellation_policy</th>
+      <th>require_guest_profile_picture</th>
+      <th>require_guest_phone_verification</th>
+      <th>calculated_host_listings_count</th>
+      <th>reviews_per_month</th>
+      <th>wms_x</th>
+      <th>wms_y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>11204286</td>
+      <td>https://www.airbnb.com/rooms/11204286</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Family friendly/California king</td>
+      <td>Aquatica Waterpark, Sleep train Amphitheater, ...</td>
+      <td>Walking to Aquatica Waterpark, Sleep train Amp...</td>
+      <td>Aquatica Waterpark, Sleep train Amphitheater, ...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>SAN DIEGO, SAN DIEGO TOURISM MARKETING DISTRIC...</td>
+      <td>f</td>
+      <td>moderate</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>4.57</td>
+      <td>-1.302460e+07</td>
+      <td>3.839936e+06</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>7972006</td>
+      <td>https://www.airbnb.com/rooms/7972006</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Welcome to Sunset Suite</td>
+      <td>Your spacious room awaiting is with a Queen Si...</td>
+      <td>NaN</td>
+      <td>Your spacious room awaiting is with a Queen Si...</td>
+      <td>none</td>
+      <td>Getting around is easy. Very close to Eastlake...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>0.76</td>
+      <td>-1.302180e+07</td>
+      <td>3.849339e+06</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>7727710</td>
+      <td>https://www.airbnb.com/rooms/7727710</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>San Diego/Eastlake. Gated community</td>
+      <td>This is an immaculate 3 bedroom, 2 1/2 bath co...</td>
+      <td>NaN</td>
+      <td>This is an immaculate 3 bedroom, 2 1/2 bath co...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>0.09</td>
+      <td>-1.302124e+07</td>
+      <td>3.850456e+06</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>13124681</td>
+      <td>https://www.airbnb.com/rooms/13124681</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Townhome in Eastlake</td>
+      <td>This 2 Story TownHome  is close to Otay Ranch ...</td>
+      <td>My place is good for couples, business travele...</td>
+      <td>This 2 Story TownHome  is close to Otay Ranch ...</td>
+      <td>none</td>
+      <td>Located in eastern Chula Vista, Otay Ranch is ...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>moderate</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>3.00</td>
+      <td>-1.301895e+07</td>
+      <td>3.847444e+06</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>3469225</td>
+      <td>https://www.airbnb.com/rooms/3469225</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Bedroom suite in Large new home</td>
+      <td>Hello; we are offering a private secluded bedr...</td>
+      <td>Beautiful, quiet award-winning suburban neighb...</td>
+      <td>Hello; we are offering a private secluded bedr...</td>
+      <td>none</td>
+      <td>The quiet serenity; near Park and lakes, beaut...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>-1.301758e+07</td>
+      <td>3.847477e+06</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>877473</td>
+      <td>https://www.airbnb.com/rooms/877473</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Private Bedroom in Newer Home</td>
+      <td>Private Bedroom with full size bed, + futon, p...</td>
+      <td>Private bedroom with full size Bed, in large n...</td>
+      <td>Private Bedroom with full size bed, + futon, p...</td>
+      <td>none</td>
+      <td>It is quiet, serene, tranquil, suburban; yet c...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>0.63</td>
+      <td>-1.301763e+07</td>
+      <td>3.847390e+06</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>3124507</td>
+      <td>https://www.airbnb.com/rooms/3124507</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Great view to mountains,lake,trails</td>
+      <td>In this beautiful home, located near the Olymp...</td>
+      <td>The location and view of lake and mountain</td>
+      <td>In this beautiful home, located near the Olymp...</td>
+      <td>none</td>
+      <td>Like countryside and also near from downtown S...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>3</td>
+      <td>0.31</td>
+      <td>-1.301712e+07</td>
+      <td>3.847245e+06</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>3432507</td>
+      <td>https://www.airbnb.com/rooms/3432507</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>2 bedrooms with shared bath</td>
+      <td>In a great house  with view on Otay Lakes and ...</td>
+      <td>the proximity to lake ,trail and Olympic train...</td>
+      <td>In a great house  with view on Otay Lakes and ...</td>
+      <td>none</td>
+      <td>Freedom in nature</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>3</td>
+      <td>0.04</td>
+      <td>-1.301723e+07</td>
+      <td>3.847299e+06</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>3249729</td>
+      <td>https://www.airbnb.com/rooms/3249729</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Near to Olympic Training center</td>
+      <td>Beautiful home in the Eastlake community with ...</td>
+      <td>Location on the border of the town with nice t...</td>
+      <td>Beautiful home in the Eastlake community with ...</td>
+      <td>none</td>
+      <td>open , quiet, country feeling</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>3</td>
+      <td>0.08</td>
+      <td>-1.301714e+07</td>
+      <td>3.847298e+06</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>11756336</td>
+      <td>https://www.airbnb.com/rooms/11756336</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Chula Vista Golf Course House</td>
+      <td>Feel right at home in our spacious 5BR, 3.5BA ...</td>
+      <td>Feel right at home in our spacious 5BR, 3.5BA ...</td>
+      <td>Feel right at home in our spacious 5BR, 3.5BA ...</td>
+      <td>none</td>
+      <td>Our home is surrounded by natural beauty. Visi...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>5</td>
+      <td>0.59</td>
+      <td>-1.301979e+07</td>
+      <td>3.846999e+06</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>12173670</td>
+      <td>https://www.airbnb.com/rooms/12173670</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Eastlake Green room available</td>
+      <td>Room available is upstairs with a bathroom, lo...</td>
+      <td>NaN</td>
+      <td>Room available is upstairs with a bathroom, lo...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>0.48</td>
+      <td>-1.301941e+07</td>
+      <td>3.848589e+06</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>13157364</td>
+      <td>https://www.airbnb.com/rooms/13157364</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Recamaras amuebladas con baño</td>
+      <td>Habitaciones amuebladas con Closet, television...</td>
+      <td>NaN</td>
+      <td>Habitaciones amuebladas con Closet, television...</td>
+      <td>none</td>
+      <td>Preciosa zona Residencial, en Eastlake Greens ...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.301921e+07</td>
+      <td>3.846869e+06</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>9756570</td>
+      <td>https://www.airbnb.com/rooms/9756570</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Family Home in SoCal (Eastlake)</td>
+      <td>Fully equipped home in a quiet family-friendly...</td>
+      <td>NaN</td>
+      <td>Fully equipped home in a quiet family-friendly...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>0.32</td>
+      <td>-1.302007e+07</td>
+      <td>3.846064e+06</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>10687910</td>
+      <td>https://www.airbnb.com/rooms/10687910</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Clean &amp; Sweet Home 2</td>
+      <td>Newly built community (2009), gated security. ...</td>
+      <td>안녕하세요. 아주 조용하고 아늑한 단지에 위치하고 있습니다. 단지안에 수영장 짐을 ...</td>
+      <td>Newly built community (2009), gated security. ...</td>
+      <td>none</td>
+      <td>Hi~ Welcome home:) We are close to Mexico bord...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>2.28</td>
+      <td>-1.301986e+07</td>
+      <td>3.846003e+06</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>7938260</td>
+      <td>https://www.airbnb.com/rooms/7938260</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>1 bedroom in San Diego.</td>
+      <td>My home is in a nice neighborhood in East Chul...</td>
+      <td>My home is in a nice neighborhood in East Chul...</td>
+      <td>My home is in a nice neighborhood in East Chul...</td>
+      <td>none</td>
+      <td>Cross Streets: H street and Paseo Del Rey.   N...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>4</td>
+      <td>2.22</td>
+      <td>-1.302745e+07</td>
+      <td>3.846009e+06</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>10779932</td>
+      <td>https://www.airbnb.com/rooms/10779932</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>2 Bedrooms in San Diego area.</td>
+      <td>My home is in a nice neighborhood in East Chul...</td>
+      <td>My home is in a nice neighborhood in East Chul...</td>
+      <td>My home is in a nice neighborhood in East Chul...</td>
+      <td>none</td>
+      <td>Cross Streets: H street and Paseo Del Rey.   N...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>4</td>
+      <td>1.85</td>
+      <td>-1.302745e+07</td>
+      <td>3.846087e+06</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>13301630</td>
+      <td>https://www.airbnb.com/rooms/13301630</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>3 Beds in my San Diego Master Bedroom Suite.</td>
+      <td>My place is close to My home is in a nice neig...</td>
+      <td>My home is in a nice neighborhood in East Chul...</td>
+      <td>My place is close to My home is in a nice neig...</td>
+      <td>none</td>
+      <td>Cross Streets: H street and Paseo Del Rey.   N...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>4</td>
+      <td>2.00</td>
+      <td>-1.302723e+07</td>
+      <td>3.846052e+06</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>5285136</td>
+      <td>https://www.airbnb.com/rooms/5285136</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Family Vacation Home With Game Room</td>
+      <td>South Bay - 2 miles from Trolley Station into ...</td>
+      <td>NaN</td>
+      <td>South Bay - 2 miles from Trolley Station into ...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>moderate</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>0.42</td>
+      <td>-1.302788e+07</td>
+      <td>3.846778e+06</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>13313236</td>
+      <td>https://www.airbnb.com/rooms/13313236</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>House in the San Diego area.</td>
+      <td>My place is in East Chula Vista close to The S...</td>
+      <td>My home is in a nice neighborhood in East Chul...</td>
+      <td>My place is in East Chula Vista close to The S...</td>
+      <td>none</td>
+      <td>Cross Streets: H street and Paseo Del Rey.   N...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>4</td>
+      <td>NaN</td>
+      <td>-1.302741e+07</td>
+      <td>3.846104e+06</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>7663518</td>
+      <td>https://www.airbnb.com/rooms/7663518</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Stanislaus 1 story house w/ garden</td>
+      <td>Large 1 story house with Garden, open floor de...</td>
+      <td>The house is very spacious , well designed, a ...</td>
+      <td>Large 1 story house with Garden, open floor de...</td>
+      <td>none</td>
+      <td>the neighborhood is a relaxed family friendly ...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>0.96</td>
+      <td>-1.302407e+07</td>
+      <td>3.845874e+06</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>5077385</td>
+      <td>https://www.airbnb.com/rooms/5077385</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Big and Bright townhome</td>
+      <td>This is a fairly new town home complex (2-3 ye...</td>
+      <td>We bought our house a year ago because of its ...</td>
+      <td>This is a fairly new town home complex (2-3 ye...</td>
+      <td>none</td>
+      <td>It is a new community, mostly with tranquil co...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>5</td>
+      <td>0.75</td>
+      <td>-1.301941e+07</td>
+      <td>3.844608e+06</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>7113838</td>
+      <td>https://www.airbnb.com/rooms/7113838</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Breathtaking home in Otay Ranch</td>
+      <td>The home is spacious, tastefully decorated and...</td>
+      <td>NaN</td>
+      <td>The home is spacious, tastefully decorated and...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>5</td>
+      <td>1.00</td>
+      <td>-1.301991e+07</td>
+      <td>3.845519e+06</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>8555262</td>
+      <td>https://www.airbnb.com/rooms/8555262</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Otay Ranch Chula Vista  CA  private bedroom/bath</td>
+      <td>Private entrance  bedroom with full bathroom(p...</td>
+      <td>Private entrance to the side of the house to a...</td>
+      <td>Private entrance  bedroom with full bathroom(p...</td>
+      <td>none</td>
+      <td>Centrally located,5minutes from the 805fwy,10 ...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>1.90</td>
+      <td>-1.302546e+07</td>
+      <td>3.844513e+06</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>13472856</td>
+      <td>https://www.airbnb.com/rooms/13472856</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Unique large room with air mattress</td>
+      <td>Beautiful quiet room with shared bathroom.</td>
+      <td>Quiet and peaceful neighborhood, located 20 mi...</td>
+      <td>Beautiful quiet room with shared bathroom. Qui...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>-1.302317e+07</td>
+      <td>3.845889e+06</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>4997701</td>
+      <td>https://www.airbnb.com/rooms/4997701</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Bright &amp; Spacious Private Rm/Bth</td>
+      <td>This is a new town home (3 years old) and prov...</td>
+      <td>Our home is spacious (1900 sq ft home), and br...</td>
+      <td>This is a new town home (3 years old) and prov...</td>
+      <td>none</td>
+      <td>The location is in the new Eastlake developmen...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>5</td>
+      <td>0.30</td>
+      <td>-1.301956e+07</td>
+      <td>3.844649e+06</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>6098460</td>
+      <td>https://www.airbnb.com/rooms/6098460</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Cozy Room, Private Bath/Quiet Area!</td>
+      <td>Perfect if you're looking for a more suburban ...</td>
+      <td>Our guest bedroom is for 1-2 guests total. Req...</td>
+      <td>Perfect if you're looking for a more suburban ...</td>
+      <td>none</td>
+      <td>We are located in the "South Bay" region of Sa...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>moderate</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>0.73</td>
+      <td>-1.302281e+07</td>
+      <td>3.847221e+06</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>13562988</td>
+      <td>https://www.airbnb.com/rooms/13562988</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>The Sailboat Room in Otay Ranch!</td>
+      <td>family-friendly activities, nightlife, the air...</td>
+      <td>Newly built 3-story townhouse with distressed ...</td>
+      <td>family-friendly activities, nightlife, the air...</td>
+      <td>none</td>
+      <td>The Otay Ranch community is the newest premier...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>2.00</td>
+      <td>-1.302124e+07</td>
+      <td>3.844441e+06</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>10284248</td>
+      <td>https://www.airbnb.com/rooms/10284248</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Bedroom in Otay Ranch</td>
+      <td>Comfortable bedroom with shared bath, walk to ...</td>
+      <td>NaN</td>
+      <td>Comfortable bedroom with shared bath, walk to ...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.302445e+07</td>
+      <td>3.845707e+06</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>13693167</td>
+      <td>https://www.airbnb.com/rooms/13693167</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Comfortable house in Chula Vista</td>
+      <td>Spacious 5 bedroom house, with easy access to ...</td>
+      <td>NaN</td>
+      <td>Spacious 5 bedroom house, with easy access to ...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>1.00</td>
+      <td>-1.302202e+07</td>
+      <td>3.845098e+06</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>12988363</td>
+      <td>https://www.airbnb.com/rooms/12988363</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Charming bedroom with shared bath!</td>
+      <td>Located close to shopping and 20 minutes from ...</td>
+      <td>NaN</td>
+      <td>Located close to shopping and 20 minutes from ...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>0.63</td>
+      <td>-1.302325e+07</td>
+      <td>3.845844e+06</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>6578</th>
+      <td>13765978</td>
+      <td>https://www.airbnb.com/rooms/13765978</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Will's Pole House at the Beach</td>
+      <td>You’ll love my place because of whitewater oce...</td>
+      <td>NaN</td>
+      <td>You’ll love my place because of whitewater oce...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.305368e+07</td>
+      <td>3.888598e+06</td>
+    </tr>
+    <tr>
+      <th>6579</th>
+      <td>13637335</td>
+      <td>https://www.airbnb.com/rooms/13637335</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Cozy space to share</td>
+      <td>My place is close to restaurants/dining, famil...</td>
+      <td>NaN</td>
+      <td>My place is close to restaurants/dining, famil...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.302970e+07</td>
+      <td>3.862954e+06</td>
+    </tr>
+    <tr>
+      <th>6580</th>
+      <td>7462953</td>
+      <td>https://www.airbnb.com/rooms/7462953</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>WELCOME TO SAN DIEGO2</td>
+      <td>Although this room has 2 single beds, it is fo...</td>
+      <td>NaN</td>
+      <td>Although this room has 2 single beds, it is fo...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.303237e+07</td>
+      <td>3.854066e+06</td>
+    </tr>
+    <tr>
+      <th>6581</th>
+      <td>13816897</td>
+      <td>https://www.airbnb.com/rooms/13816897</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Classic Motor Yacht experience for 1-2 people.</td>
+      <td>The boat is close to restaurants and dining an...</td>
+      <td>NaN</td>
+      <td>The boat is close to restaurants and dining an...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.303661e+07</td>
+      <td>3.849182e+06</td>
+    </tr>
+    <tr>
+      <th>6582</th>
+      <td>181308</td>
+      <td>https://www.airbnb.com/rooms/181308</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>LUSH HIDEAWAY (country in the city) BONITA, S.D.</td>
+      <td>A peaceful garden retreat Bed and Breakfast (s...</td>
+      <td>THE CULTURE OF THE CITY NEAR THE QUIET OF THE ...</td>
+      <td>A peaceful garden retreat Bed and Breakfast (s...</td>
+      <td>none</td>
+      <td>The property is like a large private park, but...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>t</td>
+      <td>t</td>
+      <td>1</td>
+      <td>2.07</td>
+      <td>-1.302990e+07</td>
+      <td>3.850652e+06</td>
+    </tr>
+    <tr>
+      <th>6583</th>
+      <td>12485414</td>
+      <td>https://www.airbnb.com/rooms/12485414</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Clean&amp;Sweet Home 2中日韩英语 OK</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>-1.302032e+07</td>
+      <td>3.846134e+06</td>
+    </tr>
+    <tr>
+      <th>6584</th>
+      <td>13710734</td>
+      <td>https://www.airbnb.com/rooms/13710734</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Comfortable bed in house with pool</td>
+      <td>1BR for rent in large house with pool and spa....</td>
+      <td>Very relaxed atmosphere. The backyard and pool...</td>
+      <td>1BR for rent in large house with pool and spa....</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>moderate</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.302588e+07</td>
+      <td>3.867262e+06</td>
+    </tr>
+    <tr>
+      <th>6585</th>
+      <td>13868104</td>
+      <td>https://www.airbnb.com/rooms/13868104</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Dog Patch (named after the nearby dog shelter)</td>
+      <td>You’ll love my place because of 7 minutes to D...</td>
+      <td>Your own private house to yourself</td>
+      <td>You’ll love my place because of 7 minutes to D...</td>
+      <td>none</td>
+      <td>Close to the Beach Close to Mexico Close to Sh...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>SAN DIEGO, SAN DIEGO TOURISM MARKETING DISTRIC...</td>
+      <td>t</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.304621e+07</td>
+      <td>3.863829e+06</td>
+    </tr>
+    <tr>
+      <th>6586</th>
+      <td>13526039</td>
+      <td>https://www.airbnb.com/rooms/13526039</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Mission Bay Getaway</td>
+      <td>My place is close to SeaWorld, San Diego Whale...</td>
+      <td>NaN</td>
+      <td>My place is close to SeaWorld, San Diego Whale...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>SAN DIEGO, SAN DIEGO TOURISM MARKETING DISTRIC...</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>1.00</td>
+      <td>-1.305218e+07</td>
+      <td>3.864196e+06</td>
+    </tr>
+    <tr>
+      <th>6587</th>
+      <td>13689250</td>
+      <td>https://www.airbnb.com/rooms/13689250</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Quaint Trawler San Diego waterfront</td>
+      <td>Cozy and quaint waterfront hideaway. Dockside ...</td>
+      <td>NaN</td>
+      <td>Cozy and quaint waterfront hideaway. Dockside ...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.303645e+07</td>
+      <td>3.848969e+06</td>
+    </tr>
+    <tr>
+      <th>6588</th>
+      <td>13495353</td>
+      <td>https://www.airbnb.com/rooms/13495353</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Private room overlooking canyon views near Bonita</td>
+      <td>My place is close to restaurants and dining an...</td>
+      <td>NaN</td>
+      <td>My place is close to restaurants and dining an...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>1.00</td>
+      <td>-1.302517e+07</td>
+      <td>3.849067e+06</td>
+    </tr>
+    <tr>
+      <th>6589</th>
+      <td>10328997</td>
+      <td>https://www.airbnb.com/rooms/10328997</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Pacífica /Peaceful and Relax</td>
+      <td>En la mejor zona de Playas de Tijuana. Pet Fri...</td>
+      <td>Vivo en una mini ciudad, con todo lo que quier...</td>
+      <td>En la mejor zona de Playas de Tijuana. Pet Fri...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>moderate</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>2.44</td>
+      <td>-1.303733e+07</td>
+      <td>3.833422e+06</td>
+    </tr>
+    <tr>
+      <th>6590</th>
+      <td>9710574</td>
+      <td>https://www.airbnb.com/rooms/9710574</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>MEA CULPA - BOAT &amp; BREAKFAST</td>
+      <td>"MEA CULPA" is an All-American Beauty - a 46' ...</td>
+      <td>"MEA CULPA" is an All-American Beauty - a 46' ...</td>
+      <td>"MEA CULPA" is an All-American Beauty - a 46' ...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>SAN DIEGO, SAN DIEGO TOURISM MARKETING DISTRIC...</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>7</td>
+      <td>0.45</td>
+      <td>-1.304906e+07</td>
+      <td>3.858205e+06</td>
+    </tr>
+    <tr>
+      <th>6591</th>
+      <td>13448725</td>
+      <td>https://www.airbnb.com/rooms/13448725</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>House Nearest to Ocean in PB North The Julius ...</td>
+      <td>We are new to Airbnb and look forward to shari...</td>
+      <td>This detached house was built in 1950. It was ...</td>
+      <td>We are new to Airbnb and look forward to shari...</td>
+      <td>none</td>
+      <td>Great location in desirable North Pacific Beac...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>SAN DIEGO, SAN DIEGO TOURISM MARKETING DISTRIC...</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>-1.305341e+07</td>
+      <td>3.869155e+06</td>
+    </tr>
+    <tr>
+      <th>6592</th>
+      <td>13864897</td>
+      <td>https://www.airbnb.com/rooms/13864897</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Oceanfront Whale's Tail Cabin</td>
+      <td>My place is good for couples, solo adventurers...</td>
+      <td>Welcome to the ocean front Whale's Tail Cabin....</td>
+      <td>My place is good for couples, solo adventurers...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>3</td>
+      <td>NaN</td>
+      <td>-1.305389e+07</td>
+      <td>3.888685e+06</td>
+    </tr>
+    <tr>
+      <th>6593</th>
+      <td>13859950</td>
+      <td>https://www.airbnb.com/rooms/13859950</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Motoryacht Life</td>
+      <td>My place is close to Galley At the Marina (Res...</td>
+      <td>NaN</td>
+      <td>My place is close to Galley At the Marina (Res...</td>
+      <td>none</td>
+      <td>Gated community</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>moderate</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>-1.303573e+07</td>
+      <td>3.845612e+06</td>
+    </tr>
+    <tr>
+      <th>6594</th>
+      <td>11375621</td>
+      <td>https://www.airbnb.com/rooms/11375621</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Winners Circle Resort - Studio</td>
+      <td>Located directly across from Del Mar Race trac...</td>
+      <td>Walk across to Del Mar Race track or use the s...</td>
+      <td>Located directly across from Del Mar Race trac...</td>
+      <td>none</td>
+      <td>Close to freeway and Solana Beach downtown.</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.305313e+07</td>
+      <td>3.892584e+06</td>
+    </tr>
+    <tr>
+      <th>6595</th>
+      <td>13443354</td>
+      <td>https://www.airbnb.com/rooms/13443354</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Casa Sunset Hills</td>
+      <td>you are welcome to stay in our 2 bedroom 1.5 b...</td>
+      <td>NaN</td>
+      <td>you are welcome to stay in our 2 bedroom 1.5 b...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.302889e+07</td>
+      <td>3.906340e+06</td>
+    </tr>
+    <tr>
+      <th>6596</th>
+      <td>13670544</td>
+      <td>https://www.airbnb.com/rooms/13670544</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Tree House Del Mar</td>
+      <td>My place is close to The Beach!. You’ll love m...</td>
+      <td>Beautiful 1-bedroom bungalow in Old Del Mar. T...</td>
+      <td>My place is close to The Beach!. You’ll love m...</td>
+      <td>none</td>
+      <td>Our house is located within walking distance o...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>-1.305334e+07</td>
+      <td>3.889574e+06</td>
+    </tr>
+    <tr>
+      <th>6597</th>
+      <td>8271640</td>
+      <td>https://www.airbnb.com/rooms/8271640</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>*NEW Studio-Rancho Bernardo, Poway*</td>
+      <td>Brand new, clean and very private apartment wi...</td>
+      <td>Beautifully appointed studio apartment with st...</td>
+      <td>Brand new, clean and very private apartment wi...</td>
+      <td>none</td>
+      <td>Beautifully landscaped master community.</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>3</td>
+      <td>1.46</td>
+      <td>-1.303599e+07</td>
+      <td>3.896073e+06</td>
+    </tr>
+    <tr>
+      <th>6598</th>
+      <td>13411765</td>
+      <td>https://www.airbnb.com/rooms/13411765</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Comfortable retreat in southern SD</td>
+      <td>My place is close to parks, restaurants, and s...</td>
+      <td>NaN</td>
+      <td>My place is close to parks, restaurants, and s...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>5.00</td>
+      <td>-1.302744e+07</td>
+      <td>3.852811e+06</td>
+    </tr>
+    <tr>
+      <th>6599</th>
+      <td>13377361</td>
+      <td>https://www.airbnb.com/rooms/13377361</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Double R's camp</td>
+      <td>My place is close to the beach, restaurants an...</td>
+      <td>NaN</td>
+      <td>My place is close to the beach, restaurants an...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.303074e+07</td>
+      <td>3.859925e+06</td>
+    </tr>
+    <tr>
+      <th>6600</th>
+      <td>13466129</td>
+      <td>https://www.airbnb.com/rooms/13466129</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Welcome to Sunny D! Your home away from home! :)</td>
+      <td>NaN</td>
+      <td>It's cozy, warm, inviting, safe, and relaxing!...</td>
+      <td>It's cozy, warm, inviting, safe, and relaxing!...</td>
+      <td>none</td>
+      <td>What I love most is its location with easy acc...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>t</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.302458e+07</td>
+      <td>3.873491e+06</td>
+    </tr>
+    <tr>
+      <th>6601</th>
+      <td>4698549</td>
+      <td>https://www.airbnb.com/rooms/4698549</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Ocean view Remodeled 5 star review</td>
+      <td>Ocean view , pool, sauna, walk to ocean. West ...</td>
+      <td>Short walk to ocean and shopping</td>
+      <td>Ocean view , pool, sauna, walk to ocean. West ...</td>
+      <td>none</td>
+      <td>Location to beach, ocean views, tennis, swimmi...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>0.26</td>
+      <td>-1.305343e+07</td>
+      <td>3.888208e+06</td>
+    </tr>
+    <tr>
+      <th>6602</th>
+      <td>10908984</td>
+      <td>https://www.airbnb.com/rooms/10908984</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Room "Shanti"</td>
+      <td>Este es el 2o cuarto q ofrezco en mi casa, par...</td>
+      <td>This is the secondary room i offer. To know th...</td>
+      <td>Este es el 2o cuarto q ofrezco en mi casa, par...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>2</td>
+      <td>0.56</td>
+      <td>-1.303731e+07</td>
+      <td>3.833372e+06</td>
+    </tr>
+    <tr>
+      <th>6603</th>
+      <td>13733446</td>
+      <td>https://www.airbnb.com/rooms/13733446</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Del Mar Beach Gem, 1 blk from Ocean</td>
+      <td>My place is close to Alborz Restaurant, Bellis...</td>
+      <td>NaN</td>
+      <td>My place is close to Alborz Restaurant, Bellis...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>4</td>
+      <td>NaN</td>
+      <td>-1.305364e+07</td>
+      <td>3.888540e+06</td>
+    </tr>
+    <tr>
+      <th>6604</th>
+      <td>11990520</td>
+      <td>https://www.airbnb.com/rooms/11990520</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Stunning Ocean Views, Light &amp;Bright</td>
+      <td>Beautiful ocean views from every rom await in ...</td>
+      <td>Peaceful, clean, open with high ceilings and s...</td>
+      <td>Beautiful ocean views from every rom await in ...</td>
+      <td>none</td>
+      <td>Safe and lovely. Walk to Whole Foods, Starbuck...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>moderate</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>1.96</td>
+      <td>-1.305261e+07</td>
+      <td>3.893438e+06</td>
+    </tr>
+    <tr>
+      <th>6605</th>
+      <td>13358607</td>
+      <td>https://www.airbnb.com/rooms/13358607</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>1 Bedroom Resort Condo-Horse Racing/Comic Con</td>
+      <td>My place is close to restaurants and dining.  ...</td>
+      <td>NaN</td>
+      <td>My place is close to restaurants and dining.  ...</td>
+      <td>none</td>
+      <td>You can visit the beach, bet on the horses and...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.305300e+07</td>
+      <td>3.892586e+06</td>
+    </tr>
+    <tr>
+      <th>6606</th>
+      <td>9147128</td>
+      <td>https://www.airbnb.com/rooms/9147128</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Beach Living Near the Race Track!</td>
+      <td>If you love the beach, the fairgrounds or the ...</td>
+      <td>Apartment is approx. 1100 sq. ft. (102 m2) Bea...</td>
+      <td>If you love the beach, the fairgrounds or the ...</td>
+      <td>none</td>
+      <td>Relaxing Solana beach, close to ocean and Del ...</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>strict</td>
+      <td>t</td>
+      <td>t</td>
+      <td>6</td>
+      <td>2.23</td>
+      <td>-1.305328e+07</td>
+      <td>3.893326e+06</td>
+    </tr>
+    <tr>
+      <th>6607</th>
+      <td>13452448</td>
+      <td>https://www.airbnb.com/rooms/13452448</td>
+      <td>20160706203047</td>
+      <td>2016-07-07</td>
+      <td>Timeshare rental July 1 - 8, 2016</td>
+      <td>My place is close to restaurants and dining, D...</td>
+      <td>NaN</td>
+      <td>My place is close to restaurants and dining, D...</td>
+      <td>none</td>
+      <td>NaN</td>
+      <td>...</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>f</td>
+      <td>flexible</td>
+      <td>f</td>
+      <td>f</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>-1.305318e+07</td>
+      <td>3.892708e+06</td>
+    </tr>
+  </tbody>
+</table>
+<p>6608 rows × 97 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>geopandas.geodataframe.GeoDataFrame
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">geometry</span> <span class="o">=</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="n">wms</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>6608
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;wms_x&#39;</span><span class="p">,</span> <span class="s1">&#39;wms_y&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">crs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;init&#39;</span><span class="p">:</span> <span class="s1">&#39;epsg:3857&#39;</span><span class="p">}</span>
+<span class="n">listings</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">listings</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe572885080&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_39_1.png" src="../../_images/san_diego_airbnb_39_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="coastline">
+<h1>Coastline<a class="headerlink" href="#coastline" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!ls
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>30n120w_20101117_gmted_bln300.tif	   sampling.qpj
+30n120w_20101117_gmted_dsc300.tif	   sampling.shp
+30n120w_20101117_gmted_max300.tif	   sampling.shx
+30n120w_20101117_gmted_mea300.tif	   san_diego_acs.ipynb
+30n120w_20101117_gmted_med300.tif	   san_diego_acs_pickle.ipynb
+30n120w_20101117_gmted_med300.tif.aux.xml  san_diego_airbnb.ipynb
+30n120w_20101117_gmted_min300.tif	   sandiego.qgs
+30n120w_20101117_gmted_std300.tif	   sandiego.qgs~
+cenpy_san_diego.ipynb			   sandiegotracts.cpg
+gz_2010_06_140_00_500k.dbf		   sandiegotracts.dbf
+gz_2010_06_140_00_500k.prj		   sandiegotracts.prj
+gz_2010_06_140_00_500k.shp		   sandiegotracts.qpj
+gz_2010_06_140_00_500k.shx		   sandiegotracts.shp
+gz_2010_06_140_00_500k.xml		   sandiegotracts.shx
+LAND_USE				   sandieog.qgs
+LAND_USE.GZ				   sd_contours.kml
+listings.csv				   sd_countours.tiff
+README.md				   sd_df.pkl
+sampling.cpg				   sd_mea300.tif
+sampling.dbf				   sd_mea300.tif.aux.xml
+sampling_elevation.ipynb		   tl_2015_us_coastline
+sampling.prj
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!ls tl_2015_us_coastline/
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>sd_coastline.dbf	  tl_2015_us_coastline.prj
+sd_coastline.prj	  tl_2015_us_coastline.shp
+sd_coastline.qpj	  tl_2015_us_coastline.shp.ea.iso.xml
+sd_coastline.shp	  tl_2015_us_coastline.shp.iso.xml
+sd_coastline.shx	  tl_2015_us_coastline.shp.xml
+tl_2015_us_coastline.cpg  tl_2015_us_coastline.shx
+tl_2015_us_coastline.dbf
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coastline</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;tl_2015_us_coastline/sd_coastline.shp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coastline</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CENSUSAREA</th>
+      <th>COUNTY</th>
+      <th>GEO_ID</th>
+      <th>LSAD</th>
+      <th>MTFCC</th>
+      <th>NAME</th>
+      <th>STATE</th>
+      <th>TRACT</th>
+      <th>geometry</th>
+      <th>name_2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.269</td>
+      <td>073</td>
+      <td>1400000US06073008352</td>
+      <td>Tract</td>
+      <td>L4150</td>
+      <td>Pacific</td>
+      <td>06</td>
+      <td>008352</td>
+      <td>LINESTRING (-118.0235537606526 33.671842693795...</td>
+      <td>83.52</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.269</td>
+      <td>073</td>
+      <td>1400000US06073008352</td>
+      <td>Tract</td>
+      <td>L4150</td>
+      <td>Pacific</td>
+      <td>06</td>
+      <td>008352</td>
+      <td>LINESTRING (-117.987803 33.646545, -117.987146...</td>
+      <td>83.52</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.269</td>
+      <td>073</td>
+      <td>1400000US06073008352</td>
+      <td>Tract</td>
+      <td>L4150</td>
+      <td>Pacific</td>
+      <td>06</td>
+      <td>008352</td>
+      <td>LINESTRING (-117.958538 33.628672, -117.958228...</td>
+      <td>83.52</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.269</td>
+      <td>073</td>
+      <td>1400000US06073008352</td>
+      <td>Tract</td>
+      <td>L4150</td>
+      <td>Pacific</td>
+      <td>06</td>
+      <td>008352</td>
+      <td>LINESTRING (-117.958538 33.628672, -117.958618...</td>
+      <td>83.52</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.269</td>
+      <td>073</td>
+      <td>1400000US06073008352</td>
+      <td>Tract</td>
+      <td>L4150</td>
+      <td>Pacific</td>
+      <td>06</td>
+      <td>008352</td>
+      <td>LINESTRING (-117.124689 32.534175, -117.124702...</td>
+      <td>83.52</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coastline</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe5678d28d0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_45_1.png" src="../../_images/san_diego_airbnb_45_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># convert to web mercator</span>
+<span class="n">coastline</span> <span class="o">=</span> <span class="n">coastline</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="s1">&#39;+init=epsg:3857&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coastline</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe56788b278&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_47_1.png" src="../../_images/san_diego_airbnb_47_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">crs</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">crs</span><span class="o">=</span><span class="s1">&#39;init=epsg:3857&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe572979470&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_50_1.png" src="../../_images/san_diego_airbnb_50_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">coastline</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">listings</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe56667c7b8&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_51_1.png" src="../../_images/san_diego_airbnb_51_1.png" />
+</div>
+</div>
+</div>
+<div class="section" id="calculate-distance-to-coastline-for-each-listing">
+<h1>calculate distance to coastline for each listing<a class="headerlink" href="#calculate-distance-to-coastline-for-each-listing" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lg</span> <span class="o">=</span> <span class="n">listings</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">lg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>geopandas.geoseries.GeoSeries
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cg</span> <span class="o">=</span> <span class="n">coastline</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">cg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>geopandas.geoseries.GeoSeries
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">l_2_c</span> <span class="o">=</span> <span class="n">lg</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">cg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">l_2_c</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0       179073.608755
+1       169611.670626
+2       118775.913738
+3       172850.309830
+4        22184.649536
+5                 NaN
+6                 NaN
+7                 NaN
+8                 NaN
+9                 NaN
+10                NaN
+11                NaN
+12                NaN
+13                NaN
+14                NaN
+15                NaN
+16                NaN
+17                NaN
+18                NaN
+19                NaN
+20                NaN
+21                NaN
+22                NaN
+23                NaN
+24                NaN
+25                NaN
+26                NaN
+27                NaN
+28                NaN
+29                NaN
+            ...      
+6578              NaN
+6579              NaN
+6580              NaN
+6581              NaN
+6582              NaN
+6583              NaN
+6584              NaN
+6585              NaN
+6586              NaN
+6587              NaN
+6588              NaN
+6589              NaN
+6590              NaN
+6591              NaN
+6592              NaN
+6593              NaN
+6594              NaN
+6595              NaN
+6596              NaN
+6597              NaN
+6598              NaN
+6599              NaN
+6600              NaN
+6601              NaN
+6602              NaN
+6603              NaN
+6604              NaN
+6605              NaN
+6606              NaN
+6607              NaN
+dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lg</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">wkt</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;POINT (-13017577.77666196 3847477.069978985)&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lg</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">wkt</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;POINT (-13017631.41111045 3847390.171903133)&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cg</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0    LINESTRING (-13138321.90624839 3984823.1720863...
+1    LINESTRING (-13134342.14977708 3981439.8242477...
+2    LINESTRING (-13131084.38487901 3979050.0643683...
+3    LINESTRING (-13131084.38487901 3979050.0643683...
+4    LINESTRING (-13038260.73880053 3833635.4629623...
+Name: geometry, dtype: object
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">cg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">cg</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>5
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d_2_c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">lg</span><span class="p">),</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">point</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lg</span><span class="p">):</span>
+    <span class="c1">#print(point.wkt)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="mf">1000000000.</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cg</span><span class="p">:</span>
+        <span class="n">d1</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="c1">#print(d1)</span>
+        <span class="k">if</span> <span class="n">d1</span> <span class="o">&lt;</span> <span class="n">d</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">d1</span>
+    <span class="n">d_2_c</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span>
+            
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d_2_c</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(6608, 1)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d_2_c</span><span class="p">[:</span><span class="mi">7</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>array([[ 14582.76147636],
+       [ 18432.14119968],
+       [ 19255.87673506],
+       [ 20823.05350033],
+       [ 22184.64953582],
+       [ 22117.12843273],
+       [ 22596.4698382 ]])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;d2coast&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d_2_c</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;d2coast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>5737.23893768201
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;d2coast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>31318.348862709143
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;d2coast&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.50523738143562624
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;id&#39;, &#39;listing_url&#39;, &#39;scrape_id&#39;, &#39;last_scraped&#39;, &#39;name&#39;, &#39;summary&#39;,
+       &#39;space&#39;, &#39;description&#39;, &#39;experiences_offered&#39;, &#39;neighborhood_overview&#39;,
+       &#39;notes&#39;, &#39;transit&#39;, &#39;access&#39;, &#39;interaction&#39;, &#39;house_rules&#39;,
+       &#39;thumbnail_url&#39;, &#39;medium_url&#39;, &#39;picture_url&#39;, &#39;xl_picture_url&#39;,
+       &#39;host_id&#39;, &#39;host_url&#39;, &#39;host_name&#39;, &#39;host_since&#39;, &#39;host_location&#39;,
+       &#39;host_about&#39;, &#39;host_response_time&#39;, &#39;host_response_rate&#39;,
+       &#39;host_acceptance_rate&#39;, &#39;host_is_superhost&#39;, &#39;host_thumbnail_url&#39;,
+       &#39;host_picture_url&#39;, &#39;host_neighbourhood&#39;, &#39;host_listings_count&#39;,
+       &#39;host_total_listings_count&#39;, &#39;host_verifications&#39;,
+       &#39;host_has_profile_pic&#39;, &#39;host_identity_verified&#39;, &#39;street&#39;,
+       &#39;neighbourhood&#39;, &#39;neighbourhood_cleansed&#39;,
+       &#39;neighbourhood_group_cleansed&#39;, &#39;city&#39;, &#39;state&#39;, &#39;zipcode&#39;, &#39;market&#39;,
+       &#39;smart_location&#39;, &#39;country_code&#39;, &#39;country&#39;, &#39;latitude&#39;, &#39;longitude&#39;,
+       &#39;is_location_exact&#39;, &#39;property_type&#39;, &#39;room_type&#39;, &#39;accommodates&#39;,
+       &#39;bathrooms&#39;, &#39;bedrooms&#39;, &#39;beds&#39;, &#39;bed_type&#39;, &#39;amenities&#39;, &#39;square_feet&#39;,
+       &#39;price&#39;, &#39;weekly_price&#39;, &#39;monthly_price&#39;, &#39;security_deposit&#39;,
+       &#39;cleaning_fee&#39;, &#39;guests_included&#39;, &#39;extra_people&#39;, &#39;minimum_nights&#39;,
+       &#39;maximum_nights&#39;, &#39;calendar_updated&#39;, &#39;has_availability&#39;,
+       &#39;availability_30&#39;, &#39;availability_60&#39;, &#39;availability_90&#39;,
+       &#39;availability_365&#39;, &#39;calendar_last_scraped&#39;, &#39;number_of_reviews&#39;,
+       &#39;first_review&#39;, &#39;last_review&#39;, &#39;review_scores_rating&#39;,
+       &#39;review_scores_accuracy&#39;, &#39;review_scores_cleanliness&#39;,
+       &#39;review_scores_checkin&#39;, &#39;review_scores_communication&#39;,
+       &#39;review_scores_location&#39;, &#39;review_scores_value&#39;, &#39;requires_license&#39;,
+       &#39;license&#39;, &#39;jurisdiction_names&#39;, &#39;instant_bookable&#39;,
+       &#39;cancellation_policy&#39;, &#39;require_guest_profile_picture&#39;,
+       &#39;require_guest_phone_verification&#39;, &#39;calculated_host_listings_count&#39;,
+       &#39;reviews_per_month&#39;, &#39;wms_x&#39;, &#39;wms_y&#39;, &#39;geometry&#39;, &#39;d2coast&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;d2coast&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe560423e80&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_73_1.png" src="../../_images/san_diego_airbnb_73_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0        $49.00
+1        $59.00
+2       $150.00
+3       $120.00
+4        $70.00
+5        $70.00
+6        $90.00
+7       $150.00
+8        $90.00
+9       $399.00
+10       $58.00
+11       $55.00
+12      $300.00
+13       $45.00
+14       $35.00
+15       $45.00
+16       $60.00
+17      $350.00
+18      $450.00
+19      $200.00
+20      $265.00
+21      $320.00
+22       $65.00
+23       $35.00
+24       $75.00
+25       $46.00
+26       $80.00
+27       $49.00
+28       $70.00
+29       $40.00
+         ...   
+6578    $385.00
+6579     $80.00
+6580     $60.00
+6581     $98.00
+6582     $77.00
+6583     $45.00
+6584     $75.00
+6585     $99.00
+6586    $250.00
+6587    $114.00
+6588     $40.00
+6589     $26.00
+6590    $275.00
+6591     $75.00
+6592    $500.00
+6593     $98.00
+6594    $175.00
+6595    $150.00
+6596    $199.00
+6597     $89.00
+6598     $40.00
+6599     $52.00
+6600     $40.00
+6601    $300.00
+6602     $24.00
+6603    $373.00
+6604     $75.00
+6605    $155.00
+6606    $119.00
+6607    $115.00
+Name: price, dtype: object
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">price</span> <span class="o">=</span> <span class="n">listings</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">price</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">price</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">price</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;d2coast&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">listings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe560295d30&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_78_1.png" src="../../_images/san_diego_airbnb_78_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe56027b080&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_79_1.png" src="../../_images/san_diego_airbnb_79_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0       1.0
+1       1.0
+2       3.0
+3       2.0
+4       1.0
+5       1.0
+6       1.0
+7       1.0
+8       1.0
+9       5.0
+10      1.0
+11      1.0
+12      5.0
+13      1.0
+14      1.0
+15      1.0
+16      1.0
+17      4.0
+18      4.0
+19      3.0
+20      3.0
+21      3.0
+22      1.0
+23      1.0
+24      1.0
+25      1.0
+26      1.0
+27      1.0
+28      1.0
+29      1.0
+       ... 
+6578    3.0
+6579    1.0
+6580    1.0
+6581    1.0
+6582    1.0
+6583    1.0
+6584    1.0
+6585    2.0
+6586    1.0
+6587    1.0
+6588    1.0
+6589    1.0
+6590    2.0
+6591    1.0
+6592    3.0
+6593    2.0
+6594    0.0
+6595    2.0
+6596    1.0
+6597    0.0
+6598    1.0
+6599    1.0
+6600    1.0
+6601    2.0
+6602    1.0
+6603    1.0
+6604    1.0
+6605    1.0
+6606    2.0
+6607    1.0
+Name: bedrooms, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe5604d5940&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_82_1.png" src="../../_images/san_diego_airbnb_82_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">listings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe5601bb1d0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_83_1.png" src="../../_images/san_diego_airbnb_83_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">listings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>6608
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">edf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s1">&#39;elevation_df.pkl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">edf</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>lon</th>
+      <th>lat</th>
+      <th>elevation</th>
+    </tr>
+    <tr>
+      <th>idx</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-117.001940</td>
+      <td>32.581882</td>
+      <td>54</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-116.976812</td>
+      <td>32.653029</td>
+      <td>165</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-116.971813</td>
+      <td>32.661477</td>
+      <td>184</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>-116.951252</td>
+      <td>32.638694</td>
+      <td>189</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-116.938891</td>
+      <td>32.638942</td>
+      <td>173</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>-116.939373</td>
+      <td>32.638285</td>
+      <td>173</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>-116.934752</td>
+      <td>32.637183</td>
+      <td>167</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>-116.935737</td>
+      <td>32.637594</td>
+      <td>173</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>-116.934959</td>
+      <td>32.637588</td>
+      <td>173</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>-116.958756</td>
+      <td>32.635328</td>
+      <td>184</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>-116.955336</td>
+      <td>32.647356</td>
+      <td>201</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>-116.953567</td>
+      <td>32.634342</td>
+      <td>184</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>-116.961313</td>
+      <td>32.628250</td>
+      <td>197</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>-116.959399</td>
+      <td>32.627788</td>
+      <td>197</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>-117.027535</td>
+      <td>32.627834</td>
+      <td>99</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>-117.027548</td>
+      <td>32.628429</td>
+      <td>99</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>-117.025583</td>
+      <td>32.628160</td>
+      <td>99</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>-117.031437</td>
+      <td>32.633652</td>
+      <td>99</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>-117.027218</td>
+      <td>32.628557</td>
+      <td>99</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>-116.997218</td>
+      <td>32.626812</td>
+      <td>143</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>-116.955314</td>
+      <td>32.617235</td>
+      <td>166</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>-116.959827</td>
+      <td>32.624131</td>
+      <td>197</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>-117.009670</td>
+      <td>32.616518</td>
+      <td>126</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>-116.989164</td>
+      <td>32.626928</td>
+      <td>156</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>-116.956672</td>
+      <td>32.617546</td>
+      <td>166</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>-116.985868</td>
+      <td>32.637008</td>
+      <td>156</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>-116.971834</td>
+      <td>32.615972</td>
+      <td>179</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>-117.000635</td>
+      <td>32.625552</td>
+      <td>132</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>-116.978838</td>
+      <td>32.620946</td>
+      <td>162</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>-116.989851</td>
+      <td>32.626589</td>
+      <td>156</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>6578</th>
+      <td>-117.263159</td>
+      <td>32.949464</td>
+      <td>37</td>
+    </tr>
+    <tr>
+      <th>6579</th>
+      <td>-117.047831</td>
+      <td>32.755944</td>
+      <td>136</td>
+    </tr>
+    <tr>
+      <th>6580</th>
+      <td>-117.071752</td>
+      <td>32.688773</td>
+      <td>58</td>
+    </tr>
+    <tr>
+      <th>6581</th>
+      <td>-117.109818</td>
+      <td>32.651841</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>6582</th>
+      <td>-117.049579</td>
+      <td>32.662955</td>
+      <td>42</td>
+    </tr>
+    <tr>
+      <th>6583</th>
+      <td>-116.963484</td>
+      <td>32.628783</td>
+      <td>197</td>
+    </tr>
+    <tr>
+      <th>6584</th>
+      <td>-117.013504</td>
+      <td>32.788481</td>
+      <td>191</td>
+    </tr>
+    <tr>
+      <th>6585</th>
+      <td>-117.196074</td>
+      <td>32.762549</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>6586</th>
+      <td>-117.249739</td>
+      <td>32.765321</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6587</th>
+      <td>-117.108413</td>
+      <td>32.650229</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>6588</th>
+      <td>-117.007079</td>
+      <td>32.650971</td>
+      <td>138</td>
+    </tr>
+    <tr>
+      <th>6589</th>
+      <td>-117.116331</td>
+      <td>32.532561</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>6590</th>
+      <td>-117.221661</td>
+      <td>32.720057</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6591</th>
+      <td>-117.260800</td>
+      <td>32.802779</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6592</th>
+      <td>-117.265119</td>
+      <td>32.950118</td>
+      <td>37</td>
+    </tr>
+    <tr>
+      <th>6593</th>
+      <td>-117.101989</td>
+      <td>32.624830</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6594</th>
+      <td>-117.258232</td>
+      <td>32.979508</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>6595</th>
+      <td>-117.040519</td>
+      <td>33.083107</td>
+      <td>170</td>
+    </tr>
+    <tr>
+      <th>6596</th>
+      <td>-117.260117</td>
+      <td>32.956821</td>
+      <td>104</td>
+    </tr>
+    <tr>
+      <th>6597</th>
+      <td>-117.104335</td>
+      <td>33.005791</td>
+      <td>167</td>
+    </tr>
+    <tr>
+      <th>6598</th>
+      <td>-117.027502</td>
+      <td>32.679279</td>
+      <td>64</td>
+    </tr>
+    <tr>
+      <th>6599</th>
+      <td>-117.057120</td>
+      <td>32.733057</td>
+      <td>111</td>
+    </tr>
+    <tr>
+      <th>6600</th>
+      <td>-117.001812</td>
+      <td>32.835511</td>
+      <td>132</td>
+    </tr>
+    <tr>
+      <th>6601</th>
+      <td>-117.260963</td>
+      <td>32.946526</td>
+      <td>37</td>
+    </tr>
+    <tr>
+      <th>6602</th>
+      <td>-117.116172</td>
+      <td>32.532181</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>6603</th>
+      <td>-117.262833</td>
+      <td>32.949025</td>
+      <td>37</td>
+    </tr>
+    <tr>
+      <th>6604</th>
+      <td>-117.253628</td>
+      <td>32.985937</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>6605</th>
+      <td>-117.257123</td>
+      <td>32.979522</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>6606</th>
+      <td>-117.259575</td>
+      <td>32.985098</td>
+      <td>44</td>
+    </tr>
+    <tr>
+      <th>6607</th>
+      <td>-117.258719</td>
+      <td>32.980441</td>
+      <td>7</td>
+    </tr>
+  </tbody>
+</table>
+<p>6608 rows × 3 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">listings</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">edf</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;elevation&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;price&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">listings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe56026dc50&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_88_1.png" src="../../_images/san_diego_airbnb_88_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;elevation&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;d2coast&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">listings</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fe5600fd1d0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_airbnb_89_1.png" src="../../_images/san_diego_airbnb_89_1.png" />
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./data/sandiego"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf<br/>
+        
+            &copy; Copyright 2020.<br/>
+          <div class="extra_footer">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+          </div>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    <script src="../../_static/js/index.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-146598819-1', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    
+  </body>
+</html>

@@ -1,0 +1,2741 @@
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replace NAN values with column mean &#8212; Geographic Data Science with Python</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="../../_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/sphinx-book-theme.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/mystnb.js"></script>
+    <script src="../../_static/sphinx-book-theme.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://geographicdata.science/book/data/sandiego/san_diego_acs_pickle.html" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="https://geographicdata.science/book/data/sandiego/san_diego_acs_pickle.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Replace NAN values with column mean" />
+<meta property="og:description" content="Replace NAN values with column mean  for col in df_copy.columns:     print(col)     try:         df_copy[col].fillna(((df_copy[col]).mean()), inplace=True)     " />
+<meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
+
+<meta name="twitter:card" content="summary">
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../index.html">
+  
+  <img src="../../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Geographic Data Science with Python</h1>
+  
+</a>
+</div>
+
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro.html">
+   Geographic Data Science with PySAL and the PyData Stack
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part I - Building Blocks
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_i.html">
+   Part I - Building Blocks
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/01_geospatial_computational_environment.html">
+   Computational Tools for Geographic Data Science
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/02_spatial_data.html">
+   Spatial Data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/03_spatial_data_processing.html">
+   Spatial Data Processing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/04_spatial_weights.html">
+   Spatial Weights
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part II - Spatial Data Analysis
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_ii.html">
+   Part II - Spatial Data Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/05_choropleth.html">
+   Choropleth Mapping
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/06_spatial_autocorrelation.html">
+   Global Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/07_local_autocorrelation.html">
+   Local Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html">
+   Point Pattern Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html#randomness-clustering">
+   Randomness &amp; clustering
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html#conclusion">
+   Conclusion
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html#questions">
+   Questions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html#references">
+   References
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part III - Advanced Topics
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_ii.html">
+   Part II - Spatial Data Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/09_spatial_inequality.html">
+   Spatial Inequality Analysis
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/10_clustering_and_regionalization.html">
+   Clustering and Regionalization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/11_regression.html">
+   Spatial regression
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/12_feature_engineering.html">
+   Spatial feature engineering
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Datasets
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../README.html">
+   Datasets
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../airbnb/regression_cleaning.html">
+   Data cleaning of AirBnb
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../airports/airports_cleaning.html">
+   Airports Dataset Processing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../brexit/README.html">
+   Brexit data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../countries/countries_cleaning.html">
+   Cleaning of countries dataset
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../h3_grid/build_sd_h3_grid.html">
+   Build a
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     H3
+    </span>
+   </code>
+   grid for the San Diego region
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../mexico/README.html">
+   Mexico data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../nasadem/build_nasadem_sd.html">
+   Build the
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     nasadem_sd
+    </span>
+   </code>
+   extract
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../texas/README.html">
+   Texas data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tokyo/tokyo_cleaning.html">
+   Tokyo Dataset
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+ <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/data/sandiego/san_diego_acs_pickle.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+    
+</div>
+        <!-- Source interaction buttons -->
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/gdsbook/book/master?urlpath=lab/tree/data/sandiego/san_diego_acs_pickle.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/gdsbook/book/blob/master/data/sandiego/san_diego_acs_pickle.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> On this page
+        </div>
+        <nav id="bd-toc-nav">
+            
+        </nav>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">cenpy</span> <span class="k">as</span> <span class="nn">cen</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># previously: newdata.to_pickle(&#39;sd_df.pkl&#39;)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s1">&#39;sd_df.pkl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>GEOID</th>
+      <th>GEOID_x</th>
+      <th>B01003_001E</th>
+      <th>B02001_002E</th>
+      <th>B02001_003E</th>
+      <th>B03003_003E</th>
+      <th>B01002_001E</th>
+      <th>B09001_001E</th>
+      <th>B09019_001E</th>
+      <th>B09019_002E</th>
+      <th>...</th>
+      <th>INTPTLAT</th>
+      <th>INTPTLON</th>
+      <th>LSADC</th>
+      <th>MTFCC</th>
+      <th>NAME</th>
+      <th>OBJECTID</th>
+      <th>OID</th>
+      <th>STATE</th>
+      <th>TRACT</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>343</th>
+      <td>06073000100</td>
+      <td>14000US06073000100</td>
+      <td>2716</td>
+      <td>2549</td>
+      <td>0</td>
+      <td>262</td>
+      <td>55.7</td>
+      <td>433</td>
+      <td>2716</td>
+      <td>2711</td>
+      <td>...</td>
+      <td>+32.7530051</td>
+      <td>-117.1858954</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 1</td>
+      <td>32868</td>
+      <td>20755676340566</td>
+      <td>06</td>
+      <td>000100</td>
+      <td>POLYGON ((-13046077.0368 3862535.43, -13046055...</td>
+    </tr>
+    <tr>
+      <th>176</th>
+      <td>06073000201</td>
+      <td>14000US06073000201</td>
+      <td>2223</td>
+      <td>1983</td>
+      <td>27</td>
+      <td>383</td>
+      <td>47.1</td>
+      <td>253</td>
+      <td>2223</td>
+      <td>2223</td>
+      <td>...</td>
+      <td>+32.7540028</td>
+      <td>-117.1733775</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 2.01</td>
+      <td>21905</td>
+      <td>207553717294854</td>
+      <td>06</td>
+      <td>000201</td>
+      <td>POLYGON ((-13044291.8062 3863180.058499999, -1...</td>
+    </tr>
+    <tr>
+      <th>167</th>
+      <td>06073000202</td>
+      <td>14000US06073000202</td>
+      <td>4683</td>
+      <td>4147</td>
+      <td>79</td>
+      <td>750</td>
+      <td>34.3</td>
+      <td>627</td>
+      <td>4683</td>
+      <td>4624</td>
+      <td>...</td>
+      <td>+32.7453947</td>
+      <td>-117.1751539</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 2.02</td>
+      <td>21350</td>
+      <td>207553717294578</td>
+      <td>06</td>
+      <td>000202</td>
+      <td>POLYGON ((-13044867.9959 3861599.656400003, -1...</td>
+    </tr>
+    <tr>
+      <th>133</th>
+      <td>06073000300</td>
+      <td>14000US06073000300</td>
+      <td>4875</td>
+      <td>4013</td>
+      <td>148</td>
+      <td>671</td>
+      <td>40.8</td>
+      <td>246</td>
+      <td>4875</td>
+      <td>4682</td>
+      <td>...</td>
+      <td>+32.7447827</td>
+      <td>-117.1623035</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 3</td>
+      <td>15150</td>
+      <td>20755676338501</td>
+      <td>06</td>
+      <td>000300</td>
+      <td>POLYGON ((-13043153.8983 3862030.870700002, -1...</td>
+    </tr>
+    <tr>
+      <th>134</th>
+      <td>06073000400</td>
+      <td>14000US06073000400</td>
+      <td>3606</td>
+      <td>2683</td>
+      <td>95</td>
+      <td>472</td>
+      <td>34.5</td>
+      <td>216</td>
+      <td>3606</td>
+      <td>3304</td>
+      <td>...</td>
+      <td>+32.7533382</td>
+      <td>-117.1630702</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 4</td>
+      <td>15151</td>
+      <td>20755676338495</td>
+      <td>06</td>
+      <td>000400</td>
+      <td>POLYGON ((-13043401.2502 3863312.430100001, -1...</td>
+    </tr>
+    <tr>
+      <th>63</th>
+      <td>06073000500</td>
+      <td>14000US06073000500</td>
+      <td>2873</td>
+      <td>2338</td>
+      <td>122</td>
+      <td>428</td>
+      <td>36.5</td>
+      <td>257</td>
+      <td>2873</td>
+      <td>2867</td>
+      <td>...</td>
+      <td>+32.7606651</td>
+      <td>-117.1521746</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 5</td>
+      <td>9781</td>
+      <td>20755676341496</td>
+      <td>06</td>
+      <td>000500</td>
+      <td>POLYGON ((-13042359.4111 3863345.258400001, -1...</td>
+    </tr>
+    <tr>
+      <th>64</th>
+      <td>06073000600</td>
+      <td>14000US06073000600</td>
+      <td>2904</td>
+      <td>2360</td>
+      <td>201</td>
+      <td>542</td>
+      <td>38.4</td>
+      <td>206</td>
+      <td>2904</td>
+      <td>2876</td>
+      <td>...</td>
+      <td>+32.7529930</td>
+      <td>-117.1519053</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 6</td>
+      <td>9782</td>
+      <td>20755676341174</td>
+      <td>06</td>
+      <td>000600</td>
+      <td>POLYGON ((-13042283.8252 3863262.525799997, -1...</td>
+    </tr>
+    <tr>
+      <th>584</th>
+      <td>06073000700</td>
+      <td>14000US06073000700</td>
+      <td>4576</td>
+      <td>3970</td>
+      <td>65</td>
+      <td>704</td>
+      <td>36.6</td>
+      <td>187</td>
+      <td>4576</td>
+      <td>4576</td>
+      <td>...</td>
+      <td>+32.7447605</td>
+      <td>-117.1513507</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 7</td>
+      <td>62459</td>
+      <td>20755676341881</td>
+      <td>06</td>
+      <td>000700</td>
+      <td>POLYGON ((-13041814.3909 3860986.745099999, -1...</td>
+    </tr>
+    <tr>
+      <th>571</th>
+      <td>06073000800</td>
+      <td>14000US06073000800</td>
+      <td>3927</td>
+      <td>3168</td>
+      <td>322</td>
+      <td>860</td>
+      <td>41.1</td>
+      <td>424</td>
+      <td>3927</td>
+      <td>3927</td>
+      <td>...</td>
+      <td>+32.7447819</td>
+      <td>-117.1420278</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 8</td>
+      <td>62205</td>
+      <td>20755676340720</td>
+      <td>06</td>
+      <td>000800</td>
+      <td>POLYGON ((-13040676.7057 3861694.950999998, -1...</td>
+    </tr>
+    <tr>
+      <th>585</th>
+      <td>06073000900</td>
+      <td>14000US06073000900</td>
+      <td>5184</td>
+      <td>3791</td>
+      <td>626</td>
+      <td>1338</td>
+      <td>38.3</td>
+      <td>371</td>
+      <td>5184</td>
+      <td>5184</td>
+      <td>...</td>
+      <td>+32.7518529</td>
+      <td>-117.1419570</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 9</td>
+      <td>62460</td>
+      <td>20755676340714</td>
+      <td>06</td>
+      <td>000900</td>
+      <td>POLYGON ((-13040674.368 3862861.710900001, -13...</td>
+    </tr>
+    <tr>
+      <th>302</th>
+      <td>06073001000</td>
+      <td>14000US06073001000</td>
+      <td>5470</td>
+      <td>4295</td>
+      <td>192</td>
+      <td>1123</td>
+      <td>33.4</td>
+      <td>541</td>
+      <td>5470</td>
+      <td>5411</td>
+      <td>...</td>
+      <td>+32.7603326</td>
+      <td>-117.1417318</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 10</td>
+      <td>29114</td>
+      <td>20755676340834</td>
+      <td>06</td>
+      <td>001000</td>
+      <td>POLYGON ((-13040665.2398 3862913.069499999, -1...</td>
+    </tr>
+    <tr>
+      <th>303</th>
+      <td>06073001100</td>
+      <td>14000US06073001100</td>
+      <td>3545</td>
+      <td>2773</td>
+      <td>369</td>
+      <td>1043</td>
+      <td>33.7</td>
+      <td>529</td>
+      <td>3545</td>
+      <td>3540</td>
+      <td>...</td>
+      <td>+32.7652836</td>
+      <td>-117.1335163</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 11</td>
+      <td>29115</td>
+      <td>20755676341181</td>
+      <td>06</td>
+      <td>001100</td>
+      <td>POLYGON ((-13039893.1278 3864510.725400001, -1...</td>
+    </tr>
+    <tr>
+      <th>136</th>
+      <td>06073001200</td>
+      <td>14000US06073001200</td>
+      <td>6064</td>
+      <td>4403</td>
+      <td>375</td>
+      <td>2382</td>
+      <td>31.6</td>
+      <td>763</td>
+      <td>6064</td>
+      <td>6036</td>
+      <td>...</td>
+      <td>+32.7580741</td>
+      <td>-117.1317985</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 12</td>
+      <td>17590</td>
+      <td>20755676340870</td>
+      <td>06</td>
+      <td>001200</td>
+      <td>POLYGON ((-13039700.3225 3863424.020499997, -1...</td>
+    </tr>
+    <tr>
+      <th>137</th>
+      <td>06073001300</td>
+      <td>14000US06073001300</td>
+      <td>6329</td>
+      <td>4564</td>
+      <td>602</td>
+      <td>1806</td>
+      <td>31.7</td>
+      <td>862</td>
+      <td>6329</td>
+      <td>6324</td>
+      <td>...</td>
+      <td>+32.7512721</td>
+      <td>-117.1323173</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 13</td>
+      <td>17591</td>
+      <td>20755676340876</td>
+      <td>06</td>
+      <td>001300</td>
+      <td>POLYGON ((-13039696.8716 3862866.740800001, -1...</td>
+    </tr>
+    <tr>
+      <th>138</th>
+      <td>06073001400</td>
+      <td>14000US06073001400</td>
+      <td>3286</td>
+      <td>2535</td>
+      <td>196</td>
+      <td>842</td>
+      <td>34.9</td>
+      <td>441</td>
+      <td>3286</td>
+      <td>3281</td>
+      <td>...</td>
+      <td>+32.7447400</td>
+      <td>-117.1330809</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 14</td>
+      <td>17592</td>
+      <td>20755676340853</td>
+      <td>06</td>
+      <td>001400</td>
+      <td>POLYGON ((-13039732.8277 3861000.773800001, -1...</td>
+    </tr>
+    <tr>
+      <th>144</th>
+      <td>06073001500</td>
+      <td>14000US06073001500</td>
+      <td>3836</td>
+      <td>3047</td>
+      <td>220</td>
+      <td>1399</td>
+      <td>36.4</td>
+      <td>624</td>
+      <td>3836</td>
+      <td>3823</td>
+      <td>...</td>
+      <td>+32.7437341</td>
+      <td>-117.1233871</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 15</td>
+      <td>17868</td>
+      <td>20755676340841</td>
+      <td>06</td>
+      <td>001500</td>
+      <td>POLYGON ((-13038655.3664 3861852.983000003, -1...</td>
+    </tr>
+    <tr>
+      <th>576</th>
+      <td>06073001600</td>
+      <td>14000US06073001600</td>
+      <td>5292</td>
+      <td>3161</td>
+      <td>772</td>
+      <td>2837</td>
+      <td>34.7</td>
+      <td>957</td>
+      <td>5292</td>
+      <td>5292</td>
+      <td>...</td>
+      <td>+32.7521608</td>
+      <td>-117.1213220</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 16</td>
+      <td>65535</td>
+      <td>20755676340887</td>
+      <td>06</td>
+      <td>001600</td>
+      <td>POLYGON ((-13038457.4403 3862836.561099999, -1...</td>
+    </tr>
+    <tr>
+      <th>577</th>
+      <td>06073001700</td>
+      <td>14000US06073001700</td>
+      <td>4487</td>
+      <td>3245</td>
+      <td>341</td>
+      <td>2022</td>
+      <td>32.4</td>
+      <td>793</td>
+      <td>4487</td>
+      <td>4487</td>
+      <td>...</td>
+      <td>+32.7582458</td>
+      <td>-117.1207158</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 17</td>
+      <td>65536</td>
+      <td>20755676340858</td>
+      <td>06</td>
+      <td>001700</td>
+      <td>POLYGON ((-13038510.5397 3863626.818599999, -1...</td>
+    </tr>
+    <tr>
+      <th>331</th>
+      <td>06073001800</td>
+      <td>14000US06073001800</td>
+      <td>5392</td>
+      <td>3492</td>
+      <td>935</td>
+      <td>1714</td>
+      <td>31.2</td>
+      <td>922</td>
+      <td>5392</td>
+      <td>5392</td>
+      <td>...</td>
+      <td>+32.7628808</td>
+      <td>-117.1186103</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 18</td>
+      <td>31797</td>
+      <td>20755676340847</td>
+      <td>06</td>
+      <td>001800</td>
+      <td>POLYGON ((-13038577.4428 3863900.442699999, -1...</td>
+    </tr>
+    <tr>
+      <th>582</th>
+      <td>06073001900</td>
+      <td>14000US06073001900</td>
+      <td>3171</td>
+      <td>2751</td>
+      <td>38</td>
+      <td>576</td>
+      <td>42.7</td>
+      <td>410</td>
+      <td>3171</td>
+      <td>3152</td>
+      <td>...</td>
+      <td>+32.7696239</td>
+      <td>-117.1198088</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 19</td>
+      <td>65316</td>
+      <td>20755676340507</td>
+      <td>06</td>
+      <td>001900</td>
+      <td>POLYGON ((-13039008.5831 3864925.100199997, -1...</td>
+    </tr>
+    <tr>
+      <th>173</th>
+      <td>06073002001</td>
+      <td>14000US06073002001</td>
+      <td>3273</td>
+      <td>2989</td>
+      <td>89</td>
+      <td>207</td>
+      <td>51.9</td>
+      <td>452</td>
+      <td>3273</td>
+      <td>3273</td>
+      <td>...</td>
+      <td>+32.7699228</td>
+      <td>-117.1043481</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 20.01</td>
+      <td>21631</td>
+      <td>20755676340921</td>
+      <td>06</td>
+      <td>002001</td>
+      <td>POLYGON ((-13036947.5028 3865095.090800002, -1...</td>
+    </tr>
+    <tr>
+      <th>383</th>
+      <td>06073002002</td>
+      <td>14000US06073002002</td>
+      <td>2597</td>
+      <td>2005</td>
+      <td>259</td>
+      <td>332</td>
+      <td>37.6</td>
+      <td>540</td>
+      <td>2597</td>
+      <td>2597</td>
+      <td>...</td>
+      <td>+32.7645565</td>
+      <td>-117.0929249</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 20.02</td>
+      <td>33142</td>
+      <td>20755676340928</td>
+      <td>06</td>
+      <td>002002</td>
+      <td>POLYGON ((-13035650.8533 3863279.469400004, -1...</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>06073002100</td>
+      <td>14000US06073002100</td>
+      <td>4842</td>
+      <td>3164</td>
+      <td>718</td>
+      <td>1520</td>
+      <td>36.2</td>
+      <td>537</td>
+      <td>4842</td>
+      <td>4817</td>
+      <td>...</td>
+      <td>+32.7586876</td>
+      <td>-117.1084657</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 21</td>
+      <td>4933</td>
+      <td>20755676340916</td>
+      <td>06</td>
+      <td>002100</td>
+      <td>POLYGON ((-13037266.6557 3862909.8926, -130372...</td>
+    </tr>
+    <tr>
+      <th>293</th>
+      <td>06073002201</td>
+      <td>14000US06073002201</td>
+      <td>3705</td>
+      <td>1706</td>
+      <td>823</td>
+      <td>2262</td>
+      <td>26.8</td>
+      <td>1052</td>
+      <td>3705</td>
+      <td>3705</td>
+      <td>...</td>
+      <td>+32.7524807</td>
+      <td>-117.1124957</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 22.01</td>
+      <td>28565</td>
+      <td>20755676340899</td>
+      <td>06</td>
+      <td>002201</td>
+      <td>POLYGON ((-13037269.5501 3862653.101899996, -1...</td>
+    </tr>
+    <tr>
+      <th>294</th>
+      <td>06073002202</td>
+      <td>14000US06073002202</td>
+      <td>5388</td>
+      <td>3061</td>
+      <td>353</td>
+      <td>3778</td>
+      <td>28.6</td>
+      <td>1550</td>
+      <td>5388</td>
+      <td>5327</td>
+      <td>...</td>
+      <td>+32.7523973</td>
+      <td>-117.1051018</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 22.02</td>
+      <td>28566</td>
+      <td>20755676340954</td>
+      <td>06</td>
+      <td>002202</td>
+      <td>POLYGON ((-13036558.1072 3862173.685800001, -1...</td>
+    </tr>
+    <tr>
+      <th>126</th>
+      <td>06073002301</td>
+      <td>14000US06073002301</td>
+      <td>3130</td>
+      <td>1458</td>
+      <td>691</td>
+      <td>1208</td>
+      <td>30.2</td>
+      <td>792</td>
+      <td>3130</td>
+      <td>3130</td>
+      <td>...</td>
+      <td>+32.7573492</td>
+      <td>-117.0947635</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 23.01</td>
+      <td>14493</td>
+      <td>20755676340814</td>
+      <td>06</td>
+      <td>002301</td>
+      <td>POLYGON ((-13035601.6501 3862896.523500003, -1...</td>
+    </tr>
+    <tr>
+      <th>127</th>
+      <td>06073002302</td>
+      <td>14000US06073002302</td>
+      <td>6620</td>
+      <td>3324</td>
+      <td>832</td>
+      <td>3365</td>
+      <td>29.7</td>
+      <td>1903</td>
+      <td>6620</td>
+      <td>6590</td>
+      <td>...</td>
+      <td>+32.7525425</td>
+      <td>-117.0963988</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 23.02</td>
+      <td>14494</td>
+      <td>20755676340942</td>
+      <td>06</td>
+      <td>002302</td>
+      <td>POLYGON ((-13035609.6651 3862164.420599997, -1...</td>
+    </tr>
+    <tr>
+      <th>128</th>
+      <td>06073002401</td>
+      <td>14000US06073002401</td>
+      <td>4824</td>
+      <td>3524</td>
+      <td>433</td>
+      <td>2641</td>
+      <td>30.2</td>
+      <td>1165</td>
+      <td>4824</td>
+      <td>4824</td>
+      <td>...</td>
+      <td>+32.7470743</td>
+      <td>-117.1151992</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 24.01</td>
+      <td>14495</td>
+      <td>20755676340894</td>
+      <td>06</td>
+      <td>002401</td>
+      <td>POLYGON ((-13038019.2868 3861987.722099997, -1...</td>
+    </tr>
+    <tr>
+      <th>518</th>
+      <td>06073002402</td>
+      <td>14000US06073002402</td>
+      <td>5236</td>
+      <td>3484</td>
+      <td>514</td>
+      <td>3783</td>
+      <td>26.2</td>
+      <td>1741</td>
+      <td>5236</td>
+      <td>5227</td>
+      <td>...</td>
+      <td>+32.7468136</td>
+      <td>-117.1052325</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 24.02</td>
+      <td>55654</td>
+      <td>20755676340911</td>
+      <td>06</td>
+      <td>002402</td>
+      <td>POLYGON ((-13036665.9758 3861389.4815, -130366...</td>
+    </tr>
+    <tr>
+      <th>519</th>
+      <td>06073002501</td>
+      <td>14000US06073002501</td>
+      <td>6024</td>
+      <td>4098</td>
+      <td>591</td>
+      <td>3981</td>
+      <td>29.0</td>
+      <td>1832</td>
+      <td>6024</td>
+      <td>5993</td>
+      <td>...</td>
+      <td>+32.7400368</td>
+      <td>-117.1096435</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 25.01</td>
+      <td>55655</td>
+      <td>20755676340882</td>
+      <td>06</td>
+      <td>002501</td>
+      <td>POLYGON ((-13037660.1701 3861458.171800002, -1...</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>51</th>
+      <td>06073020708</td>
+      <td>14000US06073020708</td>
+      <td>3644</td>
+      <td>2773</td>
+      <td>213</td>
+      <td>757</td>
+      <td>38.5</td>
+      <td>909</td>
+      <td>3644</td>
+      <td>3617</td>
+      <td>...</td>
+      <td>+33.0880785</td>
+      <td>-117.0664710</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 207.08</td>
+      <td>4853</td>
+      <td>20755676338783</td>
+      <td>06</td>
+      <td>020708</td>
+      <td>POLYGON ((-13032462.3292 3907370.195200004, -1...</td>
+    </tr>
+    <tr>
+      <th>221</th>
+      <td>06073020709</td>
+      <td>14000US06073020709</td>
+      <td>8184</td>
+      <td>6295</td>
+      <td>293</td>
+      <td>2260</td>
+      <td>38.4</td>
+      <td>2065</td>
+      <td>8184</td>
+      <td>8089</td>
+      <td>...</td>
+      <td>+33.1311558</td>
+      <td>-116.9769969</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 207.09</td>
+      <td>23124</td>
+      <td>20755676338778</td>
+      <td>06</td>
+      <td>020709</td>
+      <td>POLYGON ((-13029476.9631 3912060.394599997, -1...</td>
+    </tr>
+    <tr>
+      <th>243</th>
+      <td>06073020710</td>
+      <td>14000US06073020710</td>
+      <td>1577</td>
+      <td>1422</td>
+      <td>27</td>
+      <td>264</td>
+      <td>52.1</td>
+      <td>233</td>
+      <td>1577</td>
+      <td>1577</td>
+      <td>...</td>
+      <td>+33.0785891</td>
+      <td>-117.0160101</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 207.10</td>
+      <td>23339</td>
+      <td>20755676338772</td>
+      <td>06</td>
+      <td>020710</td>
+      <td>POLYGON ((-13032361.3624 3902729.692199998, -1...</td>
+    </tr>
+    <tr>
+      <th>412</th>
+      <td>06073020801</td>
+      <td>14000US06073020801</td>
+      <td>5436</td>
+      <td>4990</td>
+      <td>75</td>
+      <td>856</td>
+      <td>50.1</td>
+      <td>1120</td>
+      <td>5436</td>
+      <td>5183</td>
+      <td>...</td>
+      <td>+33.0051954</td>
+      <td>-116.9384176</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.01</td>
+      <td>38922</td>
+      <td>20755676338765</td>
+      <td>06</td>
+      <td>020801</td>
+      <td>POLYGON ((-13022085.2376 3893996.746299997, -1...</td>
+    </tr>
+    <tr>
+      <th>193</th>
+      <td>06073020805</td>
+      <td>14000US06073020805</td>
+      <td>3643</td>
+      <td>2997</td>
+      <td>369</td>
+      <td>1076</td>
+      <td>36.1</td>
+      <td>996</td>
+      <td>3643</td>
+      <td>3632</td>
+      <td>...</td>
+      <td>+33.0328550</td>
+      <td>-116.8935925</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.05</td>
+      <td>23125</td>
+      <td>20755676338758</td>
+      <td>06</td>
+      <td>020805</td>
+      <td>POLYGON ((-13014919.1567 3898901.853399999, -1...</td>
+    </tr>
+    <tr>
+      <th>194</th>
+      <td>06073020806</td>
+      <td>14000US06073020806</td>
+      <td>5999</td>
+      <td>5117</td>
+      <td>22</td>
+      <td>1931</td>
+      <td>31.3</td>
+      <td>1797</td>
+      <td>5999</td>
+      <td>5999</td>
+      <td>...</td>
+      <td>+33.0384857</td>
+      <td>-116.8766106</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.06</td>
+      <td>23126</td>
+      <td>20755676338752</td>
+      <td>06</td>
+      <td>020806</td>
+      <td>POLYGON ((-13012950.5828 3902566.195, -1301294...</td>
+    </tr>
+    <tr>
+      <th>229</th>
+      <td>06073020807</td>
+      <td>14000US06073020807</td>
+      <td>2453</td>
+      <td>2298</td>
+      <td>33</td>
+      <td>395</td>
+      <td>48.0</td>
+      <td>399</td>
+      <td>2453</td>
+      <td>2411</td>
+      <td>...</td>
+      <td>+33.0729131</td>
+      <td>-116.8231124</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.07</td>
+      <td>23076</td>
+      <td>20755676338747</td>
+      <td>06</td>
+      <td>020807</td>
+      <td>POLYGON ((-13015528.0743 3906335.713, -1301552...</td>
+    </tr>
+    <tr>
+      <th>195</th>
+      <td>06073020809</td>
+      <td>14000US06073020809</td>
+      <td>8129</td>
+      <td>6058</td>
+      <td>18</td>
+      <td>2809</td>
+      <td>36.3</td>
+      <td>1998</td>
+      <td>8129</td>
+      <td>8005</td>
+      <td>...</td>
+      <td>+33.0396539</td>
+      <td>-116.8524089</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.09</td>
+      <td>23127</td>
+      <td>20755676338733</td>
+      <td>06</td>
+      <td>020809</td>
+      <td>POLYGON ((-13010371.7555 3904036.158399999, -1...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>06073020810</td>
+      <td>14000US06073020810</td>
+      <td>5086</td>
+      <td>4908</td>
+      <td>0</td>
+      <td>756</td>
+      <td>45.0</td>
+      <td>1094</td>
+      <td>5086</td>
+      <td>5075</td>
+      <td>...</td>
+      <td>+33.0348099</td>
+      <td>-116.7875799</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.10</td>
+      <td>1576</td>
+      <td>207553717294636</td>
+      <td>06</td>
+      <td>020810</td>
+      <td>POLYGON ((-13009524.1688 3896636.946800001, -1...</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>06073020811</td>
+      <td>14000US06073020811</td>
+      <td>5642</td>
+      <td>5091</td>
+      <td>172</td>
+      <td>555</td>
+      <td>42.2</td>
+      <td>1429</td>
+      <td>5642</td>
+      <td>5623</td>
+      <td>...</td>
+      <td>+33.0026375</td>
+      <td>-116.7739839</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 208.11</td>
+      <td>1581</td>
+      <td>207553717294762</td>
+      <td>06</td>
+      <td>020811</td>
+      <td>POLYGON ((-13007080.2607 3895046.861900002, -1...</td>
+    </tr>
+    <tr>
+      <th>217</th>
+      <td>06073020902</td>
+      <td>14000US06073020902</td>
+      <td>2190</td>
+      <td>1995</td>
+      <td>32</td>
+      <td>151</td>
+      <td>42.3</td>
+      <td>481</td>
+      <td>2190</td>
+      <td>2086</td>
+      <td>...</td>
+      <td>+32.9425014</td>
+      <td>-116.6067743</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 209.02</td>
+      <td>23083</td>
+      <td>20755676340648</td>
+      <td>06</td>
+      <td>020902</td>
+      <td>POLYGON ((-13001033.4973 3883654.181000002, -1...</td>
+    </tr>
+    <tr>
+      <th>119</th>
+      <td>06073020903</td>
+      <td>14000US06073020903</td>
+      <td>2926</td>
+      <td>2043</td>
+      <td>31</td>
+      <td>427</td>
+      <td>50.4</td>
+      <td>498</td>
+      <td>2926</td>
+      <td>2762</td>
+      <td>...</td>
+      <td>+33.2564808</td>
+      <td>-116.6970824</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 209.03</td>
+      <td>14469</td>
+      <td>20755676338726</td>
+      <td>06</td>
+      <td>020903</td>
+      <td>POLYGON ((-13030207.5529 3951863.370200001, -1...</td>
+    </tr>
+    <tr>
+      <th>356</th>
+      <td>06073020904</td>
+      <td>14000US06073020904</td>
+      <td>2591</td>
+      <td>2329</td>
+      <td>4</td>
+      <td>308</td>
+      <td>49.0</td>
+      <td>539</td>
+      <td>2591</td>
+      <td>2566</td>
+      <td>...</td>
+      <td>+33.0526794</td>
+      <td>-116.6289158</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 209.04</td>
+      <td>33067</td>
+      <td>20755676338720</td>
+      <td>06</td>
+      <td>020904</td>
+      <td>POLYGON ((-12995534.0918 3893829.787699997, -1...</td>
+    </tr>
+    <tr>
+      <th>570</th>
+      <td>06073021000</td>
+      <td>14000US06073021000</td>
+      <td>3498</td>
+      <td>3093</td>
+      <td>116</td>
+      <td>844</td>
+      <td>53.2</td>
+      <td>576</td>
+      <td>3498</td>
+      <td>3487</td>
+      <td>...</td>
+      <td>+33.1084280</td>
+      <td>-116.2508174</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 210</td>
+      <td>61783</td>
+      <td>20755676338714</td>
+      <td>06</td>
+      <td>021000</td>
+      <td>POLYGON ((-12981895.8957 3945471.9846, -129818...</td>
+    </tr>
+    <tr>
+      <th>226</th>
+      <td>06073021100</td>
+      <td>14000US06073021100</td>
+      <td>7178</td>
+      <td>5814</td>
+      <td>269</td>
+      <td>2788</td>
+      <td>38.6</td>
+      <td>1814</td>
+      <td>7178</td>
+      <td>6832</td>
+      <td>...</td>
+      <td>+32.7026541</td>
+      <td>-116.4568740</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 211</td>
+      <td>23062</td>
+      <td>20755676341402</td>
+      <td>06</td>
+      <td>021100</td>
+      <td>POLYGON ((-12998236.0385 3838014.074299999, -1...</td>
+    </tr>
+    <tr>
+      <th>186</th>
+      <td>06073021202</td>
+      <td>14000US06073021202</td>
+      <td>3463</td>
+      <td>2951</td>
+      <td>55</td>
+      <td>640</td>
+      <td>38.2</td>
+      <td>847</td>
+      <td>3463</td>
+      <td>3238</td>
+      <td>...</td>
+      <td>+32.8235355</td>
+      <td>-116.6501149</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 212.02</td>
+      <td>21761</td>
+      <td>20755676340654</td>
+      <td>06</td>
+      <td>021202</td>
+      <td>POLYGON ((-12996693.5957 3868387.222199999, -1...</td>
+    </tr>
+    <tr>
+      <th>361</th>
+      <td>06073021204</td>
+      <td>14000US06073021204</td>
+      <td>5591</td>
+      <td>5255</td>
+      <td>61</td>
+      <td>660</td>
+      <td>49.0</td>
+      <td>1113</td>
+      <td>5591</td>
+      <td>5591</td>
+      <td>...</td>
+      <td>+32.8078835</td>
+      <td>-116.7641321</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 212.04</td>
+      <td>33071</td>
+      <td>20755676340666</td>
+      <td>06</td>
+      <td>021204</td>
+      <td>POLYGON ((-13005320.077 3867725.358800001, -13...</td>
+    </tr>
+    <tr>
+      <th>537</th>
+      <td>06073021205</td>
+      <td>14000US06073021205</td>
+      <td>7425</td>
+      <td>6620</td>
+      <td>83</td>
+      <td>1691</td>
+      <td>37.9</td>
+      <td>1676</td>
+      <td>7425</td>
+      <td>7260</td>
+      <td>...</td>
+      <td>+32.8287974</td>
+      <td>-116.7811501</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 212.05</td>
+      <td>56680</td>
+      <td>207553717294564</td>
+      <td>06</td>
+      <td>021205</td>
+      <td>POLYGON ((-13003157.4732 3874654.256399997, -1...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>06073021206</td>
+      <td>14000US06073021206</td>
+      <td>2656</td>
+      <td>2349</td>
+      <td>47</td>
+      <td>181</td>
+      <td>50.6</td>
+      <td>423</td>
+      <td>2656</td>
+      <td>2640</td>
+      <td>...</td>
+      <td>+32.8633016</td>
+      <td>-116.7519651</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 212.06</td>
+      <td>1582</td>
+      <td>207553717294763</td>
+      <td>06</td>
+      <td>021206</td>
+      <td>POLYGON ((-13002757.8362 3875229.320100002, -1...</td>
+    </tr>
+    <tr>
+      <th>109</th>
+      <td>06073021302</td>
+      <td>14000US06073021302</td>
+      <td>7862</td>
+      <td>6199</td>
+      <td>950</td>
+      <td>2861</td>
+      <td>36.1</td>
+      <td>1423</td>
+      <td>7862</td>
+      <td>4443</td>
+      <td>...</td>
+      <td>+32.6637754</td>
+      <td>-116.7818507</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 213.02</td>
+      <td>14461</td>
+      <td>20755676340545</td>
+      <td>06</td>
+      <td>021302</td>
+      <td>POLYGON ((-13017519.9139 3842077.573200002, -1...</td>
+    </tr>
+    <tr>
+      <th>230</th>
+      <td>06073021303</td>
+      <td>14000US06073021303</td>
+      <td>8713</td>
+      <td>5999</td>
+      <td>365</td>
+      <td>2696</td>
+      <td>42.8</td>
+      <td>2170</td>
+      <td>8713</td>
+      <td>8661</td>
+      <td>...</td>
+      <td>+32.7240315</td>
+      <td>-116.9028283</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 213.03</td>
+      <td>23079</td>
+      <td>20755676340426</td>
+      <td>06</td>
+      <td>021303</td>
+      <td>POLYGON ((-13020637.6389 3850852.846600004, -1...</td>
+    </tr>
+    <tr>
+      <th>285</th>
+      <td>06073021304</td>
+      <td>14000US06073021304</td>
+      <td>2590</td>
+      <td>2324</td>
+      <td>59</td>
+      <td>656</td>
+      <td>49.8</td>
+      <td>416</td>
+      <td>2590</td>
+      <td>2585</td>
+      <td>...</td>
+      <td>+32.6847916</td>
+      <td>-116.8687112</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 213.04</td>
+      <td>28341</td>
+      <td>20755676340473</td>
+      <td>06</td>
+      <td>021304</td>
+      <td>POLYGON ((-13017436.5356 3850087.640900001, -1...</td>
+    </tr>
+    <tr>
+      <th>531</th>
+      <td>06073021400</td>
+      <td>14000US06073021400</td>
+      <td>7079</td>
+      <td>5166</td>
+      <td>375</td>
+      <td>1217</td>
+      <td>32.0</td>
+      <td>1613</td>
+      <td>7079</td>
+      <td>6512</td>
+      <td>...</td>
+      <td>+32.7323398</td>
+      <td>-117.2199521</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 214</td>
+      <td>56415</td>
+      <td>207553717294602</td>
+      <td>06</td>
+      <td>021400</td>
+      <td>POLYGON ((-13050501.43 3858660.460100003, -130...</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>06073021500</td>
+      <td>14000US06073021500</td>
+      <td>9433</td>
+      <td>5782</td>
+      <td>128</td>
+      <td>807</td>
+      <td>40.2</td>
+      <td>3022</td>
+      <td>9433</td>
+      <td>9433</td>
+      <td>...</td>
+      <td>+32.9511013</td>
+      <td>-117.1889566</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 215</td>
+      <td>1583</td>
+      <td>207553717294764</td>
+      <td>06</td>
+      <td>021500</td>
+      <td>POLYGON ((-13048525.0638 3888073.160800003, -1...</td>
+    </tr>
+    <tr>
+      <th>190</th>
+      <td>06073021600</td>
+      <td>14000US06073021600</td>
+      <td>3689</td>
+      <td>3111</td>
+      <td>190</td>
+      <td>721</td>
+      <td>27.1</td>
+      <td>880</td>
+      <td>3689</td>
+      <td>2836</td>
+      <td>...</td>
+      <td>+32.6572021</td>
+      <td>-117.1561371</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 216</td>
+      <td>21775</td>
+      <td>207553717294614</td>
+      <td>06</td>
+      <td>021600</td>
+      <td>POLYGON ((-13046060.5616 3853479.808399998, -1...</td>
+    </tr>
+    <tr>
+      <th>191</th>
+      <td>06073021800</td>
+      <td>14000US06073021800</td>
+      <td>2381</td>
+      <td>2314</td>
+      <td>11</td>
+      <td>86</td>
+      <td>50.9</td>
+      <td>563</td>
+      <td>2381</td>
+      <td>2381</td>
+      <td>...</td>
+      <td>+32.6870934</td>
+      <td>-117.1840314</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 218</td>
+      <td>21776</td>
+      <td>207553717294631</td>
+      <td>06</td>
+      <td>021800</td>
+      <td>POLYGON ((-13045922.1914 3853785.470100001, -1...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>06073021900</td>
+      <td>14000US06073021900</td>
+      <td>5506</td>
+      <td>3452</td>
+      <td>887</td>
+      <td>2076</td>
+      <td>24.7</td>
+      <td>437</td>
+      <td>5506</td>
+      <td>1777</td>
+      <td>...</td>
+      <td>+32.6564826</td>
+      <td>-117.1150589</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 219</td>
+      <td>1577</td>
+      <td>207553717294641</td>
+      <td>06</td>
+      <td>021900</td>
+      <td>POLYGON ((-13039455.5309 3852722.632299997, -1...</td>
+    </tr>
+    <tr>
+      <th>521</th>
+      <td>06073022000</td>
+      <td>14000US06073022000</td>
+      <td>4324</td>
+      <td>1404</td>
+      <td>172</td>
+      <td>1757</td>
+      <td>37.7</td>
+      <td>1070</td>
+      <td>4324</td>
+      <td>4235</td>
+      <td>...</td>
+      <td>+32.6798478</td>
+      <td>-117.0871838</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 220</td>
+      <td>54713</td>
+      <td>207553717294632</td>
+      <td>06</td>
+      <td>022000</td>
+      <td>POLYGON ((-13034837.2192 3853844.8574, -130348...</td>
+    </tr>
+    <tr>
+      <th>533</th>
+      <td>06073022100</td>
+      <td>14000US06073022100</td>
+      <td>9172</td>
+      <td>7224</td>
+      <td>0</td>
+      <td>1908</td>
+      <td>38.6</td>
+      <td>2674</td>
+      <td>9172</td>
+      <td>9172</td>
+      <td>...</td>
+      <td>+33.1242620</td>
+      <td>-117.2924294</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 221</td>
+      <td>56416</td>
+      <td>207553717294633</td>
+      <td>06</td>
+      <td>022100</td>
+      <td>POLYGON ((-13061528.8501 3914476.931000002, -1...</td>
+    </tr>
+    <tr>
+      <th>451</th>
+      <td>06073990100</td>
+      <td>14000US06073990100</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>...</td>
+      <td>+32.9297194</td>
+      <td>-117.3297174</td>
+      <td>CT</td>
+      <td>G5020</td>
+      <td>Census Tract 9901</td>
+      <td>47945</td>
+      <td>207553717294801</td>
+      <td>06</td>
+      <td>990100</td>
+      <td>POLYGON ((-13092400.9731 3939737.911399998, -1...</td>
+    </tr>
+  </tbody>
+</table>
+<p>628 rows × 60 columns</p>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in less_equal
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
+  r = func(a, **kwargs)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43558434e0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_3_2.png" src="../../_images/san_diego_acs_pickle_3_2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25035_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in less_equal
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
+  r = func(a, **kwargs)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4352493128&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_4_2.png" src="../../_images/san_diego_acs_pickle_4_2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;,
+       &#39;B03003_003E&#39;, &#39;B01002_001E&#39;, &#39;B09001_001E&#39;, &#39;B09019_001E&#39;,
+       &#39;B09019_002E&#39;, &#39;B09019_005E&#39;, &#39;B09019_006E&#39;, &#39;B15003_017E&#39;,
+       &#39;B15003_018E&#39;, &#39;B15003_002E&#39;, &#39;B08303_001E&#39;, &#39;B17001_002E&#39;,
+       &#39;B17001_003E&#39;, &#39;B17001_017E&#39;, &#39;B19013_001E&#39;, &#39;B19058_002E&#39;,
+       &#39;B19080_001E&#39;, &#39;B19080_002E&#39;, &#39;B19080_003E&#39;, &#39;B19080_004E&#39;,
+       &#39;B19080_005E&#39;, &#39;B19083_001E&#39;, &#39;B23025_001E&#39;, &#39;B23025_002E&#39;,
+       &#39;B23025_003E&#39;, &#39;B23025_004E&#39;, &#39;B25001_001E&#39;, &#39;B25002_002E&#39;,
+       &#39;B25003_002E&#39;, &#39;B25003_003E&#39;, &#39;B25018_001E&#39;, &#39;B25035_001E&#39;,
+       &#39;B25064_001E&#39;, &#39;B25077_001E&#39;, &#39;state&#39;, &#39;county&#39;, &#39;tract&#39;, &#39;AREALAND&#39;,
+       &#39;AREAWATER&#39;, &#39;BASENAME&#39;, &#39;CENTLAT&#39;, &#39;CENTLON&#39;, &#39;COUNTY&#39;, &#39;FUNCSTAT&#39;,
+       &#39;GEOID_y&#39;, &#39;INTPTLAT&#39;, &#39;INTPTLON&#39;, &#39;LSADC&#39;, &#39;MTFCC&#39;, &#39;NAME&#39;, &#39;OBJECTID&#39;,
+       &#39;OID&#39;, &#39;STATE&#39;, &#39;TRACT&#39;, &#39;geometry&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sbn</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Median House Value&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f434bdf72b0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_7_1.png" src="../../_images/san_diego_acs_pickle_7_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">year_built</span> <span class="o">=</span> <span class="s1">&#39;B25035_001E&#39;</span>
+<span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">year_built</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in less_equal
+  binIds += (x &gt; l) * (x &lt;= r) * k
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
+  r = func(a, **kwargs)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f434aeb8ef0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_8_2.png" src="../../_images/san_diego_acs_pickle_8_2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">year_built</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Median Year Built&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4349df1b38&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_9_1.png" src="../../_images/san_diego_acs_pickle_9_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="replace-nan-values-with-column-mean">
+<h1>Replace NAN values with column mean<a class="headerlink" href="#replace-nan-values-with-column-mean" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_copy</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">df_copy</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(((</span><span class="n">df_copy</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>GEOID
+GEOID_x
+GEOID_x
+B01003_001E
+B02001_002E
+B02001_003E
+B03003_003E
+B01002_001E
+B09001_001E
+B09019_001E
+B09019_002E
+B09019_005E
+B09019_006E
+B15003_017E
+B15003_018E
+B15003_002E
+B08303_001E
+B17001_002E
+B17001_003E
+B17001_017E
+B19013_001E
+B19058_002E
+B19080_001E
+B19080_002E
+B19080_003E
+B19080_004E
+B19080_005E
+B19083_001E
+B23025_001E
+B23025_002E
+B23025_003E
+B23025_004E
+B25001_001E
+B25002_002E
+B25003_002E
+B25003_003E
+B25018_001E
+B25035_001E
+B25064_001E
+B25077_001E
+state
+county
+tract
+AREALAND
+AREAWATER
+BASENAME
+BASENAME
+CENTLAT
+CENTLAT
+CENTLON
+CENTLON
+COUNTY
+FUNCSTAT
+FUNCSTAT
+GEOID_y
+INTPTLAT
+INTPTLAT
+INTPTLON
+INTPTLON
+LSADC
+LSADC
+MTFCC
+MTFCC
+NAME
+NAME
+OBJECTID
+OID
+STATE
+TRACT
+geometry
+geometry
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">])</span>
+<span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Median House Value&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4349dba550&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_13_1.png" src="../../_images/san_diego_acs_pickle_13_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pysal</span> <span class="k">as</span> <span class="nn">ps</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;,
+       &#39;B03003_003E&#39;, &#39;B01002_001E&#39;, &#39;B09001_001E&#39;, &#39;B09019_001E&#39;,
+       &#39;B09019_002E&#39;, &#39;B09019_005E&#39;, &#39;B09019_006E&#39;, &#39;B15003_017E&#39;,
+       &#39;B15003_018E&#39;, &#39;B15003_002E&#39;, &#39;B08303_001E&#39;, &#39;B17001_002E&#39;,
+       &#39;B17001_003E&#39;, &#39;B17001_017E&#39;, &#39;B19013_001E&#39;, &#39;B19058_002E&#39;,
+       &#39;B19080_001E&#39;, &#39;B19080_002E&#39;, &#39;B19080_003E&#39;, &#39;B19080_004E&#39;,
+       &#39;B19080_005E&#39;, &#39;B19083_001E&#39;, &#39;B23025_001E&#39;, &#39;B23025_002E&#39;,
+       &#39;B23025_003E&#39;, &#39;B23025_004E&#39;, &#39;B25001_001E&#39;, &#39;B25002_002E&#39;,
+       &#39;B25003_002E&#39;, &#39;B25003_003E&#39;, &#39;B25018_001E&#39;, &#39;B25035_001E&#39;,
+       &#39;B25064_001E&#39;, &#39;B25077_001E&#39;, &#39;state&#39;, &#39;county&#39;, &#39;tract&#39;, &#39;AREALAND&#39;,
+       &#39;AREAWATER&#39;, &#39;BASENAME&#39;, &#39;CENTLAT&#39;, &#39;CENTLON&#39;, &#39;COUNTY&#39;, &#39;FUNCSTAT&#39;,
+       &#39;GEOID_y&#39;, &#39;INTPTLAT&#39;, &#39;INTPTLON&#39;, &#39;LSADC&#39;, &#39;MTFCC&#39;, &#39;NAME&#39;, &#39;OBJECTID&#39;,
+       &#39;OID&#39;, &#39;STATE&#39;, &#39;TRACT&#39;, &#39;geometry&#39;],
+      dtype=&#39;object&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">Rook</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/weights/weights.py:186: UserWarning: There is one disconnected observation (no neighbors)
+  warnings.warn(&quot;There is one disconnected observation (no neighbors)&quot;)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/weights/weights.py:187: UserWarning: Island id: 103
+  warnings.warn(&quot;Island id: %s&quot; % str(self.islands[0]))
+</pre>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span><span class="o">.</span><span class="n">n</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>628
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span><span class="o">.</span><span class="n">islands</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[103]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span><span class="o">.</span><span class="n">islands</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">year_built</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran</span><span class="p">(</span><span class="n">year_built</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">p_norm</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">I</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.65063390055088199
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">EI</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>-0.001594896331738437
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
+<span class="n">yb_lmi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">year_built</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/moran.py:835: RuntimeWarning: invalid value encountered in true_divide
+  self.z_sim = (self.Is - self.EI_sim) / self.seI_sim
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:875: RuntimeWarning: invalid value encountered in greater
+  return (self.a &lt; x) &amp; (x &lt; self.b)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:875: RuntimeWarning: invalid value encountered in less
+  return (self.a &lt; x) &amp; (x &lt; self.b)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:1731: RuntimeWarning: invalid value encountered in greater_equal
+  cond2 = (x &gt;= self.b) &amp; cond0
+</pre>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">yb_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>101
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">med_value</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span>
+<span class="n">mv_lmi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">med_value</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/moran.py:835: RuntimeWarning: invalid value encountered in true_divide
+  self.z_sim = (self.Is - self.EI_sim) / self.seI_sim
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:875: RuntimeWarning: invalid value encountered in greater
+  return (self.a &lt; x) &amp; (x &lt; self.b)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:875: RuntimeWarning: invalid value encountered in less
+  return (self.a &lt; x) &amp; (x &lt; self.b)
+/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:1731: RuntimeWarning: invalid value encountered in greater_equal
+  cond2 = (x &gt;= self.b) &amp; cond0
+</pre>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">mv_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>112
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran</span><span class="p">(</span><span class="n">med_value</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span><span class="o">.</span><span class="n">p_norm</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.0
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span><span class="o">.</span><span class="n">p_sim</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.001
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25003_003E&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25001_001E&#39;</span><span class="p">]</span>
+<span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(((</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">])</span>
+<span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Renter Occupied (pct.)&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4342715f98&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_35_1.png" src="../../_images/san_diego_acs_pickle_35_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
+
+<span class="n">df_copy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4349e30cf8&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_36_2.png" src="../../_images/san_diego_acs_pickle_36_2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>               Quantiles               
+ 
+Lower          Upper              Count
+=======================================
+        x[i] &lt;= 0.213               126
+0.213 &lt; x[i] &lt;= 0.338               125
+0.338 &lt; x[i] &lt;= 0.475               126
+0.475 &lt; x[i] &lt;= 0.646               125
+0.646 &lt; x[i] &lt;= 1.000               126
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">renter_pct</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">]</span>
+<span class="n">renter_pct_lmi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">renter_pct</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">renter_pct_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>125
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>628
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19083_001E&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>343    0.553800
+176    0.457600
+167    0.471800
+133    0.444500
+134    0.390300
+63     0.410200
+64     0.420000
+584    0.395900
+571    0.477100
+585    0.413200
+302    0.311500
+303    0.414300
+136    0.404200
+137    0.375000
+138    0.468900
+144    0.419100
+576    0.426300
+577    0.406200
+331    0.425300
+582    0.346600
+173    0.366900
+383    0.434500
+25     0.420900
+293    0.347000
+294    0.440800
+126    0.479200
+127    0.437000
+128    0.430200
+518    0.430200
+519    0.399300
+         ...   
+51     0.352000
+221    0.393000
+243    0.473400
+412    0.408600
+193    0.386300
+194    0.399900
+229    0.467400
+195    0.390000
+8      0.321300
+13     0.336000
+217    0.377500
+119    0.471100
+356    0.350900
+570    0.401000
+226    0.462800
+186    0.444400
+361    0.377700
+537    0.419500
+14     0.404200
+109    0.466900
+230    0.395600
+285    0.346300
+531    0.486700
+15     0.385800
+190    0.435700
+191    0.547900
+9      0.446700
+521    0.346200
+533    0.483700
+451    0.409798
+Name: B19083_001E, dtype: float64
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gini</span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
+
+<span class="n">df_copy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B19083_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4348ba1c50&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_42_2.png" src="../../_images/san_diego_acs_pickle_42_2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_005E&#39;</span><span class="p">])</span>
+<span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Lower limit top 5pct&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f43433bf320&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_43_1.png" src="../../_images/san_diego_acs_pickle_43_1.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ll top 5pct</span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
+
+<span class="n">df_copy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B19080_005E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43433ae5c0&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_44_2.png" src="../../_images/san_diego_acs_pickle_44_2.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">llq5</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_005E&#39;</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">llq5</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>                    Quantiles                    
+ 
+  Lower                Upper                Count
+=================================================
+             x[i] &lt;= 134834.200               126
+134834.200 &lt; x[i] &lt;= 173086.000               125
+173086.000 &lt; x[i] &lt;= 204066.400               126
+204066.400 &lt; x[i] &lt;= 250001.000               251
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">q1</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_001E&#39;</span><span class="p">])</span>
+<span class="n">q1</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>                    Quantiles                    
+ 
+  Lower                Upper                Count
+=================================================
+             x[i] &lt;=  19837.600               126
+ 19837.600 &lt; x[i] &lt;=  25778.800               125
+ 25778.800 &lt; x[i] &lt;=  32199.400               126
+ 32199.400 &lt; x[i] &lt;=  42210.800               125
+ 42210.800 &lt; x[i] &lt;= 102992.000               126
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># q1</span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
+
+<span class="n">df_copy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B19080_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+  &quot;(for consistency with matplotlib)&quot;, FutureWarning)
+</pre>
+</div>
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43419c4400&gt;
+</pre></div>
+</div>
+<img alt="../../_images/san_diego_acs_pickle_47_2.png" src="../../_images/san_diego_acs_pickle_47_2.png" />
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./data/sandiego"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf<br/>
+        
+            &copy; Copyright 2020.<br/>
+          <div class="extra_footer">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+          </div>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    <script src="../../_static/js/index.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-146598819-1', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    
+  </body>
+</html>
