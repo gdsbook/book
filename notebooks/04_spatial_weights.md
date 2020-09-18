@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -963,7 +963,7 @@ With this difference information we can do a few things. First, we can compare w
 To do this, we can first compute the all-pairs differences in wealth using the `numpy.subtract` function. Some functions in numpy have special functionality; these `ufuncs` (short for "universal functions") often support special applications to your data. Here, we will use `numpy.subtract.outer` to take the difference over the "outer cartesian product" of two vectors; in practice, this results in the subtraction of all of the combinations of the input vectors:
 
 ```python
-all_pairs = numpy.subtract.outer(san_diego_tracts['Median HH'], san_diego_tracts['Median HH'])
+all_pairs = numpy.subtract.outer(san_diego_tracts['Median HH'].values, san_diego_tracts['Median HH'].values)
 ```
 
 Then, we need to filter out those cells of `all_pairs` that are neighbors. Fortunately, our weights matrix is *binary*. So, subtracting it from an $N \times N$ matrix of $1$s will result in the *complement* of our original weights matrix:
