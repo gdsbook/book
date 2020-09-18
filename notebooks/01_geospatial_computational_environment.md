@@ -647,8 +647,11 @@ possibility of things not working for several reasons, mistakes and typos. Issue
 # Reference
 
 [1] Fanelli, D. (2018). "Is science really facing a reproducibility crisis?" *Proceedings of the National Academy of Sciences* 115(11): 2628-2631; DOI: 10.1073/pnas.1708272114
+
 [2] Rule, A., A. Birmingham, C. Zuniga,  I. Altintas, S. Huang, R. Knight, N. Moshiri, M. Ngyuen, S.B. Rosenthal, F. Perez, P. W. Rose. (2019). "Ten simple rules for writing and sharing computational analyses in Jupyter Notebooks." *PLOS Computational Biology* 15(7) DOI: 10.1371/journal.pcbi.1007007
+
 [3] Cook, J. (2017). *Docker for Data Science: Building Scalable and Extensible Data Infrastructure around the Jupyter Notebook Server.* Apress: New York. 
+
 [4] Kluyver, T., B. Ragan-Kelley, F. Perez, B. Granger, M. Boussonier, J. Frederic, K. Kelley, J. Hamrick, J. Grout, S. Corlay, P. Ivanov, D. Avila, S. Abdalla, C. Willing, and Jupyter Development Team. "Jupyter Notebooks-a publishing format for reproducibile computational workflows." in *Positioning and Power in Academic Publishing: Players, Agents, and Agendas,* F. Loizides and B. Schmidt (Eds.). IOS Press: Amsterdam, 87-91. DOI: 10.3233/978-1-61499-649-1-87
 
 ---
