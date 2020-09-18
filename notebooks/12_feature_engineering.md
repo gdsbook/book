@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
-    display_name: analysis
+    display_name: Python [conda env:analysis]
     language: python
-    name: analysis
+    name: conda-env-analysis-py
 ---
 
 # Geographic feature engineering
@@ -463,6 +463,8 @@ There is an extensive amount of map synthesis features. In addition to the two k
 
 Just like in map matching, you can use spatial summary features in map synthesis to make better predictions. One clear method involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we can now refer only to the data on hand. Thus, we may want to determine whether nearby Airbnbs are "competing" with each airbnb. We might do this by finding the distance to the nearest Airbnb with the same number of bedrooms, since two nearby listings that *also* sleep the same number of people likely will compete with one another for tenants. 
 
+#### Distance buffers within a single table
+
 We might do this by building a `DistanceBand` weight object, which considers Airbnb as "neighbors" if they are within the distance threshold. 
 
 ```python
@@ -493,7 +495,7 @@ If we were instead interested in the most common number of bedrooms, rather than
 local_mode = weights.lag_categorical(d500_w, airbnbs_albers[['bedrooms']].values)
 ```
 
-Since we are now treating these features as discrete, it helps to use `pandas.crosstab` to visualize their distribution:
+Since we are now treating the number of bedrooms as a discrete feature, we can use a crosstab from `pandas` to examine the relationship between a listing and the typical size of listings nearby:
 
 ```python
 crosstab = pandas.crosstab(airbnbs_albers.bedrooms, 
@@ -502,7 +504,7 @@ crosstab.columns.name = "nearby"
 crosstab
 ```
 
-If more complicated statistics are required. it can help to re-express the construction of summary statistics as a *reduction* of the *adjacency list* representation of our weights, as done in Chapter 3. For instance, constructing the local median involves building the adjacency list:
+If more complicated statistics are required. it can help to re-express the construction of summary statistics as a *reduction* of the *adjacency list* representation of our weights, as done in Chapter 3. To recap, the *adjacency list* is a `pandas.DataFrame` where each row contains a single link in our graph. It contains the identifier for some `focal` observation, the identifier for some `neighbor` observation, and a value for the `weight` of the link that connects the `focal` and `neighbor`:
 
 ```python
 adjlist = d500_w.to_adjlist()
@@ -512,90 +514,138 @@ adjlist = d500_w.to_adjlist()
 adjlist.head()
 ```
 
-merging in the relevant information:
+If we had the values for each for the neighbors in this adjacency list table, then we could use a `groupby()` to summarize the values of observations connected to a given focal observation. This merge can be done directly with the original data, linking the `neighbor` key in the adjacency list back to that observation in our source table: 
 
 ```python
-adjlist = adjlist.merge(airbnbs_albers[['bedrooms']], left_on='neighbor', right_index=True, how='left')
+adjlist = adjlist.merge(airbnbs_albers[['bedrooms']], left_on='neighbor', 
+                        right_index=True, how='left')
+adjlist.head()
 ```
 
-and then grouping by the `focal` and summarizing:
+Now, we need only to group the adjacency list by the focal observation and summarize the `bedrooms` column to obtain the median number of bedrooms for each `focal` observation. 
 
 ```python
 adjlist.groupby("focal").bedrooms.median()
 ```
 
-In most cases, however, `lag_spatial` and `lag_categorical` can construct most of the common features used in day-to-day analysis. 
+Since the mean and/or mode are the most commonly-used measures of central tendency, the `lag_spatial` and `lag_categorical` functions cover many of the required uses in practice. 
 
-Sometimes, analysts might build multiple "bands" of features by increasing the `threshold` in a `DistanceBand` or the `k` in a K-nearest neighbors application. That is to build another average of the area within 1 kilometer, you can repeat the above analysis with a different threshold:
+#### "Ring" buffer features
+
+Sometimes, analysts might want to use multiple "bands" of buffer features. This requires that we build summaries of the observations that fall *only within* a given range of distances, such as the typical size of houses that are further than 500m, but still within 1km. This kind of "ring buffer" is a common request in spatial analysis, and can be done in substantially the same way as before by increasing the `threshold` in a `DistanceBand` weight.  
+
+So, we can use our 500m weights from before to build the average again:
 
 ```python
 average_within_500 = weights.lag_spatial(d500_w, airbnbs_albers[['bedrooms']].values)
+```
 
+Then, we need to build the graph of airbnbs that fall *between* 500m and 1km from one another. To start, we build the `DistanceBand` graph of all listings closer than 1km:
+
+```python
 d1k_w = weights.DistanceBand.from_dataframe(airbnbs_albers, threshold=1000, silence_warnings=True)
-d1k_w.transform = 'r'
-average_within_1km = weights.lag_spatial(d1k_w, airbnbs_albers[['bedrooms']].values)
 ```
 
-In some cases, an *exclusive* average is preferred. That is, we may want the 1 kilometer average to include only the data from 500m to 1km and *disregard* the values before it. 
-
-While this is somewhat more challenging, it can be done efficiently using the `weights.set_operations` module:
+Then, using the `weights.set_operations` module, we can express set-theoretic relationships between graphs. Here, we need to *remove* the links in our 1km graph that are *also* links in the 500m graph. To do this, we need `w_difference(d1k_w, d500_w)`, the difference between the 1km graph and the 500m graph: 
 
 ```python
-d1k_no_500_w = weights.set_operations.w_difference(d1k_w, d500_w)
+d1k_exclusive = weights.set_operations.w_difference(d1k_w, d500_w, constrained=False)
+```
+
+Then, we can compute the average size of listings between 500m and 1km in the same manner as before using our `d1k_exclusive` graph, which now omits all edges shorter than 500m. 
+
+```python jupyter={"outputs_hidden": true}
+d1k_exclusive.transform= 'r'
+average_500m_to_1k = weights.lag_spatial(d1k_exclusive, 
+                                         airbnbs_albers[['bedrooms']].values)
+```
+
+Thus, we can see that the two features definitely contain distinct, but related, information, and both may be valuable as features when attempting to predict features of interest. 
+
+```python
+plt.scatter(average_within_500,
+            average_500m_to_1k,
+            color='k', marker='.')
+plt.xlabel("Average size within 500 meters")
+plt.ylabel("Average size\n beyond 500m but within 1km")
+plt.plot([0,5],[0,5], color='orangered', linestyle=':', linewidth=2, 
+         label='1 to 1')
+plt.legend()
+```
+
+#### Clustering as feature engineering
+
+
+One unique way to use spatial or feature information *within* your data as a feature in your existing models is to use *clustering*, as we saw in Chapters 8 & 10. This can provide an indication of whether an observation exists in a given "place" geographically, or if an observation is a specific "kind" of observation. 
+
+Sometimes, this data reduction of many correlated variates into a derived feature can be useful in training models. This is more useful when the *spatial location* of a given observation indicates something useful about what kind of observation is taken at that location. 
+
+While it would be *best* to use an explicitly-spatial model to examine this structure, we can cheat a little bit and use cluster labels themselves as features. For example, to cluster the listings based on their location, we can use hierarchical DBSCAN, an improved variant of the DBSCAN algorithm used in chapter 8. 
+
+```python
+from hdbscan import HDBSCAN
 ```
 
 ```python
-average_between = weights.lag_spatial(d1k_no_500_w, airbnbs_albers[['bedrooms']].values)
+coordinates = numpy.column_stack((airbnbs_albers.geometry.x, 
+                                  airbnbs_albers.geometry.y))
 ```
+
+With a little tuning, we can decide on an effective parameterization. Here, we'll look for relatively large clusters of Airbnbs, those with about 100 listings or more. 
 
 ```python
-
+labels = HDBSCAN(min_cluster_size=25).fit(coordinates).labels_
 ```
 
-### preclustering points into groups for group-based regressions
-### use spatially-constrained clustering to build categorical variables for regression
+The spatial distribution of these clusters gives us a sense of the geographical distribution of the observations. To help us visualize the clusters, we can construct the convex hull of the observations in each dectected cluster:
+
+```python
+hulls = airbnbs_albers[['geometry']].dissolve(by=labels).convex_hull
+```
+
+Since humans tend to make locational decisions hierarchically (in that they pick *San Diego*, then they pick a particular *part* of San Diego (such as the Gaslamp Quarter), then they pick a house in that part), this clustering process might give us a reasonable insight into the enclaves of competition between Airbnbs:
+
+```python
+f, ax = plt.subplots(1, figsize=(9, 9))
+airbnbs_albers.plot(column=labels,
+                    categorical=True,
+                    alpha=0.5,
+                    legend=False,
+                    ax=ax, marker='.'
+                    )
+hulls[hulls.index >=0].boundary.plot(color='k', ax=ax,)
+contextily.add_basemap(ax, 
+                       crs=airbnbs_albers.crs.to_string(), 
+                       source=contextily.providers.Stamen.Toner
+                      )
+```
+
+Regardless, this cluster label certainly communicates some information about the price of a listing, since the distributions of prices are substantially different across the detected clusters:
+
+```python
+f = plt.figure(figsize=(8,3))
+ax = airbnbs_albers.boxplot("price", by=labels, 
+                            flierprops=dict(marker=None), 
+                            ax=plt.gca())
+ax.set_xlabel("competition cluster")
+ax.set_ylabel("price ($)")
+plt.gcf().suptitle(None)
+ax.set_title("Price distribution by detected cluster")
+ax.set_ylim(0,1250)
+plt.show()
+```
+
+# Conclusion
 
 
-Ways to "stick" space into models that are not necessarily spatial.
+Feature engineering is a powerful way to enrich your data analysis capabilities. It's often within reach of your existing data analysis methods: at a minimum, it only requires that new variables are constructed from your existing data. At a maximum, feature engineering gives you the *ultimate linkage key*, a flexible and powerful tool with which you can unlock the value held in many *other* datasets that you may have access to. 
 
-<!-- #region -->
-**spatial feature engineering**: synthesizing information using spatial relationships either within the data or across data. 
+The main operations and methods that are involved in feature engineering, such as determining what the average value is in the area near each observation or identifying whether observations exist in a "cluster," are fundamentally simple operations. Together, though, they build large, rich, and useful datasets that can be used directly in your existing methods of analysis. 
 
-This is one way of "spatializing" data that is included in models. This is not about fitting *spatial models* that use
-> the kohonen quote about spatially-correlated learning in SOMs
-
-it is about figuring out representations of geographical relationships and using them in typical non-spatial models. 
+Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters 10 and 11) can leverage spatial structure *directly* during learning. These techniques can best simpler less-complicated models that learn from spatially-engineered features. However, the techniques in this chatper (and the methods that extend upon them) are immediately useful for most practicing data scientists, and can be integrated into nearly any analytical method or approach. 
 
 
-
-Geographying
-
-Spatializing
-
-*(note: fit the distinction between using spatialized data vs. using spatial models into the regression chapter, ch. 11)*. 
-<!-- #endregion -->
-
-### distance banding counts & distance-to a secondary feature
-- osmnx pois
-- flicker data
-
-### Point Interpolation using sklearn 
-- (streetscore averaging from nearest sites)
-- air quality?
-
-### spatial join, but really don't focus too much on the structure/GIS theory of it
-- census data 
-
-### tobler? area to area interpolation
-
-- census geographies vs. h3
-
-### raster engineering to vector features
-
-- Elevation: https://blog.mapbox.com/global-elevation-data-6689f1d0ba65
-- DEM from USGS? Public domain? https://www.usgs.gov/centers/eros/science/usgs-eros-archive-digital-elevation-shuttle-radar-topography-mission-srtm-1-arc?qt-science_center_objects=0#qt-science_center_objects
-- air quality
-- night light - served through nasa, using - contextily
+# Questions
 
 
 ---
