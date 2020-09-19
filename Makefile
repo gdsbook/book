@@ -32,3 +32,4 @@ html: sync
 	mv tmp_book/_build/html docs
 	echo "Cleaning up..."
 	rm -r tmp_book
+	touch docs/.nojekyll
