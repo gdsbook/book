@@ -32,4 +32,3 @@ html: sync
 	mv tmp_book/_build/html docs
 	echo "Cleaning up..."
 	rm -r tmp_book
-	cp ./CNAME ./docs/CNAME
