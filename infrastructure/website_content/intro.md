@@ -1,4 +1,5 @@
-# Geographic Data Science with PySAL and the PyData Stack
+# Home
+## Geographic Data Science with PySAL and the PyData Stack
 
 * Sergio J. Rey
 * Dani Arribas-Bel
