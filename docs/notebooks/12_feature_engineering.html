@@ -2,10 +2,9 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geographic feature engineering &#8212; Geographic Data Science with Python</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
     <link href="../_static/css/index.css" rel="stylesheet">
@@ -15,7 +14,6 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/sphinx-book-theme.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -25,12 +23,10 @@
     <script src="../_static/togglebutton.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <script src="../_static/mystnb.js"></script>
     <script src="../_static/sphinx-book-theme.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -38,6 +34,7 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://geographicdata.science/book/notebooks/12_feature_engineering.html" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -47,6 +44,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="docsearch:language" content="en">
 
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="https://geographicdata.science/book/notebooks/12_feature_engineering.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Geographic feature engineering" />
+<meta property="og:description" content="Geographic feature engineering  In machine learning and data science, we are often equipped with tons of data. Indeed, given the constellation of packages to qu" />
+<meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
+
+<meta name="twitter:card" content="summary" />
 
 
   </head>
@@ -369,7 +375,7 @@
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         <div class="tocsection onthispage pt-5 pb-3">
-            <i class="fas fa-list"></i> On this page
+            <i class="fas fa-list"></i> Contents
         </div>
         <nav id="bd-toc-nav">
             
@@ -389,7 +395,7 @@
 <p>At its core, <em>spatial feature engineering</em> is the process of developing additional information from raw data using <em>geographic knowledge</em>. This distilling of information can occur <em>between</em> datasets, where geography is used to link information in separate datasets together; or <em>within</em> datasets, where geography can be used to augment the information available for one sample by borrowing from nearby ones. This chapter is structured following that distinction: for cases where geography connects <em>different</em> datasets, we adopt the term “Map Matching”, often used in industry; while we use the mirroring concept of “Map Synthesis” describing the use of geographical structure to derive new features from a given dataset. Technically speaking, some of the methods we review are similar across these two cases, or even the same; however they can be applied in the context of “matching” or “synthesis”, and we consider those conceptually different, hence their inclusion in both sections. Throughout the chapter, we use the Airbnb nightly rental prices in San Diego, as well as auxilliary datasets such as elevation or Census demographics.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span><span class="o">,</span> <span class="nn">pandas</span><span class="o">,</span> <span class="nn">libpysal.weights</span> <span class="k">as</span> <span class="nn">weights</span><span class="o">,</span> <span class="nn">contextily</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span><span class="o">,</span> <span class="nn">pandas</span><span class="o">,</span> <span class="nn">libpysal.weights</span> <span class="k">as</span> <span class="nn">weights</span><span class="o">,</span> <span class="nn">contextily</span>
 <span class="kn">from</span> <span class="nn">tobler.area_weighted</span> <span class="kn">import</span> <span class="n">area_interpolate</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">cenpy</span>
@@ -405,7 +411,7 @@
 <p>Throughout this chapter, we will use a common dataset to which we want to append more information through geography. For the illustration, we will use the set of <a class="reference internal" href="../data/airbnb/regression_cleaning.html"><span class="doc std std-doc">AirBnb properties</span></a>. Let’s read it:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/airbnb/regression_db.geojson&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/airbnb/regression_db.geojson&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -437,7 +443,7 @@
 <p>To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require to get a polygon that covers all our <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> points. From Chapter 8, we can recall that there are a few different hulls that can be used. We’ll use the Convex Hull here, which is the smallest convex polygon that covers all of the points in the set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_ch</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">unary_union</span><span class="o">.</span><span class="n">convex_hull</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_ch</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">unary_union</span><span class="o">.</span><span class="n">convex_hull</span>
 <span class="n">airbnbs_ch</span>
 </pre></div>
 </div>
@@ -448,7 +454,7 @@
 <p>Using this polygon, we can use the <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we’ll request POIs within San Diego that are “restaurants” or “bars,” according to their metadata stored in OpenStreetMap. (<em>note: this step requires internet connection as it is querying a remote server</em>):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
 <span class="n">pois</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">pois_from_polygon</span><span class="p">(</span><span class="n">airbnbs_ch</span><span class="p">,</span>
                                <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;amenity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;restaurant&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]}</span>
                               <span class="p">)</span>
@@ -456,12 +462,11 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/osmnx/pois.py:175: UserWarning: The `pois` module has been deprecated and will be removed in a future release. Use the `geometries` module's `geometries_from_polygon` function instead.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/osmnx/pois.py:175: UserWarning: The `pois` module has been deprecated and will be removed in a future release. Use the `geometries` module&#39;s `geometries_from_polygon` function instead.
   warnings.warn(msg)
-</pre>
+</pre></div>
 </div>
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>CPU times: user 717 ms, sys: 31.3 ms, total: 748 ms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 717 ms, sys: 31.3 ms, total: 748 ms
 Wall time: 5 s
 </pre></div>
 </div>
@@ -470,12 +475,12 @@ Wall time: 5 s
 <p>This provides us with every location within our convex hull that is tagged as a “restaurant” or “bar” its metadata on OpenStreteMap. Overall, this provides us with about 1300 points of interest:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;amenity&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">amenity</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;amenity&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">amenity</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>amenity
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>amenity
 bar            304
 restaurant    1006
 Name: amenity, dtype: int64
@@ -486,7 +491,7 @@ Name: amenity, dtype: int64
 <p>Once loaded into <code class="docutils literal notranslate"><span class="pre">pois</span></code> as a <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>, let’s take a peek at their location, as compared with AirBnb spots:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
 <span class="n">airbnbs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 <span class="n">pois</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> 
@@ -512,12 +517,12 @@ Name: amenity, dtype: int64
 <p>With this, let us now translate the list above into code. For part 1., we need to be able to measure distances in metres. However, <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> is originally expressed in degrees, since it is provided in terms of locations in latitude and longitude:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
 Name: WGS 84
 Axis Info [ellipsoidal]:
 - Lat[north]: Geodetic latitude (degree)
@@ -535,12 +540,12 @@ Datum: World Geodetic System 1984
 <p>In addition, the <code class="docutils literal notranslate"><span class="pre">pois</span></code> are also provided in terms of their latitude &amp; longitude:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span><span class="o">.</span><span class="n">crs</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span><span class="o">.</span><span class="n">crs</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
 Name: WGS 84
 Axis Info [ellipsoidal]:
 - Lat[north]: Geodetic latitude (degree)
@@ -558,7 +563,7 @@ Datum: World Geodetic System 1984
 <p>Therefore, we need to convert this into a coordinate system that is easier to work with. Here, we will use a projection common for mapping in California, the California Albers projection:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_albers</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_albers</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>
 <span class="n">pois_albers</span> <span class="o">=</span> <span class="n">pois</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -566,12 +571,12 @@ Datum: World Geodetic System 1984
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pois_albers</span><span class="o">.</span><span class="n">crs</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pois_albers</span><span class="o">.</span><span class="n">crs</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Projected CRS: EPSG:3311&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Projected CRS: EPSG:3311&gt;
 Name: NAD83(HARN) / California Albers
 Axis Info [cartesian]:
 - X[east]: Easting (metre)
@@ -592,7 +597,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>With this, we can create the radius of 500m around each AirBnb. This is often called <em>buffering</em>, where a shape is dilated by a given radius.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_albers</span><span class="p">[</span><span class="s1">&#39;buffer_500m&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_albers</span><span class="p">[</span><span class="s1">&#39;buffer_500m&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -601,7 +606,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Using these, we can count the number of POIs that are within these areas using a <em>spatial join</em>. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: <code class="docutils literal notranslate"><span class="pre">pois</span> <span class="pre">within</span> <span class="pre">airbnb_buffers</span></code>, where <code class="docutils literal notranslate"><span class="pre">within</span></code> is the predicate relating <code class="docutils literal notranslate"><span class="pre">pois</span></code> to <code class="docutils literal notranslate"><span class="pre">airbnb_buffers</span></code>. Predicates are not always <em>reversible</em>: no <code class="docutils literal notranslate"><span class="pre">airbnb_buffer</span></code> can be <code class="docutils literal notranslate"><span class="pre">within</span></code> a <code class="docutils literal notranslate"><span class="pre">poi</span></code>. In <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>, we can compute all pairs of relations between the <code class="docutils literal notranslate"><span class="pre">pois</span></code> and <code class="docutils literal notranslate"><span class="pre">airbnb_buffers</span></code> efficiently using the <code class="docutils literal notranslate"><span class="pre">sjoin</span></code> function, which takes a <code class="docutils literal notranslate"><span class="pre">predicate</span></code> argument defining the requested relationship between the first &amp; second argument.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">joined</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">pois_albers</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">pois_albers</span><span class="p">,</span>
                     <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s1">&#39;buffer_500m&#39;</span><span class="p">)[[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;buffer_500m&#39;</span><span class="p">]],</span>
                     <span class="n">op</span><span class="o">=</span><span class="s2">&quot;within&quot;</span>
                    <span class="p">)</span>
@@ -612,7 +617,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>The resulting joined object <code class="docutils literal notranslate"><span class="pre">joined</span></code> contains a row for every pair of POI and AirBnb that are linked. From there, we can apply a group-by operation, using the AirBnb ID, and count how many POIs each AirBnb has within 500m of distance:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poi_count</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>\
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poi_count</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>\
                   <span class="p">[</span><span class="s2">&quot;osmid&quot;</span><span class="p">]</span>\
                   <span class="o">.</span><span class="n">count</span><span class="p">()</span>\
                   <span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;poi_count&#39;</span><span class="p">)</span>
@@ -674,7 +679,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>The resulting <code class="docutils literal notranslate"><span class="pre">Series</span></code> is indexed on the AirBnb IDs, so we can assign it to the original <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> table. In this case, we know by construction that missing AirBnbs in <code class="docutils literal notranslate"><span class="pre">poi_count</span></code> do not have any POI within 500m, so we can fill missing values in the column with zeros.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_w_counts</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">poi_count</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>\
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_w_counts</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">poi_count</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>\
                                  <span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="s2">&quot;poi_count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
 </pre></div>
 </div>
@@ -683,7 +688,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>We can visualise now the distribution of counts to get a sense of how “well-served” AirBnb properties are arranged over space (for good measure, we’ll also add a legendgram):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">airbnbs_w_counts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;poi_count&quot;</span><span class="p">,</span>
                       <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
                       <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
@@ -704,7 +709,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <hr class="docutils" />
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">airbnbs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 
@@ -740,14 +745,14 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Let us bring the elevation surface:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span><span class="p">)</span>
 <span class="n">rioshow</span><span class="p">(</span><span class="n">dem</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <img alt="../_images/12_feature_engineering_35_0.png" src="../_images/12_feature_engineering_35_0.png" />
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f91744ee070&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f91744ee070&gt;
 </pre></div>
 </div>
 </div>
@@ -755,12 +760,12 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Let’s first check the CRS is aligned with our sample of point locations:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span><span class="o">.</span><span class="n">crs</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span><span class="o">.</span><span class="n">crs</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>CRS.from_epsg(4326)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CRS.from_epsg(4326)
 </pre></div>
 </div>
 </div>
@@ -769,12 +774,12 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>To extract a discrete set of values from the elevation surface in <code class="docutils literal notranslate"><span class="pre">dem</span></code>, we can use <code class="docutils literal notranslate"><span class="pre">sample</span></code>. For a single location, this is how it works:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">sample</span><span class="p">([(</span><span class="o">-</span><span class="mf">117.24592208862305</span><span class="p">,</span> <span class="mf">32.761619109301606</span><span class="p">)]))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">sample</span><span class="p">([(</span><span class="o">-</span><span class="mf">117.24592208862305</span><span class="p">,</span> <span class="mf">32.761619109301606</span><span class="p">)]))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[array([7], dtype=int16)]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[array([7], dtype=int16)]
 </pre></div>
 </div>
 </div>
@@ -782,7 +787,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Now, we can take this logic and apply it to a sequence of coordinates. For that, we need to extract them from the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">abb_xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abb_xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> 
                             <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span>
                            <span class="p">})</span><span class="o">.</span><span class="n">to_records</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
@@ -791,7 +796,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">abb_xys</span><span class="p">),</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">abb_xys</span><span class="p">),</span>
                              <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Elevation&quot;</span><span class="p">],</span>
                              <span class="n">index</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">index</span>
                             <span class="p">)</span>
@@ -849,7 +854,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Now we have a table with the elevation of each  AirBnb property, we can plot it on a map for visual inspection:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">airbnbs</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">elevation</span><span class="p">)</span>\
        <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;Elevation&quot;</span><span class="p">,</span>
              <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
@@ -872,7 +877,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <hr class="docutils" />
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">rioshow</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
@@ -912,7 +917,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
 <span class="n">acs</span> <span class="o">=</span> <span class="n">cenpy</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ACS</span><span class="p">()</span>
 <span class="n">sd_pop</span> <span class="o">=</span> <span class="n">acs</span><span class="o">.</span><span class="n">from_msa</span><span class="p">(</span><span class="s2">&quot;San Diego, CA&quot;</span><span class="p">,</span>
                       <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;tract&quot;</span><span class="p">,</span>
@@ -922,12 +927,11 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/lw17329/anaconda/envs/analysis/lib/python3.8/site-packages/pyproj/crs/crs.py:53: FutureWarning: '+init=&lt;authority&gt;:&lt;code&gt;' syntax is deprecated. '&lt;authority&gt;:&lt;code&gt;' is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/lw17329/anaconda/envs/analysis/lib/python3.8/site-packages/pyproj/crs/crs.py:53: FutureWarning: &#39;+init=&lt;authority&gt;:&lt;code&gt;&#39; syntax is deprecated. &#39;&lt;authority&gt;:&lt;code&gt;&#39; is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
   return _prepare_from_string(&quot; &quot;.join(pjargs))
-</pre>
+</pre></div>
 </div>
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>CPU times: user 11.7 s, sys: 216 ms, total: 11.9 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 11.7 s, sys: 216 ms, total: 11.9 s
 Wall time: 38.7 s
 </pre></div>
 </div>
@@ -936,7 +940,7 @@ Wall time: 38.7 s
 <p>And calculate population density:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span><span class="o">.</span><span class="n">area</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span><span class="o">.</span><span class="n">area</span>
 </pre></div>
 </div>
 </div>
@@ -944,7 +948,7 @@ Wall time: 38.7 s
 <p>Now, to “transfer” density estimates to each AirBnb, we can rely on the spatial join in <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">j</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">airbnbs</span><span class="p">,</span> <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">j</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">airbnbs</span><span class="p">,</span> <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -952,12 +956,12 @@ Wall time: 38.7 s
 <p>The result is a table with one row per AirBnb and one column for each attribute we originally had for properties, <em>as well as</em> those of the tract where the area is located:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">j</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">j</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
 Int64Index: 6110 entries, 0 to 6068
 Data columns (total 28 columns):
  #   Column              Non-Null Count  Dtype   
@@ -999,7 +1003,7 @@ memory usage: 1.4+ MB
 <hr class="docutils" />
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">sd_pop</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
@@ -1029,7 +1033,7 @@ memory usage: 1.4+ MB
 <p>First, let us load the H3 grid:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">h3</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/h3_grid/sd_h3_grid.gpkg&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h3</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/h3_grid/sd_h3_grid.gpkg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1037,7 +1041,7 @@ memory usage: 1.4+ MB
 <p>We are ready to interpolate:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">interpolated</span> <span class="o">=</span> <span class="n">area_interpolate</span><span class="p">(</span><span class="n">source_df</span><span class="o">=</span><span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">interpolated</span> <span class="o">=</span> <span class="n">area_interpolate</span><span class="p">(</span><span class="n">source_df</span><span class="o">=</span><span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
                                 <span class="n">target_df</span><span class="o">=</span><span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
                                 <span class="n">extensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">],</span>
                                 <span class="n">intensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
@@ -1060,7 +1064,7 @@ memory usage: 1.4+ MB
 <p>A good first approach to examine the output is by comparing the source and the target visually. Here is total population:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">maxX</span><span class="p">,</span> <span class="n">maxY</span> <span class="o">=</span> <span class="n">interpolated</span><span class="o">.</span><span class="n">total_bounds</span>
 <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>\
@@ -1096,7 +1100,7 @@ memory usage: 1.4+ MB
 <p>And density:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">maxX</span><span class="p">,</span> <span class="n">maxY</span> <span class="o">=</span> <span class="n">interpolated</span><span class="o">.</span><span class="n">total_bounds</span>
 <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>\
@@ -1143,7 +1147,7 @@ memory usage: 1.4+ MB
 <p>We might do this by building a <code class="docutils literal notranslate"><span class="pre">DistanceBand</span></code> weight object, which considers Airbnb as “neighbors” if they are within the distance threshold.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d500_w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">silence_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d500_w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">silence_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1151,14 +1155,14 @@ memory usage: 1.4+ MB
 <p>Now, we can get the average size of surrounding Airbnbs directly as the spatial lag:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d500_w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d500_w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">local_average_bedrooms</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_average_bedrooms</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1166,14 +1170,14 @@ memory usage: 1.4+ MB
 <p>While related, these features contain quite distinct pieces of information, and both may prove useful in modelling:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">local_average_bedrooms</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">local_average_bedrooms</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Number of bedrooms&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Average of nearby</span><span class="se">\n</span><span class="s2"> listings&#39; bedrooms&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &quot;Average of nearby\n listings&#39; bedrooms&quot;)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &quot;Average of nearby\n listings&#39; bedrooms&quot;)
 </pre></div>
 </div>
 <img alt="../_images/12_feature_engineering_73_1.png" src="../_images/12_feature_engineering_73_1.png" />
@@ -1182,24 +1186,23 @@ memory usage: 1.4+ MB
 <p>If we were instead interested in the most common number of bedrooms, rather than the average, we could use the <code class="docutils literal notranslate"><span class="pre">lag_categorical</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">local_mode</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_categorical</span><span class="p">(</span><span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_mode</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_categorical</span><span class="p">(</span><span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/numpy/core/fromnumeric.py:3334: RuntimeWarning: Mean of empty slice.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/numpy/core/fromnumeric.py:3334: RuntimeWarning: Mean of empty slice.
   return _methods._mean(a, axis=axis, dtype=dtype,
 /opt/anaconda3/envs/analysis/lib/python3.8/site-packages/numpy/core/_methods.py:161: RuntimeWarning: invalid value encountered in double_scalars
   ret = ret.dtype.type(ret / rcount)
-</pre>
+</pre></div>
 </div>
 </div>
 </div>
 <p>Since we are now treating the number of bedrooms as a discrete feature, we can use a crosstab from <code class="docutils literal notranslate"><span class="pre">pandas</span></code> to examine the relationship between a listing and the typical size of listings nearby:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">crosstab</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">bedrooms</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">crosstab</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">bedrooms</span><span class="p">,</span> 
                            <span class="n">local_mode</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
 <span class="n">crosstab</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;nearby&quot;</span>
 <span class="n">crosstab</span>
@@ -1362,14 +1365,14 @@ memory usage: 1.4+ MB
 <p>If more complicated statistics are required. it can help to re-express the construction of summary statistics as a <em>reduction</em> of the <em>adjacency list</em> representation of our weights, as done in Chapter 3. To recap, the <em>adjacency list</em> is a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> where each row contains a single link in our graph. It contains the identifier for some <code class="docutils literal notranslate"><span class="pre">focal</span></code> observation, the identifier for some <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> observation, and a value for the <code class="docutils literal notranslate"><span class="pre">weight</span></code> of the link that connects the <code class="docutils literal notranslate"><span class="pre">focal</span></code> and <code class="docutils literal notranslate"><span class="pre">neighbor</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">d500_w</span><span class="o">.</span><span class="n">to_adjlist</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">d500_w</span><span class="o">.</span><span class="n">to_adjlist</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1435,7 +1438,7 @@ memory usage: 1.4+ MB
 <p>If we had the values for each for the neighbors in this adjacency list table, then we could use a <code class="docutils literal notranslate"><span class="pre">groupby()</span></code> to summarize the values of observations connected to a given focal observation. This merge can be done directly with the original data, linking the <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> key in the adjacency list back to that observation in our source table:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">adjlist</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]],</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbor&#39;</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">adjlist</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]],</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbor&#39;</span><span class="p">,</span> 
                         <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
 <span class="n">adjlist</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -1509,12 +1512,12 @@ memory usage: 1.4+ MB
 <p>Now, we need only to group the adjacency list by the focal observation and summarize the <code class="docutils literal notranslate"><span class="pre">bedrooms</span></code> column to obtain the median number of bedrooms for each <code class="docutils literal notranslate"><span class="pre">focal</span></code> observation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bedrooms</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">bedrooms</span><span class="o">.</span><span class="n">median</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>focal
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>focal
 0       1.0
 1       2.0
 2       1.0
@@ -1539,7 +1542,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>So, we can use our 500m weights from before to build the average again:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">average_within_500</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">average_within_500</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1547,7 +1550,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>Then, we need to build the graph of airbnbs that fall <em>between</em> 500m and 1km from one another. To start, we build the <code class="docutils literal notranslate"><span class="pre">DistanceBand</span></code> graph of all listings closer than 1km:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">silence_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">silence_warnings</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1555,31 +1558,30 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>Then, using the <code class="docutils literal notranslate"><span class="pre">weights.set_operations</span></code> module, we can express set-theoretic relationships between graphs. Here, we need to <em>remove</em> the links in our 1km graph that are <em>also</em> links in the 500m graph. To do this, we need <code class="docutils literal notranslate"><span class="pre">w_difference(d1k_w,</span> <span class="pre">d500_w)</span></code>, the difference between the 1km graph and the 500m graph:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_difference</span><span class="p">(</span><span class="n">d1k_w</span><span class="p">,</span> <span class="n">d500_w</span><span class="p">,</span> <span class="n">constrained</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_difference</span><span class="p">(</span><span class="n">d1k_w</span><span class="p">,</span> <span class="n">d500_w</span><span class="p">,</span> <span class="n">constrained</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
  There are 60 disconnected components.
  There are 32 islands with ids: 762, 907, 976, 1003, 1776, 1867, 2789, 2841, 3130, 3138, 3184, 3604, 3748, 3962, 3989, 4366, 4443, 4627, 4764, 4885, 4989, 5014, 5536, 5733, 5756, 5790, 5796, 5808, 6005, 6026, 6049, 6068.
   warnings.warn(message)
-</pre>
+</pre></div>
 </div>
 </div>
 </div>
 <p>Then, we can compute the average size of listings between 500m and 1km in the same manner as before using our <code class="docutils literal notranslate"><span class="pre">d1k_exclusive</span></code> graph, which now omits all edges shorter than 500m.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span><span class="o">.</span><span class="n">transform</span><span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span><span class="o">.</span><span class="n">transform</span><span class="o">=</span> <span class="s1">&#39;r&#39;</span>
 <span class="n">average_500m_to_1k</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">d1k_exclusive</span><span class="p">,</span> 
                                          <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>(&#39;WARNING: &#39;, 762, &#39; is an island (no neighbors)&#39;)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&#39;WARNING: &#39;, 762, &#39; is an island (no neighbors)&#39;)
 (&#39;WARNING: &#39;, 907, &#39; is an island (no neighbors)&#39;)
 (&#39;WARNING: &#39;, 976, &#39; is an island (no neighbors)&#39;)
 (&#39;WARNING: &#39;, 1003, &#39; is an island (no neighbors)&#39;)
@@ -1618,7 +1620,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>Thus, we can see that the two features definitely contain distinct, but related, information, and both may be valuable as features when attempting to predict features of interest.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">average_within_500</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">average_within_500</span><span class="p">,</span>
             <span class="n">average_500m_to_1k</span><span class="p">,</span>
             <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Average size within 500 meters&quot;</span><span class="p">)</span>
@@ -1630,7 +1632,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7fdcbf6d4eb0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7fdcbf6d4eb0&gt;
 </pre></div>
 </div>
 <img alt="../_images/12_feature_engineering_94_1.png" src="../_images/12_feature_engineering_94_1.png" />
@@ -1644,20 +1646,19 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>While it would be <em>best</em> to use an explicitly-spatial model to examine this structure, we can cheat a little bit and use cluster labels themselves as features. For example, to cluster the listings based on their location, we can use hierarchical DBSCAN, an improved variant of the DBSCAN algorithm used in chapter 8.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hdbscan</span> <span class="kn">import</span> <span class="n">HDBSCAN</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hdbscan</span> <span class="kn">import</span> <span class="n">HDBSCAN</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">&lt;frozen importlib._bootstrap&gt;:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
-</pre>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;frozen importlib._bootstrap&gt;:219: RuntimeWarning: numpy.ufunc size changed, may indicate binary incompatibility. Expected 192 from C header, got 216 from PyObject
+</pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> 
                                   <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -1666,7 +1667,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>With a little tuning, we can decide on an effective parameterization. Here, we’ll look for relatively large clusters of Airbnbs, those with about 100 listings or more.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">HDBSCAN</span><span class="p">(</span><span class="n">min_cluster_size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span><span class="o">.</span><span class="n">labels_</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">HDBSCAN</span><span class="p">(</span><span class="n">min_cluster_size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span><span class="o">.</span><span class="n">labels_</span>
 </pre></div>
 </div>
 </div>
@@ -1674,7 +1675,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>The spatial distribution of these clusters gives us a sense of the geographical distribution of the observations. To help us visualize the clusters, we can construct the convex hull of the observations in each dectected cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hulls</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">convex_hull</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hulls</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">convex_hull</span>
 </pre></div>
 </div>
 </div>
@@ -1682,7 +1683,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>Since humans tend to make locational decisions hierarchically (in that they pick <em>San Diego</em>, then they pick a particular <em>part</em> of San Diego (such as the Gaslamp Quarter), then they pick a house in that part), this clustering process might give us a reasonable insight into the enclaves of competition between Airbnbs:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
                     <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
@@ -1704,7 +1705,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>Regardless, this cluster label certainly communicates some information about the price of a listing, since the distributions of prices are substantially different across the detected clusters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
                             <span class="n">flierprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> 
                             <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
@@ -1740,7 +1741,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>But we might want to stuff in a blog post or somewhere else…</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mapbox_access_token</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mapbox_access_token</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 <span class="n">demraw</span><span class="p">,</span> <span class="n">demext</span> <span class="o">=</span> <span class="n">contextily</span><span class="o">.</span><span class="n">bounds2img</span><span class="p">(</span><span class="o">*</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span><span class="o">.</span><span class="n">total_bounds</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span>
                                        <span class="n">url</span><span class="o">=</span><span class="s1">&#39;https://api.mapbox.com/v4/mapbox.terrain-rgb/&#39;</span>
                                            <span class="s1">&#39;</span><span class="si">{z}</span><span class="s1">/</span><span class="si">{x}</span><span class="s1">/</span><span class="si">{y}</span><span class="s1">.pngraw?access_token=&#39;</span><span class="o">+</span><span class="n">mapbox_access_token</span><span class="p">)</span> 
@@ -1750,28 +1751,28 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">demraw</span> <span class="o">=</span> <span class="n">demraw</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">demraw</span> <span class="o">=</span> <span class="n">demraw</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint64</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">demraw</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">demraw</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">h</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">demraw</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">b</span> <span class="o">=</span> <span class="n">demraw</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1e4</span> <span class="o">+</span> <span class="p">(</span><span class="n">demraw</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">256</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1e4</span> <span class="o">+</span> <span class="p">(</span><span class="n">demraw</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="mi">256</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> 
               <span class="n">demraw</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="mi">256</span> <span class="o">+</span> 
               <span class="n">demraw</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">])</span><span class="o">*.</span><span class="mi">1</span>
 </pre></div>
@@ -1780,14 +1781,14 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dem</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dem</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_webmerc_coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_webmerc_coords</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> 
                                              <span class="n">airbnbs</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -1795,21 +1796,21 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dembounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">demext</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">demext</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">demext</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">demext</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dembounds</span> <span class="o">=</span> <span class="p">(</span><span class="n">demext</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">demext</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">demext</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">demext</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">transform</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">from_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">dembounds</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span><span class="n">h</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">transform</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">from_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">dembounds</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span><span class="n">h</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">MemoryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">vfile</span><span class="p">:</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">MemoryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">vfile</span><span class="p">:</span>
     <span class="k">with</span> <span class="n">vfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GTiff&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">w</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
                     <span class="n">dtype</span><span class="o">=</span><span class="n">dem</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> 
                     <span class="n">crs</span><span class="o">=</span><span class="s1">&#39;epsg:3857&#39;</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span> <span class="k">as</span> <span class="n">dem_tmp</span><span class="p">:</span>
@@ -1822,7 +1823,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">elev</span> <span class="o">=</span> <span class="n">elevation_at_airbnb</span><span class="p">)</span>\
             <span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;elev&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_ext</span><span class="p">)</span>

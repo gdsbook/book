@@ -2,10 +2,9 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clustering and Regionalization &#8212; Geographic Data Science with Python</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
     <link href="../_static/css/index.css" rel="stylesheet">
@@ -15,7 +14,6 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/sphinx-book-theme.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -25,12 +23,10 @@
     <script src="../_static/togglebutton.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
-    <script src="../_static/mystnb.js"></script>
     <script src="../_static/sphinx-book-theme.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -38,6 +34,7 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://geographicdata.science/book/notebooks/10_clustering_and_regionalization.html" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -47,6 +44,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="docsearch:language" content="en">
 
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="https://geographicdata.science/book/notebooks/10_clustering_and_regionalization.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Clustering and Regionalization" />
+<meta property="og:description" content="Clustering and Regionalization  &lt;!-- **NOTE**: parts of this notebook have been borrowed from [GDS&#39;17 - Lab 6](http://darribas.org/gds17/content/labs/lab_06.htm" />
+<meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
+
+<meta name="twitter:card" content="summary" />
 
 
   </head>
@@ -369,7 +375,7 @@
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         <div class="tocsection onthispage pt-5 pb-3">
-            <i class="fas fa-list"></i> On this page
+            <i class="fas fa-list"></i> Contents
         </div>
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
@@ -462,7 +468,7 @@ borrowed from [GDS'17 - Lab
 6](http://darribas.org/gds17/content/labs/lab_06.html)
 --><div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pysal.explore.esda.moran</span> <span class="kn">import</span> <span class="n">Moran</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pysal.explore.esda.moran</span> <span class="kn">import</span> <span class="n">Moran</span>
 <span class="kn">import</span> <span class="nn">pysal.lib.weights.set_operations</span> <span class="k">as</span> <span class="nn">Wsets</span>
 <span class="kn">from</span> <span class="nn">pysal.lib.weights</span> <span class="kn">import</span> <span class="n">Queen</span><span class="p">,</span> <span class="n">KNN</span>
 <span class="kn">import</span> <span class="nn">seaborn</span> 
@@ -475,11 +481,10 @@ borrowed from [GDS'17 - Lab
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook-jbupdate/lib/python3.8/site-packages/pysal/explore/segregation/network/network.py:15: UserWarning: You need pandana and urbanaccess to work with segregation's network module
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook-jbupdate/lib/python3.8/site-packages/pysal/explore/segregation/network/network.py:15: UserWarning: You need pandana and urbanaccess to work with segregation&#39;s network module
 You can install them with  `pip install urbanaccess pandana` or `conda install -c udst pandana urbanaccess`
   warn(
-</pre>
+</pre></div>
 </div>
 </div>
 </div>
@@ -568,7 +573,7 @@ California in 2016. Let us begin by reading in the data as a GeoDataFrame and
 exploring the attribute names.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read file</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read file</span>
 <span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/sandiego/sd_tracts_acs_clean.shp&#39;</span><span class="p">)</span>
 <span class="c1"># Print column names</span>
 <span class="n">db</span><span class="o">.</span><span class="n">columns</span>
@@ -576,7 +581,7 @@ exploring the attribute names.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;Total Popu&#39;, &#39;White&#39;, &#39;Black&#39;, &#39;Hispanic&#39;,
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;Total Popu&#39;, &#39;White&#39;, &#39;Black&#39;, &#39;Hispanic&#39;,
        &#39;Med Age&#39;, &#39;Pop &lt; 18&#39;, &#39;Total Hous&#39;, &#39;In househo&#39;, &#39;Male house&#39;,
        &#39;Female hou&#39;, &#39;High Sch D&#39;, &#39;GED&#39;, &#39;Bachelor&#39;s&#39;, &#39;Travel tim&#39;,
        &#39;Income bel&#39;, &#39;Income Mal&#39;, &#39; Income Fe&#39;, &#39;Median HH&#39;, &#39;Cash publi&#39;,
@@ -605,7 +610,7 @@ Together, this set of constructed and received variables will to
 will be used for our clustering and regionalization.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pull out total house units</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pull out total house units</span>
 <span class="n">total_units</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Total Ho_1&#39;</span><span class="p">]</span>
 <span class="c1"># Calculate percentage of renter occupied units</span>
 <span class="n">pct_rental</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Renter Occ&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">total_units</span> <span class="o">+</span> <span class="p">(</span><span class="n">total_units</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="o">*</span><span class="mi">1</span><span class="p">)</span>
@@ -633,7 +638,7 @@ economic reality of each area and, taken together, they provide a comprehensive
 characterization of San Diego as a whole:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cluster_variables</span> <span class="o">=</span>  <span class="p">[</span><span class="s1">&#39;Median Val&#39;</span><span class="p">,</span>   <span class="c1"># Median house value</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cluster_variables</span> <span class="o">=</span>  <span class="p">[</span><span class="s1">&#39;Median Val&#39;</span><span class="p">,</span>   <span class="c1"># Median house value</span>
                       <span class="s1">&#39;pct_white&#39;</span><span class="p">,</span>    <span class="c1"># Percent of tract population that is white</span>
                       <span class="s1">&#39;pct_rental&#39;</span><span class="p">,</span>   <span class="c1"># Percent of households that are rented</span>
                       <span class="s1">&#39;pct_female_hh&#39;</span><span class="p">,</span><span class="c1"># Percent of female-led households </span>
@@ -658,7 +663,7 @@ want to capture with our clustering. Let’s use choropleth maps for the
 nine attributes and compare these choropleth maps side-by-side:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
 <span class="c1"># Make the axes accessible with single indexing</span>
 <span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 <span class="c1"># Start a loop over all the variables of interest</span>
@@ -702,16 +707,15 @@ First, we need to build a spatial weights matrix that encodes the spatial
 relationships in our San Diego data. We will start with queen contiguity:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_queen</span> <span class="o">=</span> <span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_queen</span> <span class="o">=</span> <span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook-jbupdate/lib/python3.8/site-packages/pysal/lib/weights/contiguity.py:185: UserWarning: There is one disconnected observation (no neighbors).
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook-jbupdate/lib/python3.8/site-packages/pysal/lib/weights/contiguity.py:185: UserWarning: There is one disconnected observation (no neighbors).
 Island id: 103
   W.__init__(self, neighbors, ids=ids, **kw)
-</pre>
+</pre></div>
 </div>
 </div>
 </div>
@@ -723,15 +727,14 @@ of at least the observation it is closest to, plus all the areas with which
 it shares any border. Let’s first create the <code class="docutils literal notranslate"><span class="pre">KNN-1</span> <span class="pre">W</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_k1</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_k1</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook-jbupdate/lib/python3.8/site-packages/pysal/lib/weights/weights.py:170: UserWarning: The weights matrix is not fully connected. There are 154 components
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook-jbupdate/lib/python3.8/site-packages/pysal/lib/weights/weights.py:170: UserWarning: The weights matrix is not fully connected. There are 154 components
   warnings.warn(&quot;The weights matrix is not fully connected. There are %d components&quot; % self.n_components)
-</pre>
+</pre></div>
 </div>
 </div>
 </div>
@@ -740,7 +743,7 @@ with no disconnected observations. This full-connected connectivity matrix is th
 one we will use for analysis:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">Wsets</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">w_queen</span><span class="p">,</span> <span class="n">w_k1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">Wsets</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">w_queen</span><span class="p">,</span> <span class="n">w_k1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -749,12 +752,12 @@ one we will use for analysis:</p>
 any islands:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">islands</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">islands</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[]
 </pre></div>
 </div>
 </div>
@@ -763,7 +766,7 @@ any islands:</p>
 the extent to which each variable contains spatial structure:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set seed for reproducibility</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set seed for reproducibility</span>
 <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
 <span class="c1"># Calculate Moran&#39;s I for each variable</span>
 <span class="n">mi_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">Moran</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">variable</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">cluster_variables</span><span class="p">]</span>
@@ -870,7 +873,7 @@ many maps to process visually, so we can turn to an alternative tool to
 explicitly focus on the bivariate relations between each pair of attributes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -931,7 +934,7 @@ illustration, we will use <span class="math notranslate nohighlight">\(k=5\)</sp
 <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>. To proceed, we first create a <code class="docutils literal notranslate"><span class="pre">KMeans</span></code> clusterer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise KMeans instance</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise KMeans instance</span>
 <span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -940,7 +943,7 @@ illustration, we will use <span class="math notranslate nohighlight">\(k=5\)</sp
 <p>Next, we call the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method to actually apply the k-means algorithm to our data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set the seed for reproducibility</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set the seed for reproducibility</span>
 <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
 <span class="c1"># Run K-Means algorithm</span>
 <span class="n">k5cls</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">])</span>
@@ -952,12 +955,12 @@ illustration, we will use <span class="math notranslate nohighlight">\(k=5\)</sp
 records the cluster to which each observation is assigned:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">k5cls</span><span class="o">.</span><span class="n">labels_</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">k5cls</span><span class="o">.</span><span class="n">labels_</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>array([4, 1, 1, 3, 3, 1, 3, 3, 3, 0, 3, 0, 0, 0, 1, 3, 0, 0, 0, 1, 1, 1,
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([4, 1, 1, 3, 3, 1, 3, 3, 3, 0, 3, 0, 0, 0, 1, 3, 0, 0, 0, 1, 1, 1,
        3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3,
        3, 3, 0, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
        1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0,
@@ -1009,7 +1012,7 @@ to have similar locations.
 Thus, this gives us one map that incorporates the information of from all nine covariates.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assign labels into a column</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assign labels into a column</span>
 <span class="n">db</span><span class="p">[</span><span class="s1">&#39;k5cls&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">k5cls</span><span class="o">.</span><span class="n">labels_</span>
 <span class="c1"># Setup figure and ax</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
@@ -1055,14 +1058,14 @@ labels we’ve obtained. We can start, for example, by
 considering cardinality, or the count of observations in each cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group data table by cluster label and count observations</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group data table by cluster label and count observations</span>
 <span class="n">k5sizes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 <span class="n">k5sizes</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>k5cls
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k5cls
 0    247
 1    116
 2      8
@@ -1076,7 +1079,7 @@ dtype: int64
 <p>And we can get a visual representation of cardinality as well:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">k5sizes</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">k5sizes</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1095,14 +1098,14 @@ polygon object. After we have dissolved all the members of the clusters,
 we report the total land area of the cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dissolve areas by Cluster, aggregate by summing, and keep column for area</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Dissolve areas by Cluster, aggregate by summing, and keep column for area</span>
 <span class="n">areas</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> <span class="n">aggfunc</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span><span class="p">)[</span><span class="s1">&#39;AREALAND&#39;</span><span class="p">]</span>
 <span class="n">areas</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>k5cls
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k5cls
 0    5816736150
 1     752511344
 2      53860347
@@ -1116,12 +1119,12 @@ Name: AREALAND, dtype: int64
 <p>And, to show this visually:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">areas</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">areas</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:xlabel=&#39;k5cls&#39;&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:xlabel=&#39;k5cls&#39;&gt;
 </pre></div>
 </div>
 <img alt="../_images/10_clustering_and_regionalization_37_1.png" src="../_images/10_clustering_and_regionalization_37_1.png" />
@@ -1132,12 +1135,12 @@ together comprise 5,816,736,150 square meters (approximately 2,245 square miles)
 which accounts for over half of the total land area in the county:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">areas</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">areas</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">areas</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">areas</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.005234836631417086
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.005234836631417086
 </pre></div>
 </div>
 </div>
@@ -1148,7 +1151,7 @@ collection of observations with similar attributes. To build a basic profile, we
 compute the means of each of the attributes in every cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
 <span class="c1"># for clustering, and obtain their mean</span>
 <span class="n">k5means</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="n">k5means</span><span class="o">.</span><span class="n">T</span>
@@ -1268,19 +1271,18 @@ obtain more detailed profiles, we can use the <code class="docutils literal notr
 after grouping our observations by their clusters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
 <span class="c1"># for clustering, and obtain their descriptive summary</span>
 <span class="n">k5desc</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 <span class="c1"># Loop over each cluster and print a table with descriptives</span>
 <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">k5desc</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">---------</span><span class="se">\n\t</span><span class="s1">Cluster </span><span class="si">%i</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">cluster</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">---------</span><span class="se">\n\t</span><span class="s1">Cluster </span><span class="si">%i</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">cluster</span>)
     <span class="nb">print</span><span class="p">(</span><span class="n">k5desc</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span><span class="o">.</span><span class="n">unstack</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>
-	---------
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>	---------
 	Cluster 0
                count           mean           std           min  \
 Median Val     247.0  272717.408907  68847.844348  16600.000000   
@@ -1412,7 +1414,7 @@ an observation, and every column is a variable. Thus, a few steps are required
 to tidy up our labelled data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Index db on cluster ID</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Index db on cluster ID</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)</span>
 <span class="c1"># Keep only variables used for clustering</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">]</span>
@@ -1493,7 +1495,7 @@ to tidy up our labelled data:</p>
 for each variable. This gives us the full distributional profile of each cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup the facets</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup the facets</span>
 <span class="n">facets</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tidy_db</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> \
                   <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="c1"># Build the plot from `sns.kdeplot`</span>
@@ -1542,7 +1544,7 @@ section. In this case, we use the <code class="docutils literal notranslate"><sp
 use the <code class="docutils literal notranslate"><span class="pre">fit</span></code> method to actually apply the clustering algorithm to our data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set seed for reproducibility</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set seed for reproducibility</span>
 <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 <span class="c1"># Iniciate the algorithm</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
@@ -1557,13 +1559,13 @@ use the <code class="docutils literal notranslate"><span class="pre">fit</span><
 <p>As above, we can check the number of observations that fall within each cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ward5sizes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ward5&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ward5sizes</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ward5&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 <span class="n">ward5sizes</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>ward5
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ward5
 0    134
 1    326
 2     16
@@ -1577,7 +1579,7 @@ dtype: int64
 <p>Further, we can check the simple average profiles of our clusters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ward5means</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ward5&#39;</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ward5means</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;ward5&#39;</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="n">ward5means</span><span class="o">.</span><span class="n">T</span>
 </pre></div>
 </div>
@@ -1689,7 +1691,7 @@ dtype: int64
 tidying up):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Index db on cluster ID</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Index db on cluster ID</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;ward5&#39;</span><span class="p">)</span>
 <span class="c1"># Keep only variables used for clustering</span>
 <span class="n">tidy_db</span> <span class="o">=</span> <span class="n">tidy_db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">]</span>
@@ -1768,7 +1770,7 @@ tidying up):</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup the facets</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup the facets</span>
 <span class="n">facets</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">tidy_db</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">&#39;Attribute&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;ward5&#39;</span><span class="p">,</span> \
                   <span class="n">sharey</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">aspect</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">col_wrap</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="c1"># Build the plot as a `sns.kdeplot`</span>
@@ -1786,7 +1788,7 @@ However, the interpretation is analogous to that of the k-means example.</p>
 clustering solution by making a map the clusters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
 <span class="c1"># Setup figure and ax</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
@@ -1810,7 +1812,7 @@ clustering solution by making a map the clusters:</p>
 results side by side:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
 <span class="c1"># Setup figure and ax</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
@@ -1896,7 +1898,7 @@ This will force the agglomerative algorithm to only allow observations to be gro
 in a cluster if they are also spatially connected:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span>
                                             <span class="n">connectivity</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">sparse</span><span class="p">,</span>
                                             <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
@@ -1905,7 +1907,7 @@ in a cluster if they are also spatially connected:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>AgglomerativeClustering(connectivity=&lt;627x627 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AgglomerativeClustering(connectivity=&lt;627x627 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
 	with 3961 stored elements in Compressed Sparse Row format&gt;,
                         n_clusters=5)
 </pre></div>
@@ -1915,7 +1917,7 @@ in a cluster if they are also spatially connected:</p>
 <p>Let’s inspect the output:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5wq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5wq&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
 <span class="c1"># Setup figure and ax</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
@@ -1953,7 +1955,7 @@ where each observation is connected to its four nearest observations, instead
 of those it touches.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_shapefile</span><span class="p">(</span><span class="s1">&#39;../data/sandiego/sd_tracts_acs_clean.shp&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span> <span class="o">=</span> <span class="n">KNN</span><span class="o">.</span><span class="n">from_shapefile</span><span class="p">(</span><span class="s1">&#39;../data/sandiego/sd_tracts_acs_clean.shp&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1962,7 +1964,7 @@ of those it touches.</p>
 another AHC regionalization:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123456</span><span class="p">)</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span>
                                             <span class="n">connectivity</span><span class="o">=</span><span class="n">w</span><span class="o">.</span><span class="n">sparse</span><span class="p">,</span>
                                             <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
@@ -1971,7 +1973,7 @@ another AHC regionalization:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>AgglomerativeClustering(connectivity=&lt;627x627 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AgglomerativeClustering(connectivity=&lt;627x627 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
 	with 2508 stored elements in Compressed Sparse Row format&gt;,
                         n_clusters=5)
 </pre></div>
@@ -1981,7 +1983,7 @@ another AHC regionalization:</p>
 <p>And plot the final regions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5wknn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5wknn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
 <span class="c1"># Setup figure and ax</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Plot unique values choropleth including a legend and with no boundary lines</span>
