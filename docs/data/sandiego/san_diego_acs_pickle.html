@@ -2,10 +2,9 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Replace NAN values with column mean &#8212; Geographic Data Science with Python</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
     <link href="../../_static/css/index.css" rel="stylesheet">
@@ -15,7 +14,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/sphinx-book-theme.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -25,12 +23,10 @@
     <script src="../../_static/togglebutton.js"></script>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
-    <script src="../../_static/mystnb.js"></script>
     <script src="../../_static/sphinx-book-theme.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -38,6 +34,7 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://geographicdata.science/book/data/sandiego/san_diego_acs_pickle.html" />
     <link rel="shortcut icon" href="../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -45,6 +42,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="docsearch:language" content="en">
 
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="https://geographicdata.science/book/data/sandiego/san_diego_acs_pickle.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Replace NAN values with column mean" />
+<meta property="og:description" content="Replace NAN values with column mean  for col in df_copy.columns:     print(col)     try:         df_copy[col].fillna(((df_copy[col]).mean()), inplace=True)     " />
+<meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
+
+<meta name="twitter:card" content="summary" />
 
 
   </head>
@@ -367,7 +373,7 @@
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         <div class="tocsection onthispage pt-5 pb-3">
-            <i class="fas fa-list"></i> On this page
+            <i class="fas fa-list"></i> Contents
         </div>
         <nav id="bd-toc-nav">
             
@@ -381,7 +387,7 @@
                 
   <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
 <span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -393,7 +399,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># previously: newdata.to_pickle(&#39;sd_df.pkl&#39;)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># previously: newdata.to_pickle(&#39;sd_df.pkl&#39;)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s1">&#39;sd_df.pkl&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -401,7 +407,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span>
 </pre></div>
 </div>
 </div>
@@ -1906,13 +1912,12 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: &#39;colormap&#39; is deprecated, please use &#39;cmap&#39; instead (for consistency with matplotlib)
   &quot;(for consistency with matplotlib)&quot;, FutureWarning)
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
   binIds += (x &gt; l) * (x &lt;= r) * k
@@ -1920,9 +1925,9 @@
   binIds += (x &gt; l) * (x &lt;= r) * k
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
   r = func(a, **kwargs)
-</pre>
+</pre></div>
 </div>
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43558434e0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43558434e0&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_3_2.png" src="../../_images/san_diego_acs_pickle_3_2.png" />
@@ -1930,13 +1935,12 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25035_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25035_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: &#39;colormap&#39; is deprecated, please use &#39;cmap&#39; instead (for consistency with matplotlib)
   &quot;(for consistency with matplotlib)&quot;, FutureWarning)
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
   binIds += (x &gt; l) * (x &lt;= r) * k
@@ -1944,9 +1948,9 @@
   binIds += (x &gt; l) * (x &lt;= r) * k
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
   r = func(a, **kwargs)
-</pre>
+</pre></div>
 </div>
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4352493128&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4352493128&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_4_2.png" src="../../_images/san_diego_acs_pickle_4_2.png" />
@@ -1954,12 +1958,12 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span><span class="o">.</span><span class="n">columns</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;,
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;,
        &#39;B03003_003E&#39;, &#39;B01002_001E&#39;, &#39;B09001_001E&#39;, &#39;B09019_001E&#39;,
        &#39;B09019_002E&#39;, &#39;B09019_005E&#39;, &#39;B09019_006E&#39;, &#39;B15003_017E&#39;,
        &#39;B15003_018E&#39;, &#39;B15003_002E&#39;, &#39;B08303_001E&#39;, &#39;B17001_002E&#39;,
@@ -1979,20 +1983,20 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sbn</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sbn</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
 <span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Median House Value&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f434bdf72b0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f434bdf72b0&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_7_1.png" src="../../_images/san_diego_acs_pickle_7_1.png" />
@@ -2000,14 +2004,13 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">year_built</span> <span class="o">=</span> <span class="s1">&#39;B25035_001E&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">year_built</span> <span class="o">=</span> <span class="s1">&#39;B25035_001E&#39;</span>
 <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">year_built</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: &#39;colormap&#39; is deprecated, please use &#39;cmap&#39; instead (for consistency with matplotlib)
   &quot;(for consistency with matplotlib)&quot;, FutureWarning)
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
   binIds += (x &gt; l) * (x &lt;= r) * k
@@ -2015,9 +2018,9 @@
   binIds += (x &gt; l) * (x &lt;= r) * k
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
   r = func(a, **kwargs)
-</pre>
+</pre></div>
 </div>
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f434aeb8ef0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f434aeb8ef0&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_8_2.png" src="../../_images/san_diego_acs_pickle_8_2.png" />
@@ -2025,13 +2028,13 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">year_built</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">year_built</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
 <span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Median Year Built&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4349df1b38&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4349df1b38&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_9_1.png" src="../../_images/san_diego_acs_pickle_9_1.png" />
@@ -2039,7 +2042,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -2048,7 +2051,7 @@
 <h1>Replace NAN values with column mean<a class="headerlink" href="#replace-nan-values-with-column-mean" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_copy</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_copy</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">df_copy</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(((</span><span class="n">df_copy</span><span class="p">[</span><span class="n">col</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2058,7 +2061,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>GEOID
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GEOID
 GEOID_x
 GEOID_x
 B01003_001E
@@ -2135,13 +2138,13 @@ geometry
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">])</span>
 <span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Median House Value&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4349dba550&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4349dba550&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_13_1.png" src="../../_images/san_diego_acs_pickle_13_1.png" />
@@ -2149,19 +2152,19 @@ geometry
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pysal</span> <span class="k">as</span> <span class="nn">ps</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pysal</span> <span class="k">as</span> <span class="nn">ps</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="o">.</span><span class="n">columns</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="o">.</span><span class="n">columns</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;,
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;GEOID_x&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;,
        &#39;B03003_003E&#39;, &#39;B01002_001E&#39;, &#39;B09001_001E&#39;, &#39;B09019_001E&#39;,
        &#39;B09019_002E&#39;, &#39;B09019_005E&#39;, &#39;B09019_006E&#39;, &#39;B15003_017E&#39;,
        &#39;B15003_018E&#39;, &#39;B15003_002E&#39;, &#39;B08303_001E&#39;, &#39;B17001_002E&#39;,
@@ -2181,131 +2184,129 @@ geometry
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">Rook</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">Rook</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/weights/weights.py:186: UserWarning: There is one disconnected observation (no neighbors)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/weights/weights.py:186: UserWarning: There is one disconnected observation (no neighbors)
   warnings.warn(&quot;There is one disconnected observation (no neighbors)&quot;)
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/weights/weights.py:187: UserWarning: Island id: 103
   warnings.warn(&quot;Island id: %s&quot; % str(self.islands[0]))
-</pre>
+</pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span><span class="o">.</span><span class="n">n</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span><span class="o">.</span><span class="n">n</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>628
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>628
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span><span class="o">.</span><span class="n">islands</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_rook</span><span class="o">.</span><span class="n">islands</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[103]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[103]
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span><span class="o">.</span><span class="n">islands</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span><span class="o">.</span><span class="n">islands</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[]
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[]
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_k4</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">year_built</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">year_built</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran</span><span class="p">(</span><span class="n">year_built</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran</span><span class="p">(</span><span class="n">year_built</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">p_norm</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">p_norm</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.0
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">I</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">I</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.65063390055088199
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.65063390055088199
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">EI</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">yb_mi</span><span class="o">.</span><span class="n">EI</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>-0.001594896331738437
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-0.001594896331738437
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">12345</span><span class="p">)</span>
 <span class="n">yb_lmi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">year_built</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/moran.py:835: RuntimeWarning: invalid value encountered in true_divide
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/moran.py:835: RuntimeWarning: invalid value encountered in true_divide
   self.z_sim = (self.Is - self.EI_sim) / self.seI_sim
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:875: RuntimeWarning: invalid value encountered in greater
   return (self.a &lt; x) &amp; (x &lt; self.b)
@@ -2313,32 +2314,31 @@ geometry
   return (self.a &lt; x) &amp; (x &lt; self.b)
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:1731: RuntimeWarning: invalid value encountered in greater_equal
   cond2 = (x &gt;= self.b) &amp; cond0
-</pre>
+</pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">yb_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">yb_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>101
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>101
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">med_value</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">med_value</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span>
 <span class="n">mv_lmi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">med_value</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/moran.py:835: RuntimeWarning: invalid value encountered in true_divide
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/moran.py:835: RuntimeWarning: invalid value encountered in true_divide
   self.z_sim = (self.Is - self.EI_sim) / self.seI_sim
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:875: RuntimeWarning: invalid value encountered in greater
   return (self.a &lt; x) &amp; (x &lt; self.b)
@@ -2346,56 +2346,56 @@ geometry
   return (self.a &lt; x) &amp; (x &lt; self.b)
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/scipy/stats/_distn_infrastructure.py:1731: RuntimeWarning: invalid value encountered in greater_equal
   cond2 = (x &gt;= self.b) &amp; cond0
-</pre>
+</pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">mv_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">mv_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>112
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>112
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran</span><span class="p">(</span><span class="n">med_value</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran</span><span class="p">(</span><span class="n">med_value</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span><span class="o">.</span><span class="n">p_norm</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span><span class="o">.</span><span class="n">p_norm</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.0
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span><span class="o">.</span><span class="n">p_sim</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mv_mi</span><span class="o">.</span><span class="n">p_sim</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.001
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.001
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25003_003E&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25001_001E&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25003_003E&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B25001_001E&#39;</span><span class="p">]</span>
 <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(((</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2403,13 +2403,13 @@ geometry
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">])</span>
 <span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Renter Occupied (pct.)&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4342715f98&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f4342715f98&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_35_1.png" src="../../_images/san_diego_acs_pickle_35_1.png" />
@@ -2417,19 +2417,18 @@ geometry
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
 
 <span class="n">df_copy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: &#39;colormap&#39; is deprecated, please use &#39;cmap&#39; instead (for consistency with matplotlib)
   &quot;(for consistency with matplotlib)&quot;, FutureWarning)
-</pre>
+</pre></div>
 </div>
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4349e30cf8&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4349e30cf8&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_36_2.png" src="../../_images/san_diego_acs_pickle_36_2.png" />
@@ -2437,12 +2436,12 @@ geometry
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>               Quantiles               
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>               Quantiles               
  
 Lower          Upper              Count
 =======================================
@@ -2457,7 +2456,7 @@ Lower          Upper              Count
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">renter_pct</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">renter_pct</span> <span class="o">=</span> <span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;renter_pct&#39;</span><span class="p">]</span>
 <span class="n">renter_pct_lmi</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">renter_pct</span><span class="p">,</span> <span class="n">w_k4</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2465,36 +2464,36 @@ Lower          Upper              Count
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">renter_pct_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">renter_pct_lmi</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>125
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>125
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">df_copy</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>628
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>628
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19083_001E&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19083_001E&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>343    0.553800
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>343    0.553800
 176    0.457600
 167    0.471800
 133    0.444500
@@ -2562,7 +2561,7 @@ Name: B19083_001E, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gini</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gini</span>
 <span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
 
 <span class="n">df_copy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B19083_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
@@ -2570,12 +2569,11 @@ Name: B19083_001E, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: &#39;colormap&#39; is deprecated, please use &#39;cmap&#39; instead (for consistency with matplotlib)
   &quot;(for consistency with matplotlib)&quot;, FutureWarning)
-</pre>
+</pre></div>
 </div>
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4348ba1c50&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f4348ba1c50&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_42_2.png" src="../../_images/san_diego_acs_pickle_42_2.png" />
@@ -2583,13 +2581,13 @@ Name: B19083_001E, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_005E&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sbn</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_005E&#39;</span><span class="p">])</span>
 <span class="n">sbn</span><span class="o">.</span><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Lower limit top 5pct&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f43433bf320&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.text.Text at 0x7f43433bf320&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_43_1.png" src="../../_images/san_diego_acs_pickle_43_1.png" />
@@ -2597,7 +2595,7 @@ Name: B19083_001E, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ll top 5pct</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ll top 5pct</span>
 <span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
 
 <span class="n">df_copy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B19080_005E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
@@ -2605,12 +2603,11 @@ Name: B19083_001E, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: &#39;colormap&#39; is deprecated, please use &#39;cmap&#39; instead (for consistency with matplotlib)
   &quot;(for consistency with matplotlib)&quot;, FutureWarning)
-</pre>
+</pre></div>
 </div>
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43433ae5c0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43433ae5c0&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_44_2.png" src="../../_images/san_diego_acs_pickle_44_2.png" />
@@ -2618,13 +2615,13 @@ Name: B19083_001E, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">llq5</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_005E&#39;</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">llq5</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_005E&#39;</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="n">llq5</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>                    Quantiles                    
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                    Quantiles                    
  
   Lower                Upper                Count
 =================================================
@@ -2638,13 +2635,13 @@ Name: B19083_001E, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">q1</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_001E&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">q1</span> <span class="o">=</span> <span class="n">ps</span><span class="o">.</span><span class="n">Quantiles</span><span class="p">(</span><span class="n">df_copy</span><span class="p">[</span><span class="s1">&#39;B19080_001E&#39;</span><span class="p">])</span>
 <span class="n">q1</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>                    Quantiles                    
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>                    Quantiles                    
  
   Lower                Upper                Count
 =================================================
@@ -2659,7 +2656,7 @@ Name: B19083_001E, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># q1</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># q1</span>
 <span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
 
 <span class="n">df_copy</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B19080_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
@@ -2667,12 +2664,11 @@ Name: B19083_001E, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: &#39;colormap&#39; is deprecated, please use &#39;cmap&#39; instead (for consistency with matplotlib)
   &quot;(for consistency with matplotlib)&quot;, FutureWarning)
-</pre>
+</pre></div>
 </div>
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43419c4400&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f43419c4400&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_pickle_47_2.png" src="../../_images/san_diego_acs_pickle_47_2.png" />
