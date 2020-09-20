@@ -3,7 +3,6 @@ FROM darribas/gds_py:5.0
 # Local docs
 RUN rm -R work/
 COPY ./README.md ${HOME}/README.md
-RUN mkdir ${HOME}/content
 COPY ./notebooks ${HOME}/notebooks
 COPY ./figures ${HOME}/figures
 COPY ./data ${HOME}/data
