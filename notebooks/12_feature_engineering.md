@@ -8,12 +8,12 @@ jupyter:
       format_version: '1.2'
       jupytext_version: 1.5.2
   kernelspec:
-    display_name: Python [conda env:analysis]
+    display_name: Python 3
     language: python
-    name: conda-env-analysis-py
+    name: python3
 ---
 
-# Geographic feature engineering
+# Spatial Feature Engineering
 
 
 In machine learning and data science, we are often equipped with *tons* of data. Indeed, given the constellation of packages to query data services, free and open source data sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful *features* from this rich and deep sea of data. 
@@ -42,7 +42,7 @@ Throughout this chapter, we will use a common dataset to which we want to append
 airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')
 ```
 
-# What is spatial feature engineering? 
+## What is spatial feature engineering? 
 
 At its core, *spatial feature engineering* is the process of developing additional information from raw data using *geographic knowledge*. This synthesis could occur *between* datasets, where geography is used to link samples in separate datasets together; or *within* datasets, where geography can be used to borrow information from nearby samples. Building linkages *between* datasets is often called "Map Matching", while we use the term "Map Synthesis" to describe the use of geographical structure to derive new features from existing data. Both kinds of geographic feature engineering will be covered in this chapter, starting first with various methods for Map Matching when modelling Airbnb nightly rental prices in San Diego.
 
@@ -646,11 +646,6 @@ Beyond feature engineering, statistical techniques we discuss in this book (part
 
 
 # Questions
-
-
----
-
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
 
 
 ---

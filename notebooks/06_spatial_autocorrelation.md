@@ -517,10 +517,4 @@ Tukey, J. W. (1977). Exploratory data analysis (Vol. 2).
    G dissagree substantially. What could drive such a result? What does that
    mean for the use and interpretation of both statistics?
 
----
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
-
-```python
-
-```
