@@ -608,7 +608,6 @@ In this case, for the default of a three by three grid spanning the point patter
 ```python
 qstat.chi2_pvalue
 ```
-
 In contrast, our totally random point process will have nearly the same points in every cell:
 
 
@@ -624,7 +623,6 @@ This means its p-value will be large, and likely not significant:
 ```python
 qstat_null.chi2_pvalue
 ```
-
 Be careful, however: the fact that quadrat counts are measured in *regular tiling* within the study area (that is, squares or hexagons that cover the entire bounding box), irregular *but random* patterns can be mistakenly found "significant" by this approach. 
 
 For example, on the random simulations from within the alpha shape, we have the following quadrat count:
@@ -642,7 +640,6 @@ The quadrat test finds this to be *statistically nonrandom*, while our simulatin
 ```python
 qstat_null_ashape.chi2_pvalue
 ```
-
 ### Ripley's alphabet functions
 
 A large branch of spatial statistics focuses on the distributions of three quantities in a point pattern. They derive from earlier work by Ripley [2] on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases. 
@@ -810,7 +807,6 @@ The function returns two objects, which we call `cs` and `lbls`. `cs` contains t
 # Print the first 5 elements of `cs`
 cs[:5]
 ```
-
 The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as it is the 23rd, 31st, 36th, and 43rd. The object `cs` always has a variable length, depending on how many cores the algorithm finds.
 
 Now let us have a look at `lbls`, short for labels:
@@ -819,7 +815,6 @@ Now let us have a look at `lbls`, short for labels:
 ```python
 lbls[:5]
 ```
-
 The labels object always has the same length as the number of points used to run `DBSCAN`. Each value represents the index of the cluster a point belongs to. If the point is classified as *noise*, it receives a -1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make thinks easier later on, let us turn `lbls` into a `Series` object that we can index in the same way as our collection of points:
 
 
@@ -865,7 +860,6 @@ Let us change those parameters to see if we can pick up more general patterns. F
 minp = numpy.round(db.shape[0] * 0.01)
 minp
 ```
-
 At the same time, let us expand the maximum radious to say, 500 metres. Then we can re-run the algorithm and plot the output, all in the same cell this time:
 
 

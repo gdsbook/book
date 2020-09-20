@@ -1,4 +1,4 @@
-# Mexico data
+# Mexico
 
 This dataset contains decadal GDP/capita for Mexican states, from 1940-2000.
 
