@@ -635,7 +635,7 @@ ax.set_ylim(0,1250)
 plt.show()
 ```
 
-# Conclusion
+## Conclusion
 
 
 Feature engineering is a powerful way to enrich your data analysis capabilities. It's often within reach of your existing data analysis methods: at a minimum, it only requires that new variables are constructed from your existing data. At a maximum, feature engineering gives you the *ultimate linkage key*, a flexible and powerful tool with which you can unlock the value held in many *other* datasets that you may have access to. 
@@ -645,7 +645,7 @@ The main operations and methods that are involved in feature engineering, such a
 Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters 10 and 11) can leverage spatial structure *directly* during learning. These techniques can best simpler less-complicated models that learn from spatially-engineered features. However, the techniques in this chatper (and the methods that extend upon them) are immediately useful for most practicing data scientists, and can be integrated into nearly any analytical method or approach. 
 
 
-# Questions
+## Questions
 
 
 ---
