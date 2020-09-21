@@ -1,4 +1,4 @@
-# Texas data
+# Texas
 
 This dataset includes geometries for Texas counties.
 

@@ -8,12 +8,12 @@ jupyter:
       format_version: '1.2'
       jupytext_version: 1.5.2
   kernelspec:
-    display_name: Python [conda env:analysis]
+    display_name: Python 3
     language: python
-    name: conda-env-analysis-py
+    name: python3
 ---
 
-# Geographic feature engineering
+# Spatial Feature Engineering
 
 
 In machine learning and data science, we are often equipped with *tons* of data. Indeed, given the constellation of packages to query data services, free and open source data sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful *features* from this rich and deep sea of data. 
@@ -42,7 +42,7 @@ Throughout this chapter, we will use a common dataset to which we want to append
 airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')
 ```
 
-# What is spatial feature engineering? 
+## What is spatial feature engineering? 
 
 At its core, *spatial feature engineering* is the process of developing additional information from raw data using *geographic knowledge*. This synthesis could occur *between* datasets, where geography is used to link samples in separate datasets together; or *within* datasets, where geography can be used to borrow information from nearby samples. Building linkages *between* datasets is often called "Map Matching", while we use the term "Map Synthesis" to describe the use of geographical structure to derive new features from existing data. Both kinds of geographic feature engineering will be covered in this chapter, starting first with various methods for Map Matching when modelling Airbnb nightly rental prices in San Diego.
 
@@ -635,7 +635,7 @@ ax.set_ylim(0,1250)
 plt.show()
 ```
 
-# Conclusion
+## Conclusion
 
 
 Feature engineering is a powerful way to enrich your data analysis capabilities. It's often within reach of your existing data analysis methods: at a minimum, it only requires that new variables are constructed from your existing data. At a maximum, feature engineering gives you the *ultimate linkage key*, a flexible and powerful tool with which you can unlock the value held in many *other* datasets that you may have access to. 
@@ -645,12 +645,7 @@ The main operations and methods that are involved in feature engineering, such a
 Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters 10 and 11) can leverage spatial structure *directly* during learning. These techniques can best simpler less-complicated models that learn from spatially-engineered features. However, the techniques in this chatper (and the methods that extend upon them) are immediately useful for most practicing data scientists, and can be integrated into nearly any analytical method or approach. 
 
 
-# Questions
-
-
----
-
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+## Questions
 
 
 ---

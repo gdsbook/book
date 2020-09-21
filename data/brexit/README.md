@@ -1,4 +1,5 @@
-# Brexit data
+# Brexit
+## Brexit dataset
 
 This dataset contains results for the Brexit vote at the local authority district, and administrative boundaries.
 
