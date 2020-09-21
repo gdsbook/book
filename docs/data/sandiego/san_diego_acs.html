@@ -2,9 +2,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connect to database &#8212; Geographic Data Science with Python</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
     <link href="../../_static/css/index.css" rel="stylesheet">
@@ -14,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/sphinx-book-theme.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -23,10 +25,12 @@
     <script src="../../_static/togglebutton.js"></script>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/mystnb.js"></script>
     <script src="../../_static/sphinx-book-theme.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -50,7 +54,7 @@
 <meta property="og:description" content="Connect to database  api_conn = cen.base.Connection(api_database) api_conn  Connection to 2011-2015 American Community Survey 5-Year Estimates (ID: http://api.c" />
 <meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
 
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary">
 
 
   </head>
@@ -95,6 +99,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="../../notebooks/00_toc.html">
    Table of Contents
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/references.html">
+   References
   </a>
  </li>
 </ul>
@@ -338,7 +347,7 @@
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         <div class="tocsection onthispage pt-5 pb-3">
-            <i class="fas fa-list"></i> Contents
+            <i class="fas fa-list"></i> On this page
         </div>
         <nav id="bd-toc-nav">
             
@@ -352,7 +361,7 @@
                 
   <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
 <span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span><span class="mi">12</span>  <span class="c1"># change this line if you want to change the default map size</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -364,17 +373,17 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">databases</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">cen</span><span class="o">.</span><span class="n">explorer</span><span class="o">.</span><span class="n">available</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">databases</span> <span class="o">=</span> <span class="p">[(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">cen</span><span class="o">.</span><span class="n">explorer</span><span class="o">.</span><span class="n">available</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()]</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;total number of databases:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">databases</span><span class="p">))</span>
 <span class="n">databases</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>total number of databases: 223
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>total number of databases: 223
 </pre></div>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(&#39;pubschlfin2012&#39;,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;pubschlfin2012&#39;,
   &#39;2012 Public Elementary-Secondary Education Finance: Individual Unit Tables&#39;),
  (&#39;CBP2012&#39;, &#39;2012 County Business Patterns: Business Patterns&#39;),
  (&#39;POPESTPROJagegroups2014&#39;,
@@ -389,13 +398,14 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_database</span> <span class="o">=</span> <span class="s1">&#39;ACSSF5Y2015&#39;</span>  <span class="c1"># ACS 2011-2015</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_database</span> <span class="o">=</span> <span class="s1">&#39;ACSSF5Y2015&#39;</span>  <span class="c1"># ACS 2011-2015</span>
 <span class="n">cen</span><span class="o">.</span><span class="n">explorer</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">api_database</span><span class="p">)</span>
+
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;2011-2015 American Community Survey 5-Year Estimates&#39;: &#39;The American Community Survey (ACS) is an ongoing survey that provides data every year -- giving communities the current information they need to plan investments and services. The ACS covers a broad range of topics about social, economic, demographic, and housing characteristics of the U.S. population.  Summary files include the following geographies: nation, all states (including DC and Puerto Rico), all metropolitan areas, all congressional districts (114th congress), all counties, all places, and all tracts and block groups.  Summary files contain the most detailed cross-tabulations, many of which are published down to block groups. The data are population and housing counts. There are over 64,000 variables in this dataset.&#39;}
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{&#39;2011-2015 American Community Survey 5-Year Estimates&#39;: &#39;The American Community Survey (ACS) is an ongoing survey that provides data every year -- giving communities the current information they need to plan investments and services. The ACS covers a broad range of topics about social, economic, demographic, and housing characteristics of the U.S. population.  Summary files include the following geographies: nation, all states (including DC and Puerto Rico), all metropolitan areas, all congressional districts (114th congress), all counties, all places, and all tracts and block groups.  Summary files contain the most detailed cross-tabulations, many of which are published down to block groups. The data are population and housing counts. There are over 64,000 variables in this dataset.&#39;}
 </pre></div>
 </div>
 </div>
@@ -404,32 +414,32 @@
 <h1>Connect to database<a class="headerlink" href="#connect-to-database" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span> <span class="o">=</span> <span class="n">cen</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Connection</span><span class="p">(</span><span class="n">api_database</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span> <span class="o">=</span> <span class="n">cen</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Connection</span><span class="p">(</span><span class="n">api_database</span><span class="p">)</span>
 <span class="n">api_conn</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Connection to 2011-2015 American Community Survey 5-Year Estimates (ID: http://api.census.gov/data/id/ACSSF5Y2015)
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Connection to 2011-2015 American Community Survey 5-Year Estimates (ID: http://api.census.gov/data/id/ACSSF5Y2015)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">geographies</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">geographies</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;fips&#39;])
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>dict_keys([&#39;fips&#39;])
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">geographies</span><span class="p">[</span><span class="s1">&#39;fips&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">geographies</span><span class="p">[</span><span class="s1">&#39;fips&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -942,7 +952,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># san diego, ca</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># san diego, ca</span>
 <span class="n">g_unit</span> <span class="o">=</span> <span class="s1">&#39;tract&#39;</span>
 <span class="n">g_filter</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;state&#39;</span><span class="p">:</span><span class="s1">&#39;06&#39;</span><span class="p">,</span> <span class="s1">&#39;county&#39;</span><span class="p">:</span><span class="s1">&#39;073&#39;</span><span class="p">}</span>
 </pre></div>
@@ -954,13 +964,13 @@
 <h1>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Attributes in the ACS:&#39;</span><span class="p">,</span> <span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Attributes in the ACS:&#39;</span><span class="p">,</span> <span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Attributes in the ACS: 45503
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>Attributes in the ACS: 45503
 </pre></div>
 </div>
 <div class="output text_html"><div>
@@ -1053,7 +1063,7 @@
 <p>http://www.socialexplorer.com/data/ACS2015_5yr/metadata/?ds=ACS15_5yr</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1111,7 +1121,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">codes</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;B01003_001E </span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">codes</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;B01003_001E </span>
 <span class="s2">B02001_002E </span>
 <span class="s2">B02001_003E </span>
 <span class="s2">B03003_003E </span>
@@ -1154,7 +1164,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;B01003_001E&#39;,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;B01003_001E&#39;,
  &#39;B02001_002E&#39;,
  &#39;B02001_003E&#39;,
  &#39;B03003_003E&#39;,
@@ -1212,7 +1222,7 @@ cols.extend([‘B25017_001E’, ‘B25035_001E’, ‘B25041_001E’, ‘B25077_
 <p>cols.extend([‘B19301_001E’,’B19113_001E’])</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">]</span>
 <span class="n">cols</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">codes</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1220,7 +1230,7 @@ cols.extend([‘B25017_001E’, ‘B25035_001E’, ‘B25041_001E’, ‘B25077_
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1509,20 +1519,21 @@ cols.extend([‘B25017_001E’, ‘B25035_001E’, ‘B25041_001E’, ‘B25077_
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">api_conn</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">geo_unit</span><span class="o">=</span><span class="n">g_unit</span><span class="p">,</span> <span class="n">geo_filter</span><span class="o">=</span><span class="n">g_filter</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">api_conn</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">geo_unit</span><span class="o">=</span><span class="n">g_unit</span><span class="p">,</span> <span class="n">geo_filter</span><span class="o">=</span><span class="n">g_filter</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/Users/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/cenpy/remote.py:167: FutureWarning: convert_objects is deprecated.  Use the data-type specific converters pd.to_datetime, pd.to_timedelta and pd.to_numeric.
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/Users/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/cenpy/remote.py:167: FutureWarning: convert_objects is deprecated.  Use the data-type specific converters pd.to_datetime, pd.to_timedelta and pd.to_numeric.
   df[cols] = df[cols].convert_objects(convert_numeric=convert_numeric)
-</pre></div>
+</pre>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span>
 </pre></div>
 </div>
 </div>
@@ -3027,24 +3038,24 @@ cols.extend([‘B25017_001E’, ‘B25035_001E’, ‘B25041_001E’, ‘B25077_
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(628, 41)
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(628, 41)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;B15003_002E&#39;</span><span class="p">]</span> <span class="c1"># bachelors degree</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;B15003_002E&#39;</span><span class="p">]</span> <span class="c1"># bachelors degree</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0        0
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0        0
 1        0
 2        0
 3       53
@@ -3112,7 +3123,7 @@ Name: B15003_002E, dtype: int64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">GEOID</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">GEOID</span>
 <span class="c1">#14000US</span>
 <span class="n">data</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;14000US&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
 </pre></div>
@@ -3121,24 +3132,24 @@ Name: B15003_002E, dtype: int64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>38
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>38
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">index</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">index</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;06073000100&#39;, &#39;06073000201&#39;, &#39;06073000202&#39;, &#39;06073000300&#39;,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;06073000100&#39;, &#39;06073000201&#39;, &#39;06073000202&#39;, &#39;06073000300&#39;,
        &#39;06073000400&#39;, &#39;06073000500&#39;, &#39;06073000600&#39;, &#39;06073000700&#39;,
        &#39;06073000800&#39;, &#39;06073000900&#39;,
        ...
@@ -3152,7 +3163,7 @@ Name: B15003_002E, dtype: int64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cols_detail</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cols_detail</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
 <span class="n">cols_detail</span>
 </pre></div>
 </div>
@@ -3325,12 +3336,12 @@ Name: B15003_002E, dtype: int64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">columns</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">columns</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;, &#39;B03003_003E&#39;,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;GEOID&#39;, &#39;B01003_001E&#39;, &#39;B02001_002E&#39;, &#39;B02001_003E&#39;, &#39;B03003_003E&#39;,
        &#39;B01002_001E&#39;, &#39;B09001_001E&#39;, &#39;B09019_001E&#39;, &#39;B09019_002E&#39;,
        &#39;B09019_005E&#39;, &#39;B09019_006E&#39;, &#39;B15003_017E&#39;, &#39;B15003_018E&#39;,
        &#39;B15003_002E&#39;, &#39;B08303_001E&#39;, &#39;B17001_002E&#39;, &#39;B17001_003E&#39;,
@@ -3347,12 +3358,12 @@ Name: B15003_002E, dtype: int64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cen</span><span class="o">.</span><span class="n">tiger</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cen</span><span class="o">.</span><span class="n">tiger</span><span class="o">.</span><span class="n">available</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[{&#39;name&#39;: &#39;AIANNHA&#39;, &#39;type&#39;: &#39;MapServer&#39;},
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[{&#39;name&#39;: &#39;AIANNHA&#39;, &#39;type&#39;: &#39;MapServer&#39;},
  {&#39;name&#39;: &#39;CBSA&#39;, &#39;type&#39;: &#39;MapServer&#39;},
  {&#39;name&#39;: &#39;Hydro_LargeScale&#39;, &#39;type&#39;: &#39;MapServer&#39;},
  {&#39;name&#39;: &#39;Hydro&#39;, &#39;type&#39;: &#39;MapServer&#39;},
@@ -3384,13 +3395,13 @@ Name: B15003_002E, dtype: int64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">set_mapservice</span><span class="p">(</span><span class="s1">&#39;tigerWMS_ACS2015&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">set_mapservice</span><span class="p">(</span><span class="s1">&#39;tigerWMS_ACS2015&#39;</span><span class="p">)</span>
 <span class="n">api_conn</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Connection to 2011-2015 American Community Survey 5-Year Estimates(ID: http://api.census.gov/data/id/ACSSF5Y2015)
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Connection to 2011-2015 American Community Survey 5-Year Estimates(ID: http://api.census.gov/data/id/ACSSF5Y2015)
 With MapServer: Census ACS 2015 WMS
 </pre></div>
 </div>
@@ -3398,12 +3409,12 @@ With MapServer: Census ACS 2015 WMS
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">mapservice</span><span class="o">.</span><span class="n">layers</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">mapservice</span><span class="o">.</span><span class="n">layers</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: (ESRILayer) 2010 Census Public Use Microdata Areas,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{0: (ESRILayer) 2010 Census Public Use Microdata Areas,
  1: (ESRILayer) 2010 Census Public Use Microdata Areas Labels,
  2: (ESRILayer) 2010 Census ZIP Code Tabulation Areas,
  3: (ESRILayer) 2010 Census ZIP Code Tabulation Areas Labels,
@@ -3495,33 +3506,33 @@ With MapServer: Census ACS 2015 WMS
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">mapservice</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">mapservice</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span>
 <span class="c1">#https://tigerweb.geo.census.gov/arcgis/rest/services/TIGERweb/tigerWMS_ACS2015/MapServer/8</span>
 <span class="c1"># Spatial Reference: 102100 (3857)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(ESRILayer) Census Tracts
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(ESRILayer) Census Tracts
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geodata</span> <span class="o">=</span> <span class="n">api_conn</span><span class="o">.</span><span class="n">mapservice</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;STATE=06 and COUNTY=073&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="o">=</span><span class="s1">&#39;geopandas&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">geodata</span> <span class="o">=</span> <span class="n">api_conn</span><span class="o">.</span><span class="n">mapservice</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">layer</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="s1">&#39;STATE=06 and COUNTY=073&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="o">=</span><span class="s1">&#39;geopandas&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">dir</span><span class="p">(</span><span class="n">geodata</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">dir</span><span class="p">(</span><span class="n">geodata</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[&#39;AREALAND&#39;,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;AREALAND&#39;,
  &#39;AREAWATER&#39;,
  &#39;BASENAME&#39;,
  &#39;CENTLAT&#39;,
@@ -4028,7 +4039,7 @@ With MapServer: Census ACS 2015 WMS
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">geodata</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;GEOID&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">geodata</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s1">&#39;GEOID&#39;</span><span class="p">)</span>
 <span class="n">newdata</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">newdata</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -4036,12 +4047,13 @@ With MapServer: Census ACS 2015 WMS
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25064_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;B25064_001E&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;QUANTILES&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">colormap</span><span class="o">=</span><span class="s1">&#39;OrRd&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: &#39;colormap&#39; is deprecated, please use &#39;cmap&#39; instead (for consistency with matplotlib)
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/geopandas/plotting.py:225: FutureWarning: 'colormap' is deprecated, please use 'cmap' instead (for consistency with matplotlib)
   &quot;(for consistency with matplotlib)&quot;, FutureWarning)
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/pysal/esda/mapclassify.py:267: RuntimeWarning: invalid value encountered in greater
   binIds += (x &gt; l) * (x &lt;= r) * k
@@ -4049,9 +4061,9 @@ With MapServer: Census ACS 2015 WMS
   binIds += (x &gt; l) * (x &lt;= r) * k
 /home/serge/anaconda3/envs/gdsbook3/lib/python3.5/site-packages/numpy/lib/function_base.py:3858: RuntimeWarning: Invalid value encountered in median
   r = func(a, **kwargs)
-</pre></div>
+</pre>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7efd9f215be0&gt;
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7efd9f215be0&gt;
 </pre></div>
 </div>
 <img alt="../../_images/san_diego_acs_38_2.png" src="../../_images/san_diego_acs_38_2.png" />
@@ -4059,7 +4071,7 @@ With MapServer: Census ACS 2015 WMS
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span>
 </pre></div>
 </div>
 </div>
@@ -5564,7 +5576,7 @@ With MapServer: Census ACS 2015 WMS
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geodata</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">geodata</span>
 </pre></div>
 </div>
 </div>
@@ -6883,12 +6895,12 @@ With MapServer: Census ACS 2015 WMS
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geodata</span><span class="o">.</span><span class="n">columns</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">geodata</span><span class="o">.</span><span class="n">columns</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;AREALAND&#39;, &#39;AREAWATER&#39;, &#39;BASENAME&#39;, &#39;CENTLAT&#39;, &#39;CENTLON&#39;, &#39;COUNTY&#39;,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Index([&#39;AREALAND&#39;, &#39;AREAWATER&#39;, &#39;BASENAME&#39;, &#39;CENTLAT&#39;, &#39;CENTLON&#39;, &#39;COUNTY&#39;,
        &#39;FUNCSTAT&#39;, &#39;GEOID&#39;, &#39;INTPTLAT&#39;, &#39;INTPTLON&#39;, &#39;LSADC&#39;, &#39;MTFCC&#39;, &#39;NAME&#39;,
        &#39;OBJECTID&#39;, &#39;OID&#39;, &#39;STATE&#39;, &#39;TRACT&#39;, &#39;geometry&#39;],
       dtype=&#39;object&#39;)
@@ -6898,12 +6910,12 @@ With MapServer: Census ACS 2015 WMS
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geodata</span><span class="p">[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">geodata</span><span class="p">[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0      06073004300
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0      06073004300
 1      06073004400
 2      06073004600
 3      06073004700
@@ -6971,12 +6983,12 @@ Name: GEOID, dtype: object
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GEOID
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>GEOID
 06073000100    14000US06073000100
 06073000201    14000US06073000201
 06073000202    14000US06073000202
@@ -7045,12 +7057,12 @@ Name: GEOID, dtype: object
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">label</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">api_conn</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">ix</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span><span class="o">.</span><span class="n">label</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>GEOID                                      Geographic Identifier
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>GEOID                                      Geographic Identifier
 B01003_001E                                                Total
 B02001_002E                                          White alone
 B02001_003E                      Black or African American alone
@@ -7095,12 +7107,12 @@ Name: label, dtype: object
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span><span class="p">[</span><span class="s1">&#39;B25064_001E&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span><span class="p">[</span><span class="s1">&#39;B25064_001E&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>343       NaN
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>343       NaN
 176     966.0
 167    1333.0
 133    1327.0
@@ -7168,12 +7180,12 @@ Name: B25064_001E, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span><span class="p">[</span><span class="s1">&#39;B25077_001E&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>343    1038200.0
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>343    1038200.0
 176     754900.0
 167     589000.0
 133     498900.0
@@ -7241,7 +7253,7 @@ Name: B25077_001E, dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="s1">&#39;sd_df.pkl&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">newdata</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="s1">&#39;sd_df.pkl&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

@@ -2,9 +2,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sampling a DEM at specified points &#8212; Geographic Data Science with Python</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
     <link href="../../_static/css/index.css" rel="stylesheet">
@@ -14,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
     <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/sphinx-book-theme.js"></script>
     <script src="../../_static/jquery.js"></script>
@@ -23,10 +25,12 @@
     <script src="../../_static/togglebutton.js"></script>
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/mystnb.js"></script>
     <script src="../../_static/sphinx-book-theme.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -50,7 +54,7 @@
 <meta property="og:description" content="Sampling a DEM at specified points  Given a raster and a point shapefile, get elevations from the raster by sampling at each point in shapefile.  Follows the lo" />
 <meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
 
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary">
 
 
   </head>
@@ -95,6 +99,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="../../notebooks/00_toc.html">
    Table of Contents
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/references.html">
+   References
   </a>
  </li>
 </ul>
@@ -338,7 +347,7 @@
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         <div class="tocsection onthispage pt-5 pb-3">
-            <i class="fas fa-list"></i> Contents
+            <i class="fas fa-list"></i> On this page
         </div>
         <nav id="bd-toc-nav">
             
@@ -357,14 +366,15 @@
 <p>http://gis.stackexchange.com/questions/46893/getting-pixel-value-of-gdal-raster-under-ogr-point-without-numpy</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">gdal</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+<span class="kn">import</span> <span class="nn">gdal</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ogr</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ogr</span>
 <span class="kn">import</span> <span class="nn">struct</span>
 </pre></div>
 </div>
@@ -372,7 +382,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shp_f</span> <span class="o">=</span> <span class="s1">&#39;sampling.shp&#39;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">shp_f</span> <span class="o">=</span> <span class="s1">&#39;sampling.shp&#39;</span>
 <span class="n">r_f</span> <span class="o">=</span> <span class="s1">&#39;sd_mea300.tif&#39;</span>
 </pre></div>
 </div>
@@ -380,7 +390,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">src</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">r_f</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">src</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">r_f</span><span class="p">)</span>
 <span class="n">gt</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">GetGeoTransform</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -388,12 +398,12 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(-117.284803179,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(-117.284803179,
  0.008147910069767332,
  0.0,
  33.0841995655,
@@ -405,7 +415,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># note gt[2]==gt[4]==0 so image is north up</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># note gt[2]==gt[4]==0 so image is north up</span>
 <span class="c1"># gt[1] is pixel width</span>
 <span class="c1"># gt[5] is pixel height</span>
 <span class="c1"># gt[0], gt[3] is top levt corner of the top left pixel of the raster</span>
@@ -415,33 +425,33 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rb</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rb</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rb</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rb</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;osgeo.gdal.Band; proxy of &lt;Swig Object of type &#39;GDALRasterBandShadow *&#39; at 0x7f1be00965d0&gt; &gt;
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;osgeo.gdal.Band; proxy of &lt;Swig Object of type &#39;GDALRasterBandShadow *&#39; at 0x7f1be00965d0&gt; &gt;
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">ogr</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">shp_f</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="n">ogr</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">shp_f</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span> <span class="o">=</span> <span class="p">[]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">lyr</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">GetLayer</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">feat</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lyr</span><span class="p">):</span>
     <span class="n">geom</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">GetGeometryRef</span><span class="p">()</span>
@@ -459,7 +469,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0 -117.00194036983297 32.581881678016465 34 60 54
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>0 -117.00194036983297 32.581881678016465 34 60 54
 1 -116.9768121144805 32.653028883813334 37 52 165
 2 -116.97181345668919 32.66147659114107 38 51 184
 3 -116.95125174294384 32.63869423281108 40 53 189
@@ -781,7 +791,7 @@
 319 -117.06890009845384 32.620725645422695 26 56 33
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>320 -117.03844225943712 32.59360153727043 30 59 46
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>320 -117.03844225943712 32.59360153727043 30 59 46
 321 -117.0861495402851 32.60223761495546 24 58 14
 322 -117.04679925028266 32.62353672914223 29 55 77
 323 -117.07370576055496 32.60973669815488 25 57 20
@@ -1338,7 +1348,7 @@
 874 -117.16428167888482 32.721048791721 14 43 32
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>875 -117.16560953305078 32.72151044588728 14 43 32
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>875 -117.16560953305078 32.72151044588728 14 43 32
 876 -117.16483597160118 32.723915822016124 14 43 32
 877 -117.16554211156227 32.72249149192685 14 43 32
 878 -117.16185140959449 32.720308403414485 15 43 32
@@ -1835,7 +1845,7 @@
 1369 -117.15837647105865 32.707646740720655 15 45 0
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1370 -117.15307088629318 32.71124369216521 16 45 4
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>1370 -117.15307088629318 32.71124369216521 16 45 4
 1371 -117.1499386360918 32.71500032384673 16 44 17
 1372 -117.15691016603604 32.712970230451155 15 44 15
 1373 -117.15732114607506 32.71463657340935 15 44 15
@@ -2311,7 +2321,7 @@
 1843 -117.17237517862648 32.73634504492162 13 42 19
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1844 -117.16738779728013 32.74889501027523 14 40 88
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>1844 -117.16738779728013 32.74889501027523 14 40 88
 1845 -117.1547468321053 32.745792277027086 15 40 88
 1846 -117.16669827506213 32.74479218338434 14 41 83
 1847 -117.15664960156816 32.74905137297529 15 40 88
@@ -2872,7 +2882,7 @@
 2402 -117.27987880203355 32.830899101570274 0 30 0
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2403 -117.27923287930709 32.828633757418416 0 30 0
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>2403 -117.27923287930709 32.828633757418416 0 30 0
 2404 -117.27410819318688 32.838775656323996 1 29 52
 2405 -117.25499804894552 32.81302381675136 3 32 63
 2406 -117.27958119115299 32.84376936443113 0 29 0
@@ -3400,7 +3410,7 @@
 2928 -117.23525385418213 32.75066199321816 6 40 18
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2929 -117.23963278259433 32.74960458467035 5 40 23
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>2929 -117.23963278259433 32.74960458467035 5 40 23
 2930 -117.22397112848157 32.745212931123675 7 40 39
 2931 -117.23674828410056 32.741585919302935 5 41 60
 2932 -117.2419254389456 32.74832026557404 5 40 23
@@ -3959,7 +3969,7 @@
 3485 -117.25105996385149 32.78395730955361 4 36 0
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3486 -117.25265219933029 32.77693486248503 3 37 0
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>3486 -117.25265219933029 32.77693486248503 3 37 0
 3487 -117.25235675418949 32.78063216100098 3 36 0
 3488 -117.25291340902136 32.76339359073841 3 38 0
 3489 -117.2528441664549 32.788853859015376 3 35 0
@@ -4467,7 +4477,7 @@
 3991 -117.2419597283928 32.79051384377873 5 35 11
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3992 -117.2498407819206 32.76829647989408 4 38 0
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>3992 -117.2498407819206 32.76829647989408 4 38 0
 3993 -117.23977393090371 32.78820577668931 5 35 11
 3994 -117.23728327242084 32.78687442180918 5 35 11
 3995 -117.14581321142529 32.77498976284147 17 37 17
@@ -5047,7 +5057,7 @@
 4569 -117.12995445464806 32.74110805275057 19 41 97
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>4570 -117.1347358972371 32.74151871086302 18 41 84
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>4570 -117.1347358972371 32.74151871086302 18 41 84
 4571 -117.14230253314776 32.750853697241034 17 40 93
 4572 -117.14191023155486 32.753960279910416 17 39 103
 4573 -117.12698917941913 32.73846505800488 19 41 97
@@ -5561,7 +5571,7 @@
 5081 -117.2454510554159 32.794990056105384 4 34 11
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5082 -117.23425459282409 32.80606230264319 6 33 20
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>5082 -117.23425459282409 32.80606230264319 6 33 20
 5083 -117.2361783206374 32.798113524324215 5 34 17
 5084 -117.25412297173922 32.79486958038273 3 34 0
 5085 -117.25518253742419 32.79871389528117 3 34 0
@@ -6133,7 +6143,7 @@
 5651 -117.25322578691541 32.80111885836925 3 34 0
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>5652 -117.2368086820526 32.80878925218874 5 33 36
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>5652 -117.2368086820526 32.80878925218874 5 33 36
 5653 -117.25484249542461 32.80500034165476 3 33 26
 5654 -117.25575904464708 32.8046173813868 3 33 26
 5655 -117.23901628959135 32.805305911637475 5 33 36
@@ -6708,7 +6718,7 @@
 6224 -117.08214612363153 32.82523432310656 24 31 118
 </pre></div>
 </div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>6225 -117.10187927068911 32.82858652201823 22 30 111
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>6225 -117.10187927068911 32.82858652201823 22 30 111
 6226 -117.07087552042405 32.54587647487835 26 65 12
 6227 -117.24623066079288 32.87217003887937 4 25 118
 6228 -117.24951099726815 32.93181056162556 4 18 2
@@ -7097,24 +7107,24 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="p">,</span><span class="n">py</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">px</span><span class="p">,</span><span class="n">py</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(3, 12)
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(3, 12)
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[[0, -117.00194036983297, 32.581881678016465, 54],
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[[0, -117.00194036983297, 32.581881678016465, 54],
  [1, -116.9768121144805, 32.653028883813334, 165],
  [2, -116.97181345668919, 32.66147659114107, 184],
  [3, -116.95125174294384, 32.63869423281108, 189],
@@ -8121,7 +8131,7 @@
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 </pre></div>
 </div>
 </div>
@@ -8130,19 +8140,19 @@
 pd.DataFrame(data,columns=[‘Country’,’Volume’]).set_index(‘Country’)</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">elevation</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;idx&#39;</span><span class="p">,</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;elevation&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;idx&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">edf</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">elevation</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;idx&#39;</span><span class="p">,</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;elevation&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;idx&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edf</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">edf</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>idx
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>idx
 0        54
 1       165
 2       184
@@ -8211,7 +8221,7 @@ Name: elevation, dtype: int64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">edf</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="s2">&quot;elevation_df.pkl&quot;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">edf</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="s2">&quot;elevation_df.pkl&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

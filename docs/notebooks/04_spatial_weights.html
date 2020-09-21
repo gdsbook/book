@@ -2,9 +2,10 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spatial Weights &#8212; Geographic Data Science with Python</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
     <link href="../_static/css/index.css" rel="stylesheet">
@@ -14,6 +15,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script src="../_static/sphinx-book-theme.js"></script>
     <script src="../_static/jquery.js"></script>
@@ -23,10 +25,12 @@
     <script src="../_static/togglebutton.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
+    <script src="../_static/mystnb.js"></script>
     <script src="../_static/sphinx-book-theme.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -52,7 +56,7 @@
 <meta property="og:description" content="Spatial Weights  Introduction  Spatial weights are widely used in geographic data science to represent geographical relationships between the observational unit" />
 <meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
 
-<meta name="twitter:card" content="summary" />
+<meta name="twitter:card" content="summary">
 
 
   </head>
@@ -97,6 +101,11 @@
  <li class="toctree-l1">
   <a class="reference internal" href="00_toc.html">
    Table of Contents
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="references.html">
+   References
   </a>
  </li>
 </ul>
@@ -340,7 +349,7 @@
     <!-- Table of contents -->
     <div class="d-none d-md-block col-md-2 bd-toc show">
         <div class="tocsection onthispage pt-5 pb-3">
-            <i class="fas fa-list"></i> Contents
+            <i class="fas fa-list"></i> On this page
         </div>
         <nav id="bd-toc-nav">
             <ul class="nav section-nav flex-column">
@@ -468,7 +477,7 @@ How many gas stations are within 5 miles of my stalled car?
 In what follows, we first consider different approaches to construct spatial weights, distinguishing between those based on contiguity/adjacency relations from weights obtained from distance based relationships. We then discuss the case of hybrid weights which combine one or more spatial operations in deriving the neighbor relationships between observations. We illustrate all of these concepts through the spatial weights class in PySAL which provides a rich set of methods and characteristics for spatial weights. We also demonstrate its functionality regarding set theory, which permits the derivation of weights through application of notions from set theory. Throughout the chapter, we discuss common file formats used to store spatial weights of different types, and we include visual discussion of spatial weights, making these sometimes abstract constructs more intuitive.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 
 <span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
 <span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">cg</span> <span class="k">as</span> <span class="n">geometry</span>
@@ -491,7 +500,7 @@ no so simple. The first complication is that there are different notions of
 contiguity to consider. First, though, let’s use a simple example of a three-by-three grid:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get points in a grid</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get points in a grid</span>
 <span class="n">l</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">xs</span><span class="p">,</span> <span class="n">ys</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
 <span class="c1"># Set up store</span>
@@ -503,14 +512,14 @@ contiguity to consider. First, though, let’s use a simple example of a three-b
 <span class="c1"># Convert to GeoSeries</span>
 <span class="n">polys</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">polys</span><span class="p">)</span>
 <span class="n">gdf</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">({</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">polys</span><span class="p">,</span> 
-                        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;P-</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">str</span>(i).zfill(2) for i in range(len(polys))]})
+                        <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;P-</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">polys</span><span class="p">))]})</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
 <span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> 
           <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
           <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
@@ -530,14 +539,14 @@ contiguity to consider. First, though, let’s use a simple example of a three-b
 question share an <em>edge</em>. According to this definition, polygon <span class="math notranslate nohighlight">\(0\)</span> would be a rook neighbor of <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(3\)</span>, while <span class="math notranslate nohighlight">\(1\)</span> would be a rook neighbor with <span class="math notranslate nohighlight">\(0\)</span>, <span class="math notranslate nohighlight">\(2\)</span>, and <span class="math notranslate nohighlight">\(4\)</span>. Applying this rule to all 9 polygons we can model our neighbor relations as:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># do a regular 3x3 lattice and draw it here</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># do a regular 3x3 lattice and draw it here</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Rook</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 <span class="n">w</span><span class="o">.</span><span class="n">neighbors</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: [1, 3],
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{0: [1, 3],
  1: [0, 2, 4],
  2: [1, 5],
  3: [0, 4, 6],
@@ -553,7 +562,7 @@ question share an <em>edge</em>. According to this definition, polygon <span cla
 <p>Shown visually, we can see this plotted on top of the same grid of labelled polygons, using red dotted lines showing connetions between the polygons:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">))</span>
 <span class="n">w</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">),</span> <span class="n">ax</span> <span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> 
@@ -581,7 +590,7 @@ memory requirements. However, it is possible to create the fully dense
 representation if needed:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">full</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="o">*</span><span class="n">w</span><span class="o">.</span><span class="n">full</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -731,12 +740,12 @@ representation if needed:</p>
 <p>As you can see from the matrix above, most entries are zero. In fact out of all of the possible <span class="math notranslate nohighlight">\(9^2=81\)</span> linkages that there could be in this matrix, there are only twenty-four:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">nonzero</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">nonzero</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>24
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>24
 </pre></div>
 </div>
 </div>
@@ -762,14 +771,14 @@ requires the pair of polygons to only share one or more <em>vertices</em>. We ca
 neighbor relations for this same configuration as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># do a regular 3x3 lattice and draw it here</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># do a regular 3x3 lattice and draw it here</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 <span class="n">w</span><span class="o">.</span><span class="n">neighbors</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: [1, 3, 4],
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{0: [1, 3, 4],
  1: [0, 2, 3, 4, 5],
  2: [1, 4, 5],
  3: [0, 1, 4, 6, 7],
@@ -785,7 +794,7 @@ neighbor relations for this same configuration as follows:</p>
 <p>In addition to this neighbors representation, we can also express the graph visually, as done before:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">))</span>
 <span class="n">w</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">),</span> <span class="n">ax</span> <span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">gdf</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="p">[</span><span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> 
@@ -808,12 +817,12 @@ weights, values are usually binary and, as in any <code class="docutils literal 
 <code class="docutils literal notranslate"><span class="pre">weights</span></code> attribute:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">weights</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">weights</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: [1.0, 1.0, 1.0],
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{0: [1.0, 1.0, 1.0],
  1: [1.0, 1.0, 1.0, 1.0, 1.0],
  2: [1.0, 1.0, 1.0],
  3: [1.0, 1.0, 1.0, 1.0, 1.0],
@@ -836,12 +845,12 @@ large number of other attributes and methods that can be useful. The
 <code class="docutils literal notranslate"><span class="pre">cardinalities</span></code> attribute reports the number of neighbors for each observation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">cardinalities</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">cardinalities</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: 3, 1: 5, 2: 3, 3: 5, 4: 8, 5: 5, 6: 3, 7: 5, 8: 3}
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{0: 3, 1: 5, 2: 3, 3: 5, 4: 8, 5: 5, 6: 3, 7: 5, 8: 3}
 </pre></div>
 </div>
 </div>
@@ -850,12 +859,12 @@ large number of other attributes and methods that can be useful. The
 these cardinalities:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">histogram</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">histogram</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(3, 4), (4, 0), (5, 4), (6, 0), (7, 0), (8, 1)]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[(3, 4), (4, 0), (5, 4), (6, 0), (7, 0), (8, 1)]
 </pre></div>
 </div>
 </div>
@@ -864,7 +873,7 @@ these cardinalities:</p>
 into a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> and creating a histogram:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">cardinalities</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">);</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">cardinalities</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
@@ -884,12 +893,12 @@ represented by a non-zero weight in a <span class="math notranslate nohighlight"
 of joins.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">s0</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">s0</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>40.0
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>40.0
 </pre></div>
 </div>
 </div>
@@ -899,12 +908,12 @@ sparsity) of the spatial weights matrix (if we had it stored explicitly, which
 we don’t):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">pct_nonzero</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">pct_nonzero</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>49.382716049382715
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>49.382716049382715
 </pre></div>
 </div>
 </div>
@@ -925,17 +934,18 @@ must construct it ourselves. Under the hood, PySAL uses efficient spatial indexi
 structures to extract these.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">san_diego_tracts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/sandiego/sd_tracts_acs_clean.shp&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">san_diego_tracts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/sandiego/sd_tracts_acs_clean.shp&#39;</span><span class="p">)</span>
 <span class="n">wq</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:167: UserWarning: The weights matrix is not fully connected: 
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:167: UserWarning: The weights matrix is not fully connected: 
  There are 2 disconnected components.
  There is 1 island with id: 103.
   warnings.warn(message)
-</pre></div>
+</pre>
 </div>
 </div>
 </div>
@@ -943,7 +953,7 @@ structures to extract these.</p>
 <p>Like before, we can visualize the adjacency relationships, but they are much more difficult to see without showing a closer detail:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
 <span class="n">wq</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> 
         <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
         <span class="n">node_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
@@ -958,7 +968,7 @@ structures to extract these.</p>
 <p>So, showing more detail, we can get a glimpse of the complicated structure of the contiguity relationships between tracts in the center city:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
 <span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">wq</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> 
         <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
         <span class="n">node_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">))</span>
@@ -968,7 +978,7 @@ structures to extract these.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(-13040000.0, -13020000.0, 3850000.0, 3860000.0)
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(-13040000.0, -13020000.0, 3850000.0, 3860000.0)
 </pre></div>
 </div>
 <img alt="../_images/04_spatial_weights_35_1.png" src="../_images/04_spatial_weights_35_1.png" />
@@ -978,13 +988,13 @@ structures to extract these.</p>
 we encountered with our artificial layout above:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">wq</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">wq</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">wq</span><span class="o">.</span><span class="n">pct_nonzero</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>627
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>627
 1.0067942074993195
 </pre></div>
 </div>
@@ -995,7 +1005,7 @@ also much more sparse for the tracts than what we saw for our smaller toy
 layout. Moreover, the cardinalities have a radically different distribution:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">wq</span><span class="o">.</span><span class="n">cardinalities</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">s</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">wq</span><span class="o">.</span><span class="n">cardinalities</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
 </pre></div>
 </div>
@@ -1009,7 +1019,7 @@ queen neighbors. The most common number of neighbors is 6.</p>
 <p>There is also a function to create the rook weights for the same dataframe:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Rook</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Rook</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">wr</span><span class="o">.</span><span class="n">pct_nonzero</span><span class="p">)</span>
 <span class="n">s</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">wr</span><span class="o">.</span><span class="n">cardinalities</span><span class="p">)</span>
 <span class="n">s</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
@@ -1017,14 +1027,15 @@ queen neighbors. The most common number of neighbors is 6.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.8592599375777417
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>0.8592599375777417
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:167: UserWarning: The weights matrix is not fully connected: 
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:167: UserWarning: The weights matrix is not fully connected: 
  There are 2 disconnected components.
  There is 1 island with id: 103.
   warnings.warn(message)
-</pre></div>
+</pre>
 </div>
 <img alt="../_images/04_spatial_weights_41_2.png" src="../_images/04_spatial_weights_41_2.png" />
 </div>
@@ -1047,12 +1058,12 @@ issue and explore it a bit further. PySAL indicates that the disconnected
 observation has <code class="docutils literal notranslate"><span class="pre">id:</span> <span class="pre">103</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span><span class="o">.</span><span class="n">islands</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span><span class="o">.</span><span class="n">islands</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[103]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[103]
 </pre></div>
 </div>
 </div>
@@ -1062,12 +1073,12 @@ neighbors according to the specific contiguity criterion. Checking the
 <code class="docutils literal notranslate"><span class="pre">neighbors</span></code> attribute we see an empty list for this observation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[]
 </pre></div>
 </div>
 </div>
@@ -1075,12 +1086,12 @@ neighbors according to the specific contiguity criterion. Checking the
 <p>in contrast to say observation with <code class="docutils literal notranslate"><span class="pre">id:</span> <span class="pre">10</span></code> which has six neighbors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">10</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[5, 214, 6, 9, 11, 12]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[5, 214, 6, 9, 11, 12]
 </pre></div>
 </div>
 </div>
@@ -1108,7 +1119,7 @@ between these polygon objects, however. To do so we develop a representative
 point for each of the polygons using the so called “center of mass” or centroid.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wk4</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wk4</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1120,12 +1131,12 @@ polygons in this case, PySAL uses inter-centroid distances to distance determine
 <p>The knn weights solve our island problem:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wk4</span><span class="o">.</span><span class="n">islands</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wk4</span><span class="o">.</span><span class="n">islands</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[]
 </pre></div>
 </div>
 </div>
@@ -1134,12 +1145,12 @@ polygons in this case, PySAL uses inter-centroid distances to distance determine
 that each observation has the same number of neighbors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wk4</span><span class="o">.</span><span class="n">histogram</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wk4</span><span class="o">.</span><span class="n">histogram</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(4, 9)]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[(4, 9)]
 </pre></div>
 </div>
 </div>
@@ -1167,7 +1178,7 @@ Law), but may decay at different rates with respect to distance.</p>
 call:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_kernel</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">Kernel</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_kernel</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">Kernel</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1188,12 +1199,12 @@ observations use the same distance for the cut-off. We can inspect this from
 the generated <code class="docutils literal notranslate"><span class="pre">W</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_kernel</span><span class="o">.</span><span class="n">function</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_kernel</span><span class="o">.</span><span class="n">function</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;triangular&#39;
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&#39;triangular&#39;
 </pre></div>
 </div>
 </div>
@@ -1201,12 +1212,12 @@ the generated <code class="docutils literal notranslate"><span class="pre">W</sp
 <p>for the kernel function, and:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_kernel</span><span class="o">.</span><span class="n">bandwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_kernel</span><span class="o">.</span><span class="n">bandwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[1.0000001],
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>array([[1.0000001],
        [1.0000001],
        [1.0000001],
        [1.0000001],
@@ -1225,7 +1236,7 @@ characteristics- can be preferred. Adaptive bandwidths are picked again using a 
 <p>For example, using the first ten tracts in our San Diego tract data, we can see that the centroids of each tract are not exactly regularly-spaced, although others do nearly fall into a regular spacing:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top_30</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">top_30</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">top_30</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">top_30</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">centroid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
@@ -1239,13 +1250,13 @@ characteristics- can be preferred. Adaptive bandwidths are picked again using a 
 <p>We can see that the adaptive bandwidth adjusts for this:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_adaptive</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">Kernel</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">top_30</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_adaptive</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">Kernel</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">top_30</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
 <span class="n">w_adaptive</span><span class="o">.</span><span class="n">bandwidth</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[7065.75104957],
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>array([[7065.75104957],
        [5728.46240793],
        [5766.83702384],
        [4334.37049483],
@@ -1282,7 +1293,7 @@ characteristics- can be preferred. Adaptive bandwidths are picked again using a 
 <p>And, we can visualize what these kernels look like on the map, too, by focusing on an individual unit and showing how the distance deacy attenuates the weight by grabbing the corresponding row of the full kernel matrix:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">full_matrix</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="n">w_adaptive</span><span class="o">.</span><span class="n">full</span><span class="p">()</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">full_matrix</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="n">w_adaptive</span><span class="o">.</span><span class="n">full</span><span class="p">()</span> 
 <span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">))</span>
 <span class="n">top_30</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">weight_0</span> <span class="o">=</span> <span class="n">full_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;weight_0&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;plasma&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">top_30</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">weight_15</span> <span class="o">=</span> <span class="n">full_matrix</span><span class="p">[</span><span class="mi">17</span><span class="p">])</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;weight_15&quot;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;plasma&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -1293,7 +1304,7 @@ characteristics- can be preferred. Adaptive bandwidths are picked again using a 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[None, None]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[None, None]
 </pre></div>
 </div>
 <img alt="../_images/04_spatial_weights_67_1.png" src="../_images/04_spatial_weights_67_1.png" />
@@ -1305,12 +1316,12 @@ increased memory requirements, as every single pair of observations within the
 bandwidth distance is considered:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_kernel</span><span class="o">.</span><span class="n">pct_nonzero</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_kernel</span><span class="o">.</span><span class="n">pct_nonzero</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>40.74074074074074
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>40.74074074074074
 </pre></div>
 </div>
 </div>
@@ -1333,7 +1344,7 @@ other observations are within the buffer. If they are, they are assigned a
 weight of one in the spatial weights matrix, if not they receive a zero.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_bdb</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_bdb</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1349,7 +1360,7 @@ everyone else. For this example we will return to the small lattice example
 covered in the beginning:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_hy</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_hy</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1362,12 +1373,12 @@ matrix.</p>
 not 1 or 0 only, but there are values in-between:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_hy</span><span class="o">.</span><span class="n">weights</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_hy</span><span class="o">.</span><span class="n">weights</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: [1.0, 1.0, 0.7071067811865475],
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{0: [1.0, 1.0, 0.7071067811865475],
  1: [1.0, 1.0, 0.7071067811865475, 1.0, 0.7071067811865475],
  2: [1.0, 0.7071067811865475, 1.0],
  3: [1.0, 0.7071067811865475, 1.0, 1.0, 0.7071067811865475],
@@ -1390,12 +1401,12 @@ not 1 or 0 only, but there are values in-between:</p>
 <p>which contrasts with the original weights:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">weights</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">weights</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{0: [1.0, 1.0, 1.0],
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{0: [1.0, 1.0, 1.0],
  1: [1.0, 1.0, 1.0, 1.0, 1.0],
  2: [1.0, 1.0, 1.0],
  3: [1.0, 1.0, 1.0, 1.0, 1.0],
@@ -1424,7 +1435,7 @@ distance based weights for the case of counties in the state of Texas. First, le
 a KNN-4 object that ignores the curvature of the Earth’s surface:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">texas</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/texas/texas.shp&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">texas</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/texas/texas.shp&#39;</span><span class="p">)</span>
 <span class="n">knn4_bad</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">texas</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span> <span class="c1"># ignore curvature of the earth</span>
 </pre></div>
 </div>
@@ -1432,12 +1443,12 @@ a KNN-4 object that ignores the curvature of the Earth’s surface:</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">knn4_bad</span><span class="o">.</span><span class="n">histogram</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knn4_bad</span><span class="o">.</span><span class="n">histogram</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(4, 254)]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[(4, 254)]
 </pre></div>
 </div>
 </div>
@@ -1447,13 +1458,13 @@ radious of the Earth expressed in a given metric. PySAL provides this number
 in both miles and kilometres. For the sake of the example, we will use miles:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">radius</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">sphere</span><span class="o">.</span><span class="n">RADIUS_EARTH_MILES</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">radius</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">sphere</span><span class="o">.</span><span class="n">RADIUS_EARTH_MILES</span>
 <span class="n">radius</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3958.755865744055
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>3958.755865744055
 </pre></div>
 </div>
 </div>
@@ -1464,19 +1475,19 @@ expressed in the units we have used for the radious, that is in miles in our
 case:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">knn4</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">texas</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knn4</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">texas</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">knn4</span><span class="o">.</span><span class="n">histogram</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knn4</span><span class="o">.</span><span class="n">histogram</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(4, 254)]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[(4, 254)]
 </pre></div>
 </div>
 </div>
@@ -1485,24 +1496,24 @@ case:</p>
 Earth’s surface can create erroneous neighbor pairs:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">knn4</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knn4</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{6: 1.0, 4: 1.0, 5: 1.0, 3: 1.0}
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{6: 1.0, 4: 1.0, 5: 1.0, 3: 1.0}
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">knn4_bad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knn4_bad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{6: 1.0, 4: 1.0, 5: 1.0, 13: 1.0}
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>{6: 1.0, 4: 1.0, 5: 1.0, 13: 1.0}
 </pre></div>
 </div>
 </div>
@@ -1531,7 +1542,7 @@ original contiguity weight to obtain a fully connected set of weights. Recall th
 <p>But, since this is real data, we might want to take a look first by plotting our disconnected tract in red on top of the existing tracts. To do this, let’s first extract our “problem” geometry:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">disconnected_tract</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">103</span><span class="p">]]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">disconnected_tract</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">103</span><span class="p">]]</span>
 </pre></div>
 </div>
 </div>
@@ -1539,7 +1550,7 @@ original contiguity weight to obtain a fully connected set of weights. Recall th
 <p>build a good “viewing” window around this polygon by <em>buffering</em> it, giving a good context around the focal unit of observation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">buffer</span> <span class="o">=</span> <span class="n">disconnected_tract</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">buffer</span> <span class="o">=</span> <span class="n">disconnected_tract</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">2000</span><span class="p">)</span>
 <span class="n">west</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -1548,7 +1559,7 @@ original contiguity weight to obtain a fully connected set of weights. Recall th
 <p>Then, we can make a plot of the tracts, zooming into the frame established by our buffer:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">disconnected_tract</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">north</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -1563,27 +1574,28 @@ original contiguity weight to obtain a fully connected set of weights. Recall th
 <p>That aside, we can still re-attach the observation to the graph by connecting it to its nearest neighbor. To do this, we can construct the KNN graph as we did above, but set <code class="docutils literal notranslate"><span class="pre">k=1</span></code>, so observations are only assigned to their nearest neighbor:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wk1</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wk1</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:167: UserWarning: The weights matrix is not fully connected: 
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:167: UserWarning: The weights matrix is not fully connected: 
  There are 154 disconnected components.
   warnings.warn(message)
-</pre></div>
+</pre>
 </div>
 </div>
 </div>
 <p>In this graph, all our observations are connected to <em>at least</em> one other observation, so island observation is connected to:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wk1</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wk1</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[104]
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[104]
 </pre></div>
 </div>
 </div>
@@ -1591,7 +1603,7 @@ original contiguity weight to obtain a fully connected set of weights. Recall th
 <p>To attach our island, we need to create a copy of the <code class="docutils literal notranslate"><span class="pre">neighbors</span></code> dictionary and update the entry for <code class="docutils literal notranslate"><span class="pre">103</span></code>, giving it <code class="docutils literal notranslate"><span class="pre">104</span></code> as a neighbor. So, first we copy the neighbors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">neighbors</span> <span class="o">=</span> <span class="n">wr</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neighbors</span> <span class="o">=</span> <span class="n">wr</span><span class="o">.</span><span class="n">neighbors</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1600,7 +1612,7 @@ original contiguity weight to obtain a fully connected set of weights. Recall th
 nearest neighbor (<code class="docutils literal notranslate"><span class="pre">104</span></code>) as well as update <code class="docutils literal notranslate"><span class="pre">104</span></code> to have <code class="docutils literal notranslate"><span class="pre">103</span></code> as a neighbor:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">neighbors</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">104</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">neighbors</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">104</span><span class="p">)</span>
 <span class="n">neighbors</span><span class="p">[</span><span class="mi">104</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">103</span><span class="p">)</span>
 <span class="n">w_fixed</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">W</span><span class="p">(</span><span class="n">neighbors</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">w_fixed</span><span class="o">.</span><span class="n">islands</span><span class="p">)</span>
@@ -1609,7 +1621,7 @@ nearest neighbor (<code class="docutils literal notranslate"><span class="pre">1
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[]
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>[]
 [(1, 1), (2, 1), (3, 45), (4, 145), (5, 190), (6, 129), (7, 64), (8, 25), (9, 6), (10, 11), (11, 5), (12, 1), (13, 1), (14, 1), (15, 1), (16, 0), (17, 1)]
 </pre></div>
 </div>
@@ -1618,7 +1630,7 @@ nearest neighbor (<code class="docutils literal notranslate"><span class="pre">1
 <p>now, when we visualize the graph in the area around our island:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">w_fixed</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">,</span> <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">w_fixed</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">,</span> <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">disconnected_tract</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;lightblue&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">south</span><span class="p">,</span> <span class="n">north</span><span class="p">])</span>
@@ -1638,13 +1650,13 @@ nearest neighbor (<code class="docutils literal notranslate"><span class="pre">1
 <em>set theoretic operations</em> on PySAL weights:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_fixed_sets</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">wr</span><span class="p">,</span> <span class="n">wk1</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">w_fixed_sets</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">wr</span><span class="p">,</span> <span class="n">wk1</span><span class="p">)</span>
 <span class="n">w_fixed_sets</span><span class="o">.</span><span class="n">histogram</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[(1, 1),
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[(1, 1),
  (2, 1),
  (3, 45),
  (4, 145),
@@ -1685,7 +1697,7 @@ belonging to different groups.</p>
 San Diego and focus on their county membership:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">san_diego_tracts</span><span class="p">[[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;county&#39;</span><span class="p">,</span> <span class="s1">&#39;tract&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">san_diego_tracts</span><span class="p">[[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;county&#39;</span><span class="p">,</span> <span class="s1">&#39;tract&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1761,7 +1773,7 @@ state ID is the same across the dataset.</p>
 list of memberships. In this case, we will use the county membership:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: since this is a large dataset, it might take a while to process</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: since this is a large dataset, it might take a while to process</span>
 <span class="n">w_bl</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">block_weights</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">[</span><span class="s1">&#39;county&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
                                   <span class="n">ids</span><span class="o">=</span><span class="n">san_diego_tracts</span><span class="p">[</span><span class="s1">&#39;GEOID&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </pre></div>
@@ -1772,12 +1784,12 @@ list of memberships. In this case, we will use the county membership:</p>
 weights command has worked out correctly, both should be neighbors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;06073000201&#39;</span> <span class="ow">in</span> <span class="n">w_bl</span><span class="p">[</span><span class="s1">&#39;06073000100&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;06073000201&#39;</span> <span class="ow">in</span> <span class="n">w_bl</span><span class="p">[</span><span class="s1">&#39;06073000100&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>True
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>True
 </pre></div>
 </div>
 </div>
@@ -1800,7 +1812,7 @@ relation between the states according to the specific definition.</p>
 <p>We first read in the data for Mexico:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mx</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/mexico/mexicojoin.shp&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mx</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/mexico/mexicojoin.shp&#39;</span><span class="p">)</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
@@ -1823,7 +1835,7 @@ relation between the states according to the specific definition.</p>
 <p>Beginning with Queen weights:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">queen_mx</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">mx</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">queen_mx</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">mx</span><span class="p">)</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">queen_mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span><span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">),</span> <span class="n">node_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">),</span>  <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="p">)</span>
@@ -1841,7 +1853,7 @@ relation between the states according to the specific definition.</p>
 <p>For the block weights, we use the official designation of regions from the federal government:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;INEGI2&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Pastel2&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;INEGI2&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Pastel2&#39;</span><span class="p">)</span>
 <span class="n">block_mx</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">block_weights</span><span class="p">(</span><span class="n">mx</span><span class="p">[</span><span class="s1">&#39;INEGI2&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Mexican Regions&quot;</span><span class="p">)</span>
@@ -1849,12 +1861,13 @@ relation between the states according to the specific definition.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:167: UserWarning: The weights matrix is not fully connected: 
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:167: UserWarning: The weights matrix is not fully connected: 
  There are 5 disconnected components.
   warnings.warn(message)
-</pre></div>
+</pre>
 </div>
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Mexican Regions&#39;)
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Mexican Regions&#39;)
 </pre></div>
 </div>
 <img alt="../_images/04_spatial_weights_120_2.png" src="../_images/04_spatial_weights_120_2.png" />
@@ -1862,7 +1875,7 @@ relation between the states according to the specific definition.</p>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;INEGI2&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
         <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Pastel2&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="n">block_mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mx</span><span class="p">,</span> <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> 
@@ -1882,7 +1895,7 @@ relation between the states according to the specific definition.</p>
 <p>Next, we construct the union of queen contiguity and block weights</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">union_mx</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">block_mx</span><span class="p">,</span> <span class="n">queen_mx</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">union_mx</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">block_mx</span><span class="p">,</span> <span class="n">queen_mx</span><span class="p">)</span>
 
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">mx</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;INEGI2&#39;</span><span class="p">,</span> <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Pastel2&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
@@ -1903,7 +1916,7 @@ relation between the states according to the specific definition.</p>
 <p>Finally, we compare the three neighbor graphs side by side:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 
 <span class="c1"># Contiguity</span>
@@ -1949,24 +1962,24 @@ connectivity structures. The Block graph is visually more dense in particular ar
 Queen graph and this is borne out in their sparsity measures:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">block_mx</span><span class="o">.</span><span class="n">pct_nonzero</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">block_mx</span><span class="o">.</span><span class="n">pct_nonzero</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>19.140625
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>19.140625
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">queen_mx</span><span class="o">.</span><span class="n">pct_nonzero</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">queen_mx</span><span class="o">.</span><span class="n">pct_nonzero</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>13.4765625
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>13.4765625
 </pre></div>
 </div>
 </div>
@@ -1999,14 +2012,14 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>First, let’s consider the median household income for our census tracts in San Diego:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">booktools</span> <span class="kn">import</span> <span class="n">choropleth</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">booktools</span> <span class="kn">import</span> <span class="n">choropleth</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
 <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Median HH&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
@@ -2016,7 +2029,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Median Household Income&#39;)
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Median Household Income&#39;)
 </pre></div>
 </div>
 <img alt="../_images/04_spatial_weights_134_1.png" src="../_images/04_spatial_weights_134_1.png" />
@@ -2025,15 +2038,16 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>Now, we see some cases where there are very stark differences between neighboring areas, and some cases where there are essentially no difference between adjacent areas. Digging into this, we can examine the <em>distribution of differences</em> in neighboring areas using the adjacency list:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">wr</span><span class="o">.</span><span class="n">to_adjlist</span><span class="p">()</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">wr</span><span class="o">.</span><span class="n">to_adjlist</span><span class="p">()</span> 
 <span class="n">adjlist</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:262: UserWarning: {} islands in this weights matrix. Conversion to an adjacency list will drop these observations!
-  warnings.warn(&#39;{} islands in this weights matrix. Conversion to an &#39;
-</pre></div>
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/opt/conda/lib/python3.7/site-packages/libpysal/weights/weights.py:262: UserWarning: {} islands in this weights matrix. Conversion to an adjacency list will drop these observations!
+  warnings.warn('{} islands in this weights matrix. Conversion to an '
+</pre>
 </div>
 <div class="output text_html"><div>
 <style scoped>
@@ -2096,7 +2110,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>This provides us with a table with three columns. <code class="docutils literal notranslate"><span class="pre">Focal</span></code> is the column containing the “origin” of the link, <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> is the column containing the “destination” of the link, and <code class="docutils literal notranslate"><span class="pre">weight</span></code> contains how strong the link from <code class="docutils literal notranslate"><span class="pre">focal</span></code> to <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> is. Since our weights are <em>symmetrical</em>, this table contains two entries per pair of neighbors, one for <code class="docutils literal notranslate"><span class="pre">(focal,neighbor)</span></code> and the other for <code class="docutils literal notranslate"><span class="pre">(neighbor,focal)</span></code>. Using this table and <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, we can merge up the focal units’ &amp; neighboring units’ median household incomes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist_wealth</span> <span class="o">=</span> <span class="n">adjlist</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">[[</span><span class="s1">&#39;Median HH&#39;</span><span class="p">]],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist_wealth</span> <span class="o">=</span> <span class="n">adjlist</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">[[</span><span class="s1">&#39;Median HH&#39;</span><span class="p">]],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> 
                                <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;focal&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>\
                         <span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">[[</span><span class="s1">&#39;Median HH&#39;</span><span class="p">]],</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
                                <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbor&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
@@ -2179,7 +2193,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>Now, we have the wealth at both the focal observation and the neighbor observation. The difference between these two columns provides us every pairwise difference between <em>adjacent</em> tracts:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;Median HH_focal&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;Median HH_neighbor&#39;</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;Median HH_focal&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;Median HH_neighbor&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -2188,7 +2202,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>To do this, we can first compute the all-pairs differences in wealth using the <code class="docutils literal notranslate"><span class="pre">numpy.subtract</span></code> function. Some functions in numpy have special functionality; these <code class="docutils literal notranslate"><span class="pre">ufuncs</span></code> (short for “universal functions”) often support special applications to your data. Here, we will use <code class="docutils literal notranslate"><span class="pre">numpy.subtract.outer</span></code> to take the difference over the “outer cartesian product” of two vectors; in practice, this results in the subtraction of all of the combinations of the input vectors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">all_pairs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">subtract</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">[</span><span class="s1">&#39;Median HH&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">san_diego_tracts</span><span class="p">[</span><span class="s1">&#39;Median HH&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">all_pairs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">subtract</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">[</span><span class="s1">&#39;Median HH&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">san_diego_tracts</span><span class="p">[</span><span class="s1">&#39;Median HH&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2196,7 +2210,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>Then, we need to filter out those cells of <code class="docutils literal notranslate"><span class="pre">all_pairs</span></code> that are neighbors. Fortunately, our weights matrix is <em>binary</em>. So, subtracting it from an <span class="math notranslate nohighlight">\(N \times N\)</span> matrix of <span class="math notranslate nohighlight">\(1\)</span>s will result in the <em>complement</em> of our original weights matrix:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">complement_wr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">wr</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">complement_wr</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">wr</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -2204,7 +2218,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>Using this compelement, we can filter the <code class="docutils literal notranslate"><span class="pre">all_pairs</span></code> matrix to only consider the differences in median household income for tracts that are not neighboring:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">non_neighboring_diffs</span> <span class="o">=</span> <span class="p">(</span><span class="n">complement_wr</span> <span class="o">*</span> <span class="n">all_pairs</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">non_neighboring_diffs</span> <span class="o">=</span> <span class="p">(</span><span class="n">complement_wr</span> <span class="o">*</span> <span class="n">all_pairs</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -2212,7 +2226,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>Now, we can compare the two distributions of the difference in wealth:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">non_neighboring_diffs</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;lightgrey&#39;</span><span class="p">,</span> 
          <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Nonneighbors&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">],</span> 
@@ -2227,7 +2241,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f72d613c250&gt;
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f72d613c250&gt;
 </pre></div>
 </div>
 <img alt="../_images/04_spatial_weights_148_1.png" src="../_images/04_spatial_weights_148_1.png" />
@@ -2237,7 +2251,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>With this, we can then find our <em>most extreme</em> observed differences in wealth. Since our links are symmetric, the table sort is symmetric. So, we can focus only on focal observations with <em>the most extreme</em> difference in wealth from their immediate neighbors, focusing only on those where the <em>focal</em> is higher.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">extremes</span> <span class="o">=</span> <span class="n">adjlist_wealth</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extremes</span> <span class="o">=</span> <span class="n">adjlist_wealth</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">extremes</span>
 </pre></div>
 </div>
@@ -2369,7 +2383,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>So, to start, we can construct many random <code class="docutils literal notranslate"><span class="pre">diff</span></code> vectors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_simulations</span> <span class="o">=</span> <span class="mi">1000</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">n_simulations</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="n">simulated_diffs</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">adjlist</span><span class="p">),</span> <span class="n">n_simulations</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_simulations</span><span class="p">):</span>
     <span class="n">median_hh_focal</span> <span class="o">=</span> <span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;Median HH_focal&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
@@ -2385,7 +2399,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>After running our simulations, we get many distributions of pairwise differences in household income. Below, we can see the shroud of all of the simulated differences, shown in black, and our observed differences, shown in red:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">],</span> 
          <span class="n">color</span><span class="o">=</span><span class="s1">&#39;salmon&#39;</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
          <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -2409,7 +2423,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>Again, our random distribution is much more dispersed than our observed distribution of the differences between nearby tracts. Empirically, we can pool our simulations and construct and use their quantiles to summarize how unlikely any of our <em>observed</em> differences are if neighbors’ household incomes were randomly assigned:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pooled_diffs</span> <span class="o">=</span> <span class="n">simulated_diffs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pooled_diffs</span> <span class="o">=</span> <span class="n">simulated_diffs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 <span class="n">lower</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">pooled_diffs</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span><span class="mi">50</span><span class="p">,</span><span class="mf">99.5</span><span class="p">))</span>
 <span class="n">outside</span> <span class="o">=</span> <span class="p">(</span><span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">lower</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">adjlist_wealth</span><span class="p">[</span><span class="s1">&#39;diff&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">upper</span><span class="p">)</span>
 </pre></div>
@@ -2419,7 +2433,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>So, despite the fact that that our observed differences are less dispersed on average, we can identify three boundaries in the data that are in the top 1% most extreme differences in neighboring household incomes across the map. These boundaries are shown in the table below:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist_wealth</span><span class="p">[</span><span class="n">outside</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist_wealth</span><span class="p">[</span><span class="n">outside</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -2513,7 +2527,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 <p>It is most helpful, though, to visualize this on a map, focusing on the first two boundaries around observation <span class="math notranslate nohighlight">\(148\)</span>, and then the second boundary between observation <span class="math notranslate nohighlight">\(217\)</span> and <span class="math notranslate nohighlight">\(219\)</span>, shown in the larger context of San Diego incomes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> 
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> 
                     <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;equal&#39;</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
     <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;Median HH&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -2540,7 +2554,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(-13068503.404883943,
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(-13068503.404883943,
  -13006196.85363941,
  3857713.0707310555,
  3903955.682213868)

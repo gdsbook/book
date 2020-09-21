@@ -36,6 +36,7 @@ var initToggleItems = () => {
 var toggleHidden = (button) => {
   target = button.dataset['target']
   var itemToToggle = document.getElementById(target);
+  console.log(itemToToggle)
   if (itemToToggle.classList.contains("toggle-hidden")) {
     itemToToggle.classList.remove("toggle-hidden");
     button.classList.remove("toggle-button-hidden");
