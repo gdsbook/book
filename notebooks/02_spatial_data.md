@@ -6,31 +6,79 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
     name: python3
 ---
 
-# Chapter 2: Spatial Data
+# Geographic thinking for data scientists
 
 ## Introduction to geographic thinking
 
+[Cova & Goodchild (2002)](https://doi.org/10.1080/13658810210137040) as a useful canonical reference. 
+
+- all models are wrong, some are useful
+- all maps are wrong, some are useful
+
+spatial data is data with a locational component
+sales pitch "what does geography give you?" argument
+
+spatial data is ubiquitous and XXX
+
+it gives you:
+- location
+- relation
+
+Here, we'll refer to "models" of geography as a conceptual representation of geographic phenomena. We'll use "data structure" to refer to how these concepts are implemented in computer programs. 
+
+## Conceptual Representations: Models
+
 explain the ideas behind common geographical processes
 
-## Representations
+The world is too complex to fully capture, a model as "dumbing down" reality that distills the essence of what you're interested in.
+(theory versus measurement)
+
+systems
+    - object, agents that do things (movement modellers, demographers, )
+    - field, fields of relationships (geostatisticians, remote sensors)
+    - interaction, relationships as entities themselves (economists, mobility in cities)
+
+scale/matched filter/tobler's scale invariance
 
 explain object vs. field models of geographical processes more explicitly
 
+This is about storing measurement
 
-## Data Structure
+objects
+    - have discrete boundary
+    - have attributes measured about that are constant within their bounds
+    
+field model
+    - doesn't necessarily have a discrete partitioning
+    - assumes continuity where not observed
+
+interactions
+    - relations between one (or more) agents that themselves are of interest
+    - more than the straight line between two objects
+
+Scale (mis)match and how it can be mediated by the representation choice + information content (6m hexes from a single census tract contain the same amount of information...)
+
+
+## Computational represenations: Data Structures
+
+Tech as implementation of abstract concepts. But also as an entity with a "life of its own" (--> pick up later on barriers breaking up)
 
 all maps are wrong, but some are useful
 
 data cubes
 
 postgis vector table
+
+each cell is an "object" and fits into that paradigm, but it's not necessarily the same
+
+GALs and other serializations of graphs
 
 ## Connecting the conceptual to the computational
 
@@ -40,6 +88,10 @@ postgis vector table
 
 ### This categorization is now breaking up (data is data)
 
+hexagons/universalism 
+- support as a data problem, good interpolators mean we don't need to worry about support. 
+- common scales/formats for visualization (h3, rasterization to webmerc zooms, etc. )
+    
 examples of
 - mapping between
 - changes in "typical" representations of
@@ -56,7 +108,8 @@ examples of
 - data mining from bad to good to ??
 - process vs pattern
 - matched filter (rodgerson)
-    - https://en.wikipedia.org/wiki/Matched_filter 
+    - https://en.wikipedia.org/wiki/Matched_filter
+
     - scale invariance (tobler)
 - target-> data scientisits
 - information content
