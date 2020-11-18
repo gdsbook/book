@@ -1,4 +1,4 @@
-# San Diego Tract data
+# San Diego ACS'17 Census tracts
 
 This dataset contains an extract of 2017 ACS Census Tracts for the San Diego metropolitan area.
 
