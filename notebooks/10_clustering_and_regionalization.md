@@ -21,9 +21,9 @@ borrowed from [GDS'17 - Lab
 -->
 
 ```python
-from pysal.explore.esda.moran import Moran
-import pysal.lib.weights.set_operations as Wsets
-from pysal.lib.weights import Queen, KNN
+from esda.moran import Moran
+import libpysal.weights.set_operations as Wsets
+from libpysal.weights import Queen, KNN
 import seaborn 
 import pandas
 import geopandas 
@@ -119,47 +119,14 @@ incorporate geographical constraints into the exploration of the social structur
 
 The dataset we will use in this chapter comes from the American Community Survey
 (ACS). In particular, we examine data at the Census Tract level in San Diego,
-California in 2016. Let us begin by reading in the data as a GeoDataFrame and
+California in 2017. Let us begin by reading in the data as a GeoDataFrame and
 exploring the attribute names.
 
 ```python
 # Read file
-db = geopandas.read_file('../data/sandiego/sd_tracts_acs_clean.shp')
+db = geopandas.read_file('../data/sandiego/sandiego_tracts.gpkg')
 # Print column names
 db.columns
-```
-
-While the ACS comes with a large number of attributes we can use for clustering
-and regionalization, we are not limited to the original variables at hand; we
-can construct additional variables. This is particularly useful when
-we want to compare areas that are not very similar in some structural
-characteristic, such as area or population. For example, a quick look into the
-variable names shows most variables are counts. For tracts of different sizes,
-these variables will mainly reflect their overall population, rather than provide direct information
-about the variables itself. To get around this, we will cast many of these count variables to rates,
-and use them in addition to a subset of the original variables. 
-Together, this set of constructed and received variables will to
-will be used for our clustering and regionalization.
-
-```python
-# Pull out total house units
-total_units = db['Total Ho_1']
-# Calculate percentage of renter occupied units
-pct_rental = db['Renter Occ'] / (total_units + (total_units==0)*1)
-
-# Pull out total number of households
-total_hh = db['Total Hous']
-# Calculate percentage of female households
-pct_female_hh = db['Female hou'] / (total_hh + (total_hh==0)*1)
-
-# Calculate percentage of population with a bachelor degree
-pct_bachelor = db["Bachelor's"] / (db['Total Popu'] + (db['Total Popu']==0)*1)
-# Assign newly created variables to main table `db`
-db['pct_rental'] = pct_rental
-db['pct_female_hh'] = pct_female_hh
-db['pct_bachelor'] = pct_bachelor
-# Calculate percentage of population white
-db['pct_white'] = db["White"] / (db['Total Popu'] + (db['Total Popu']==0) * 1)
 ```
 
 To make things easier later on, let us collect the variables we will use to
@@ -168,15 +135,15 @@ economic reality of each area and, taken together, they provide a comprehensive
 characterization of San Diego as a whole:
 
 ```python
-cluster_variables =  ['Median Val',   # Median house value
-                      'pct_white',    # Percent of tract population that is white
-                      'pct_rental',   # Percent of households that are rented
-                      'pct_female_hh',# Percent of female-led households 
-                      'pct_bachelor', # Percent of tract population with a Bachelors degree
-                      'Median Num',   # Median number of rooms in the tract's households
-                      'Gini index',   # Gini index measuring tract wealth inequality
-                      'Med Age',      # Median age of tract population
-                      'Travel tim'    # Travel time to work 
+cluster_variables =  ['median_house_value', # Median house value
+                      'pct_white',          # Percent of tract population that is white
+                      'pct_rented',         # Percent of households that are rented
+                      'pct_hh_female',      # Percent of female-led households 
+                      'pct_bachelor',       # Percent of tract population with a Bachelors degree
+                      'median_no_rooms',    # Median number of rooms in the tract's households
+                      'income_gini',        # Gini index measuring tract wealth inequality
+                      'median_age',         # Median age of tract population
+                      'tt_work'             # Travel time to work 
                       ]
 ```
 
@@ -457,7 +424,7 @@ we report the total land area of the cluster:
 
 ```python
 # Dissolve areas by Cluster, aggregate by summing, and keep column for area
-areas = db.dissolve(by='k5cls', aggfunc='sum')['AREALAND']
+areas = db.dissolve(by='k5cls', aggfunc='sum')['area_sqm']
 areas
 ```
 
@@ -788,7 +755,7 @@ where each observation is connected to its four nearest observations, instead
 of those it touches.
 
 ```python
-w = KNN.from_shapefile('../data/sandiego/sd_tracts_acs_clean.shp', k=4)
+w = KNN.from_dataframe(db, k=4)
 ```
 
 With this matrix connecting each tract to the four closest tracts, we can run 

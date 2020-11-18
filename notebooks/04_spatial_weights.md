@@ -34,6 +34,7 @@ In what follows, we first consider different approaches to construct spatial wei
 
 from pysal.lib import weights
 from pysal.lib import cg as geometry
+import contextily
 import geopandas
 import seaborn
 import pandas 
@@ -245,7 +246,7 @@ must construct it ourselves. Under the hood, PySAL uses efficient spatial indexi
 structures to extract these.
 
 ```python
-san_diego_tracts = geopandas.read_file('../data/sandiego/sd_tracts_acs_clean.shp')
+san_diego_tracts = geopandas.read_file('../data/sandiego/sandiego_tracts.gpkg')
 wq = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 ```
 
@@ -450,19 +451,22 @@ of neighbors while others with observations very sparsely connected. In these
 situations, an *adaptive* bandwith -one which varies by observation and its
 characteristics- can be preferred. Adaptive bandwidths are picked again using a K-nearest neighbor rule. A bandwidth for each observation is chosen such that, once the $k$-nearest observation is considered, all the remaining observations have zero weight.
 
+
+
+
 For example, using the first ten tracts in our San Diego tract data, we can see that the centroids of each tract are not exactly regularly-spaced, although others do nearly fall into a regular spacing:
 
 ```python
-top_30 = san_diego_tracts.head(30)
-ax = top_30.plot(facecolor='w', edgecolor='k')
-ax = top_30.head(30).centroid.plot(color='r', ax=ax)
+sub_30 = san_diego_tracts.query("sub_30 == True")
+ax = sub_30.plot(facecolor='w', edgecolor='k')
+sub_30.head(30).centroid.plot(color='r', ax=ax)
 ax.set_axis_off()
 ```
 
 We can see that the adaptive bandwidth adjusts for this:
 
 ```python
-w_adaptive = weights.distance.Kernel.from_dataframe(top_30, fixed=False, k=15)
+w_adaptive = weights.distance.Kernel.from_dataframe(sub_30, fixed=False, k=15)
 w_adaptive.bandwidth
 ```
 
@@ -471,8 +475,8 @@ And, we can visualize what these kernels look like on the map, too, by focusing 
 ```python
 full_matrix, ids = w_adaptive.full() 
 f,ax = plt.subplots(1,2,figsize=(12,6), subplot_kw=dict(aspect='equal'))
-top_30.assign(weight_0 = full_matrix[0]).plot("weight_0", cmap='plasma', ax=ax[0])
-top_30.assign(weight_15 = full_matrix[17]).plot("weight_15", cmap='plasma', ax=ax[1])
+sub_30.assign(weight_0 = full_matrix[0]).plot("weight_0", cmap='plasma', ax=ax[0])
+sub_30.assign(weight_15 = full_matrix[17]).plot("weight_15", cmap='plasma', ax=ax[1])
 ax[0].set_title("Kernel centered on first tract")
 ax[1].set_title("Kernel centered on 18th tract")
 [ax_.set_axis_off() for ax_ in ax]
@@ -922,15 +926,11 @@ Below, we'll show one model-free way to identify empirical boundaries in your da
 First, let's consider the median household income for our census tracts in San Diego:
 
 ```python
-from booktools import choropleth
-```
-
-```python
 f,ax = plt.subplots(1,2, figsize=(12,4))
-san_diego_tracts.plot('Median HH', ax=ax[0])
+san_diego_tracts.plot('median_hh_income', ax=ax[0])
 ax[0].set_aspect('equal')
 ax[0].set_axis_off()
-san_diego_tracts['Median HH'].hist(ax=ax[1])
+san_diego_tracts['median_hh_income'].hist(ax=ax[1])
 ax[1].set_title("Median Household Income")
 ```
 
@@ -944,9 +944,9 @@ adjlist.head()
 This provides us with a table with three columns. `Focal` is the column containing the "origin" of the link, `neighbor` is the column containing the "destination" of the link, and `weight` contains how strong the link from `focal` to `neighbor` is. Since our weights are *symmetrical*, this table contains two entries per pair of neighbors, one for `(focal,neighbor)` and the other for `(neighbor,focal)`. Using this table and `pandas`, we can merge up the focal units' & neighboring units' median household incomes:
 
 ```python
-adjlist_wealth = adjlist.merge(san_diego_tracts[['Median HH']], how='left', 
+adjlist_wealth = adjlist.merge(san_diego_tracts[['median_hh_income']], how='left', 
                                left_on='focal', right_index=True)\
-                        .merge(san_diego_tracts[['Median HH']], how='left',
+                        .merge(san_diego_tracts[['median_hh_income']], how='left',
                                left_on='neighbor', right_index=True, 
                                suffixes=('_focal', '_neighbor'))
 adjlist_wealth.head()
@@ -955,7 +955,7 @@ adjlist_wealth.head()
 Now, we have the wealth at both the focal observation and the neighbor observation. The difference between these two columns provides us every pairwise difference between *adjacent* tracts:
 
 ```python
-adjlist_wealth['diff'] = adjlist_wealth['Median HH_focal'] - adjlist_wealth['Median HH_neighbor']
+adjlist_wealth['diff'] = adjlist_wealth['median_hh_income_focal'] - adjlist_wealth['median_hh_income_neighbor']
 ```
 
 With this difference information we can do a few things. First, we can compare whether or not this *distribution* is distinct from the distribution of non-neighboring tracts' differences in wealth. 
@@ -963,7 +963,7 @@ With this difference information we can do a few things. First, we can compare w
 To do this, we can first compute the all-pairs differences in wealth using the `numpy.subtract` function. Some functions in numpy have special functionality; these `ufuncs` (short for "universal functions") often support special applications to your data. Here, we will use `numpy.subtract.outer` to take the difference over the "outer cartesian product" of two vectors; in practice, this results in the subtraction of all of the combinations of the input vectors:
 
 ```python
-all_pairs = numpy.subtract.outer(san_diego_tracts['Median HH'].values, san_diego_tracts['Median HH'].values)
+all_pairs = numpy.subtract.outer(san_diego_tracts['median_hh_income'].values, san_diego_tracts['median_hh_income'].values)
 ```
 
 Then, we need to filter out those cells of `all_pairs` that are neighbors. Fortunately, our weights matrix is *binary*. So, subtracting it from an $N \times N$ matrix of $1$s will result in the *complement* of our original weights matrix:
@@ -1015,12 +1015,12 @@ So, to start, we can construct many random `diff` vectors:
 n_simulations = 1000
 simulated_diffs = numpy.empty((len(adjlist), n_simulations))
 for i in range(n_simulations):
-    median_hh_focal = adjlist_wealth['Median HH_focal'].values
-    random_wealth = san_diego_tracts[['Median HH']].sample(frac=1, replace=False).reset_index()
+    median_hh_focal = adjlist_wealth['median_hh_income_focal'].values
+    random_wealth = san_diego_tracts[['median_hh_income']].sample(frac=1, replace=False).reset_index()
     adjlist_random_wealth = adjlist.merge(random_wealth, left_on='focal', right_index=True)\
                                    .merge(random_wealth, left_on='neighbor', right_index=True, 
                                           suffixes=('_focal','_neighbor'))
-    simulated_diffs[:,i] = adjlist_random_wealth['Median HH_focal'] - adjlist_random_wealth['Median HH_neighbor']
+    simulated_diffs[:,i] = adjlist_random_wealth['median_hh_income_focal'] - adjlist_random_wealth['median_hh_income_neighbor']
 ```
 
 After running our simulations, we get many distributions of pairwise differences in household income. Below, we can see the shroud of all of the simulated differences, shown in black, and our observed differences, shown in red:
@@ -1064,7 +1064,7 @@ It is most helpful, though, to visualize this on a map, focusing on the first tw
 f,ax = plt.subplots(1,3,figsize=(18,6), 
                     subplot_kw=dict(aspect='equal'))
 for i in range(3):
-    san_diego_tracts.plot('Median HH', ax=ax[i])
+    san_diego_tracts.plot('median_hh_income', ax=ax[i])
 first_focus = san_diego_tracts.iloc[[148,142]]
 ax[0].plot(first_focus.centroid.x, first_focus.centroid.y, color='red')
 ax[2].plot(first_focus.centroid.x, first_focus.centroid.y, color='red')
