@@ -34,6 +34,7 @@ In what follows, we first consider different approaches to construct spatial wei
 
 from pysal.lib import weights
 from pysal.lib import cg as geometry
+import contextily
 import geopandas
 import seaborn
 import pandas 
@@ -245,12 +246,9 @@ must construct it ourselves. Under the hood, PySAL uses efficient spatial indexi
 structures to extract these.
 
 ```python
-san_diego_tracts = geopandas.read_file('../data/sandiego/sd_tracts_acs_clean.shp')
+san_diego_tracts = geopandas.read_file('../data/sandiego/sandiego_tracts.gpkg')
 wq = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 ```
-
-Note the warning about disconnected observations (no neighbors). The disconnected observation warning indicates that there are polygons in the shapefile that do not share any vertices with other polygons. Any time there is a disconnected observation, sometimes called a topological *island*, the graph is also disconnected into at least two one components. Further, graphs can have more than one disconnected component even without any islands. We will return to deal with this later in this chapter. For now we focus on the object just created.
-
 
 Like before, we can visualize the adjacency relationships, but they are much more difficult to see without showing a closer detail:
 
@@ -290,7 +288,7 @@ s = pandas.Series(wq.cardinalities)
 s.plot.hist(bins=s.unique().shape[0]);
 ```
 
-as the minimum number of neighbors is 0 (due to our disconnected observation), while there is one polygon with 17
+As the minimum number of neighbors is 1, while there is one polygon with 29
 queen neighbors. The most common number of neighbors is 6.
 
 There is also a function to create the rook weights for the same dataframe:
@@ -319,33 +317,6 @@ differences between the two approaches and how to apply them.
 
 
 
-We also see the same disconnected observation warning, so let's return to this
-issue and explore it a bit further. PySAL indicates that the disconnected
-observation has `id: 103`.
-
-```python
-wr.islands
-```
-
- Disconnected here means that this observation has no
-neighbors according to the specific contiguity criterion. Checking the
-`neighbors` attribute we see an empty list for this observation:
-
-```python
-wr.neighbors[103]
-```
-
-in contrast to say observation with `id: 10` which has six neighbors:
-
-```python
-wr.neighbors[10]
-```
-
-Disconnected observations, or islands, can cause problems for the spatial
-analytics that rely on spatial weights. As such, there are different approaches
-to deal with these observations so that they are no longer disconnected. One
-approach relies on the notion of nearest neighbor weights, which we turn to
-next.
 
 ## Distance Based Weights
 
@@ -359,13 +330,13 @@ of *nearest neighbor* weights.
 
 The first type of distance based weights defines the neighbor set of a
 particular observation as containing its nearest $k$ observations, where the
-user specifies the value of value $k$. To illustrate this for the San Diego
+user specifies the value of $k$. To illustrate this for the San Diego
 tracts we take $k=4$. This still leaves the issue of how to measure the distance
 between these polygon objects, however. To do so we develop a representative
 point for each of the polygons using the so called "center of mass" or centroid.
 
 ```python
-wk4 = weights.distance.KNN.from_dataframe(gdf, k=4)
+wk4 = weights.distance.KNN.from_dataframe(san_diego_tracts, k=4)
 ```
 
 The centroids are attributes of the polygon shapes that PySAL calculates from
@@ -373,20 +344,20 @@ the spatial information stored in the `GeoDataFrame`. Since we are dealing with
 polygons in this case, PySAL uses inter-centroid distances to distance determine the
 $k$ nearest observations to each polygon. 
 
-The knn weights solve our island problem:
+The knn weights displays no island problem:
 
 ```python
 wk4.islands
 ```
 
-however, examination of the cardinality histogram for the knn weights shows us
+This is the same for the contiguity case above but, in the case of KNN weights, this is by construction. However, examination of the cardinality histogram for the knn weights shows us
 that each observation has the same number of neighbors:
 
 ```python
 wk4.histogram
 ```
 
-This is by construction as the feature is at the very heart of the
+This is also by construction as the feature is at the very heart of the
 KNN approach. In some cases, this is not an issue but a desired feature. In
 other contexts, however, this characteristic of KNN weights can be undesirable.
 In such situations, we can turn to other types of distance-based weights.
@@ -450,19 +421,22 @@ of neighbors while others with observations very sparsely connected. In these
 situations, an *adaptive* bandwith -one which varies by observation and its
 characteristics- can be preferred. Adaptive bandwidths are picked again using a K-nearest neighbor rule. A bandwidth for each observation is chosen such that, once the $k$-nearest observation is considered, all the remaining observations have zero weight.
 
-For example, using the first ten tracts in our San Diego tract data, we can see that the centroids of each tract are not exactly regularly-spaced, although others do nearly fall into a regular spacing:
+
+
+
+For example, using a subset of tracts in our San Diego dataset, we can see that the centroids of each tract are not exactly regularly-spaced, although others do nearly fall into a regular spacing:
 
 ```python
-top_30 = san_diego_tracts.head(30)
-ax = top_30.plot(facecolor='w', edgecolor='k')
-ax = top_30.head(30).centroid.plot(color='r', ax=ax)
+sub_30 = san_diego_tracts.query("sub_30 == True")
+ax = sub_30.plot(facecolor='w', edgecolor='k')
+sub_30.head(30).centroid.plot(color='r', ax=ax)
 ax.set_axis_off()
 ```
 
 We can see that the adaptive bandwidth adjusts for this:
 
 ```python
-w_adaptive = weights.distance.Kernel.from_dataframe(top_30, fixed=False, k=15)
+w_adaptive = weights.distance.Kernel.from_dataframe(sub_30, fixed=False, k=15)
 w_adaptive.bandwidth
 ```
 
@@ -471,8 +445,8 @@ And, we can visualize what these kernels look like on the map, too, by focusing 
 ```python
 full_matrix, ids = w_adaptive.full() 
 f,ax = plt.subplots(1,2,figsize=(12,6), subplot_kw=dict(aspect='equal'))
-top_30.assign(weight_0 = full_matrix[0]).plot("weight_0", cmap='plasma', ax=ax[0])
-top_30.assign(weight_15 = full_matrix[17]).plot("weight_15", cmap='plasma', ax=ax[1])
+sub_30.assign(weight_0 = full_matrix[0]).plot("weight_0", cmap='plasma', ax=ax[0])
+sub_30.assign(weight_15 = full_matrix[17]).plot("weight_15", cmap='plasma', ax=ax[1])
 ax[0].set_title("Kernel centered on first tract")
 ax[1].set_title("Kernel centered on 18th tract")
 [ax_.set_axis_off() for ax_ in ax]
@@ -607,86 +581,68 @@ by *combining* different existing ones. This is useful in contexts where a
 single neighborhood rule has flaws or when theory or other guiding principles
 point in directions that require combining more than a single criterium.
 
-We will explore these ideas in the section by returning to the problem we
-faced above of an island observation encountered
-when constructing the weights for the San Diego tracts. A number of ways exist 
-to solve this island problem through a combination of the original contiguity
+We will explore these ideas in the section by returning to the San Diego tracts.
+A number of ways exist to expand the basic criteria we have reviewed above and create
+hybrid or bespoke weights. In this example, we will generate a combination of the original contiguity
 weights and the nearest neighbor weights. We will examine two different
 approaches that provide the same solution, thus illustrating the value of set
 operations in PySAL.
 
 ### Editing/connecting disconnected observations
 
+Imagine one of our tracts was an island and did not have any neighbors in the contiguity case. This can
+create issues in the spatial analytics that build on spatial weights, so it is good practice
+to amend the matrix before using it.
 The first approach we adopt is to find the nearest neighbor for the island observation
 and then add this pair of neighbors to extend the neighbor pairs from the
-original contiguity weight to obtain a fully connected set of weights. Recall that our tract shapefile in San Diego had a disconnected observation, number 103. For us to reattach this tract, we can assign it to be "connected" to its nearest neighbor. 
+original contiguity weight to obtain a fully connected set of weights. 
 
-But, since this is real data, we might want to take a look first by plotting our disconnected tract in red on top of the existing tracts. To do this, let's first extract our "problem" geometry:
+We will assume, for the sake of the example, that the disconnected observation was number 103. For us to reattach this tract, we can assign it to be "connected" to its nearest neighbor. Let's first extract our "problem" geometry:
 
 ```python
 disconnected_tract = san_diego_tracts.iloc[[103]]
 ```
 
-build a good "viewing" window around this polygon by *buffering* it, giving a good context around the focal unit of observation:
+As we have seen above, this tract *does* have neighbors:
 
 ```python
-buffer = disconnected_tract.geometry.buffer(2000)
-west, south, east, north = buffer.bounds.values[0]
+wq[103]
 ```
 
-Then, we can make a plot of the tracts, zooming into the frame established by our buffer:
+But, for this example, we will assume it does not and thus we find ourselves in the position of having to create additional neighboring units. This approach does not only apply in the context of islands. Sometimes, the process we are interested in may require that we manually edit the weights to better reflect connections we *know* exist.
 
-```python
-ax = san_diego_tracts.plot(facecolor='w', edgecolor='k')
-ax = disconnected_tract.plot(ax=ax, color='red')
-ax.axis([west, east, south, north])
-plt.show()
-```
-
-From this, we can see *why* our tract is disconnected, rather than simply *that* it is disconnected. The larger square tract *contains* the tract above, our island. Conceptually, they sit on top of one another rather than touching one another. Since they do not share any vertices on their boundaries in common (since the polygon below entirely contains the polygon above), they do not actually *touch* using our definition of contiguity. 
-
-
-That aside, we can still re-attach the observation to the graph by connecting it to its nearest neighbor. To do this, we can construct the KNN graph as we did above, but set `k=1`, so observations are only assigned to their nearest neighbor:
+We will connect the observation to its nearest neighbor. To do this, we can construct the KNN graph as we did above, but set `k=1`, so observations are only assigned to their nearest neighbor:
 
 ```python
 wk1 = weights.distance.KNN.from_dataframe(san_diego_tracts, k=1)
 ```
 
-In this graph, all our observations are connected to *at least* one other observation, so island observation is connected to:
+In this graph, all our observations are connected to one other observation by construction:
+
+```python
+pandas.Series(wk1.cardinalities).unique()
+```
+
+So is, of course, our tract of interest:
 
 ```python
 wk1.neighbors[103]
 ```
 
-To attach our island, we need to create a copy of the `neighbors` dictionary and update the entry for `103`, giving it `104` as a neighbor. So, first we copy the neighbors:
+To connect it in our initial matrix, we need to create a copy of the `neighbors` dictionary and update the entry for `103`, including `102` as a neighbor. So, first we copy the neighbors:
 
 ```python
 neighbors = wr.neighbors.copy()
 ```
 
 and then we are change the entry for the island observation to include its
-nearest neighbor (`104`) as well as update `104` to have `103` as a neighbor:
+nearest neighbor (`102`) as well as update `102` to have `103` as a neighbor:
 
 ```python
-neighbors[103].append(104)
-neighbors[104].append(103)
-w_fixed = weights.W(neighbors)
-print(w_fixed.islands)
-print(w_fixed.histogram)
+neighbors[103].append(102)
+neighbors[102].append(103)
+w_new = weights.W(neighbors)
 ```
-
-now, when we visualize the graph in the area around our island:
-
-```python
-f,ax = w_fixed.plot(san_diego_tracts, edge_kws=dict(color='red', linestyle=':'))
-ax = san_diego_tracts.plot(facecolor='w', edgecolor='k', ax = ax)
-ax = disconnected_tract.plot(ax=ax, color='lightblue')
-ax.axis([west, east, south, north])
-plt.show()
-```
-
-We can see that our island is now connected to its nearest neighbor, which happens to *also* be the observation which contains it. 
-
 
 ### Using the `union` of matrices
 
@@ -695,7 +651,6 @@ A more elegant approach to the island problem makes use of PySAL's support for
 
 ```python
 w_fixed_sets = weights.set_operations.w_union(wr, wk1)
-w_fixed_sets.histogram
 ```
 
 <!-- #region -->
@@ -922,15 +877,11 @@ Below, we'll show one model-free way to identify empirical boundaries in your da
 First, let's consider the median household income for our census tracts in San Diego:
 
 ```python
-from booktools import choropleth
-```
-
-```python
 f,ax = plt.subplots(1,2, figsize=(12,4))
-san_diego_tracts.plot('Median HH', ax=ax[0])
+san_diego_tracts.plot('median_hh_income', ax=ax[0])
 ax[0].set_aspect('equal')
 ax[0].set_axis_off()
-san_diego_tracts['Median HH'].hist(ax=ax[1])
+san_diego_tracts['median_hh_income'].hist(ax=ax[1])
 ax[1].set_title("Median Household Income")
 ```
 
@@ -944,9 +895,9 @@ adjlist.head()
 This provides us with a table with three columns. `Focal` is the column containing the "origin" of the link, `neighbor` is the column containing the "destination" of the link, and `weight` contains how strong the link from `focal` to `neighbor` is. Since our weights are *symmetrical*, this table contains two entries per pair of neighbors, one for `(focal,neighbor)` and the other for `(neighbor,focal)`. Using this table and `pandas`, we can merge up the focal units' & neighboring units' median household incomes:
 
 ```python
-adjlist_wealth = adjlist.merge(san_diego_tracts[['Median HH']], how='left', 
+adjlist_wealth = adjlist.merge(san_diego_tracts[['median_hh_income']], how='left', 
                                left_on='focal', right_index=True)\
-                        .merge(san_diego_tracts[['Median HH']], how='left',
+                        .merge(san_diego_tracts[['median_hh_income']], how='left',
                                left_on='neighbor', right_index=True, 
                                suffixes=('_focal', '_neighbor'))
 adjlist_wealth.head()
@@ -955,7 +906,7 @@ adjlist_wealth.head()
 Now, we have the wealth at both the focal observation and the neighbor observation. The difference between these two columns provides us every pairwise difference between *adjacent* tracts:
 
 ```python
-adjlist_wealth['diff'] = adjlist_wealth['Median HH_focal'] - adjlist_wealth['Median HH_neighbor']
+adjlist_wealth['diff'] = adjlist_wealth['median_hh_income_focal'] - adjlist_wealth['median_hh_income_neighbor']
 ```
 
 With this difference information we can do a few things. First, we can compare whether or not this *distribution* is distinct from the distribution of non-neighboring tracts' differences in wealth. 
@@ -963,7 +914,7 @@ With this difference information we can do a few things. First, we can compare w
 To do this, we can first compute the all-pairs differences in wealth using the `numpy.subtract` function. Some functions in numpy have special functionality; these `ufuncs` (short for "universal functions") often support special applications to your data. Here, we will use `numpy.subtract.outer` to take the difference over the "outer cartesian product" of two vectors; in practice, this results in the subtraction of all of the combinations of the input vectors:
 
 ```python
-all_pairs = numpy.subtract.outer(san_diego_tracts['Median HH'].values, san_diego_tracts['Median HH'].values)
+all_pairs = numpy.subtract.outer(san_diego_tracts['median_hh_income'].values, san_diego_tracts['median_hh_income'].values)
 ```
 
 Then, we need to filter out those cells of `all_pairs` that are neighbors. Fortunately, our weights matrix is *binary*. So, subtracting it from an $N \times N$ matrix of $1$s will result in the *complement* of our original weights matrix:
@@ -1004,7 +955,7 @@ extremes = adjlist_wealth.sort_values('diff', ascending=False).head(10)
 extremes
 ```
 
-Thus, we see that observation $148$ appears often on the the `focal` side, suggesting it's quite distinct from its nearby polygons. We also see observation $219$ often in the `focal` column. 
+Thus, we see that observation $473$ appears often on the the `focal` side, suggesting it's quite distinct from its nearby polygons. We also see observation $343$ often in the `focal` column. 
 
 
 To verify whether these differences are truly beyond the pale, we can use a map randomization strategy. In this case, we shuffle the map and compute *new* `diff` columns. But, this time, `diff` represents the difference between random neighbors, rather than the neighbor structure we did observe, encoded in our Rook contiguity matrix. Using many `diff` vectors, we can find the observed differences which tend to be much larger than those encountered in randomly-drawn maps of household income.
@@ -1015,12 +966,12 @@ So, to start, we can construct many random `diff` vectors:
 n_simulations = 1000
 simulated_diffs = numpy.empty((len(adjlist), n_simulations))
 for i in range(n_simulations):
-    median_hh_focal = adjlist_wealth['Median HH_focal'].values
-    random_wealth = san_diego_tracts[['Median HH']].sample(frac=1, replace=False).reset_index()
+    median_hh_focal = adjlist_wealth['median_hh_income_focal'].values
+    random_wealth = san_diego_tracts[['median_hh_income']].sample(frac=1, replace=False).reset_index()
     adjlist_random_wealth = adjlist.merge(random_wealth, left_on='focal', right_index=True)\
                                    .merge(random_wealth, left_on='neighbor', right_index=True, 
                                           suffixes=('_focal','_neighbor'))
-    simulated_diffs[:,i] = adjlist_random_wealth['Median HH_focal'] - adjlist_random_wealth['Median HH_neighbor']
+    simulated_diffs[:,i] = adjlist_random_wealth['median_hh_income_focal'] - adjlist_random_wealth['median_hh_income_neighbor']
 ```
 
 After running our simulations, we get many distributions of pairwise differences in household income. Below, we can see the shroud of all of the simulated differences, shown in black, and our observed differences, shown in red:
@@ -1056,34 +1007,36 @@ So, despite the fact that that our observed differences are less dispersed on av
 adjlist_wealth[outside]
 ```
 
-Note that one of these, observation $148$, appears in both boundaries. This means that the observation is likely to be *outlying*, extremely unlike *all* of its neighbors. These kinds of generalized neighborhood comparisons are discussed in the subsequent chapter on Local Spatial autocorrelation.
+Note that one of these, observation $473$, appears in both boundaries. This means that the observation is likely to be *outlying*, extremely unlike *all* of its neighbors. These kinds of generalized neighborhood comparisons are discussed in the subsequent chapter on Local Spatial autocorrelation.
 
-It is most helpful, though, to visualize this on a map, focusing on the first two boundaries around observation $148$, and then the second boundary between observation $217$ and $219$, shown in the larger context of San Diego incomes:
+It is most helpful, though, to visualize this on a map, focusing on the two boundaries around observation $473$, shown also in the larger context of San Diego incomes:
 
 ```python
-f,ax = plt.subplots(1,3,figsize=(18,6), 
-                    subplot_kw=dict(aspect='equal'))
-for i in range(3):
-    san_diego_tracts.plot('Median HH', ax=ax[i])
-first_focus = san_diego_tracts.iloc[[148,142]]
+f,ax = plt.subplots(1, 3, figsize=(18,6))
+
+# Plot tracts
+for i in range(2):
+    san_diego_tracts.plot('median_hh_income', ax=ax[i])
+
+# Zoom 1
+first_focus = san_diego_tracts.iloc[[473,157]]
 ax[0].plot(first_focus.centroid.x, first_focus.centroid.y, color='red')
-ax[2].plot(first_focus.centroid.x, first_focus.centroid.y, color='red')
 west,east,south,north = first_focus.buffer(1000).total_bounds
 ax[0].axis([west, south, east, north])
 
-second_focus = san_diego_tracts.iloc[[148,180]]
-ax[0].plot(second_focus.centroid.x, second_focus.centroid.y, color='red')
-ax[2].plot(second_focus.centroid.x, second_focus.centroid.y, color='red')
-
-third_focus = san_diego_tracts.iloc[[217, 219]]
-ax[1].plot(third_focus.centroid.x, third_focus.centroid.y, color='red')
-ax[2].plot(third_focus.centroid.x, third_focus.centroid.y, color='red')
-west,east,south,north = third_focus.buffer(1000).total_bounds
+# Zoom 2
+second_focus = san_diego_tracts.iloc[[473,163]]
+ax[1].plot(second_focus.centroid.x, second_focus.centroid.y, color='red')
 ax[1].axis([west, south, east, north])
 
-area_of_focus = pandas.concat((first_focus, second_focus, third_focus)).buffer(16000).total_bounds
+# Context
+san_diego_tracts.plot(facecolor="k", edgecolor="w", linewidth=0.5, alpha=0.5, ax=ax[2])
+contextily.add_basemap(ax[2], crs=san_diego_tracts.crs)
+area_of_focus = pandas.concat((first_focus, second_focus)).buffer(12000).total_bounds
+ax[2].plot(first_focus.centroid.x, first_focus.centroid.y, color='red')
+ax[2].plot(second_focus.centroid.x, second_focus.centroid.y, color='red')
 west, east, south, north = area_of_focus
-ax[2].axis([west, south, east, north])
+ax[2].axis([west, south, east, north]);
 ```
 
 These are the starkest contrasts in the map, and result in the most distinctive divisions between adjacent tracts' household incomes. 
