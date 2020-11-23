@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
-    display_name: analysis
+    display_name: Python 3
     language: python
-    name: analysis
+    name: python3
 ---
 
 # Point Pattern Analysis
@@ -48,7 +48,7 @@ In this chapter, we will focus on an introduction to point patters through geo-t
 
 ## Location, Location, Location
 
-The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, [1]) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let's load the flickr data first:
+The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, {cite}`Goodchild2007citizens`) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let's load the flickr data first:
 
 
 ```python
@@ -284,7 +284,7 @@ Voila, this allows a lot more detail! It is now clear that the majority of photo
 
 #### Kernel Density Estimation (KDE)
 
-Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretisation of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. [Silverman 1986](https://books.google.co.uk/books?hl=en&lr=&id=e-xsrjsL7WkC&oi=fnd&pg=PR9&dq=Silverman,+B.+W.+(1986)&ots=ixJrnv0GXo&sig=pMOnWU2UYmJ5SYpGWsnXtBgS_LI#v=onepage&q=Silverman%2C%20B.%20W.%20(1986)&f=false)), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a gaussian kernel in Python is rather straightfoward:
+Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretisation of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a gaussian kernel in Python is rather straightfoward:
 
 
 ```python
@@ -581,7 +581,7 @@ plt.show()
 
 Each gives a different impression of the area enclosing the user's range of photographs. In this, you can see that the the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle & circle are the "loosest" shapes, in that they contain the most area outside of the user's typical area. But, they're also the simplest shapes to draw and understand. 
 
-# Randomness & clustering
+## Randomness & clustering
 
 Beyond questions of centrality and extent, spatial statistics on point patterns are often concerned with how *even* a distribution of points is. By this, we might want to inquire about whether points tend to all cluster near one another or whether they disperse evenly throughout the problem area. Questions like this refer to the *intensity* or *dispersion* of the point pattern overall. 
 
@@ -636,7 +636,7 @@ plt.show()
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_66_0.png)
 
 
-## Quadrat statistics
+### Quadrat statistics
 
 Quadrat statistics examine the spatial distribution of points in an area in terms of the count of observations that fall within a given cell. By examining whether observations are spread *evenly* over cells, the quadrat approach aims to estimate whether points are spread out, or if they are clustered into a few cells. Strictly speaking, quadrat statistics examine the *evenness* of the distribution over cells using a $\chi^2$ statistical test common in the analysis of contingency tables. 
 
@@ -720,9 +720,9 @@ qstat_null_ashape.chi2_pvalue
 
 
 
-## Ripley's alphabet functions
+### Ripley's alphabet functions
 
-A large branch of spatial statistics focuses on the distributions of three quantities in a point pattern. They derive from earlier work by Ripley [2] on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases. 
+A large branch of spatial statistics focuses on the distributions of three quantities in a point pattern. They derive from earlier work by {cite}`Ripley1991` on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases. 
 
 The first function, Ripley's $G$ function, focuses on the distribution of nearest neighbor distances. That is, the $G$ function summarises the distances between each point in the point pattern to their nearest neighbor in the pattern. 
 
@@ -866,7 +866,7 @@ plt.show()
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_88_0.png)
 
 
-There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the `pointpats` documentation for more information on how this can be done in Python, or the book by Baddeley on *Spatial Point Patterns* in R[3].
+There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the `pointpats` documentation for more information on how this can be done in Python, or the book by {cite}`Baddeley2015`.
 
 ### Identifying clusters
 
@@ -1007,19 +1007,13 @@ plt.show()
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_104_0.png)
 
 
-# Conclusion
+## Conclusion
 
 Overall, this chapter has provided an overview of methods to analyze point patterns. From measuring their location, central tendency, and extent, to observing how they cluster or disperse and locating where the clusters are, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about many point patterns. Further, we will cover *modelling* point patterns, such as describing their properties or future locations, in subsequent chapters. 
 
-# Questions
+## Questions
 
-# References
-
-[1] Goodchild, M.F. (2007) "Citizens as sensors: the world of volunteered geography." *GeoJournal* 69, 211-221. 
-
-[2] Ripley, B. D. (1988). *Statistical Inference for Spatial Processes.* Cambridge: Cambridge University Press. doi: 10.1017/CBO9780511624131
-
-[3] Baddeley, A., E. Rubak, and R. Turner. 2015. *Spatial Point Patterns: Methodology and Applications with R* Boca Raton, FL: Chapman & Hall/CRC Press. 
+ 
 
 ---
 

@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -19,7 +19,18 @@ jupyter:
 In the previous chapter we explored the use of global measures of spatial autocorrelation to ask the question of whether the overall spatial distribution of our attribute of interest was reflective of a geographically random process, or not. These statistics are useful as the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. In these cases formal modeling of the spatial dimensions of the processes should next be carried out. On the other hand, spatial autocorrelation can sometimes arise from data processing operations in which cases the dependence is a form of non-random noise rather than due to substantive processes. Irrespective of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical anaylsis.
 
 For these reasons the ability to determine whether  spatial autocorrelation is present in a geographically referenced data set is a critical component of the spatial data science toolbox. That said, the global measures of spatial autocorrelation are "whole map" statistics, meaning that the single statistic pertains to the complete data set. In other words, global autocorrelation statistics allow us to detect *clustering* in a geographically referenced dataset. For example,
-Moran's I is good tool to summarize a dataset into a single value that informs about its degree of geographical clustering. However, it is not an appropriate measure to identify areas within the map where specific types of values (e.g. high, low) are located. In other words, Moran's I can tell us values are clustered overall, but it will not inform us about where the *clusters* are. For that purpose, we need to use a local measure of spatial autocorrelation. Local measures consider each single observation and operate on them, as oposed to on the overall dataset, as global measures do. Because of that, they are not good at summarizing a map, but they allow to obtain further insights about interesting geographical subsets of the data. In this chapter, we consider Local Indicators of Spatial Association (LISAs), a local counter-part of global measures like Moran's I. 
+Moran's I is good tool to summarize a dataset into a single value that informs
+about its degree of geographical clustering. However, it is not an appropriate
+measure to identify areas within the map where specific types of values (e.g.
+high, low) are located. In other words, Moran's I can tell us values are
+clustered overall, but it will not inform us about where the *clusters* are.
+For that purpose, we need to use a local measure of spatial autocorrelation.
+Local measures consider each single observation and operate on them, as oposed
+to on the overall dataset, as global measures do. Because of that, they are not
+good at summarizing a map, but they allow to obtain further insights about
+interesting geographical subsets of the data. In this chapter, we consider
+Local Indicators of Spatial Association (LISAs) {cite}`Anselin1995local`, a
+local counter-part of global measures like Moran's I.
 
 
 
@@ -42,7 +53,7 @@ from pysal.lib import weights
 import contextily                # Background tiles
 # Stamen Terrain Background tiles
 from contextily.tile_providers import ST_TERRAIN_BACKGROUND
-from booktools import choropleth
+
 ```
 
 ```python
@@ -98,7 +109,7 @@ And with this elements, we can generate a choropleth to get a quick sense of the
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
 ax.imshow(img, extent=ext, alpha=0.5)
-choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
+db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
            k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True, ax=ax)
 plt.text(ext[0],ext[2], lic, size=8)
 ax.set_axis_off()
@@ -206,7 +217,7 @@ Because of their very nature, looking at the numerical result of LISAs is not al
 f, ax = plt.subplots(1, figsize=(9,9))
 ax.imshow(img, extent=ext, alpha=0.5)
 db['Is'] = lisa.Is
-choropleth(db, column='Is', cmap='viridis', scheme='quantiles',
+db.plot(column='Is', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True,ax=ax);
 plt.text(ext[0], ext[2], lic, size=8)
 ax.set_axis_off()
@@ -222,7 +233,7 @@ axs = axs.flatten()
 
                     # Subplot 1 #
 ax = axs[0]
-choropleth(db, column='Is', cmap='viridis', scheme='quantiles',
+db.plot(column='Is', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True, ax=ax)
 ax.set_aspect('equal')
 ax.set_axis_off()
@@ -356,7 +367,7 @@ The final cluster map in the lower right above displays the output of the LISA s
 
 Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `PySAL` includes Getis and Ord's $G_i$ and $G_i^*$, which differ only on whether to exclude the self-value in the calculation or not, respectively. The way to calculate them also follows similar patterns as with the LISA above. Let us see how that would look like for our Brexit example:
 
-```python jupyter={"outputs_hidden": true}
+```python
 # Gi
 gostats = esda.getisord.G_Local(db['Pct_Leave'], w)
 # Gi*

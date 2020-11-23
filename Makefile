@@ -14,8 +14,12 @@ booksite: sync
 	mv ./tmp ./docs && \
 	cp ./CNAME ./docs/CNAME
 bookserve:
-	# serve docs folder locally
 	bash ./infrastructure/booksite/build.sh
 	cd ./docs && \
 	bundle exec jekyll serve --host 0.0.0.0
+jb-convert:
+	./convert_jb.py
+	cp notebooks/references.bib book/.
+jb-build:
+	jb build book/
 

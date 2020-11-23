@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -18,7 +18,7 @@ jupyter:
 
 ## Spatial autocorrelation
 
-The notion of spatial dependence or spatial autocorrelation relates to the existence of a "functional relationship between what happens at one point in space and what happens elsewhere" (Anselin, 1988). Spatial autocorrelation thus has to do with the degree to which the similarity in values between observations in a dataset is related to the similarity in locations of such observations. Not completely unlike (although there are some key differences) the traditional correlation between two variables -which informs us about how the values in one variable change as a function of those in the other- or its temporal counterpart -which relates the value of a variable at a given point in time with those in previous periods-, spatial autocorrelation relates the value of the variable of interest in a given location, with values of the same variable in other locations. An alternative way to understand the concept is as the degree of information contained in the value of a variable at a given location about the value of that same variable in other locations.
+The notion of spatial dependence or spatial autocorrelation relates to the existence of a "functional relationship between what happens at one point in space and what happens elsewhere" {cite}`Anselin_1988`. Spatial autocorrelation thus has to do with the degree to which the similarity in values between observations in a dataset is related to the similarity in locations of such observations. Not completely unlike (although there are some key differences) the traditional correlation between two variables -which informs us about how the values in one variable change as a function of those in the other- or its temporal counterpart -which relates the value of a variable at a given point in time with those in previous periods-, spatial autocorrelation relates the value of the variable of interest in a given location, with values of the same variable in other locations. An alternative way to understand the concept is as the degree of information contained in the value of a variable at a given location about the value of that same variable in other locations.
 
 In order to understand better the notion of spatial autocorrelation, it is useful to begin by considering its absence. A key idea in this context is that of spatial randomness: a situation in which the location of an observation gives no information whatsoever about its value. In other words, a variable is spatially random if it is distributed following no discernible pattern over space. Spatial autocorrelation can thus be formally defined as the "absence of spatial randomness". This definition renders spatial autocorrelation as a very encompassing and daunting concept. To better understand it, spatial autocorrelation is typically categorized along two main dimensions: sign and scale.
 
@@ -28,7 +28,7 @@ Spatial autocorrelation can also be delimited by the scale at which it is consid
 
 
 
-We will explore these concepts with an applied example, interrogating the data about the presence, nature, and strength of global spatial autocorrelation. To do this, we will use a set of tools collectively known as Exploratory Spatial Data Analysis (ESDA). Analogous to its non-spatial counterpart (EDA; Tukey, 1977), ESDA has been specifically designed for this purpose, and puts space and the relative location of the observations in a dataset at the forefront of the analysis. The range of ESDA methods is wide and spans from simpler approaches like choropleth maps (previous chapter), to more advanced and robust methodologies that include statistical inference and an explicit recognition of the geographical arrangement of the data. The purpose of this chapter is to dip our toes into the latter group.
+We will explore these concepts with an applied example, interrogating the data about the presence, nature, and strength of global spatial autocorrelation. To do this, we will use a set of tools collectively known as Exploratory Spatial Data Analysis (ESDA). Analogous to its non-spatial counterpart (EDA; {cite}`Tukey1977exploratory`), ESDA has been specifically designed for this purpose, and puts space and the relative location of the observations in a dataset at the forefront of the analysis. The range of ESDA methods is wide and spans from simpler approaches like choropleth maps (previous chapter), to more advanced and robust methodologies that include statistical inference and an explicit recognition of the geographical arrangement of the data. The purpose of this chapter is to dip our toes into the latter group.
 
 
 ## An empirical illustration: the EU Referendum
@@ -49,8 +49,7 @@ import pandas
 from pysal.explore import esda
 from pysal.lib import weights
 from numpy.random import seed
-# Bespoke
-from booktools import choropleth
+
 ```
 
 In 2016, Great Britain ran a referendum to decide whether to remain in the European Union or to leave the club, the so called "Brexit" vote. We will use the official data from the Electoral Comission at the local authority level on percentage of votes for the Remain and Leave campains. There are two distinct datasets we will combine:
@@ -114,7 +113,7 @@ And with this elements, we can generate a choropleth to get a quick sense of the
 f, ax = plt.subplots(1, figsize=(9, 9))
 ax.imshow(img, extent=ext, alpha=0.5)
 
-choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
+db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax)
 
 plt.text(ext[0],ext[2], lic, size=8)
@@ -181,14 +180,14 @@ f, axs = plt.subplots(1, 2, figsize=(12, 6))
 ax1, ax2 = axs
 
 ax1.imshow(img, extent=ext, alpha=0.5)
-choropleth(db, column='Pct_Leave', cmap='viridis', scheme='quantiles',
+db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax1)
 ax1.text(ext[0],ext[2], lic, size=8)
 ax1.set_axis_off()
 ax1.set_title("% Leave")
 
 ax2.imshow(img, extent=ext, alpha=0.5)
-choropleth(db, column='Pct_Leave_lag', cmap='viridis', scheme='quantiles',
+db.plot(column='Pct_Leave_lag', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax2)
 ax2.text(ext[0],ext[2], lic, size=8)
 ax2.set_axis_off()
@@ -226,7 +225,7 @@ plt.show()
 
 ```
 
-Visually, it appears that the map represents a clear case of positive spatial autocorrelation: overall, there are few visible cases where a given observation is surrounded by others in the opposite category. To formally explore this initial assessment, we can use what is called a "joint count" statistic (JC; Cliff & Ord 1981). Imagine a checkerboard with green (G, value 0) and yellow (Y, value 1) squares. The idea of the statistic is to count occurrences of green-green (GG), yellow-yellow (YY), or green-yellow/yellow-green (GY) joins (or neighboring pairs) on the map. In this context, both GG and YY reflect positive spatial autocorrelation, while GY captures its negative counterpart. The intuition of the statistic is to provide a baseline of how many GG, YY, and GY one would expect under the case of complete spatial randomness, and to compare this with the observed counts in the dataset. A situation where we observe more GG/YY than expected and less GY than expected would suggest positive spatial autocorrelation; while the oposite, more GY than GG/YY, would point towards negative spatial autocorrelation.
+Visually, it appears that the map represents a clear case of positive spatial autocorrelation: overall, there are few visible cases where a given observation is surrounded by others in the opposite category. To formally explore this initial assessment, we can use what is called a "joint count" statistic (JC; {cite}`Cliff1981spatial`). Imagine a checkerboard with green (G, value 0) and yellow (Y, value 1) squares. The idea of the statistic is to count occurrences of green-green (GG), yellow-yellow (YY), or green-yellow/yellow-green (GY) joins (or neighboring pairs) on the map. In this context, both GG and YY reflect positive spatial autocorrelation, while GY captures its negative counterpart. The intuition of the statistic is to provide a baseline of how many GG, YY, and GY one would expect under the case of complete spatial randomness, and to compare this with the observed counts in the dataset. A situation where we observe more GG/YY than expected and less GY than expected would suggest positive spatial autocorrelation; while the oposite, more GY than GG/YY, would point towards negative spatial autocorrelation.
 
 Since the spatial weights are only used here to delimit who is a neighbor or not, the joint count statistic requires binary weights. Let us thus transform `w` back to a non-standardised state:
 
@@ -305,7 +304,10 @@ These results point to a clear presence of positive spatial autocorrelation, as 
 
 ### Continuous case: Moran Plot and Moran's I
 
-Once we have built some intuition around how spatial autocorrelation can be formally assessed in the binary case, let us move to situations where the variable of interest does not only take two values, but is instead continuous. Probably the most commonly used statistic in this context is Moran's I (Moran, 1950), which can be written as:
+Once we have built some intuition around how spatial autocorrelation can be
+formally assessed in the binary case, let us move to situations where the
+variable of interest does not only take two values, but is instead continuous.
+Probably the most commonly used statistic in this context is Moran's I {cite}`Moran1948`, which can be written as:
 
 $$
 I = \dfrac{n}{\sum_i\sum_j w_{ij}} \dfrac{\sum_i\sum_j w_{ij} \, z_i \, z_j}{\sum_i z_i^2}
@@ -381,7 +383,7 @@ Moran's I is probably the most widely used statistic for global spatial autocorr
 
 #### Geary's C
 
-The contiguity ratio $c$, proposed by Geary (1954), is given by:
+The contiguity ratio $c$, proposed by {cite}`Geary1954contiguity`, is given by:
 
 $$
 C = \dfrac{(n-1)}
@@ -416,7 +418,7 @@ In this case, Geary's C points in the same direction as Moran's I: there is clea
 
 #### Getis and Ord's G
 
-Originally proposed by Getis & Ord (1992), the $G$ is the global version of a family of statistics of spatial autocorrelation based on distance. The $G$ class of statistics is conceived for points, hence the use of a distance $W$, but it can also be applied to lattice data if a binary spatial weights matrix can be constructed. Additionally, it is designed for the study of positive variables with a natural origin. The $G$ can be expressed as follows:
+Originally proposed by {cite}`Getis1992analysis`, the $G$ is the global version of a family of statistics of spatial autocorrelation based on distance. The $G$ class of statistics is conceived for points, hence the use of a distance $W$, but it can also be applied to lattice data if a binary spatial weights matrix can be constructed. Additionally, it is designed for the study of positive variables with a natural origin. The $G$ can be expressed as follows:
 
 $$
 G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
@@ -456,19 +458,7 @@ print("Getis & Ord G: %.3f | Pseudo P-value: %.3f"%(gao.G, gao.p_sim))
 Similarly, inference can also be carried out by relying on computational simulations that replicate several instances of spatial randomness using the values in the variable of interest, but shuffling their locations. In this case, the pseudo P-value computed suggests a clear departure from the hypothesis of no concentration.
 
 
-## References
 
-Anselin, L. (1988). Lagrange multiplier test diagnostics for spatial dependence and spatial heterogeneity. Geographical analysis, 20(1), 1-17.
-
-Cliff, A. D., and J. K. Ord. 1981. Spatial Processes, Models & Applications. London: Pion.
-
-Geary, R. (1954). The Contiguity Ratio and Statistical Mapping. The Incorporated Statistician, 5(3), 115-146. doi:10.2307/2986645
-
-Getis, A., & Ord, J. K. (1992). The analysis of spatial association by use of distance statistics. Geographical analysis, 24(3), 189-206.
-
-Moran, P. A. (1950). Notes on continuous stochastic phenomena. Biometrika, 37(1/2), 17-23.
-
-Tukey, J. W. (1977). Exploratory data analysis (Vol. 2).
 
 ## Questions
 

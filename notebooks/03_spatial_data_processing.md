@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -59,6 +59,8 @@ Airports are interesting entities. They are nodes that connect a network of nati
 In this vignette, we will use a preprocessed open dataset. This dataset provides the location of airports in many different countries, alongside an indication of their size and importance to the air transit network. Before we start analyzing it, we need to load it:
 
 ```python
+import pandas as pd
+import geopandas as gpd
 # Load GeoJSON file
 air = gpd.read_file('../data/airports/airports_clean.geojson')
 # Check top of the table
@@ -80,6 +82,7 @@ The first extension is to bring geographic context. Although the shape of the fi
 First, we'll download the tiles into an image object, and then we will plot it together with the airports dataset.
 
 ```python
+import contextily as ctx
 # Download tiles for the bounding box of the airport's GeoDataFrame
 %time img, ext = ctx.bounds2img(*air.total_bounds, 2)
 ```
@@ -93,17 +96,11 @@ ext
 This allows us then to match it up with other data which is also expressed in the same coordinate reference system (CRS). Let us produce a slightly more useful image than above:
 
 ```python
-# Set up figure and axes
 f, ax = plt.subplots(1, figsize=(9, 9))
-# Display tile map
 ax.imshow(img, extent=ext)
-# Display airports on top
 ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
 ax.set_axis_off()
-# Add title
 ax.set_title('World Airports Dataset')
-# Display
 plt.show()
 ```
 
@@ -293,18 +290,14 @@ len(df)
 
 Examination of the dataframe reveals that the location information is encoded
 in the columns `longitude` and `latitude`.  We will use these columns together
-with the `Point` class from **shapely** to create a geodataframe:
-
-```python
-from shapely.geometry import Point
-```
-
-```python jupyter={"outputs_hidden": false}
-geometry = [Point(xy) for xy in zip(df['longitude'], df['latitude'])]
-```
+with the `points_from_xy` function from **geopandas**  to create the geometry for a new geodataframe:
 
 ```python
 import geopandas as gpd
+```
+
+```python
+geometry = gpd.points_from_xy(df.longitude, df.latitude) 
 ```
 
 ```python
@@ -331,6 +324,9 @@ the data type of the listing column as it is currently encoded as a string:
 ```python
 gdf.price
 ```
+
+Additionally, the dollar signs need to be removed prior to converting the price
+string to a floating point type:
 
 ```python
 gdf['price'] = gdf['price'].apply(lambda x: x.replace('$', '').replace(',', '')).astype(float)
@@ -874,8 +870,6 @@ ax.imshow(img, extent=ext)
 # Display airports on top
 #listings.plot(ax=ax, c='green')
 sheds.plot(ax=ax, alpha=.7, edgecolor='white', column='listings', legend=True, scheme='quantiles')
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
 
 
 #ax.scatter(air.x, air.y, c='purple', s=2)
@@ -891,9 +885,6 @@ ax.set_axis_off()
 plt.show()
 
 ```
-
-
-
 ## Exercises
 
 1. Which coffee shed has the highest listing price?
@@ -915,25 +906,15 @@ sheds['area'] = sheds.geometry.area / 1000000
 ```
 
 ```python
-# Set up figure and axes
 f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
 ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
+
+
 sheds.plot(ax=ax, edgecolor='grey', column='area', legend=True,
           scheme='fisher_jenks',
           classification_kwds={'k':10})
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
 
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
 ax.set_title('San Diego Cafe Sheds Area (km2)')
-# Display
 ax.set_xlim((w,e))
 ax.set_ylim((s,n))
 ax.set_axis_off()
@@ -953,8 +934,6 @@ ax.imshow(img, extent=ext)
 sheds.plot(ax=ax, edgecolor='grey', column='lintensity', legend=True,
           scheme='fisher_jenks',
           classification_kwds={'k':10})
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
 
 
 #ax.scatter(air.x, air.y, c='purple', s=2)
@@ -975,6 +954,3 @@ plt.show()
 
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
 
-```python
-
-```
