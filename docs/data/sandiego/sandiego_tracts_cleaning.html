@@ -1,0 +1,786 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>San Diego Tracts &#8212; Geographic Data Science with Python</title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.40e2e510f6b7d1648584402491bb10fe.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.d31b09fe5c1d09cb49b26a786de4a05d.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://geographicdata.science/book/data/sandiego/sandiego_tracts_cleaning.html" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Texas" href="../texas/README.html" />
+    <link rel="prev" title="NASA DEM" href="../nasadem/build_nasadem_sd.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="https://geographicdata.science/book/data/sandiego/sandiego_tracts_cleaning.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="San Diego Tracts" />
+<meta property="og:description" content="San Diego Tracts  This dataset contains an extract of a set of variables from the 2017 ACS Census Tracts for the San Diego (CA) metropolitan area.  import conte" />
+<meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
+
+<meta name="twitter:card" content="summary" />
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../index.html">
+  
+  <img src="../../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Geographic Data Science with Python</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro.html">
+   Home
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Preface
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/00_toc.html">
+   Table of Contents
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/references.html">
+   References
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Part I - Building Blocks
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_i.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/01_geospatial_computational_environment.html">
+   Geospatial Computational Environment
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/02_spatial_data.html">
+   Geographic thinking for data scientists
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/03_spatial_data_processing.html">
+   Spatial Data Processing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/04_spatial_weights.html">
+   Spatial Weights
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Part II - Spatial Data Analysis
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_ii.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/05_choropleth.html">
+   Choropleth Mapping
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/06_spatial_autocorrelation.html">
+   Global Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/07_local_autocorrelation.html">
+   Local Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html">
+   Point Pattern Analysis
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Part III - Advanced Topics
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_ii.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/09_spatial_inequality.html">
+   Spatial Inequality
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/10_clustering_and_regionalization.html">
+   Clustering &amp; Regionalization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/11_regression.html">
+   Spatial Regression
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/12_feature_engineering.html">
+   Spatial Feature Engineering
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Datasets
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../README.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../airbnb/regression_cleaning.html">
+   AirBnb
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../airports/airports_cleaning.html">
+   Airports
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../brexit/README.html">
+   Brexit
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../countries/countries_cleaning.html">
+   Countries
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../h3_grid/build_sd_h3_grid.html">
+   H3 Grid
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../mexico/README.html">
+   Mexico
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../nasadem/build_nasadem_sd.html">
+   NASA DEM
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   San Diego Tracts
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../texas/README.html">
+   Texas
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tokyo/tokyo_cleaning.html">
+   Tokyo Photographs
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/data/sandiego/sandiego_tracts_cleaning.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+        <!-- Source interaction buttons -->
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/gdsbook/book/master?urlpath=lab/tree/data/sandiego/sandiego_tracts_cleaning.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/gdsbook/book/blob/master/data/sandiego/sandiego_tracts_cleaning.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#download-data">
+   Download Data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#metadata">
+   Metadata
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#process-data">
+   Process data
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#write-out">
+   Write Out
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#download-link">
+   Download Link
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="san-diego-tracts">
+<h1>San Diego Tracts<a class="headerlink" href="#san-diego-tracts" title="Permalink to this headline">¶</a></h1>
+<p>This dataset contains an extract of a set of variables from the 2017 ACS Census Tracts for the San Diego (CA) metropolitan area.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">contextily</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">cenpy</span>
+
+<span class="n">acs</span> <span class="o">=</span> <span class="n">cenpy</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ACS</span><span class="p">(</span><span class="mi">2017</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="download-data">
+<h2>Download Data<a class="headerlink" href="#download-data" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Set variables to download</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">vars_to_download</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;B25077_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;median_house_value&quot;</span><span class="p">,</span>  <span class="c1"># Median house value</span>
+    <span class="s2">&quot;B02001_002E&quot;</span><span class="p">:</span> <span class="s2">&quot;total_pop_white&quot;</span><span class="p">,</span>     <span class="c1"># Total white population</span>
+    <span class="s2">&quot;B01003_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;total_pop&quot;</span><span class="p">,</span>           <span class="c1"># Total population</span>
+    <span class="s2">&quot;B25003_003E&quot;</span><span class="p">:</span> <span class="s2">&quot;total_rented&quot;</span><span class="p">,</span>        <span class="c1"># Total rented occupied</span>
+    <span class="s2">&quot;B25001_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;total_housing_units&quot;</span><span class="p">,</span> <span class="c1"># Total housing units</span>
+    <span class="s2">&quot;B09019_006E&quot;</span><span class="p">:</span> <span class="s2">&quot;hh_female&quot;</span><span class="p">,</span>           <span class="c1"># Female households</span>
+    <span class="s2">&quot;B09019_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;hh_total&quot;</span><span class="p">,</span>            <span class="c1"># Total households</span>
+    <span class="s2">&quot;B15003_002E&quot;</span><span class="p">:</span> <span class="s2">&quot;total_bachelor&quot;</span><span class="p">,</span>      <span class="c1"># Total w/ Bachelor degree</span>
+    <span class="s2">&quot;B25018_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;median_no_rooms&quot;</span><span class="p">,</span>     <span class="c1"># Median number of rooms</span>
+    <span class="s2">&quot;B19083_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;income_gini&quot;</span><span class="p">,</span>         <span class="c1"># Gini index of income inequality</span>
+    <span class="s2">&quot;B01002_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;median_age&quot;</span><span class="p">,</span>          <span class="c1"># Median age</span>
+    <span class="s2">&quot;B08303_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;tt_work&quot;</span><span class="p">,</span>              <span class="c1"># Aggregate travel time to work</span>
+    <span class="s2">&quot;B19013_001E&quot;</span><span class="p">:</span> <span class="s2">&quot;median_hh_income&quot;</span>     <span class="c1"># Median household income</span>
+<span class="p">}</span>
+<span class="n">vars_to_download_l</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">vars_to_download</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Download geometries and attributes</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">db</span> <span class="o">=</span> <span class="n">acs</span><span class="o">.</span><span class="n">from_msa</span><span class="p">(</span><span class="s2">&quot;San Diego, CA&quot;</span><span class="p">,</span>
+                  <span class="n">level</span><span class="o">=</span><span class="s2">&quot;tract&quot;</span><span class="p">,</span>
+                  <span class="n">variables</span><span class="o">=</span><span class="n">vars_to_download_l</span>
+                 <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.7/site-packages/pyproj/crs/crs.py:53: FutureWarning: &#39;+init=&lt;authority&gt;:&lt;code&gt;&#39; syntax is deprecated. &#39;&lt;authority&gt;:&lt;code&gt;&#39; is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
+  return _prepare_from_string(&quot; &quot;.join(pjargs))
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 1.12 s, sys: 153 ms, total: 1.27 s
+Wall time: 30.8 s
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="metadata">
+<h2>Metadata<a class="headerlink" href="#metadata" title="Permalink to this headline">¶</a></h2>
+<p>We will also write a companion file with the names of each variable:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">var_names</span> <span class="o">=</span> <span class="n">acs</span><span class="o">.</span><span class="n">variables</span>\
+               <span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="n">vars_to_download</span><span class="p">)</span>\
+               <span class="p">[[</span><span class="s2">&quot;label&quot;</span><span class="p">,</span> <span class="s2">&quot;concept&quot;</span><span class="p">]]</span>\
+               <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>\
+               <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;var_id&quot;</span><span class="p">})</span>
+<span class="n">var_names</span><span class="p">[</span><span class="s2">&quot;short_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_names</span><span class="p">[</span><span class="s2">&quot;var_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">vars_to_download</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="process-data">
+<h2>Process data<a class="headerlink" href="#process-data" title="Permalink to this headline">¶</a></h2>
+<p>While the ACS comes with a large number of attributes, we are not limited to the original variables at hand; we
+can construct additional variables. This is particularly useful when
+we want to compare areas that are not very similar in some structural
+characteristic, such as area or population. For example, a quick look into the
+variable names shows most variables are counts. For tracts of different sizes,
+these variables will mainly reflect their overall population, rather than provide direct information
+about the variables itself. To get around this, we will cast many of these count variables to rates,
+and use them in addition to a subset of the original variables.</p>
+<ul class="simple">
+<li><p>Replace missing values with columns mean</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">filler</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">col</span><span class="p">:</span> <span class="n">col</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">col</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">vars_to_download</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">vars_to_download</span><span class="p">]</span>\
+                                <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">filler</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Replace variable codes with short names</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">vars_to_download</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Calculate area in Sq.Km (we use the <a class="reference external" href="http://epsg.io/5070">Conus Albers</a> CRS)</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;area_sqm&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">5070</span><span class="p">)</span><span class="o">.</span><span class="n">area</span> <span class="o">/</span> <span class="mf">1e6</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Percentage of renter occupied units</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;pct_rented&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_rented&quot;</span><span class="p">]</span> <span class="o">/</span> \
+                  <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_housing_units&quot;</span><span class="p">]</span> <span class="o">+</span> \
+                   <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_housing_units&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span>
+                  <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Percentage of female households</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;pct_hh_female&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;hh_female&quot;</span><span class="p">]</span> <span class="o">/</span> \
+                  <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;hh_total&quot;</span><span class="p">]</span> <span class="o">+</span> \
+                   <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;hh_total&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span>
+                  <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Percentage with a Bachelor’s degree</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;pct_bachelor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_bachelor&quot;</span><span class="p">]</span> <span class="o">/</span> \
+                  <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_pop&quot;</span><span class="p">]</span> <span class="o">+</span> \
+                   <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_pop&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span>
+                  <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Percentage of white population</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;pct_white&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_pop_white&quot;</span><span class="p">]</span> <span class="o">/</span> \
+                  <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_pop&quot;</span><span class="p">]</span> <span class="o">+</span> \
+                   <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;total_pop&quot;</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span>
+                  <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Generate indicator for subset of contiguous 30 tracts</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tract_geoids</span> <span class="o">=</span> <span class="p">[</span>
+     <span class="s1">&#39;06073000100&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000201&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000202&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000300&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000400&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000500&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000600&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000700&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000800&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073000900&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001000&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001100&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001200&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001300&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001400&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001500&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001600&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001700&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001800&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073001900&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002001&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002002&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002100&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002201&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002202&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002301&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002302&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002401&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002402&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;06073002501&#39;</span>
+<span class="p">]</span>
+<span class="n">db</span><span class="p">[</span><span class="s2">&quot;sub_30&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;GEOID&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">tract_geoids</span><span class="p">),</span> <span class="s2">&quot;sub_30&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">)</span>
+<span class="n">db</span><span class="p">[</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;sub_30&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;yellow&quot;</span><span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/sandiego_tracts_cleaning_27_0.png" src="../../_images/sandiego_tracts_cleaning_27_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="write-out">
+<h2>Write Out<a class="headerlink" href="#write-out" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+Int64Index: 628 entries, 0 to 627
+Data columns (total 25 columns):
+ #   Column               Non-Null Count  Dtype   
+---  ------               --------------  -----   
+ 0   GEOID                628 non-null    object  
+ 1   geometry             628 non-null    geometry
+ 2   median_age           628 non-null    float64 
+ 3   total_pop            628 non-null    float64 
+ 4   total_pop_white      628 non-null    float64 
+ 5   tt_work              628 non-null    float64 
+ 6   hh_total             628 non-null    float64 
+ 7   hh_female            628 non-null    float64 
+ 8   total_bachelor       628 non-null    float64 
+ 9   median_hh_income     628 non-null    float64 
+ 10  income_gini          628 non-null    float64 
+ 11  total_housing_units  628 non-null    float64 
+ 12  total_rented         628 non-null    float64 
+ 13  median_no_rooms      628 non-null    float64 
+ 14  median_house_value   628 non-null    float64 
+ 15  NAME                 628 non-null    object  
+ 16  state                628 non-null    object  
+ 17  county               628 non-null    object  
+ 18  tract                628 non-null    object  
+ 19  area_sqm             628 non-null    float64 
+ 20  pct_rented           628 non-null    float64 
+ 21  pct_hh_female        628 non-null    float64 
+ 22  pct_bachelor         628 non-null    float64 
+ 23  pct_white            628 non-null    float64 
+ 24  sub_30               628 non-null    bool    
+dtypes: bool(1), float64(18), geometry(1), object(5)
+memory usage: 123.3+ KB
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Dataset</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span> rm -f sandiego_tracts.gpkg
+<span class="n">db</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;sandiego_tracts.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>Metadata</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span> rm -f sandiego_tracts_varnames.json
+<span class="n">var_names</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;sandiego_tracts_varnames.json&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="download-link">
+<h2>Download Link<a class="headerlink" href="#download-link" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../_downloads/f2341ee89163afe06b42fc5d5ed38060/sandiego_tracts.gpkg"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">the</span> <span class="pre">*sandiego_tracts.gpkg*</span> <span class="pre">file</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../../_downloads/451ab39841e524b6b49f077559c74945/sandiego_tracts_varnames.json"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">the</span> <span class="pre">*sandiego_tracts_varnames.json*</span> <span class="pre">file</span></code></a></p></li>
+</ul>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./data/sandiego"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+    <a class='left-prev' id="prev-link" href="../nasadem/build_nasadem_sd.html" title="previous page">NASA DEM</a>
+    <a class='right-next' id="next-link" href="../texas/README.html" title="next page">Texas</a>
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf<br/>
+        
+            &copy; Copyright 2020.<br/>
+          <div class="extra_footer">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+          </div>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-146598819-1', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    
+  </body>
+</html>

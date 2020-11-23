@@ -13,7 +13,7 @@ jupyter:
     name: python3
 ---
 
-# Clustering and Regionalization
+# Clustering & Regionalization
 <!--
 **NOTE**: parts of this notebook have been
 borrowed from [GDS'17 - Lab
@@ -21,9 +21,9 @@ borrowed from [GDS'17 - Lab
 -->
 
 ```python
-from pysal.explore.esda.moran import Moran
-import pysal.lib.weights.set_operations as Wsets
-from pysal.lib.weights import Queen, KNN
+from esda.moran import Moran
+import libpysal.weights.set_operations as Wsets
+from libpysal.weights import Queen, KNN
 import seaborn 
 import pandas
 import geopandas 
@@ -119,47 +119,14 @@ incorporate geographical constraints into the exploration of the social structur
 
 The dataset we will use in this chapter comes from the American Community Survey
 (ACS). In particular, we examine data at the Census Tract level in San Diego,
-California in 2016. Let us begin by reading in the data as a GeoDataFrame and
+California in 2017. Let us begin by reading in the data as a GeoDataFrame and
 exploring the attribute names.
 
 ```python
 # Read file
-db = geopandas.read_file('../data/sandiego/sd_tracts_acs_clean.shp')
+db = geopandas.read_file('../data/sandiego/sandiego_tracts.gpkg')
 # Print column names
 db.columns
-```
-
-While the ACS comes with a large number of attributes we can use for clustering
-and regionalization, we are not limited to the original variables at hand; we
-can construct additional variables. This is particularly useful when
-we want to compare areas that are not very similar in some structural
-characteristic, such as area or population. For example, a quick look into the
-variable names shows most variables are counts. For tracts of different sizes,
-these variables will mainly reflect their overall population, rather than provide direct information
-about the variables itself. To get around this, we will cast many of these count variables to rates,
-and use them in addition to a subset of the original variables. 
-Together, this set of constructed and received variables will to
-will be used for our clustering and regionalization.
-
-```python
-# Pull out total house units
-total_units = db['Total Ho_1']
-# Calculate percentage of renter occupied units
-pct_rental = db['Renter Occ'] / (total_units + (total_units==0)*1)
-
-# Pull out total number of households
-total_hh = db['Total Hous']
-# Calculate percentage of female households
-pct_female_hh = db['Female hou'] / (total_hh + (total_hh==0)*1)
-
-# Calculate percentage of population with a bachelor degree
-pct_bachelor = db["Bachelor's"] / (db['Total Popu'] + (db['Total Popu']==0)*1)
-# Assign newly created variables to main table `db`
-db['pct_rental'] = pct_rental
-db['pct_female_hh'] = pct_female_hh
-db['pct_bachelor'] = pct_bachelor
-# Calculate percentage of population white
-db['pct_white'] = db["White"] / (db['Total Popu'] + (db['Total Popu']==0) * 1)
 ```
 
 To make things easier later on, let us collect the variables we will use to
@@ -168,16 +135,17 @@ economic reality of each area and, taken together, they provide a comprehensive
 characterization of San Diego as a whole:
 
 ```python
-cluster_variables =  ['Median Val',   # Median house value
-                      'pct_white',    # Percent of tract population that is white
-                      'pct_rental',   # Percent of households that are rented
-                      'pct_female_hh',# Percent of female-led households 
-                      'pct_bachelor', # Percent of tract population with a Bachelors degree
-                      'Median Num',   # Median number of rooms in the tract's households
-                      'Gini index',   # Gini index measuring tract wealth inequality
-                      'Med Age',      # Median age of tract population
-                      'Travel tim'    # Travel time to work 
-                      ]
+cluster_variables =  [
+    'median_house_value', # Median house value
+    'pct_white',          # Percent of tract population that is white
+    'pct_rented',         # Percent of households that are rented
+    'pct_hh_female',      # Percent of female-led households 
+    'pct_bachelor',       # Percent of tract population with a Bachelors degree
+    'median_no_rooms',    # Median number of rooms in the tract's households
+    'income_gini',        # Gini index measuring tract wealth inequality
+    'median_age',         # Median age of tract population
+    'tt_work'             # Travel time to work 
+]
 ```
 
 ### Exploring the data
@@ -213,9 +181,9 @@ plt.show()
 Many visual patterns jump out from the maps, revealing both commonalities as
 well as differences across the spatial distributions of the individual variables.
 Several variables tend to increase in value from the east to the west
-(`pct_rental`, `Median Val`, `Median Num`, and `Travel tim`) while others
-have a spatial trend in the opposite direction (`pct_white`, `pct_female_hh`,
-`pct_bachelor`, `Med Age`). This is actually desirable; when variables have
+(`pct_rented`, `median_house_value`, `median_no_rooms`, and `tt_work`) while others
+have a spatial trend in the opposite direction (`pct_white`, `pct_hh_female`,
+`pct_bachelor`, `median_age`). This is actually desirable; when variables have
 different spatial distributions, each variable to contributes distinct 
 information to the profiles of each cluster. However, if all variables display very similar 
 spatial patterns, the amount of useful information across the maps is 
@@ -232,30 +200,10 @@ First, we need to build a spatial weights matrix that encodes the spatial
 relationships in our San Diego data. We will start with queen contiguity:
 
 ```python
-w_queen = Queen.from_dataframe(db)
+w = Queen.from_dataframe(db)
 ```
 
-As the warning tells us, observation `103` is an *island*, a disconnected observation
-with no queen contiguity neighbors. To make sure that every observation
-has at least one neighbor, we can combine the queen contiguity matrix with a
-nearest neighbor matrix. This would ensure that every observation is neighbor 
-of at least the observation it is closest to, plus all the areas with which 
-it shares any border. Let's first create the `KNN-1 W`:
-
-```python
-w_k1 = KNN.from_dataframe(db, k=1)
-```
-
-Now we can combine the queen and nearest neighbor matrices into a single representation
-with no disconnected observations. This full-connected connectivity matrix is the 
-one we will use for analysis:
-
-```python
-w = Wsets.w_union(w_queen, w_k1)
-```
-
-As we ensured (thanks to the nearest neighbor connections),  `w` does not contain
-any islands:
+As we have seen before, `w` does not contain any islands:
 
 ```python
 w.islands
@@ -270,10 +218,12 @@ numpy.random.seed(123456)
 # Calculate Moran's I for each variable
 mi_results = [Moran(db[variable], w) for variable in cluster_variables]
 # Display on table
-table = pandas.DataFrame([(variable, res.I, res.p_sim) for variable,res 
-                      in zip(cluster_variables, mi_results)],
-                     columns=['Variable', "Moran's I", 'P-value'])\
-          .set_index('Variable')
+table = pandas.DataFrame([(variable, res.I, res.p_sim) \
+                          for variable,res \
+                          in zip(cluster_variables, mi_results)
+                         ], columns=['Variable', "Moran's I", 'P-value']
+                        )\
+              .set_index('Variable')
 table
 ```
 
@@ -302,17 +252,17 @@ Two different types of plots are contained in the scatterplot matrix. On the
 diagonal are the density functions for the nine attributes. These allow for an
 inspection of the overall morphology of the attribute's value distribution.
 Examining these we see that our selection of variables includes those that are
-negatively skewed (`pct_white` and `pct_female_hh`) as well as positively skewed
-(`while median_val`, `pct_bachelor`, and `travel_tim`).
+negatively skewed (`pct_white` and `pct_hh_female`) as well as positively skewed
+(`median_house_value`, `pct_bachelor`, and `tt_work`).
 
 The second type of visualization lies in the off-diagonal cells of the matrix; 
 these are bi-variate scatterplots. Each cell shows the association between one
 pair of variables. Several of these cells indicate positive linear
-associations (`med_age` Vs. `median_value`, `median_value` Vs. `Median Num`)
-while other cells display negative correlation (`Median Val` Vs. `pct_rental`,
-`Median Num` Vs. `pct_rental`, and `Med Age` Vs. `pct_rental`). The one variable
+associations (`median_age` Vs. `median_house_value`, `median_house_value` Vs. `median_no_rooms`)
+while other cells display negative correlation (`median_house_value` Vs. `pct_rented`,
+`median_no_rooms` Vs. `pct_rented`, and `median_age` Vs. `pct_rented`). The one variable
 that tends to have consistenty weak association with the other variables is
-`Travel tim`, and in part this appears to reflect its rather concentrated 
+`tt_work`, and in part this appears to reflect its rather concentrated 
 distribution as seen on the lower right diagonal corner cell.
 
 ## Geodemographic Clusters in San Diego Census Tracts
@@ -417,7 +367,7 @@ more distant from each other. We can see evidence of this in
 our cluster map, since clumps of tracts with the same color emerge. However, this
 visual inspection is obscured by the complexity of the underlying spatial
 units. Our eyes are drawn to the larger polygons in the eastern part of the
-county, giving the impression that cluster 2 is the dominant cluster. While this
+county, giving the impression that cluster 1 is the dominant cluster. While this
 seems to be true in terms of land area (and we will verify this below), there is
 more to the cluster pattern than this. Because the tract polygons are all 
 different sizes and shapes, we cannot solely rely on our eyes to interpret 
@@ -446,10 +396,10 @@ _ = k5sizes.plot.bar()
 ```
 
 There are substantial differences in the sizes of the five clusters, with two very
-large clusters (0, 2), one medium sized cluster (4), and two small clusters (1,
-3). Cluster 2 is the largest when measured by the number of assigned tracts.
+large clusters (0, 3), one medium sized cluster (2), and two small clusters (1,
+4). Cluster 3 is the largest when measured by the number of assigned tracts.
 This confirms our intuition from the map above, where we got the visual impression
-that tracts in cluster 2 seemed to have the largest area. Let's see if this is 
+that tracts in cluster 3 seemed to have the largest area. Let's see if this is 
 the case. To do so we can use the `dissolve` operation in `geopandas`, which 
 combines all tracts belonging to each cluster into a single
 polygon object. After we have dissolved all the members of the clusters,
@@ -457,7 +407,7 @@ we report the total land area of the cluster:
 
 ```python
 # Dissolve areas by Cluster, aggregate by summing, and keep column for area
-areas = db.dissolve(by='k5cls', aggfunc='sum')['AREALAND']
+areas = db.dissolve(by='k5cls', aggfunc='sum')['area_sqm']
 areas
 ```
 
@@ -467,12 +417,12 @@ And, to show this visually:
 areas.plot.bar()
 ```
 
-Our visual impression is confirmed: cluster 2 contains tracts that
-together comprise 5,816,736,150 square meters (approximately 2,245 square miles),
+Our visual impression is confirmed: cluster 3 contains tracts that
+together comprise 6,636 square kilometers (approximately 2562 square miles),
 which accounts for over half of the total land area in the county:
 
 ```python
-areas[2]/areas.sum()
+areas[3]/areas.sum()
 ```
 
 Let's move on to build the profiles for each cluster. Again, the profiles is what
@@ -484,13 +434,13 @@ compute the means of each of the attributes in every cluster:
 # Group table by cluster label, keep the variables used 
 # for clustering, and obtain their mean
 k5means = db.groupby('k5cls')[cluster_variables].mean()
-k5means.T
+k5means.T.round(3)
 ```
 
-We see that cluster 3, for example, is composed of tracts that have
-the highest average `Median_val`, while cluster 2 has the highest level of inequality
-(`Gini index`), and cluster 1 contains an older population (`Med Age`)
-who tend to live in housing units with more rooms (`Median Num`).
+We see that cluster 4, for example, is composed of tracts that have
+the highest average `median_house_value`, and also the highest level of inequality
+(`income_gini`); and cluster 4 contains an older population (`median_age`)
+who tend to live in housing units with more rooms (`median_no_rooms`).
 Average values, however, can hide a great deal of detail and, in some cases,
 give wrong impressions about the type of data distribution they represent. To
 obtain more detailed profiles, we can use the `describe` command in `pandas`, 
@@ -544,8 +494,8 @@ _ = facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend()
 ```
 
 This allows us to see that, while some attributes such as the percentage of
-female households (`pct_female_hh`) display largely the same distribution for
-each cluster, others paint a much more divided picture (e.g. `Median Val`).
+female households (`pct_hh_female`) display largely the same distribution for
+each cluster, others paint a much more divided picture (e.g. `median_house_value`).
 Taken altogether, these graphs allow us to start delving into the multidimensional 
 complexity of each cluster and the types of areas behind them.
 
@@ -601,7 +551,7 @@ Further, we can check the simple average profiles of our clusters:
 
 ```python
 ward5means = db.groupby('ward5')[cluster_variables].mean()
-ward5means.T
+ward5means.T.round(3)
 ```
 
 And again, we can create a plot of the profiles' distributions (after properly 
@@ -788,7 +738,7 @@ where each observation is connected to its four nearest observations, instead
 of those it touches.
 
 ```python
-w = KNN.from_shapefile('../data/sandiego/sd_tracts_acs_clean.shp', k=4)
+w = KNN.from_dataframe(db, k=4)
 ```
 
 With this matrix connecting each tract to the four closest tracts, we can run 
@@ -893,6 +843,3 @@ Thus, clustering and regionalization are essential tools for the spatial data sc
 
 [1] Gelman, A., & Hill, J. (2006). Data analysis using regression and multilevel/hierarchical models. Cambridge university press.
 
----
-
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
