@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -574,7 +574,7 @@ The default color map used by geopandas is viridis, which is a multi-hue
 sequential scheme, with the darker (ligher) hues representing lower (higher)
 values for the attribute in question. The choice of a color scheme for a
 choropleth map should be based on the type of variable under consideration
-{cite}`brewer1997mapping`. Generally, a distinction is drawn between three
+{cite}`Brewer1997mapping`. Generally, a distinction is drawn between three
 types of numerical attributes:
 
 - sequential

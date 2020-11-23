@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -529,7 +529,7 @@ In theory, since $P_i$ is included in computing $P_{lag-i}$, exogeneity is viola
 Similarly to the case of
 the spatial error, several techniques have been proposed to overcome this
 limitation, and `PySAL` implements several of them. In the example below, we
-use a two-stage least squares estimation (Anselin, 1988), where the spatial
+use a two-stage least squares estimation {cite}`Anselin_1988`, where the spatial
 lag of all the explanatory variables is used as instrument for the endogenous
 lag:
 

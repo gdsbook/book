@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.4.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -395,7 +395,7 @@ In such situations, we can turn to other types of distance-based weights.
 
 The knn rule assigns binary values to the weights for neighboring observations.
 PySAL also supports continuously valued weights to reflect Tobler's first law
-[1] in a more direct way: observations that are close to a unit have larger
+{cite}`Tobler1970computer` in a more direct way: observations that are close to a unit have larger
 valued weights than more distant observations.
 
 Kernel weights are one of the most commonly-used kinds of distance weights. They
@@ -915,7 +915,7 @@ component.
 Spatial weights are ubiquitous in the analysis of spatial patterns in data, since they provide a direct method to represent spatial structure. 
 However, spatial weights are sometimes useful in their own right, such as when examining latent structures directly in the graphs themselves or when using them to conduct descriptive analysis. 
 One clear use case that arises in the analysis of social data is to characterize latent *data discontinuities*. By *data discontinuity*, we mean a single border (or collection of borders) where data for a variate (or many variates) of interest change rapidly. 
-These can be used in stochastic models of boundaries [2-4] or used to adapt classic empirical outlier detection methods. 
+These can be used in stochastic models of boundaries {cite}`Lu2005bayesian,Fitzpatrick2010ecological,Dean2019frontiers` or used to adapt classic empirical outlier detection methods. 
 Below, we'll show one model-free way to identify empirical boundaries in your data. 
 
 
@@ -1142,26 +1142,6 @@ These are the starkest contrasts in the map, and result in the most distinctive 
     3. What is the smallest $k$ that you can find for the K-Nearest Neighbor graph to be fully-connected?
     4. In graph theory, a link whose *removal* will increase the number of connected components in a graph is called a *bridge*. In the fully-connected KNN graph with the smallest $k$, how many bridges are there between the north and south components? *(hint: use the plotting functionality)*
     5. What are the next two values of $k$ required for there to be an *additional* bridge at that $k$?
-
-
-## References
-
-
-[1] Tobler, W. R. "A computer movie simulating urban growth in the Detroit region." *Economic Geography* 46, no. sup1 (1970): 234-240.
-
-[2] Lu, H, and Carlin, B. 2005. “Bayesian Areal Wombling for Geographical Boundary Analysis.” *Geographical Analysis* 37 (3): 265–285.
-
-[3] Fitzpatrick, M C.,Preisser, E.L., Porter, A., Elkinton, J., Waller, L.A., Carlin, B. P., and Ellison, A.M. 2010. “Ecological Boundary Detection Using Bayesian Areal Wombling.” *Ecology* 91 (12): 3448–3455.
-
-[4] Dean, N., Dong, G., and Price, G. "Frontiers in Residential Segregation: Understanding Neighbourhood Boundaries and their Impacts." *Tijdschrift voor economische en sociale geografie*, in press
-
-
-## Further Reading
-
-LeSage, James P., and R. Kelley Pace. 2014. “The Biggest Myth in Spatial Econometrics.” *Econometrics* 2(4): 217–49. https://doi.org/10.3390/econometrics2040217.
-
-Griffith, D. A. 1996. “Some Guidelines for Specifying the Geographic Weights Matrix Contained in Spatial Statistical Models.” In *Practical Handbook of Spatial Statistics*, edited by Sandra Lach Arlinghaus, 65–82. Boca Raton, FL: CRC Press.
-
 
 
 ---
