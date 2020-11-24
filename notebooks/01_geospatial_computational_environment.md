@@ -230,7 +230,7 @@ This section will present the specific format of notebooks we use, and
 illustrate its building blocks in a way that allows you to then follow the
 rest of the book interactively.
 
-Our choice of notebook is Jupyter {cite}`kluyver2016jupyter`. A Jupyter notebook is a plain
+Our choice of notebook is Jupyter {cite}`Kluyver2016jupyter`. A Jupyter notebook is a plain
 text file with the `.ipynb` extension, which means that it is an easy file to
 move around, sync, and track over time. Internally, it is structured as a plain-text document containing
 JavaScript Object Notation that records the state of the notebook, so they 

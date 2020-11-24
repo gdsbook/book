@@ -59,8 +59,6 @@ Airports are interesting entities. They are nodes that connect a network of nati
 In this vignette, we will use a preprocessed open dataset. This dataset provides the location of airports in many different countries, alongside an indication of their size and importance to the air transit network. Before we start analyzing it, we need to load it:
 
 ```python
-import pandas as pd
-import geopandas as gpd
 # Load GeoJSON file
 air = gpd.read_file('../data/airports/airports_clean.geojson')
 # Check top of the table
@@ -82,7 +80,6 @@ The first extension is to bring geographic context. Although the shape of the fi
 First, we'll download the tiles into an image object, and then we will plot it together with the airports dataset.
 
 ```python
-import contextily as ctx
 # Download tiles for the bounding box of the airport's GeoDataFrame
 %time img, ext = ctx.bounds2img(*air.total_bounds, 2)
 ```
@@ -971,5 +968,13 @@ ax.set_ylim((s,n))
 ax.set_axis_off()
 
 plt.show()
+
+```
+
+---
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+```python
 
 ```

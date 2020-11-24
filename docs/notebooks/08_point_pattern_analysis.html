@@ -433,16 +433,6 @@
    Conclusion
   </a>
  </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#questions">
-   Questions
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#references">
-   References
-  </a>
- </li>
 </ul>
 
         </nav>
@@ -489,7 +479,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 <div class="section" id="location-location-location">
 <h2>Location, Location, Location<a class="headerlink" href="#location-location-location" title="Permalink to this headline">¶</a></h2>
-<p>The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, [1]) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to <a class="reference external" href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a class="reference external" href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let’s load the flickr data first:</p>
+<p>The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, <span class="bibtex" id="id1">[Goodchild2007citizens]</span>) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to <a class="reference external" href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a class="reference external" href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let’s load the flickr data first:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/tokyo/tokyo_clean.csv&#39;</span><span class="p">)</span>
@@ -817,7 +807,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 <div class="section" id="kernel-density-estimation-kde">
 <h3>Kernel Density Estimation (KDE)<a class="headerlink" href="#kernel-density-estimation-kde" title="Permalink to this headline">¶</a></h3>
-<p>Grids are the spatial equivalent of a histogram: the user decides how many “buckets”, and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretisation of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. <a class="reference external" href="https://books.google.co.uk/books?hl=en&amp;lr=&amp;id=e-xsrjsL7WkC&amp;oi=fnd&amp;pg=PR9&amp;dq=Silverman,+B.+W.+(1986)&amp;ots=ixJrnv0GXo&amp;sig=pMOnWU2UYmJ5SYpGWsnXtBgS_LI#v=onepage&amp;q=Silverman%2C%20B.%20W.%20(1986)&amp;f=false">Silverman 1986</a>), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a gaussian kernel in Python is rather straightfoward:</p>
+<p>Grids are the spatial equivalent of a histogram: the user decides how many “buckets”, and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretisation of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. <span class="bibtex" id="id2">[Silverman1986density]</span>), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a gaussian kernel in Python is rather straightfoward:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
@@ -1175,6 +1165,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <img alt="../_images/08_point_pattern_analysis_63_0.png" src="../_images/08_point_pattern_analysis_63_0.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/08_point_pattern_analysis_files/08_point_pattern_analysis_66_0.png" /></p>
 <div class="section" id="quadrat-statistics">
 <h3>Quadrat statistics<a class="headerlink" href="#quadrat-statistics" title="Permalink to this headline">¶</a></h3>
 <p>Quadrat statistics examine the spatial distribution of points in an area in terms of the count of observations that fall within a given cell. By examining whether observations are spread <em>evenly</em> over cells, the quadrat approach aims to estimate whether points are spread out, or if they are clustered into a few cells. Strictly speaking, quadrat statistics examine the <em>evenness</em> of the distribution over cells using a <span class="math notranslate nohighlight">\(\chi^2\)</span> statistical test common in the analysis of contingency tables.</p>
@@ -1187,7 +1178,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_65_0.png" src="../_images/08_point_pattern_analysis_65_0.png" />
+<img alt="../_images/08_point_pattern_analysis_66_0.png" src="../_images/08_point_pattern_analysis_66_0.png" />
 </div>
 </div>
 <p>In this case, for the default of a three by three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small p-value:</p>
@@ -1212,7 +1203,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_69_0.png" src="../_images/08_point_pattern_analysis_69_0.png" />
+<img alt="../_images/08_point_pattern_analysis_70_0.png" src="../_images/08_point_pattern_analysis_70_0.png" />
 </div>
 </div>
 <p>This means its p-value will be large, and likely not significant:</p>
@@ -1238,7 +1229,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_73_0.png" src="../_images/08_point_pattern_analysis_73_0.png" />
+<img alt="../_images/08_point_pattern_analysis_74_0.png" src="../_images/08_point_pattern_analysis_74_0.png" />
 </div>
 </div>
 <p>The quadrat test finds this to be <em>statistically nonrandom</em>, while our simulating process ensured that <em>within the given study area</em>, the pattern is a complete spatially-random process. Thus, quadrat counts can have issues with irregular study areas, and care should be taken to ensure that clustering is not mistakenly identified.</p>
@@ -1254,10 +1245,13 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 </div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>2.3045568458939038e-24
+</pre></div>
+</div>
 </div>
 <div class="section" id="ripley-s-alphabet-functions">
 <h3>Ripley’s alphabet functions<a class="headerlink" href="#ripley-s-alphabet-functions" title="Permalink to this headline">¶</a></h3>
-<p>A large branch of spatial statistics focuses on the distributions of three quantities in a point pattern. They derive from earlier work by Ripley [2] on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases.</p>
+<p>A large branch of spatial statistics focuses on the distributions of three quantities in a point pattern. They derive from earlier work by <span class="bibtex" id="id3">[Ripley1991]</span> on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases.</p>
 <p>The first function, Ripley’s <span class="math notranslate nohighlight">\(G\)</span> function, focuses on the distribution of nearest neighbor distances. That is, the <span class="math notranslate nohighlight">\(G\)</span> function summarises the distances between each point in the point pattern to their nearest neighbor in the pattern.</p>
 <p>In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are <em>mutual</em> nearest neighbors (and so have arrows going in both directions) but some are not.</p>
 <div class="cell docutils container">
@@ -1295,7 +1289,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_77_0.png" src="../_images/08_point_pattern_analysis_77_0.png" />
+<img alt="../_images/08_point_pattern_analysis_78_0.png" src="../_images/08_point_pattern_analysis_78_0.png" />
 </div>
 </div>
 <p>Then, the distribution of these distances has a distinctive pattern under completely spatially random processes. We can compute the distribution of nearest neighbor distances of the observed pattern and compare it to the distribution for a set of simulated patterns that have been simulated according to a known spatially-random process, such as a spatial Poisson point process.</p>
@@ -1346,7 +1340,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_81_0.png" src="../_images/08_point_pattern_analysis_81_0.png" />
+<img alt="../_images/08_point_pattern_analysis_82_0.png" src="../_images/08_point_pattern_analysis_82_0.png" />
 </div>
 </div>
 <p>Another way to measure dispersion is to examine the <em>gaps</em> in the pattern. That is, where the <span class="math notranslate nohighlight">\(G\)</span> function works by analyzing the distance <em>between</em> points in the pattern, the <em>F</em> function works by analyzing the distance <em>to</em> points in the pattern from locations in empty space. That is why the <span class="math notranslate nohighlight">\(F\)</span> function is called the “the empty space function,” since it characterizes the typical distance from arbitrary points in empty space to the point pattern. If the pattern has large gaps or empty areas, the <span class="math notranslate nohighlight">\(F\)</span> function will increase slowly. But, if the pattern is highly dispersed, then the <span class="math notranslate nohighlight">\(F\)</span> function will increase rapidly.</p>
@@ -1395,11 +1389,11 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_84_0.png" src="../_images/08_point_pattern_analysis_84_0.png" />
+<img alt="../_images/08_point_pattern_analysis_85_0.png" src="../_images/08_point_pattern_analysis_85_0.png" />
 </div>
 </div>
 <p><img alt="png" src="notebooks/08_point_pattern_analysis_files/08_point_pattern_analysis_88_0.png" /></p>
-<p>There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> documentation for more information on how this can be done in Python, or the book by Baddeley on <em>Spatial Point Patterns</em> in R[3].</p>
+<p>There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> documentation for more information on how this can be done in Python, or the book by <span class="bibtex" id="id4">[Baddeley2015]</span>.</p>
 </div>
 </div>
 <div class="section" id="identifying-clusters">
@@ -1482,7 +1476,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_95_0.png" src="../_images/08_point_pattern_analysis_95_0.png" />
+<img alt="../_images/08_point_pattern_analysis_96_0.png" src="../_images/08_point_pattern_analysis_96_0.png" />
 </div>
 </div>
 <p>Although informative, the result of this run is not particularly satisfactory. There are <em>way</em> too many points that are classified as “noise”.</p>
@@ -1533,22 +1527,14 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_99_0.png" src="../_images/08_point_pattern_analysis_99_0.png" />
+<img alt="../_images/08_point_pattern_analysis_100_0.png" src="../_images/08_point_pattern_analysis_100_0.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/08_point_pattern_analysis_files/08_point_pattern_analysis_104_0.png" /></p>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>Overall, this chapter has provided an overview of methods to analyze point patterns. From measuring their location, central tendency, and extent, to observing how they cluster or disperse and locating where the clusters are, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about many point patterns. Further, we will cover <em>modelling</em> point patterns, such as describing their properties or future locations, in subsequent chapters.</p>
-</div>
-<div class="section" id="questions">
-<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
-<p>[1] Goodchild, M.F. (2007) “Citizens as sensors: the world of volunteered geography.” <em>GeoJournal</em> 69, 211-221.</p>
-<p>[2] Ripley, B. D. (1988). <em>Statistical Inference for Spatial Processes.</em> Cambridge: Cambridge University Press. doi: 10.1017/CBO9780511624131</p>
-<p>[3] Baddeley, A., E. Rubak, and R. Turner. 2015. <em>Spatial Point Patterns: Methodology and Applications with R</em> Boca Raton, FL: Chapman &amp; Hall/CRC Press.</p>
 </div>
 </div>
 
