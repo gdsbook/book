@@ -12,6 +12,7 @@ jupyter:
     language: python
     name: python3
 ---
+
 # Geographic thinking for data scientists
 
 Data scientists have long worked with geographical data. Maps, particularly, are a favored kind of "infographic" in the age of responsive web cartography. While we discuss a bit about computational cartography in the chapter on choropleth mapping, it's useful to think a bit more deeply about how geography works in the context of data science. So, this chapter delves a bit into "geographic thinking," which represents the collected knowledge geographers have about why geographical information deserves special care and attention, especially when using geographic data in computation. 
