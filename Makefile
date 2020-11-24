@@ -21,6 +21,7 @@ html: sync
 	mkdir tmp_book
 	mkdir tmp_book/notebooks
 	cp notebooks/*.ipynb tmp_book/notebooks/
+	cp notebooks/references.bib tmp_book/notebooks/
 	cp -r data tmp_book/data
 	cp -r figures tmp_book/figures
 	cp infrastructure/website_content/* tmp_book/
