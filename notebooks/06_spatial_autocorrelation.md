@@ -100,8 +100,7 @@ db.plot(column='Pct_Leave',
        )
 contextily.add_basemap(ax, 
                        crs=db.crs, 
-                       source=contextily.providers.Stamen.TerrainBackground,
-                       
+                       source=contextily.providers.Stamen.TerrainBackground
                       )
 ax.set_axis_off()
 ```
