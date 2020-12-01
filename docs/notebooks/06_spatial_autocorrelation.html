@@ -238,7 +238,7 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../data/brexit/README.html">
+  <a class="reference internal" href="../data/brexit/brexit_cleaning.html">
    Brexit
   </a>
  </li>
@@ -453,24 +453,15 @@
 <span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">seaborn</span>
-<span class="kn">from</span> <span class="nn">pysal.viz.splot.esda</span> <span class="kn">import</span> <span class="n">plot_moran</span>
+<span class="kn">from</span> <span class="nn">pysal.viz</span> <span class="kn">import</span> <span class="n">splot</span>
+<span class="kn">from</span> <span class="nn">splot.esda</span> <span class="kn">import</span> <span class="n">plot_moran</span>
 <span class="kn">import</span> <span class="nn">contextily</span>
-<span class="kn">from</span> <span class="nn">contextily.tile_providers</span> <span class="kn">import</span> <span class="n">ST_TERRAIN_BACKGROUND</span>
 <span class="c1"># Analysis</span>
 <span class="kn">import</span> <span class="nn">geopandas</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>
 <span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
 <span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">seed</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook-jbupdate/lib/python3.8/site-packages/pysal/explore/segregation/network/network.py:15: UserWarning: You need pandana and urbanaccess to work with segregation&#39;s network module
-You can install them with  `pip install urbanaccess pandana` or `conda install -c udst pandana urbanaccess`
-  warn(
-&lt;ipython-input-1-11e86cb422df&gt;:7: FutureWarning: The &quot;contextily.tile_providers&quot; module is deprecated and will be removed in contextily v1.1. Please use &quot;contextily.providers&quot; instead.
-  from contextily.tile_providers import ST_TERRAIN_BACKGROUND
 </pre></div>
 </div>
 </div>
@@ -524,12 +515,7 @@ memory usage: 62.7+ KB
 <p>While the shapes of the geographical units (local authority districts, in this case) are stored in a compressed GeoJSON file. We can read it directly from the <code class="docutils literal notranslate"><span class="pre">.zip</span></code> file as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lads_path</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;../data/brexit/&#39;</span>\
-             <span class="s1">&#39;Local_Authority_Districts_December_2016_&#39;</span>\
-             <span class="s1">&#39;Generalised_Clipped_Boundaries_in_the_UK_WGS84/&#39;</span>\
-             <span class="s1">&#39;Local_Authority_Districts_December_2016_Generalised_&#39;</span>\
-             <span class="s1">&#39;Clipped_Boundaries_in_the_UK_WGS84.shp&#39;</span><span class="p">)</span>
-<span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">lads_path</span><span class="p">)</span>\
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/brexit/local_authority_districts.geojson&quot;</span><span class="p">)</span>\
                 <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;lad16cd&#39;</span><span class="p">)</span>
 <span class="n">lads</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
@@ -584,87 +570,31 @@ memory usage: 14.8+ KB
 </div>
 </div>
 </div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
-Name: WGS 84
-Axis Info [ellipsoidal]:
-- Lat[north]: Geodetic latitude (degree)
-- Lon[east]: Geodetic longitude (degree)
-Area of Use:
-- name: World
-- bounds: (-180.0, -90.0, 180.0, 90.0)
-Datum: World Geodetic System 1984
-- Ellipsoid: WGS 84
-- Prime Meridian: Greenwich
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">crs</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Projected CRS: EPSG:3857&gt;
-Name: WGS 84 / Pseudo-Mercator
-Axis Info [cartesian]:
-- X[east]: Easting (metre)
-- Y[north]: Northing (metre)
-Area of Use:
-- name: World - 85°S to 85°N
-- bounds: (-180.0, -85.06, 180.0, 85.06)
-Coordinate Operation:
-- name: Popular Visualisation Pseudo-Mercator
-- method: Popular Visualisation Pseudo Mercator
-Datum: World Geodetic System 1984
-- Ellipsoid: WGS 84
-- Prime Meridian: Greenwich
-</pre></div>
-</div>
-</div>
-</div>
-<p>Throughout the chapter, we will rely heavily on geovisualizations. To create more useful maps that bring geographical context to the spatial distribution of votes, we will use an image made up of tiles from a web map. Let us first download it on-the-fly using <code class="docutils literal notranslate"><span class="pre">contextily</span></code>. The image will be reused later on in several maps.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">we</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">ea</span><span class="p">,</span> <span class="n">no</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">total_bounds</span>
-<span class="n">img</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">contextily</span><span class="o">.</span><span class="n">bounds2img</span><span class="p">(</span><span class="n">we</span><span class="p">,</span> <span class="n">so</span><span class="p">,</span> <span class="n">ea</span><span class="p">,</span> <span class="n">no</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span>
-                         <span class="n">url</span><span class="o">=</span><span class="n">ST_TERRAIN_BACKGROUND</span><span class="p">)</span>
-<span class="n">lic</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Map tiles by Stamen Design, under CC BY 3.0. &quot;</span>\
-               <span class="s2">&quot;Data by OpenStreetMap, under ODbL.&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;ipython-input-7-0b8e67367386&gt;:2: FutureWarning: The &quot;url&quot; option is deprecated. Please use the &quot;source&quot; argument instead.
-  img, ext = contextily.bounds2img(we, so, ea, no, 6,
-</pre></div>
-</div>
-</div>
-</div>
 <p>And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the <code class="docutils literal notranslate"><span class="pre">alpha</span></code> attribute) to make the final plot easier to read.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-
-<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
-        <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">ext</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ext</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lic</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> 
+        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> 
+        <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
+        <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> 
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> 
+        <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> 
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> 
+        <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+       <span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> 
+                       <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> 
+                       <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span>
+                      <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/06_spatial_autocorrelation_16_0.png" src="../_images/06_spatial_autocorrelation_16_0.png" />
+<img alt="../_images/06_spatial_autocorrelation_12_0.png" src="../_images/06_spatial_autocorrelation_12_0.png" />
 </div>
 </div>
 <p>The final piece we need before we can delve into autocorrelation is the spatial weights matrix. We will use eight nearest neighbors for the sake of the example, but the discussion in the earlier chapter on weights applies in this context, and other criteriums would be valid too. We also row-standardize them:</p>
@@ -760,31 +690,35 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <p>To end this section visually, the smoothing nature of the lag can be appreciated in the following map comparison:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lic</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Map tiles by Stamen Design, under CC BY 3.0. </span><span class="se">\n</span><span class="s2">&quot;</span>\
-               <span class="s2">&quot;Data by OpenStreetMap, under ODbL.&quot;</span><span class="p">)</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span> <span class="o">=</span> <span class="n">axs</span>
 
-<span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
         <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">ext</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ext</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lic</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">% Le</span><span class="s2">ave&quot;</span><span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax1</span><span class="p">,</span> 
+                       <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> 
+                       <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
+                       
+                      <span class="p">)</span>
 
-<span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">ext</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;Pct_Leave_lag&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
         <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">ext</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">ext</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">lic</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">% Le</span><span class="s2">ave - Spatial Lag&quot;</span><span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span> 
+                       <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> 
+                       <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
+                       
+                      <span class="p">)</span>
 
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/06_spatial_autocorrelation_27_0.png" src="../_images/06_spatial_autocorrelation_27_0.png" />
+<img alt="../_images/06_spatial_autocorrelation_23_0.png" src="../_images/06_spatial_autocorrelation_23_0.png" />
 </div>
 </div>
 <p>Stark differences on the left between immendiate neighbors (as in the case of Liverpool, in the NW of England) are diminished on the map in the right.</p>
@@ -873,7 +807,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/06_spatial_autocorrelation_32_0.png" src="../_images/06_spatial_autocorrelation_32_0.png" />
+<img alt="../_images/06_spatial_autocorrelation_28_0.png" src="../_images/06_spatial_autocorrelation_28_0.png" />
 </div>
 </div>
 <p>Visually, it appears that the map represents a clear case of positive spatial autocorrelation: overall, there are few visible cases where a given observation is surrounded by others in the opposite category. To formally explore this initial assessment, we can use what is called a “joint count” statistic (JC; <a class="bibtex reference internal" href="references.html#cliff1981spatial" id="id4">[CO81]</a>). Imagine a checkerboard with green (G, value 0) and yellow (Y, value 1) squares. The idea of the statistic is to count occurrences of green-green (GG), yellow-yellow (YY), or green-yellow/yellow-green (GY) joins (or neighboring pairs) on the map. In this context, both GG and YY reflect positive spatial autocorrelation, while GY captures its negative counterpart. The intuition of the statistic is to provide a baseline of how many GG, YY, and GY one would expect under the case of complete spatial randomness, and to compare this with the observed counts in the dataset. A situation where we observe more GG/YY than expected and less GY than expected would suggest positive spatial autocorrelation; while the oposite, more GY than GG/YY, would point towards negative spatial autocorrelation.</p>
@@ -919,7 +853,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;pysal.explore.esda.join_counts.Join_Counts at 0x7fe9424daa60&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;esda.join_counts.Join_Counts at 0x7f9df7723f90&gt;
 </pre></div>
 </div>
 </div>
@@ -932,7 +866,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>872.0
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>871.0
 </pre></div>
 </div>
 </div>
@@ -945,7 +879,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>301.0
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>302.0
 </pre></div>
 </div>
 </div>
@@ -996,7 +930,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>727.46996996997
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>727.4124124124124
 </pre></div>
 </div>
 </div>
@@ -1009,7 +943,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>649.2542542542543
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>649.3233233233233
 </pre></div>
 </div>
 </div>
@@ -1077,7 +1011,7 @@ I = \dfrac{n}{\sum_i\sum_j w_{ij}} \dfrac{\sum_i\sum_j w_{ij} \, z_i \, z_j}{\su
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/06_spatial_autocorrelation_59_0.png" src="../_images/06_spatial_autocorrelation_59_0.png" />
+<img alt="../_images/06_spatial_autocorrelation_55_0.png" src="../_images/06_spatial_autocorrelation_55_0.png" />
 </div>
 </div>
 <p>The figure above displays the relationship between the standardized percentage to leave and its spatial lag which, because the <span class="math notranslate nohighlight">\(W\)</span> used is row-standardized, can be interpreted as the average standardized density of the Pct_Leave in the neighborhood of each observation. In order to guide the interpretation of the plot, a linear fit is also included in the post, together with confidence intervals. This line represents the best linear fit to the scatter plot or, in other words, what is the best way to represent the relationship between the two variables as a straight line.</p>
@@ -1101,7 +1035,7 @@ I = \dfrac{n}{\sum_i\sum_j w_{ij}} \dfrac{\sum_i\sum_j w_{ij} \, z_i \, z_j}{\su
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6436557633381564
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.6454521298096587
 </pre></div>
 </div>
 </div>
@@ -1129,7 +1063,7 @@ I = \dfrac{n}{\sum_i\sum_j w_{ij}} \dfrac{\sum_i\sum_j w_{ij} \, z_i \, z_j}{\su
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/06_spatial_autocorrelation_68_0.png" src="../_images/06_spatial_autocorrelation_68_0.png" />
+<img alt="../_images/06_spatial_autocorrelation_64_0.png" src="../_images/06_spatial_autocorrelation_64_0.png" />
 </div>
 </div>
 <p>On the left panel we can see in grey the empirical distribution generated from simulating 999 random maps with the values of the <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code> variable and then calculating Moran’s I for each of those maps. The black rug signals the mean. In contrary, the red rug shows Moran’s I calculated for the variable using the geography observed in the dataset. It is clear the value under the observed pattern is significantly higher than under randomness. This insight is confirmed on the right panel, where there is displayed an equivalent plot to the Moran Plot we created above.</p>
@@ -1164,7 +1098,7 @@ C = \dfrac{(n-1)}
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.41016025947192414
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.4080233215854691
 </pre></div>
 </div>
 </div>
@@ -1205,7 +1139,7 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>181452.49476417922
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>180878.9180092599
 </pre></div>
 </div>
 </div>
@@ -1234,7 +1168,7 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Getis &amp; Ord G: 0.436 | Pseudo P-value: 0.002
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Getis &amp; Ord G: 0.434 | Pseudo P-value: 0.003
 </pre></div>
 </div>
 </div>
