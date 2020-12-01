@@ -51,9 +51,6 @@ import pandas                    # Tabular data manipulation
 from pysal.explore import esda   # Exploratory Spatial analytics
 from pysal.lib import weights
 import contextily                # Background tiles
-# Stamen Terrain Background tiles
-from contextily.tile_providers import ST_TERRAIN_BACKGROUND
-
 ```
 
 ```python
@@ -65,12 +62,7 @@ ref.info()
 Now let us bring in the spatial data:
 
 ```python
-lads_path = ('../data/brexit/'\
-             'Local_Authority_Districts_December_2016_'\
-             'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'\
-             'Local_Authority_Districts_December_2016_Generalised_'\
-             'Clipped_Boundaries_in_the_UK_WGS84.shp')
-lads = geopandas.read_file(lads_path)\
+lads = geopandas.read_file("../data/brexit/local_authority_districts.geojson")\
                 .set_index('lad16cd')
 lads.info()
 ```
@@ -91,27 +83,26 @@ Although there are several variables that could be considered, we will focus on 
 lads.crs
 ```
 
-Throughout the chapter, we will rely heavily on geovisualizations. To create more useful maps that bring geographical context to the spatial distribution of votes, we will use an image made up of tiles from a web map. Let us first download it on-the-fly. The image will be reused later on in several maps.
-
-```python
-# Bounding box of the polygon layer
-we, so, ea, no = db.total_bounds
-# Download image and extent at zoom 6
-img, ext = contextily.bounds2img(we, so, ea, no, 6,
-                         url=ST_TERRAIN_BACKGROUND)
-# License text
-lic = ("Map tiles by Stamen Design, under CC BY 3.0. "\
-               "Data by OpenStreetMap, under ODbL.")
-```
-
 And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
 
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
-ax.imshow(img, extent=ext, alpha=0.5)
-db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
-           k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True, ax=ax)
-plt.text(ext[0],ext[2], lic, size=8)
+db.plot(column='Pct_Leave', 
+        cmap='viridis', 
+        scheme='quantiles',
+        k=5, 
+        edgecolor='white', 
+        linewidth=0., 
+        alpha=0.75, 
+        legend=True,
+        legend_kwds={"loc": 2},
+        ax=ax
+       )
+contextily.add_basemap(ax, 
+                       crs=db.crs, 
+                       source=contextily.providers.Stamen.TerrainBackground,
+                       
+                      )
 ax.set_axis_off()
 ```
 
@@ -215,11 +206,13 @@ Because of their very nature, looking at the numerical result of LISAs is not al
 
 ```python
 f, ax = plt.subplots(1, figsize=(9,9))
-ax.imshow(img, extent=ext, alpha=0.5)
 db['Is'] = lisa.Is
 db.plot(column='Is', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0.1, alpha=0.75, legend=True,ax=ax);
-plt.text(ext[0], ext[2], lic, size=8)
+contextily.add_basemap(ax, 
+                       crs=db.crs, 
+                       source=contextily.providers.Stamen.TerrainBackground
+                      )
 ax.set_axis_off()
 ```
 
@@ -379,7 +372,7 @@ As the local statistics they are, it is best to explore them by plotting them on
 In this case, let us write a little function that generates the map so we can then easily use it to generate two maps, one for $G_i$ and one for $G_i^*$:
 
 ```python
-def g_map(g, geog, img, ext, ax):
+def g_map(g, geog, ax):
     '''
     Create a cluster map
     ...
@@ -391,8 +384,6 @@ def g_map(g, geog, img, ext, ax):
     geog   : GeoDataFrame
              Table aligned with values in `g` and containing 
              the geometries to plot
-    img    : ndarray
-             Image for background
     ax     : AxesSubplot
              `matplotlib` axis to draw the map on
 
@@ -406,8 +397,6 @@ def g_map(g, geog, img, ext, ax):
     # Break observations into significant or not
     sig = g.p_sim < 0.05
 
-    # Plot background map
-    ax.imshow(img, extent=ext, alpha=0.5)
     # Plot non-significant clusters
     ns = db.loc[sig==False, 'geometry']
     ns.plot(ax=ax, color='grey', edgecolor=ec, linewidth=0.1)
@@ -418,6 +407,11 @@ def g_map(g, geog, img, ext, ax):
     ll = db.loc[(g.Zs < 0) & (sig==True), 'geometry']
     ll.plot(ax=ax, color='blue', edgecolor=ec, linewidth=0.1)
     # Style and draw
+    contextily.add_basemap(ax, 
+                           crs=db.crs, 
+                           source=contextily.providers.Stamen.TerrainBackground,
+
+                          )
     st = ''
     if g.star:
         st = '*'
@@ -431,7 +425,7 @@ def g_map(g, geog, img, ext, ax):
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 # Loop over the two statistics and generate the map
 for g, ax in zip([gostats, gostars], axs.flatten()):
-    ax = g_map(g, db, img, ext, ax)
+    ax = g_map(g, db, ax)
 # Render
 plt.show()
 ```
