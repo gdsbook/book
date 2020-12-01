@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -72,11 +72,11 @@ from pylab import rcParams
 rcParams['figure.figsize'] = 10, 5
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-
-gdf = geopandas.read_file('../data/us_county_income/uscountypcincome.gpkg')
+```python
+url = 'https://github.com/gdsbook/data_archive/raw/master/us_county_income/uscountypcincome.gpkg'
+gdf = geopandas.read_file(url)
 gdf.head()
-
+                    
 ```
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
@@ -393,8 +393,12 @@ chapter XX. We use a queen spatial weights matrix to calculate Moran's I for
 each year in the sample.
 <!-- #endregion -->
 
+```python
+from pysal.lib import weights
+```
+
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-wq = pysal.lib.weights.Queen.from_dataframe(pci_df)
+wq = weights.Queen.from_dataframe(pci_df)
 ```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}

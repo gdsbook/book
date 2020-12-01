@@ -4,6 +4,7 @@ This documents the creation of the data set: `uscountypcincome.gpkg` that is use
 
 - 09_inequality
 
+**Note that because of the large size of the file, the consuming notebook reads a remote version of the file. We do not store the file in this repository. The file can be reconstructed locally using the notebooks below.**
 
 ## Data Sources
 

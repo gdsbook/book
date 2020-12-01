@@ -1,10 +1,11 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
   <head>
     <meta charset="utf-8" />
-    <title>State Specific Data Frames &#8212; Geographic Data Science with Python</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Read remote shapefile with county geometries &#8212; Geographic Data Science with Python</title>
     
   <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
 
@@ -24,12 +25,14 @@
     href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
 
     
-    <link rel="stylesheet" href="../../_static/sphinx-book-theme.40e2e510f6b7d1648584402491bb10fe.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.2d2078699c18a0efb88233928e1cf6ed.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
   <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
 
@@ -42,8 +45,8 @@
     <script src="../../_static/clipboard.min.js"></script>
     <script src="../../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
-    <script src="../../_static/sphinx-book-theme.d31b09fe5c1d09cb49b26a786de4a05d.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="../../_static/sphinx-book-theme.be0a4a0c39cd630af62a2fcf693f3f06.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
@@ -64,8 +67,8 @@
 <!-- Opengraph tags -->
 <meta property="og:url"         content="https://geographicdata.science/book/data/us_county_income/015_csv_state_shp.html" />
 <meta property="og:type"        content="article" />
-<meta property="og:title"       content="State Specific Data Frames" />
-<meta property="og:description" content="State Specific Data Frames  gdf = geopandas.read_file(&#34;zip:tl_2019_us_county.zip!tl_2019_us_county.shp&#34;) csv_files = glob.glob(&#34;??.csv&#34;) csv_files.sort() csv_fi" />
+<meta property="og:title"       content="Read remote shapefile with county geometries" />
+<meta property="og:description" content="Read remote shapefile with county geometries  import fiona.io import geopandas as gpd import requests url = &#39;https://github.com/gdsbook/data_archive/raw/master/" />
 <meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
 
 <meta name="twitter:card" content="summary" />
@@ -89,19 +92,22 @@
   <h1 class="site-logo" id="site-title">Geographic Data Science with Python</h1>
   
 </a>
-</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+</div>
+
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
 </form>
+
 <nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-    <ul class="nav sidenav_l1">
+  <ul class="nav sidenav_l1">
  <li class="toctree-l1">
   <a class="reference internal" href="../../intro.html">
    Home
   </a>
  </li>
 </ul>
-<p class="caption collapsible-parent">
+<p class="caption">
  <span class="caption-text">
   Preface
  </span>
@@ -118,7 +124,7 @@
   </a>
  </li>
 </ul>
-<p class="caption collapsible-parent">
+<p class="caption">
  <span class="caption-text">
   Part I - Building Blocks
  </span>
@@ -150,7 +156,7 @@
   </a>
  </li>
 </ul>
-<p class="caption collapsible-parent">
+<p class="caption">
  <span class="caption-text">
   Part II - Spatial Data Analysis
  </span>
@@ -182,7 +188,7 @@
   </a>
  </li>
 </ul>
-<p class="caption collapsible-parent">
+<p class="caption">
  <span class="caption-text">
   Part III - Advanced Topics
  </span>
@@ -214,7 +220,7 @@
   </a>
  </li>
 </ul>
-<p class="caption collapsible-parent">
+<p class="caption">
  <span class="caption-text">
   Datasets
  </span>
@@ -275,9 +281,16 @@
    Tokyo Photographs
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="README.html">
+   US County Income 1969-2017
+  </a>
+ </li>
 </ul>
 
-</nav> <!-- To handle the deprecated key -->
+</nav>
+
+ <!-- To handle the deprecated key -->
 
 <div class="navbar_extra_footer">
   Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
@@ -306,11 +319,11 @@
             <i class="fas fa-arrow-up"></i>
         </button>
         
-        
-<div class="dropdown-buttons-trigger">
+        <div class="dropdown-buttons-trigger">
     <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
             class="fas fa-download"></i></button>
 
+    
     <div class="dropdown-buttons">
         <!-- ipynb file if we had a myst markdown file -->
         
@@ -322,8 +335,8 @@
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
     </div>
+    
 </div>
-
         <!-- Source interaction buttons -->
 
 
@@ -369,6 +382,11 @@
             <ul class="nav section-nav flex-column">
  <li class="toc-h1 nav-item toc-entry">
   <a class="reference internal nav-link" href="#">
+   Read remote shapefile with county geometries
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#state-specific-data-frames">
    State Specific Data Frames
   </a>
  </li>
@@ -393,8 +411,42 @@
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">geopandas</span>
 <span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">zipfile</span> <span class="kn">import</span> <span class="n">ZipFile</span>
+
 <span class="kn">import</span> <span class="nn">glob</span>
 </pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="read-remote-shapefile-with-county-geometries">
+<h1>Read remote shapefile with county geometries<a class="headerlink" href="#read-remote-shapefile-with-county-geometries" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">fiona.io</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/gdsbook/data_archive/raw/master/us_county_income/tl_2019_us_county.zip&#39;</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="n">data_bytes</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">content</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">ZipMemoryFile</span><span class="p">(</span><span class="n">data_bytes</span><span class="p">)</span> <span class="k">as</span> <span class="n">zip_memory_file</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">zip_memory_file</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;tl_2019_us_county.shp&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">collection</span><span class="p">:</span>
+      <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="o">.</span><span class="n">from_features</span><span class="p">(</span><span class="n">collection</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">collection</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="n">gdf</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s1">&#39;tl_2019_us_county.shp&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/usr/local/anaconda3/envs/gdsbook-jbupdate/lib/python3.8/site-packages/pyproj/crs/crs.py:53: FutureWarning: &#39;+init=&lt;authority&gt;:&lt;code&gt;&#39; syntax is deprecated. &#39;&lt;authority&gt;:&lt;code&gt;&#39; is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
+  return _prepare_from_string(&quot; &quot;.join(pjargs))
+</pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -402,7 +454,7 @@
 <h1>State Specific Data Frames<a class="headerlink" href="#state-specific-data-frames" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gdf</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;zip:tl_2019_us_county.zip!tl_2019_us_county.shp&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#gdf = geopandas.read_file(&quot;zip:tl_2019_us_county.zip!tl_2019_us_county.shp&quot;)</span>
 <span class="n">csv_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;??.csv&quot;</span><span class="p">)</span>
 <span class="n">csv_files</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 <span class="n">csv_files</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="c1"># kick out US</span>
@@ -473,10 +525,10 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f8309b3dba8&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../../_images/015_csv_state_shp_6_1.png" src="../../_images/015_csv_state_shp_6_1.png" />
+<img alt="../../_images/015_csv_state_shp_9_1.png" src="../../_images/015_csv_state_shp_9_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -516,6 +568,7 @@
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>geometry</th>
       <th>STATEFP</th>
       <th>COUNTYFP</th>
       <th>COUNTYNS</th>
@@ -525,7 +578,6 @@
       <th>LSAD</th>
       <th>CLASSFP</th>
       <th>MTFCC</th>
-      <th>CSAFP</th>
       <th>...</th>
       <th>2008</th>
       <th>2009</th>
@@ -542,6 +594,7 @@
   <tbody>
     <tr>
       <th>0</th>
+      <td>POLYGON ((-85.97879 33.32757, -85.97876 33.328...</td>
       <td>01</td>
       <td>027</td>
       <td>00161539</td>
@@ -551,7 +604,6 @@
       <td>06</td>
       <td>H1</td>
       <td>G4020</td>
-      <td>None</td>
       <td>...</td>
       <td>399915</td>
       <td>388053</td>
@@ -566,6 +618,7 @@
     </tr>
     <tr>
       <th>1</th>
+      <td>POLYGON ((-85.97879 33.32757, -85.97876 33.328...</td>
       <td>01</td>
       <td>027</td>
       <td>00161539</td>
@@ -575,7 +628,6 @@
       <td>06</td>
       <td>H1</td>
       <td>G4020</td>
-      <td>None</td>
       <td>...</td>
       <td>14161</td>
       <td>14006</td>
@@ -590,6 +642,7 @@
     </tr>
     <tr>
       <th>2</th>
+      <td>POLYGON ((-85.97879 33.32757, -85.97876 33.328...</td>
       <td>01</td>
       <td>027</td>
       <td>00161539</td>
@@ -599,7 +652,6 @@
       <td>06</td>
       <td>H1</td>
       <td>G4020</td>
-      <td>None</td>
       <td>...</td>
       <td>28241</td>
       <td>27706</td>
@@ -614,6 +666,7 @@
     </tr>
     <tr>
       <th>3</th>
+      <td>POLYGON ((-87.92970 32.29252, -87.93180 32.297...</td>
       <td>01</td>
       <td>091</td>
       <td>00161572</td>
@@ -623,7 +676,6 @@
       <td>06</td>
       <td>H1</td>
       <td>G4020</td>
-      <td>None</td>
       <td>...</td>
       <td>631357</td>
       <td>618986</td>
@@ -638,6 +690,7 @@
     </tr>
     <tr>
       <th>4</th>
+      <td>POLYGON ((-87.92970 32.29252, -87.93180 32.297...</td>
       <td>01</td>
       <td>091</td>
       <td>00161572</td>
@@ -647,7 +700,6 @@
       <td>06</td>
       <td>H1</td>
       <td>G4020</td>
-      <td>None</td>
       <td>...</td>
       <td>21331</td>
       <td>21170</td>
@@ -672,16 +724,17 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;STATEFP&#39;, &#39;COUNTYFP&#39;, &#39;COUNTYNS&#39;, &#39;GEOID&#39;, &#39;NAME&#39;, &#39;NAMELSAD&#39;, &#39;LSAD&#39;,
-       &#39;CLASSFP&#39;, &#39;MTFCC&#39;, &#39;CSAFP&#39;, &#39;CBSAFP&#39;, &#39;METDIVFP&#39;, &#39;FUNCSTAT&#39;, &#39;ALAND&#39;,
-       &#39;AWATER&#39;, &#39;INTPTLAT&#39;, &#39;INTPTLON&#39;, &#39;geometry&#39;, &#39;Unnamed: 0&#39;, &#39;GeoFIPS&#39;,
-       &#39;GeoName&#39;, &#39;Region&#39;, &#39;TableName&#39;, &#39;LineCode&#39;, &#39;IndustryClassification&#39;,
-       &#39;Description&#39;, &#39;Unit&#39;, &#39;1969&#39;, &#39;1970&#39;, &#39;1971&#39;, &#39;1972&#39;, &#39;1973&#39;, &#39;1974&#39;,
-       &#39;1975&#39;, &#39;1976&#39;, &#39;1977&#39;, &#39;1978&#39;, &#39;1979&#39;, &#39;1980&#39;, &#39;1981&#39;, &#39;1982&#39;, &#39;1983&#39;,
-       &#39;1984&#39;, &#39;1985&#39;, &#39;1986&#39;, &#39;1987&#39;, &#39;1988&#39;, &#39;1989&#39;, &#39;1990&#39;, &#39;1991&#39;, &#39;1992&#39;,
-       &#39;1993&#39;, &#39;1994&#39;, &#39;1995&#39;, &#39;1996&#39;, &#39;1997&#39;, &#39;1998&#39;, &#39;1999&#39;, &#39;2000&#39;, &#39;2001&#39;,
-       &#39;2002&#39;, &#39;2003&#39;, &#39;2004&#39;, &#39;2005&#39;, &#39;2006&#39;, &#39;2007&#39;, &#39;2008&#39;, &#39;2009&#39;, &#39;2010&#39;,
-       &#39;2011&#39;, &#39;2012&#39;, &#39;2013&#39;, &#39;2014&#39;, &#39;2015&#39;, &#39;2016&#39;, &#39;2017&#39;],
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Index([&#39;geometry&#39;, &#39;STATEFP&#39;, &#39;COUNTYFP&#39;, &#39;COUNTYNS&#39;, &#39;GEOID&#39;, &#39;NAME&#39;,
+       &#39;NAMELSAD&#39;, &#39;LSAD&#39;, &#39;CLASSFP&#39;, &#39;MTFCC&#39;, &#39;CSAFP&#39;, &#39;CBSAFP&#39;, &#39;METDIVFP&#39;,
+       &#39;FUNCSTAT&#39;, &#39;ALAND&#39;, &#39;AWATER&#39;, &#39;INTPTLAT&#39;, &#39;INTPTLON&#39;, &#39;Unnamed: 0&#39;,
+       &#39;GeoFIPS&#39;, &#39;GeoName&#39;, &#39;Region&#39;, &#39;TableName&#39;, &#39;LineCode&#39;,
+       &#39;IndustryClassification&#39;, &#39;Description&#39;, &#39;Unit&#39;, &#39;1969&#39;, &#39;1970&#39;, &#39;1971&#39;,
+       &#39;1972&#39;, &#39;1973&#39;, &#39;1974&#39;, &#39;1975&#39;, &#39;1976&#39;, &#39;1977&#39;, &#39;1978&#39;, &#39;1979&#39;, &#39;1980&#39;,
+       &#39;1981&#39;, &#39;1982&#39;, &#39;1983&#39;, &#39;1984&#39;, &#39;1985&#39;, &#39;1986&#39;, &#39;1987&#39;, &#39;1988&#39;, &#39;1989&#39;,
+       &#39;1990&#39;, &#39;1991&#39;, &#39;1992&#39;, &#39;1993&#39;, &#39;1994&#39;, &#39;1995&#39;, &#39;1996&#39;, &#39;1997&#39;, &#39;1998&#39;,
+       &#39;1999&#39;, &#39;2000&#39;, &#39;2001&#39;, &#39;2002&#39;, &#39;2003&#39;, &#39;2004&#39;, &#39;2005&#39;, &#39;2006&#39;, &#39;2007&#39;,
+       &#39;2008&#39;, &#39;2009&#39;, &#39;2010&#39;, &#39;2011&#39;, &#39;2012&#39;, &#39;2013&#39;, &#39;2014&#39;, &#39;2015&#39;, &#39;2016&#39;,
+       &#39;2017&#39;],
       dtype=&#39;object&#39;)
 </pre></div>
 </div>
