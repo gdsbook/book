@@ -1,0 +1,547 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Brexit &#8212; Geographic Data Science with Python</title>
+    
+  <link rel="stylesheet" href="../../_static/css/index.73d71520a4ca3b99cfee5594769eaaae.css">
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+  <link rel="stylesheet"
+    href="../../_static/vendor/open-sans_all/1.44.1/index.css">
+  <link rel="stylesheet"
+    href="../../_static/vendor/lato_latin-ext/1.44.1/index.css">
+
+    
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.40e2e510f6b7d1648584402491bb10fe.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.3da636dd464baa7582d2.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.d31b09fe5c1d09cb49b26a786de4a05d.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://geographicdata.science/book/data/brexit/brexit_cleaning.html" />
+    <link rel="shortcut icon" href="../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Countries" href="../countries/countries_cleaning.html" />
+    <link rel="prev" title="Airports" href="../airports/airports_cleaning.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="https://geographicdata.science/book/data/brexit/brexit_cleaning.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Brexit" />
+<meta property="og:description" content="Brexit  import geopandas import topojson import matplotlib.pyplot as plt    Local Authority District (LAD) geometries  The original geometries are downloaded fr" />
+<meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
+
+<meta name="twitter:card" content="summary" />
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../index.html">
+  
+  <img src="../../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Geographic Data Science with Python</h1>
+  
+</a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro.html">
+   Home
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Preface
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/00_toc.html">
+   Table of Contents
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/references.html">
+   References
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Part I - Building Blocks
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_i.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/01_geospatial_computational_environment.html">
+   Geospatial Computational Environment
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/02_spatial_data.html">
+   Geographic thinking for data scientists
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/03_spatial_data_processing.html">
+   Spatial Data Processing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/04_spatial_weights.html">
+   Spatial Weights
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Part II - Spatial Data Analysis
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_ii.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/05_choropleth.html">
+   Choropleth Mapping
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/06_spatial_autocorrelation.html">
+   Global Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/07_local_autocorrelation.html">
+   Local Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/08_point_pattern_analysis.html">
+   Point Pattern Analysis
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Part III - Advanced Topics
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../intro_part_ii.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/09_spatial_inequality.html">
+   Spatial Inequality
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/10_clustering_and_regionalization.html">
+   Clustering &amp; Regionalization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/11_regression.html">
+   Spatial Regression
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../notebooks/12_feature_engineering.html">
+   Spatial Feature Engineering
+  </a>
+ </li>
+</ul>
+<p class="caption collapsible-parent">
+ <span class="caption-text">
+  Datasets
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../README.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../airbnb/regression_cleaning.html">
+   AirBnb
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../airports/airports_cleaning.html">
+   Airports
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Brexit
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../countries/countries_cleaning.html">
+   Countries
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../h3_grid/build_sd_h3_grid.html">
+   H3 Grid
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../mexico/README.html">
+   Mexico
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../nasadem/build_nasadem_sd.html">
+   NASA DEM
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../sandiego/sandiego_tracts_cleaning.html">
+   San Diego Tracts
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../texas/README.html">
+   Texas
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tokyo/tokyo_cleaning.html">
+   Tokyo Photographs
+  </a>
+ </li>
+</ul>
+
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/data/brexit/brexit_cleaning.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+        <!-- Source interaction buttons -->
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+                title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/gdsbook/book/master?urlpath=lab/tree/data/brexit/brexit_cleaning.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/gdsbook/book/blob/master/data/brexit/brexit_cleaning.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#local-authority-district-lad-geometries">
+   Local Authority District (LAD) geometries
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#topology-simplification">
+   Topology simplification
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#download-link">
+   Download link
+  </a>
+ </li>
+</ul>
+
+        </nav>
+        
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="brexit">
+<h1>Brexit<a class="headerlink" href="#brexit" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">topojson</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_remove-input docutils container">
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="section" id="local-authority-district-lad-geometries">
+<h2>Local Authority District (LAD) geometries<a class="headerlink" href="#local-authority-district-lad-geometries" title="Permalink to this headline">¶</a></h2>
+<p>The original geometries are downloaded from the Office of National Statistics through <a class="reference external" href="https://data.gov.uk/dataset/1261032e-c683-4408-a82d-37281d0e250d/local-authority-districts-december-2016-full-clipped-boundaries-in-great-britain"><code class="docutils literal notranslate"><span class="pre">data.gov.uk</span></code></a> and stored locally:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;./Local_Authority_Districts_December_2016_&#39;</span>
+                           <span class="s1">&#39;Generalised_Clipped_Boundaries_in_the_UK_WGS84/&#39;</span>
+                           <span class="s1">&#39;Local_Authority_Districts_December_2016_&#39;</span>
+                           <span class="s1">&#39;Generalised_Clipped_Boundaries_in_the_UK_WGS84.shp&#39;</span>
+                          <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="topology-simplification">
+<h2>Topology simplification<a class="headerlink" href="#topology-simplification" title="Permalink to this headline">¶</a></h2>
+<p>To obtain a much more lightweight set of geometries, we simplify the layer, respecting its topology. First we build the topology:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">topology</span> <span class="o">=</span> <span class="n">topojson</span><span class="o">.</span><span class="n">Topology</span><span class="p">(</span><span class="n">lads</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then simplify it:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_uk</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">toposimplify</span><span class="p">(</span><span class="o">.</span><span class="mi">025</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Inspect the resulting geography:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_uk</span><span class="o">.</span><span class="n">to_gdf</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+</pre></div>
+</div>
+<img alt="../../_images/brexit_cleaning_10_1.png" src="../../_images/brexit_cleaning_10_1.png" />
+</div>
+</div>
+<p>And we can write it to a GeoJSON file:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">simple_uk</span><span class="o">.</span><span class="n">to_gdf</span><span class="p">()</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s1">&#39;./local_authority_districts.geojson&#39;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GeoJSON&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<hr class="docutils" />
+<div class="section" id="download-link">
+<h2>Download link<a class="headerlink" href="#download-link" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../../_downloads/860cf1380fe6cb15c80f882fad461a04/local_authority_districts.geojson"><code class="xref download docutils literal notranslate"><span class="pre">[Download</span> <span class="pre">the</span> <span class="pre">simplified</span> <span class="pre">LAD</span> <span class="pre">geometries</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">GeoJSON]</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../../_downloads/3c5d077df052a9a21915c1a938536f99/brexit_vote.csv"><code class="xref download docutils literal notranslate"><span class="pre">[Download</span> <span class="pre">the</span> <span class="pre">EU</span> <span class="pre">referendum</span> <span class="pre">vote</span> <span class="pre">results</span> <span class="pre">as</span> <span class="pre">a</span> <span class="pre">CSV]</span></code></a></p></li>
+</ul>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./data/brexit"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+    <a class='left-prev' id="prev-link" href="../airports/airports_cleaning.html" title="previous page">Airports</a>
+    <a class='right-next' id="next-link" href="../countries/countries_cleaning.html" title="next page">Countries</a>
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf<br/>
+        
+            &copy; Copyright 2020.<br/>
+          <div class="extra_footer">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+          </div>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    
+  <script src="../../_static/js/index.3da636dd464baa7582d2.js"></script>
+
+
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-146598819-1', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    
+  </body>
+</html>
