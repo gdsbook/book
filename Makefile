@@ -5,6 +5,16 @@ lab:
                -p 8888:8888 \
                -v ${PWD}:/home/jovyan/work \
                darribas/gds_dev:5.0
+lablinuxsr:
+	docker run --rm \
+	--user root \
+	-e NB_UID=1001 \
+	-e NB_GID=1001 \
+	-p 4000:4000 \
+	-p 8888:8888 \
+	-v ${PWD}:/home/jovyan/work \
+	darribas/gds_py:5.0
+
 labosx:
 	docker run --rm \
                -p 4000:4000 \

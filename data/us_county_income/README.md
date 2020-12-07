@@ -15,16 +15,16 @@ The original files, and the final geopackage,  have been archived at [gdsbook/da
 
 The data archive has urls back to the original sources for the downloads.
 
+
+## File Generated
+
+- `uscountypcincome.gpk` Final geopackage with US county per capita incomes 1969-2017
+
 ## Notebooks
 
-To produce the dataset, run these notebooks in sequence:
+To produce the dataset, run the following notebook.
 
-- `010_csv.ipynb`: Reads `CAINC1.zip` and creates csv files for each state
-- `015_csv_state_shp.ipynb`: Creates state specific shapefiles
-- `020_virginia.ipynb`: Handles independent cities and counties in Virginia
-- `030_wisconsin.ipynb`: Handles county merges  in Wisconsin
-- `040_other.ipynb`: Handles county histories in CO, NM, AZ
-- `050_shrink.ipynb`: Creates final geopackage with pcincome by county
+- `us_county_income_clean.ipynb`
 
 ## Notes
 

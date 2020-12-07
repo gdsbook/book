@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.6.0
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -72,11 +72,13 @@ from pylab import rcParams
 rcParams['figure.figsize'] = 10, 5
 ```
 
-```python
 url = 'https://github.com/gdsbook/data_archive/raw/master/us_county_income/uscountypcincome.gpkg'
 gdf = geopandas.read_file(url)
 gdf.head()
                     
+
+```python
+gdf = geopandas.read_file("../data/us_county_income/uscountypcincome.gpkg")
 ```
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
@@ -90,7 +92,7 @@ gdf[['LineCode', 'Descriptio']].head()
 
 ```
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df = gdf[gdf.LineCode == 3]
+pci_df = gdf[gdf.LineCode == '3']
 ```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
@@ -653,6 +655,10 @@ summary
 ```
 
 ```python
+pci_df['Region'] = pci_df['Region'].astype(int) 
+```
+
+```python
 region_names = ["New England",
                'Mideast', 'Great Lakes', 'Plains',
                'Southeast', 'Southwest', 'Rocky Mountain',
@@ -874,6 +880,10 @@ geom=[Point(xy) for xy in zip([117.454361,117.459880],[38.8459879,38.846255])]
 ldf=gpd.GeoDataFrame(geometry=geom,crs={'init':'epsg:4326'})
 ldf.to_crs(epsg=3310,inplace=True)
 l=gdf.distance(ldf.shift())
+```
+
+```python
+df.crs = {'init':'epsg:4326'}
 ```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
