@@ -22,11 +22,8 @@ The data archive has urls back to the original sources for the downloads.
 
 ## Notebooks
 
-To produce the dataset, run the following notebook.
+To reproduce the dataset, run the following notebook.
 
 - `us_county_income_clean.ipynb`
 
-## Notes
 
-- The geopackage can either be created locally by running the notebooks in sequence, or by downloading from the gdsbook data archive listed above.
-- Population and Total County income are not in the final geopackage but are available in the file `uscountyincome.csv`
