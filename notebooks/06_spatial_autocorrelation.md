@@ -40,9 +40,9 @@ To illustrate the notion of spatial autocorrelation and its different variants, 
 %matplotlib inline
 import matplotlib.pyplot as plt
 import seaborn
-from pysal.viz.splot.esda import plot_moran
+from pysal.viz import splot
+from splot.esda import plot_moran
 import contextily
-from contextily.tile_providers import ST_TERRAIN_BACKGROUND
 # Analysis
 import geopandas
 import pandas
@@ -68,12 +68,7 @@ ref.info()
 While the shapes of the geographical units (local authority districts, in this case) are stored in a compressed GeoJSON file. We can read it directly from the `.zip` file as follows:
 
 ```python
-lads_path = ('../data/brexit/'\
-             'Local_Authority_Districts_December_2016_'\
-             'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'\
-             'Local_Authority_Districts_December_2016_Generalised_'\
-             'Clipped_Boundaries_in_the_UK_WGS84.shp')
-lads = geopandas.read_file(lads_path)\
+lads = geopandas.read_file("../data/brexit/local_authority_districts.geojson")\
                 .set_index('lad16cd')
 lads.info()
 ```
@@ -88,35 +83,25 @@ db = geopandas.GeoDataFrame(lads.join(ref[['Pct_Leave']]), crs=lads.crs)\
 db.info()
 ```
 
-```python
-lads.crs
-```
-
-```python
-db.crs
-```
-
-Throughout the chapter, we will rely heavily on geovisualizations. To create more useful maps that bring geographical context to the spatial distribution of votes, we will use an image made up of tiles from a web map. Let us first download it on-the-fly using `contextily`. The image will be reused later on in several maps.
-
-
-```python
-we, so, ea, no = db.total_bounds
-img, ext = contextily.bounds2img(we, so, ea, no, 6,
-                         url=ST_TERRAIN_BACKGROUND)
-lic = ("Map tiles by Stamen Design, under CC BY 3.0. "\
-               "Data by OpenStreetMap, under ODbL.")
-```
-
 And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
 
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
-ax.imshow(img, extent=ext, alpha=0.5)
-
-db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
-        k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax)
-
-plt.text(ext[0],ext[2], lic, size=8)
+db.plot(column='Pct_Leave', 
+        cmap='viridis', 
+        scheme='quantiles',
+        k=5, 
+        edgecolor='white', 
+        linewidth=0., 
+        alpha=0.75, 
+        legend=True,
+        legend_kwds={"loc": 2},
+        ax=ax
+       )
+contextily.add_basemap(ax, 
+                       crs=db.crs, 
+                       source=contextily.providers.Stamen.TerrainBackground
+                      )
 ax.set_axis_off()
 ```
 
@@ -174,24 +159,29 @@ The first row (`E08000012`) represents Liverpool, which was a notorious "remaine
 To end this section visually, the smoothing nature of the lag can be appreciated in the following map comparison:
 
 ```python
-lic = ("Map tiles by Stamen Design, under CC BY 3.0. \n"\
-               "Data by OpenStreetMap, under ODbL.")
+
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 ax1, ax2 = axs
 
-ax1.imshow(img, extent=ext, alpha=0.5)
 db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax1)
-ax1.text(ext[0],ext[2], lic, size=8)
 ax1.set_axis_off()
 ax1.set_title("% Leave")
+contextily.add_basemap(ax1, 
+                       crs=db.crs, 
+                       source=contextily.providers.Stamen.TerrainBackground,
+                       
+                      )
 
-ax2.imshow(img, extent=ext, alpha=0.5)
 db.plot(column='Pct_Leave_lag', cmap='viridis', scheme='quantiles',
         k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax2)
-ax2.text(ext[0],ext[2], lic, size=8)
 ax2.set_axis_off()
 ax2.set_title("% Leave - Spatial Lag")
+contextily.add_basemap(ax2, 
+                       crs=db.crs, 
+                       source=contextily.providers.Stamen.TerrainBackground,
+                       
+                      )
 
 plt.show()
 ```
