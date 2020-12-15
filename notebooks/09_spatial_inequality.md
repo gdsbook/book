@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.7.1
   kernelspec:
     display_name: Python 3
     language: python
@@ -20,15 +20,17 @@ jupyter:
 
 ## Introduction
 
-At the time this is being written, the topic of inequality is at the top of
-agenda of policy makers and is drawing considerable attention in academic
-circles. This is due to historic levels of inequality across the globe. Much of the focus has been on *interpersonal income inequality*,
-yet there is a growing recognition that the question of *interregional income
-inequality* requires further attention as the growing gaps between poor and rich
-regions have been identified as key drivers of political polarization in
-developing and developed countries {cite}`Rodriguez_Pose_2018`.
+Social and economic inequality is often at the top of policy makers' agendas.
+It has always drawn considerable attention in academic circles. Currently, 
+the world is extremely unequal, stratified, and segregated; no matter the 
+society or economic system, inequality is at a high point. Much of the focus
+has been on *interpersonal income inequality*, yet there is a growing recognition
+that the question of *interregional income inequality* requires further 
+attention as the growing gaps between poor and rich regions have been identified
+as key drivers of political polarization in developing and developed countries
+{cite}`Rodriguez_Pose_2018`.
 
-Indeed, while the two literatures, personal and regional inequality, are
+Indeed, while the two literatures (personal and regional inequality) are
 related, they have developed in a largely parallel fashion with limited
 cross-fertilization. In this notebook, we examine how a spatially explicit focus
 can provide insights on inequality and its dynamics. We also show the lineage of
@@ -50,8 +52,7 @@ spatial dimensions of regional inequality dynamics.
 ## Data: US State Per-Capita Income 1969-2017
 
 
-We focus on the case of the United States over the
-period  1969-2017.
+For this chapter, we focus on the case of the United States from 1969 to 2017. Specifically, we will analyze median incomes at the county level, examining the trends both in terms of how individual counties, states, or regions get richer or poorer, as well as how the overall distribution of income moves, skews, or spreads out. 
 
 <!-- #endregion -->
 
@@ -68,87 +69,75 @@ import pysal
 import numpy
 import mapclassify
 import matplotlib.pyplot as plt
-from pylab import rcParams
+from matplotlib import rcParams
 rcParams['figure.figsize'] = 10, 5
 ```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-
-gdf = geopandas.read_file('../data/us_county_income/uscountypcincome.gpkg')
-gdf.head()
-
+pci_df = geopandas.read_file('../data/us_county_income/uscountypcincome.gpkg')
+pci_df.head()
 ```
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 Inspection of the head of the data frame reveals that the years appear as columns in the data set, together with information about the particular record.
-This format is an example of a [*wide* longitudinal data set](https://www.theanalysisfactor.com/wide-and-long-data/).
+This format is an example of a [*wide* longitudinal data set](https://en.wikipedia.org/wiki/Wide_and_narrow_data).
+In wide-format data, each column represents a different time period, meaning that each row represents a set of measurements made about the same "entity" over time time (as well as any unique identifying information about that entity.)
+This contrasts with a *narrow* or *long* format, where each row describes an entity at a specific point in time. 
+Long data results in significant duplication for records and is generally worse for data storage. However, long form data is sometimes a more useful format when manipulating and analyzing data, as {cite}`Wickham_2014` discusses. Nonetheless, when analyzing *trajectories*, that is, the paths that entities take over time, wide data is more useful, and we will use that here. 
+
+In this data, we have 3076 counties across 49 years, as well as 28 extra columns that describe each county. 
+<!-- 
+ljw: we (1) don't discuss wide vs. long anywhere else in the book and (2) don't ever show a wide-to-long pivot using something like pandas.wide_to_long... We also don't need the LineCode filtering, since the final dataframe is already filtered by LineCode so that all LineCode==3.
+-->
 
 <!-- #endregion -->
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-gdf[['LineCode', 'Descriptio']].head()
-
-```
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df = gdf[gdf.LineCode == 3]
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df.head()
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-gdf.head()
-```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.shape
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df[['1969', 'STATEFP', 'COUNTYFP', 'geometry']].head()
+As an example, we can see the first few years for Jackson Counti, Mississippi below:
+
+```python
+pci_df.query('NAME == "Jackson" & STATEFP == "28"')
 ```
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ## Global Inequality
-We begin our examination of inequality by focusing on several global measures. Here, global means the measure is concerned with the overall, or a-spatial, nature of inequality. Several classic measures of inequality are available for this purpose.
 
-In general terms, measures of inequality focus on the dispersion present in an income distribution. In the case of regional, or spatial, inequality the distributions are defined on average or per-capita incomes for a spatial unit, such as a county, census tract, or region. For the US counties, we can visualize the distribution of per capita incomes for the first year in the sample as follows:
+We begin our examination of inequality by focusing on several global measures of income inequlity. Here, "global" means that the measure is concerned with the overall nature of inequality within the income distribution. That is, these measures focus on the direct disparity between rich and poor, considering nothing about where the rich and poor live. Several classic measures of inequality are available for this purpose. 
 
-
-To get a sense for the value distribution for per capita income, we can first discretize the distribution:
+In general terms, measures of inequality focus on the dispersion present in an income distribution. In the case of regional or spatial inequality, the distributions describe the average or per-capita incomes for spatial units, such as for counties, census tracts, or regions. For our US counties data, we can visualize the distribution of per capita incomes for the first year in the sample as follows:
 <!-- #endregion -->
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-import seaborn  as sns
-sns.set()
-sns.distplot(pci_df['1969'])
-
+seaborn.set_theme(style='whitegrid')
+seaborn.histplot(x=pci_df['1969'], kde=True)
 ```
 
 
-The long right tail is a prominent feature of the distribution, and is common in the study of incomes. A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate - a county. By contrast, in the wider inequality literature the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced, and this is because the regional distributions are based on averages obtained from the individual distributions.
+Looking at this distribution, notice that the right side of the distribution is much longer than the left side. This long right tail is a prominent feature of the distribution, and is common in the study of incomes, as it reflects the fact that within a single income distribution, the super-rich are generally much more wealthy than the super-poor are deprived. 
+
+A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate of individual incomes. Here, we are using the per-capita incomes for each county. By contrast, in the wider inequality literature, the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced. This difference arises from the smoothing that is intrinsic to aggregation: the regional distributions are based on averages obtained from the individual distributions, and so the extremely high-income individuals are averaged with the rest of their county. 
 
 
-The density is a powerful summary device that captures the overall morphology of the *value* distribution. At the same time, the density is silent on the underlying *spatial distribution* of county incomes. We can look at this second view of the distribution using a choropleth map:
+The kernel density estimate (or histogram) is a powerful visualization device that captures the overall morphology of the *feature* distribution for this measure of income. At the same time, the density is silent on the underlying *geographic distribution* of county incomes. We can look at this second view of the distribution using a choropleth map. To construct this, we can use the standard `geopandas` plotting tools. First, though, we will clean up the data for mapping. 
+
+```python
+pci_df = (pci_df.set_crs(epsg=4326) # US Census default projection
+                .to_crs(epsg=5070)) # Albers Equal Area North America
+```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-from pysal.viz import mapclassify
-pci_1969 = pci_df['1969']
+pci_df.plot(column='1969', scheme='Quantiles', 
+            legend=True, edgecolor='none',
+            legend_kwds={'loc': 'lower left'}, 
+            figsize=(12, 12))
+plt.title('Per Capita Income by County, 1969')
+plt.show()
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-q5_1969 = mapclassify.Quantiles(pci_df['1969'])
-
-```
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-_= pci_df.plot(column='1969', scheme='Quantiles', legend=True,
-                 edgecolor='none',
-             legend_kwds={'loc': 'lower right',
-                         'bbox_to_anchor':(1.5, 0.0)}, figsize=(12, 12))
-```
-
-The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. These are useful for developing an understanding of the overall  To gain more specific insights on the level of inequality in the distribution, we turn to a number of inequality indices.
+The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. The kernel density estimate is a *feature*-based representation, and the map is a *geographic* representation. Both are useful for developing an understanding of the overall. To gain more specific insights on the level of inequality in the distribution, we'll discuss a few inequality indices common in econometrics. 
 
 
 ### 20:20 Ratio
@@ -156,14 +145,14 @@ The choropleth and the kernel density provide different visual depictions of the
 One commonly used measure of inequality in a distribution is the so called 20:20 ratio, which is defined as the ratio of the incomes at the 80th percentile over that at the 20th percentile: 
 <!-- #endregion -->
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-q5_1969.bins
+top20, bottom20 = pci_df['1969'].quantile([.8, .2])
 ```
 
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-i_20_20 = q5_1969.bins[-2]/q5_1969.bins[0]
-i_20_20
+```python
+top20/bottom20
 ```
+
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 In 1969 the richest 20% of the counties had an income that was 1.5 times the poorest 20% of the counties. The 20:20 ratio has the advantage of being robust to outliers at the top and the bottom of the distribution. 
 
@@ -172,24 +161,23 @@ We can examine the dynamics of this global inequality measure by creating a simp
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 def ineq_2020(values):
-    q5 = mapclassify.Quantiles(values)
-    return q5.bins[-2]/q5.bins[0]
-    
-    
+    top20, bottom20 = values.quantile([.8, .2])
+    return top20/bottom20
 ```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-years = list(range(1969, 2018))
-i_20_20_all = numpy.array([ ineq_2020(pci_df[str(year)]) for year in years])
-_ = plt.plot(years, i_20_20_all)
-_ = plt.ylabel("20:20 ratio")
-_ = plt.xlabel("Year")
-
-
+years = numpy.arange(1969, 2018).astype(str)
+ratio_2020 = pci_df[years].apply(ineq_2020, axis=0)
+ax = plt.plot(years, ratio_2020)
+figure = plt.gcf()
+plt.xticks(years[::2])
+plt.ylabel("20:20 ratio")
+plt.xlabel("Year")
+figure.autofmt_xdate(rotation=90)
+plt.show()
 ```
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-The ratio has a U-shaped pattern over time, bottoming out around 1994 after a long secular decline in the early period. Post 1994, however, the trend is one of increasing inequality up until 2013 where there is a turn towards lower income inequality between the counties.
-
+The ratio has a U-shaped pattern over time, bottoming out around 1994 after a long decline. Post 1994, however, the 20:20 ratio indicates there is increasing inequality up until 2013, where there is a turn towards lower income inequality between the counties.
 <!-- #endregion -->
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
@@ -203,55 +191,65 @@ from pysal.explore import inequality
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ### Gini Index
 
-The Gini index can be derived in a number of ways. Visually, the Gini is defined as the ratio of the area between
-the line of equality and the Lorenze curve over the area below the line of equality, both of which are defined on a a two-dimensional space with population
-percentiles on the x-axis and cumulative income on the vertical axis.
+The Gini index is a longstanding measure of inequality. It can be derived in a number of ways. One of the simplest ways to define the Gini Curve is *via* the cumulative wealth distribution, called the *Lorenz* curve. This represents the share of people on the horizontal axis and the share of overall wealth on the vertical axis. 
 
-We can construct each of these as follows:
+With the Lorenz curve, we can define what a "perfectly equal" society would look like: a straight line connecting $(0,0)$ and $(1,1)$ is called the *line of perfect equality*, and represents the case where $p$% of the population owns exactly $p$% of the wealth. For example, this might mean that 50% of the population earns exactly 50% of the income, or 90% of the population owns 90% of the wealth. The main idea is that the share of wealth or income is exactly proportional to the share of population that owns that wealth or earns that income.  
 
+With this, we can define the Gini index as the ratio of the area between the line of perfect equality and the Lorenze curve over the area below the line of equality. 
+
+We can construct one of the income curves for 1969 by first computing the share of population below each observation:
 <!-- #endregion -->
 
 ```python
-y = pci_df.sort_values(by=['1969'])['1969']
+N = len(pci_df)
+share_of_population = numpy.arange(1, N+1)/N
 ```
 
-```python
-Fy = (y / y.sum()).cumsum()
-```
+Then, we need to find out how many incomes are *smaller than* the values for each observation. Empirically, this can be computed by first sorting the incomes:
 
 ```python
-import numpy as np
-%matplotlib inline
-import matplotlib.pyplot as plt
+incomes = pci_df['1969'].sort_values()
 ```
 
+Then, we need to find the overall fraction of income at (or below) each value in the sorted incomes. 
+
+To convert the raw incomes to income shares, we simply divide by the total income:
+
 ```python
-n = y.shape[0]
-Fn = np.arange(1, n+1)/n
+shares = incomes / incomes.sum()
 ```
+
+Then, we construct the *cumulative sum* of these shares, which reflects the sum of all observations up to the current one:
+$$ \texttt{cumsum(v, k)} = \sum_{i=1}^k v_i$$
+
+```python
+cumulative_share = shares.cumsum()
+```
+
+With this, we can plot both curves using the standard `matplotlib` call:
 
 ```python
 f, ax = plt.subplots()
-ax.plot(Fn,Fy)
-ax.plot(Fn, Fn)
-#plt.xlim(0, 1.0)
+ax.plot(share_of_population, cumulative_share, label='Lorenz')
+ax.plot((0,1), (0,1), color='r', label='Equality')
+ax.set_xlabel('Share of population')
+ax.set_ylabel('Share of income')
+ax.legend()
+plt.show()
 ```
-The blue line is the Lorenze curve, and the Gini is the area between it and the 45-degree line of equality, expressed as a ratio over the area under the line of equality.
+The blue line is the Lorenze curve for county incomes in 1969. The Gini index is the area between it and the 45-degree line of equality shown in red, all standardized by the area underneath the line of equality.
 
-To examine how inequality evolves over time, we can create a function for the Lorenze curve:
+To examine how inequality evolves over time, we can create a function to compute the Lorenze curve for arbitrary inputs. We'll use this to plot the Lorenz curves for each year.
 
 ```python
 def lorenz(y):
-    y = np.sort(y)
-    Fy = (y / y.sum()).cumsum()
-    n = y.shape[0]
-    Fn = np.arange(1, n+1)/n
-    return Fy
+    incomes = numpy.sort(y)
+    income_shares = (y / y.sum()).cumsum()
+    N = y.shape[0]
+    pop_shares = numpy.arange(1, N+1)/N
+    return pop_shares, income_shares
 ```
 
-```python
-lorenz(y)
-```
 and then call this for each year in our sample:
 ```python
 lorenz_curves = np.array([ lorenz(pci_df[str(year)]) for year in years])
