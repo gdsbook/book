@@ -9,9 +9,9 @@ jupyter:
       format_version: '1.2'
       jupytext_version: 1.7.1
   kernelspec:
-    display_name: Python 3
+    display_name: Python [conda env:analysis]
     language: python
-    name: python3
+    name: conda-env-analysis-py
 ---
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
@@ -121,7 +121,7 @@ Looking at this distribution, notice that the right side of the distribution is 
 A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate of individual incomes. Here, we are using the per-capita incomes for each county. By contrast, in the wider inequality literature, the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced. This difference arises from the smoothing that is intrinsic to aggregation: the regional distributions are based on averages obtained from the individual distributions, and so the extremely high-income individuals are averaged with the rest of their county. 
 
 
-The kernel density estimate (or histogram) is a powerful visualization device that captures the overall morphology of the *feature* distribution for this measure of income. At the same time, the density is silent on the underlying *geographic distribution* of county incomes. We can look at this second view of the distribution using a choropleth map. To construct this, we can use the standard `geopandas` plotting tools. First, though, we will clean up the data for mapping. 
+The kernel density estimate (or histogram) is a powerful visualization device that captures the overall morphology of the *feature* distribution for this measure of income. At the same time, the density is silent on the underlying *geographic distribution* of county incomes. We can look at this second view of the distribution using a choropleth map. To construct this, we can use the standard `geopandas` plotting tools. First, though, we will clean up the data for mapping. We do this by first setting the coordinate reference system (as it is currently missing) and then by re-projecting the data into a coordinate reference system suitable for mapping, the Albers Equal Area projection for North America:  
 
 ```python
 pci_df = (pci_df.set_crs(epsg=4326) # US Census default projection
@@ -191,13 +191,13 @@ from pysal.explore import inequality
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ### Gini Index
 
-The Gini index is a longstanding measure of inequality. It can be derived in a number of ways. One of the simplest ways to define the Gini Curve is *via* the cumulative wealth distribution, called the *Lorenz* curve. This represents the share of people on the horizontal axis and the share of overall wealth on the vertical axis. 
+The Gini index is a longstanding measure of inequality. It can be derived in a number of ways. One of the simplest ways to define the Gini Curve is *via* the cumulative wealth distribution, called the *Lorenz* curve. To plot a Lorenz curve, the cumulative share of wealth is plotted against the share of the population that owns that wealth. For example, in an extremely unequal society where few people own nearly all the wealth, the Lorenz curve increases very slowly at first, then skyrockets the wealthiest people are included. 
 
-With the Lorenz curve, we can define what a "perfectly equal" society would look like: a straight line connecting $(0,0)$ and $(1,1)$ is called the *line of perfect equality*, and represents the case where $p$% of the population owns exactly $p$% of the wealth. For example, this might mean that 50% of the population earns exactly 50% of the income, or 90% of the population owns 90% of the wealth. The main idea is that the share of wealth or income is exactly proportional to the share of population that owns that wealth or earns that income.  
+In contrast, a "perfectly equal" society would look like a straight line connecting $(0,0)$ and $(1,1)$. This is called the *line of perfect equality*, and represents the case where $p$% of the population owns exactly $p$% of the wealth. For example, this might mean that 50% of the population earns exactly 50% of the income, or 90% of the population owns 90% of the wealth. The main idea is that the share of wealth or income is exactly proportional to the share of population that owns that wealth or earns that income, which occurs only when everyone has the same income or owns the same amount of wealth. 
 
-With this, we can define the Gini index as the ratio of the area between the line of perfect equality and the Lorenze curve over the area below the line of equality. 
+With this, we can define the Gini index as the ratio of the area between the line of perfect equality and the Lorenz curve for a given income or wealth distribution, standardized by the area under the line of perfect equality (which is always $\frac{1}{2}$). Thus, the Gini index is a measure of the gap between a perfectly equal society and the observed society over every level of wealth/income. 
 
-We can construct one of the income curves for 1969 by first computing the share of population below each observation:
+We can construct one of the Lorenz curves for 1969 by first computing the share of population below each observation:
 <!-- #endregion -->
 
 ```python
@@ -211,22 +211,22 @@ Then, we need to find out how many incomes are *smaller than* the values for eac
 incomes = pci_df['1969'].sort_values()
 ```
 
-Then, we need to find the overall fraction of income at (or below) each value in the sorted incomes. 
-
-To convert the raw incomes to income shares, we simply divide by the total income:
+Then, we need to find the overall percentage of income at (or below) each value. To do this, we need to first compute what percentage of the total income each income represents:
 
 ```python
 shares = incomes / incomes.sum()
 ```
 
-Then, we construct the *cumulative sum* of these shares, which reflects the sum of all observations up to the current one:
+Then, we construct the *cumulative sum* of these shares, which reflects the sum of all of the shares of income up to the current one:
 $$ \texttt{cumsum(v, k)} = \sum_{i=1}^k v_i$$
+
+This starts at $0$ and reaches $1$ once the last share is included. 
 
 ```python
 cumulative_share = shares.cumsum()
 ```
 
-With this, we can plot both curves using the standard `matplotlib` call:
+With this, we can plot both the Lorenz curve and the line of perfect equality:
 
 ```python
 f, ax = plt.subplots()
@@ -239,83 +239,111 @@ plt.show()
 ```
 The blue line is the Lorenze curve for county incomes in 1969. The Gini index is the area between it and the 45-degree line of equality shown in red, all standardized by the area underneath the line of equality.
 
-To examine how inequality evolves over time, we can create a function to compute the Lorenze curve for arbitrary inputs. We'll use this to plot the Lorenz curves for each year.
+To examine how inequality evolves over time, we will plot the Lorenz curves for each year. To do this, we can create a function that will compute the Lorenz curve for arbitrary inputs. 
 
 ```python
 def lorenz(y):
+    y = numpy.asarray(y)
     incomes = numpy.sort(y)
-    income_shares = (y / y.sum()).cumsum()
+    income_shares = (incomes / incomes.sum()).cumsum()
     N = y.shape[0]
     pop_shares = numpy.arange(1, N+1)/N
     return pop_shares, income_shares
 ```
 
-and then call this for each year in our sample:
+Then, we use the same method as before to compute lorenz curves (as a set of population shares that correspond to income shares) in each time:
 ```python
-lorenz_curves = np.array([ lorenz(pci_df[str(year)]) for year in years])
+lorenz_curves = pci_df[years].apply(lorenz, axis=0)
 ```
+
+Practically, this becomes a dataframe with columns for each year. Rows contain the population shares (or income shares) as lists.
+
+```python
+lorenz_curves.head()
+```
+
+By iterating over the columns of this dataframe, we can make a plot of the lorenz curves for each year:
 
 ```python
 f, ax = plt.subplots()
-ax.plot(Fn,Fn)
-for c in lorenz_curves:
-    ax.plot(Fn, c)
-
+ax.plot((0,1),(0,1), color='r')
+for year in lorenz_curves.columns:
+    pop_shares, inc_shares = lorenz_curves[year].values
+    ax.plot(pop_shares, inc_shares, color='k', alpha=.05)
 ```
 
-The compression of the Lorenze curves makes it difficult to ascertain the temporal pattern in inequality. Focusing explicilty on the Gini coefficients may shed more light on this evolution:
+The compression of the Lorenze curves makes it difficult to ascertain the temporal pattern in inequality. Focusing explicilty on the Gini coefficients may shed more light on the evolution of inequality over time. 
+
+To express this, we first show that the Gini coefficient is computed by the `Gini` class in `inequality`:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 g69 = inequality.gini.Gini(pci_df['1969'].values)
-
 ```
+
+To actually get the coefficient, we extract the `g` property. Here, the Gini coefficient in 1969 was .13:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 g69.g
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-years = [str(y) for y in range(1969, 2018)]
-ginis = numpy.array([inequality.gini.Gini(pci_df[year].values).g for year in years])
-years = numpy.array([int(y) for y in years])
+To do this for all years, we can use a similar pattern as we have before. First, define a function to compute the quantity of interest. Then, apply the function across the dataframe:
+
+```python
+def gini(values):
+    values = numpy.asarray(values)
+    return inequality.gini.Gini(values).g
 ```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-gini_df = pandas.DataFrame(data = numpy.hstack([[years, ginis]]).T, columns=['Year', 'Gini'])
-gini_df['Year'] = gini_df['Year'].astype(int)
-gini_df.head()
+inequalities = pci_df[years].apply(gini, axis=0).to_frame('gini')
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-gini_df.index = pandas.to_datetime(gini_df['Year'], format="%Y")
-gini_df = gini_df.drop(columns=["Year"])
+Then, we have the results as follows:
+
+```python
+inequalities.head()
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-_ = gini_df.plot(y=["Gini"])
+<!-- #region {"ein.hycell": false, "ein.tags": "worksheet-0", "jupyter": {"outputs_hidden": false}, "slideshow": {"slide_type": "-"}} -->
+And, to make a plot, we use the standard `pandas` methods, which reveals a similar pattern to the 20:20 ratio above:
+<!-- #endregion -->
+
+```python
+inequalities.plot()
 ```
 
 ### Theil's index
 
 A third commonly used measure of inequality is Theil's $T$ given as:
 $$T = \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\sum_{i=1}^m y_i}\right] \right)$$
-where $y_i$ is per-capita income in area $i$ among $m$ areas. In PySAL, we can calculate this index each year as:
+where $y_i$ is per-capita income in area $i$ among $m$ areas. Conceptually, this metric is related to the entropy of the income distribution, measuring how evenly-distributed incomes are across the population. However, elucidating the deeper links between these concepts is beyond the scope of this chapter. 
+
+We can calculate the Theil index using the same methods as above:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-gini_df['T'] = [inequality.theil.Theil(pci_df[str(y)]).T for y in years]
+def theil(y):
+    y = numpy.asarray(y)
+    return inequality.theil.Theil(y).T
+```
+
+```python
+inequalities['theil'] = pci_df[years].apply(theil, axis=0)
 ```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-#gini_df.plot(figsize=(15,4))
-_ = gini_df.plot(subplots=True, figsize=(15,6))
-#gini_df.plot(y=['Gini', 'T'], figsize=(15,4))
+inequalities.plot(subplots=True, figsize=(15,6))
 ```
 
 The time paths of the Gini and the Theil coefficients show striking
-similarities, and, at first glance, this might suggest that the indices are
-substitutes for one another. As we shall see below, however, each index has
-properties that lend themselves to particular spatial extensions that provide
-important complementarities.
+similarities. At first glance, this might suggest that the indices are
+substitutes for one another. However, they are not perfectly correlated: 
+
+```python
+seaborn.regplot(x='theil', y='gini', data=inequalities)
+```
+
+Indeed, as we shall see below, each index has
+properties that lend themselves to particular spatial extensions that work in complementary ways. We need both (and more) for a complete picture. 
 
 ## Personal versus Regional Income
 There is a subtle but important distinction between the study of personal and
@@ -326,7 +354,7 @@ income of individual $l$. Total personal income in region $i$ is given as $Y_i =
 \sum_{l \in i} Y_l$. Per-capita income in region $i$ is $y_i = \frac{Y_i}{N_i}$,
 where $N_i$ is the number of individuals in region $i$.
 
-At the national level,  the coefficient of variation as an index of  interpersonal income inequality would be:
+At the national level,  the coefficient of variation in incomes could be used as an index of interpersonal income inequality. This would be:
 
 $$CV_{nat} = \sqrt{\frac{\sum_{l=1}^N (Y_l - \bar{y})^2}{N}}$$
 
@@ -386,57 +414,79 @@ has been approaches in a number of ways.
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ### Spatial Autocorrelation
 To get some insights on the spatial properties of regional income data, we can
-turn to global measures of spatial autocorrelation that we encountered in
-chapter XX. We use a queen spatial weights matrix to calculate Moran's I for
+turn to global measures of spatial autocorrelation that we encountered earlier in the book. We use a queen spatial weights matrix to calculate Moran's I for
 each year in the sample.
 <!-- #endregion -->
 
+```python
+from pysal.explore import esda
+from pysal.lib import weights
+```
+
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-wq = pysal.lib.weights.Queen.from_dataframe(pci_df)
+wq = weights.Queen.from_dataframe(pci_df)
 ```
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 wq.n
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-MI = [pysal.explore.esda.moran.Moran(pci_df[str(y)], wq) for y in years]
-```
+Then, as before, we create a function that returns the results we need from each statistic. Here, we will also keep the $p$-value for the Moran statistic, which indicates whether it is statistically significant under the null hypothesis that incomes are randomly distributed geographically. 
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-res = np.array([ (mi.I, mi.p_sim) for mi in MI])
-```
 ```python
-res.shape
+def moran(y, w=wq):
+    mo = esda.Moran(y, w=w)
+    return mo.I, mo.p_sim
 ```
+
+Using this function, we compute each of these statistics.
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-res_df = gini_df
-res_df['I'] = res[:,0]
-res_df['I pvalue'] = res[:,1]
-_ = res_df[["Gini", "T", "I", "I pvalue"]].plot(subplots=True, figsize=(15,6))
-```
-```python
-res_df.columns
+moran_stats = pci_df[years].apply(moran, axis=0)
 ```
 
-Several patterns emerge from the time series of Moran's I. First, the is a secular decline in the value of Moran's I. Second, despite this decline,  there is never a year in which the spatial autocorrelation is not statistically significant. In other words, there is a strong spatial structure in the distribution of regional incomes that needs to be accounted for when focusing on inequality questions.
+Further, we then re-arrange them from being one long list of ($I$, $p$-value) into two lists that solely contain $I$ and $p$-values:
+
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+moran_coefs, p_values  = moran_stats.values
+```
+Finally, we will store these as columns in the `inequalities` dataframe:
+
+```python
+inequalities['moran'] = moran_coefs
+inequalities['moran_pvalue'] = p_values
+```
+
+To show the overall inter-relationships between these statistics, we make another plot below:
+
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+inequalities.plot(subplots=True, figsize=(15,12))
+plt.show()
+```
+Several patterns emerge from the time series of Moran's I. First, the is a long-term decline in the value of Moran's I. This suggests a gradual decline in the geographic structure of inequality with two implications: (a) per capita incomes are now less similar between nearby counties and (b), this has been consistently declining, regardless of whether inequality is high or low. 
+
+Second, despite this decline, there is never a year in which the spatial autocorrelation is not statistically significant. In other words, there is a strong geographic structure in the distribution of regional incomes that needs to be accounted for when focusing on inequality questions.
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 
 ### Decompositional Approaches
 
-A popular approach to the analysis of inequality is to group the observations into mutually exclusive and exhaustive subsets in order to understand how much of the inequality is due to differences between members of the same subset versus between observations from different subsets. In the personal income literature, the groups have been defined in a number of ways: male vs. female, age cohorts, occupation types, race, etc. In regional applications, small areas are grouped into larger sets such that the resulting sets are spatially defined. **Add notions of connected components here and link to other chapters where appropriate.**
+One common objection to the analysis of inequality in aggregate is about confounding. Inequality can be driven by differences between groups and not by discrepancies in income between similar individuals. That is, there is always the possibility that observed inequality can be "explained" by a confounding variate, such as age, sex, or education. For example, income differences between older and younger people can "explain" a large part of the societal inequality in wealth: older people have much longer to acquire experience, and thus are generally paid more for that experience. Younger people do not have as much experience, so young people (on average) have lower incomes than older people. 
 
+To combat this issue, it is often useful to *decompose* inequality indices into constituent groups. This allows us to understand how much of inequality is driven by aggregate group differences and how much is driven by observation-level inequality. This also allows us to characterize how unequal each group is separately. In geographic applications, these groups are usually spatially defined, in that *regions* are contiguous geographic groups of observations. Thus, we will dicuss regional inequality decompositions in the following sections as a way to introduce geography into the study of inequality. 
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ### Regional Inequality Decompositions
-One approach to incorporating spatial considerations into regional inequality extends this decompositional approach by using space to define the subgroups. This can be seen using   Theil's $T$, which we encountered previously and decomposing the index  into so called *between* and *within* regional inequality components.
+
+One way to introduce geography into the analysis of inequality is to use geography to define groups for decompositions. Theil's $T$, which we encountered previously, can be decomposed using regions into so called *between* and *within* regional inequality components.
 <!-- #endregion -->
 
-Applied to a collection of observations on  per capita incomes for $m$ regional economies: $y = \left( y_1, y_2, \ldots, y_m \right)$, which are 
-are grouped into $\omega$ mutually exclusive regions such that $\sum_{g=1}^{\omega} m_g=m$, where $m_g$ is the number of areas
-assigned to region $g$, Theil's index from above can be rewritten as: 
+To define this regional income decomposition, we first re-define our observations of per capita incomes for $m$ regional economies as $y = \left( y_1, y_2, \ldots, y_m \right)$. These are grouped into $\omega$ mutually exclusive regions. Formally, this means that when $m_g$ represents the number of areas assigned to region $g$, the total number of areas must be equal to the count of all the areas in each region: $\sum_{g=1}^{\omega} m_g=m$.[^mut-ex] With this notation, Theil's index from above can be rewritten to emphasize its between and within components:
 
+[^mut-ex]: This would be violated, for example, if one area were in two regions. This area would get "double counted" in this total. 
+
+```python
+
+```
 
 $$
 \begin{align}
@@ -449,136 +499,110 @@ $$
 where $s_g = \frac{\sum_{i \in g} y_i}{\sum_i y_i}$, and   $s_{i,g} = y_i / \sum_{i \in g} y_i$. 
 
 The first term is the between regions inequality component, and the second is
-the within regions inequality component. The within region term is a weighted
+the within regions inequality component. The within regions term is a weighted
 average of inequality between economies belonging to the same region. Similar
 to what is done above for the case of interpersonal inequality, the estimate of
 the between region (group) component of the decomposition is based on setting
-the incomes of all economies (individuals )belonging to a region (group) equal
+the incomes of all economies (individuals) belonging to a region (group) equal
 to that of the regional (group) average of these per capita incomes. Now,
 however, intraregional inequality between economies within the same region is
 explicitly considered in the second component.[^weight]
 
 [^weight]: The regional decomposition does not involve weighting the regions by their respective population. See  {cite}`Gluschenko_2018` for further details. 
 
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df.columns
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pandas.unique(pci_df['Region'])
-```
+In our data, we record the United States Census Bureau regions, stored in the `Region` variable. These divide the country into eight regions:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.plot(column='Region', categorical=True, linewidth=0.1)
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-region_df = pci_df.dissolve(by='STATEFP')
-```
+These regions' names are:
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pandas.unique(region_df.Region)
-```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-ax = region_df.plot(column='Region', categorical=True)
-_ = ax.axis('off')
-```
+- New England
+- Mideast
+- Great Lakes
+- Plains
+- Southeast
+- Southwest
+- Rocky Mountain
+- Far West
 
-```python
-pci_df.columns
-```
+
+We can map these region names to a new variable in our data and make a plot:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 region_names = ["New England",
-               'Mideast', 'Great Lakes', 'Plains',
-               'Southeast', 'Southwest', 'Rocky Mountain',
-                'Far West']
+                "Mideast", 
+                "Great Lakes", 
+                "Plains",
+                "Southeast", 
+                "Southwest", 
+                "Rocky Mountain",
+                "Far West"]
 ```
 
 ```python
-fig = plt.figure(figsize=(15,12))
-fig.subplots_adjust(hspace=0.4, wspace=0.4)
-for i in range(1, 9):
-    ax = fig.add_subplot(2, 4, i)
-    rdf = pci_df[pci_df.Region==i]
-    rdf.plot(ax=ax, linewidth=0.1)
-    ax.set_title(region_names[i-1])
-    ax.axis('off')
-    
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df.groupby('Region').mean()
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-regimes = pci_df['Region']
-ys = [str(y) for y in years]
+pci_df['Region_Name'] = pci_df.Region.apply(lambda region: region_names[region - 1])
 ```
 
 ```python
-rmeans = pci_df.groupby(by='Region').mean().transpose()
+pci_df.plot('Region_Name', linewidth=0, legend=True, 
+            legend_kwds=dict(bbox_to_anchor=(1.2,.5)))
+```
+
+To see the income changes for each region separately, we can use standard `pandas` methods. First, we can group the data by region and compute the mean of each column. For good measure, we will also select only the year columns of interest:
+
+```python
+rmeans = pci_df.groupby(by='Region_Name').mean()[years]
 ```
 
 ```python
-rmeans.index
+rmeans
 ```
 
-```python
-rmeans = rmeans.loc[ys]
-```
+Once we transpose this dataframe, we can plot the region sequences as distinct variables:
 
 ```python
-rmeans.columns = region_names
-```
-
-```python
-rmeans.head()
-```
-
-```python
-rmeans = pandas.DataFrame(rmeans)
-```
-
-```python
-rmeans.plot.line()
+rmeans.T.plot.line()
 ```
 
 ## Regional Decomposition of Inequality
 
+
+Now, we can compute the regional Theil decomposition using the `inequality` module of pysal:
+
 ```python
-theil_dr = pysal.explore.inequality.theil.TheilD(pci_df[ys].values, regimes)
+theil_dr = inequality.theil.TheilD(pci_df[years].values, pci_df.Region)
 ```
+
+The `theil_dr` object has the between and within components stored in the `bg` and `wg` attributes. The `bg` stands for the "between" component, and "wg" for the within component. For example the "between" component for each year is computed is:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 theil_dr.bg
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-res_df['bgr'] = theil_dr.bg
-res_df['wgr'] = theil_dr.wg
-```
+storing these components in our result dataframe as before:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-res_df.plot(subplots=True, figsize=(15,6))
+inequalities['theil_between'] = theil_dr.bg
+inequalities['theil_within'] = theil_dr.wg
+inequalities.drop('moran_pvalue', axis=1, inplace=True)
 ```
+
+We can visualize them alongside our earlier results:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-
-numpy.random.seed(12345)
-theil_drs = pysal.explore.inequality.theil.TheilDSim(pci_df[ys].values, regimes, 999)
+inequalities.plot(subplots=True, figsize=(15,15))
+plt.show()
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-res_df['bgr_pvalue'] = theil_drs.bg_pvalue
-res_df.plot(subplots=True, figsize=(15,6))
-```
+Inference on these decompositions can be done using the `inequality.theil.TheilDSim` class, but we omit that here for brevity and report that, like the Moran's $I$, all of the Theil decompositions are statistically significant. Further, since the within and between components are interpreted as shares of the overall Theil index, we can compute the share of the Theil index due to the between-region inequality, and note that it also generally shares the same pattern, but does not see minima in the same places. The between-region share of inequality is at its lowest in the mid-2000s, not in the mid-1990s. This suggests that regional differences were very important in the 1970s and 80s, but this importance has been waning, relative to the inequality *within* US Census Regions. 
 
 ```python
-res_df['bgr_share'] = res_df['bgr'] / res_df['T']
-res_df['bgr_share'].plot()
+inequalities['theil_between_share'] = inequalities['theil_between'] / inequalities['theil']
+inequalities['theil_between_share'].plot()
+plt.show()
 ```
 
 ## Decomposition Using States
