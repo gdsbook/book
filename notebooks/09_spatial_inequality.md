@@ -609,45 +609,60 @@ plt.show()
 ### Spatializing Classic Measures
 <!-- #endregion -->
 
-While regional decompositions are useful, they do not tell the whole story. Indeed, a "region" is just a special kind of geographical group; its "geography" is only made manifest through group membership: is the county "in" the region or not? This kind of "place-based" thinking, while geographic, is not necessarily *spatial*. It does not incorporate the notions of distance or proximity into the study of inequality. 
+While regional decompositions are useful, they do not tell the whole story. Indeed, a "region" is just a special kind of geographical group; its "geography" is only made manifest through group membership: is the county "in" the region or not? This kind of "place-based" thinking, while geographic, is not necessarily *spatial*. It does not incorporate the notions of distance or proximity into the study of inequality; the geographical locations of the regions could be re-arranged without impact, so long as the group membership structure is maintained. While, arguably, shuffling regions around means they are no longer "regions," the statistical methods do not differentiate.
 
 So, we will now turn to two newer methods for analyzing inequality that include more spatial elements. These "spatial" measures of inequality care directly about the 
+
 #### Spatial Gini
 
 The first spatial extension was introduced by {cite}`Rey_2012` and is designed to consider
-the role of adjacency in a decomposition of the Gini index of inequality. More
-specifically, The Gini in mean  is
-$$G = \frac{\sum_i \sum_j \left | x_i - x_j \right|}{2 n^2 \bar{x}} $$
-and the spatial decomposition focuses on the numerator
+the role of adjacency in a decomposition of the Gini index of inequality. One formulation for the Gini coefficient we discussed above focuses on the set of pairwise absolute differences in incomes:
+$$G = \frac{\sum_i \sum_j \left | y_i - y_j \right|}{2 n^2 \bar{x}} $$
+
+Focusing on the set of pairwise absolute differences in income, we can de-compose this into the set of differences between "nearby" observations and the set of differences among "distant" observations. This is the main conceptual point of the "Spatial Gini" coefficient. This decomposition works similarly to the regional decomposition of the Theil index:
 $$
-\sum_i \sum_j \left |x_i - x_j \right | = \sum_i \sum_j \left( w_{i,j} \left |x_i - x_j \right | \right ) + \left( (1-w_{i,j})  \left |x_i - x_j \right | \right )
+\sum_i \sum_j \left |y_i - y_j \right | =\sum_i \sum_j \underset{\text{near differences}}{\left( w_{ij} \left |y_i - y_j \right | \right )} + \underset{\text{far differences}}{\left( (1-w_{ij})  \left |y_i - y_j \right | \right )}
 $$
-where $w_{i,j}$ is an element of a binary spatial weights matrix indicating if observations $i$ and $j$ are spatial neighbors. This results in
+In this decomposition, $w_{ij}$ is a binary variable that is $1$ when $i$ and $j$ are neighbors, and is zero otherwise. Recalling the spatial weights matrices from Chapter 4, this can be used directly from a spatial weights matrix.^[However, non-binary spatial weights matrices require a correction factor, and are not discussed here.] Thus, with this decomposition, the Spatial Gini can be stated as
+$$G = \frac{\sum_i \sum_j w_{i,j}\left | x_i - x_j \right|}{2 n^2 \bar{x}} +   \frac{\sum_i \sum_j \left (1-w_{i,j} )| x_i - x_j \right|}{2 n^2 \bar{x}}$$
+with the first term being the component among neighbors and the second term being the component among non-neighbors. The "spatial Gini", then, is the first component that describes the differences between nearby observations. 
 
-$$G = \frac{\sum_i \sum_j w_{i,j}\left | x_i - x_j \right|}{2 n^2 \bar{x}} +   \frac{\sum_i \sum_j \left (1-w_{i,j} )| x_i - x_j \right|}{2 n^2 \bar{x}}. $$
-
-The spatial Iini allows for a consideration of the spatial dependence in inequality. As this dependence increases, the second term of the spatial Gini can be expected to grow relative to the case where incomes are randomly distributed in space. Inference on the spatial Gini can be based on random spatial permutations of the income values, as we have seen elsewhere in this book.
+The spatial Gini allows for a consideration of the spatial dependence in inequality. If spatial depenedence is very strong and positive, incomes are very similar among nearby observations, so the inequality of "near" differences will be small. Most of the inequality in the society will be driven by disparities in income between distant places. In contrast, when dependence is very weak (or even negative), then the two components may equalize. Inference on the spatial Gini can be based on random spatial permutations of the income values, as we have seen elsewhere in this book. This tests whether the distribution of the compoents are different from that obtained when incomes are randomly distributed across the map. 
 
 
-The spatial Gini also provides a useful complement to the regional decomposition used in the Theil statistic. The latter does not consider pair-wise relationships between observations, while the spatial Gini does.
+The spatial Gini also provides a useful complement to the regional decomposition used in the Theil statistic. The latter does not consider pairwise relationships between observations, while the spatial Gini does. By considering the pairwise relationships between observations, the Gini coefficient is more sensitive, and can also be more strongly affected by small groups of significanatly wealthy observations.  
+
+We can estimate spatial Gini coefficients using the `Gini_Spatial` class:
 
 ```python
 from inequality.gini import Gini_Spatial
 ```
 
+First, since the spatial Gini requires binary spatial weights, we will ensure this is so before proceeding:
+
 ```python
 wq.transform = 'B'
 ```
 
-The spatial Gini takes a vector of incomes and a spatial weights object:
+Then, the spatial Gini can be computed from an income vector and the spatial weights describing adjacency among the observations. 
 
 ```python
 gs69 = Gini_Spatial(pci_df['1969'], wq)
 ```
 
+The aspatial Gini is stored in the `g` attribute, just like for the aspatial class:
+
 ```python
 gs69.g
 ```
+
+The share of the overall gini coefficient that is due to the "far" differences is stored in the `wcg` share:
+
+```python
+gs69.wcg_share
+```
+
+The $p$-value for this tests whether the component measuring inequality among neighbors is larger (or smaller) than that would have occurred if incomes were shuffled randomly around the map:
 
 ```python
 gs69.p_sim
@@ -655,220 +670,58 @@ gs69.p_sim
 
 The value is statistically significant for 1969, indicating that inequality between neighboring pairs of counties is different from the inequality between county paris that are not geographically proximate.
 
-We can apply the same statistic over each year in the sample:
+We can apply the same statistic over each year in the sample using the same approach as before:
 
 ```python
-gs = [Gini_Spatial(pci_df[y], wq) for y in ys]
+def gini_spatial(incomes, weights=wq):
+    gs = Gini_Spatial(incomes, weights)
+    denom = 2*incomes.mean()*weights.n**2
+    return gs.g, gs.wg/denom, gs.wcg/denom, gs.p_sim
 ```
+
+Inference on this estimator is computationally demanding, since the pairwise differences have to be re-computed every permutation. 
 
 ```python
-gs_array = np.array([(gsi.e_wcg, gsi.wcg, gsi.z_wcg, gsi.p_sim) for gsi in gs])
-```
-
-Extracting the z-values for the spatial Gini we see that the spatial dependence in the inequality is signficant in every year of the sample:
-
-```python
-res_df['z_wcg'] = gs_array[:,2]
-res_df.plot(y=['z_wcg'])
-```
-
-<!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-#### Spatial 20:20
-The final analytics that we examine in this notebook are based on extending the classic 20:20 ratio to develop spatial visualizations.
-As was seen earlier, the 20:20 ratio measures the gap in the incomes between the counties at the 80th and 20th percentiles of the income distirbution.
-In the spatial 20:20 analytic, we can visualize and measure the geographical gap (separation) between these pair of counties.
-
-<!-- #endregion -->
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-ranks = pci_df.rank()
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-for year in years:
-    pci_df["{}_rank".format(year)] = pci_df[str(year)].rank(method='first')
-```
-
-
-```python jupyter={"outputs_hidden": false}
-ridx_20 = int(.2 * 3077)
-ridx_80 = int(.8 * 3077)
-ridx_20, ridx_80
+spatial_gini_results = pci_df[years].apply(gini_spatial, axis=0).T
+spatial_gini_results.columns = ['gini', 'near_diffs', 'far_diffs', 'p_sim']
 ```
 
 ```python
-df = pci_df
+spatial_gini_results.head()
 ```
 
-```python jupyter={"outputs_hidden": false}
-df['1969_rank']
+The $p$-values are always small, suggesting that the contribution of the local ties is always smaller than that that would be expected if incomes were distributed randomly in the map.^[While it is possible that the "near differences" component could be *larger* than expected, that would imply negative spatial dependence, which is generally rare in empirical work.] We can compute the percent of times the $p$-value is smaller than a threshold using the mean:
+
+```python
+(spatial_gini_results.p_sim < 0.05).mean()
 ```
 
-```python jupyter={"outputs_hidden": false}
-df.index[df['1969_rank']==615].tolist()
+While it may appear that the component due to "near differences" is quite small, this has two reasons. First, the number of "nearby" pairs are less than 1% of all pairs of observations:
+
+```python
+wq.pct_nonzero
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-idx_20 = []
-idx_80 = []
-for year in years:
-    column = "{}_rank".format(year)
-    idx_20_i = df.index[df[column]==ridx_20]
-    idx_20.extend(idx_20_i)
-    idx_80_i = df.index[df[column]==ridx_80]
-    idx_80.extend(idx_80_i)
+Second, when spatial dependence is high, nearby observations will be similar. So, each "near difference" will also be small. Adding together a small number of small observations will generally be small, relative to the large differences between distant observations. Thus, small values of the "near" distances are indicative of spatial dependence.  
+
+Indeed, you can see that as the spatial dependence weakens, the `near_diffs` get larger:
+
+```python
+inequalities['near_diffs'] = spatial_gini_results.near_diffs
 ```
 
-As an example of the spatial 20:20 view, we plot the pair of counties at the 20th and 80th percentile for the last period of the sample:
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-df.loc[[idx_20[-1], idx_80[-1]], :].plot()
+```python
+inequalities[['near_diffs', 'moran']].plot.line(subplots=True, figsize=(15,6))
 ```
 
-Because we will be interested in measuring the spatial separation between the 20:20 counties each period, we set the coordinate reference system:
+# Conclusion
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-import geopandas as gpd
-from shapely.geometry import Point,Polygon
-geom=[Point(xy) for xy in zip([117.454361,117.459880],[38.8459879,38.846255])]
-ldf=gpd.GeoDataFrame(geometry=geom,crs={'init':'epsg:4326'})
-ldf.to_crs(epsg=3310,inplace=True)
-l=gdf.distance(ldf.shift())
-```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-ldf = df.to_crs({'init':'epsg:4326'})
-```
+Inequality is an important social phenomenon, and its geography is a serious, important concern for social scientists. This chapter discusses methods to assess inequality, as well as examine its spatial and regional structure. Through the Gini coefficient and Theil index, you can summarize the overall levels of inequality, as well as divide the components of inequality to those due to geographical region or proximate pairs of observations. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as the measures of autocorrelation discussed in Chapter 7. 
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-ldf.loc[[idx_20[-1], idx_80[-1]], :].plot()
-```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-ldf.to_crs(epsg=3310,inplace=True)
+# Questions
+
+```python
 
 ```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-ldf.loc[[idx_20[-1], idx_80[-1]], :].plot()
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-small = ldf.loc[[idx_20[-1], idx_80[-1]], :]
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-small
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-small.distance(small.shift()).values[-1]
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-small.geometry.centroid
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-idxs = zip(idx_20, idx_80)
-distances = []
-for idx in idxs:
-    o,d = idx
-    #print(o,d, idx)
-    pair = df.loc[idx, :]
-    d = pair.distance(pair.shift()).values[-1]
-    distances.append(d)
-```
-
-Visualizing the  plot the of the 20:20 distances, reveals a secular decline in the distances separating these pair of counties over time:
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-idxs = zip(idx_20, idx_80)
-
-len(distances), len(years), len(list(idxs))
-gini_df['s_dist'] = numpy.array(distances)
-```
-
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-gini_df.plot(y=["s_dist"])
-```
-
-<!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-## Rank paths
-A final analytic that we use to examine the spatial distribution of inequality across US counties is the evolution of the rank paths for the 20:20 ratio.
-The rank path traces out the migration of a particular rank in the county income distribution over time {cite}`Rey_2020`. To construct the rank paths for the 20:20 counties, we first plot the centroids:
-<!-- #endregion -->
-
-```python ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-idxs = numpy.array(list(zip(idx_20, idx_80)))
-```
-
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-
-fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
-df.loc[idxs[:,0],:].centroid.plot(ax=ax, color='r')
-df.loc[idxs[:,1],:].centroid.plot(ax=ax, color='b')
-ax.set_axis_off()
-```
-
-
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-
-fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
-df.loc[idxs[:,0],:].centroid.plot(ax=ax, color='r')
-df.loc[idxs[:,1],:].centroid.plot(ax=ax, color='b')
-gdf.plot(ax=ax,edgecolor='gray', alpha=0.2)
-ax.set_axis_off()
-```
-<!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-Next, a directed edge connects the centroids of the two states that held a specific rank in a pair of consecutive periods.  
-<!-- #endregion -->
-
-
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-from shapely.geometry import LineString
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-ls20 = geopandas.GeoSeries(LineString(df.loc[idxs[:,0],:].centroid.tolist()))
-ls80 = geopandas.GeoSeries(LineString(df.loc[idxs[:,1],:].centroid.tolist()))
-```
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-
-fig, ax = plt.subplots(1, 1, sharex='col', sharey='row')
-ls20.plot(ax=ax, color='r', label='20p')
-ls80.plot(ax=ax, color='b')
-#gdf.plot(ax=ax,edgecolor='gray', alpha=0.2)
-plt.title('Rank Paths (80pct Blue, 20pct Red)')
-ax.set_axis_off()
-```
-The rank paths can also be constructed using a moving temporal window to provide a view of the evolution of the rank migrations over subsets of the sample period. Here we do so using a window of five years:
-
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-columns = 4
-rows = 12
-fig, ax_array = plt.subplots(rows, columns, squeeze=False, figsize=(15,15), constrained_layout=True)
-year=0
-for i,ax_row in enumerate(ax_array):
-    for j,axes in enumerate(ax_row):
-        axes.set_title('{}-{}'.format(1969+year, 1969+year+5))
-        axes.set_yticklabels([])
-        axes.set_xticklabels([])
-        if year < 43:
-            ls20 = geopandas.GeoSeries(LineString(df.loc[idxs[:,0],:].centroid.tolist()[year:year+5]))
-            ls20.plot(ax=axes, color='r', label='20p')
-            ls80 = geopandas.GeoSeries(LineString(df.loc[idxs[:,1],:].centroid.tolist()[year:year+5]))
-            ls80.plot(ax=axes, color='b', label='20p')
-    
-        year += 1
-plt.show()
-```
-
-
-Overall, there is a general north-south split for the 20 and 80 rank paths, with the wealthier part of the distribution being located more often in the northern section of the country.
-
