@@ -484,9 +484,6 @@ To define this regional income decomposition, we first re-define our observation
 
 [^mut-ex]: This would be violated, for example, if one area were in two regions. This area would get "double counted" in this total. 
 
-```python
-
-```
 
 $$
 \begin{align}
@@ -513,7 +510,7 @@ explicitly considered in the second component.[^weight]
 In our data, we record the United States Census Bureau regions, stored in the `Region` variable. These divide the country into eight regions:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df.plot(column='Region', categorical=True, linewidth=0.1)
+pci_df.plot(column='Region', categorical=True, linewidth=0.1, legend=True)
 ```
 
 These regions' names are:
@@ -605,162 +602,6 @@ inequalities['theil_between_share'].plot()
 plt.show()
 ```
 
-## Decomposition Using States
-
-```python
-theil_ds = pysal.explore.inequality.theil.TheilD(pci_df[ys].values, pci_df['STATEFP'])
-```
-
-```python
-theil_ds.T
-```
-
-```python
-theil_ds.bg
-```
-
-```python
-res_df['bgs_share'] = theil_ds.bg / theil_ds.T
-res_df['bgs'] = theil_ds.bg
-```
-
-```python
-res_df[['bgr', 'bgs', 'T']].plot()
-```
-
-```python
-res_df[['bgr_share', 'bgs_share']].plot()
-```
-
-```python
-res_df[['bgr_share', 'bgs_share','T']].corr()
-```
-
-A few patterns emerge from these figures. First, inequality between the states is larger than inequality between regions. Second, inequality within states is smaller than inequality within regions. Third, the time series patterns for the interregional components are similar for the BEA regions and state partitions of the counties. Finally, the correlation of between share and overall inequality is higher at the state level than for the BEA region level
-
-
-### Intraregional inequality
-We can take a closer look at the within region inequality component by dissagregating the total value from XX into that occuring within each of the 8 regions. This can be done by calculating the global Theil index on the counties belonging to a given region.
-
-```python
-region_names = ["New England",
-               'Mideast', 'Great Lakes', 'Plains',
-               'Southeast', 'Southwest', 'Rocky Mountain',
-                'Far West']
-results = []
-table = []
-for region in range(1, 9):
-    rdf = pci_df[pci_df.Region==region]
-    #rdf.plot()
-    #print(region, len(pandas.unique(rdf.STATEFP)), rdf.shape[0])
-    table.append([region, region_names[region-1], len(pandas.unique(rdf.STATEFP)), rdf.shape[0]])
-    #results.append(pysal.explore.inequality.theil.TheilDSim(rdf[ys].values, rdf.STATEFP,999))
-    
-```
-
-```python
-summary = pandas.DataFrame(table)
-```
-
-```python
-summary.columns = [ "Region", "Name", "States", "Counties"]
-```
-
-```python
-summary
-```
-
-```python
-region_names = ["New England",
-               'Mideast', 'Great Lakes', 'Plains',
-               'Southeast', 'Southwest', 'Rocky Mountain',
-                'Far West']
-results = []
-table = []
-for region in range(1, 9):
-    rdf = pci_df[pci_df.Region==region]
-    #rdf.plot()
-    #print(region, len(pandas.unique(rdf.STATEFP)), rdf.shape[0])
-    table.append([region, region_names[region-1], len(pandas.unique(rdf.STATEFP)), rdf.shape[0]])
-    results.append(pysal.explore.inequality.theil.TheilDSim(rdf[ys].values, rdf.STATEFP,999))
-    
-```
-
-```python
-len(results)
-```
-
-```python
-r1 = results[0]
-```
-
-```python
-r1.bg_pvalue
-```
-
-```python
-Tr = pandas.DataFrame([result.T for result in results]).transpose()
-```
-
-```python
-Tr.head()
-```
-
-```python
-Tr = Tr.rename(columns=dict([(i,name) for i,name in enumerate(region_names)]))
-```
-
-```python
-pinned0 = Tr.divide(Tr.iloc[0])
-```
-
-```python
-import pandas as pd
-
-df = pinned0
-markers = [ "+", "8", "^", "p", ".", ">", "1", '2']
-ax = df.plot(kind='line', figsize=(15, 12))
-for i, line in enumerate(ax.get_lines()):
-    line.set_marker(markers[i])
-
-# for adding legend
-ax.legend(ax.get_lines(), df.columns, loc='best')
-_ = ax.set_title("County Income Inequality Within BEA Regions (Relative to Year 0)")
-```
-Unpacking the intraregional inequality term reveals that the original decomposition of inequality into within and between regions actually masks a great deal of heterogeneity in the internal inequality dynamics across the eight regions. Put another way, the overall trend in the aggregate within region component above is an average of the trends exhibited in each of the eight regions. There are two distinct groups of regions in this regard. The first consists of regions where the inequality between counties within each region has been increasing over the sample period. This group is composed of the New England,  Mideast, Far West, and Rocky Mountains regions. The second group are those regions where intraregional inequality has remained stable, or even decreased, over time. The Great Lakes, Southeast, and Southwest regions compose this group. The one outlier region is the Plains which does not fall neatly into either of these two groups.
-
-
-### Regional Inequality Between States
-
-We can also ask if there is spatial heterogeneity in the inequality between counties from different states across each of the eight regions. That is, do states matter more in different regions?
-
-```python
-bs =  numpy.array([ r.bg[0]/ r.T for r in results]).T
-```
-
-```python
-bs.shape
-```
-
-```python
-bs_df = pandas.DataFrame(bs, columns=region_names)
-```
-
-```python
-import pandas as pd
-
-
-markers = [ "+", "8", "^", "p", ".", ">", "1", '2']
-ax = bs_df.plot(kind='line', figsize=(15, 12))
-for i, line in enumerate(ax.get_lines()):
-    line.set_marker(markers[i])
-
-# for adding legend
-ax.legend(ax.get_lines(), df.columns, loc='best')
-_ = ax.set_title("Between State Inequality as a Share of Intraregional Inequality")
-```
-In general terms, there is much more similarity across the regions in terms of inequality between the states. The between state share of inequality is the smaller component of inequality between the counties within each of the regions with the exception of the New England region.
-
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 
@@ -768,8 +609,9 @@ In general terms, there is much more similarity across the regions in terms of i
 ### Spatializing Classic Measures
 <!-- #endregion -->
 
-We now turn to two newer spatial analytics that extend a selction of the classic (a-spatial) inequality measures above to introduce a spatially explicit focus.
+While regional decompositions are useful, they do not tell the whole story. Indeed, a "region" is just a special kind of geographical group; its "geography" is only made manifest through group membership: is the county "in" the region or not? This kind of "place-based" thinking, while geographic, is not necessarily *spatial*. It does not incorporate the notions of distance or proximity into the study of inequality. 
 
+So, we will now turn to two newer methods for analyzing inequality that include more spatial elements. These "spatial" measures of inequality care directly about the 
 #### Spatial Gini
 
 The first spatial extension was introduced by {cite}`Rey_2012` and is designed to consider
