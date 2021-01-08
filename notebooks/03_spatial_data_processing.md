@@ -1,980 +1,570 @@
 ---
-jupyter:
-  jupytext:
-    formats: ipynb,md
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.2
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+jupytext:
+  formats: ipynb,md:myst
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: '0.9'
+    jupytext_version: 1.5.2
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
 ---
 
-# Spatial Data Processing
+# Spatial Data
 
-As we have seen in the previous chapter, spatial data comes in a wide variety
-of forms. Much of  the power of spatial analysis flows from the ability
-to consider the spatial relationships between processes reflected in different
-geographical datasets. We can also leverage spatatial analysis to consider the
-geographical relationships between observations from the *same* dataset.
-**Deterministic spatial analysis** formalizes these spatial relationships.
- By deterministic we mean that the geometric coordinates of the
-spatial objects are free from any noise, error, or random variation. The focus
-of deterministic analysis is then on the spatial predicates, topologically
-invariant binary-spatial relationships, between spatial entities. These spatial
-predicates power spatial database systems such
-as PostGIS, Oracle Spatial, and others.  
-
-
-The types of questions/queries that deterministic analysis can answer include:
-
-- *Given two data series, one of points and one of polygons, find the polygon
-  that containing each point*.
-- *How many points from the first series, does each polygon in the second
-  series contain*?
-- *Given a set of coffee shops, represented as  points in a city, and a list of
-  addresses for rental properties, determine the
-  closest coffee shop for each rental property*
-
-In this chapter we explore the use of several different forms of deterministic
-spatial analysis, through two example *Vignettes*. We begin with a point
-dataset that reports the location of airports across the world. Using the
-airports, we will explore different types of spatial queries that filter the
-data by regions. We also combine the point data set with a polygonal dataset
-for countries and carry out a spatial join that defines the country for each
-airport. The second vignette focuses on a point dataset representing Airbnb
-listings in San Diego, California. We explore the listing prices across the
-point set and then use spatial joins to aggregate the prices by census tracts.
-We also combine the Airbnb data with a second point set on cafe locations in
-the region to carry out a market analysis of potential demand for each cafe
-using spatial tessellations.
-
-## Vignette: Airports 
-
-Airports are interesting entities. They are nodes that connect a network of national and international flows, and are its most visible realization. Where they are located is a function of several factors such as the population they are trying to serve, their level of income, the demand for flying, etc. However their exact location is far from the only possible one. Physically speaking, an airport could be built in many more places than where it ends up. This make the process behind an interesting one to explore through the overall "appearance" of their locations; that is, through its pattern.
-
-In this vignette, we will use a preprocessed open dataset. This dataset provides the location of airports in many different countries, alongside an indication of their size and importance to the air transit network. Before we start analyzing it, we need to load it:
-
-```python
-# Load GeoJSON file
-air = gpd.read_file('../data/airports/airports_clean.geojson')
-# Check top of the table
-air.head()
-```
-
-At first brush, a point pattern is essentially the collective shape a bunch of points create. Given the table contains the coordinates of each airport in a map projection, the quickest way to get a first sense of what the data look like is to plot the coordinates of airports as points, like a scatterplot:
-
-```python
-# Plot XY coordinates
+```{code-cell} ipython3
+import pandas
+import osmnx
+import geopandas
+import rioxarray
+import xarray
+import datashader
+import contextily as cx
+from shapely.geometry import box
 import matplotlib.pyplot as plt
-plt.scatter(air.x, air.y)
 ```
 
-This is not very pretty but that is not our purpose. Our goal was to get a quick first picture and this approach has done the job. Things we can learn from this figure include the fact the overall shape should look familiar to anyone who's seen a map of the world and that, thus, the data do not seem to have any obvious errors. We can then move on to do more interesting things with it.
+This chapter lands the ideas discussed in the previous one on a practical context. We consider how structures, and the models they represent, are implemented in Python, and how we can manipulate the data they contain. Rather than focusing on *file* formats, which are used to store data, we will spend most of the chapter discussing how Python represents it, *once read* from a file or database. We take this approach because it is these data structures that we will interact with when we are analysing data. Part of the magic of Python (and other languages) is that they remove the complexities, particularities and quirks associated with each file format by representing data in standard ways, whichever their provenance. We take full advantage of this feature here. 
 
-The first extension is to bring geographic context. Although the shape of the figure above might be familiar, it still takes some effort to identify where different dots are placed on the surface of the Earth. An easy solution to make this easier is to overlay it with a tile map downloaded from the internet. Let us do just that. 
+We divide the chapter in two main parts. The first one looks at each of the three main data structures reviewed in Chapter 2 (XXX): geographic tables, surfaces and spatial graphs. The second one explores combinations of different models that depart from the traditional data model/structure matching discussed, covering how one data in one structured can be effectively transfered to another, but also focusing on why that might be a good idea in some cases. A final note before we delve into the content of this book is in order: this is not a comprehensive account of *everything* that is possible with each of the data structures we present. Rather, you can think of it as a taster that we will build on throughout the book to showcase much of what is possible with Python.
 
-First, we'll download the tiles into an image object, and then we will plot it together with the airports dataset.
++++
 
-```python
-# Download tiles for the bounding box of the airport's GeoDataFrame
-%time img, ext = ctx.bounds2img(*air.total_bounds, 2)
+## Fundamentals
+
++++
+
+### Geographic Tables
+
+Geographic objects are usually matched to what we called the *geographic table*. This data structure represents a single geographic object as a row of a table; each column in the table records information about the object, its attributes or features, as we will see below. Typically, there is a special column in this table that records the *geometry* of the object. Computer systems that use this data structure are intended to add geography into a *relational database*, such as PostGreSQL (through its PostGIS extension) or sqlite (through its spatialite extension). Beyond this, however, many data science languages (such as R, Julia, and Python), have packages that adopt this data structure as well (such as sf, ArchGDAL, and geopandas), and it is rapidly becoming the main data structure for object-based geographic data. Geographic tables can be thought of as a tab in a spreadsheet where one of the columns records geometric information.
+
+Before proceeding, though, it helps to mention a quick clarification on terminology. Throughout this book, regardless of the data structure used, we will refer to a measurement about an observation as a *feature*. This is consistent with other work in data science and machine learning. Then, one set of measurements is a *sample*. For tables, this means a feature is a column and a sample is a row. Historically, though, geographic information scientists have used the word "feature" to mean an individual observation, since a "feature" in cartography is an entity on a map, and "attribute" to describe characteristics of that observation. Thus, being clear about this terminology is important: for this book, a *feature* is one measured trait pertaining to an observation (a column), and a *sample* is one set of measurements (a row). 
+
+To understand the structure of these datasets, it will help to read in the `countries_clean.gpkg` dataset included in this book that describes countries in the world. To read in this data, we can use the `read_file()` method in `geopandas`:
+
+```{code-cell} ipython3
+gt_polygons = geopandas.read_file("../data/countries/countries_clean.gpkg")
 ```
 
-The method `bounds2img` (from the library `contextily`, `ctx` for short) returns the image object (`img`) and also an auxilliary tuple with its exact geographic bounds:
+And we can examine the top of the table with the method `.head()`:
 
-```python
-ext
+```{code-cell} ipython3
+gt_polygons.head()
 ```
 
-This allows us then to match it up with other data which is also expressed in the same coordinate reference system (CRS). Let us produce a slightly more useful image than above:
+Each row of this table is a single country. This table shows only two features: the administrative name of the country and the geometry of the country's boundary. The name of the country is encoded in the `ADMIN` column using the Python `str` type, which is used to store text-based data. The geometry of the country's boundary is stored in the `geometry` column, and is encoded using a special class in Python that is used to represent geometric objects. As with other table-based data structures in Python, every row and column have an index that identifies them uniquely and is rendered in bold. Geographic tables in Python are stored as `GeoDataFrame` objects.
 
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-ax.set_axis_off()
-# Add title
-ax.set_title('World Airports Dataset')
-# Display
-plt.show()
+Geographic tables store geographic information as an additional column. But, how is this information pertaining to each row encoded to store it? To clarify this, we can check the type of the object in the first row:
+
+```{code-cell} ipython3
+type(gt_polygons.geometry[0])
 ```
 
-Now this looks a bit better!
+In `geopandas` (as well as other packages representing geographic data), the `geometry` column has special traits. For example, when we plot the dataframe, the `geometry` column is used as the main shape to use in the plot:
 
-### Point-in-polygon visualization
-
-Commonly, we either need or want to link points to areal geographies that allow us to augment their attribute list, or to look at the problem at hand from a new perspective. Maybe because the process we are interested in operates at a more aggregated level, or maybe because by aggregating we can obtain a view into the data that makes it simpler to understand. 
-
-For example, the figure above gives us a good sense about how airports are distributed overall but, in particularly dense areas like Europe, it is hard to see much. By aggregating them to say the country geography, we can consider new sets of questions such as which countries have most airports or which ones have a larger density. This works because the geography we want to aggregate it to, countries, is meaningful. This means it has some inherent structure that confers value. In this case, countries are relevant entities and a crucial piece in arranging the world.
-
-The first thing we need to do to create a country map is to have country (spatial) data. Let us load up a cleaned table with countries:
-
-```python
-# Load up shapefile with countries
-ctys = gpd.read_file('../data/countries/countries_clean.gpkg')
+```{code-cell} ipython3
+gt_polygons.plot()
 ```
 
-And, same as with any new dataset, let us have a quick look at what it looks like and how it stacks up with the other data we have collected along the way:
+Changing geometries must be done carefully: since the `geometry` column is special, there are special functions to adjust the geometry. For example, if we were to represent each country using its *centroid*, a point in the middle of the shape, then we must take care to set the geometry again. For example, when we compute the centroid, we can use the `gt_polygons.geometry.centroid` property and add a new column containing the centroid:
 
-```python
-# Set up figure and axis
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Add tile map
-ax.imshow(img, extent=ext)
-# Display country layer
-ctys.plot(ax=ax, linewidth=0.1, \
-          edgecolor='0.8', color='0.2')
-# Display airport locations
-ax.scatter(air.x, air.y, c='yellow', s=2, linewidth=0.)
-# Remove axis
-ax.set_axis_off()
-# Add title
-ax.set_title('World Airports Dataset')
-# Display
-plt.show()
+```{code-cell} ipython3
+gt_polygons['centroid'] = gt_polygons.geometry.centroid
 ```
 
-Again nothing new or too exciting from this figure, but this is good news: it means our data are aligned and match up nicely. So we can move on to more interesting ventures.
-
-The next thing that we might want to do to obtain country counts of airports is to link each airport with the country where it is located. Sometimes, we are lucky and the airport table will include a column with that information. In this case, we need to create it for ourselves. This is a well-known problem in geometry and GIS and is commonly known as point-in-polygon: to determine whether a given point is inside a polygon. With that operation solved, linking airports to countries amoutns to a bit of house keeping. We will first explore in pure Python how that algorithm can be easily implemented from scratch so it becomes clear what steps are involved; then we will see a much more efficient and fast implementation that we should probably use when need to perform this operation in other contexts.
-
-
-Creating a manual, brute-force implementation of a spatial join is not very difficult, if one has solved the problem of checking whether a point is inside a polygon or not. Thanks to the library that provides geometry objects to `geopandas` (`shapely`), this is solved in Python. For example, we can easily check if the first dot on the airports table is inside the first polygon in the countries table:
-
-```python
-# Single out point
-pt = air.iloc[0]['geometry']
-# Single out polygon
-poly = ctys.iloc[0]['geometry']
-# Check whether `poly` contains `pt`
-poly.contains(pt)
+```{code-cell} ipython3
+gt_polygons.head()
 ```
 
-That easy. As we can see, the method `contains` in any `shapely` geometry makes it trivial. So, the first airport in the list is not in the first country of the list.
+We can switch to the centroid column using the `set_geometry()` method. This can be useful when you want to work with two different geometric representations of the same underlying sample. For example, to plot the centroid and the boundary of each country by switching the geometry column with `set_geometry`:
 
-To find which country every airport is in easily (albeit not very efficiently!), we need to sift through all possible combinations to see if any of them gives us a match. Once we find it for a given airport, we need to record that and move on, no need to keep checking. That is exactly what we do in the cell below:
+```{code-cell} ipython3
+# Plot centroids
+ax = gt_polygons.set_geometry('centroid')\
+                .plot('ADMIN', 
+                      markersize=5
+                     )
+# Plot polygons without color filling
+gt_polygons.plot('ADMIN', 
+                 ax=ax, 
+                 facecolor='none', 
+                 edgecolor='k', 
+                 linewidth=.2
+                )
+```
 
-```python
+Note how we can create a map by calling `.plot()` on a `GeoDataFrame`. We can color thematically each feature based on a given column by passing the name of that column to the plot engine (as we do on with `ADMIN` on this case).
+
+Thus, as should now be clear, nearly any kind of geometric object can be represented in one (or more) geometry column(s). Thinking about the number of different kinds of shapes or geometries one could draw quickly boggles the mind. Fortunately the Open Geospatial Consortium (OGC) has defined a set of "abstract" types that can be used to define any kind of geometry. This specification, codified in ISO 19125-1, the "simple features" specification, specifies the formal relationships between these types: a `Point` is a zero-dimensional location with an x and y coordinate; a `LineString` is a path composed of a set of more than one `Point`, and a `Polygon` is a surface that has  at least one LineString that starts and stops with the same coordinate. All of these types *also* have "Multi-" variants that indicate a collection of multiple geometries of the same type. So, for instance, Bolivia is represented as a single polygon:
+
+```{code-cell} ipython3
+gt_polygons.query('ADMIN == "Bolivia"')
+```
+
+```{code-cell} ipython3
+gt_polygons.query('ADMIN == "Bolivia"').plot();
+```
+
+while Indonesia is a `MultiPolygon` containing  many `Polygons` for each individual island in the country:
+
+```{code-cell} ipython3
+gt_polygons.query('ADMIN == "Indonesia"')
+```
+
+```{code-cell} ipython3
+gt_polygons.query('ADMIN == "Indonesia"').plot()
+```
+
+Normally, geographic tables will only have geometries of a single type; records will *all* be `Point` or `LineString`, for instance. However, there is no formal requirement that a *geographic table* has geometries that all have the same type. 
+
+Throughout this book, we will use geographic tables extensively, storing polygons, but also points and lines. We will explore lines a bit more in the second part of this chapter but, for now, let us stop on points for a second. As mentioned above, these are the simplest type of feature in that they do not have any dimension, only a pair of coordinates attached to them. This means that points can sometimes be stored in a non-geographic table, simply using one column for each coordinate. We find an example of this on the Tokyo dataset we will use more later. The data is stored as a comma-separated value table, or `.csv`:
+
+```{code-cell} ipython3
+gt_points = pandas.read_csv("../data/tokyo/tokyo_clean.csv")
+```
+
+Since we have read it with `pandas`, the table is loaded as a `DataFrame`, with no explicit spatial dimension:
+
+```{code-cell} ipython3
+type(gt_points)
+```
+
+If we inspect the table, we find there is not a `geometry` column:
+
+```{code-cell} ipython3
+gt_points.head()
+```
+
+Many point datasets are provided in this format. To make the most of them, it is convenient to convert them into `GeoDataFrame` tables. There are two steps involved in this process:
+
+1. Turn coordinates into geometries:
+
+```{code-cell} ipython3
+pt_geoms = geopandas.points_from_xy(gt_points["longitude"],
+                                    gt_points["latitude"],
+                                    crs="EPSG:4326"
+                                   )
+```
+
+2. Create a `GeoDataFrame` object:
+
+```{code-cell} ipython3
+gt_points = geopandas.GeoDataFrame(gt_points,
+                                   geometry=pt_geoms
+                                  )
+```
+
+And now `gt_points` looks and feels exactly like the one of countries we have seen before, with the difference the `geometry` column stores `POINT` geometries:
+
+```{code-cell} ipython3
+gt_points.head()
+```
+
+### Surfaces
+
+Surfaces record data conceptualised as a field. In theory, a field is a continuous surface and thus has an infinite number of locations at which it could be measured. In reality however, fields are measured and recorded at a finite sample of locations that, to provide a sense of continuity and better conform with the field model, are uniformly structured across space. Surfaces thus, are represented as grids where each cell contains a sample. A grid can also be thought of as a table with rows and columns but, as we discussed in the previous chapter, both of them are directly tied to geographic location. This is in sharp contrast with geographic tables, where geography is confined to a single column.
+
+To explore how Python represents surfaces, we will use an extract for the Brazillian city of Sao Paulo of a [global population dataset](../data/ghsl/build_ghsl_extract). This dataset records population counts in cells of the same dimensions uniformly covering the surface of the Earth. Our extract is available as a GeoTIF file, a variation of the TIF image format that includes geographic information. We can use the `xarray` package to read it in:
+
+```{code-cell} ipython3
+pop = xarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
+```
+
+which reads the data into a `DataArray` object:
+
+```{code-cell} ipython3
+type(pop)
+```
+
+`xarray` is a library to work with multi-dimensional, labelled arrays. Let's unpack this: we can use arrays of not only two dimensions as in a table with rows and columns, but with an arbitrary number of them; each of these dimensions are "tracked" by an index that makes it easy and efficient to manipulate. In `xarray`, these indices are called coordinates, and they can be retrieved from our `DataArray` through the `coords` attribute:
+
+```{code-cell} ipython3
+pop.coords
+```
+
+Interestingly, our surface has *three* dimensions: `x`, `y`, and `band`. The former to track the latitude and longitude that each cell in our population grid covers. The third one has a single value (1) and, in this context, it is not very useful. But it is easy to imagine contexts where a third dimension would be useful: time series, as in the case of geocubes that we discussed in Chapter 2); or multi-band surfaces such as satellite data where different bands are recorded for a given scene (the clearest case perhaps being optical images where there is one band for red, one for green and another one for blue, the three together making up the color of a pixel). A geographic surface will thus have two dimensions recording location, and potentially more recording other dimensions pertaining to our data.
+
+An `xarray.DataArray` object contains additional information about the values stored under the `attrs` attribute:
+
+```{code-cell} ipython3
+pop.attrs
+```
+
+In this case, we can see this includes information required to convert pixels in the array into locations on the Earth surface (e.g. `transform`, and `crs`), the resolution (250 metres by 250 metres), and other metadata that allows us to better understand where the data come from and how it is stored.
+
+Our `DataArray` has thus three dimensions:
+
+```{code-cell} ipython3
+pop.shape
+```
+
+A common operation will be to reduce it to only the two geographic ones. We can do this with the `sel` operator, which allows us to select data by the value of their coordinates:
+
+```{code-cell} ipython3
+pop.sel(band=1)
+```
+
+The resulting object is thus a two-dimensional array. Similarly as with geographic tables, we can quickly plot the values in our dataset:
+
+```{code-cell} ipython3
+pop.sel(band=1).plot()
+```
+
+This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g. `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where` operator to select only values that are *not* -200:
+
+```{code-cell} ipython3
+pop.where(pop!=-200)\
+   .sel(band=1)\
+   .plot(cmap="RdPu")
+```
+
+The colorbar now looks more sensible.
+
++++
+
+### Spatial graphs
+
+Spatial graphs store connections between objects mediated through space. These connections may derive from geographical topology (e.g. contiguity), distance, or more sophisticated dimensions such as interaction flows (e.g. commuting, trade). Compared to geographic tables and surfaces, spatial graphs are rather different "animals". First, in most cases they do not record measurements about a given phenomena, but instead focus on *connections*, on storing relationships between objects as they are facilitaded (or impeded in their absence) by space. Second, because of this relational nature, data are organised in a more unstructured fashion: while one sample may be connected to only one other sample, another one can display several links. This in stark contrast to geographic tables and surfaces, both of which have a clearly defined structure, shape and dimensionality in which data are organised. These particularities translate into a different set of Python data structures. Unlike the previous ones we have seen, there are different data structures to represent spatial graphs, each optimised for different contexts. One of such cases is the integration of spatial connections in statistical methods such as exploratory data analysis or regression. For this, the most common data structure are spatial weights matrices, to which we devote the next chapter. 
+
+In this chapter, we briefly review a different way of representing spatial graphs that is much closer to the mathematical concept of a graph. For the illustration, we will rely on the `osmnx` library, which can query data from OpenStreetMap. For example, we extract the street-based graph of Yoyogi Park, in Tokyo:
+
+```{code-cell} ipython3
 %%time
-# Set up an empty dictionary to populate it with the matches
-airport2country = {aID: None for aID in air.index}
-# Loop over every airport
-for aID, row_a in air.iterrows():
-    # Single out location of the airport for convenience
-    pt = row_a['geometry']
-    # Loop over every country
-    for cID, row_p in ctys.iterrows():
-        # Single out country polygon for convenience
-        poly = row_p['geometry']
-        # Single out country name for convenience
-        cty_nm = row_p['ADMIN']
-        # Check if the country contains the airport
-        if poly.contains(pt):
-            # If so, store in the dictionary
-            airport2country[aID] = cty_nm
-            # Move on to the next airport, skipping remaining 
-            # countries (an airport cannot be in two countries 
-            # at the same time)
-            break
-airport2country = pd.Series(airport2country)
+graph = osmnx.graph_from_place("Yoyogi Park, Shibuya, Tokyo, Japan")
 ```
 
-Once run, we can check the content of the dictionary we have created (after converting it to a `Series` for convenience):
+The code snippet above sends the query to the OpenStreetMap server, which returns back the data to `osmnx` to process it as the `graph` Python representation.
 
-```python
-pd.DataFrame({'Airport Name': air['name'], 'Country': airport2country}).head(10)
+```{code-cell} ipython3
+type(graph)
+```
+
+We can have a quick inspection of the structure of the graph with the `plot_graph` method:
+
+```{code-cell} ipython3
+osmnx.plot_graph(graph)
+```
+
+The returning object is a `MultiDiGraph` from `networkx`, a graph library written in Python. The graph here is stored as a collection of 106 nodes (street intersections):
+
+```{code-cell} ipython3
+len(graph.nodes)
+```
+
+and 287 edges (streets) that connect them:
+
+```{code-cell} ipython3
+len(graph.edges)
+```
+
+Each of these elements can be queried to obtain more information such as the location and ID of a node:
+
+```{code-cell} ipython3
+graph.nodes[1520546819]
+```
+
+The characteristics of an edge:
+
+```{code-cell} ipython3
+graph.edges[(1520546819, 3010293622, 0)]
+```
+
+Or how the different components of the graph relate to each other. For example, what other nodes are directly connected to the observation `1520546819`?
+
+```{code-cell} ipython3
+list(graph.adj[1520546819].keys())
+```
+
+## Hybrids
+
++++
+
+We have just seen how geographic tables, surfaces and networks map onto `GeoDataFrame`, `DataArray` and `Graph` objects in Python, respectively. These represent the pairings that, conceptually, best align data models and structures with Python representations. In this second section of the chapter, we step a bit "out of the box", and explore cases in which it may make sense to represent a dataset with a data structure that might not be the most obvious initial choice. Interestingly, many of these cases are driven by technology enabling approaches that were not possible in the past, or creating situations (e.g. large datasets) that make the traditional approach limiting.
+
++++
+
+### Surfaces as tables
+
+The first case we explore is treating surfaces as (geo-)tables. In this context, we shift from an approach where each dimension has a clear mapping to a spatial or temporal aspect of the dataset, to one where each sample, cell of the surface/cube is represented as a row in a table. This approach runs contrary to the general consensus that fields are best represented as surfaces or rasters because that allows us to index space and time "by default" based on the location of values within the data structure. Shifting to a tabular structure implies either loosing that space-time reference, or having to build it manually with auxillary objects (e.g. a spatial graph). In almost any case, operating on this format is less efficient than it *could* be if we had bespoke algorithms built around surface structures. Finally, from a more conceptual point of view, treating pixels as independent realisations of a proces that we *know* is continuous is not without its own challenges.
+
+This perspective however also involves important benefits. First, sometimes we *don't* need location for our particular application. Maybe we are interested in calculating overall descriptive statistics; or maybe we need to run an analysis that is entirely atomic in the sense that it operates on each sample in isolation from all the other ones.  Second, by "going tabular" we recast our specialised, spatial data into the most common data structure available, for which a large amount of commodity technology is built. So called "big data" technologies such as distributed systems are much more common, robust and tested for tabular data than for spatial formats. *If* we can translate our spatial challenge into a table challenge, we can plug into technology that is more optimised and, in some cases, reliable. Further, some analytic toolboxes common in (geographic) data science are entirely built around tabular structures. Machine learning libraries such as `scikit-learn`, or some spatial analytics such as most in `PySAL`, are designed around this data structure. Converting our surfaces into tables thus allows us to plug into a much wider suite of tools and techniques.
+
+We will see two ways of going from surfaces to tables: one that is based on taking every pixel into a table row; and another one involving aggregations of pixels into pre-determined polygons.
+
++++
+
+#### One pixel at a time
+
+Technically, going from surface to table involves traversing from `xarray` to `pandas` objects. This is actually a well established bridge. To illustrate it with a example, let's pick population counts as provided by the [GHSL](../data/ghsl/build_ghsl_extract) for the region of Sao Paulo in Brazil. We can read the surface into a `DataArray` object with:
+
+```{code-cell} ipython3
+surface = xarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
+```
+
+Transferring to a table is as simple as calling `to_series`:
+
+```{code-cell} ipython3
+t_surface = surface.to_series()
+```
+
+The resulting object is a `pandas.Series` object indexed on each of the dimensions of the original `DataArray`:
+
+```{code-cell} ipython3
+t_surface.head()
+```
+
+At this point, everything we know about `pandas` and tabular data applies here! For example, it might be more convenient to express it a a `DataFrame` table:
+
+```{code-cell} ipython3
+t_surface = t_surface.reset_index().rename(columns={0: "Value"})
+```
+
+With the power of a tabular library, some queries and filter operations are rather natural. For example, finding cells with more than 1,000 people can be done with the usual `query` operator (note that if all you want to do is this type of query, `xarray` is well equiped for this kind of task too):
+
+```{code-cell} ipython3
+t_surface.query("Value > 1000").info()
+```
+
+The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a full-fledge geotable, where each pixel includes the grid geometry it represents. For this task, we develop a simple function that takes a row from our table and the resolution of the surface, and returns its geometry:
+
+```{code-cell} ipython3
+def row2cell(row, res_xy):
+    res_x, res_y = res_xy
+    minX = row["x"]
+    maxX = row["x"] + res_x
+    minY = row["y"] + res_y
+    maxY = row["y"]
+    poly = box(minX, minY, maxX, maxY)
+    return poly
+```
+
+For example:
+
+```{code-cell} ipython3
+row2cell(t_surface.loc[0, :], surface.attrs["res"])
+```
+
+One of the benefits of this approach is we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:
+
+```{code-cell} ipython3
+max_polys = t_surface.query("Value > 1000")\
+                     .apply(row2cell, 
+                            res_xy=surface.attrs["res"], 
+                            axis=1
+                           )
+max_polys = geopandas.GeoSeries(max_polys, crs=surface.attrs["crs"])
+```
+
+And generate a map with the same tooling that we use for any standard geo-table:
+
+```{code-cell} ipython3
+ax = max_polys.plot(edgecolor="red", 
+                    figsize=(9, 9)
+                   )
+cx.add_basemap(ax, 
+               crs=surface.attrs["crs"], 
+               source=cx.providers.CartoDB.Voyager
+              )
+```
+
+Finally, once we have operated on the data as a table, we may want to return to a surface-like data structure. This involves taking the same journey in the oposite direction as how we started. The sister method of `to_series` in `xarray` is `from_series`:
+
+```{code-cell} ipython3
+new_da = xarray.DataArray.from_series(
+    t_surface.set_index(["band", "y", "x"])["Value"]
+)
+new_da
 ```
 
 ---
 
+**DAB note** - The more I think about this, this is *transfer* of data more than conversion of structure and should probably be in Feature Enginnering? But then maybe the "Tables to surfaces" example could be seen as similar. To discuss.
 
-Although interesting from a pedagogical standpoint, in practive, very rarely do we have to write a spatial join algorithm from scratch. More commonly, we will use one of the already available packaged methods. As mentioned, this is a fairly standard GIS operation, and the GIS community has spent a lot of effort to build optimized algorithms that can conveniently do the job for us. In `GeoPandas`, this is as simple as calling `sjoin`:
 
-```python
-# Spatial join
-%time air_w_cty = gpd.sjoin(air, ctys)
-air_w_cty.head()
+
++++
+
+#### Pixels to polygons
+
+A second use case involves moving surfaces directly into geo-tables by aggregating pixels into pre-specified geometries. For this illustration, we will use the [DEM](../data/nasadem/build_nasadem_sd) surface containing elevation for the San Diego (US) region, and the set of [Census tracts](../data/sandiego/sandiego_tracts_cleaning). Imagine we want to know the average altitude of each neighbourhood.
+
+Let's start by reading the data. First, the elevation model:
+
+```{code-cell} ipython3
+dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(band=1)
+dem.where(dem > 0).plot.imshow()
 ```
 
-Instead of the $\approx$47 seconds it took our homemade algorithm, the one above did a full join in just over two seconds! Through this join also, it is not only the IDs that are matched, but the entire table. Let us quickly compare whether the names match up with our own:
+And the neighbourhood areas (tracts) from the Census:
 
-```python
-# Display only top six records of airport and country name
-# Note that the order of the `sjoin`ed table is not the same
-# as ours but it can easily be rearranged using original indices
-air_w_cty.loc[range(6), ['name', 'ADMIN']]
-```
-
-Voila! Both tables seem to match nicely.
-
-To finish this vignette, let us explore which countries have the most airports through a simple choropleth. The only additional step we need to take is to obtain counts per country. But this is pretty straightforward now we have them linked to each airport. To do this, we use the `groupby` operation which, well, groups by a given column in a table, and then we apply the method `size`, which tells us how many elements every group has:
-
-```python
-# Group airports by country and count by group
-cty_counts = air_w_cty.groupby('ADMIN')\
-                      .size()
-```
-
-Then a choropleth is as simple as:
-
-```python
-# Set up figure and axis
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Index countries by the name, append the airport counts
-# (which are themselves indexed on country names too),
-# Fill any missing value in the count with zero (no counts
-# in this context means zero airports), and display choropleth
-# using quantiles
-p = ctys.set_index('ADMIN')\
-        .assign(airport_count=cty_counts)\
-        .fillna(0)\
-        .plot(column='airport_count', scheme='Quantiles', \
-              ax=ax, linewidth=0, legend=True)
-# Display map
-plt.show()
-```
-
-Maybe unsurprisingly, what we find after all of this is that larger countries such as Canada, US, or Russia, have more airports. However, we can also find interesting insights. Some countries with similar size, such as France or Germany and some African countries such as Namibia have very different numbers. This should trigger further questions as to why that is, and maybe even suggest some tentative answers.
-
-And additional view that might be of interest is to display airport counts, but weighted by the area of the country. In other words, to show airport density. The idea behind it is to explore the variation in probabilities of an airport to be located in a given country, irrespective of how large that country is. Let us first create the densities:
-
-```python
-# Airport density
-# Note since the CRS we are working with is expressed in Sq. metres,
-# we rescale it so the numbers are easier to read
-airport_density = cty_counts * 1e12 / ctys.set_index('ADMIN').area
-
-airport_density.head()
-```
-
-And now we are ready to plot!
-
-```python
-# Set up figure and axis
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Index countries by the name, append the airport densities
-# (which are themselves indexed on country names too),
-# Fill any missing value in the count with zero (no number
-# in this context means zero airports), and display choropleth
-# using quantiles
-p = ctys.set_index('ADMIN')\
-        .assign(airport_dens=airport_density)\
-        .fillna(0)\
-        .plot(column='airport_dens', scheme='Quantiles', \
-              ax=ax, linewidth=0, legend=True)
-# Display map
-plt.show()
-```
-
-This map gives us a very different view. Very large countries are all of a sudden "penalized" and some smaller ones rise to the highest values. Again, how to read this map and whether its message is interesting or not depends on what we are after. But, together with the previous one, it does highlight important issues to consider when exploring uneven spatial data and what it means to display data (e.g. airports) through specific geographies (e.g. countries).
-
-
-
-## Vignette: Airbnb Prices in San Diego
-
-Our second vignette changes the spatial scale to examine the distribution of
-Airbnb listings in San Diego California. We begin by reading the listings, 
- which are stored in a comma separated file (csv):
-
-
-```python
-df = pd.read_csv('../data/sandiego/listings.csv')
-len(df)
-
-```
-
-Examination of the dataframe reveals that the location information is encoded
-in the columns `longitude` and `latitude`.  We will use these columns together
-with the `Point` class from **shapely** to create a geodataframe:
-
-```python
-from shapely.geometry import Point
-```
-
-```python jupyter={"outputs_hidden": false}
-geometry = [Point(xy) for xy in zip(df['longitude'], df['latitude'])]
-```
-
-```python
-import geopandas as gpd
-```
-
-```python
-gdf = gpd.GeoDataFrame(df)
-```
-
-```python
-gdf['geometry'] = geometry
-```
-
-```python
-gdf.plot()
-```
-
-The listings are represented as point objects, and what we are interested in is
-the spatial distribution of the listing prices across the market. So unlike the
-airport dataset above where we were focusing on the locations of the points,
-here we extend the analysis to consider the locations and an attribute that is
-measured at each of the locations.
-
-Before we analyze the spatial distribution of the listings, we have to convert
-the data type of the listing column as it is currently encoded as a string:
-
-```python
-gdf.price
-```
-
-```python
-gdf['price'] = gdf['price'].apply(lambda x: x.replace('$', '').replace(',', '')).astype(float)
-```
-
-```python
-gdf.price
-```
-
-
-
-
-```python
-crs = {'init': 'epsg:4326'}
-gdf.crs = crs
-```
-
-
-With the listing variable converted, we can now proceed to visualize the
-spatial distribution:
-
-```python
-gdf.plot(column='price', legend=True, scheme='quantiles', figsize=(16,16))
-```
-
-
-This is somewhat informative, but there are several issues with approaching the
-analysis in this fashion. Chief among these is the occlusion of listings in
-areas with high density. The size of the points also makes it challenging to
-develop a systematic view of the spatial variation in the listing prices.
-
-We can address these issues through spatial aggregation. That is, similar to
-what we did for the airport dataset, we can use a spatial join to associate each
-listing with its enclosing  polygon. Once we have that information, we can use
-database methods to perform aggregation queries to get the average listing
-price per polygon.
-
-
-For our polygons we will use census tracts that we have downloaded for the
-state of California:
-
-```python
-tracts = '../data/sandiego/tl_2019_06_tract.shp'
-tracts = gpd.read_file(tracts)
-```
-
-```python
-tracts.plot()
-```
-
-This gives us all the tracts for the state, but our market analysis is focusing on
-the case of San Diego. We can use a Pandas query to create a more focused dataframe:
-
-```python
-sd_tracts = tracts[tracts.COUNTYFP=='073']
-```
-
-```python
+```{code-cell} ipython3
+sd_tracts = geopandas.read_file("../data/sandiego/sandiego_tracts.gpkg")
 sd_tracts.plot()
 ```
 
-Visual examination of the tracts reveals one idiosyncratic tract. The elongated
-coastal tract actually has a boundary that extends into the Pacific Ocean.
-This will induce visual noise in any subsequent analysis, so let's remove it.
+There are several approaches to do this, we will use `rioxarray` which allows you clip parts of the surface *within* a given set of geometries. Let's start with a single polygon. For the illustration, we will use the largest one, located on the eastern side of the region. We can find the ID of the polygon with:
 
-The question is how to remove it? 
-
-Fortunately for this case, the tract in question is the extreme west tract, so
-we can exploit this information to find, and remove, the row in the dataframe:
-
-
-```python
-bounds = sd_tracts.bounds
-```
-
-```python
-bounds
-```
-
-```python
-bounds.minx.min()
-```
-
-```python
-bounds[bounds.minx==bounds.minx.min()]
-```
-
-```python
-sd_tracts[bounds.minx==bounds.minx.min()].plot()
-```
-
-```python
-sd_tracts[bounds.minx!=bounds.minx.min()].plot()
-```
-
-```python
-sd_tracts = sd_tracts[bounds.minx!=bounds.minx.min()]
-```
-
-Having removed the coastal tract, we can now do a spatial join to associate a
-tract with each listing point:
-
-```python
- gdf.geometry
-```
-
-```python
-j = gpd.sjoin(gdf, sd_tracts, how='inner', op='within')
-```
-
-We see a warning that alerts us to a problem with the coordinate reference systems
-being different between the two dataframes. Since our spatial join is based on
-the spatial relationship of containment (`within`), the CRSs have to be
-identical for this to be correct.
-
-Let's fix this and continue on:
-
-```python
-gdf = gdf.to_crs(sd_tracts.crs)
-```
-
-```python
-j = gpd.sjoin(gdf, sd_tracts, how='inner', op='within')
-```
-
-```python
-j.shape
-```
-
-The result of the spatial join is that the listings dataframe has now been
-extended to add a column that identifies the census tract that contains
-the point for the listing.
-
-
-From the perspective of an individual listing point, this is a *one-to-one* spatial
-relationship. That is, a point can be within only one census tract, since the
-census tracts are [planar
-enforced](https://books.google.com/books?id=-FbVI-2tSuYC&pg=PA186&lpg=PA186&dq=planar+enforcement+theobald&source=bl&ots=SpOsACcrbP&sig=ACfU3U1CPniL-YpWCt0ml--XIP5_d3fkWA&hl=en&sa=X&ved=2ahUKEwjC-5LX1_fqAhWEHzQIHcNwC-8Q6AEwDXoECAoQAQ#v=onepage&q=planar%20enforcement%20theobald&f=false)
-and do not overlap.
-
-From the perspective of the census tracts, the relationship is of a
-*one-to-many* form, since one census tract can contain multiple listings. 
-And, it is this cardinality that we want to leverage in aggregating the listing
-information by tract. For example, we can get the number of listings within
-each census tract using a `grouby` method on the dataframe:
-
-
-```python
-j.groupby(by='GEOID').count()
-```
-
-```python
-j[['price', 'GEOID']]
-```
-
-Here we have used the `count` method on the dataframe that is generated from
-the `groupby`. If we change the `count` method to `mean`, we will get the
-average listing price by census tract:
-
-```python
-j[['price','GEOID']].groupby(by='GEOID').mean()
-```
-
-We then can add this new variable to the tract dataframe:
-
-```python
-tract_mean = j[['price','GEOID']].groupby(by='GEOID').mean()
-```
-
-```python
-sd_tracts = sd_tracts.merge(tract_mean, on='GEOID')
-```
-
-and plot the average listing price by census tract:
-
-```python
-sd_tracts.plot(column='price',legend=True, figsize=(16,16), scheme='quantiles')
-```
-
-Let's add in a basemap for some context:
-
-```python
-west, south, east, north = sd_tracts.total_bounds
-```
-
-```python
-%time img, ext = ctx.bounds2img(west, south, east, north, ll=True, zoom=11)
-```
-
-```python
-sd_tracts = sd_tracts.to_crs(epsg=3857)
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16, 16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-sd_tracts.plot(ax=ax, alpha=0.6, color='green',edgecolor='lightgrey')
-#listings.plot(ax=ax, c='green')
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Tracts with Listings')
-# Display
-plt.show()
-
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16, 16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-sd_tracts.plot(ax=ax, alpha=0.6, edgecolor='lightgrey',
-              column='price', legend=True, scheme='quantiles')
-#listings.plot(ax=ax, c='green')
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Tracts Listing Prices')
-# Display
-plt.show()
-
-```
-
-The visual analysis of the listing prices at the tract scale has addressed the
-problems we encountered in analyzing the points layer directly. There is a
-trade-off as we switch from the point to areal unit layers, as the latter
-results from an aggregation of the information in the former. In subsequent
-chapters, we will be introducing methods that are appropriate for the deeper
-statistical analysis of these different types of spatial support. Here we only
-wanted to introduce methods of spatial data processing that allow us to
-construct the variables and layers that would feed into those analyses.
-
-
-
-### Cafe Sheds
-
-We close this chapter with the application of a final set of deterministic
-spatial analytical methods that provide insights on the market structure of
-cafes in the San Diego region.
-
-Our data come from OpenStreetMap and have been extracted using QGIS and the OSM
-plugin to create a geopackage that we read in here:
-
-```python
-cafes = gpd.read_file('../data/sandiego/sdcafes.gpkg')
-```
-
-We can explore this data frame through some plotting and introspection:
-
-```python
-cafes.plot()
-```
-
-```python
-cafes.crs
-```
-
-Again, we grab a basemap for context:
-
-```python
-west, south, east, north = cafes.total_bounds
-
-```
-
-```python
-%time img, ext = ctx.bounds2img(west, south, east, north, ll=True, zoom=11)
-```
-
-```python
-ext
-```
-
-```python
-cafes.total_bounds
-```
-and we need to set the CRS of our cafes, and listings, to web mercator so that we
-can plot them together with our basemap to get a better understanding of the
-spatial relationships between the cafes and the airbnb listings:
-
-```python
-cafes = cafes.to_crs(epsg=3857)
-```
-
-```python
-listings = j.to_crs(epsg=3857)
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-cafes.plot(ax=ax, c='purple')
-listings.plot(ax=ax, c='green')
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafes (Purple) and Air BnB Listings (Green)')
-# Display
-plt.show()
-
-```
-
-We see that the spatial extent of the cafes is much larger than that of the
-listings, so let's subset our cafes to those within the extent of the listings:
-
-```python
-listings.total_bounds
-```
-
-```python
-%time img, ext = ctx.bounds2img(*listings.total_bounds, zoom=11)
-```
-
-```python
-w,s,e,n = listings.total_bounds
-```
-
-```python
-cafes = cafes.cx[w:e,s:n]
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-listings.plot(ax=ax, c='green')
-cafes.plot(ax=ax, c='purple', alpha=0.5)
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafes (Purple) and Air BnB Listings (Green)')
-
-# Display
-plt.show()
-
-```
-
-Plotting the two point sets together, we encounter the same occlusion problem,
-only now it takes on a more complex form since listings can occlude other
-listings, cafes can occlude other cafes, and cafes can occlude listings (since
-cafes are drawn last).
-
-One way around these issues is to ask more particular questions about the
-spatial relationships between the two point sets. For example, one very
-important question (from the perspective of  a coffee aficionado) we may
-want to answer is "what is the closest cafe to my listing?"
-
-To answer this question we develop [Voronoi polygons](http://jwilson.coe.uga.edu/EMAT6680Fa08/Kuzle/Math%20in%20Context/Voronoi%20diagrams.html)
-for each cafe. These polygons comprise a tessellation of the extent such that
-there is one polygon for each cafe, and these polygons define the set of points
-for which that cafe is the closest of all cafes in San Diego.
-
-Because these polygons are planar enforced, we know that each of our listings
-will be contained by one, and only one, of the Voronoi polygons. Once we know
-which polygon a listing is within, we also know which cafe is closet to that
-listing - and that will be the cafe that is the generator point for the polygon.
-
-
-We construct the Voronoi polygons using **libpysal**:
-
-
-```python
-import libpysal
-```
-
-```python
-sheds, generators = libpysal.cg.voronoi.voronoi_frames(list(zip(cafes.geometry.x.values, cafes.geometry.y.values)))
-```
-
-```python
-sheds.plot(figsize=(16,16))
-```
-
-and add these "cafe sheds" together with our basemap:
-
-```python
-sheds.crs = 'epsg:3857'
-```
-
-```python
-w,s,e,n = sheds.total_bounds
-```
-
-
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, alpha=.7, edgecolor='white')
-cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
-
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafe Sheds')
-# Display
-ax.set_xlim((w,e))
-ax.set_ylim((s,n))
-ax.set_axis_off()
-
-plt.show()
-
-```
-
-### Closest cafe
-
-To find the closest cafe to each listing, we do a spatial join of the listings
-dataframe with the coffee sheds (voronoi polygons):
-
-```python
-sheds.crs = 'epsg:3857'
+```{code-cell} ipython3
+largest_tract_id = sd_tracts.query(f"area_sqm == {sd_tracts['area_sqm'].max()}").index[0]
+largest_tract_id
 ```
 
+And then pull out the polygon itself for the illustration:
 
-
-```python
-cc = gpd.sjoin(listings.drop(['index_right'], axis=1), sheds, how='inner', op='within')
-```
-
-```python
-cc.head()
-```
-
-```python
-cc.shape
-```
-
-```python
-cc.rename(columns={'index_right': 'cafe'}, inplace=True)
-```
-
-```python
-cc.head()
-```
-This new dataframe has one record for each listing, and records the coffee
-shed, or Voronoi polygon,
-that contains the listing.
-
-## Choropleth of Demand by Coffee Shed
-
-From the perspective of an airbnb renter, we have given them what they need -
-the identification of their closest cafe. For the owners of the cafe, what
-would be of interest is how many such renters are within their Voronoi polygon.
-We can determine this number for each cafe in the data set in a similar fashion
-to what we've done above for the airports and listing by tract: do a groupby of
-the listings in each shed polygon:
-
-
-```python
-cc.groupby(by='cafe').count()
-```
-
-Here the `id` column is the count of the number of listings within the polygon
-associated with the cafe in the first column. Essentially this is counting up
-how many times a particular cafe appears in the `cafe` column:
-
-```python
-cc.cafe
-```
-and we can find out how many cafes (out of all cafes in San Diego) are the
-nearest cafe to at least one listing:
-
-```python
-generators.iloc[cc.cafe.unique()] # cafes that are a nearest neighbor to at least 1 listing
-```
-
-Now we are in a position to visualize the spatial distribution of coffee demand
-across the sheds. Let's first rename our dataframe:
-
-```python
-demand = cc[['cafe', 'listing_url']].groupby(by='cafe').count()
-demand.rename(columns={'listing_url':'listings'}, inplace=True)
+```{code-cell} ipython3
+largest_tract = sd_tracts.loc[largest_tract_id, "geometry"]
 ```
 
-```python
-demand.head()
-```
-
-```python
-demand.shape
-```
+Clipping the section of the surface that is within the polygon in the DEM can be achieved with the `rioxarray` extension to clip surfaces based on geometries:
 
-```python
-demand.index
+```{code-cell} ipython3
+dem_clip = dem.rio.clip([largest_tract.__geo_interface__], 
+                        crs=sd_tracts.crs
+                       )
+dem_clip.where(dem_clip > 0).plot()
 ```
 
-We can join the demand dataframe to the sheds dataframe. This adds the demand
-column to the shed dataframe:
+Once we have elevation measurements for all the pixels within the tract, the average one can be calculated with `mean()`:
 
-```python
-sheds = sheds.join(demand)
+```{code-cell} ipython3
+dem_clip.where(dem_clip > 0).mean()
 ```
 
-```python
-sheds.head()
-```
+Now, to scale this to the entire geo-table, there are several approaches, each with benefits and disadvantages. We opt for applying the method above to each row of the table. We define an auxilliary method that takes a row containing one of our tracts, and returns its elevation:
 
-```python
-sheds
+```{code-cell} ipython3
+def get_mean_elevation(row):
+    geom = row["geometry"].__geo_interface__
+    section = dem.rio.clip([geom], crs=sd_tracts.crs)
+    ele = float(section.where(section > 0).mean())
+    return ele
 ```
-
-There are cafes with sheds that do not contain any listings and these have a
-`Nan` in their demand column. We can set these values to 0:
 
-```python
-sheds = sheds.fillna(0)
-```
+Applied to the same tract, it returns the same average elevation:
 
-```python
-sheds
+```{code-cell} ipython3
+get_mean_elevation(sd_tracts.loc[largest_tract_id, :])
 ```
-
-And finally, we can map the number of airbnb listings in each coffee shed:
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, alpha=.7, edgecolor='white', column='listings', legend=True, scheme='quantiles')
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
 
+This method can then be run on a series of polygons with `apply`:
 
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('Number of Airbnb Listings by San Diego Cafe Sheds')
-# Display
-ax.set_xlim((w,e))
-ax.set_ylim((s,n))
-ax.set_axis_off()
-
-plt.show()
-
+```{code-cell} ipython3
+elevations = sd_tracts.head().apply(get_mean_elevation, axis=1)
+elevations
 ```
-
 
+**DAB note** - consider removing the example above and keeping only the one below
 
-## Exercises
+The approach plays well with `xarray` surface structures and is scalable in that it is not too involved to run in parallel and distributed with Dask, but it's not the most performant. A more efficient alternative for our example is using the `rasterstats` library:
 
-1. Which coffee shed has the highest listing price?
+```{code-cell} ipython3
+%%time
+from rasterstats import zonal_stats
 
-2. How distant are the highest and lowest listings?
-3. Generate a choropleth that expresses listing intensity (listings per square
-   kilometer) by coffee shed.
-
-```python
-sheds.geometry
-```
-
-```python
-sheds.geometry.area
+elevations2 = zonal_stats(sd_tracts.to_crs(dem.rio.crs),
+                          "../data/nasadem/nasadem_sd.tif"
+                         )
+elevations2 = pandas.DataFrame(elevations2)
 ```
-
-```python
-sheds['area'] = sheds.geometry.area / 1000000
-```
-
-```python
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, edgecolor='grey', column='area', legend=True,
-          scheme='fisher_jenks',
-          classification_kwds={'k':10})
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
 
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Cafe Sheds Area (km2)')
-# Display
-ax.set_xlim((w,e))
-ax.set_ylim((s,n))
-ax.set_axis_off()
-
-plt.show()
-
+```{code-cell} ipython3
+elevations2.head()
 ```
-
-```python
-sheds['lintensity'] = sheds['listings'] / sheds['area']
-# Set up figure and axes
-f, ax = plt.subplots(1, figsize=(16,16))
-# Display tile map
-ax.imshow(img, extent=ext)
-# Display airports on top
-#listings.plot(ax=ax, c='green')
-sheds.plot(ax=ax, edgecolor='grey', column='lintensity', legend=True,
-          scheme='fisher_jenks',
-          classification_kwds={'k':10})
-#cafes.plot(ax=ax, c='purple', alpha=0.5)
-#listings.plot(ax=ax, c='green')
-
-
-#ax.scatter(air.x, air.y, c='purple', s=2)
-# Remove axis
-#ax.set_axis_off()
-# Add title
-ax.set_title('San Diego Listings Intensity by Cafe Sheds')
-# Display
-ax.set_xlim((w,e))
-ax.set_ylim((s,n))
-ax.set_axis_off()
 
-plt.show()
+Then this is what we do in the end (more of these approaches in Spatial Feature Engineering):
 
+```{code-cell} ipython3
+f, axs = plt.subplots(1, 3, figsize=(15, 5))
+dem.where(dem > 0)\
+   .rio.reproject(sd_tracts.crs)\
+   .plot.imshow(ax=axs[0], add_colorbar=False)
+sd_tracts.plot(ax=axs[1])
+sd_tracts.assign(elevation=elevations2["mean"]).plot("elevation", ax=axs[2])
 ```
 
 ---
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
++++
 
-```python
+### Tables as surfaces
 
+The case for converting tables into surfaces is perhaps less controversial. This is an approach we can take in cases where we are interested in the *overall* distribution of objects (usually points) and we have so many that it is not only technically more efficient to represent them as a surface, but conceptually it is also easier to think about it as a continuous phenomenon. To illustrate this approach, we will use the dataset of [Tokyo photographs](../data/tokyo/tokyo_cleaning) we loaded above into `gt_points`.
+
+From a purely technical perspective, for datasets with too many points, one-to-one representation where we draw a point on the screen for every sample can result in overcrowding:
+
+```{code-cell} ipython3
+gt_points.plot()
+```
+
+In the image above, it is hard to tell anything about the density of points in the centre of the image. Converting the dataset from a geo-table into a surface involves laying out a grid, counting how many points fall within each cell, and then encoding the count in a color scheme. In some ways, this is the opposite operation to what we saw in the previous section, where we were aggregating cells into polygons. 
+
+In Python, we can rely on the `datashader` library, which can do all the heavy lifting in a very efficient way. This process involves two main steps. First, we set up the grid (or canvas, `cvs`) into which we want to aggregate points:
+
+```{code-cell} ipython3
+cvs = datashader.Canvas(plot_width=60,
+                        plot_height=60
+                       )
+```
+
+Then we "transfer" the points into the grid:
+
+```{code-cell} ipython3
+grid = cvs.points(gt_points, 
+                  x="longitude", 
+                  y="latitude"
+                 )
+```
+
+The resulting `grid` is a standard `DataArray` object that we can then manipulate as we have seen before. As we can see below, the amount of detail it allows for is much greater than on the one-to-one mapping version:
+
+```{code-cell} ipython3
+f, axs = plt.subplots(1, 2, figsize=(14, 6))
+gt_points.plot(ax=axs[0])
+grid.plot(ax=axs[1]);
+```
+
+### Networks as graphs *and* tables
+
+In the previous chapter, we saw networks as data structures that store *connections* between objects. We also discussed how this broad definition includes many interpretations that focus on different aspects of the networks. While spatial analytics may use graphs to record the topology of a table of objects such as polygons; transport applications may treat the network representation of the street layout as a set of objects itself, in this case lines. In this final section we show how one can flip back and forth between one representation and another, to take advantage of different aspects.
+
+We start with the `graph` object from the [previous section](#Spatial-graphs). Remember this captures the street layout around Yoyogi park in Tokyo. We have seen how, stored under this data structure, it is easy to query which node is connected to which, and which ones are at the end of a given edge. 
+
+However, in some cases, we may want to convert the graphh into a structure that allows us to operate on each component of the network independently. For example, we may want to map streets, calculate segment lengths, or draw buffers around each intersection. These are all operations that do not require topological information, that are standard for geo-tables and that are harder to complete with graph structures. In this context, it makes sense to convert our `graph` to two geo-tables, one for intersections (the graph nodes) and one for street segments (the graph edges). In `osmnx`, we can do that with the built-in converter:
+
+```{code-cell} ipython3
+gt_intersections, gt_lines = osmnx.graph_to_gdfs(graph)
+```
+
+Now each of the resulting geo-tables behaves as a collection of geographic objects, because it is:
+
+```{code-cell} ipython3
+gt_intersections.head()
+```
+
+```{code-cell} ipython3
+gt_lines.info()
+```
+
+If we were in the opposite situation, where we had a set of street segments and their intersections in geo-table form, we can generate the graph representation with the `graph_from_gdfs` sister method:
+
+```{code-cell} ipython3
+new_graph = osmnx.graph_from_gdfs(gt_intersections, gt_lines)
+```
+
+The resulting object will behave in the same was as our original `graph`.
+
++++
+
+---
+
++++
+
+## Questions
+
+1. One way to convert from `Multi-`type geometries into many individual geometries is using the `explode()` method of a GeoDataFrame. Using the `explode()` method, how many islands are in Indonesia?
+
+```{code-cell} ipython3
+gt_polygons.query('ADMIN == "Indonesia"').explode()
 ```
