@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.7.1
+      jupytext_version: 1.5.2
   kernelspec:
     display_name: Python [conda env:analysis]
     language: python

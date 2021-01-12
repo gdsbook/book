@@ -382,8 +382,6 @@ new_da
 
 **DAB note** - The more I think about this, this is *transfer* of data more than conversion of structure and should probably be in Feature Enginnering? But then maybe the "Tables to surfaces" example could be seen as similar. To discuss.
 
-
-
 +++
 
 #### Pixels to polygons
