@@ -1,18 +1,22 @@
-.PHONY: all website
+.PHONY: all html
+    
 lab:
 	docker run --rm \
                -p 4000:4000 \
                -p 8888:8888 \
                -v ${PWD}:/home/jovyan/work \
                darribas/gds_dev:5.0
+    
 labosx:
 	docker run --rm \
                -p 4000:4000 \
                -p 8888:8888 \
                -v ${PWD}:/home/jovyan/work:delegated \
                darribas/gds_dev:5.0
+    
 sync: 
 	jupytext --sync ./notebooks/*.ipynb
+    
 html: sync
 	echo "Cleaning up existing tmp_book folder..."
 	rm -rf docs
@@ -34,3 +38,27 @@ html: sync
 	echo "Cleaning up..."
 	rm -r tmp_book
 	touch docs/.nojekyll
+    
+reset_docs:
+	rm -rf docs/*
+	git checkout HEAD docs/*
+
+# Run for example as: `make test_one nb=00_toc`
+test_one:
+	jupyter nbconvert --to notebook \
+                      --execute \
+                      --ExecutePreprocessor.timeout=600 \
+                      notebooks/$(nb).ipynb
+	rm notebooks/$(nb).nbconvert.ipynb
+
+test:
+	rm -rf tests
+	mkdir tests
+	jupyter nbconvert --to notebook \
+                      --execute \
+                      --output-dir=tests \
+                      --ExecutePreprocessor.timeout=600 \
+                      notebooks/*.ipynb 
+
+	rm -rf tests
+	echo "########\n\nAll blocks passed\n\n########"
