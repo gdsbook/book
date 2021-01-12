@@ -49,25 +49,25 @@ At its core, *spatial feature engineering* is the process of developing addition
 To help us discuss this, a vocabulary is helpful. We will cover a few different kinds of features in this chapter, both of which can be constructed in either Map Synthesis or Map Matching operations: 
 - A *spatial summary feature* measures the attributes of observations that have some pre-specified spatial relationship with our target observations. This includes 
     - taking the average or median value of features within a neighborhood of each target observation. 
-    - the *spatial lag*, used in previous chapters of this book (e.g. Chapters 3, 6, and 11), is a kind of spatial summary feature, since it reflects the average value of the data in the neighborhood around each point. 
+    - the *spatial lag*, used in previous chapters of this book (e.g., Chapters 3, 6, and 11), is a kind of spatial summary feature, since it reflects the average value of the data in the neighborhood around each point. 
     - Other kinds of spatial summary features might include the count of observations within a given distance or the standard deviation of ten nearest observations. 
     - Summary features generally include *interpolated features* which involve a transfer of information from one spatial support to another, such as when the target locations are not the same as the locations in our anciliary data. Interpolated features become significantly more complex as well when the data is *areal*, as will be discussed later in this chapter.
 - A *proximity feature* measures the distance from a target observation to some other observation or position in the map. This might be done in a map matching context, as we did before with the distance to Balboa Park, or it might be done in a map synthesis context by measuring the distance to the nearest other observation. 
 
 ## Feature Engineering Using Map Matching
 
-Space is the ultimate linkage key; map matching is all about exploiting this asset. Geographic information is collected at different scales, aggregated using bespoke geographic delineations, and ultimately stored in different datasets. Modelling and machine learning usually require the use of data aligned and coherently structured; to bring disparate geo-datasets together, the data scientist needs to be able to transfer information expressed for one geography into another. This is where map matching comes to rescue. By using geographical location, we can connect datasets that have no common key or that are otherwise completely unrelated. This is a "magic trick" that we can pull off because of location that would be much harder, or impossible, with data of other nature.
+Space is the ultimate linkage key; map matching is all about exploiting this asset. Geographic information is collected at different scales, aggregated using bespoke geographic delineations, and ultimately stored in different datasets. Modelling and machine learning usually require the use of data aligned and coherently structured; to bring disparate geo-datasets together, the data scientist needs to be able to transfer information expressed for one geography into another. This is where map matching comes to rescue. By using geographical location, we can connect datasets that have no common key or that are otherwise completely unrelated. This is a "magic trick" that we can pull off because of location that would be much harder, or impossible, with data lacking spatial information.
 
 The details, and difficulty, of this transfer of information from one geography to another one depend on the nature of the "source" and "target", and on the precision with which we want to perform such transfer. In this context, there is always an inevitable trade-off between precission and sophistication: more precise transfer is usually possible at the expense of more advanced and involved techniques. Their additional cost in applying them, both in terms of cognitive load on the data scientist's part or in terms of computation, must be weighted in on an individual basis: sometimes we need the best possible estimates, at all costs; sometimes "good enough" is, well, good enough. 
 
-In this section, we cover a few cases that we consider represent the most common and widely used approaches. We begin with situations where we have two point datasets and all we need to calculate are descriptive statistics of one dataset to the observations in the other. We swith the type of data and consider how to attach information from a continuous grid, stored in a raster file, to a set of points. Then we show the equivalent case for "moving" information for a polygon geography to a point dataset. These are all cases that, in their simplest form, involve mostly traditional GIS operations (e.g. buffer construction, spatial joins) and little in the way of statistical modelling. As an example of a case that is more involved, we cover the transfer of information from a polygon geography to another, different polygon geography. For this final case, but also as a more general comment, we try to include examples that capture the essence of the method, but keep the technique as simple as possible. For almost any of these cases we cover, the reader can find more sophisticated techniques that usually yield more accurate estimates. Where possible, we try to signpost these.
+In this section, we cover a few cases that we consider represent the most common and widely used approaches. We begin with situations where we have two point datasets and all we need to calculate are descriptive statistics of one dataset to the observations in the other. We swith the type of data and consider how to attach information from a continuous grid, stored in a raster file, to a set of points. Then we show the equivalent case for "moving" information for a polygon geography to a point dataset. These are all cases that, in their simplest form, involve mostly traditional GIS operations (e.g., buffer construction, spatial joins) and little in the way of statistical modelling. As an example of a case that is more involved, we cover the transfer of information from a polygon geography to another, different polygon geography. For this final case, but also as a more general comment, we try to include examples that capture the essence of the method, but keep the technique as simple as possible. For almost any of these cases we cover, the reader can find more sophisticated techniques that usually yield more accurate estimates. Where possible, we try to signpost these.
 
 ### Counting *nearby* features
 
 
-A first, conceptually straightforward, approach is to augment our dataset by counting how many points of a different dataset are in the vicinity of each observation. For example, we might want to know how many bars and restaurants each AirBnb has within a given radious. This count can then become an additional  feature of our dataset, stored in a new column of `airbnbs`.
+A first, conceptually straightforward, approach is to augment our dataset by counting how many points of a different dataset are in the vicinity of each observation. For example, we might want to know how many bars and restaurants each AirBnb has within a given radius. This count can then become an additional  feature of our dataset, stored in a new column of `airbnbs`.
 
-To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require to get a polygon that covers all our `airbnbs` points. From Chapter 8, we can recall that there are a few different hulls that can be used. We'll use the Convex Hull here, which is the smallest convex polygon that covers all of the points in the set. 
+To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our `airbnbs` points. From Chapter 8, we can recall that there are a few different hulls that can be used. We'll use the Convex Hull here, which is the smallest convex polygon that covers all of the points in the set. 
 
 ```python
 airbnbs_ch = airbnbs.unary_union.convex_hull
@@ -213,7 +213,7 @@ plt.show()
 
 We have just seen how to count points around each observation in a point dataset. In other cases, we might be confronted with a related but different challenge: transfering the value of a particular point in a surface to a point in a different dataset. 
 
-To make this more accessible, let us illustrate the context with an example question: *what is the elevation of each AirBnb property?* To answer it, we require, at least, the following:
+To make this more accessible, let us illustrate the context with an example question: *what is the elevation of each AirBnb property?* To answer this question, we require, at least, the following:
 
 1. A sample of AirBnb property locations.
 1. A dataset of elevation. We will use here the [NASA DEM](../data/nasadem/README.md) surface for the San Diego area.
@@ -239,7 +239,7 @@ To extract a discrete set of values from the elevation surface in `dem`, we can 
 list(dem.sample([(-117.24592208862305, 32.761619109301606)]))
 ```
 
-Now, we can take this logic and apply it to a sequence of coordinates. For that, we need to extract them from the `geometry` object:
+Now, we can  apply this logic to a sequence of coordinates. For that, we need to extract them from the `geometry` object:
 
 ```python
 abb_xys = pandas.DataFrame({"X": airbnbs.geometry.x, 
@@ -255,7 +255,7 @@ elevation = pandas.DataFrame(dem.sample(abb_xys),
 elevation.head()
 ```
 
-Now we have a table with the elevation of each  AirBnb property, we can plot it on a map for visual inspection:
+Now we have a table with the elevation of each  AirBnb property, we can plot the site elevations on a map for visual inspection:
 
 ```python
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -331,7 +331,7 @@ ax[0].set_title('X values')
 ax[1].set_title('Y values')
 ```
 
-With these coordinates, we can make a geodataframe containing the gridcells at which we would like to predict:
+With these coordinates, we can make a geodataframe containing the grid cells at which we would like to predict:
 
 ```python
 grid = numpy.column_stack((x.flatten(), y.flatten()))
@@ -374,7 +374,7 @@ for i,k_neighbors in enumerate(numpy.geomspace(2, 100, 8).astype(int)):
     facet.set_title(f"{k_neighbors} neighbors")
 ```
 
-Focusing in on central Diego tells the story a bit more clearly, since there are more points there to show. The increasing number of naerest neighbors increases the smoothness of the interpolated surface. 
+Focusing in on central San Diego tells the story a bit more clearly, since there are more points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface. 
 
 ```python
 central_sd_bounds = [-117.179832, 32.655563, -117.020874, 32.769909]
@@ -407,7 +407,7 @@ Plenty more of these methods are implemented in `scikit-learn.neighbors`, as wel
 
 ### Polygon to point
 
-We now move on to a case where the information we are interested in matching to our set of points is stored for a polygon geography. For example, we would like to know the population density of the neighborhood in which each AirBnb is located. To that, we will download population estimates at the Census tract level, and "transfer" those estimates over to each AirBnb point. Geographically, the only challenge here is finding within which tract every point falls, and the performing what is spatial databases parlance is called a "spatial join", by which we connect the two layers through their spatial connection.
+We now move on to a case where the information we are interested in matching to our set of points is stored for a polygon geography. For example, we would like to know the population density of the neighborhood in which each AirBnb is located. To determine density, we will download population estimates at the Census tract level, and "transfer" those estimates over to each AirBnb point. Geographically, the only challenge here is finding the containing polygon for each point, and then performing what is in spatial databases parlance known as a "spatial join", by which we link the two layers through their spatial connection.
 
 Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:
 
@@ -458,11 +458,11 @@ plt.show()
 
 ### Area to area interpolation
 
-The final case of map matchin we consider is transfer of information from one polygon/areal geography to a different one. This is a common use-case when an analysis requires data that is provided at different levels of aggregation and different boundary delineations.
+The final case of map matching we consider is transfer of information from one polygon/areal geography to a different one. This is a common use-case when an analysis requires data that is provided at different levels of aggregation and different boundary delineations.
 
-There is a large literature around this problem under the umbrella of dasymetric mapping (REF). The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to the other based on how much "geography" is shared. In its simplest case, we can do this based on area. In this case, we will assign values from the source geography to the target based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the "source", and that to which we want to transfer data the "target". If polygon A in the target is made up of 50% of polygon 1 in the source, 30% of polygon 2, and 20% of polygon 3, the estimate for A will be a weighted average between the values in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.
+There is a large literature around this problem under the umbrella of dasymetric mapping {cite}`eicher2001dasymetric`. The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to the other based on how much "geography" is shared. In its simplest case, we can do this based on area. In this case, we will assign values from the source geography to the target based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the "source", and that to which we want to transfer data the "target". If polygon A in the target is made up of 50% of polygon 1 in the source, 30% of polygon 2, and 20% of polygon 3, the estimate for A will be a weighted average between the values in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.
 
-To implement dasymetric mapping in Python, the best option is `tobler`, a package from the PySAL federation designed exactly for this goal. We will show here the simplest case, that of areal interpolation where apportioning is estimated based on area, but the package provides also more sophisticated approaches.
+To implement dasymetric mapping in Python, the best option is `tobler`, a package from the PySAL federation designed exactly for this goal. We will show here the simplest case, that of areal interpolation where apportioning is estimated based on area, but the package also provides more sophisticated approaches.
 
 For the example, we need two polygon layers. We will stick with San Diego and use the set of Census Tracts and the [H3 hexagonal grid layer](../data/h3_grid/README.md). Our goal will be to create population estimates for each hexagon.
 
@@ -561,7 +561,7 @@ There is an extensive amount of map synthesis features. In addition to the two k
 ### Spatial Summary Features in Map Synthesis
 
 
-Just like in map matching, you can use spatial summary features in map synthesis to make better predictions. One clear method involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we can now refer only to the data on hand. Thus, we may want to determine whether nearby Airbnbs are "competing" with each airbnb. We might do this by finding the distance to the nearest Airbnb with the same number of bedrooms, since two nearby listings that *also* sleep the same number of people likely will compete with one another for tenants. 
+Just like in map matching, you can use spatial summary features in map synthesis to make better predictions. One clear method involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we can now refer only to the data on hand. Thus, we may want to determine whether nearby Airbnbs are "competing" with each Airbnb. We might do this by finding the distance to the nearest Airbnb with the same number of bedrooms, since two nearby listings that *also* sleep the same number of people likely will compete with one another for tenants. 
 
 #### Distance buffers within a single table
 
@@ -632,7 +632,7 @@ Since the mean and/or mode are the most commonly-used measures of central tenden
 
 #### "Ring" buffer features
 
-Sometimes, analysts might want to use multiple "bands" of buffer features. This requires that we build summaries of the observations that fall *only within* a given range of distances, such as the typical size of houses that are further than 500m, but still within 1km. This kind of "ring buffer" is a common request in spatial analysis, and can be done in substantially the same way as before by increasing the `threshold` in a `DistanceBand` weight.  
+Sometimes, analysts might want to use multiple "bands" of buffer features. This requires that we build summaries of the observations that fall *only within* a given range of distances, such as the typical size of houses that are further than 500m, but still within 1km. This kind of "ring buffer", or annulus, is a common request in spatial analysis, and can be done in substantially the same way as before by increasing the `threshold` in a `DistanceBand` weight.  
 
 So, we can use our 500m weights from before to build the average again:
 
@@ -747,4 +747,15 @@ Beyond feature engineering, statistical techniques we discuss in this book (part
 
 ## Questions
 
+1. Thinking of your own research, provide an example where map matching would
+   be a useful spatial feature engineering approach? How about an example where
+   map synthesis would be useful for your research?
+2. In the  **Counting *nearby* features** example early in the chapter, there
+   is a potential issue with under-counting the number of nearby bars and
+   restaurants for certain Airbnbs in the dataset. Which Airbnbs are subject to
+   neighbor under-counts and why?
+3. How would you correct the under-count in the previous question?
+4. Dasymetric mapping may introduce spurious spatial autocorrelation (see
+   Chapters 6 and 7) through
+   the interpolation process. How does this occur and why is it important to acknowledge?
 
