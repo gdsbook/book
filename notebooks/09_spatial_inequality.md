@@ -719,13 +719,13 @@ inequalities['near_diffs'] = spatial_gini_results.near_diffs
 inequalities[['near_diffs', 'moran']].plot.line(subplots=True, figsize=(15,6))
 ```
 
-# Conclusion
+## Conclusion
 
 
 Inequality is an important social phenomenon, and its geography is a serious, important concern for social scientists. This chapter discusses methods to assess inequality, as well as examine its spatial and regional structure. Through the Gini coefficient and Theil index, you can summarize the overall levels of inequality, as well as divide the components of inequality to those due to geographical region or proximate pairs of observations. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as the measures of autocorrelation discussed in Chapter 7. 
 
 
-# Questions
+## Questions
 
 ```python
 
