@@ -617,14 +617,19 @@ So, we will now turn to two newer methods for analyzing inequality that include 
 
 The first spatial extension was introduced by {cite}`Rey_2012` and is designed to consider
 the role of adjacency in a decomposition of the Gini index of inequality. One formulation for the Gini coefficient we discussed above focuses on the set of pairwise absolute differences in incomes:
+
 $$G = \frac{\sum_i \sum_j \left | y_i - y_j \right|}{2 n^2 \bar{x}} $$
 
 Focusing on the set of pairwise absolute differences in income, we can de-compose this into the set of differences between "nearby" observations and the set of differences among "distant" observations. This is the main conceptual point of the "Spatial Gini" coefficient. This decomposition works similarly to the regional decomposition of the Theil index:
+
 $$
 \sum_i \sum_j \left |y_i - y_j \right | =\sum_i \sum_j \underset{\text{near differences}}{\left( w_{ij} \left |y_i - y_j \right | \right )} + \underset{\text{far differences}}{\left( (1-w_{ij})  \left |y_i - y_j \right | \right )}
 $$
+
 In this decomposition, $w_{ij}$ is a binary variable that is $1$ when $i$ and $j$ are neighbors, and is zero otherwise. Recalling the spatial weights matrices from Chapter 4, this can be used directly from a spatial weights matrix.^[However, non-binary spatial weights matrices require a correction factor, and are not discussed here.] Thus, with this decomposition, the Spatial Gini can be stated as
+
 $$G = \frac{\sum_i \sum_j w_{i,j}\left | x_i - x_j \right|}{2 n^2 \bar{x}} +   \frac{\sum_i \sum_j \left (1-w_{i,j} )| x_i - x_j \right|}{2 n^2 \bar{x}}$$
+
 with the first term being the component among neighbors and the second term being the component among non-neighbors. The "spatial Gini", then, is the first component that describes the differences between nearby observations. 
 
 The spatial Gini allows for a consideration of the spatial dependence in inequality. If spatial depenedence is very strong and positive, incomes are very similar among nearby observations, so the inequality of "near" differences will be small. Most of the inequality in the society will be driven by disparities in income between distant places. In contrast, when dependence is very weak (or even negative), then the two components may equalize. Inference on the spatial Gini can be based on random spatial permutations of the income values, as we have seen elsewhere in this book. This tests whether the distribution of the compoents are different from that obtained when incomes are randomly distributed across the map. 
@@ -714,13 +719,13 @@ inequalities['near_diffs'] = spatial_gini_results.near_diffs
 inequalities[['near_diffs', 'moran']].plot.line(subplots=True, figsize=(15,6))
 ```
 
-# Conclusion
+## Conclusion
 
 
 Inequality is an important social phenomenon, and its geography is a serious, important concern for social scientists. This chapter discusses methods to assess inequality, as well as examine its spatial and regional structure. Through the Gini coefficient and Theil index, you can summarize the overall levels of inequality, as well as divide the components of inequality to those due to geographical region or proximate pairs of observations. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as the measures of autocorrelation discussed in Chapter 7. 
 
 
-# Questions
+## Questions
 
 ```python
 
