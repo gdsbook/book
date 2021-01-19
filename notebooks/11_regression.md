@@ -17,7 +17,6 @@ jupyter:
 
 ## Introduction
    
-**NOTE**: this chapter was written building from this [Spatial Analysis note](http://darribas.org/spa_notes/sp_eco.html).
 
 ### *What* is spatial regression and *why* should I care?
 
@@ -636,6 +635,3 @@ Taken together, we can conclude that there is distinct positive spatial dependen
 This means that our over- and under-predictions are likely to cluster. 
 
 
-## References
-<!-- Not sure if we are missing a cite or if this was for further reading -->
-[8] Cressie, N., and Christopher K. W. *Statistics for spatio-temporal data.* (John Wiley & Sons, 2015).
