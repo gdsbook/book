@@ -1,0 +1,1164 @@
+
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spatial Data &#8212; Geographic Data Science with Python</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="../_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/sphinx-book-theme.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script src="../_static/mystnb.js"></script>
+    <script src="../_static/sphinx-book-theme.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://geographicdata.science/book/notebooks/03_spatial_data.html" />
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+
+
+<!-- Opengraph tags -->
+<meta property="og:url"         content="https://geographicdata.science/book/notebooks/03_spatial_data.html" />
+<meta property="og:type"        content="article" />
+<meta property="og:title"       content="Spatial Data" />
+<meta property="og:description" content="Spatial Data  import pandas import osmnx import geopandas import rioxarray import xarray import datashader import contextily as cx from shapely.geometry import " />
+<meta property="og:image"       content="https://geographicdata.science/book/_static/logo.png" />
+
+<meta name="twitter:card" content="summary">
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../index.html">
+  
+  <img src="../_static/logo.png" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Geographic Data Science with Python</h1>
+  
+</a>
+</div>
+
+<form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../intro.html">
+   Home
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Preface
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="00_toc.html">
+   Table of Contents
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="references.html">
+   References
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part I - Building Blocks
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../intro_part_i.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="01_geospatial_computational_environment.html">
+   Geospatial Computational Environment
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="02_spatial_data.html">
+   Geographic thinking for data scientists
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="04_spatial_weights.html">
+   Spatial Weights
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part II - Spatial Data Analysis
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../intro_part_ii.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="05_choropleth.html">
+   Choropleth Mapping
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="06_spatial_autocorrelation.html">
+   Global Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="07_local_autocorrelation.html">
+   Local Spatial Autocorrelation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="08_point_pattern_analysis.html">
+   Point Pattern Analysis
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Part III - Advanced Topics
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../intro_part_ii.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="09_spatial_inequality.html">
+   Spatial Inequality
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="10_clustering_and_regionalization.html">
+   Clustering &amp; Regionalization
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="11_regression.html">
+   Spatial Regression
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="12_feature_engineering.html">
+   Spatial Feature Engineering
+  </a>
+ </li>
+</ul>
+<p class="caption">
+ <span class="caption-text">
+  Datasets
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/README.html">
+   Overview
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/airbnb/regression_cleaning.html">
+   AirBnb
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/airports/airports_cleaning.html">
+   Airports
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/brexit/brexit_cleaning.html">
+   Brexit
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/countries/countries_cleaning.html">
+   Countries
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/h3_grid/build_sd_h3_grid.html">
+   H3 Grid
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/mexico/README.html">
+   Mexico
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/nasadem/build_nasadem_sd.html">
+   NASA DEM
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/sandiego/sandiego_tracts_cleaning.html">
+   San Diego Tracts
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/texas/README.html">
+   Texas
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/tokyo/tokyo_cleaning.html">
+   Tokyo Photographs
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../data/us_county_income/README.html">
+   US County Income 1969-2017
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+ <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/notebooks/03_spatial_data.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+    
+</div>
+        <!-- Source interaction buttons -->
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/gdsbook/book/master?urlpath=lab/tree/notebooks/03_spatial_data.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        <a class="colab-button" href="https://colab.research.google.com/github/gdsbook/book/blob/master/notebooks/03_spatial_data.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+                title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
+                    src="../_static/images/logo_colab.png"
+                    alt="Interact on Colab">Colab</button></a>
+        
+        
+    </div>
+</div>
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> On this page
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#fundamentals">
+   Fundamentals
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#geographic-tables">
+     Geographic Tables
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#surfaces">
+     Surfaces
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#spatial-graphs">
+     Spatial graphs
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#hybrids">
+   Hybrids
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#surfaces-as-tables">
+     Surfaces as tables
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#one-pixel-at-a-time">
+       One pixel at a time
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#pixels-to-polygons">
+       Pixels to polygons
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#tables-as-surfaces">
+     Tables as surfaces
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#networks-as-graphs-and-tables">
+     Networks as graphs
+     <em>
+      and
+     </em>
+     tables
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+        </nav>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="spatial-data">
+<h1>Spatial Data<a class="headerlink" href="#spatial-data" title="Permalink to this headline">¶</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">osmnx</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">rioxarray</span>
+<span class="kn">import</span> <span class="nn">xarray</span>
+<span class="kn">import</span> <span class="nn">datashader</span>
+<span class="kn">import</span> <span class="nn">contextily</span> <span class="k">as</span> <span class="nn">cx</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">box</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This chapter grounds the ideas discussed in the previous one on a practical context. We consider how structures, and the models they represent, are implemented in Python, as well as how we can manipulate the data they contain. Rather than focusing on <em>file</em> formats used to store data, we will spend most of the chapter discussing how Python represents data <em>once read</em> from a file or database. We take this approach because these data structures are what we interact with during our data analysis: they our interface with the data. Indeed, part of the benefit of Python (and other computing languages) is <em>abstraction</em>. The complexities, particularities and quirks associated with each file format are removed as Python represents all data in a few standard ways, regardless of provenance. We take full advantage of this feature here.</p>
+<p>We divide the chapter in two main parts. The first part looks at each of the three main data structures reviewed in Chapter 2 (<em>Geographic Thinking</em>): geographic tables, surfaces and spatial graphs. Second, we explore combinations of different data structures that depart from the traditional data model/structure matchings discussed in Chapter 2. We cover how one data in one structure can be effectively transfered to another, but also discuss why that might (or might not) be a good idea in some cases. A final note before we delve into the content of this book is in order: this is not a comprehensive account of <em>everything</em> that is possible with each of the data structures we present. Rather, you can think of it as a taster that we will build on throughout the book to showcase much of what is possible with Python.</p>
+<div class="section" id="fundamentals">
+<h2>Fundamentals<a class="headerlink" href="#fundamentals" title="Permalink to this headline">¶</a></h2>
+<p>As outlined in Chapter 2, there are a few main data structures that are used in geographic data science: geographic tables (which are generally matched to an object data models), rasters or surfaces (which are generally matched to a field data model), and spatial networks (which are generally matched to a graph data model). We discuss these in turn throughout this section.</p>
+<div class="section" id="geographic-tables">
+<h3>Geographic Tables<a class="headerlink" href="#geographic-tables" title="Permalink to this headline">¶</a></h3>
+<p>Geographic objects are usually matched to what we called the <em>geographic table</em>. Geographic tables can be thought of as a tab in a spreadsheet where one of the columns records geometric information. This data structure represents a single geographic object as a row of a table; each column in the table records information about the object, its attributes or features, as we will see below. Typically, there is a special column in this table that records the <em>geometry</em> of the object. Computer systems that use this data structure are intended to add geography into a <em>relational database</em>, such as PostGreSQL (through its PostGIS extension) or sqlite (through its spatialite extension). Beyond this, however, many data science languages (such as R, Julia, and Python), have packages that adopt this data structure as well (such as <code class="docutils literal notranslate"><span class="pre">sf</span></code>, <code class="docutils literal notranslate"><span class="pre">ArchGDAL</span></code>, and <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>), and it is rapidly becoming the main data structure for object-based geographic data.</p>
+<p>Before proceeding, though, it helps to mention a quick clarification on terminology. Throughout this book, regardless of the data structure used, we will refer to a measurement about an observation as a <em>feature</em>. This is consistent with other work in data science and machine learning. Then, one set of measurements is a <em>sample</em>. For tables, this means a feature is a column and a sample is a row. Historically, though, geographic information scientists have used the word “feature” to mean an individual observation, since a “feature” in cartography is an entity on a map, and “attribute” to describe characteristics of that observation. Elsewhere, a <em>feature</em> may be called a <em>variable</em>, and a <em>sample</em> referred to as a record. So, consistent terminology is important: for this book, a <em>feature</em> is one measured trait pertaining to an observation (a column), and a <em>sample</em> is one set of measurements (a row).</p>
+<p>To understand the structure of geographic tables, it will help to read in the <code class="docutils literal notranslate"><span class="pre">countries_clean.gpkg</span></code> dataset included in this book that describes countries in the world. To read in this data, we can use the <code class="docutils literal notranslate"><span class="pre">read_file()</span></code> method in <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>:^[We will generally use two curved brackets (such as <code class="docutils literal notranslate"><span class="pre">method_name()</span></code>) to denote a <em>function</em>, and will omit them (such as <code class="docutils literal notranslate"><span class="pre">package</span></code>) when referring to an object or package.]</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/countries/countries_clean.gpkg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And we can examine the top of the table with the <code class="docutils literal notranslate"><span class="pre">.head()</span></code> method:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Each row of this table is a single country. Each country only has two features: the administrative name of the country and the geometry of the country’s boundary. The name of the country is encoded in the <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code> column using the Python <code class="docutils literal notranslate"><span class="pre">str</span></code> type, which is used to store text-based data. The geometry of the country’s boundary is stored in the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column, and is encoded using a special class in Python that is used to represent geometric objects. As with other table-based data structures in Python, every row and column have an index that identifies them uniquely and is rendered in bold on the lefthand side of the table. This geographic table is an instance of the <code class="docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code> object, used throughout Python’s ecosystem to represent geographic data.</p>
+<p>Geographic tables store geographic information as an additional column. But, how is this information encoded? To see, we can check the type of the object in the first row:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In <code class="docutils literal notranslate"><span class="pre">geopandas</span></code> (as well as other packages representing geographic data), the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column has special traits which a “normal” column, such as <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code>, does not. For example, when we plot the dataframe, the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column is used as the main shape to use in the plot:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Changing geometries must be done carefully: since the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column is special, there are special functions to adjust the geometry. For example, if we wanted to represent each country using its <em>centroid</em>, a point in the middle of the shape, then we must take care to make sure that a new geometry column was set properly using the <code class="docutils literal notranslate"><span class="pre">set_geometry()</span></code> method. This can be useful when you want to work with two different geometric representations of the same underlying sample.</p>
+<p>Let us make a map of both the boundary and the centroid of a country. First, to compute the centroid, we can use the <code class="docutils literal notranslate"><span class="pre">gt_polygons.geometry.centroid</span></code> property. This gives us the point that minimizes the average distance from all other points on the boundary of the shape. Storing that back to a column, called <code class="docutils literal notranslate"><span class="pre">centroid</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="p">[</span><span class="s1">&#39;centroid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gt_polygons</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We now have an additional feature:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Despite the fact that <code class="docutils literal notranslate"><span class="pre">centroid</span></code> is a geometry, it is not currently set as the geometry for our table. We can switch to the <code class="docutils literal notranslate"><span class="pre">centroid</span></code> column using the <code class="docutils literal notranslate"><span class="pre">set_geometry()</span></code> method. Finally, we can plot the centroid and the boundary of each country by switching the geometry column with <code class="docutils literal notranslate"><span class="pre">set_geometry</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot centroids</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">gt_polygons</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s1">&#39;centroid&#39;</span><span class="p">)</span>\
+                <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;ADMIN&#39;</span><span class="p">,</span> 
+                      <span class="n">markersize</span><span class="o">=</span><span class="mi">5</span>
+                     <span class="p">)</span>
+<span class="c1"># Plot polygons without color filling</span>
+<span class="n">gt_polygons</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;ADMIN&#39;</span><span class="p">,</span> 
+                 <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> 
+                 <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
+                 <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> 
+                 <span class="n">linewidth</span><span class="o">=.</span><span class="mi">2</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Note how we can create a map by calling <code class="docutils literal notranslate"><span class="pre">.plot()</span></code> on a <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>. We can thematically color each feature based on a column by passing the name of that column to the plot method (as we do on with <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code> in this case).</p>
+<p>Thus, as should now be clear, nearly any kind of geographic object can be represented in one (or more) geometry column(s). Thinking about the number of different kinds of shapes or geometries one could draw quickly boggles the mind. Fortunately the Open Geospatial Consortium (OGC) has defined a set of “abstract” types that can be used to define any kind of geometry. This specification, codified in ISO 19125-1—the “simple features” specification—defines the formal relationships between these types: a <code class="docutils literal notranslate"><span class="pre">Point</span></code> is a zero-dimensional location with an x and y coordinate; a <code class="docutils literal notranslate"><span class="pre">LineString</span></code> is a path composed of a set of more than one <code class="docutils literal notranslate"><span class="pre">Point</span></code>, and a <code class="docutils literal notranslate"><span class="pre">Polygon</span></code> is a surface that has at least one LineString that starts and stops with the same coordinate. All of these types <em>also</em> have <code class="docutils literal notranslate"><span class="pre">Multi</span></code> variants that indicate a collection of multiple geometries of the same type. So, for instance, Bolivia is represented as a single polygon:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Bolivia&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Bolivia&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>while Indonesia is a <code class="docutils literal notranslate"><span class="pre">MultiPolygon</span></code> containing many <code class="docutils literal notranslate"><span class="pre">Polygons</span></code> for each individual island in the country:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Indonesia&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Indonesia&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In many cases, geographic tables will have geometries of a single type; records will <em>all</em> be <code class="docutils literal notranslate"><span class="pre">Point</span></code> or <code class="docutils literal notranslate"><span class="pre">LineString</span></code>, for instance. However, there is no formal requirement that a <em>geographic table</em> has geometries that all have the same type.</p>
+<p>Throughout this book, we will use geographic tables extensively, storing polygons, but also points and lines. We will explore lines a bit more in the second part of this chapter but, for now, let us stop on points for a second. As mentioned above, these are the simplest type of feature in that they do not have any dimension, only a pair of coordinates attached to them. This means that points can sometimes be stored in a non-geographic table, simply using one column for each coordinate. We find an example of this on the Tokyo dataset we will use more later. The data is stored as a comma-separated value table, or <code class="docutils literal notranslate"><span class="pre">.csv</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/tokyo/tokyo_clean.csv&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Since we have read it with <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, the table is loaded as a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, with no explicit spatial dimension:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">gt_points</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we inspect the table, we find there is not a <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Many point datasets are provided in this format. To make the most of them, it is convenient to convert them into <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code> tables. There are two steps involved in this process:</p>
+<ol class="simple">
+<li><p>Turn coordinates into geometries:</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pt_geoms</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">gt_points</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">],</span>
+                                    <span class="n">y</span><span class="o">=</span><span class="n">gt_points</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">],</span>
+                                    <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span>
+                                   <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ol class="simple">
+<li><p>Create a <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code> object:</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">gt_points</span><span class="p">,</span>
+                                   <span class="n">geometry</span><span class="o">=</span><span class="n">pt_geoms</span>
+                                  <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And now <code class="docutils literal notranslate"><span class="pre">gt_points</span></code> looks and feels exactly like the one of countries we have seen before, with the difference the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column stores <code class="docutils literal notranslate"><span class="pre">POINT</span></code> geometries:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="surfaces">
+<h3>Surfaces<a class="headerlink" href="#surfaces" title="Permalink to this headline">¶</a></h3>
+<p>Surfaces are used to record data from a field data model. In theory, a field is a continuous surface and thus has an infinite number of locations at which it could be measured. In reality however, fields are measured at a finite sample of locations that, to provide a sense of continuity and better conform with the field model, are uniformly structured across space. Surfaces thus, are represented as grids where each cell contains a sample. A grid can also be thought of as a table with rows and columns but, as we discussed in the previous chapter, both of them are directly tied to geographic location. This is in sharp contrast with geographic tables, where geography is confined to a single column.</p>
+<p>To explore how Python represents surfaces, we will use an extract for the Brazillian city of Sao Paulo of a <a class="reference internal" href="../data/ghsl/build_ghsl_extract.html"><span class="doc std std-doc">global population dataset</span></a>. This dataset records population counts in cells of the same dimensions uniformly covering the surface of the Earth. Our extract is available as a GeoTIF file, a variation of the TIF image format that includes geographic information. We can use the <code class="docutils literal notranslate"><span class="pre">open_rasterio()</span></code> method from the <code class="docutils literal notranslate"><span class="pre">xarray</span></code> package to read in the GeoTIF:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/ghsl/ghsl_sao_paulo.tif&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This reads the data into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">xarray</span></code> is a package to work with multi-dimensional labelled arrays. Let’s unpack this: we can use arrays of not only two dimensions as in a table with rows and columns, but with an arbitrary number of them; each of these dimensions are “tracked” by an index that makes it easy and efficient to manipulate. In <code class="docutils literal notranslate"><span class="pre">xarray</span></code>, these indices are called coordinates, and they can be retrieved from our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> through the <code class="docutils literal notranslate"><span class="pre">coords</span></code> attribute:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">coords</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Interestingly, our surface has <em>three</em> dimensions: <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, and <code class="docutils literal notranslate"><span class="pre">band</span></code>. The former to track the latitude and longitude that each cell in our population grid covers. The third one has a single value (1) and, in this context, it is not very useful. But it is easy to imagine contexts where a third dimension would be useful. For example, an optical color image may have three bands: red, blue, and green. More powerful sensors may pick up additional bands, such as near infrared (NIR) or even radio bands. Or, a surface measured over time, like the geocubes that we discussed in Chapter 2, will have bands for each point in time at which the field is measured. A geographic surface will thus have two dimensions recording the location of cells (<code class="docutils literal notranslate"><span class="pre">x</span></code> and <code class="docutils literal notranslate"><span class="pre">y</span></code>), and at least one <code class="docutils literal notranslate"><span class="pre">band</span></code> that records other dimensions pertaining to our data.</p>
+<p>An <code class="docutils literal notranslate"><span class="pre">xarray.DataArray</span></code> object contains additional information about the values stored under the <code class="docutils literal notranslate"><span class="pre">attrs</span></code> attribute:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">attrs</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In this case, we can see this includes information required to convert pixels in the array into locations on the Earth surface (e.g. <code class="docutils literal notranslate"><span class="pre">transform</span></code>, and <code class="docutils literal notranslate"><span class="pre">crs</span></code>), the resolution (250 metres by 250 metres), and other metadata that allows us to better understand where the data comes from and how it is stored.</p>
+<p>Thus, our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> has three dimensions:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>A common operation will be to reduce this to only the two geographic ones. We can do this with the <code class="docutils literal notranslate"><span class="pre">sel</span></code> operator, which allows us to select data by the value of their coordinates:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The resulting object is thus a two-dimensional array. Similar to geographic tables, we can quickly plot the values in our dataset:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g. <code class="docutils literal notranslate"><span class="pre">NaN</span></code>) but with an impossible value. If we return to the <code class="docutils literal notranslate"><span class="pre">attrs</span></code> printout above, we can see how the <code class="docutils literal notranslate"><span class="pre">nodatavals</span></code> attribute specifies missing data recorded with -200. With that in mind, we can use the <code class="docutils literal notranslate"><span class="pre">where()</span></code> method to select only values that are <em>not</em> -200:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pop</span><span class="o">!=-</span><span class="mi">200</span><span class="p">)</span>\
+   <span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+   <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdPu&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The colorbar now looks more sensible, and indicates <em>real</em> counts, rather than including the missing data placeholder values.</p>
+</div>
+<div class="section" id="spatial-graphs">
+<h3>Spatial graphs<a class="headerlink" href="#spatial-graphs" title="Permalink to this headline">¶</a></h3>
+<p>Spatial graphs store connections between objects through space. These connections may derive from geographical topology (e.g. contiguity), distance, or more sophisticated dimensions such as interaction flows (e.g. commuting, trade, communication). Compared to geographic tables and surfaces, spatial graphs are rather different. First, in most cases they do not record measurements about a given phenomena, but instead focus on <em>connections</em>, on storing relationships between objects as they are facilitated (or impeded in their absence) by space. Second, because of this relational nature, the data are organised in a more unstructured fashion: while one sample may be connected to only one other sample, another one can display several links. This in stark contrast to geographic tables and surfaces, both of which have a clearly defined structure, shape and dimensionality in which data are organised. These particularities translate into a different set of Python data structures. Unlike the previous ones we have seen, there are different data structures to represent spatial graphs, each optimised for different contexts. One of such cases is the integration of spatial connections in statistical methods such as exploratory data analysis or regression. For this, the most common data structure are spatial weights matrices, to which we devote the next chapter.</p>
+<p>In this chapter, we briefly review a different way of representing spatial graphs that is much closer to the mathematical concept of a graph. A graph is composed of <em>nodes</em> that are linked together by <em>edges</em>. In a spatial network, <em>nodes</em> may represent geographical places, and thus have a specific location; likewise, <em>edges</em> may represent geographical paths between these places. Networks require both <em>nodes</em> and <em>edges</em> to analyze their structure.</p>
+<p>For illustration, we will rely on the <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> library, which can query data from OpenStreetMap. For example, we extract the street-based graph of Yoyogi Park, near our earlier data from Tokyo:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">time</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_from_place</span><span class="p">(</span><span class="s2">&quot;Yoyogi Park, Shibuya, Tokyo, Japan&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The code snippet above sends the query to the OpenStreetMap server, which returns back the data to <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> to process it into the <code class="docutils literal notranslate"><span class="pre">graph</span></code> Python representation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can have a quick inspection of the structure of the graph with the <code class="docutils literal notranslate"><span class="pre">plot_graph</span></code> method:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">osmnx</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The resultant <code class="docutils literal notranslate"><span class="pre">graph</span></code> object is actually a <code class="docutils literal notranslate"><span class="pre">MultiDiGraph</span></code> from <code class="docutils literal notranslate"><span class="pre">networkx</span></code>, a graph library written in Python. The graph here is stored as a collection of 106 nodes (street intersections):</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>and 287 edges (streets) that connect them:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Each of these elements can be queried to obtain more information such as the location and ID of a node:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1520546819</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The characteristics of an edge:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="mi">1520546819</span><span class="p">,</span> <span class="mi">3010293622</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Or how the different components of the graph relate to each other. For example, what other nodes are directly connected to node <code class="docutils literal notranslate"><span class="pre">1520546819</span></code>?</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">adj</span><span class="p">[</span><span class="mi">1520546819</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Thus, networks are easy to represent in Python, and are one of the three main data structures in geographic data science.</p>
+</div>
+</div>
+<div class="section" id="hybrids">
+<h2>Hybrids<a class="headerlink" href="#hybrids" title="Permalink to this headline">¶</a></h2>
+<p>We have just seen how geographic tables, surfaces, and networks map onto <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>, <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> and <code class="docutils literal notranslate"><span class="pre">Graph</span></code> objects in Python, respectively. These represent the conventional pairings that align data models to data structures with Python representations. However, Thus, while the conventional pairings are well-used, there are others in active use and many more to yet be developed. Interestingly, many new pairings are driven by new developments in technology, enabling approaches that were not possible in the past or creating situations (e.g. large datasets) that make the conventional approach limiting. Therefore, in this second section of the chapter, we step a bit “out of the box” to explore cases in which it may make sense to represent a dataset with a data structure that might not be the most obvious initial choice.</p>
+<div class="section" id="surfaces-as-tables">
+<h3>Surfaces as tables<a class="headerlink" href="#surfaces-as-tables" title="Permalink to this headline">¶</a></h3>
+<p>The first case we explore is treating surfaces as (geo-)tables. In this context, we shift from an approach where each dimension has a clear mapping to a spatial or temporal aspect of the dataset, to one where each sample, cell of the surface/cube is represented as a row in a table. This approach runs contrary to the general consensus that fields are best represented as surfaces or rasters because that allows us to index space and time “by default” based on the location of values within the data structure. Shifting to a tabular structure implies either losing that space-time reference, or having to build it manually with auxillary objects (e.g. a spatial graph). In almost any case, operating on this format is less efficient than it <em>could</em> be if we had bespoke algorithms built around surface structures. Finally, from a more conceptual point of view, treating pixels as independent realisations of a proces that we <em>know</em> is continuous is can be computationally inefficient and statistically flawed.</p>
+<p>This perspective however also involves important benefits. First, sometimes we <em>don’t</em> need location for our particular application. Maybe we are interested in calculating overall descriptive statistics; or maybe we need to run an analysis that is entirely atomic in the sense that it operates on each sample in isolation from all the other ones.  Second, by “going tabular” we recast our specialised, spatial data into the most common data structure available, for which a large amount of commodity technology is built. This means many new tools can be used for analysis. So called “big data” technologies, such as distributed systems, are much more common, robust, and tested for tabular data than for spatial surfaces. <em>If</em> we can translate our spatial challenge into a tabular challenge, we can immediately plug into technology that is more optimised and, in some cases, reliable. Further, some analytic toolboxes common in (geographic) data science are entirely built around tabular structures. Machine learning packages such as <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, or some spatial analytics (such as most methods in <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>) are designed around this data structure. Converting our surfaces into tables thus allows us to plug into a much wider suite of (potentially) efficient tools and techniques.</p>
+<p>We will see two ways of going from surfaces to tables: one converts every pixel into a table row, and another that aggregates pixels into pre-determined polygons.</p>
+<div class="section" id="one-pixel-at-a-time">
+<h4>One pixel at a time<a class="headerlink" href="#one-pixel-at-a-time" title="Permalink to this headline">¶</a></h4>
+<p>Technically, going from surface to table involves traversing from <code class="docutils literal notranslate"><span class="pre">xarray</span></code> to <code class="docutils literal notranslate"><span class="pre">pandas</span></code> objects. This is actually a well established bridge. To illustrate it with a example, let’s revisit the [population counts in Sao Paolo(../data/ghsl/build_ghsl_extract) used earlier. We can read the surface into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object with the <code class="docutils literal notranslate"><span class="pre">open_rasterio()</span></code> method:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">surface</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/ghsl/ghsl_sao_paulo.tif&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Transferring to a table is as simple as calling the <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>’s <code class="docutils literal notranslate"><span class="pre">to_series()</span></code> method:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span> <span class="o">=</span> <span class="n">surface</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The resulting object is a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> object indexed on each of the dimensions of the original <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>At this point, everything we know about <code class="docutils literal notranslate"><span class="pre">pandas</span></code> and tabular data applies! For example, it might be more convenient to express it as a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span> <span class="o">=</span> <span class="n">t_surface</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Value&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>With the power of a tabular library, some queries and filter operations become much easier. For example, finding cells with more than 1,000 people can be done with the usual <code class="docutils literal notranslate"><span class="pre">query()</span></code> method^[Although, if all you want to do is this type of query, <code class="docutils literal notranslate"><span class="pre">xarray</span></code> is well equiped for this kind of task too.]:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Value &gt; 1000&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a fully-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a simple function that takes a row from our table and the resolution of the surface, and returns its geometry:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">row2cell</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">res_xy</span><span class="p">):</span>
+    <span class="n">res_x</span><span class="p">,</span> <span class="n">res_y</span> <span class="o">=</span> <span class="n">res_xy</span>
+    <span class="n">minX</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
+    <span class="n">maxX</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">res_x</span>
+    <span class="n">minY</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">res_y</span>
+    <span class="n">maxY</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">box</span><span class="p">(</span><span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">maxX</span><span class="p">,</span> <span class="n">maxY</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">poly</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For example:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">row2cell</span><span class="p">(</span><span class="n">t_surface</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">surface</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;res&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>One of the benefits of this approach is we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">max_polys</span> <span class="o">=</span> <span class="n">t_surface</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Value &gt; 1000&quot;</span><span class="p">)</span>\
+                     <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">row2cell</span><span class="p">,</span> 
+                            <span class="n">res_xy</span><span class="o">=</span><span class="n">surface</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;res&quot;</span><span class="p">],</span> 
+                            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+                           <span class="p">)</span>
+<span class="n">max_polys</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">(</span><span class="n">max_polys</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">surface</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And generate a map with the same tooling that we use for any standard geo-table:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">max_polys</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> 
+                    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+                   <span class="p">)</span>
+<span class="n">cx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> 
+               <span class="n">crs</span><span class="o">=</span><span class="n">surface</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;crs&quot;</span><span class="p">],</span> 
+               <span class="n">source</span><span class="o">=</span><span class="n">cx</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Voyager</span>
+              <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Finally, once we have operated on the data as a table, we may want to return to a surface-like data structure. This involves taking the same journey in the oposite direction as how we started. The sister method of <code class="docutils literal notranslate"><span class="pre">to_series</span></code> in <code class="docutils literal notranslate"><span class="pre">xarray</span></code> is <code class="docutils literal notranslate"><span class="pre">from_series</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_da</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span><span class="o">.</span><span class="n">from_series</span><span class="p">(</span>
+    <span class="n">t_surface</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;band&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">])[</span><span class="s2">&quot;Value&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">new_da</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="pixels-to-polygons">
+<h4>Pixels to polygons<a class="headerlink" href="#pixels-to-polygons" title="Permalink to this headline">¶</a></h4>
+<p>A second use case involves moving surfaces directly into geographic tables by aggregating pixels into pre-specified geometries. For this illustration, we will use the <a class="reference internal" href="../data/nasadem/build_nasadem_sd.html"><span class="doc std std-doc">DEM</span></a> surface containing elevation for the San Diego (US) region, and the set of <a class="reference internal" href="../data/sandiego/sandiego_tracts_cleaning.html"><span class="doc std std-doc">Census tracts</span></a>. For an example, we will investigate the average altitude of each neighbourhood.</p>
+<p>Let’s start by reading the data. First, the elevation model:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dem</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And the neighbourhood areas (tracts) from the Census:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sd_tracts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/sandiego/sandiego_tracts.gpkg&quot;</span><span class="p">)</span>
+<span class="n">sd_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>There are several approaches to compute the average altitude of each neighbourhood. We will use <code class="docutils literal notranslate"><span class="pre">rioxarray</span></code>to clip parts of the surface <em>within</em> a given set of geometries. Let’s start with a single polygon. For the illustration, we will use the largest one, located on the eastern side of San Diego. We can find the ID of the polygon with:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">largest_tract_id</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;area_sqm == </span><span class="si">{</span><span class="n">sd_tracts</span><span class="p">[</span><span class="s1">&#39;area_sqm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">largest_tract_id</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And then pull out the polygon itself for the illustration:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">largest_tract</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">largest_tract_id</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Clipping the section of the surface that is within the polygon in the DEM can be achieved with the <code class="docutils literal notranslate"><span class="pre">rioxarray</span></code> extension to clip surfaces based on geometries:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem_clip</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">largest_tract</span><span class="o">.</span><span class="n">__geo_interface__</span><span class="p">],</span> 
+                        <span class="n">crs</span><span class="o">=</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">crs</span>
+                       <span class="p">)</span>
+<span class="n">dem_clip</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem_clip</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Once we have elevation measurements for all the pixels within the tract, the average one can be calculated with <code class="docutils literal notranslate"><span class="pre">mean()</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem_clip</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem_clip</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, to scale this to the entire geo-table, there are several approaches, each with benefits and disadvantages. We opt for applying the method above to each row of the table. We define an auxilliary function that takes a row containing one of our tracts and returns its elevation:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_mean_elevation</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="n">geom</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">__geo_interface__</span>
+    <span class="n">section</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">geom</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+    <span class="n">ele</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">section</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">ele</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Applied to the same tract, it returns the same average elevation:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">get_mean_elevation</span><span class="p">(</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">largest_tract_id</span><span class="p">,</span> <span class="p">:])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This method can then be run on each polygon in our series using the <code class="docutils literal notranslate"><span class="pre">apply</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elevations</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_mean_elevation</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">elevations</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This simple approach illustrates the main idea well: find the cells that pertain to a given geometry and summarize their values in some manner. This can be done with any kind of geometry. Further, this simple method plays well with <code class="docutils literal notranslate"><span class="pre">xarray</span></code> surface structures and is scalable in that it is not too involved to run in parallel and distributed with Dask, and can be extended using arbitrary Python functions.</p>
+<p>However, this approach can be quite slow in big data. A more efficient alternative for our example is using the <code class="docutils literal notranslate"><span class="pre">rasterstats</span></code> library. This is a purpose-built library to construct so-called “zonal statistics” from surfaces. Here, the “zones” are the polygons and the “surface” is our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. Generally, this library will be faster than the simpler approach used above, but may be more difficult to extend or adapt:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">time</span>
+<span class="kn">from</span> <span class="nn">rasterstats</span> <span class="kn">import</span> <span class="n">zonal_stats</span>
+
+<span class="n">elevations2</span> <span class="o">=</span> <span class="n">zonal_stats</span><span class="p">(</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="p">),</span>
+                          <span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span>
+                         <span class="p">)</span>
+<span class="n">elevations2</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">elevations2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elevations2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>To visualize these results, we can make an elevation map:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">dem</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>\
+   <span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>\
+   <span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">sd_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">sd_tracts</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">elevation</span><span class="o">=</span><span class="n">elevations2</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;elevation&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="tables-as-surfaces">
+<h3>Tables as surfaces<a class="headerlink" href="#tables-as-surfaces" title="Permalink to this headline">¶</a></h3>
+<p>The case for converting tables into surfaces is perhaps less controversial. This is an approach we can take in cases where we are interested in the <em>overall</em> distribution of objects (usually points) and we have so many that it is not only technically more efficient to represent them as a surface, but conceptually it is also easier to think about the points as uneven measurements from a continuous field. To illustrate this approach, we will use the dataset of <a class="reference internal" href="../data/tokyo/tokyo_cleaning.html"><span class="doc std std-doc">Tokyo photographs</span></a> we loaded above into <code class="docutils literal notranslate"><span class="pre">gt_points</span></code>.</p>
+<p>From a purely technical perspective, for datasets with too many points, representing every point in the data on a screen can be seriously overcrowded:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>In the image above, it is hard to tell anything about the density of points in the centre of the image due to <em>overplotting</em>: while points <em>theoretically</em> have no width, they must in order for us to see them! Therefore, point <em>markers</em> often plot on top of one another, obscuring the true pattern and density in dense areas. Converting the dataset from a geo-table into a surface involves laying out a grid and counting how many points fall within each cell. In one sense, this is the reverse operation to what we saw when computing zonal statistics in the previous section: instead of aggregating cells into objects, we aggregate objects into cells. Both operations, however, involve aggregation that reduces the amount of information present in order to make the (new) data more manageable.</p>
+<p>In Python, we can rely on the <code class="docutils literal notranslate"><span class="pre">datashader</span></code> library, which does all the computation in a very efficient way. This process involves two main steps. First, we set up the grid (or canvas, <code class="docutils literal notranslate"><span class="pre">cvs</span></code>) into which we want to aggregate points:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cvs</span> <span class="o">=</span> <span class="n">datashader</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                        <span class="n">plot_height</span><span class="o">=</span><span class="mi">60</span>
+                       <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then we “transfer” the points into the grid:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">cvs</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">gt_points</span><span class="p">,</span> 
+                  <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longitude&quot;</span><span class="p">,</span> 
+                  <span class="n">y</span><span class="o">=</span><span class="s2">&quot;latitude&quot;</span>
+                 <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">grid</span></code> is a standard <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the re-sampled data allows for is much greater than when the points were visualized alone:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">gt_points</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="networks-as-graphs-and-tables">
+<h3>Networks as graphs <em>and</em> tables<a class="headerlink" href="#networks-as-graphs-and-tables" title="Permalink to this headline">¶</a></h3>
+<p>In the previous chapter, we saw networks as data structures that store <em>connections</em> between objects. We also discussed how this broad definition includes many interpretations that focus on different aspects of the networks. While spatial analytics may use graphs to record the topology of a table of objects such as polygons; transport applications may treat the network representation of the street layout as a set of objects itself, in this case lines. In this final section we show how one can flip back and forth between one representation and another, to take advantage of different aspects.</p>
+<p>We start with the <code class="docutils literal notranslate"><span class="pre">graph</span></code> object from the <a class="reference external" href="#Spatial-graphs">previous section</a>. Remember this captures the street layout around Yoyogi park in Tokyo. We have seen how, stored under this data structure, it is easy to query which node is connected to which, and which ones are at the end of a given edge.</p>
+<p>However, in some cases, we may want to convert the graph into a structure that allows us to operate on each component of the network independently. For example, we may want to map streets, calculate segment lengths, or draw buffers around each intersection. These are all operations that do not require topological information, that are standard for geo-tables and that are irrelevant to the graph structure. In this context, it makes sense to convert our <code class="docutils literal notranslate"><span class="pre">graph</span></code> to two geo-tables, one for intersections (the graph nodes) and one for street segments (the graph edges). In <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>, we can do that with the built-in converter:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_intersections</span><span class="p">,</span> <span class="n">gt_lines</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_to_gdfs</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now each of the resulting geo-tables behaves as a collection of geographic objects, because it is:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_intersections</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_lines</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>If we were in the opposite situation, where we had a set of street segments and their intersections in geo-table form, we can generate the graph representation with the <code class="docutils literal notranslate"><span class="pre">graph_from_gdfs</span></code> sister method:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_graph</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_from_gdfs</span><span class="p">(</span><span class="n">gt_intersections</span><span class="p">,</span> <span class="n">gt_lines</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The resulting object will behave in the same was as our original <code class="docutils literal notranslate"><span class="pre">graph</span></code>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h1>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h1>
+<p>In conclusion, this chapter provides an overview of the mappings between data models, presented in Chapter 2, and data structures that are common in Python. Beyond the data structures discussed here, the Python ecosystem is vast, deep, and ever-changing. Part of this is the ease with which you (yes, you!) can create your own representations to express different aspects of a problem at hand. However, by focusing on our shared representations and the interfaces between these representations, you can generally conduct any analysis you need. By creating unique, bespoke representations, your analysis might be more efficient, but you can also inadvertently isolate it from other developers and render useful tools inoperable. Therefore, a solid understanding of the basic data structures (the <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>, <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>, and <code class="docutils literal notranslate"><span class="pre">Graph</span></code>) will be sufficient to support nearly any analysis you need to conduct.</p>
+<div class="section" id="questions">
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
+<ol class="simple">
+<li><p>One way to convert from <code class="docutils literal notranslate"><span class="pre">Multi-</span></code>type geometries into many individual geometries is using the <code class="docutils literal notranslate"><span class="pre">explode()</span></code> method of a GeoDataFrame. Using the <code class="docutils literal notranslate"><span class="pre">explode()</span></code> method, how many islands are in Indonesia?</p></li>
+</ol>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Indonesia&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">explode</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<ol class="simple">
+<li><p>As you have seen with the <code class="docutils literal notranslate"><span class="pre">osmnx.gdfs_from_graph()</span></code> method, it is possible to convert a graph into the constituent nodes and edges. Graphs have many other kinds of non-geographical representations. Many of these are provided in <code class="docutils literal notranslate"><span class="pre">networkx</span></code> methods that start with <code class="docutils literal notranslate"><span class="pre">to_</span></code>. How many representations are currently supported?</p></li>
+<li><p>Using <code class="docutils literal notranslate"><span class="pre">networkx.to_edgelist()</span></code>, what “extra” information does <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> include when building the dataframe for edges?</p></li>
+<li><p>Instead of computing the average elevation for each neighborhood in San Diego, can you find the neighborhood with <em>the highest point</em>? Can you find the neighborhood with <em>the largest elevation change</em>?</p></li>
+</ol>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf<br/>
+        
+            &copy; Copyright 2020.<br/>
+          <div class="extra_footer">
+            <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-nd/4.0/88x31.png" /></a><br />This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License</a>.
+
+          </div>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    <script src="../_static/js/index.js"></script>
+    
+    <!-- Google Analytics -->
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-146598819-1', 'auto');
+      ga('set', 'anonymizeIp', true);
+      ga('send', 'pageview');
+    </script>
+    <script async src='https://www.google-analytics.com/analytics.js'></script>
+    <!-- End Google Analytics -->
+    
+  </body>
+</html>
