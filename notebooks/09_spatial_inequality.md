@@ -137,7 +137,7 @@ plt.title('Per Capita Income by County, 1969')
 plt.show()
 ```
 
-The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. The kernel density estimate is a *feature*-based representation, and the map is a *geographic* representation. Both are useful for developing an understanding of the overall. To gain more specific insights on the level of inequality in the distribution, we'll discuss a few inequality indices common in econometrics. 
+The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. The kernel density estimate is a *feature*-based representation, and the map is a *geographic* representation. Both are useful for developing an understanding of the overall pattern. To gain more specific insights on the level of inequality in the distribution, we'll discuss a few inequality indices common in econometrics. 
 
 
 ### 20:20 Ratio
