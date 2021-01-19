@@ -38,11 +38,11 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <link rel="canonical" href="https://geographicdata.science/book/notebooks/02_spatial_data.html" />
+    <link rel="canonical" href="https://geographicdata.science/book/notebooks/02_geo_thinking.html" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Spatial Weights" href="04_spatial_weights.html" />
+    <link rel="next" title="Spatial Data" href="03_spatial_data.html" />
     <link rel="prev" title="Geospatial Computational Environment" href="01_geospatial_computational_environment.html" />
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -50,7 +50,7 @@
 
 
 <!-- Opengraph tags -->
-<meta property="og:url"         content="https://geographicdata.science/book/notebooks/02_spatial_data.html" />
+<meta property="og:url"         content="https://geographicdata.science/book/notebooks/02_geo_thinking.html" />
 <meta property="og:type"        content="article" />
 <meta property="og:title"       content="Geographic thinking for data scientists" />
 <meta property="og:description" content="Geographic thinking for data scientists  Data scientists have long worked with geographical data. Maps, particularly, are a favored kind of “infographic” in the" />
@@ -128,6 +128,16 @@
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    Geographic thinking for data scientists
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="03_spatial_data.html">
+   Spatial Data
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="03_spatial_data.html#conclusion">
+   Conclusion
   </a>
  </li>
  <li class="toctree-l1">
@@ -308,7 +318,7 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="../_sources/notebooks/02_spatial_data.ipynb"><button type="button"
+        <a class="dropdown-buttons" href="../_sources/notebooks/02_geo_thinking.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
                 data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
@@ -332,7 +342,7 @@
         aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
     <div class="dropdown-buttons">
         
-        <a class="binder-button" href="https://mybinder.org/v2/gh/gdsbook/book/master?urlpath=lab/tree/notebooks/02_spatial_data.ipynb"><button type="button"
+        <a class="binder-button" href="https://mybinder.org/v2/gh/gdsbook/book/master?urlpath=lab/tree/notebooks/02_geo_thinking.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
                 data-placement="left"><img class="binder-button-logo"
                     src="../_static/images/logo_binder.svg"
@@ -340,7 +350,7 @@
         
         
         
-        <a class="colab-button" href="https://colab.research.google.com/github/gdsbook/book/blob/master/notebooks/02_spatial_data.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
+        <a class="colab-button" href="https://colab.research.google.com/github/gdsbook/book/blob/master/notebooks/02_geo_thinking.ipynb"><button type="button" class="btn btn-secondary topbarbtn"
                 title="Launch Colab" data-toggle="tooltip" data-placement="left"><img class="colab-button-logo"
                     src="../_static/images/logo_colab.png"
                     alt="Interact on Colab">Colab</button></a>
@@ -439,11 +449,11 @@
 <p>However, making conceptual decisions based on technological implementations can also be limiting. As a metaphor, we can think of technology as a pair of eyeglasses and data models as the “intructions” to build lenses: if all we use to look at the world is the one pair we already have, we miss all the other ways of looking at the world that arise if we built different lenses. In the 1990s, Mark Gahegan proposed the concept of <a class="reference external" href="http://www.geocomputation.org/what.html">“disabling technology”</a> to express this notion <a class="bibtex reference internal" href="references.html#gahegan-1999" id="id4">[Gah99]</a>.</p>
 <p>So, “<em>what main data structures should the geographic data scientist care about, we hear you say?</em>” Of course, as with anything in technology, this is an evolving world. In fact, as we will see below in this chapter, much is changing rapidly and redefining how we translate conceptual models into computational constructs to hold data. However, there are a few key standards that have been around for a long time and proven their usefulness. In particular, we will cover three of them: geographic tables, surfaces (and cubes), and spatial graphs. We have decided to discuss these as each can be seen as the technological mirror of the concepts discussed in the previous section.</p>
 <p><em>Geographic tables</em> store information about discrete <em>objects</em>. Tables are two dimensional structures made up of rows and columns; each row represents an independent object, while each column stores an attribute of those objects. Geographic tables are standard tables where one column stores geographic information. The tabular structure fits well with the object model because it clearly partitions space into discrete entities, and assigns a geometry to each entity according to their spatial nature. More importantly, geographic tables allow to seamlessly combine geographic and non-geographic information. It is almost as if Geography is simply “one more attribute”, when it comes to storage and computer representation. This is powerful because there is wide support in the world of databases for tabular formats. Geographic tables integrate spatial data into this non-spatial world and allow it to leverage much of its power. Technically speaking, geographic tables are widely supported in a variety of platforms. Popular examples include: PostGIS tables (as a geographic extension of PostgreSQL), R’s <code class="docutils literal notranslate"><span class="pre">sf</span></code> data frames or, more relevant for this book, Python’s <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code> objects, provided by <code class="docutils literal notranslate"><span class="pre">geopandas</span></code> (shown in the figure below). Although each of them has their own particularities, they all represent implementations of an object model.</p>
-<p><img alt="Figure 1: geographic tables" src="notebooks/./02_spatial_data_geopandas.png" /></p>
+<p><img alt="Figure 1: geographic tables" src="notebooks/../figures/02_spatial_data_geopandas.png" /></p>
 <p><em>Surfaces</em> record empirical measurements of <em>fields</em>. Fields are a continuous representation of space. In principle, there is an infinite set of locations for which a field has a different value. In practice, fields are measured at a discrete set of locations.  This aim for continuity in space (and potentially time) is important because it feeds directly into how data are structured. In practice, fields are recorded and stored in uniform grids, or arrays whose dimension is closely linked to the geographic extent of the area they represent. Arrays are matrices made up of, at least, two dimensions. Unlike geographic tables, surface arrays use both rows and columns to signify location, and use cell values to store information about that location. A surface for a given phenomenon (e.g. air pollution) will be represented as an array where each row will be linked to different latitudes, and each column will represent longitudes. If we want to represent more than one phenomenon (e.g. air pollution <em>and</em> elevation), or the same phenomenon at different points int time we will need different arrays, possibly connected. These multi-dimensional arrays are sometimes called <em>data cubes</em>. An emerging standard in Python to represent surfaces and cubes is that provided by the <code class="docutils literal notranslate"><span class="pre">xarray</span></code> library, shown in the figure below.</p>
-<p><img alt="Figure 2: data cube" src="notebooks/./02_spatial_data_xarray.png" /></p>
+<p><img alt="Figure 2: data cube" src="../_images/02_spatial_data_xarray.png" /></p>
 <p><em>Spatial graphs</em> capture relations relationships between objects that are mediated through space. In a sense, they can be considered geographic <em>networks</em>, or a data structure to store topologies. There are several ways to define spatial relationships between features, and we explore many of them in Chapter XXX. The important thing to note for now is that, whichever spatial rule we follow, spatial graphs provide a way to encode them into a data structure that can support analytics. As we will see throughout the book, the range of techniques that rely on these topologies is pretty large, spanning from exploratory statistics of spatial autocorrelation (Ch. XXX), to regionalisation (Ch. XXX) to spatial econometrics (Ch. XXX). Ironically, each of these fields, and others in computer science and mathematics, have come up with their own terminology to describe similar structures. Hence, when we talk or read about spatial weights matrices, adjacency matrices, geo-graphs, or spatial networks, we are thinking of very similar fundamental structures deployed in different contexts. Spatial graphs record information about how a given observation is spatially connected to others in the dataset. For this reason, they are an obvious complement to geographic tables, which store information about individual observations in isolation. Spatial graphs can also be derived from surfaces but here the situation is slightly different because, although surfaces record discrete measurements, they usually relate to a continuous phenomena. In theory, one could take these measurements at any point in space, so spatial graph of a surface should have an infinite number of observations. In practice however spatial graphs <em>are</em> sometimes used with grids because, as we will see in the following section, the connections and barriers between data models and structures are melting very quickly. Since many fields have theoretical constructs that resemble spatial graphs, there exist several slightly different data  structure that store them both in memory and on disk. In this book, we will focus on graph objects provided by the <code class="docutils literal notranslate"><span class="pre">networkX</span></code> library and, specially, on spatial weights matrices in PySAL which rely to a great extent on sparse matrix data structures.</p>
-<p><img alt="Figure 3: networks" src="notebooks/./02_spatial_data_network.png" /></p>
+<p><img alt="Figure 3: networks" src="../_images/02_spatial_data_network.png" /></p>
 <p>The term spatial graph is sometimes interchangeably used with that of spatial network. This is of course a matter of naming conventions and, to the extent it is only that, it is not very important. However, the confusion can sometimes reflect a more profound misconception of what is being represented. Take the example of the streets in a city or, of the interconnected system of rivers in a catchment area. Both are usually referred to as networks, although in many cases what is being recorded is actually a collection of objects stored in a geographic table. To make the distinction clear, we need to think about what aspect of the street layout or the river system we want to record. If it is the exact shape, length and location of each segment or stream, this resembles much more a collection of independent lines or polygons that happen to “touch each other” at their ends. If what we are interested in is to understand how each segment or river <em>is related</em> to each other, which is connected with which and how this set of individual connections grow into a broader interconnected system, then a spatial graph is a more helpful structure to use. This dichotomy of the object versus the graph is only one example of a larger point about how we use data models and structures and how what the <em>right</em> one is does not depend on the phenomenon we are trying to capture only, but also on why we want to represent it, what the goal is.</p>
 </div>
 <div class="section" id="connecting-the-conceptual-to-the-computational">
@@ -519,7 +529,7 @@ Recognizing these conceptual differences will be important throughout the book.<
     <div class='prev-next-bottom'>
         
     <a class='left-prev' id="prev-link" href="01_geospatial_computational_environment.html" title="previous page">Geospatial Computational Environment</a>
-    <a class='right-next' id="next-link" href="04_spatial_weights.html" title="next page">Spatial Weights</a>
+    <a class='right-next' id="next-link" href="03_spatial_data.html" title="next page">Spatial Data</a>
 
     </div>
     <footer class="footer mt-5 mt-md-0">
