@@ -311,7 +311,7 @@ def gini_by_col(column):
 PySAL's Gini requires an `numpy.ndarray` rather than a `pandas.Series` object, which we can pull out through the `values` attribute. This is passed to the `Gini` class, and we only return the value of the coefficient.
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-inequalities = pci_df[years].apply(gini, axis=0).to_frame('gini')
+inequalities = pci_df[years].apply(gini_by_col, axis=0).to_frame('gini')
 ```
 
 This results in a series of Gini values, one for each year:
@@ -477,11 +477,6 @@ For further comparison, the results are attached to the `inequalities` table:
 inequalities = inequalities.join(moran_stats)
 ```
 
-```python
-inequalities['moran'] = moran_coefs
-inequalities['moran_pvalue'] = p_values
-```
-
 To show the overall inter-relationships between these statistics, we make another plot below:
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
@@ -498,7 +493,6 @@ One common objection to the analysis of inequality in aggregate relates to lack 
 To combat this issue, it is often useful to *decompose* inequality indices into constituent groups. This allows us to understand how much of inequality is driven by aggregate group differences and how much is driven by observation-level inequality. This also allows us to characterize how unequal each group is separately. In geographic applications, these groups are usually spatially defined, in that *regions* are contiguous geographic groups of observations. This section dicusses regional inequality decompositions as a way to introduce geography into the study of inequality. 
 
 Let's illustrate these ideas with our income dataset. The table records the United States Census Bureau region a county belongs to in the `Region` variable. These divide the country into eight regions, each assigned a number that relates to its name as specified below:
-
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 region_names = {
     1:"New England",
@@ -528,7 +522,10 @@ pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
 Let's peak into income changes for each region. To do that, we can apply a split-apply-combine pattern that groups counties by region, calculates its mean, and combines it into a table:
 
 ```python
-rmeans = pci_df.groupby(by='Region_Name').mean()[years]
+rmeans = pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
+               .groupby(by='Region_Name')\
+               .mean()\
+               [years]
 ```
 
 The resulting table has a row for each region and a column for each year. We can visualise these means to get a sense of their temporal trajectory:
