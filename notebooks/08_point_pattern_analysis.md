@@ -33,125 +33,46 @@ from sklearn.cluster import dbscan
 
 Points are spatial entities that can be understood in two fundamentally different ways. On the one hand, points can be seen as fixed objects in space, which is to say their location is taken as given (*exogenous*). In this interpretation, the location of an observed point is considered as secondary to the value observed at the point. Think of this like measuring the number of cars traversing a given road intersection; the location is fixed, and the data of interest comes from the measurement taken at that location. The analysis of this kind of point data is very similar to that of other types of spatial data such as polygons and lines. On the other hand, an observation occuring at a point can also be thought of as a site of measurement from an underlying geographically-continuous process. In this case, the measurement could theoretically take place anywhere, but was only carried out or conducted in certain locations. Think of this as measuring the length of birds' wings: the location at which birds are measured reflects the underlying geographical process of bird movement and foraging, and the length of the birds' wings may reflect an underlying ecological process that varies by bird. This kind of approach means that both the location and the measurement matter. This is the perspective we will adopt in the rest of the chapter.
 
-When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a *point pattern*. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is crime events in a city: they could technically happen in many locations but we usually find crimes are committed only in a handful of them. Point patterns can be *marked*, if more attributes are provided with the location, or *unmarked*, if only the coordinates of where the event occured are provided. Continuing the crime example, an unmarked pattern would result if only the location where crimes were committed was used for analysis, while we would be speaking of a marked point pattern if other attributes, such as the type of crime, the extent of the damage, etc. was provided with the location.
+When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a *point pattern*. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is geo-tagged photographs: they could technically happen in many locations but we usually find photos tend to concentrate only in a handful of them. Point patterns can be *marked*, if more attributes are provided with the location, or *unmarked*, if only the coordinates of where the event occured are provided. Continuing the photo example, an unmarked pattern would result if only the location where are taken is used for analysis, while we would be speaking of a marked point pattern if other attributes, such as the time, camera model, or a "image quality score" was provided with the location.
 
-Point pattern analysis is thus concerned with the visualization, description, statistical characerization, and modeling of point patterns, focusing specially on the generating process that gives rise and explains the observed data. Common questions in this domain include
+Point pattern analysis is thus concerned with the visualization, description, statistical characerization, and modeling of point patterns, trying to understand the generating process that gives rise and explains the observed data. Common questions in this domain include:
+
 - *What does the pattern look like?* 
 - *What is the nature of the distribution of points?* 
 - *Is there any structure in the way locations are arranged over space? That is, are events clustered? or are they dispersed?*
 - *Why do events occur in those places and not in others?* 
+
 These are the most common questions in the analysis of point patterns. 
 
-At this point, it is useful to remind ourselves of an important distinction, that between process and pattern. The former relates to the underlying mechanism that is at work to generate the outcome we end up observing. Because of its abstract nature, we do not get to see it. However, in many contexts, the key focus of any analysis is to learn about *what* determines a given phenomenon and *how* those factors combine to generate it. In this context, "process" is associated with the *how*. "Pattern," on the other hand, relates to the result of that process. In some cases, it is the only trace of the process we can observe and thus the only input we have to work with in order to reconstruct it. Although directly observable and, arguably, easier to tackle, pattern is only a reflection of process. The real challenge in many applications is not to characterize the former but to use it to work out the latter.
+At this point, it is useful to remind ourselves of an important distinction, that between process and pattern. The former relates to the underlying mechanism that is at work to generate the outcome we end up observing. Because of its abstract nature, we do not get to see it. However, in many contexts, the key focus of any analysis is to learn about *what* determines a given phenomenon and *how* those factors combine to generate it. In this context, "process" is associated with the *how*. "Pattern," on the other hand, relates to the result of that process. In some cases, it is the only trace of the process we can observe and thus the only input we have to work with in order to reconstruct it. Although directly observable and, arguably, easier to tackle, pattern is only a reflection of process. The real challenge is not to characterize the former but to use it to work out the latter.
 
-In this chapter, we will focus on an introduction to point patters through geo-tagged Flickr photos from Tokyo. In this case, we will treat the phenomena represented in the data as events: photos could be taken of any place in Tokyo, but only certain locations are captured. Keep in mind this understanding of Tokyo photos is not immutable: one could conceive cases where it makes sense to take those locations as given and look at the properties of each of them ignoring their "event" aspect. However, in this context, we will focus on those questions that relate to location and the collective shape of locations. The use of these tools will allow us to transform a long list of unintelligible XY coordinates into tangible phenomena with a characteristic spatial structure, and to answer questions about the center, dispersion, and clustering of attractions in Tokyo for Flickr users.
+In this chapter, we provide an introduction to point patters through geo-tagged Flickr photos from Tokyo. We will treat the phenomena represented in the data as events: photos could be taken of any place in Tokyo, but only certain locations are captured. Keep in mind this understanding of Tokyo photos is not immutable: one could conceive cases where it makes sense to take those locations as given and look at the properties of each of them ignoring their "event" aspect. However, in this context, we will focus on those questions that relate to location and the collective shape of locations. The use of these tools will allow us to transform a long list of unintelligible XY coordinates into tangible phenomena with a characteristic spatial structure, and to answer questions about the center, dispersion, and clustering of attractions in Tokyo for Flickr users.
 
-## Location, Location, Location
 
-The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, {cite}`Goodchild2007citizens`) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let's load the flickr data first:
 
+
+## The Tokyo photographs dataset
+
+The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, {cite}`Goodchild2007citizens`). In this chapter we will explore metadata from a sample of georeferenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. 
+
+To get started, let's load the flickr data first:
 
 ```python
 db = pandas.read_csv('../data/tokyo/tokyo_clean.csv')
 ```
 
-This table has been lightly processed from the raw data. It contains the user ID, the latitude and longitude, as well as those coordinates expressed in Pseudo Mercator, the timestamp when the photo was taken, and the url of the picture they refer to:
-
+The table contains the following information about the sample of 10,000 photographs: the ID of the user who took the photo; the location expressed as latitude and longitude columns; a transformed version of those coordinates expressed in Pseudo Mercator; the timestamp when the photo was taken; and the url where the picture they refer to is stored online:
 
 ```python
-db.head()
+db.info()
 ```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>user_id</th>
-      <th>longitude</th>
-      <th>latitude</th>
-      <th>date_taken</th>
-      <th>photo/video_page_url</th>
-      <th>x</th>
-      <th>y</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>10727420@N00</td>
-      <td>139.700499</td>
-      <td>35.674000</td>
-      <td>2010-04-09 17:26:25.0</td>
-      <td>http://www.flickr.com/photos/10727420@N00/4545...</td>
-      <td>1.555139e+07</td>
-      <td>4.255856e+06</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>8819274@N04</td>
-      <td>139.766521</td>
-      <td>35.709095</td>
-      <td>2007-02-10 16:08:40.0</td>
-      <td>http://www.flickr.com/photos/8819274@N04/26503...</td>
-      <td>1.555874e+07</td>
-      <td>4.260667e+06</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>62068690@N00</td>
-      <td>139.765632</td>
-      <td>35.694482</td>
-      <td>2008-12-21 15:45:31.0</td>
-      <td>http://www.flickr.com/photos/62068690@N00/3125...</td>
-      <td>1.555864e+07</td>
-      <td>4.258664e+06</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>49503094041@N01</td>
-      <td>139.784391</td>
-      <td>35.548589</td>
-      <td>2011-11-11 05:48:54.0</td>
-      <td>http://www.flickr.com/photos/49503094041@N01/6...</td>
-      <td>1.556073e+07</td>
-      <td>4.238684e+06</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>40443199@N00</td>
-      <td>139.768753</td>
-      <td>35.671521</td>
-      <td>2006-04-06 16:42:49.0</td>
-      <td>http://www.flickr.com/photos/40443199@N00/2482...</td>
-      <td>1.555899e+07</td>
-      <td>4.255517e+06</td>
-    </tr>
-  </tbody>
-</table>
-</div>
+Note that the data is provided as a `.csv` file, so the spatial information is encoded as separate columns, one for each coordinate. This is contrast to how we have consumed spatial data in previous chapters, where spatial information was stored in a single column and encoded in geometry objects.
 
 
 
 ## Visualization
 
-The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatter plot with a single line:
+The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatter plot with `seaborn`:
 
 
 ```python
@@ -179,10 +100,6 @@ basemap, basemap_extent = contextily.bounds2img(*bounding_box, zoom=11,
                                                 url = contextily.providers.CartoDB.Positron)
 ```
 
-    <ipython-input-6-8a25bf4e1df7>:2: FutureWarning: The "url" option is deprecated. Please use the "source" argument instead.
-      basemap, basemap_extent = contextily.bounds2img(*bounding_box, zoom=11,
-
-
 Now, `basemap` is an array containing the raw image data for a basemap of Tokyo, and the `extent` is the boundary of that image, in terms of the same pseudo-Mercator projection the data uses. However, it is important to note that many of the mapping tools in spatial analysis express their bounding box in **corner form**:
 ```
 left, bottom, right, top
@@ -199,26 +116,9 @@ You can see this practically by comparing our original `bounding_box` to the `ba
 ```python
 bounding_box
 ```
-
-
-
-
-    [15536078.976635901, 4235240.756448597, 15575297.38983982, 4275538.623192449]
-
-
-
-
 ```python
 basemap_extent
 ```
-
-
-
-
-    (15517328.23811706, 15576031.875840075, 4226661.916057105, 4285365.553780119)
-
-
-
 For convenience, sometime is it also helpful to define the `data_extent` as well, in case the basemap covers too much additional area:
 
 
@@ -296,6 +196,7 @@ ax.set_axis_off()
 
 
 The result is a much smoother output that captures the same structure of the hexbin but eases the transitions between different areas. This provides a better generalisation of the theoretical probability that a picture *might* occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares. 
+
 
 ## Centrography
 
@@ -540,6 +441,9 @@ plt.show()
 
 Each gives a different impression of the area enclosing the user's range of photographs. In this, you can see that the the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle & circle are the "loosest" shapes, in that they contain the most area outside of the user's typical area. But, they're also the simplest shapes to draw and understand. 
 
+
+
+
 ## Randomness & clustering
 
 Beyond questions of centrality and extent, spatial statistics on point patterns are often concerned with how *even* a distribution of points is. By this, we might want to inquire about whether points tend to all cluster near one another or whether they disperse evenly throughout the problem area. Questions like this refer to the *intensity* or *dispersion* of the point pattern overall. 
@@ -587,9 +491,6 @@ ax.imshow(basemap, extent=basemap_extent, interpolation='bilinear')
 ax.legend(ncol=1, loc='center left')
 plt.show()
 ```
-
-
-![png](08_point_pattern_analysis_files/08_point_pattern_analysis_66_0.png)
 
 
 ### Quadrat statistics
@@ -643,14 +544,6 @@ The quadrat test finds this to be *statistically nonrandom*, while our simulatin
 ```python
 qstat_null_ashape.chi2_pvalue
 ```
-
-
-
-
-    2.3045568458939038e-24
-
-
-
 ### Ripley's alphabet functions
 
 A large branch of spatial statistics focuses on the distributions of three quantities in a point pattern. They derive from earlier work by {cite}`Ripley1991` on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases. 
@@ -788,10 +681,10 @@ plt.show()
 ```
 
 
-![png](08_point_pattern_analysis_files/08_point_pattern_analysis_88_0.png)
-
-
 There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the `pointpats` documentation for more information on how this can be done in Python, or the book by {cite}`Baddeley2015`.
+
+
+
 
 ## Identifying clusters
 
@@ -900,9 +793,6 @@ ax.set_axis_off()
 # Display the figure
 plt.show()
 ```
-
-
-![png](08_point_pattern_analysis_files/08_point_pattern_analysis_104_0.png)
 
 
 ## Conclusion
