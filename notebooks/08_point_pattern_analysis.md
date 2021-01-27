@@ -26,7 +26,7 @@ import pysal
 import seaborn
 import contextily
 import matplotlib.pyplot as plt
-from sklearn.cluster import dbscan
+from sklearn.cluster import DBSCAN
 ```
 
 ## Introduction
@@ -174,7 +174,7 @@ ax.set_axis_off()
 The result is a smoother output that captures the same structure of the hexbin but "eases" the transitions between different areas. This provides a better generalisation of the theoretical probability that a picture *might* occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares. 
 
 
-# Centrography
+## Centrography
 
 Centrography is the analysis of centrality in a point pattern. By "centrality," we mean the general location and dispersion of the pattern. If the hexbin above can be seen as a "spatial histogram", centrography is the point pattern equivalent of measures of central tendency such as the mean. These measures are useful because they allow us to summarise spatial distributions in smaller sets of information (e.g. a single point). Many different indices are used in centrography to provide an indication of "where" a point pattern is, how tightly the point pattern clusters around its center, or how irregular its shape is. 
 
@@ -241,7 +241,7 @@ A measure of dispersion that is common in centrography is the *standard distance
 ```python
 centrography.std_distance(db[['x','y']])
 ```
-This means that, on average, pictures are taken around 8800 feet away from the mean center. 
+This means that, on average, pictures are taken around 8800 metres away from the mean center. 
 
 Another helpful visualization is the *standard deviational ellipse*, or *standard ellipse*. This is an ellipse drawn from the data that reflects both its center and dispersion. To visualize this, we first compute the axes and rotation using the `ellipse` function in `pointpats`:
 
@@ -594,12 +594,12 @@ Thus, quadrat counts can have issues with irregular study areas, and care should
 
 ### Ripley's alphabet of functions
 
-The second group of spatial statistics we consider focuses on the distributions of three quantities in a point pattern: nearest neighbor distances and "gaps" in the pattern. They derive from earlier work by {cite}`Ripley1991` on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases. 
+The second group of spatial statistics we consider focuses on the distributions of two quantities in a point pattern: nearest neighbor distances and what we will term "gaps" in the pattern. They derive from seminal work by {cite}`Ripley1991` on how to characterize clustering or co-location in point patterns. Each of these characterize an aspect of the point pattern as we increase the distance range from each point to calculate them. 
 
 The first function, Ripley's $G$, focuses on the distribution of nearest neighbor distances. That is, the $G$ function summarises the distances between each point in the pattern and their nearest neighbor. In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are *mutual* nearest neighbors (and so have arrows going in both directions) but some are not. 
 
 
-```python
+```python tags=["hide-input"]
 # this code should be hidden in the book, and only the plot visible!
 f,ax = plt.subplots(1,2,figsize=(8,4), sharex=True, sharey=True)
 ax[0].scatter(*random_pattern.T, color='red')
@@ -632,7 +632,7 @@ plt.show()
 ```
 
 
-The distribution of these distances has a distinctive shape under completely spatially random processes. The intuition behind Ripley's G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the distribution of nearest neighbor distances of the observed pattern, and comparing it to that of a set of simulated patterns that follow a known spatially-random process. Usually, a spatial Poisson point process is used as such reference distribution. 
+Ripley's $G$ keeps track of the proportion of points for which the nearest neighbor is within a given distance threshold, and plots that cumulative percentage against the increasing distance radiuses. The distribution of these cumulative percentage has a distinctive shape under completely spatially random processes. The intuition behind Ripley's G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the cumulative distribution of nearest neighbor distances over increasing distance thresholds, and comparing it to that of a set of simulated patterns that follow a known spatially-random process. Usually, a spatial Poisson point process is used as such reference distribution. 
 
 To do this in the `pointpats` package, we can use the `g_test` function, which computes both the `G` function for the empirical data *and* these hypothetical replications under a completely spatially random process.
 
@@ -645,12 +645,12 @@ g_test = distance_statistics.g_test(
 
 Thinking about these distributions of distances, a "clustered" pattern must have more points near one another than a pattern that is "dispersed"; and a completely random pattern should have something in between. Therefore, if the $G$ function increases *rapidly* with distance, we probably have a clustered pattern. If it increases *slowly* with distance, we have a dispersed pattern. Something in the middle will be difficult to distinguish from pure chance.
 
-We can visualize this below. On the left, we plot the $G(d)$ function, with distance-to-point ($d$) on the horizontal axis and the fraction of nearest neighbor distances smaller than $d$ on the right axis. In red, the empirical cumulative distribution of nearest neighbor distances is shown. In blue, simulations (like the `random` pattern shown in the previous section) are shown. The bright blue line represents the average of all simulations, and the darker blue band around it represents the middle 95% of simulations. 
+We can visualize this below. On the left, we plot the $G(d)$ function, with distance-to-point ($d$) on the horizontal axis and the fraction of nearest neighbor distances smaller than $d$ on the right axis. In red, the empirical cumulative distribution of nearest neighbor distances is shown. In blue, simulations (like the `random` pattern shown in the previous section) are shown. The bright blue line represents the average of all simulations, and the darker blue/black band around it represents the middle 95% of simulations. 
 
 In this plot, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user's flickr photographs are *closer* to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is *clustered.*
 
 
-```python
+```python tags=["hide-input"]
 f,ax = plt.subplots(1,2,figsize=(9,3), 
                     gridspec_kw=dict(width_ratios=(6,3)))
 # plot all the simulations with very fine lines
@@ -684,19 +684,22 @@ plt.show()
 ```
 
 
-Another way to measure dispersion is to examine the *gaps* in the pattern. That is, where the $G$ function works by analyzing the distance *between* points in the pattern, the *F* function works by analyzing the distance *to* points in the pattern from locations in empty space. That is why the $F$ function is called the "the empty space function," since it characterizes the typical distance from arbitrary points in empty space to the point pattern. If the pattern has large gaps or empty areas, the $F$ function will increase slowly. But, if the pattern is highly dispersed, then the $F$ function will increase rapidly. 
+The second function we introduce is Ripley's $F$. Where the $G$ function works by analyzing the distance *between* points in the pattern, the *F* function works by analyzing the distance *to* points in the pattern from locations in empty space. That is why the $F$ function is called the "the empty space function", since it characterizes the typical distance from arbitrary points in empty space to the point pattern. More explicitly, the $F$ accumulates, for a growing distance range, the percentage of points that can be found within that range from a random point pattern generated within the extent of the observed pattern. If the pattern has large gaps or empty areas, the $F$ function will increase slowly. But, if the pattern is highly dispersed, then the $F$ function will increase rapidly. The shape of this cumulative distribution is then compared to those constructed by calculating the same cumulative distribution between the random pattern and an additional, random one generated in each simulation step.
 
-We can use similar tooling to investigate the $F$ function, since it is so mathematically similar to the $G$ function. This is implemented identically using the `Fenv` function in `pointpats`. Since the $F$ function estimated for the observed pattern increases *much* more slowly than the $F$ functions for the simulated patterns, we can be confident that there are many gaps in our pattern; i.e. the pattern is *clustered*. 
+We can use similar tooling to investigate the $F$ function, since it is so mathematically similar to the $G$ function. This is implemented identically using the `f_test` function in `pointpats`. Since the $F$ function estimated for the observed pattern increases *much* more slowly than the $F$ functions for the simulated patterns, we can be confident that there are many gaps in our pattern; i.e. the pattern is *clustered*. 
 
 
 ```python
-f_test = distance_statistics.f_test(coordinates, support=40, keep_simulations=True)
+f_test = distance_statistics.f_test(
+    coordinates, support=40, keep_simulations=True
+)
 ```
 
 
-```python
-f,ax = plt.subplots(1,2,figsize=(9,3), 
-                    gridspec_kw=dict(width_ratios=(6,3)))
+```python tags=["hide-input"]
+f,ax = plt.subplots(
+    1,2,figsize=(9,3), gridspec_kw=dict(width_ratios=(6,3))
+)
 
 # plot all the simulations with very fine lines
 ax[0].plot(f_test.support, f_test.simulations.T, color='k', alpha=.01)
@@ -729,49 +732,50 @@ plt.show()
 ```
 
 
-There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the `pointpats` documentation for more information on how this can be done in Python, or the book by {cite}`Baddeley2015`.
-
-
+Ripley's "alphabet" extends to several other letter-named functions that can be used for conducting point pattern analysis in this vein. Good "next steps" in your point pattern analysis journey include the book by {cite}`Baddeley2015`; and the `pointpats` documentation for guidance on how to run these in Python.
 
 
 ## Identifying clusters
 
-The previous two sections on exploratory spatial analysis of point patterns provides methods to characterize whether point patterns are dispersed or clustered in space. However, knowing that a point pattern *is* clustered does not necessarily give us information about *where* that cluster resides. To do this, we must learn a method to identify clusters of points, based on their density across space. 
+The previous two sections on exploratory spatial analysis of point patterns provide methods to characterize whether point patterns are dispersed or clustered in space. Another way to see the content in those sections is they help us explore the degree of overall *clustering*. However, knowing that a point pattern is clustered does not necessarily give us information about where that (set of) cluster(s) resides. To do this, we need to switch to a method able to identify areas of high density of points within our pattern. In other words, in this section we focus on the existence and location of *clusters*. This distinction between cluster*ing* and cluster*s* of points is analogue to that discussed in the context of spatial autocorrelation (Chapters [6](06_spatial_autocorrelation) and [7](07_local_autocorrelation). The notion is the same, the differences in the techniques we examine in each part of the book relate to the unique nature of points we referred to in the beginning of the book. Remember that, while the methods we explored in the earlier chapters take the location of the spatial objects (points, lines, polygons) as given and focus on understanding the configurations of values within those locations; the methods discussed in this chapter understand points as events that happen in particular locations but that could happen in a much broader set of places. Factoring in this underlying relevance of the location of an object itself is what makes the techniques in this chapter distinct.
 
-There are many spatial point clustering algorithms. Here, will cover the widely used `DBSCAN` algorithm. For this method, a cluster is a concentration of at least `m` points, each of them within a distance of `r` of at least another point in the cluster. Points in the dataset are then divided into three categories:
+From the many spatial point clustering algorithms, we will cover one called DBSCAN (Density-Based Spatial Clustering of Applications, {cite}`ester1996density`. DBSCAN is a widely used algorithm that originated in the area of knowledge discovery and machine learning and that has since spread into many areas, including the analysis of spatial points. In part, its popularity resides in its intellectual simplicity and computational tractability. In some ways, we can think of DBSCAN as a point pattern counterpart of the local statistics we explored in [Chapter 7](07_local_autocorrelation). They do however differ in fundamental ways. Unlike the local statistics we have seen earlier, DBSCAN is not based on an inferential framework, but it is instead a deterministic algorithm. This implies that, unlike the measures seen before, we will not be able to estimate a measure of the degree to which the clusters found are compatible with cases of spatial randomness.  
+
+From the point of view of DBSCAN, a cluster is a concentration of at least `m` points, each of them within a distance of `r` of at least another point in the cluster. Following this definition, the algorithm classifies each point in our pattern into three categories:
 
 * *Noise*, for those points outside a cluster.
 * *Cores*, for those points inside a cluster whith at least `m` points in the cluster within distance `r`.
 * *Borders* for points inside a cluster with less than `m` other points in the cluster within distance `r`.
 
-Both `m` and `r` need to be prespecified by the user before running `DBSCAN`. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing `DBSCAN` in Python.
+The flexibility (but also some of the limitations) of the algorithm resides in that both `m` and `r` need to be prespecified by the user before running DBSCAN. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing `DBSCAN` in Python:
 
 
 ```python
-# Compute DBSCAN
-cs, lbls = dbscan(db[['x', 'y']])
+# Define DBSCAN
+clusterer = DBSCAN()
+# Fit to our data
+clusterer.fit(db[["x", "y"]])
 ```
 
-The function returns two objects, which we call `cs` and `lbls`. `cs` contains the indices (order, starting from zero) of each point which is classified as a *core*. We can have a peek into it to see what it looks like:
+Following the standard interface in scikit-learn, we first define the algorithm we want to run (creating the `clusterer` object) and then we *fit* it to our data. Once fit, `clusterer` contains the required information to access all the results of the algorithm. The `core_sample_indices_` attribute contains the indices (order, starting from zero) of each point which is classified as a *core*. We can have a peek into it to see what it looks like:
 
 
 ```python
 # Print the first 5 elements of `cs`
-cs[:5]
+clusterer.core_sample_indices_[:5]
 ```
-The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as it is the 23rd, 31st, 36th, and 43rd. The object `cs` always has a variable length, depending on how many cores the algorithm finds.
+The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as it is the 23rd, 31st, 36th, and 43rd. This attribute has a variable length, depending on how many cores the algorithm finds.
 
-Now let us have a look at `lbls`, short for labels:
+The second attribute of interest is `labels_`:
+
+```python
+clusterer.labels_[:5]
+```
+The labels object always has the same length as the number of points used to run DBSCAN. Each value represents the index of the cluster a point belongs to. If the point is classified as *noise*, it receives a -1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make thinks easier later on, let us turn the labels into a `Series` object that we can index in the same way as our collection of points:
 
 
 ```python
-lbls[:5]
-```
-The labels object always has the same length as the number of points used to run `DBSCAN`. Each value represents the index of the cluster a point belongs to. If the point is classified as *noise*, it receives a -1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make thinks easier later on, let us turn `lbls` into a `Series` object that we can index in the same way as our collection of points:
-
-
-```python
-lbls = pandas.Series(lbls, index=db.index)
+lbls = pandas.Series(clusterer.labels_, index=db.index)
 ```
 
 Now we already have the clusters, we can proceed to visualize them. There are many ways in which this can be done. We will start just by coloring points in a cluster in red and noise in grey:
@@ -780,8 +784,6 @@ Now we already have the clusters, we can proceed to visualize them. There are ma
 ```python
 # Setup figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
-# Add base layer with tiles for context
-ax.imshow(basemap, extent=basemap_extent)
 # Subset points that are not part of any cluster (noise)
 noise = db.loc[lbls==-1, ['x', 'y']]
 # Plot noise in grey
@@ -793,6 +795,11 @@ ax.scatter(noise['x'], noise['y'], c='grey', s=5, linewidth=0)
 ax.scatter(db.loc[db.index.difference(noise.index), 'x'], \
            db.loc[db.index.difference(noise.index), 'y'], \
           c='red', linewidth=0)
+# Add basemap
+contextily.add_basemap(
+    ax, 
+    source=contextily.providers.CartoDB.Positron
+)
 # Remove axes
 ax.set_axis_off()
 # Display the figure
@@ -802,9 +809,9 @@ plt.show()
 
 Although informative, the result of this run is not particularly satisfactory. There are *way* too many points that are classified as "noise".
 
-This is because we have run `DBSCAN` with the default parameters. If you type `dbscan?`, you will get the help of the function and will be able to see what those are: a radious of 0.5 and a minimum of five points per cluster. Since our data is expressed in metres, a radius of half a metre will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs. 
+This is because we have run DBSCAN with the default parameters: a radious of 0.5 and a minimum of five points per cluster. Since our data is expressed in metres, a radius of half a metre will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs. 
 
-Let us change those parameters to see if we can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:
+If we change those parameters, can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:
 
 
 ```python
@@ -817,25 +824,31 @@ At the same time, let us expand the maximum radious to say, 500 metres. Then we 
 
 ```python
 # Rerun DBSCAN
-cs, lbls = dbscan(db[['x', 'y']], eps=500, min_samples=minp)
+clusterer = DBSCAN(eps=500, min_samples=minp)
+clusterer.fit(db[['x', 'y']])
 # Turn labels into a Series
-lbls = pandas.Series(lbls, index=db.index)
-
+lbls = pandas.Series(clusterer.labels_, index=db.index)
 # Setup figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
-# Add base layer with tiles for context
-ax.imshow(basemap, extent=basemap_extent, interpolation='bilinear')
 # Subset points that are not part of any cluster (noise)
 noise = db.loc[lbls==-1, ['x', 'y']]
 # Plot noise in grey
 ax.scatter(noise['x'], noise['y'], c='grey', s=5, linewidth=0)
 # Plot all points that are not noise in red
 # NOTE how this is done through some fancy indexing, where
-#      we take the index of all points (tw) and substract from
+#      we take the index of all points (db) and substract from
 #      it the index of those that are noise
-ax.scatter(db.loc[db.index.difference(noise.index), 'x'], \
-           db.loc[db.index.difference(noise.index), 'y'], \
-          c='red', linewidth=0)
+ax.scatter(
+    db.loc[db.index.difference(noise.index), 'x'],
+    db.loc[db.index.difference(noise.index), 'y'],
+    c='red', 
+    linewidth=0
+)
+# Add basemap
+contextily.add_basemap(
+    ax, 
+    source=contextily.providers.CartoDB.Positron
+)
 # Remove axes
 ax.set_axis_off()
 # Display the figure
@@ -845,6 +858,15 @@ plt.show()
 
 ## Conclusion
 
-Overall, this chapter has provided an overview of methods to analyze point patterns. From measuring their location, central tendency, and extent, to observing how they cluster or disperse and locating where the clusters are, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about many point patterns. Further, we will cover *modelling* point patterns, such as describing their properties or future locations, in subsequent chapters. 
+Overall, this chapter has provided an overview of methods to analyze point patterns. We have begun our point journey by visualising their location and learning way to overcome the "cluttering" challenge that large point patterns present us with. From graphical display, we have moved to statistical characterisation of their spatial distribution. In this context, we have learnt about  central tendency dispersion and extent, and we have positioned these measures as the point pattern counterparts of traditional statistics such as the mean or the standard deviation. These measures provide a summary of an entire pattern, but tell us little about the spatial organisation of each point. To that end, we have introduced the quadrat and Ripley's functions. These statistical devices help us in characterising whether a point pattern is spatially clustered or dispersed. We have wrapped up the chapter going one step further and exploring methods to identify the location of clusters: areas of the map with high density of points. Taken altogether, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about point patterns that represent widely varied phenomena in the world, from the location where photographs where taken to the distribution of bird nests, to the clustering of bike crashes in a city.
 
 
+
+## Questions
+
+1. What is the trade-off implicit in the choice of hexagon granularity when "hexbinning"? Based on this, how would you recommend to select a specific number of bins? 
+1. KDE gets around the need to partition space in "buckets" to count points inside each of them. But, can you think of the limitations of applying this technique? To explore them, reproduce the KDE figure in the chapter playing with the arguments of the type of kernel (`kernel`) and bandwidth (`bw`). Consult the documentation of `seaborn.kdeplot` to learn what each of them controls.
+1. Given a hypothetical point pattern, what characteristics would it need to meet for the mean and median centers to coincide? 
+1. The choice of extent definition you adopt may influence your final results significantly. To further internalise this realisation, compute the density of photographs in the example we have seen using each of the extent definitions covered (minimum bounding/rotate circle/rectangle, convex hull and alpha shape). Remember the density can be obtained by dividing the number of photographs by the area of the extent.
+1. How do you think the density of quadrants affect quadrat statistics?
+1. Can you use information from Ripley's functions to inform the choice of DBSCAN parameters? How? Use the example with Tokyo photographs covered above to illustrate your ideas.
