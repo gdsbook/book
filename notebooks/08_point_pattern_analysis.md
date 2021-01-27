@@ -126,7 +126,6 @@ hb = ax.hexbin(
     alpha=0.5, 
     cmap='viridis_r'
 )
-ax.axis(data_extent)
 # Add basemap
 contextily.add_basemap(
     ax, 
@@ -166,7 +165,6 @@ contextily.add_basemap(
     source=contextily.providers.CartoDB.Positron
 )
 # Remove axes
-ax.axis(data_extent)
 ax.set_axis_off()
 ```
 
@@ -271,7 +269,6 @@ ellipse = Ellipse(xy=mean_center, # center the ellipse on our mean center
                   label='Std. Ellipse')
 ax.add_patch(ellipse)
 
-ax.axis(data_extent)
 ax.legend()
 # Display
 # Add basemap
