@@ -120,6 +120,10 @@ We begin our examination of inequality by focusing on several global measures of
 In general terms, measures of inequality focus on the dispersion present in an income distribution. In the case of regional or spatial inequality, the distributions describe the average or per-capita incomes for spatial units, such as for counties, census tracts, or regions. For our US county data, we can visualize the distribution of per capita incomes for the first year in the sample as follows:
 <!-- #endregion -->
 
+```python
+seaborn.__version__
+```
+
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 seaborn.set_theme(style='whitegrid')
 seaborn.histplot(x=pci_df['1969'], kde=True)
@@ -483,7 +487,7 @@ To show the overall inter-relationships between these statistics, we make anothe
 inequalities.plot(subplots=True, figsize=(15,12))
 plt.show()
 ```
-Several patterns emerge from the time series of Moran's I. Before delving into the details, it is worth noting that, while Gini and Theil follow a similar path, Moran's I displays a distinct trajectory. The first aspect to point out is that there is a long-term decline in the value of Moran's I. This suggests a gradual decline in the geographic structure of inequality with two implications: (a) per capita incomes are now less similar between nearby counties and (b), this has been consistently declining, regardless of whether inequality is high or low. 
+Several patterns emerge from the time series of Moran's I. Before delving into the details, it is worth noting that, while Gini and Theil follow a similar path, Moran's I displays a distinct trajectory. There is a long-term decline in the value of Moran's I. This suggests a gradual decline in the geographic structure of inequality with two implications: (a) per capita incomes are now less similar between nearby counties and (b), this has been consistently declining, regardless of whether inequality is high or low. 
 Second, despite this decline, there is never a year in which the spatial autocorrelation is not statistically significant. In other words, there is a strong geographic structure in the distribution of regional incomes that needs to be accounted for when focusing on inequality questions.
 
 ### Regional Decomposition of Inequality
@@ -542,7 +546,7 @@ To proceed in this direction, we first re-conceptualise our observations of per 
 $$
 \begin{align}
 T &= \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\sum_{i=1}^m y_i}\right] \right) \\
-  &= \left[ \sum_{g=1}^{\omega} s_{g} log(\frac{m}{m_g} s_g)  \right] + \left[ \sum_{g=1}^{\omega} s_g \sum_{i \in g} s_{i,g} log(m_g s_{i,g}) \right] \\
+  &= \left[ \sum_{g=1}^{\omega} s_{g} \ln \left(\frac{m}{m_g} s_g \right)  \right] + \left[ \sum_{g=1}^{\omega} s_g \sum_{i \in g} s_{i,g} \ln \left(m_g s_{i,g}\right) \right] \\
   &= B + W \\
 \end{align}
 $$
@@ -725,6 +729,9 @@ inequalities[['near_diffs', 'I']].plot.line(subplots=True, figsize=(15,6))
 
 Inequality is an important social phenomenon, and its geography is an important concern for social scientists. This chapter discusses methods to assess inequality, as well as examine its spatial and regional structure. We have seen the Gini coefficient and Theil index as examples of global measures to summarize the overall level of inequality; then we have considered differences between personal and regional inequality. From this vantage, we have reviewed three approaches to incorporate geography and space in the study of inequality. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as those for spatial autocorrelation discussed in chapters [6](06_spatial_autocorrelation) and [7](07_local_autocorrelation). 
 
+```python
+
+```
 
 ## Questions
 
