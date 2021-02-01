@@ -2,12 +2,6 @@
     
 lab:
 	docker run --rm \
-               -p 4000:4000 \
-               -p 8888:8888 \
-               -v ${PWD}:/home/jovyan/work \
-               darribas/gds_dev:5.0
-lablinux:
-	docker run --rm \
 		       --user root \
 			   -e NB_UID=1001 \
 			   -e NB_GID=100 \
@@ -18,12 +12,6 @@ lablinux:
 
 
 
-labosx:
-	docker run --rm \
-               -p 4000:4000 \
-               -p 8888:8888 \
-               -v ${PWD}:/home/jovyan/work:delegated \
-               darribas/gds_dev:5.0
     
 sync: 
 	jupytext --sync ./notebooks/*.ipynb
