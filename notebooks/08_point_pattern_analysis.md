@@ -589,9 +589,6 @@ plt.show()
 ```
 
 
-![png](08_point_pattern_analysis_files/08_point_pattern_analysis_66_0.png)
-
-
 ### Quadrat statistics
 
 Quadrat statistics examine the spatial distribution of points in an area in terms of the count of observations that fall within a given cell. By examining whether observations are spread *evenly* over cells, the quadrat approach aims to estimate whether points are spread out, or if they are clustered into a few cells. Strictly speaking, quadrat statistics examine the *evenness* of the distribution over cells using a $\chi^2$ statistical test common in the analysis of contingency tables. 
@@ -788,9 +785,6 @@ plt.show()
 ```
 
 
-![png](08_point_pattern_analysis_files/08_point_pattern_analysis_88_0.png)
-
-
 There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the `pointpats` documentation for more information on how this can be done in Python, or the book by {cite}`Baddeley2015`.
 
 ## Identifying clusters
@@ -900,9 +894,6 @@ ax.set_axis_off()
 # Display the figure
 plt.show()
 ```
-
-
-![png](08_point_pattern_analysis_files/08_point_pattern_analysis_104_0.png)
 
 
 ## Conclusion
