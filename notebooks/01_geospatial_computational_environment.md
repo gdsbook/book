@@ -323,7 +323,7 @@ images, which we will so throughout the book. For that, we use the `Image`
 method:
 
 ```python
-path = ("../infrastructure/booksite/logo/"\
+path = ("../infrastructure/logo/"\
         "logo_transparent-bg.png")
 display.Image(path)
 ```
