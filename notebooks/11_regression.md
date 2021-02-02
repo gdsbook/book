@@ -16,7 +16,7 @@ jupyter:
 # Spatial Regression
 
 ## Introduction
-   
+
 
 ### *What* is spatial regression and *why* should I care?
 
