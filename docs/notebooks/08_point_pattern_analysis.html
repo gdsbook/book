@@ -374,8 +374,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#location-location-location">
-   Location, Location, Location
+  <a class="reference internal nav-link" href="#the-tokyo-photographs-dataset">
+   The Tokyo photographs dataset
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -404,6 +404,23 @@
   <a class="reference internal nav-link" href="#centrography">
    Centrography
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#tendency">
+     Tendency
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#dispersion">
+     Dispersion
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#extent">
+     Extent
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#randomness-clustering">
@@ -416,8 +433,8 @@
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#ripley-s-alphabet-functions">
-     Ripley’s alphabet functions
+    <a class="reference internal nav-link" href="#ripley-s-alphabet-of-functions">
+     Ripley’s alphabet of functions
     </a>
    </li>
   </ul>
@@ -430,6 +447,11 @@
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#conclusion">
    Conclusion
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#questions">
+   Questions
   </a>
  </li>
 </ul>
@@ -455,7 +477,7 @@
 <span class="kn">import</span> <span class="nn">seaborn</span>
 <span class="kn">import</span> <span class="nn">contextily</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">dbscan</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">DBSCAN</span>
 </pre></div>
 </div>
 </div>
@@ -463,21 +485,22 @@
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Points are spatial entities that can be understood in two fundamentally different ways. On the one hand, points can be seen as fixed objects in space, which is to say their location is taken as given (<em>exogenous</em>). In this interpretation, the location of an observed point is considered as secondary to the value observed at the point. Think of this like measuring the number of cars traversing a given road intersection; the location is fixed, and the data of interest comes from the measurement taken at that location. The analysis of this kind of point data is very similar to that of other types of spatial data such as polygons and lines. On the other hand, an observation occuring at a point can also be thought of as a site of measurement from an underlying geographically-continuous process. In this case, the measurement could theoretically take place anywhere, but was only carried out or conducted in certain locations. Think of this as measuring the length of birds’ wings: the location at which birds are measured reflects the underlying geographical process of bird movement and foraging, and the length of the birds’ wings may reflect an underlying ecological process that varies by bird. This kind of approach means that both the location and the measurement matter. This is the perspective we will adopt in the rest of the chapter.</p>
-<p>When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a <em>point pattern</em>. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is crime events in a city: they could technically happen in many locations but we usually find crimes are committed only in a handful of them. Point patterns can be <em>marked</em>, if more attributes are provided with the location, or <em>unmarked</em>, if only the coordinates of where the event occured are provided. Continuing the crime example, an unmarked pattern would result if only the location where crimes were committed was used for analysis, while we would be speaking of a marked point pattern if other attributes, such as the type of crime, the extent of the damage, etc. was provided with the location.</p>
-<p>Point pattern analysis is thus concerned with the visualization, description, statistical characerization, and modeling of point patterns, focusing specially on the generating process that gives rise and explains the observed data. Common questions in this domain include</p>
+<p>When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a <em>point pattern</em>. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is geo-tagged photographs: they could technically happen in many locations but we usually find photos tend to concentrate only in a handful of them. Point patterns can be <em>marked</em>, if more attributes are provided with the location, or <em>unmarked</em>, if only the coordinates of where the event occured are provided. Continuing the photo example, an unmarked pattern would result if only the location where are taken is used for analysis, while we would be speaking of a marked point pattern if other attributes, such as the time, camera model, or a “image quality score” was provided with the location.</p>
+<p>Point pattern analysis is thus concerned with the visualization, description, statistical characerization, and modeling of point patterns, trying to understand the generating process that gives rise and explains the observed data. Common questions in this domain include:</p>
 <ul class="simple">
 <li><p><em>What does the pattern look like?</em></p></li>
 <li><p><em>What is the nature of the distribution of points?</em></p></li>
 <li><p><em>Is there any structure in the way locations are arranged over space? That is, are events clustered? or are they dispersed?</em></p></li>
-<li><p><em>Why do events occur in those places and not in others?</em>
-These are the most common questions in the analysis of point patterns.</p></li>
+<li><p><em>Why do events occur in those places and not in others?</em></p></li>
 </ul>
-<p>At this point, it is useful to remind ourselves of an important distinction, that between process and pattern. The former relates to the underlying mechanism that is at work to generate the outcome we end up observing. Because of its abstract nature, we do not get to see it. However, in many contexts, the key focus of any analysis is to learn about <em>what</em> determines a given phenomenon and <em>how</em> those factors combine to generate it. In this context, “process” is associated with the <em>how</em>. “Pattern,” on the other hand, relates to the result of that process. In some cases, it is the only trace of the process we can observe and thus the only input we have to work with in order to reconstruct it. Although directly observable and, arguably, easier to tackle, pattern is only a reflection of process. The real challenge in many applications is not to characterize the former but to use it to work out the latter.</p>
-<p>In this chapter, we will focus on an introduction to point patters through geo-tagged Flickr photos from Tokyo. In this case, we will treat the phenomena represented in the data as events: photos could be taken of any place in Tokyo, but only certain locations are captured. Keep in mind this understanding of Tokyo photos is not immutable: one could conceive cases where it makes sense to take those locations as given and look at the properties of each of them ignoring their “event” aspect. However, in this context, we will focus on those questions that relate to location and the collective shape of locations. The use of these tools will allow us to transform a long list of unintelligible XY coordinates into tangible phenomena with a characteristic spatial structure, and to answer questions about the center, dispersion, and clustering of attractions in Tokyo for Flickr users.</p>
+<p>These are the most common questions in the analysis of point patterns.</p>
+<p>At this point, it is useful to remind ourselves of an important distinction, that between process and pattern. The former relates to the underlying mechanism that is at work to generate the outcome we end up observing. Because of its abstract nature, we do not get to see it. However, in many contexts, the key focus of any analysis is to learn about <em>what</em> determines a given phenomenon and <em>how</em> those factors combine to generate it. In this context, “process” is associated with the <em>how</em>. “Pattern,” on the other hand, relates to the result of that process. In some cases, it is the only trace of the process we can observe and thus the only input we have to work with in order to reconstruct it. Although directly observable and, arguably, easier to tackle, pattern is only a reflection of process. The real challenge is not to characterize the former but to use it to work out the latter.</p>
+<p>In this chapter, we provide an introduction to point patters through geo-tagged Flickr photos from Tokyo. We will treat the phenomena represented in the data as events: photos could be taken of any place in Tokyo, but only certain locations are captured. Keep in mind this understanding of Tokyo photos is not immutable: one could conceive cases where it makes sense to take those locations as given and look at the properties of each of them ignoring their “event” aspect. However, in this context, we will focus on those questions that relate to location and the collective shape of locations. The use of these tools will allow us to transform a long list of unintelligible XY coordinates into tangible phenomena with a characteristic spatial structure, and to answer questions about the center, dispersion, and clustering of attractions in Tokyo for Flickr users.</p>
 </div>
-<div class="section" id="location-location-location">
-<h2>Location, Location, Location<a class="headerlink" href="#location-location-location" title="Permalink to this headline">¶</a></h2>
-<p>The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where to people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider volunteered geographic information (VGI, <a class="bibtex reference internal" href="references.html#goodchild2007citizens" id="id1">[Goo07]</a>) in the form of online photo hosting services. In this vignette we will explore metadata from a sample of georeferenced images uploaded to <a class="reference external" href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a class="reference external" href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. To do that, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. To get started, let’s load the flickr data first:</p>
+<div class="section" id="the-tokyo-photographs-dataset">
+<h2>The Tokyo photographs dataset<a class="headerlink" href="#the-tokyo-photographs-dataset" title="Permalink to this headline">¶</a></h2>
+<p>The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, <a class="bibtex reference internal" href="references.html#goodchild2007citizens" id="id1">[Goo07]</a>). In this chapter we will explore metadata from a sample of georeferenced images uploaded to <a class="reference external" href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a class="reference external" href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern.</p>
+<p>To get started, let’s load the flickr data first:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/tokyo/tokyo_clean.csv&#39;</span><span class="p">)</span>
@@ -485,182 +508,39 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 </div>
-<p>This table has been lightly processed from the raw data. It contains the user ID, the latitude and longitude, as well as those coordinates expressed in Pseudo Mercator, the timestamp when the photo was taken, and the url of the picture they refer to:</p>
+<p>The table contains the following information about the sample of 10,000 photographs: the ID of the user who took the photo; the location expressed as latitude and longitude columns; a transformed version of those coordinates expressed in Pseudo Mercator; the timestamp when the photo was taken; and the url where the picture they refer to is stored online:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>user_id</th>
-      <th>longitude</th>
-      <th>latitude</th>
-      <th>date_taken</th>
-      <th>photo/video_page_url</th>
-      <th>x</th>
-      <th>y</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>10727420@N00</td>
-      <td>139.700499</td>
-      <td>35.674000</td>
-      <td>2010-04-09 17:26:25.0</td>
-      <td>http://www.flickr.com/photos/10727420@N00/4545...</td>
-      <td>1.555139e+07</td>
-      <td>4.255856e+06</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>8819274@N04</td>
-      <td>139.766521</td>
-      <td>35.709095</td>
-      <td>2007-02-10 16:08:40.0</td>
-      <td>http://www.flickr.com/photos/8819274@N04/26503...</td>
-      <td>1.555874e+07</td>
-      <td>4.260667e+06</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>62068690@N00</td>
-      <td>139.765632</td>
-      <td>35.694482</td>
-      <td>2008-12-21 15:45:31.0</td>
-      <td>http://www.flickr.com/photos/62068690@N00/3125...</td>
-      <td>1.555864e+07</td>
-      <td>4.258664e+06</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>49503094041@N01</td>
-      <td>139.784391</td>
-      <td>35.548589</td>
-      <td>2011-11-11 05:48:54.0</td>
-      <td>http://www.flickr.com/photos/49503094041@N01/6...</td>
-      <td>1.556073e+07</td>
-      <td>4.238684e+06</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>40443199@N00</td>
-      <td>139.768753</td>
-      <td>35.671521</td>
-      <td>2006-04-06 16:42:49.0</td>
-      <td>http://www.flickr.com/photos/40443199@N00/2482...</td>
-      <td>1.555899e+07</td>
-      <td>4.255517e+06</td>
-    </tr>
-  </tbody>
-</table>
-</div></div></div>
-</div>
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
-    vertical-align: top;
-}
-
-.dataframe thead th {
-    text-align: right;
-}
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 10000 entries, 0 to 9999
+Data columns (total 7 columns):
+ #   Column                Non-Null Count  Dtype  
+---  ------                --------------  -----  
+ 0   user_id               10000 non-null  object 
+ 1   longitude             10000 non-null  float64
+ 2   latitude              10000 non-null  float64
+ 3   date_taken            10000 non-null  object 
+ 4   photo/video_page_url  10000 non-null  object 
+ 5   x                     10000 non-null  float64
+ 6   y                     10000 non-null  float64
+dtypes: float64(4), object(3)
+memory usage: 547.0+ KB
 </pre></div>
 </div>
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>user_id</th>
-      <th>longitude</th>
-      <th>latitude</th>
-      <th>date_taken</th>
-      <th>photo/video_page_url</th>
-      <th>x</th>
-      <th>y</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>10727420@N00</td>
-      <td>139.700499</td>
-      <td>35.674000</td>
-      <td>2010-04-09 17:26:25.0</td>
-      <td>http://www.flickr.com/photos/10727420@N00/4545...</td>
-      <td>1.555139e+07</td>
-      <td>4.255856e+06</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>8819274@N04</td>
-      <td>139.766521</td>
-      <td>35.709095</td>
-      <td>2007-02-10 16:08:40.0</td>
-      <td>http://www.flickr.com/photos/8819274@N04/26503...</td>
-      <td>1.555874e+07</td>
-      <td>4.260667e+06</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>62068690@N00</td>
-      <td>139.765632</td>
-      <td>35.694482</td>
-      <td>2008-12-21 15:45:31.0</td>
-      <td>http://www.flickr.com/photos/62068690@N00/3125...</td>
-      <td>1.555864e+07</td>
-      <td>4.258664e+06</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>49503094041@N01</td>
-      <td>139.784391</td>
-      <td>35.548589</td>
-      <td>2011-11-11 05:48:54.0</td>
-      <td>http://www.flickr.com/photos/49503094041@N01/6...</td>
-      <td>1.556073e+07</td>
-      <td>4.238684e+06</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>40443199@N00</td>
-      <td>139.768753</td>
-      <td>35.671521</td>
-      <td>2006-04-06 16:42:49.0</td>
-      <td>http://www.flickr.com/photos/40443199@N00/2482...</td>
-      <td>1.555899e+07</td>
-      <td>4.255517e+06</td>
-    </tr>
-  </tbody>
-</table>
 </div>
+</div>
+<p>Note that the data is provided as a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file, so the spatial information is encoded as separate columns, one for each coordinate. This is contrast to how we have consumed spatial data in previous chapters, where spatial information was stored in a single column and encoded in geometry objects.</p>
 </div>
 <div class="section" id="visualization">
 <h2>Visualization<a class="headerlink" href="#visualization" title="Permalink to this headline">¶</a></h2>
-<p>The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatter plot with a single line:</p>
+<div class="section" id="dots-on-a-map">
+<h3>Dots on a map<a class="headerlink" href="#dots-on-a-map" title="Permalink to this headline">¶</a></h3>
+<p>The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatter plot with <code class="docutils literal notranslate"><span class="pre">seaborn</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
@@ -669,128 +549,55 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_9_0.png" src="../_images/08_point_pattern_analysis_9_0.png" />
+<img alt="../_images/08_point_pattern_analysis_10_0.png" src="../_images/08_point_pattern_analysis_10_0.png" />
 </div>
 </div>
 <p>This is a good start: we can see dots tend to be concentrated in the center of the covered area in a very (apparently) not random. Furthermore, within the broad pattern, we can also see there seems to be more localised clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb.</p>
-<p>Start with the context. The easiest way to provide additional context is by ovelaying a tile map from the internet. Let us quickly call <code class="docutils literal notranslate"><span class="pre">contextily</span></code> for that. We first obtain the bounding box of the point pattern.</p>
+<p>Start with the context. The easiest way to provide additional context is by ovelaying a tile map from the internet. Let us quickly call <code class="docutils literal notranslate"><span class="pre">contextily</span></code> for that, and integrate it with <code class="docutils literal notranslate"><span class="pre">jointplot</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract bounding box from the `x` and `y` columns</span>
-<span class="n">bounding_box</span> <span class="o">=</span> <span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Then, we can pull the tiles down using <code class="docutils literal notranslate"><span class="pre">contextily.bounds2img</span></code>:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Download map tiles</span>
-<span class="n">basemap</span><span class="p">,</span> <span class="n">basemap_extent</span> <span class="o">=</span> <span class="n">contextily</span><span class="o">.</span><span class="n">bounds2img</span><span class="p">(</span><span class="o">*</span><span class="n">bounding_box</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span>
-                                                <span class="n">url</span> <span class="o">=</span> <span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
+<span class="n">joint_axes</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_joint</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">PositronNoLabels</span>
+<span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="stderr docutils container">
-<pre class="stderr literal-block">&lt;ipython-input-6-8a25bf4e1df7&gt;:2: FutureWarning: The &quot;url&quot; option is deprecated. Please use the &quot;source&quot; argument instead.
-  basemap, basemap_extent = contextily.bounds2img(*bounding_box, zoom=11,
-</pre>
+<img alt="../_images/08_point_pattern_analysis_12_0.png" src="../_images/08_point_pattern_analysis_12_0.png" />
 </div>
 </div>
-</div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;ipython-input-6-8a25bf4e1df7&gt;:2: FutureWarning: The &quot;url&quot; option is deprecated. Please use the &quot;source&quot; argument instead.
-  basemap, basemap_extent = contextily.bounds2img(*bounding_box, zoom=11,
-</pre></div>
-</div>
-<p>Now, <code class="docutils literal notranslate"><span class="pre">basemap</span></code> is an array containing the raw image data for a basemap of Tokyo, and the <code class="docutils literal notranslate"><span class="pre">extent</span></code> is the boundary of that image, in terms of the same pseudo-Mercator projection the data uses. However, it is important to note that many of the mapping tools in spatial analysis express their bounding box in <strong>corner form</strong>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">left</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">top</span>
-</pre></div>
-</div>
-<p>This is <strong>corner form</strong> because it stitches together the locations of the bottom-left and top-right of the map. Despite the geographic analysis tools’ focus on corner-form bounds, many of the <em>plotting</em> tools in Python express their bounding box in an <strong>edge form</strong>, stitching together the left &amp; right edges with the bottom &amp; top edges:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="n">bottom</span><span class="p">,</span> <span class="n">top</span>
-</pre></div>
-</div>
-<p>This can be confusing. We will be consistent in referring to a <strong>corner form</strong> boundary as a <code class="docutils literal notranslate"><span class="pre">bounding_box</span></code>, whereas an <code class="docutils literal notranslate"><span class="pre">extent</span></code> will refer to an <strong>edge form</strong> boundary.</p>
-<p>You can see this practically by comparing our original <code class="docutils literal notranslate"><span class="pre">bounding_box</span></code> to the <code class="docutils literal notranslate"><span class="pre">basemap_extent</span></code> returned from <code class="docutils literal notranslate"><span class="pre">contextily</span></code>. Since the <code class="docutils literal notranslate"><span class="pre">basemap_extent</span></code> is used in plotting, it is in edge form. But, since <code class="docutils literal notranslate"><span class="pre">contextily</span></code> takes its input from geographical data, it expects a <code class="docutils literal notranslate"><span class="pre">bounding_box</span></code> in corner form, as input.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bounding_box</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[15536078.976635901, 4235240.756448597, 15575297.38983982, 4275538.623192449]
-</pre></div>
-</div>
-</div>
-</div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[15536078.976635901, 4235240.756448597, 15575297.38983982, 4275538.623192449]
-</pre></div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">basemap_extent</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>(15517328.23811706, 15576031.875840075, 4226661.916057105, 4285365.553780119)
-</pre></div>
-</div>
-</div>
-</div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(15517328.23811706, 15576031.875840075, 4226661.916057105, 4285365.553780119)
-</pre></div>
-</div>
-<p>For convenience, sometime is it also helpful to define the <code class="docutils literal notranslate"><span class="pre">data_extent</span></code> as well, in case the basemap covers too much additional area:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_extent</span> <span class="o">=</span> <span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">db</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()]</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="dots-on-a-map">
-<h3>Dots on a map<a class="headerlink" href="#dots-on-a-map" title="Permalink to this headline">¶</a></h3>
-<p>Together, adding a basemap to our initial plot really makes the pattern of Flickr data clearer:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c1"># Add map tiles for context</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> 
-          <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
-<span class="c1"># Plot photograph points</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="n">data_extent</span><span class="p">)</span>
-<span class="c1"># Display</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_22_0.png" src="../_images/08_point_pattern_analysis_22_0.png" />
-</div>
-</div>
+<p>Note how we can pull out the axis where the points are plotted and add the basemap there, specifying the CRS as WGS84, since we are plotting longitude and latitude. Compared to the previous plot, adding a basemap to our initial plot makes the pattern of Flickr data clearer.</p>
 </div>
 <div class="section" id="hex-binning">
 <h3>Hex-binning<a class="headerlink" href="#hex-binning" title="Permalink to this headline">¶</a></h3>
-<p>Let us now take care of the second problem. When some areas of town have too many dots, plotting opaque dots on top of one another can make it hard to tell any pattern or see through to explore the characteristics of the area. For example, in the middle of the map, towards the right, there is the highest concentration of pictures taken; this sheer amount of dots on the maps in some parts obscures whether all of that area receives as many pics or whether, within there, some places receive a particularly high degree of attention.</p>
-<p>The first solution for this, which has become very popular in the last few years, is a <em>spatial</em> or <em>2-dimensional histogram</em>. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive, and the regular grid removes some of the area distortions choropleths may induce. We will use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as larger flexibility in the shape and better connectivity between cells. Creating a hexbin 2-d histogram is straightforward in Python using the <code class="docutils literal notranslate"><span class="pre">hexbin</span></code> function:</p>
+<p>Consider our second problem: cluttering. When too many photos are concentrated in some areas of, plotting opaque dots on top of one another can make it hard to discern any pattern and explore its nature. For example, in the middle of the map, towards the right, there appears to be the highest concentration of pictures taken; the sheer amount of dots on the maps in some parts obscures whether all of that area receives as many pics or whether, within there, some places receive a particularly high degree of attention.</p>
+<p>One solution to get around cluttering relates to what we referred to earlier as moving from <a class="reference internal" href="03_spatial_data.html#ch03-surfaces-as-tables"><span class="std std-ref">“tables to surfaces”</span></a>. We can now recast this approach as a <em>spatial</em> or <em>2-dimensional histogram</em>. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleths may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin 2-d histogram is straightforward in Python using the <code class="docutils literal notranslate"><span class="pre">hexbin</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c1"># Add map tiles for context</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Generate and add hexbin with 50 hexagons in each </span>
 <span class="c1"># dimension, no borderlines, half transparency,</span>
 <span class="c1"># and the reverse viridis colormap</span>
-<span class="n">hb</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">hexbin</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
-               <span class="n">gridsize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-               <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis_r&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="n">data_extent</span><span class="p">)</span>
+<span class="n">hb</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">hexbin</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> 
+    <span class="n">db</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
+    <span class="n">gridsize</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> 
+    <span class="n">linewidths</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> 
+    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis_r&#39;</span>
+<span class="p">)</span>
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 <span class="c1"># Add colorbar</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">hb</span><span class="p">)</span>
 <span class="c1"># Remove axes</span>
@@ -799,7 +606,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_24_0.png" src="../_images/08_point_pattern_analysis_24_0.png" />
+<img alt="../_images/08_point_pattern_analysis_15_0.png" src="../_images/08_point_pattern_analysis_15_0.png" />
 </div>
 </div>
 <p>Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localised areas and that the previous map was obscuring this.</p>
@@ -811,31 +618,40 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c1"># Add map tiles for context</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
 <span class="c1"># Generate and add KDE with a shading of 50 gradients </span>
 <span class="c1"># coloured contours, 75% of transparency,</span>
 <span class="c1"># and the reverse viridis colormap</span>
-<span class="n">seaborn</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
-                <span class="n">n_levels</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">alpha</span><span class="o">=</span><span class="mf">0.55</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis_r&#39;</span><span class="p">)</span>
+<span class="n">seaborn</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> 
+    <span class="n">db</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span>
+    <span class="n">n_levels</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> 
+    <span class="n">shade</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.55</span><span class="p">,</span> 
+    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis_r&#39;</span>
+<span class="p">)</span>
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 <span class="c1"># Remove axes</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="n">data_extent</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_26_0.png" src="../_images/08_point_pattern_analysis_26_0.png" />
+<img alt="../_images/08_point_pattern_analysis_17_0.png" src="../_images/08_point_pattern_analysis_17_0.png" />
 </div>
 </div>
-<p>The result is a much smoother output that captures the same structure of the hexbin but eases the transitions between different areas. This provides a better generalisation of the theoretical probability that a picture <em>might</em> occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares.</p>
+<p>The result is a smoother output that captures the same structure of the hexbin but “eases” the transitions between different areas. This provides a better generalisation of the theoretical probability that a picture <em>might</em> occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares.</p>
 </div>
 </div>
 <div class="section" id="centrography">
 <h2>Centrography<a class="headerlink" href="#centrography" title="Permalink to this headline">¶</a></h2>
-<p>Centrography is the analysis of centrality in a point pattern. By “centrality,” we mean the general location and dispersion of the pattern. Many different measures are used in centrography to provide an indication of “where” a point pattern is, how tightly the point pattern clusters around its center, or how irregular its shape is.</p>
-<p>For instance, one common measure of central tendency for a point pattern is its <em>center of mass</em>. For marked point patterns, the center of mass identifies a central point close to observations that have higher values in their marked attribute. For unmarked point patterns, the center of mass is equivalent to the <em>mean center</em>, or average of the coordinate values. In addition, the <em>median center</em> is analogous to the <em>median</em> elsewhere, and represents a point where half of the data is above or below the point &amp; half is to its left or right. We can analyze the mean center with our flickr point pattern using the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package in Python.</p>
+<p>Centrography is the analysis of centrality in a point pattern. By “centrality,” we mean the general location and dispersion of the pattern. If the hexbin above can be seen as a “spatial histogram”, centrography is the point pattern equivalent of measures of central tendency such as the mean. These measures are useful because they allow us to summarise spatial distributions in smaller sets of information (e.g. a single point). Many different indices are used in centrography to provide an indication of “where” a point pattern is, how tightly the point pattern clusters around its center, or how irregular its shape is.</p>
+<div class="section" id="tendency">
+<h3>Tendency<a class="headerlink" href="#tendency" title="Permalink to this headline">¶</a></h3>
+<p>A common measure of central tendency for a point pattern is its <em>center of mass</em>. For marked point patterns, the center of mass identifies a central point close to observations that have higher values in their marked attribute. For unmarked point patterns, the center of mass is equivalent to the <em>mean center</em>, or average of the coordinate values. In addition, the <em>median center</em> is analogous to the <em>median</em> elsewhere, and represents a point where half of the data is above or below the point &amp; half is to its left or right. We can analyze the mean center with our flickr point pattern using the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package in Python.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pointpats</span> <span class="kn">import</span> <span class="n">centrography</span>
@@ -854,27 +670,44 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <p>It is easiest to visualize this by plotting the point pattern and its mean center alongside one another:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c1"># Add map tiles for context</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> 
-          <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
-<span class="c1"># Plot photograph points</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">mean_center</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean Center&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">med_center</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;limegreen&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Median Center&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="n">data_extent</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
+<span class="n">joint_axes</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span>
+    <span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">9</span>
+<span class="p">)</span>
+<span class="c1"># Add mean point and marginal lines</span>
+<span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_joint</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="o">*</span><span class="n">mean_center</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean Center&#39;</span>
+<span class="p">)</span>
+<span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_marg_x</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">mean_center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_marg_y</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">mean_center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="c1"># Add median point and marginal lines</span>
+<span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_joint</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="o">*</span><span class="n">med_center</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;limegreen&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Median Center&#39;</span>
+<span class="p">)</span>
+<span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_marg_x</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">med_center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;limegreen&#39;</span><span class="p">)</span>
+<span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_marg_y</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">med_center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;limegreen&#39;</span><span class="p">)</span>
+<span class="c1"># Legend</span>
+<span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_joint</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_joint</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
+<span class="c1"># Clean axes</span>
+<span class="n">joint_axes</span><span class="o">.</span><span class="n">ax_joint</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="c1"># Display</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_31_0.png" src="../_images/08_point_pattern_analysis_31_0.png" />
+<img alt="../_images/08_point_pattern_analysis_24_0.png" src="../_images/08_point_pattern_analysis_24_0.png" />
 </div>
 </div>
-<p>The discrepancy between the two centers is caused by the skew; there are many “clusters” of pictures far out in West&amp; South Tokyo, whereas North &amp; East Tokyo is densely packed, but drops off very quickly. Thus, the far out clusters of pictures pulls the mean center to the west and south, relative to the median center.</p>
+<p>The discrepancy between the two centers is caused by the skew; there are many “clusters” of pictures far out in West and South Tokyo, whereas North and East Tokyo is densely packed, but drops off very quickly. Thus, the far out clusters of pictures pulls the mean center to the west and south, relative to the median center.</p>
+</div>
+<div class="section" id="dispersion">
+<h3>Dispersion<a class="headerlink" href="#dispersion" title="Permalink to this headline">¶</a></h3>
 <p>A measure of dispersion that is common in centrography is the <em>standard distance</em>. This measure provides the average distance away from the center of the point cloud (such as measured by the center of mass). This is also simple to compute using <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>, using the <code class="docutils literal notranslate"><span class="pre">std_distance</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -888,7 +721,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 </div>
-<p>This means that, on average, pictures are taken around 8800 feet away from the mean center.</p>
+<p>This means that, on average, pictures are taken around 8800 metres away from the mean center.</p>
 <p>Another helpful visualization is the <em>standard deviational ellipse</em>, or <em>standard ellipse</em>. This is an ellipse drawn from the data that reflects both its center and dispersion. To visualize this, we first compute the axes and rotation using the <code class="docutils literal notranslate"><span class="pre">ellipse</span></code> function in <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -900,17 +733,9 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Ellipse</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+
+<span class="c1"># Set up figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c1"># Add map tiles for context</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> 
-          <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
 <span class="c1"># Plot photograph points</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">mean_center</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Mean Center&#39;</span><span class="p">)</span>
@@ -926,19 +751,26 @@ These are the most common questions in the analysis of point patterns.</p></li>
                   <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Std. Ellipse&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">ellipse</span><span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="n">data_extent</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="c1"># Display</span>
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_37_0.png" src="../_images/08_point_pattern_analysis_37_0.png" />
+<img alt="../_images/08_point_pattern_analysis_30_0.png" src="../_images/08_point_pattern_analysis_30_0.png" />
 </div>
 </div>
-<p>Finally, another collection of measures about point patterns characterize the extent of a point cloud. Four shapes are useful, and reflect varying levels of how “tightly” they bind the pattern.</p>
-<p>Below, we’ll walk through how to construct each example and visualize them at the end. To make things more clear, we’ll use the flickr photos for the most prolific user in the dataset to show how different these results can be.</p>
+</div>
+<div class="section" id="extent">
+<h3>Extent<a class="headerlink" href="#extent" title="Permalink to this headline">¶</a></h3>
+<p>The last collection of centrography measures we will discuss characterizes the extent of a point cloud. Four shapes are useful, and reflect varying levels of how “tightly” they bind the pattern.</p>
+<p>Below, we’ll walk through how to construct each example and visualize them at the end. To make things more clear, we’ll use the flickr photos for the most prolific user in the dataset (ID: <code class="docutils literal notranslate"><span class="pre">95795770</span></code>) to show how different these results can be.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">user</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;user_id == &quot;95795770@N00&quot;&#39;</span><span class="p">)</span>
@@ -955,12 +787,11 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 </div>
-<p>Second, we’ll compute the <strong>alpha shape</strong>, which is like a “tighter” version of the convex hull. One way to think of a convex hull is that it’s the space left over when rolling a <strong>really</strong> large ball or circle all the way around the shape. The ball is so large relative to the shape, its radius is actually infinite, and the lines forming the convex hull are actually just straight lines!</p>
+<p>Second, we’ll compute the <strong>alpha shape</strong>, which can be understood as a “tighter” version of the convex hull. One way to think of a convex hull is that it’s the space left over when rolling a <strong>really</strong> large ball or circle all the way around the shape. The ball is so large relative to the shape, its radius is actually infinite, and the lines forming the convex hull are actually just straight lines!</p>
 <p>In contrast, you can think of an alpha shape as the space made from rolling a <em>small</em> balls around the shape. Since the ball is smaller, it rolls into the dips &amp; valleys created between points. As that ball gets bigger, the alpha shape becomes the convex hull. But, for small balls, the shape can get very tight indeed. In fact, if alpha gets too small, it “slips” through the points, resulting in <em>more than one hull!</em> As such, the <code class="docutils literal notranslate"><span class="pre">pysal</span></code> package has an <code class="docutils literal notranslate"><span class="pre">alpha_shape_auto</span></code> function to find the smallest <em>single</em> alpha shape, so that you don’t have to guess at how big the ball needs to be.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># TODO: Change this to use July 2020 release of PySAL with this function in libpysal</span>
-<span class="kn">import</span> <span class="nn">libpysal</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpysal</span>
 <span class="n">alpha_shape</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">circs</span> <span class="o">=</span> <span class="n">libpysal</span><span class="o">.</span><span class="n">cg</span><span class="o">.</span><span class="n">alpha_shape_auto</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">return_circles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -973,13 +804,20 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
 
 <span class="c1"># Plot a green alpha shape</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">PolygonPatch</span><span class="p">(</span><span class="n">alpha_shape</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> 
-                          <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Tighest alpha shape&#39;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span>
+    <span class="n">PolygonPatch</span><span class="p">(</span>
+        <span class="n">alpha_shape</span><span class="p">,</span> 
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> 
+        <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> 
+        <span class="n">alpha</span><span class="o">=.</span><span class="mi">2</span><span class="p">,</span> 
+        <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Tighest single alpha shape&#39;</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 
 <span class="c1"># Include the points for our prolific user in black</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Source Points&#39;</span><span class="p">)</span>
-<span class="c1"># Add a basemap</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="o">*</span><span class="n">coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Source Points&#39;</span>
+<span class="p">)</span>
 
 <span class="c1"># plot the circles forming the boundary of the alpha shape</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">circle</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">circs</span><span class="p">):</span>
@@ -988,29 +826,44 @@ These are the most common questions in the analysis of point patterns.</p></li>
         <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Bounding Circles&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">(</span><span class="n">circle</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">))</span>
-    
+    <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">Circle</span><span class="p">(</span>
+            <span class="n">circle</span><span class="p">,</span> 
+            <span class="n">radius</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> 
+            <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
+            <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="n">label</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
 
 <span class="c1"># add a blue convex hull</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">convex_hull_vertices</span><span class="p">,</span> 
-                            <span class="n">closed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-                            <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
-                            <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Convex Hull&#39;</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span>
+        <span class="n">convex_hull_vertices</span><span class="p">,</span> 
+        <span class="n">closed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> 
+        <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
+        <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> 
+        <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Convex Hull&#39;</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f413c088c10&gt;
-</pre></div>
-</div>
-<img alt="../_images/08_point_pattern_analysis_45_1.png" src="../_images/08_point_pattern_analysis_45_1.png" />
+<img alt="../_images/08_point_pattern_analysis_38_0.png" src="../_images/08_point_pattern_analysis_38_0.png" />
 </div>
 </div>
-<p>The remaining three bounding shapes are all rectangles or circles. First, we’ll consider two kinds of <strong>minimum bounding rectangles</strong>. They both are constructed as the tightest <em>rectangle</em> that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the <strong>minimum rotated rectangle</strong> provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated.</p>
+<p>We will cover three more bounding shapes, all of them rectangles or circles. First, two kinds of <strong>minimum bounding rectangles</strong>. They both are constructed as the tightest <em>rectangle</em> that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the <strong>minimum rotated rectangle</strong> provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated.</p>
 <p>For the minimum rotated rectangle, we will use the <code class="docutils literal notranslate"><span class="pre">minimum_rotated_rectangle</span></code> function from the <code class="docutils literal notranslate"><span class="pre">pointpats.centrography</span></code> module.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1042,41 +895,57 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <span class="kn">from</span> <span class="nn">descartes</span> <span class="kn">import</span> <span class="n">PolygonPatch</span>
 
 <span class="c1"># Make a purple alpha shape</span>
-<span class="n">alpha_shape_patch</span> <span class="o">=</span> <span class="n">PolygonPatch</span><span class="p">(</span><span class="n">alpha_shape</span><span class="p">,</span> 
-                                 <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
-                                 <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                                 <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Alpha Shape&#39;</span><span class="p">)</span>
+<span class="n">alpha_shape_patch</span> <span class="o">=</span> <span class="n">PolygonPatch</span><span class="p">(</span>
+    <span class="n">alpha_shape</span><span class="p">,</span> 
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;purple&#39;</span><span class="p">,</span> 
+    <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Alpha Shape&#39;</span>
+<span class="p">)</span>
 
 <span class="c1"># a blue convex hull</span>
-<span class="n">convex_hull_patch</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">convex_hull_vertices</span><span class="p">,</span> 
-                            <span class="n">closed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-                            <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
-                            <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                            <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Convex Hull&#39;</span><span class="p">)</span>
+<span class="n">convex_hull_patch</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span>
+    <span class="n">convex_hull_vertices</span><span class="p">,</span> 
+    <span class="n">closed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
+    <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Convex Hull&#39;</span>
+<span class="p">)</span>
 
 <span class="c1"># a green minimum rotated rectangle</span>
-<span class="n">min_rot_rect_patch</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">min_rot_rect</span><span class="p">,</span> 
-                             <span class="n">closed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-                             <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
-                             <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> 
-                             <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Min Rotated Rectangle&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">min_rot_rect_patch</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span>
+    <span class="n">min_rot_rect</span><span class="p">,</span> 
+    <span class="n">closed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;green&#39;</span><span class="p">,</span> 
+    <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
+    <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">,</span> 
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Min Rotated Rectangle&#39;</span><span class="p">,</span> 
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span>
+<span class="p">)</span>
 
 <span class="c1"># compute the width and height of the </span>
 <span class="n">min_rect_width</span> <span class="o">=</span> <span class="n">min_rect_vertices</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">min_rect_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">min_rect_height</span> <span class="o">=</span> <span class="n">min_rect_vertices</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">min_rect_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
 <span class="c1"># a goldenrod minimum bounding rectangle</span>
-<span class="n">min_rect_patch</span> <span class="o">=</span> <span class="n">Rectangle</span><span class="p">(</span><span class="n">min_rect_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> 
-                           <span class="n">width</span> <span class="o">=</span> <span class="n">min_rect_width</span><span class="p">,</span>
-                           <span class="n">height</span> <span class="o">=</span> <span class="n">min_rect_height</span><span class="p">,</span>
-                           <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;goldenrod&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
-                           <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
-                           <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Min Bounding Rectangle&#39;</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">min_rect_patch</span> <span class="o">=</span> <span class="n">Rectangle</span><span class="p">(</span>
+    <span class="n">min_rect_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> 
+    <span class="n">width</span> <span class="o">=</span> <span class="n">min_rect_width</span><span class="p">,</span>
+    <span class="n">height</span> <span class="o">=</span> <span class="n">min_rect_height</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;goldenrod&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
+    <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Min Bounding Rectangle&#39;</span><span class="p">,</span> 
+<span class="p">)</span>
 
 <span class="c1"># and a red minimum bounding circle</span>
-<span class="n">circ_patch</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">((</span><span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span><span class="p">),</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
-                    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Min Bounding Circle&#39;</span><span class="p">)</span>
+<span class="n">circ_patch</span> <span class="o">=</span> <span class="n">Circle</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span><span class="p">),</span> 
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> 
+    <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> 
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Min Bounding Circle&#39;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1085,7 +954,6 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">alpha_shape_patch</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">convex_hull_patch</span><span class="p">)</span>
@@ -1096,20 +964,27 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=.</span><span class="mi">75</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_55_0.png" src="../_images/08_point_pattern_analysis_55_0.png" />
+<img alt="../_images/08_point_pattern_analysis_48_0.png" src="../_images/08_point_pattern_analysis_48_0.png" />
 </div>
 </div>
 <p>Each gives a different impression of the area enclosing the user’s range of photographs. In this, you can see that the the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle &amp; circle are the “loosest” shapes, in that they contain the most area outside of the user’s typical area. But, they’re also the simplest shapes to draw and understand.</p>
 </div>
+</div>
 <div class="section" id="randomness-clustering">
 <h2>Randomness &amp; clustering<a class="headerlink" href="#randomness-clustering" title="Permalink to this headline">¶</a></h2>
-<p>Beyond questions of centrality and extent, spatial statistics on point patterns are often concerned with how <em>even</em> a distribution of points is. By this, we might want to inquire about whether points tend to all cluster near one another or whether they disperse evenly throughout the problem area. Questions like this refer to the <em>intensity</em> or <em>dispersion</em> of the point pattern overall.</p>
-<p>Many methods in spatial statistics are interested in this kind of clustering. We will cover a few of the methods useful for identifying clustering in locations of points across the flickr photographs in Tokyo. The first set of techniques, <strong>quadrat</strong> statistics, splits the data up into small areas and then examines the uniformity of counts across areas. The second set of techniques all derive from Ripley (1988), and involve measurements of the distance between points in a point pattern.</p>
+<p>Beyond questions of centrality and extent, spatial statistics on point patterns are often concerned with how <em>even</em> a distribution of points is. By this, we mean whether points tend to all cluster near one another or disperse evenly throughout the problem area. Questions like this refer to the <em>intensity</em> or <em>dispersion</em> of the point pattern overall. In the jargon of the last two chapters, this focus resembles the goals we examined when we introduced <a class="reference internal" href="06_spatial_autocorrelation.html"><span class="doc std std-doc">global spatial autocorrelation</span></a>: what is the overall degree of <em>clustering</em> we observe in the pattern? Spatial statistics has devoted plenty of effort to understand this kind of clustering. This section will cover methods useful for identifying clustering in point patterns.</p>
+<p>The first set of techniques, <strong>quadrat</strong> statistics, receive their name after their approach to split the data up into small areas (quadrants). Once created, these “buckets” are used to examinee the uniformity of counts across them. The second set of techniques all derive from Ripley (1988), and involve measurements of the distance between points in a point pattern.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pointpats</span> <span class="kn">import</span> <span class="n">distance_statistics</span><span class="p">,</span> <span class="n">QStatistic</span><span class="p">,</span> <span class="n">random</span><span class="p">,</span> <span class="n">PointPattern</span>
@@ -1128,20 +1003,23 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed&#39;</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed photographs&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">random_pattern</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Random&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_60_0.png" src="../_images/08_point_pattern_analysis_60_0.png" />
+<img alt="../_images/08_point_pattern_analysis_54_0.png" src="../_images/08_point_pattern_analysis_54_0.png" />
 </div>
 </div>
-<p>As you can see, the simulation (by default) works with the bounding box of the input point pattern. To simulate from more restricted areas formed by the point pattern, pass those hulls to the simulator.</p>
+<p>As you can see, the simulation (by default) works with the bounding box of the input point pattern. To simulate from more restricted areas formed by the point pattern, pass those hulls to the simulator! For example, to generate a random pattern within the alpha shapes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">random_pattern_ashape</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">alpha_shape</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span>
@@ -1151,20 +1029,22 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">random_pattern_ashape</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Random&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">ncol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="s1">&#39;center left&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_63_0.png" src="../_images/08_point_pattern_analysis_63_0.png" />
+<img alt="../_images/08_point_pattern_analysis_57_0.png" src="../_images/08_point_pattern_analysis_57_0.png" />
 </div>
 </div>
-<p><img alt="png" src="notebooks/08_point_pattern_analysis_files/08_point_pattern_analysis_66_0.png" /></p>
 <div class="section" id="quadrat-statistics">
 <h3>Quadrat statistics<a class="headerlink" href="#quadrat-statistics" title="Permalink to this headline">¶</a></h3>
 <p>Quadrat statistics examine the spatial distribution of points in an area in terms of the count of observations that fall within a given cell. By examining whether observations are spread <em>evenly</em> over cells, the quadrat approach aims to estimate whether points are spread out, or if they are clustered into a few cells. Strictly speaking, quadrat statistics examine the <em>evenness</em> of the distribution over cells using a <span class="math notranslate nohighlight">\(\chi^2\)</span> statistical test common in the analysis of contingency tables.</p>
@@ -1177,7 +1057,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_66_0.png" src="../_images/08_point_pattern_analysis_66_0.png" />
+<img alt="../_images/08_point_pattern_analysis_59_0.png" src="../_images/08_point_pattern_analysis_59_0.png" />
 </div>
 </div>
 <p>In this case, for the default of a three by three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small p-value:</p>
@@ -1202,7 +1082,7 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_70_0.png" src="../_images/08_point_pattern_analysis_70_0.png" />
+<img alt="../_images/08_point_pattern_analysis_63_0.png" src="../_images/08_point_pattern_analysis_63_0.png" />
 </div>
 </div>
 <p>This means its p-value will be large, and likely not significant:</p>
@@ -1213,13 +1093,12 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.35845027437320376
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>0.36220027047033565
 </pre></div>
 </div>
 </div>
 </div>
-<p>Be careful, however: the fact that quadrat counts are measured in <em>regular tiling</em> within the study area (that is, squares or hexagons that cover the entire bounding box), irregular <em>but random</em> patterns can be mistakenly found “significant” by this approach.</p>
-<p>For example, on the random simulations from within the alpha shape, we have the following quadrat count:</p>
+<p>Be careful, however: the fact that quadrat counts are measured in a <em>regular tiling</em> that is overlaid on top of the potentially irregular extent of our pattern can mislead us. In particular, irregular <em>but random</em> patterns can be mistakenly found “significant” by this approach. Consider our random set generated within the alpha shape polygon, with the quadrat grid overlaid on top:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null_ashape</span> <span class="o">=</span> <span class="n">QStatistic</span><span class="p">(</span><span class="n">random_pattern_ashape</span><span class="p">)</span>
@@ -1228,10 +1107,10 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_74_0.png" src="../_images/08_point_pattern_analysis_74_0.png" />
+<img alt="../_images/08_point_pattern_analysis_67_0.png" src="../_images/08_point_pattern_analysis_67_0.png" />
 </div>
 </div>
-<p>The quadrat test finds this to be <em>statistically nonrandom</em>, while our simulating process ensured that <em>within the given study area</em>, the pattern is a complete spatially-random process. Thus, quadrat counts can have issues with irregular study areas, and care should be taken to ensure that clustering is not mistakenly identified.</p>
+<p>The quadrat test finds this to be <em>statistically nonrandom</em>, while our simulating process ensured that <em>within the given study area</em>, the pattern is a complete spatially-random process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null_ashape</span><span class="o">.</span><span class="n">chi2_pvalue</span>
@@ -1239,21 +1118,18 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>2.3045568458939038e-24
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>2.7711379688365975e-22
 </pre></div>
 </div>
 </div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>2.3045568458939038e-24
-</pre></div>
+<p>Thus, quadrat counts can have issues with irregular study areas, and care should be taken to ensure that clustering is not mistakenly identified. One way to interpret the quadrat statistic that reconciles cases like the one above is to think of it as a test that considers both the uniformity of points <em>and</em> the shape of their extent to examine whether the resulting pattern is uniform across a regular grid. In some cases, this is a useful tool; in others this needs to be used with caution.</p>
 </div>
-</div>
-<div class="section" id="ripley-s-alphabet-functions">
-<h3>Ripley’s alphabet functions<a class="headerlink" href="#ripley-s-alphabet-functions" title="Permalink to this headline">¶</a></h3>
-<p>A large branch of spatial statistics focuses on the distributions of three quantities in a point pattern. They derive from earlier work by <a class="bibtex reference internal" href="references.html#ripley1991" id="id3">[Rip91]</a> on how to characterize clustering or co-location in point patterns. These each characterize some aspect of the point pattern as the distance from points increases.</p>
-<p>The first function, Ripley’s <span class="math notranslate nohighlight">\(G\)</span> function, focuses on the distribution of nearest neighbor distances. That is, the <span class="math notranslate nohighlight">\(G\)</span> function summarises the distances between each point in the point pattern to their nearest neighbor in the pattern.</p>
-<p>In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are <em>mutual</em> nearest neighbors (and so have arrows going in both directions) but some are not.</p>
-<div class="cell docutils container">
+<div class="section" id="ripley-s-alphabet-of-functions">
+<h3>Ripley’s alphabet of functions<a class="headerlink" href="#ripley-s-alphabet-of-functions" title="Permalink to this headline">¶</a></h3>
+<p>The second group of spatial statistics we consider focuses on the distributions of two quantities in a point pattern: nearest neighbor distances and what we will term “gaps” in the pattern. They derive from seminal work by <a class="bibtex reference internal" href="references.html#ripley1991" id="id3">[Rip91]</a> on how to characterize clustering or co-location in point patterns. Each of these characterize an aspect of the point pattern as we increase the distance range from each point to calculate them.</p>
+<p>The first function, Ripley’s <span class="math notranslate nohighlight">\(G\)</span>, focuses on the distribution of nearest neighbor distances. That is, the <span class="math notranslate nohighlight">\(G\)</span> function summarises the distances between each point in the pattern and their nearest neighbor. In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are <em>mutual</em> nearest neighbors (and so have arrows going in both directions) but some are not.</p>
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># this code should be hidden in the book, and only the plot visible!</span>
 <span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1288,22 +1164,24 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_78_0.png" src="../_images/08_point_pattern_analysis_78_0.png" />
+<img alt="../_images/08_point_pattern_analysis_72_0.png" src="../_images/08_point_pattern_analysis_72_0.png" />
 </div>
 </div>
-<p>Then, the distribution of these distances has a distinctive pattern under completely spatially random processes. We can compute the distribution of nearest neighbor distances of the observed pattern and compare it to the distribution for a set of simulated patterns that have been simulated according to a known spatially-random process, such as a spatial Poisson point process.</p>
+<p>Ripley’s <span class="math notranslate nohighlight">\(G\)</span> keeps track of the proportion of points for which the nearest neighbor is within a given distance threshold, and plots that cumulative percentage against the increasing distance radiuses. The distribution of these cumulative percentage has a distinctive shape under completely spatially random processes. The intuition behind Ripley’s G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the cumulative distribution of nearest neighbor distances over increasing distance thresholds, and comparing it to that of a set of simulated patterns that follow a known spatially-random process. Usually, a spatial Poisson point process is used as such reference distribution.</p>
 <p>To do this in the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package, we can use the <code class="docutils literal notranslate"><span class="pre">g_test</span></code> function, which computes both the <code class="docutils literal notranslate"><span class="pre">G</span></code> function for the empirical data <em>and</em> these hypothetical replications under a completely spatially random process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g_test</span> <span class="o">=</span> <span class="n">distance_statistics</span><span class="o">.</span><span class="n">g_test</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">support</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">keep_simulations</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g_test</span> <span class="o">=</span> <span class="n">distance_statistics</span><span class="o">.</span><span class="n">g_test</span><span class="p">(</span>
+    <span class="n">coordinates</span><span class="p">,</span> <span class="n">support</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">keep_simulations</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Thinking about these distributions of distances, a “clustered” pattern must have more points near one another than a pattern that is “dispersed”, and a completely random pattern should have something in between. Therefore, if the <span class="math notranslate nohighlight">\(G\)</span> function increases <em>rapidly</em> with distance, we probably have a clustered pattern. If it increases <em>slowly</em> with distance, we have a dispersed pattern. Something in the middle will be difficult to distinguish from pure chance.</p>
-<p>We can visualize this below. On the left, we plot the <span class="math notranslate nohighlight">\(G(d)\)</span> function, with distance-to-point (<span class="math notranslate nohighlight">\(d\)</span>) on the horizontal axis and the fraction of nearest neighbor distances smaller than <span class="math notranslate nohighlight">\(d\)</span> on the right axis. In red, the empirical cumulative distribution of nearest neighbor distances is shown. In blue, simulations (like the <code class="docutils literal notranslate"><span class="pre">random</span></code> pattern shown in the previous section) are shown. The bright blue line represents the average of all simulations, and the darker blue band around it represents the middle 95% of simulations.</p>
+<p>Thinking about these distributions of distances, a “clustered” pattern must have more points near one another than a pattern that is “dispersed”; and a completely random pattern should have something in between. Therefore, if the <span class="math notranslate nohighlight">\(G\)</span> function increases <em>rapidly</em> with distance, we probably have a clustered pattern. If it increases <em>slowly</em> with distance, we have a dispersed pattern. Something in the middle will be difficult to distinguish from pure chance.</p>
+<p>We can visualize this below. On the left, we plot the <span class="math notranslate nohighlight">\(G(d)\)</span> function, with distance-to-point (<span class="math notranslate nohighlight">\(d\)</span>) on the horizontal axis and the fraction of nearest neighbor distances smaller than <span class="math notranslate nohighlight">\(d\)</span> on the right axis. In red, the empirical cumulative distribution of nearest neighbor distances is shown. In blue, simulations (like the <code class="docutils literal notranslate"><span class="pre">random</span></code> pattern shown in the previous section) are shown. The bright blue line represents the average of all simulations, and the darker blue/black band around it represents the middle 95% of simulations.</p>
 <p>In this plot, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user’s flickr photographs are <em>closer</em> to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is <em>clustered.</em></p>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> 
                     <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span>
@@ -1339,22 +1217,25 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_82_0.png" src="../_images/08_point_pattern_analysis_82_0.png" />
+<img alt="../_images/08_point_pattern_analysis_76_0.png" src="../_images/08_point_pattern_analysis_76_0.png" />
 </div>
 </div>
-<p>Another way to measure dispersion is to examine the <em>gaps</em> in the pattern. That is, where the <span class="math notranslate nohighlight">\(G\)</span> function works by analyzing the distance <em>between</em> points in the pattern, the <em>F</em> function works by analyzing the distance <em>to</em> points in the pattern from locations in empty space. That is why the <span class="math notranslate nohighlight">\(F\)</span> function is called the “the empty space function,” since it characterizes the typical distance from arbitrary points in empty space to the point pattern. If the pattern has large gaps or empty areas, the <span class="math notranslate nohighlight">\(F\)</span> function will increase slowly. But, if the pattern is highly dispersed, then the <span class="math notranslate nohighlight">\(F\)</span> function will increase rapidly.</p>
-<p>We can use similar tooling to investigate the <span class="math notranslate nohighlight">\(F\)</span> function, since it is so mathematically similar to the <span class="math notranslate nohighlight">\(G\)</span> function. This is implemented identically using the <code class="docutils literal notranslate"><span class="pre">Fenv</span></code> function in <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>. Since the <span class="math notranslate nohighlight">\(F\)</span> function estimated for the observed pattern increases <em>much</em> more slowly than the <span class="math notranslate nohighlight">\(F\)</span> functions for the simulated patterns, we can be confident that there are many gaps in our pattern; i.e. the pattern is <em>clustered</em>.</p>
+<p>The second function we introduce is Ripley’s <span class="math notranslate nohighlight">\(F\)</span>. Where the <span class="math notranslate nohighlight">\(G\)</span> function works by analyzing the distance <em>between</em> points in the pattern, the <em>F</em> function works by analyzing the distance <em>to</em> points in the pattern from locations in empty space. That is why the <span class="math notranslate nohighlight">\(F\)</span> function is called the “the empty space function”, since it characterizes the typical distance from arbitrary points in empty space to the point pattern. More explicitly, the <span class="math notranslate nohighlight">\(F\)</span> accumulates, for a growing distance range, the percentage of points that can be found within that range from a random point pattern generated within the extent of the observed pattern. If the pattern has large gaps or empty areas, the <span class="math notranslate nohighlight">\(F\)</span> function will increase slowly. But, if the pattern is highly dispersed, then the <span class="math notranslate nohighlight">\(F\)</span> function will increase rapidly. The shape of this cumulative distribution is then compared to those constructed by calculating the same cumulative distribution between the random pattern and an additional, random one generated in each simulation step.</p>
+<p>We can use similar tooling to investigate the <span class="math notranslate nohighlight">\(F\)</span> function, since it is so mathematically similar to the <span class="math notranslate nohighlight">\(G\)</span> function. This is implemented identically using the <code class="docutils literal notranslate"><span class="pre">f_test</span></code> function in <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>. Since the <span class="math notranslate nohighlight">\(F\)</span> function estimated for the observed pattern increases <em>much</em> more slowly than the <span class="math notranslate nohighlight">\(F\)</span> functions for the simulated patterns, we can be confident that there are many gaps in our pattern; i.e. the pattern is <em>clustered</em>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f_test</span> <span class="o">=</span> <span class="n">distance_statistics</span><span class="o">.</span><span class="n">f_test</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">support</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">keep_simulations</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f_test</span> <span class="o">=</span> <span class="n">distance_statistics</span><span class="o">.</span><span class="n">f_test</span><span class="p">(</span>
+    <span class="n">coordinates</span><span class="p">,</span> <span class="n">support</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">keep_simulations</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<div class="cell docutils container">
+<div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> 
-                    <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="p">)</span>
 
 <span class="c1"># plot all the simulations with very fine lines</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">f_test</span><span class="o">.</span><span class="n">support</span><span class="p">,</span> <span class="n">f_test</span><span class="o">.</span><span class="n">simulations</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">01</span><span class="p">)</span>
@@ -1388,36 +1269,43 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_85_0.png" src="../_images/08_point_pattern_analysis_85_0.png" />
+<img alt="../_images/08_point_pattern_analysis_79_0.png" src="../_images/08_point_pattern_analysis_79_0.png" />
 </div>
 </div>
-<p><img alt="png" src="notebooks/08_point_pattern_analysis_files/08_point_pattern_analysis_88_0.png" /></p>
-<p>There are a few other functions that can be used for conducting point pattern analysis in this vein. Consult the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> documentation for more information on how this can be done in Python, or the book by <a class="bibtex reference internal" href="references.html#baddeley2015" id="id4">[BRT15]</a>.</p>
+<p>Ripley’s “alphabet” extends to several other letter-named functions that can be used for conducting point pattern analysis in this vein. Good “next steps” in your point pattern analysis journey include the book by <a class="bibtex reference internal" href="references.html#baddeley2015" id="id4">[BRT15]</a>; and the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> documentation for guidance on how to run these in Python.</p>
 </div>
 </div>
 <div class="section" id="identifying-clusters">
 <h2>Identifying clusters<a class="headerlink" href="#identifying-clusters" title="Permalink to this headline">¶</a></h2>
-<p>The previous two sections on exploratory spatial analysis of point patterns provides methods to characterize whether point patterns are dispersed or clustered in space. However, knowing that a point pattern <em>is</em> clustered does not necessarily give us information about <em>where</em> that cluster resides. To do this, we must learn a method to identify clusters of points, based on their density across space.</p>
-<p>There are many spatial point clustering algorithms. Here, will cover the widely used <code class="docutils literal notranslate"><span class="pre">DBSCAN</span></code> algorithm. For this method, a cluster is a concentration of at least <code class="docutils literal notranslate"><span class="pre">m</span></code> points, each of them within a distance of <code class="docutils literal notranslate"><span class="pre">r</span></code> of at least another point in the cluster. Points in the dataset are then divided into three categories:</p>
+<p>The previous two sections on exploratory spatial analysis of point patterns provide methods to characterize whether point patterns are dispersed or clustered in space. Another way to see the content in those sections is they help us explore the degree of overall <em>clustering</em>. However, knowing that a point pattern is clustered does not necessarily give us information about where that (set of) cluster(s) resides. To do this, we need to switch to a method able to identify areas of high density of points within our pattern. In other words, in this section we focus on the existence and location of <em>clusters</em>. This distinction between cluster<em>ing</em> and cluster<em>s</em> of points is analogue to that discussed in the context of spatial autocorrelation (Chapters <a class="reference internal" href="06_spatial_autocorrelation.html"><span class="doc std std-doc">6</span></a> and <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">7</span></a>. The notion is the same, the differences in the techniques we examine in each part of the book relate to the unique nature of points we referred to in the beginning of the book. Remember that, while the methods we explored in the earlier chapters take the location of the spatial objects (points, lines, polygons) as given and focus on understanding the configurations of values within those locations; the methods discussed in this chapter understand points as events that happen in particular locations but that could happen in a much broader set of places. Factoring in this underlying relevance of the location of an object itself is what makes the techniques in this chapter distinct.</p>
+<p>From the many spatial point clustering algorithms, we will cover one called DBSCAN (Density-Based Spatial Clustering of Applications, <a class="bibtex reference internal" href="references.html#ester1996density" id="id5">[EKS+96]</a>. DBSCAN is a widely used algorithm that originated in the area of knowledge discovery and machine learning and that has since spread into many areas, including the analysis of spatial points. In part, its popularity resides in its intellectual simplicity and computational tractability. In some ways, we can think of DBSCAN as a point pattern counterpart of the local statistics we explored in <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">Chapter 7</span></a>. They do however differ in fundamental ways. Unlike the local statistics we have seen earlier, DBSCAN is not based on an inferential framework, but it is instead a deterministic algorithm. This implies that, unlike the measures seen before, we will not be able to estimate a measure of the degree to which the clusters found are compatible with cases of spatial randomness.</p>
+<p>From the point of view of DBSCAN, a cluster is a concentration of at least <code class="docutils literal notranslate"><span class="pre">m</span></code> points, each of them within a distance of <code class="docutils literal notranslate"><span class="pre">r</span></code> of at least another point in the cluster. Following this definition, the algorithm classifies each point in our pattern into three categories:</p>
 <ul class="simple">
 <li><p><em>Noise</em>, for those points outside a cluster.</p></li>
 <li><p><em>Cores</em>, for those points inside a cluster whith at least <code class="docutils literal notranslate"><span class="pre">m</span></code> points in the cluster within distance <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p></li>
 <li><p><em>Borders</em> for points inside a cluster with less than <code class="docutils literal notranslate"><span class="pre">m</span></code> other points in the cluster within distance <code class="docutils literal notranslate"><span class="pre">r</span></code>.</p></li>
 </ul>
-<p>Both <code class="docutils literal notranslate"><span class="pre">m</span></code> and <code class="docutils literal notranslate"><span class="pre">r</span></code> need to be prespecified by the user before running <code class="docutils literal notranslate"><span class="pre">DBSCAN</span></code>. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing <code class="docutils literal notranslate"><span class="pre">DBSCAN</span></code> in Python.</p>
+<p>The flexibility (but also some of the limitations) of the algorithm resides in that both <code class="docutils literal notranslate"><span class="pre">m</span></code> and <code class="docutils literal notranslate"><span class="pre">r</span></code> need to be prespecified by the user before running DBSCAN. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing <code class="docutils literal notranslate"><span class="pre">DBSCAN</span></code> in Python:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compute DBSCAN</span>
-<span class="n">cs</span><span class="p">,</span> <span class="n">lbls</span> <span class="o">=</span> <span class="n">dbscan</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define DBSCAN</span>
+<span class="n">clusterer</span> <span class="o">=</span> <span class="n">DBSCAN</span><span class="p">()</span>
+<span class="c1"># Fit to our data</span>
+<span class="n">clusterer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>DBSCAN()
 </pre></div>
 </div>
 </div>
 </div>
-<p>The function returns two objects, which we call <code class="docutils literal notranslate"><span class="pre">cs</span></code> and <code class="docutils literal notranslate"><span class="pre">lbls</span></code>. <code class="docutils literal notranslate"><span class="pre">cs</span></code> contains the indices (order, starting from zero) of each point which is classified as a <em>core</em>. We can have a peek into it to see what it looks like:</p>
+<p>Following the standard interface in scikit-learn, we first define the algorithm we want to run (creating the <code class="docutils literal notranslate"><span class="pre">clusterer</span></code> object) and then we <em>fit</em> it to our data. Once fit, <code class="docutils literal notranslate"><span class="pre">clusterer</span></code> contains the required information to access all the results of the algorithm. The <code class="docutils literal notranslate"><span class="pre">core_sample_indices_</span></code> attribute contains the indices (order, starting from zero) of each point which is classified as a <em>core</em>. We can have a peek into it to see what it looks like:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print the first 5 elements of `cs`</span>
-<span class="n">cs</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="n">clusterer</span><span class="o">.</span><span class="n">core_sample_indices_</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1427,11 +1315,11 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 </div>
-<p>The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as it is the 23rd, 31st, 36th, and 43rd. The object <code class="docutils literal notranslate"><span class="pre">cs</span></code> always has a variable length, depending on how many cores the algorithm finds.</p>
-<p>Now let us have a look at <code class="docutils literal notranslate"><span class="pre">lbls</span></code>, short for labels:</p>
+<p>The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as it is the 23rd, 31st, 36th, and 43rd. This attribute has a variable length, depending on how many cores the algorithm finds.</p>
+<p>The second attribute of interest is <code class="docutils literal notranslate"><span class="pre">labels_</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lbls</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">clusterer</span><span class="o">.</span><span class="n">labels_</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1441,10 +1329,10 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 </div>
-<p>The labels object always has the same length as the number of points used to run <code class="docutils literal notranslate"><span class="pre">DBSCAN</span></code>. Each value represents the index of the cluster a point belongs to. If the point is classified as <em>noise</em>, it receives a -1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make thinks easier later on, let us turn <code class="docutils literal notranslate"><span class="pre">lbls</span></code> into a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object that we can index in the same way as our collection of points:</p>
+<p>The labels object always has the same length as the number of points used to run DBSCAN. Each value represents the index of the cluster a point belongs to. If the point is classified as <em>noise</em>, it receives a -1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make thinks easier later on, let us turn the labels into a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object that we can index in the same way as our collection of points:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lbls</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">lbls</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lbls</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">clusterer</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1454,8 +1342,6 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c1"># Add base layer with tiles for context</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">)</span>
 <span class="c1"># Subset points that are not part of any cluster (noise)</span>
 <span class="n">noise</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lbls</span><span class="o">==-</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]]</span>
 <span class="c1"># Plot noise in grey</span>
@@ -1467,6 +1353,11 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span> \
            <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span> \
           <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="c1"># Display the figure</span>
@@ -1475,12 +1366,12 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_96_0.png" src="../_images/08_point_pattern_analysis_96_0.png" />
+<img alt="../_images/08_point_pattern_analysis_90_0.png" src="../_images/08_point_pattern_analysis_90_0.png" />
 </div>
 </div>
 <p>Although informative, the result of this run is not particularly satisfactory. There are <em>way</em> too many points that are classified as “noise”.</p>
-<p>This is because we have run <code class="docutils literal notranslate"><span class="pre">DBSCAN</span></code> with the default parameters. If you type <code class="docutils literal notranslate"><span class="pre">dbscan?</span></code>, you will get the help of the function and will be able to see what those are: a radious of 0.5 and a minimum of five points per cluster. Since our data is expressed in metres, a radius of half a metre will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs.</p>
-<p>Let us change those parameters to see if we can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:</p>
+<p>This is because we have run DBSCAN with the default parameters: a radious of 0.5 and a minimum of five points per cluster. Since our data is expressed in metres, a radius of half a metre will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs.</p>
+<p>If we change those parameters, can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Obtain the number of points 1% of the total represents</span>
@@ -1499,25 +1390,31 @@ These are the most common questions in the analysis of point patterns.</p></li>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rerun DBSCAN</span>
-<span class="n">cs</span><span class="p">,</span> <span class="n">lbls</span> <span class="o">=</span> <span class="n">dbscan</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]],</span> <span class="n">eps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="n">minp</span><span class="p">)</span>
+<span class="n">clusterer</span> <span class="o">=</span> <span class="n">DBSCAN</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="n">minp</span><span class="p">)</span>
+<span class="n">clusterer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]])</span>
 <span class="c1"># Turn labels into a Series</span>
-<span class="n">lbls</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">lbls</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-
+<span class="n">lbls</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">clusterer</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 <span class="c1"># Setup figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="c1"># Add base layer with tiles for context</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">basemap</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">basemap_extent</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">)</span>
 <span class="c1"># Subset points that are not part of any cluster (noise)</span>
 <span class="n">noise</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lbls</span><span class="o">==-</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]]</span>
 <span class="c1"># Plot noise in grey</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">noise</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">],</span> <span class="n">noise</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">],</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 <span class="c1"># Plot all points that are not noise in red</span>
 <span class="c1"># NOTE how this is done through some fancy indexing, where</span>
-<span class="c1">#      we take the index of all points (tw) and substract from</span>
+<span class="c1">#      we take the index of all points (db) and substract from</span>
 <span class="c1">#      it the index of those that are noise</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span> \
-           <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span> \
-          <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s1">&#39;x&#39;</span><span class="p">],</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">noise</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span>
+    <span class="n">c</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> 
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">Positron</span>
+<span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="c1"># Display the figure</span>
@@ -1526,14 +1423,24 @@ These are the most common questions in the analysis of point patterns.</p></li>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_100_0.png" src="../_images/08_point_pattern_analysis_100_0.png" />
+<img alt="../_images/08_point_pattern_analysis_94_0.png" src="../_images/08_point_pattern_analysis_94_0.png" />
 </div>
 </div>
-<p><img alt="png" src="notebooks/08_point_pattern_analysis_files/08_point_pattern_analysis_104_0.png" /></p>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>Overall, this chapter has provided an overview of methods to analyze point patterns. From measuring their location, central tendency, and extent, to observing how they cluster or disperse and locating where the clusters are, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about many point patterns. Further, we will cover <em>modelling</em> point patterns, such as describing their properties or future locations, in subsequent chapters.</p>
+<p>Overall, this chapter has provided an overview of methods to analyze point patterns. We have begun our point journey by visualising their location and learning way to overcome the “cluttering” challenge that large point patterns present us with. From graphical display, we have moved to statistical characterisation of their spatial distribution. In this context, we have learnt about  central tendency dispersion and extent, and we have positioned these measures as the point pattern counterparts of traditional statistics such as the mean or the standard deviation. These measures provide a summary of an entire pattern, but tell us little about the spatial organisation of each point. To that end, we have introduced the quadrat and Ripley’s functions. These statistical devices help us in characterising whether a point pattern is spatially clustered or dispersed. We have wrapped up the chapter going one step further and exploring methods to identify the location of clusters: areas of the map with high density of points. Taken altogether, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about point patterns that represent widely varied phenomena in the world, from the location where photographs where taken to the distribution of bird nests, to the clustering of bike crashes in a city.</p>
+</div>
+<div class="section" id="questions">
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
+<ol class="simple">
+<li><p>What is the trade-off implicit in the choice of hexagon granularity when “hexbinning”? Based on this, how would you recommend to select a specific number of bins?</p></li>
+<li><p>KDE gets around the need to partition space in “buckets” to count points inside each of them. But, can you think of the limitations of applying this technique? To explore them, reproduce the KDE figure in the chapter playing with the arguments of the type of kernel (<code class="docutils literal notranslate"><span class="pre">kernel</span></code>) and bandwidth (<code class="docutils literal notranslate"><span class="pre">bw</span></code>). Consult the documentation of <code class="docutils literal notranslate"><span class="pre">seaborn.kdeplot</span></code> to learn what each of them controls.</p></li>
+<li><p>Given a hypothetical point pattern, what characteristics would it need to meet for the mean and median centers to coincide?</p></li>
+<li><p>The choice of extent definition you adopt may influence your final results significantly. To further internalise this realisation, compute the density of photographs in the example we have seen using each of the extent definitions covered (minimum bounding/rotate circle/rectangle, convex hull and alpha shape). Remember the density can be obtained by dividing the number of photographs by the area of the extent.</p></li>
+<li><p>How do you think the density of quadrants affect quadrat statistics?</p></li>
+<li><p>Can you use information from Ripley’s functions to inform the choice of DBSCAN parameters? How? Use the example with Tokyo photographs covered above to illustrate your ideas.</p></li>
+</ol>
 </div>
 </div>
 
