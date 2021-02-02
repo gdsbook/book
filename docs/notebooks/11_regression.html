@@ -136,11 +136,6 @@
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="03_spatial_data.html#conclusion">
-   Conclusion
-  </a>
- </li>
- <li class="toctree-l1">
   <a class="reference internal" href="04_spatial_weights.html">
    Spatial Weights
   </a>
@@ -419,11 +414,13 @@
        Proximity variables
       </a>
      </li>
-     <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#spatial-fixed-effects">
-       Spatial Fixed-Effects
-      </a>
-     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#spatial-heterogeneity">
+     Spatial Heterogeneity
+    </a>
+    <ul class="nav section-nav flex-column">
      <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#spatial-regimes">
        Spatial Regimes
@@ -437,8 +434,8 @@
     </a>
     <ul class="nav section-nav flex-column">
      <li class="toc-h4 nav-item toc-entry">
-      <a class="reference internal nav-link" href="#exogenous-effects">
-       Exogenous effects
+      <a class="reference internal nav-link" href="#exogenous-effects-the-slx-model">
+       Exogenous effects: The SLX Model
       </a>
      </li>
      <li class="toc-h4 nav-item toc-entry">
@@ -539,9 +536,8 @@ This dataset contains house intrinsic characteristics, both continuous (number o
 </div>
 <div class="cell_output docutils container">
 <div class="stderr docutils container">
-<pre class="stderr literal-block">/home/serge/anaconda3/envs/gdsbook/lib/python3.6/site-packages/pysal/explore/segregation/network/network.py:16: UserWarning: You need pandana and urbanaccess to work with segregation's network module
-You can install them with  `pip install urbanaccess pandana` or `conda install -c udst pandana urbanaccess`
-  &quot;You need pandana and urbanaccess to work with segregation's network module\n&quot;
+<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/numba/np/ufunc/parallel.py:355: NumbaWarning: The TBB threading layer requires TBB version 2019.5 or later i.e., TBB_INTERFACE_VERSION &gt;= 11005. Found TBB_INTERFACE_VERSION = 10005. The TBB threading layer is disabled.
+  warnings.warn(problem)
 </pre>
 </div>
 </div>
@@ -557,27 +553,29 @@ You can install them with  `pip install urbanaccess pandana` or `conda install -
 <div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
 RangeIndex: 6110 entries, 0 to 6109
 Data columns (total 20 columns):
-accommodates          6110 non-null int64
-bathrooms             6110 non-null float64
-bedrooms              6110 non-null float64
-beds                  6110 non-null float64
-neighborhood          6110 non-null object
-pool                  6110 non-null int64
-d2balboa              6110 non-null float64
-coastal               6110 non-null int64
-price                 6110 non-null float64
-log_price             6110 non-null float64
-id                    6110 non-null int64
-pg_Apartment          6110 non-null int64
-pg_Condominium        6110 non-null int64
-pg_House              6110 non-null int64
-pg_Other              6110 non-null int64
-pg_Townhouse          6110 non-null int64
-rt_Entire_home/apt    6110 non-null int64
-rt_Private_room       6110 non-null int64
-rt_Shared_room        6110 non-null int64
-geometry              6110 non-null object
-dtypes: float64(6), int64(12), object(2)
+ #   Column              Non-Null Count  Dtype   
+---  ------              --------------  -----   
+ 0   accommodates        6110 non-null   int64   
+ 1   bathrooms           6110 non-null   float64 
+ 2   bedrooms            6110 non-null   float64 
+ 3   beds                6110 non-null   float64 
+ 4   neighborhood        6110 non-null   object  
+ 5   pool                6110 non-null   int64   
+ 6   d2balboa            6110 non-null   float64 
+ 7   coastal             6110 non-null   int64   
+ 8   price               6110 non-null   float64 
+ 9   log_price           6110 non-null   float64 
+ 10  id                  6110 non-null   int64   
+ 11  pg_Apartment        6110 non-null   int64   
+ 12  pg_Condominium      6110 non-null   int64   
+ 13  pg_House            6110 non-null   int64   
+ 14  pg_Other            6110 non-null   int64   
+ 15  pg_Townhouse        6110 non-null   int64   
+ 16  rt_Entire_home/apt  6110 non-null   int64   
+ 17  rt_Private_room     6110 non-null   int64   
+ 18  rt_Shared_room      6110 non-null   int64   
+ 19  geometry            6110 non-null   geometry
+dtypes: float64(6), geometry(1), int64(12), object(1)
 memory usage: 954.8+ KB
 </pre></div>
 </div>
@@ -602,12 +600,12 @@ memory usage: 954.8+ KB
 <p>The core idea of linear regression is to explain the variation in a given (<em>dependent</em>) variable as a linear function of a collection of other (<em>explanatory</em>) variables. For example, in our case, we may want to express/explain the price of a house as a function of whether it is new and the degree of deprivation of the area where it is located. At the individual level, we can express this as:</p>
 <div class="math notranslate nohighlight">
 \[
-P_i = \alpha + \sum_k \beta_k X_{ki} + \epsilon_i
+P_i = \alpha + \sum_k \mathbf{X}_{ik}\beta_k  + \epsilon_i
 \]</div>
 <p>where <span class="math notranslate nohighlight">\(P_i\)</span> is the AirBnb price of house <span class="math notranslate nohighlight">\(i\)</span>, and <span class="math notranslate nohighlight">\(X\)</span> is a set of covariates that we use to explain such price. <span class="math notranslate nohighlight">\(\beta\)</span> is a vector of parameters that give us information about in which way and to what extent each variable is related to the price, and <span class="math notranslate nohighlight">\(\alpha\)</span>, the constant term, is the average house price when all the other variables are zero. The term <span class="math notranslate nohighlight">\(\epsilon_i\)</span> is usually referred to as “error” and captures elements that influence the price of a house but are not included in <span class="math notranslate nohighlight">\(X\)</span>. We can also express this relation in matrix form, excluding subindices for <span class="math notranslate nohighlight">\(i\)</span>, which yields:</p>
 <div class="math notranslate nohighlight">
 \[
-P = \alpha + \beta X + \epsilon
+P = \alpha + \mathbf{X}\beta + \epsilon
 \]</div>
 <p>A regression can be seen as a multivariate extension of bivariate correlations. Indeed, one way to interpret the <span class="math notranslate nohighlight">\(\beta_k\)</span> coefficients in the equation above is as the degree of correlation between the explanatory variable <span class="math notranslate nohighlight">\(k\)</span> and the dependent variable, <em>keeping all the other explanatory variables constant</em>. When one calculates bivariate correlations, the coefficient of a variable is picking up the correlation between the variables, but it is also subsuming into it variation associated with other correlated variables – also called confounding factors. Regression allows us to isolate the distinct effect that a single variable has on the dependent one, once we <em>control</em> for those other variables.</p>
 <p>Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>, <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>). In the context of this chapter, it makes sense to start with <code class="docutils literal notranslate"><span class="pre">PySAL</span></code> as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with <span class="math notranslate nohighlight">\(X\)</span> as the list defined, we only need the following line of code:</p>
@@ -746,7 +744,12 @@ For us to determine whether this is the case, we might be interested in the full
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_16_0.png" src="../_images/11_regression_16_0.png" />
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
+  warnings.warn(
+</pre>
+</div>
+<img alt="../_images/11_regression_16_1.png" src="../_images/11_regression_16_1.png" />
 </div>
 </div>
 <p>No neighborhood is disjoint from one another, but some do appear to be higher than others, such as the well-known downtown tourist neighborhoods areas of the Gaslamp Quarter, Little Italy, or The Core.
@@ -766,8 +769,9 @@ For this example, we’ll start off with a <span class="math notranslate nohighl
 </div>
 <div class="cell_output docutils container">
 <div class="stderr docutils container">
-<pre class="stderr literal-block">/opt/conda/lib/python3.7/site-packages/pysal/lib/weights/weights.py:170: UserWarning: The weights matrix is not fully connected. There are 1849 components
-  warnings.warn(&quot;The weights matrix is not fully connected. There are %d components&quot; % self.n_components)
+<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
+ There are 1849 disconnected components.
+  warnings.warn(message)
 </pre>
 </div>
 </div>
@@ -785,7 +789,12 @@ For this example, we’ll start off with a <span class="math notranslate nohighl
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_20_0.png" src="../_images/11_regression_20_0.png" />
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
+  warnings.warn(
+</pre>
+</div>
+<img alt="../_images/11_regression_20_1.png" src="../_images/11_regression_20_1.png" />
 </div>
 </div>
 <p>In this plot, we see that our prediction errors tend to cluster!
@@ -813,8 +822,9 @@ Recalling the <em>local Moran</em> statistics, we can identify certain areas whe
 </div>
 <div class="cell_output docutils container">
 <div class="stderr docutils container">
-<pre class="stderr literal-block">/opt/conda/lib/python3.7/site-packages/pysal/lib/weights/weights.py:170: UserWarning: The weights matrix is not fully connected. There are 3 components
-  warnings.warn(&quot;The weights matrix is not fully connected. There are %d components&quot; % self.n_components)
+<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
+ There are 3 disconnected components.
+  warnings.warn(message)
 </pre>
 </div>
 <img alt="../_images/11_regression_23_1.png" src="../_images/11_regression_23_1.png" />
@@ -840,10 +850,7 @@ referred to <a class="bibtex reference internal" href="references.html#anselin-2
 <div class="section" id="spatial-feature-engineering">
 <h3>Spatial Feature Engineering<a class="headerlink" href="#spatial-feature-engineering" title="Permalink to this headline">¶</a></h3>
 <p>Using geographic information to “construct” new data is a common approach to bring in spatial information into geographic analysis.
-Often, this reflects the fact that processes are not the same everywhere in the map of analysis.
-Indeed, this heterogeneity can have a large impact on how a process is understood or modeled.</p>
-<p>Spatial heterogeneity (SH) arises when we cannot safely assume the process we are studying operates under the same “rules” throughout the geography of interest. In other words, we can observe SH when there are effects on the outcome variable that are intrinsically linked to specific locations. A good example of this is the case of seafront houses above: we are trying to model the price of a house and, the fact some houses are located under certain conditions (i.e. by the sea), makes their price behave differently.</p>
-<p>The abstract concept of SH can be made operational in a model in several ways. We will explore the following three: proximity variables, spatial fixed-effects (FE), and spatial regimes — which itself is a generalization of FE.</p>
+Often, this reflects the fact that processes are not the same everywhere in the map of analysis, or that geographical information may be useful to predict our outcome of interest. In this section, we will briefly present how to use <em>spatial features</em>, or <span class="math notranslate nohighlight">\(X\)</span> variables that are constructed from geographical relationships, in a standard linear model. We discuss spatial feature engineering extensively in the next chapter, though, and the depth and extent of spatial feature engineering is difficult to overstate. In this, we will consider only the simplest of spatial features: proximity variables.</p>
 <div class="section" id="proximity-variables">
 <h4>Proximity variables<a class="headerlink" href="#proximity-variables" title="Permalink to this headline">¶</a></h4>
 <p>For a start, one relevant proximity-driven variable that could influence our model is based on the listings proximity to Balboa Park. A common tourist destination, Balboa park is a central recreation hub for the city of San Diego, containing many museums and the San Diego zoo. Thus, it could be the case that people searching for Airbnbs in San Diego are willing to pay a premium to live closer to the park. If this were true <em>and</em> we omitted this from our model, we may indeed see a significant spatial pattern caused by this distance decay effect.</p>
@@ -855,7 +862,7 @@ Indeed, this heterogeneity can have a large impact on how a process is understoo
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7f2cf6b40940&gt;
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.axes._subplots.AxesSubplot at 0x7fbefa4c0970&gt;
 </pre></div>
 </div>
 <img alt="../_images/11_regression_26_1.png" src="../_images/11_regression_26_1.png" />
@@ -947,18 +954,24 @@ Koenker-Bassett test             11         132.860           0.0000
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_32_0.png" src="../_images/11_regression_32_0.png" />
+<div class="stderr docutils container">
+<pre class="stderr literal-block">/opt/anaconda3/envs/analysis/lib/python3.8/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
+  warnings.warn(
+</pre>
+</div>
+<img alt="../_images/11_regression_32_1.png" src="../_images/11_regression_32_1.png" />
 </div>
 </div>
-<p>Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is <em>positive</em>, meaning that people are paying a premium to be <em>further</em> from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this.</p>
+<p>Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is <em>positive</em>, meaning that people are paying a premium to be <em>further</em> from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this. Further, the next chapter is an extensive treatment of spatial fixed effects, presenting many more spatial feature engineering methods. Here, we have only showed how to include these engineered features in a standard linear modelling framework.</p>
 </div>
-<div class="section" id="spatial-fixed-effects">
-<h4>Spatial Fixed-Effects<a class="headerlink" href="#spatial-fixed-effects" title="Permalink to this headline">¶</a></h4>
-<p>While we’ve stipulated that our proximity variable might stand in for a difficult-to-measure premium individuals pay when they’re close to a recreational zone. However, not all neighborhoods are created equal; some neighborhoods may be more lucrative than others, regardless of their proximity to Balboa Park. When this is the case, we need some way to account for the fact that each neighborhood may experience these kinds of <em>gestalt</em>, unique effects. One way to do this is through <em>spatial fixed effects</em>.</p>
-<p>To illustrate these, let us consider the house price example from the previous section to introduce a more general illustration that relates to the second motivation for spatial effects (“space as a proxy”). Given we are only including two explanatory variables in the model, it is likely we are missing some important factors that play a role at determining the price at which a house is sold. Some of them, however, are likely to vary systematically over space (e.g. different neighborhood characteristics). If that is the case, we can control for those unobserved factors by using traditional dummy variables but basing their creation on a spatial rule. For example, let us include a binary variable for every neighborhood, indicating whether a given house is located within such area (<code class="docutils literal notranslate"><span class="pre">1</span></code>) or not (<code class="docutils literal notranslate"><span class="pre">0</span></code>). Mathematically, we are now fitting the following equation:</p>
+</div>
+<div class="section" id="spatial-heterogeneity">
+<h3>Spatial Heterogeneity<a class="headerlink" href="#spatial-heterogeneity" title="Permalink to this headline">¶</a></h3>
+<p>While we’ve assumed that our proximity variable might stand in for a difficult-to-measure premium individuals pay when they’re close to a recreational zone. However, not all neighborhoods are created equal; some neighborhoods may be more lucrative than others, regardless of their proximity to Balboa Park. When this is the case, we need some way to account for the fact that each neighborhood may experience these kinds of <em>gestalt</em>, unique effects. One way to do this is by capturing <em>spatial heterogeneity</em>. At its most basic, <em>spatial heterogeneity</em> means that parts of the model may change in different places. For example, changes to the intercept, <span class="math notranslate nohighlight">\(\alpha\)</span>, may reflect the fact that different areas have different baseline exposures to a given process. Changes to the slope terms, <span class="math notranslate nohighlight">\(\beta\)</span>, may indicate some kind of geographical mediating factor, such as when a governmental policy is not consistently applied across jurisdictions. Finally, changes to the variance of the residuals, commonly denoted <span class="math notranslate nohighlight">\(\sigma^2\)</span>, can introduce spatial heteroskedasticity. We deal with the first two in this section.</p>
+<p>To illustrate spatial fixed effects, let us consider the house price example from the previous section to introduce a more general illustration for “space as a proxy”. Given we are only including two explanatory variables in the model, it is likely we are missing some important factors that play a role at determining the price at which a house is sold. Some of them, however, are likely to vary systematically over space (e.g. different neighborhood characteristics). If that is the case, we can control for those unobserved factors by using traditional dummy variables but basing their creation on a spatial rule. For example, let us include a binary variable for every neighborhood, indicating whether a given house is located within such area (<code class="docutils literal notranslate"><span class="pre">1</span></code>) or not (<code class="docutils literal notranslate"><span class="pre">0</span></code>). Mathematically, we are now fitting the following equation:</p>
 <div class="math notranslate nohighlight">
 \[
-\log{P_i} = \alpha_r + \sum_k \beta_k X_{ki} + \epsilon_i
+\log{P_i} = \alpha_r + \sum_k \mathbf{X}_{ik}\beta_k  + \epsilon_i
 \]</div>
 <p>where the main difference is that we are now allowing the constant term, <span class="math notranslate nohighlight">\(\alpha\)</span>, to vary by neighbourhood <span class="math notranslate nohighlight">\(r\)</span>, <span class="math notranslate nohighlight">\(\alpha_r\)</span>.</p>
 <p>Programmatically, we will show two different ways can estimate this: one,
@@ -990,7 +1003,7 @@ using <code class="docutils literal notranslate"><span class="pre">statsmodels</
 ======================================================================================
 Model:                      OLS                    Adj. R-squared:           0.709    
 Dependent Variable:         log_price              AIC:                      7229.6640
-Date:                       2019-08-07 16:37       BIC:                      7599.1365
+Date:                       2021-02-02 16:01       BIC:                      7599.1365
 No. Observations:           6110                   Log-Likelihood:           -3559.8  
 Df Model:                   54                     F-statistic:              276.9    
 Df Residuals:               6055                   Prob (F-statistic):       0.00     
@@ -1286,13 +1299,12 @@ dtype: float64
 <img alt="../_images/11_regression_46_0.png" src="../_images/11_regression_46_0.png" />
 </div>
 </div>
-</div>
 <div class="section" id="spatial-regimes">
 <h4>Spatial Regimes<a class="headerlink" href="#spatial-regimes" title="Permalink to this headline">¶</a></h4>
 <p>At the core of estimating spatial FEs is the idea that, instead of assuming the dependent variable behaves uniformly over space, there are systematic effects following a geographical pattern that affect its behaviour. In other words, spatial FEs introduce econometrically the notion of spatial heterogeneity. They do this in the simplest possible form: by allowing the constant term to vary geographically. The other elements of the regression are left untouched and hence apply uniformly across space. The idea of spatial regimes (SRs) is to generalize the spatial FE approach to allow not only the constant term to vary but also any other explanatory variable. This implies that the equation we will be estimating is:</p>
 <div class="math notranslate nohighlight">
 \[
-\log{P_i} = \alpha_r + \sum_k \beta_{k-r} X_{ki} + \epsilon_i
+\log{P_i} = \alpha_r + \sum_k \mathbf{X}_{ki}\beta_{k-r} + \epsilon_i
 \]</div>
 <p>where we are not only allowing the constant term to vary by region (<span class="math notranslate nohighlight">\(\alpha_r\)</span>), but also every other parameter (<span class="math notranslate nohighlight">\(\beta_{k-r}\)</span>).</p>
 <p>To illustrate this approach, we will use the “spatial differentiator” of whether a house is in a coastal neighbourhood or not (<code class="docutils literal notranslate"><span class="pre">coastal_neig</span></code>) to define the regimes. The rationale behind this choice is that renting a house close to the ocean might be a strong enough pull that people might be willing to pay at different <em>rates</em> for each of the house’s characteristics.</p>
@@ -1412,9 +1424,9 @@ each other through distance <em>spatial dependence</em> <a class="bibtex referen
 <p>There are several ways to introduce spatial dependence in an econometric
 framework, with varying degrees of econometric sophistication (see
 <a class="bibtex reference internal" href="references.html#anselin-2002" id="id6">[Ans02]</a> for a good overview). Common to all of them however is the way space is
-formally encapsulated: through <em>spatial weights matrices (<span class="math notranslate nohighlight">\(W\)</span>)</em>.</p>
-<div class="section" id="exogenous-effects">
-<h4>Exogenous effects<a class="headerlink" href="#exogenous-effects" title="Permalink to this headline">¶</a></h4>
+formally encapsulated: through <em>spatial weights matrices (<span class="math notranslate nohighlight">\(\mathbf{W}\)</span>)</em>, which we discussed in Chapter 4.</p>
+<div class="section" id="exogenous-effects-the-slx-model">
+<h4>Exogenous effects: The SLX Model<a class="headerlink" href="#exogenous-effects-the-slx-model" title="Permalink to this headline">¶</a></h4>
 <p>Let us come back to the house price example we have been working with. So far, we
 have hypothesized that the price of a house rented in San Diego through AirBnb can
 be explained using information about its own characteristics as well as some
@@ -1431,17 +1443,43 @@ we are also including as explanatory factor of the price of a given house the pr
 neighbouring houses in each type. Mathematically, this implies estimating the following model:</p>
 <div class="math notranslate nohighlight">
 \[
-\log(P) = \alpha + X\beta + WX\beta + \epsilon
+\log(P_i) = \alpha + \sum^{p}_{k=1}X_{ij}\beta_j + \sum^{p}_{k=1}\left(\sum^{N}_{j=1}w_{ij}x_{jk}\right)\gamma_k + \epsilon_i
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(WX\beta\)</span> represents the spatial lag of (some of) the explanatory variables. In Python,
-we can calculate the spatial lag of each variable whose name starts by <code class="docutils literal notranslate"><span class="pre">pg_</span></code>
+<p>where <span class="math notranslate nohighlight">\(\sum_{j=1}^N w_{ij}x_{jk}\)</span> represents the spatial lag of the <span class="math notranslate nohighlight">\(k\)</span>th explanatory variable.
+This can be stated in <em>matrix</em> form using the spatial weights matrix, <span class="math notranslate nohighlight">\(\mathbf{W}\)</span>, as:
+<span class="math notranslate nohighlight">\($
+\log(P_i) = \alpha + \mathbf{X}\beta + \mathbf{WX}\gamma + \epsilon
+$\)</span></p>
+<p>This splits the model to focus on two main effects: <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\gamma\)</span>. The
+<span class="math notranslate nohighlight">\(\beta\)</span> effect describes the change in <span class="math notranslate nohighlight">\(y_i\)</span> when <span class="math notranslate nohighlight">\(X_{ik}\)</span> changes by one.
+^[Since we use the log price for a <span class="math notranslate nohighlight">\(y\)</span> variable, our
+<span class="math notranslate nohighlight">\(\beta\)</span> coefficients are still all interpreted as <em>elasticities</em>, meaning that a
+unit change in the <span class="math notranslate nohighlight">\(x_i\)</span> variate results in a <span class="math notranslate nohighlight">\(\beta\)</span> percent change in the
+price <em>y_i</em>]. The subscript for site <span class="math notranslate nohighlight">\(i\)</span> is important here: since we’re dealing
+with a <span class="math notranslate nohighlight">\(\mathbf{W}\)</span> matrix, it’s useful to be clear about where the change occurs.</p>
+<p>Indeed, this matters for the <span class="math notranslate nohighlight">\(\gamma\)</span> effect, which represents an
+<em>indirect</em> effect of a change in <span class="math notranslate nohighlight">\(X_i\)</span>. This can be conceptualized in two ways.
+First, one could think of <span class="math notranslate nohighlight">\(\gamma\)</span> as simply <em>the effect of a unit change in your average surroundings.</em>
+This is useful and simple. But, this interpretation ignores where this change
+might occur. In truth, a change in a variable at site <span class="math notranslate nohighlight">\(i\)</span> will result in a <em>spillover</em> to its surroundings:
+when <span class="math notranslate nohighlight">\(x_i\)</span> changes, so too does the <em>spatial lag</em> of any site near <span class="math notranslate nohighlight">\(i\)</span>.
+The precise size of this will depend on the structure of <span class="math notranslate nohighlight">\(\mathbf{W}\)</span>, and can be
+different for every site. For example, think of a very highly-connected “focal” site in a
+row-standardized weight matrix. This focal site will not be strongly affected
+if a neighbor changes by a single unit, since each site only contributes a
+small amount to the lag at the focal site. Alternatively, consider a site with only
+one neighbor: its lag will change by <em>exactly</em> the amount its sole neighbor changes.
+Thus, to discover the exact indirect effect of a change <span class="math notranslate nohighlight">\(y\)</span> caused by the change
+at a specific site <span class="math notranslate nohighlight">\(x_i\)</span> you would need to compute the <em>change in the spatial lag</em>,
+and then use that as your <em>change</em> in <span class="math notranslate nohighlight">\(X\)</span>. We will discuss this in the following section.</p>
+<p>In Python, we can calculate the spatial lag of each variable whose name starts by <code class="docutils literal notranslate"><span class="pre">pg_</span></code>
 by first creating a list of all of those names, and then applying <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>’s
 <code class="docutils literal notranslate"><span class="pre">lag_spatial</span></code> to each of them:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">variable_names</span> <span class="k">if</span> <span class="s1">&#39;pg_&#39;</span> <span class="ow">in</span> <span class="n">i</span><span class="p">]</span>
-<span class="n">wx</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">wx</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>\
-           <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s1">&#39;w_&#39;</span><span class="o">+</span><span class="n">c</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wx</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s1">&#39;pg&#39;</span><span class="p">)</span>\
+        <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>\
+        <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s1">&#39;w_&#39;</span><span class="o">+</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;w_pg_Apartment&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1451,9 +1489,11 @@ context, the spatial  lags included do not violate any of the assumptions OLS
 relies on (they are essentially additional exogenous variables):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
-                  <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wx</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                  <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;l_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="o">+</span><span class="n">wx</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">slx_exog</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wx</span><span class="p">)</span>
+<span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+                  <span class="n">slx_exog</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                  <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;l_price&#39;</span><span class="p">,</span> 
+               <span class="n">name_x</span><span class="o">=</span><span class="n">slx_exog</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m5</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1520,12 +1560,432 @@ interpreted also in a similar way. The spatial lag of each type of property
 (<code class="docutils literal notranslate"><span class="pre">w_pg_XXX</span></code>) is the new addition. We observe that, except for the case
 of townhouses (same as with the binary variable, <code class="docutils literal notranslate"><span class="pre">pg_Townhouse</span></code>), they are all
 significant, suggesting our initial hypothesis on the role of the surrounding
-houses might indeed be at work here. As an illustration, being a condominium increases
-the price, on average, 11% (<span class="math notranslate nohighlight">\(\beta_{pg\_Condominium}=0.11\)</span>) with respect to the benchmark, which is set to apartments. More relevant to this section, any given house surrounded by condominiums <em>also</em> receives a price premium. In this case, the interpretation is slightly different because the variable is not a dummy but a proportion in the range [0, 1]. A 10% increase the proportion of neighbors that are condominiums translates into a 6% increase in the property house price (<span class="math notranslate nohighlight">\(\beta_{w_pg\_Condominium} = 0.6\)</span>). This interpretation comes from the following: increasing the prevalence of
-condos in the area surrounding a house by ten percent is associated with a change in the
-log of the nightly rental price of about .06, which translates to around a 6% increase in the nightly
-rental price of the house. Similar interpretations can be derived for all other spatially lagged variables.</p>
-<p>Introducing a spatial lag of an explanatory variable, as we have just seen, is the most straightforward way of incorporating the notion of spatial dependence in a linear regression framework. It does not require additional changes, it can be estimated with OLS, and the interpretation is rather similar to interpreting non-spatial variables. The field of spatial econometrics however is a much broader one and has produced over the last decades many techniques to deal with spatial effects and spatial dependence in different ways. Although this might be an over simplification, one can say that most of such efforts for the case of a single cross-section are focused on two main variations: the spatial lag and the spatial error model. Both are similar to the case we have seen in that they are based on the introduction of a spatial lag, but they differ in the component of the model they modify and affect.</p>
+houses might indeed be at work here.</p>
+<p>As an illustration, let’s look at some of the direct/indirect effects.
+The direct effect of the <code class="docutils literal notranslate"><span class="pre">pg_Condominium</span></code> variable means that condominimums are
+typically 11% more expensive (<span class="math notranslate nohighlight">\(\beta_{pg\_Condominium}=0.1063\)</span>) than the benchmark
+property type, apartments. More relevant to this section, any given house surrounded by
+condominiums <em>also</em> receives a price premium. But, since <span class="math notranslate nohighlight">\(pg_Condominium\)</span> is a dummy variable,
+the spatial lag at site <span class="math notranslate nohighlight">\(i\)</span> represents the <em>percentage</em> of properties near <span class="math notranslate nohighlight">\(i\)</span> that are
+condominiums, which is between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>.^[Discover this for yourself: what is the average of <code class="docutils literal notranslate"><span class="pre">numpy.array([True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">False,</span> <span class="pre">False,</span> <span class="pre">True)]</span></code>?]
+So, a <em>unit</em> change in this variable means that you would increase the condominium
+percentage by 100%. Thus, a <span class="math notranslate nohighlight">\(.1\)</span> increase in <code class="docutils literal notranslate"><span class="pre">w_pg_Condominium</span></code> (a change of ten percentage points)
+would result in a 5.92% increase in the property house price (<span class="math notranslate nohighlight">\(\beta_{w_pg\_Condominium} = 0.6\)</span>).
+Similar interpretations can be derived for all other spatially lagged variables to derive the
+<em>indirect</em> effect of a change in the spatial lag.</p>
+<p>However, to compute the indirect change for a given site <span class="math notranslate nohighlight">\(i\)</span>, you may need to examine the predicted values for <span class="math notranslate nohighlight">\(y_i\)</span>. In this example, since we are using a row-standardized weights matrix with twenty nearest neighbors, the impact of changing <span class="math notranslate nohighlight">\(x_i\)</span> is the same for all of its neighbors and for any site <span class="math notranslate nohighlight">\(i\)</span>. Thus, the effect is always <span class="math notranslate nohighlight">\(\frac{\gamma}{20}\)</span>, or about <span class="math notranslate nohighlight">\(0.0296\)</span>. However, this would not be the same for many other kinds of weights (like <code class="docutils literal notranslate"><span class="pre">Kernel</span></code>, <code class="docutils literal notranslate"><span class="pre">Queen</span></code>, <code class="docutils literal notranslate"><span class="pre">Rook</span></code>, <code class="docutils literal notranslate"><span class="pre">DistanceBand</span></code>, or <code class="docutils literal notranslate"><span class="pre">Voronoi</span></code>), so we will demonstrate how to construct the indirect effect for a specific <span class="math notranslate nohighlight">\(i\)</span>:</p>
+<p>First, predicted values for <span class="math notranslate nohighlight">\(y_i\)</span> are stored in the <code class="docutils literal notranslate"><span class="pre">predy</span></code> attribute of any model:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">m5</span><span class="o">.</span><span class="n">predy</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>array([[5.43610121],
+       [5.38596868],
+       [4.25377454],
+       ...,
+       [4.29145318],
+       [4.89174746],
+       [4.85867698]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>To build new predictions, we need to follow the equation stated above.</p>
+<p>Showing this process below, let’s first change a property to be a condominimum. Consider the third observation, which is the first apartment in the data:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>accommodates                                                     2
+bathrooms                                                        1
+bedrooms                                                         1
+beds                                                             1
+neighborhood                                           North Hills
+pool                                                             0
+d2balboa                                                   2.49389
+coastal                                                          0
+price                                                           99
+log_price                                                  4.59512
+id                                                            9553
+pg_Apartment                                                     1
+pg_Condominium                                                   0
+pg_House                                                         0
+pg_Other                                                         0
+pg_Townhouse                                                     0
+rt_Entire_home/apt                                               0
+rt_Private_room                                                  1
+rt_Shared_room                                                   0
+geometry              POINT (-117.1412083878189 32.75326632438691)
+residual                                                  0.287341
+Name: 2, dtype: object
+</pre></div>
+</div>
+</div>
+</div>
+<p>This is an apartment. Let’s make a copy of our data and change this apartment into a condominium:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db_scenario</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">db_scenario</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pg_Apartment&#39;</span><span class="p">,</span> <span class="s1">&#39;pg_Condominium&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># make Apartment 0 and condo 1</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>We’ve successfully made the change:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db_scenario</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>accommodates                                                     2
+bathrooms                                                        1
+bedrooms                                                         1
+beds                                                             1
+neighborhood                                           North Hills
+pool                                                             0
+d2balboa                                                   2.49389
+coastal                                                          0
+price                                                           99
+log_price                                                  4.59512
+id                                                            9553
+pg_Apartment                                                     0
+pg_Condominium                                                   1
+pg_House                                                         0
+pg_Other                                                         0
+pg_Townhouse                                                     0
+rt_Entire_home/apt                                               0
+rt_Private_room                                                  1
+rt_Shared_room                                                   0
+geometry              POINT (-117.1412083878189 32.75326632438691)
+residual                                                  0.287341
+Name: 2, dtype: object
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, we need to <em>also</em> update the spatial lag variates:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wx_scenario</span> <span class="o">=</span> <span class="n">db_scenario</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s1">&#39;pg&#39;</span><span class="p">)</span>\
+                         <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>\
+                         <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s1">&#39;w_&#39;</span><span class="o">+</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;w_pg_Apartment&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And build a new exogenous <span class="math notranslate nohighlight">\(\mathbf{X}\)</span> matrix, including the a constant 1 as the leading column</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">slx_exog_scenario</span> <span class="o">=</span> <span class="n">db_scenario</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wx_scenario</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, our new prediction (in the scenario where we have changed site <code class="docutils literal notranslate"><span class="pre">2</span></code> from an apartment into a condominium), is:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">y_pred_scenario</span> <span class="o">=</span> <span class="n">m5</span><span class="o">.</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">slx_exog_scenario</span> <span class="o">@</span> <span class="n">m5</span><span class="o">.</span><span class="n">betas</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This prediction will be exactly the same for all sites, except site <code class="docutils literal notranslate"><span class="pre">2</span></code> and its neighbors. So, the <em>neighbors</em> to site <code class="docutils literal notranslate"><span class="pre">2</span></code> are:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">knn</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-none notranslate"><div class="highlight"><pre><span></span>[772,
+ 2212,
+ 139,
+ 4653,
+ 2786,
+ 1218,
+ 138,
+ 808,
+ 1480,
+ 4241,
+ 1631,
+ 3617,
+ 2612,
+ 1162,
+ 135,
+ 23,
+ 5528,
+ 3591,
+ 407,
+ 6088]
+</pre></div>
+</div>
+</div>
+</div>
+<p>And the effect of changing site <code class="docutils literal notranslate"><span class="pre">2</span></code> into a condominium is associated with the following changes to <span class="math notranslate nohighlight">\(y_i\)</span>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">y_pred_scenario</span> <span class="o">-</span> <span class="n">m5</span><span class="o">.</span><span class="n">predy</span><span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">knn</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>0</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>2</th>
+      <td>0.106349</td>
+    </tr>
+    <tr>
+      <th>772</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>2212</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>139</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>4653</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>2786</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>1218</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>138</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>808</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>1480</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>4241</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>1631</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>3617</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>2612</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>1162</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>135</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>5528</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>3591</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>407</th>
+      <td>0.029642</td>
+    </tr>
+    <tr>
+      <th>6088</th>
+      <td>0.029642</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>We see the first row, representing the direct effect, is equal exactly to the estimate for <code class="docutils literal notranslate"><span class="pre">pg_Condominium</span></code>. For the other effects, though, we have only changed <code class="docutils literal notranslate"><span class="pre">w_pg_Condominium</span></code> by <span class="math notranslate nohighlight">\(.05\)</span></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scenario_near_2</span> <span class="o">=</span> <span class="n">slx_exog_scenario</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">knn</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;w_pg_Condominium&#39;</span><span class="p">]]</span>
+<span class="n">orig_near_2</span> <span class="o">=</span> <span class="n">slx_exog</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">knn</span><span class="o">.</span><span class="n">neighbors</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;w_pg_Condominium&#39;</span><span class="p">]]</span>
+<span class="n">scenario_near_2</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">orig_near_2</span><span class="p">,</span> <span class="n">lsuffix</span><span class="o">=</span><span class="s1">&#39;_scenario&#39;</span><span class="p">,</span> <span class="n">rsuffix</span><span class="o">=</span> <span class="s1">&#39;_original&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>w_pg_Condominium_scenario</th>
+      <th>w_pg_Condominium_original</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>772</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>2212</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>139</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>4653</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>2786</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>1218</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>138</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>808</th>
+      <td>0.05</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>1480</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>4241</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>1631</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>3617</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>2612</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>1162</th>
+      <td>0.05</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>135</th>
+      <td>0.05</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th>5528</th>
+      <td>0.05</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>3591</th>
+      <td>0.05</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>407</th>
+      <td>0.05</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>6088</th>
+      <td>0.10</td>
+      <td>0.05</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>Introducing a spatial lag of an explanatory variable, as we have just seen, is the most straightforward way of incorporating the notion of spatial dependence in a linear regression framework. It does not require additional changes, it can be estimated with OLS, and the interpretation is rather similar to interpreting non-spatial variables, so long as aggregate changes are required.</p>
+<p>The field of spatial econometrics however is a much broader one and has produced over the last decades many techniques to deal with spatial effects and spatial dependence in different ways. Although this might be an over simplification, one can say that most of such efforts for the case of a single cross-section are focused on two main variations: the spatial lag and the spatial error model. Both are similar to the case we have seen in that they are based on the introduction of a spatial lag, but they differ in the component of the model they modify and affect.</p>
 </div>
 <div class="section" id="spatial-error">
 <h4>Spatial Error<a class="headerlink" href="#spatial-error" title="Permalink to this headline">¶</a></h4>
@@ -1651,6 +2111,7 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
 </div>
 </div>
 </div>
+<p>Similarly to the effects in the SLX regression, changes in the spatial lag regression need to be interpreted with care. Here, <code class="docutils literal notranslate"><span class="pre">w_log_price</span></code> applies consistently over all observations, and actually changes the effective strength of each of the <span class="math notranslate nohighlight">\(\beta\)</span> coefficients. Thus, it is useful to use predictions and scenario-building to predict <span class="math notranslate nohighlight">\(y\)</span> when changing <span class="math notranslate nohighlight">\(X\)</span>, which allows you to analyze the <em>direct</em> and <em>indirect</em>components.</p>
 </div>
 <div class="section" id="other-ways-of-bringing-space-into-regression">
 <h4>Other ways of bringing space into regression<a class="headerlink" href="#other-ways-of-bringing-space-into-regression" title="Permalink to this headline">¶</a></h4>
@@ -1703,7 +2164,7 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_61_0.png" src="../_images/11_regression_61_0.png" />
+<img alt="../_images/11_regression_81_0.png" src="../_images/11_regression_81_0.png" />
 </div>
 </div>
 </div>
@@ -1767,7 +2228,7 @@ We won’t spend too much time on this theory specifically, but we can quickly a
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_64_0.png" src="../_images/11_regression_64_0.png" />
+<img alt="../_images/11_regression_84_0.png" src="../_images/11_regression_84_0.png" />
 </div>
 </div>
 <p>Clearly, the two curves are different. The observed correlation reaches a peak around <span class="math notranslate nohighlight">\(r=.34\)</span> when around 20 nearest listings are used. This means that adding more than 20 nearest neighbors does not significantly change the correlation in the residuals. Further, the lowest correlation is for the single nearest neighbor, and correlation rapidly increases as more neighbors are added close to the listing. Thus, this means that there does appear to be an unmeasured spatial structure in the residuals, since they are more similar to one another when they are near than when they are far apart. Further, while it’s not shown here (since computationally, it becomes intractable), as the number of nearest neighbors gets very large (approaching the number of observations in the dataset), the average of the <span class="math notranslate nohighlight">\(k\)</span>th nearest neighbors’ residuals goes to zero, the global average of residuals. This means that the correlation of the residuals and a vector that is nearly constant begins to approach zero.</p>
@@ -1791,16 +2252,16 @@ This means that our over- and under-predictions are likely to cluster.</p>
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "conda-env-analysis-py"
         },
         kernelOptions: {
-            kernelName: "python3",
+            kernelName: "conda-env-analysis-py",
             path: "./notebooks"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'conda-env-analysis-py'</script>
 
               </div>
               
