@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
-    display_name: analysis
+    display_name: Python [conda env:analysis]
     language: python
-    name: analysis
+    name: conda-env-analysis-py
 ---
 
 # Spatial Feature Engineering
@@ -307,7 +307,7 @@ from sklearn.neighbors import KNeighborsRegressor
 ```
 
 ```python
-two_bed_homes = airbnbs.query('bedrooms == 2 & `rt_Entire_home/apt`')
+two_bed_homes = airbnbs[airbnbs['bedrooms']==2 & airbnbs['rt_Entire_home/apt']]
 ```
 
 ```python
@@ -654,7 +654,7 @@ d1k_exclusive = weights.set_operations.w_difference(d1k_w, d500_w, constrained=F
 
 Then, we can compute the average size of listings between 500m and 1km in the same manner as before using our `d1k_exclusive` graph, which now omits all edges shorter than 500m. 
 
-```python jupyter={"outputs_hidden": true}
+```python
 d1k_exclusive.transform= 'r'
 average_500m_to_1k = weights.lag_spatial(d1k_exclusive, 
                                          airbnbs_albers[['bedrooms']].values)
