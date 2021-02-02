@@ -18,8 +18,8 @@ jupyter:
 ## Part I: Building Blocks
 
 - [Geospatial Computational Environment](01_geospatial_computational_environment)
-- [Spatial data](02_spatial_data)
-- [Spatial data processing](03_spatial_data_processing)
+- [Geographic Thinking for Data Scientists](02_geo_thinking)
+- [Spatial data](03_spatial_data)
 - [Spatial weights](04_spatial_weights)
 
 ## Part II: Spatial Data Analysis
