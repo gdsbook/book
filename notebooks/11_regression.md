@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
-    display_name: Python 3
+    display_name: Python [conda env:analysis]
     language: python
-    name: python3
+    name: conda-env-analysis-py
 ---
 
 # Spatial Regression
@@ -87,13 +87,13 @@ Before we discuss how to explicitly include space into the linear regression fra
 The core idea of linear regression is to explain the variation in a given (*dependent*) variable as a linear function of a collection of other (*explanatory*) variables. For example, in our case, we may want to express/explain the price of a house as a function of whether it is new and the degree of deprivation of the area where it is located. At the individual level, we can express this as:
 
 $$
-P_i = \alpha + \sum_k \beta_k X_{ki} + \epsilon_i
+P_i = \alpha + \sum_k \mathbf{X}_{ik}\beta_k  + \epsilon_i
 $$
 
 where $P_i$ is the AirBnb price of house $i$, and $X$ is a set of covariates that we use to explain such price. $\beta$ is a vector of parameters that give us information about in which way and to what extent each variable is related to the price, and $\alpha$, the constant term, is the average house price when all the other variables are zero. The term $\epsilon_i$ is usually referred to as "error" and captures elements that influence the price of a house but are not included in $X$. We can also express this relation in matrix form, excluding subindices for $i$, which yields:
 
 $$
-P = \alpha + \beta X + \epsilon
+P = \alpha + \mathbf{X}\beta + \epsilon
 $$
 
 A regression can be seen as a multivariate extension of bivariate correlations. Indeed, one way to interpret the $\beta_k$ coefficients in the equation above is as the degree of correlation between the explanatory variable $k$ and the dependent variable, *keeping all the other explanatory variables constant*. When one calculates bivariate correlations, the coefficient of a variable is picking up the correlation between the variables, but it is also subsuming into it variation associated with other correlated variables -- also called confounding factors. Regression allows us to isolate the distinct effect that a single variable has on the dependent one, once we *control* for those other variables.
@@ -248,12 +248,7 @@ referred to {cite}`Anselin_2003,Anselin_2014,Gelman_2006`.
 ### Spatial Feature Engineering
 
 Using geographic information to "construct" new data is a common approach to bring in spatial information into geographic analysis. 
-Often, this reflects the fact that processes are not the same everywhere in the map of analysis. 
-Indeed, this heterogeneity can have a large impact on how a process is understood or modeled. 
-
-Spatial heterogeneity (SH) arises when we cannot safely assume the process we are studying operates under the same "rules" throughout the geography of interest. In other words, we can observe SH when there are effects on the outcome variable that are intrinsically linked to specific locations. A good example of this is the case of seafront houses above: we are trying to model the price of a house and, the fact some houses are located under certain conditions (i.e. by the sea), makes their price behave differently.
-
-The abstract concept of SH can be made operational in a model in several ways. We will explore the following three: proximity variables, spatial fixed-effects (FE), and spatial regimes &mdash; which itself is a generalization of FE.
+Often, this reflects the fact that processes are not the same everywhere in the map of analysis, or that geographical information may be useful to predict our outcome of interest. In this section, we will briefly present how to use *spatial features*, or $X$ variables that are constructed from geographical relationships, in a standard linear model. We discuss spatial feature engineering extensively in the next chapter, though, and the depth and extent of spatial feature engineering is difficult to overstate. In this, we will consider only the simplest of spatial features: proximity variables. 
 
 #### Proximity variables
 
@@ -290,17 +285,17 @@ seaborn.regplot(m2.u.flatten(), lag_residual.flatten(),
                 ci=None);
 ```
 
-Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is *positive*, meaning that people are paying a premium to be *further* from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this.
+Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is *positive*, meaning that people are paying a premium to be *further* from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this. Further, the next chapter is an extensive treatment of spatial fixed effects, presenting many more spatial feature engineering methods. Here, we have only showed how to include these engineered features in a standard linear modelling framework. 
 
 
-#### Spatial Fixed-Effects
+### Spatial Heterogeneity
 
-While we've stipulated that our proximity variable might stand in for a difficult-to-measure premium individuals pay when they're close to a recreational zone. However, not all neighborhoods are created equal; some neighborhoods may be more lucrative than others, regardless of their proximity to Balboa Park. When this is the case, we need some way to account for the fact that each neighborhood may experience these kinds of *gestalt*, unique effects. One way to do this is through *spatial fixed effects*.
+While we've assumed that our proximity variable might stand in for a difficult-to-measure premium individuals pay when they're close to a recreational zone. However, not all neighborhoods are created equal; some neighborhoods may be more lucrative than others, regardless of their proximity to Balboa Park. When this is the case, we need some way to account for the fact that each neighborhood may experience these kinds of *gestalt*, unique effects. One way to do this is by capturing *spatial heterogeneity*. At its most basic, *spatial heterogeneity* means that parts of the model may change in different places. For example, changes to the intercept, $\alpha$, may reflect the fact that different areas have different baseline exposures to a given process. Changes to the slope terms, $\beta$, may indicate some kind of geographical mediating factor, such as when a governmental policy is not consistently applied across jurisdictions. Finally, changes to the variance of the residuals, commonly denoted $\sigma^2$, can introduce spatial heteroskedasticity. We deal with the first two in this section. 
 
-To illustrate these, let us consider the house price example from the previous section to introduce a more general illustration that relates to the second motivation for spatial effects ("space as a proxy"). Given we are only including two explanatory variables in the model, it is likely we are missing some important factors that play a role at determining the price at which a house is sold. Some of them, however, are likely to vary systematically over space (e.g. different neighborhood characteristics). If that is the case, we can control for those unobserved factors by using traditional dummy variables but basing their creation on a spatial rule. For example, let us include a binary variable for every neighborhood, indicating whether a given house is located within such area (`1`) or not (`0`). Mathematically, we are now fitting the following equation:
+To illustrate spatial fixed effects, let us consider the house price example from the previous section to introduce a more general illustration for "space as a proxy". Given we are only including two explanatory variables in the model, it is likely we are missing some important factors that play a role at determining the price at which a house is sold. Some of them, however, are likely to vary systematically over space (e.g. different neighborhood characteristics). If that is the case, we can control for those unobserved factors by using traditional dummy variables but basing their creation on a spatial rule. For example, let us include a binary variable for every neighborhood, indicating whether a given house is located within such area (`1`) or not (`0`). Mathematically, we are now fitting the following equation:
 
 $$
-\log{P_i} = \alpha_r + \sum_k \beta_k X_{ki} + \epsilon_i
+\log{P_i} = \alpha_r + \sum_k \mathbf{X}_{ik}\beta_k  + \epsilon_i
 $$
 
 where the main difference is that we are now allowing the constant term, $\alpha$, to vary by neighbourhood $r$, $\alpha_r$.
@@ -382,7 +377,7 @@ plt.show()
 At the core of estimating spatial FEs is the idea that, instead of assuming the dependent variable behaves uniformly over space, there are systematic effects following a geographical pattern that affect its behaviour. In other words, spatial FEs introduce econometrically the notion of spatial heterogeneity. They do this in the simplest possible form: by allowing the constant term to vary geographically. The other elements of the regression are left untouched and hence apply uniformly across space. The idea of spatial regimes (SRs) is to generalize the spatial FE approach to allow not only the constant term to vary but also any other explanatory variable. This implies that the equation we will be estimating is:
 
 $$
-\log{P_i} = \alpha_r + \sum_k \beta_{k-r} X_{ki} + \epsilon_i
+\log{P_i} = \alpha_r + \sum_k \mathbf{X}_{ki}\beta_{k-r} + \epsilon_i
 $$
 
 where we are not only allowing the constant term to vary by region ($\alpha_r$), but also every other parameter ($\beta_{k-r}$).
@@ -426,9 +421,9 @@ each other through distance *spatial dependence* {cite}`Anselin_1988`.
 There are several ways to introduce spatial dependence in an econometric
 framework, with varying degrees of econometric sophistication (see
 {cite}`Anselin_2002` for a good overview). Common to all of them however is the way space is
-formally encapsulated: through *spatial weights matrices ($W$)*.
+formally encapsulated: through *spatial weights matrices ($\mathbf{W}$)*, which we discussed in Chapter 4.
 
-#### Exogenous effects
+#### Exogenous effects: The SLX Model
 
 Let us come back to the house price example we have been working with. So far, we
 have hypothesized that the price of a house rented in San Diego through AirBnb can
@@ -447,18 +442,47 @@ we are also including as explanatory factor of the price of a given house the pr
 neighbouring houses in each type. Mathematically, this implies estimating the following model:
 
 $$
-\log(P) = \alpha + X\beta + WX\beta + \epsilon
+\log(P_i) = \alpha + \sum^{p}_{k=1}X_{ij}\beta_j + \sum^{p}_{k=1}\left(\sum^{N}_{j=1}w_{ij}x_{jk}\right)\gamma_k + \epsilon_i
 $$
 
-where $WX\beta$ represents the spatial lag of (some of) the explanatory variables. In Python, 
-we can calculate the spatial lag of each variable whose name starts by `pg_`
+where $\sum_{j=1}^N w_{ij}x_{jk}$ represents the spatial lag of the $k$th explanatory variable.
+This can be stated in *matrix* form using the spatial weights matrix, $\mathbf{W}$, as:
+$$
+\log(P_i) = \alpha + \mathbf{X}\beta + \mathbf{WX}\gamma + \epsilon
+$$
+
+This splits the model to focus on two main effects: $\beta$ and $\gamma$. The
+$\beta$ effect describes the change in $y_i$ when $X_{ik}$ changes by one. 
+^[Since we use the log price for a $y$ variable, our
+$\beta$ coefficients are still all interpreted as *elasticities*, meaning that a
+unit change in the $x_i$ variate results in a $\beta$ percent change in the
+price *y_i*]. The subscript for site $i$ is important here: since we're dealing 
+with a $\mathbf{W}$ matrix, it's useful to be clear about where the change occurs. 
+
+Indeed, this matters for the $\gamma$ effect, which represents an 
+*indirect* effect of a change in $X_i$. This can be conceptualized in two ways. 
+First, one could think of $\gamma$ as simply *the effect of a unit change in your average surroundings.*
+This is useful and simple. But, this interpretation ignores where this change
+might occur. In truth, a change in a variable at site $i$ will result in a *spillover* to its surroundings:
+when $x_i$ changes, so too does the *spatial lag* of any site near $i$. 
+The precise size of this will depend on the structure of $\mathbf{W}$, and can be 
+different for every site. For example, think of a very highly-connected "focal" site in a 
+row-standardized weight matrix. This focal site will not be strongly affected 
+if a neighbor changes by a single unit, since each site only contributes a 
+small amount to the lag at the focal site. Alternatively, consider a site with only 
+one neighbor: its lag will change by *exactly* the amount its sole neighbor changes.
+Thus, to discover the exact indirect effect of a change $y$ caused by the change
+at a specific site $x_i$ you would need to compute the *change in the spatial lag*,
+and then use that as your *change* in $X$. We will discuss this in the following section. 
+
+In Python, we can calculate the spatial lag of each variable whose name starts by `pg_`
 by first creating a list of all of those names, and then applying `PySAL`'s
 `lag_spatial` to each of them:
 
 ```python
-wx = [i for i in variable_names if 'pg_' in i]
-wx = db[wx].apply(lambda y: weights.spatial_lag.lag_spatial(knn, y))\
-           .rename(columns=lambda c: 'w_'+c)
+wx = db.filter(like='pg')\
+        .apply(lambda y: weights.spatial_lag.lag_spatial(knn, y))\
+        .rename(columns=lambda c: 'w_'+c).drop('w_pg_Apartment', axis=1)
 ```
 
 Once computed, we can run the model using OLS estimation because, in this
@@ -466,9 +490,11 @@ context, the spatial  lags included do not violate any of the assumptions OLS
 relies on (they are essentially additional exogenous variables):
 
 ```python
+slx_exog = db[variable_names].join(wx)
 m5 = spreg.OLS(db[['log_price']].values, 
-                  db[variable_names].join(wx).values,
-                  name_y='l_price', name_x=variable_names+wx.columns.tolist())
+                  slx_exog.values,
+                  name_y='l_price', 
+               name_x=slx_exog.columns.tolist())
 print(m5.summary)
 ```
 
@@ -479,13 +505,93 @@ interpreted also in a similar way. The spatial lag of each type of property
 (`w_pg_XXX`) is the new addition. We observe that, except for the case
 of townhouses (same as with the binary variable, `pg_Townhouse`), they are all
 significant, suggesting our initial hypothesis on the role of the surrounding
-houses might indeed be at work here. As an illustration, being a condominium increases
-the price, on average, 11% ($\beta_{pg\_Condominium}=0.11$) with respect to the benchmark, which is set to apartments. More relevant to this section, any given house surrounded by condominiums *also* receives a price premium. In this case, the interpretation is slightly different because the variable is not a dummy but a proportion in the range [0, 1]. A 10% increase the proportion of neighbors that are condominiums translates into a 6% increase in the property house price ($\beta_{w_pg\_Condominium} = 0.6$). This interpretation comes from the following: increasing the prevalence of 
-condos in the area surrounding a house by ten percent is associated with a change in the
-log of the nightly rental price of about .06, which translates to around a 6% increase in the nightly
-rental price of the house. Similar interpretations can be derived for all other spatially lagged variables.
+houses might indeed be at work here. 
 
-Introducing a spatial lag of an explanatory variable, as we have just seen, is the most straightforward way of incorporating the notion of spatial dependence in a linear regression framework. It does not require additional changes, it can be estimated with OLS, and the interpretation is rather similar to interpreting non-spatial variables. The field of spatial econometrics however is a much broader one and has produced over the last decades many techniques to deal with spatial effects and spatial dependence in different ways. Although this might be an over simplification, one can say that most of such efforts for the case of a single cross-section are focused on two main variations: the spatial lag and the spatial error model. Both are similar to the case we have seen in that they are based on the introduction of a spatial lag, but they differ in the component of the model they modify and affect.
+As an illustration, let's look at some of the direct/indirect effects. 
+The direct effect of the `pg_Condominium` variable means that condominimums are
+typically 11% more expensive ($\beta_{pg\_Condominium}=0.1063$) than the benchmark
+property type, apartments. More relevant to this section, any given house surrounded by 
+condominiums *also* receives a price premium. But, since $pg_Condominium$ is a dummy variable,
+the spatial lag at site $i$ represents the *percentage* of properties near $i$ that are
+condominiums, which is between $0$ and $1$.^[Discover this for yourself: what is the average of `numpy.array([True, True, True, False, False, True)]`?]
+So, a *unit* change in this variable means that you would increase the condominium 
+percentage by 100%. Thus, a $.1$ increase in `w_pg_Condominium` (a change of ten percentage points)
+would result in a 5.92% increase in the property house price ($\beta_{w_pg\_Condominium} = 0.6$). 
+Similar interpretations can be derived for all other spatially lagged variables to derive the
+*indirect* effect of a change in the spatial lag. 
+
+However, to compute the indirect change for a given site $i$, you may need to examine the predicted values for $y_i$. In this example, since we are using a row-standardized weights matrix with twenty nearest neighbors, the impact of changing $x_i$ is the same for all of its neighbors and for any site $i$. Thus, the effect is always $\frac{\gamma}{20}$, or about $0.0296$. However, this would not be the same for many other kinds of weights (like `Kernel`, `Queen`, `Rook`, `DistanceBand`, or `Voronoi`), so we will demonstrate how to construct the indirect effect for a specific $i$:
+
+First, predicted values for $y_i$ are stored in the `predy` attribute of any model:
+
+```python
+m5.predy
+```
+
+To build new predictions, we need to follow the equation stated above.
+
+Showing this process below, let's first change a property to be a condominimum. Consider the third observation, which is the first apartment in the data:
+
+```python
+db.loc[2]
+```
+
+This is an apartment. Let's make a copy of our data and change this apartment into a condominium:
+
+```python
+db_scenario = db.copy()
+db_scenario.loc[2, ['pg_Apartment', 'pg_Condominium']] = [0,1] # make Apartment 0 and condo 1
+```
+
+We've successfully made the change:
+
+```python
+db_scenario.loc[2]
+```
+
+Now, we need to *also* update the spatial lag variates:
+
+```python
+wx_scenario = db_scenario.filter(like='pg')\
+                         .apply(lambda y: weights.spatial_lag.lag_spatial(knn, y))\
+                         .rename(columns=lambda c: 'w_'+c).drop('w_pg_Apartment', axis=1)
+```
+
+And build a new exogenous $\mathbf{X}$ matrix, including the a constant 1 as the leading column
+
+```python
+slx_exog_scenario = db_scenario[variable_names].join(wx_scenario)
+```
+
+Now, our new prediction (in the scenario where we have changed site `2` from an apartment into a condominium), is:
+
+```python
+y_pred_scenario = m5.betas[0] + slx_exog_scenario @ m5.betas[1:]
+```
+
+This prediction will be exactly the same for all sites, except site `2` and its neighbors. So, the *neighbors* to site `2` are:
+
+```python
+knn.neighbors[2]
+```
+
+And the effect of changing site `2` into a condominium is associated with the following changes to $y_i$:
+
+```python
+(y_pred_scenario - m5.predy).loc[[2] + knn.neighbors[2]]
+```
+
+We see the first row, representing the direct effect, is equal exactly to the estimate for `pg_Condominium`. For the other effects, though, we have only changed `w_pg_Condominium` by $.05$
+
+```python
+scenario_near_2 = slx_exog_scenario.loc[knn.neighbors[2], ['w_pg_Condominium']]
+orig_near_2 = slx_exog.loc[knn.neighbors[2], ['w_pg_Condominium']]
+scenario_near_2.join(orig_near_2, lsuffix='_scenario', rsuffix= '_original')
+```
+
+Introducing a spatial lag of an explanatory variable, as we have just seen, is the most straightforward way of incorporating the notion of spatial dependence in a linear regression framework. It does not require additional changes, it can be estimated with OLS, and the interpretation is rather similar to interpreting non-spatial variables, so long as aggregate changes are required. 
+
+The field of spatial econometrics however is a much broader one and has produced over the last decades many techniques to deal with spatial effects and spatial dependence in different ways. Although this might be an over simplification, one can say that most of such efforts for the case of a single cross-section are focused on two main variations: the spatial lag and the spatial error model. Both are similar to the case we have seen in that they are based on the introduction of a spatial lag, but they differ in the component of the model they modify and affect.
 
 #### Spatial Error
 
@@ -537,6 +643,8 @@ m7 = spreg.GM_Lag(db[['log_price']].values, db[variable_names].values,
                      w=knn, name_y='log_price', name_x=variable_names)
 print(m7.summary)
 ```
+
+Similarly to the effects in the SLX regression, changes in the spatial lag regression need to be interpreted with care. Here, `w_log_price` applies consistently over all observations, and actually changes the effective strength of each of the $\beta$ coefficients. Thus, it is useful to use predictions and scenario-building to predict $y$ when changing $X$, which allows you to analyze the *direct* and *indirect*components. 
 
 #### Other ways of bringing space into regression
 
