@@ -1,3 +1,6 @@
 # Overview
 
-[Add here overview to Part I]
+Geography is a rather old discipline, so why do we need all of these fancy new concepts, methods, and computation? Indeed, why is this book about geographic *data science* and not some other kind of quantitative study in geography, such as *geocomputation* or *Geographic Information Science*? This section addresses these questions by outlining what we see as the building blocks as well as a few of the innovations and important new framings that are involved in geographic data science.
+
+First, in [Chapter 1](../../notebooks/01_geospatial_computational_environment), we discuss the fundamental differences in how data science is *done*. Reproducible, literate and interactive programming environments have seriously changed the game for how analysis is done. Second, we outline the fundamentals of geographic theory for data scientists. The main distinctions between geographic *models* and the *data structures* that represent them are explained in [Chapter 2](../../notebooks/02_geo_thinking). The linkages between these models and structures are also discussed. Then, starting in [Chapter 3](../../notebooks/03_spatial_data), we show how these notions translate into patterns to read/write/represent geographic data formats. Finally, we close this part by discussing how to represent and store geographical relationships in an efficient data structure. Together, this provides a comprehensive overview of the main models of geographical processes, as well as the nuts and bolts of how to interact with geographical data. 
+
