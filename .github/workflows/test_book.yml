@@ -1,0 +1,46 @@
+name: Test Book
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+
+  Test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+            auto-update-conda: true
+            auto-activate-base: true
+
+      - name: Set up GDS Env
+        shell: bash -l {0}
+        run: |
+          conda update -y -n base -c defaults conda
+          conda --version
+          conda env create -f https://github.com/darribas/gds_env/raw/v6.0post1/gds_py/gds_py.yml
+          conda activate gds
+          pip install -r https://github.com/darribas/gds_env/raw/v6.0post1/gds_py/gds_py_pip.txt
+      - name: Check and Log Environment
+        shell: bash -l {0}
+        run: |
+          conda activate gds
+          conda info
+          # Print conda list
+          conda list
+          
+      - name: Run Tests
+        shell: bash -l {0}
+        continue-on-error: false
+        run: |
+          conda activate gds
+          make test
