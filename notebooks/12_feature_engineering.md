@@ -5,12 +5,12 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.2
+      format_version: '1.3'
+      jupytext_version: 1.10.2
   kernelspec:
-    display_name: Python [conda env:analysis]
+    display_name: Python 3
     language: python
-    name: conda-env-analysis-py
+    name: python3
 ---
 
 # Spatial Feature Engineering
@@ -34,6 +34,12 @@ import osmnx
 import seaborn
 import rasterio
 from rasterio.plot import show as rioshow
+```
+
+```python tags=["hide-cell"]
+osmnx.config(
+    overpass_settings='[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
+)
 ```
 
 Throughout this chapter, we will use a common dataset to which we want to append more information through geography. For the illustration, we will use the set of [AirBnb properties](../data/airbnb/regression_cleaning). Let's read it:
@@ -78,9 +84,9 @@ Using this polygon, we can use the `osmnx` package to fetch points of interest (
 
 ```python
 %%time
-pois = osmnx.pois_from_polygon(airbnbs_ch,
-                               tags={"amenity": ['restaurant', 'bar']}
-                              )
+pois = osmnx.geometries_from_polygon(
+    airbnbs_ch, tags={"amenity": ['restaurant', 'bar']}
+)
 ```
 
 This provides us with every location within our convex hull that is tagged as a "restaurant" or "bar" its metadata on OpenStreteMap. Overall, this provides us with about 1300 points of interest: 
@@ -95,10 +101,11 @@ Once loaded into `pois` as a `GeoDataFrame`, let's take a peek at their location
 f,ax = plt.subplots(1,figsize=(12, 12))
 airbnbs.plot(ax=ax, marker='.')
 pois.plot(ax=ax, color='r')
-contextily.add_basemap(ax, 
-                       crs=airbnbs.crs.to_string(), 
-                       source=contextily.providers.Stamen.Toner
-                      )
+contextily.add_basemap(
+    ax, 
+    crs=airbnbs.crs.to_string(), 
+    source=contextily.providers.Stamen.Toner
+)
 ```
 
 Now, for some feature engineering, it may be extremely useful to know whether an Airbnb is located in a "hot" location, with a lot of restaurants and bars to choose from. Alternatively, if Airbnbs are very remote, they might not be as lucrative for short, expensive "city-break" reservations. That is, Airbnb users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be *willing to pay more* for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the Airbnb. 
@@ -147,10 +154,11 @@ Now, `abb_buffer` contains a 500-meter circle around each Airbnb.
 Using these, we can count the number of POIs that are within these areas using a *spatial join*. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: `pois within airbnb_buffers`, where `within` is the predicate relating `pois` to `airbnb_buffers`. Predicates are not always *reversible*: no `airbnb_buffer` can be `within` a `poi`. In `geopandas`, we can compute all pairs of relations between the `pois` and `airbnb_buffers` efficiently using the `sjoin` function, which takes a `predicate` argument defining the requested relationship between the first & second argument. 
 
 ```python
-joined = geopandas.sjoin(pois_albers,
-                    airbnbs_albers.set_geometry('buffer_500m')[['id', 'buffer_500m']],
-                    op="within"
-                   )
+joined = geopandas.sjoin(
+    pois_albers,
+    airbnbs_albers.set_geometry('buffer_500m')[['id', 'buffer_500m']],
+    op="within"
+)
 ```
 
 The resulting joined object `joined` contains a row for every pair of POI and AirBnb that are linked. From there, we can apply a group-by operation, using the AirBnb ID, and count how many POIs each AirBnb has within 500m of distance:
@@ -166,8 +174,9 @@ poi_count.head()
 The resulting `Series` is indexed on the AirBnb IDs, so we can assign it to the original `airbnbs` table. In this case, we know by construction that missing AirBnbs in `poi_count` do not have any POI within 500m, so we can fill missing values in the column with zeros.
 
 ```python
-airbnbs_w_counts = airbnbs_albers.merge(poi_count, left_on='id', right_index=True)\
-                                 .fillna({"poi_count": 0})
+airbnbs_w_counts = airbnbs_albers.merge(
+    poi_count, left_on='id', right_index=True
+).fillna({"poi_count": 0})
 ```
 
 We can visualise now the distribution of counts to get a sense of how "well-served" AirBnb properties are arranged over space (for good measure, we'll also add a legendgram):
@@ -414,10 +423,11 @@ Let us pull down the number of inhabitants from the American Community Survey fo
 ```python
 %%time
 acs = cenpy.products.ACS()
-sd_pop = acs.from_msa("San Diego, CA",
-                      level = "tract",
-                      variables=['B02001_001E']
-                     )
+sd_pop = acs.from_msa(
+    "San Diego, CA",
+    level = "tract",
+    variables=['B02001_001E']
+)
 ```
 
 And calculate population density:
@@ -568,7 +578,9 @@ Just like in map matching, you can use spatial summary features in map synthesis
 We might do this by building a `DistanceBand` weight object, which considers Airbnb as "neighbors" if they are within the distance threshold. 
 
 ```python
-d500_w = weights.DistanceBand.from_dataframe(airbnbs_albers, threshold=500, silence_warnings=True)
+d500_w = weights.DistanceBand.from_dataframe(
+    airbnbs_albers, threshold=500, silence_warnings=True
+)
 ```
 
 Now, we can get the average size of surrounding Airbnbs directly as the spatial lag:
@@ -592,7 +604,9 @@ plt.ylabel("Average of nearby\n listings' bedrooms")
 If we were instead interested in the most common number of bedrooms, rather than the average, we could use the `lag_categorical` function:
 
 ```python
-local_mode = weights.lag_categorical(d500_w, airbnbs_albers[['bedrooms']].values)
+local_mode = weights.lag_categorical(
+    d500_w, airbnbs_albers[['bedrooms']].values
+)
 ```
 
 Since we are now treating the number of bedrooms as a discrete feature, we can use a crosstab from `pandas` to examine the relationship between a listing and the typical size of listings nearby:
@@ -643,21 +657,26 @@ average_within_500 = weights.lag_spatial(d500_w, airbnbs_albers[['bedrooms']].va
 Then, we need to build the graph of airbnbs that fall *between* 500m and 1km from one another. To start, we build the `DistanceBand` graph of all listings closer than 1km:
 
 ```python
-d1k_w = weights.DistanceBand.from_dataframe(airbnbs_albers, threshold=1000, silence_warnings=True)
+d1k_w = weights.DistanceBand.from_dataframe(
+    airbnbs_albers, threshold=1000, silence_warnings=True
+)
 ```
 
 Then, using the `weights.set_operations` module, we can express set-theoretic relationships between graphs. Here, we need to *remove* the links in our 1km graph that are *also* links in the 500m graph. To do this, we need `w_difference(d1k_w, d500_w)`, the difference between the 1km graph and the 500m graph: 
 
 ```python
-d1k_exclusive = weights.set_operations.w_difference(d1k_w, d500_w, constrained=False)
+d1k_exclusive = weights.set_operations.w_difference(
+    d1k_w, d500_w, constrained=False
+)
 ```
 
 Then, we can compute the average size of listings between 500m and 1km in the same manner as before using our `d1k_exclusive` graph, which now omits all edges shorter than 500m. 
 
 ```python
 d1k_exclusive.transform= 'r'
-average_500m_to_1k = weights.lag_spatial(d1k_exclusive, 
-                                         airbnbs_albers[['bedrooms']].values)
+average_500m_to_1k = weights.lag_spatial(
+    d1k_exclusive, airbnbs_albers[['bedrooms']].values
+)
 ```
 
 Thus, we can see that the two features definitely contain distinct, but related, information, and both may be valuable as features when attempting to predict features of interest. 
@@ -687,8 +706,9 @@ from hdbscan import HDBSCAN
 ```
 
 ```python
-coordinates = numpy.column_stack((airbnbs_albers.geometry.x, 
-                                  airbnbs_albers.geometry.y))
+coordinates = numpy.column_stack(
+    (airbnbs_albers.geometry.x, airbnbs_albers.geometry.y)
+)
 ```
 
 With a little tuning, we can decide on an effective parameterization. Here, we'll look for relatively large clusters of Airbnbs, those with about 100 listings or more. 

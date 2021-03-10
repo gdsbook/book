@@ -3,6 +3,7 @@
 Repository for the book "Geographic Data Science with PySAL and the pydata
 Stack"
 
+[![Build Jupyter book](https://github.com/gdsbook/book/actions/workflows/build_website.yml/badge.svg?branch=master)](https://github.com/gdsbook/book/actions/workflows/build_website.yml)
 
 ## Table of Contents
 

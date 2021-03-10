@@ -5,8 +5,8 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.2
+      format_version: '1.3'
+      jupytext_version: 1.10.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -376,7 +376,8 @@ For the minimum rotated rectangle, we will use the `minimum_rotated_rectangle` f
 
 
 ```python
-min_rot_rect = centrography.minimum_rotated_rectangle(coordinates)
+# Commented out until functionality is added to pointpats
+#min_rot_rect = centrography.minimum_rotated_rectangle(coordinates)
 ```
 
 And, for the minimum bounding rectangle without rotation, we will use the `minimum_bounding_rectangle` function from the `pointpats` package.
@@ -419,6 +420,8 @@ convex_hull_patch = Polygon(
 )
 
 # a green minimum rotated rectangle
+"""
+# Commented out until functionality is added to pointpats
 min_rot_rect_patch = Polygon(
     min_rot_rect, 
     closed=True, 
@@ -428,6 +431,7 @@ min_rot_rect_patch = Polygon(
     label='Min Rotated Rectangle', 
     linewidth=2
 )
+"""
 
 # compute the width and height of the 
 min_rect_width = min_rect_vertices[2] - min_rect_vertices[0]
@@ -462,7 +466,8 @@ f,ax = plt.subplots(1, figsize=(10,10))
 
 ax.add_patch(alpha_shape_patch)
 ax.add_patch(convex_hull_patch)
-ax.add_patch(min_rot_rect_patch)
+# Commented out until functionality is added to pointpats
+#ax.add_patch(min_rot_rect_patch)
 ax.add_patch(min_rect_patch)
 ax.add_patch(circ_patch)
 
