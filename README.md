@@ -5,6 +5,8 @@ Stack"
 
 [![Build Jupyter book](https://github.com/gdsbook/book/actions/workflows/build_website.yml/badge.svg?branch=master)](https://github.com/gdsbook/book/actions/workflows/build_website.yml)
 
+[![Test Book](https://github.com/gdsbook/book/actions/workflows/test_book.yml/badge.svg?branch=master)](https://github.com/gdsbook/book/actions/workflows/test_book.yml)
+
 ## Table of Contents
 
 Check the [current table of contents](notebooks/00_toc.md).
