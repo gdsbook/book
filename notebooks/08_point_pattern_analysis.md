@@ -866,9 +866,10 @@ Overall, this chapter has provided an overview of methods to analyze point patte
 
 ## Questions
 
-1. What is the trade-off implicit in the choice of hexagon granularity when "hexbinning"? Based on this, how would you recommend to select a specific number of bins? 
-1. KDE gets around the need to partition space in "buckets" to count points inside each of them. But, can you think of the limitations of applying this technique? To explore them, reproduce the KDE figure in the chapter playing with the arguments of the type of kernel (`kernel`) and bandwidth (`bw`). Consult the documentation of `seaborn.kdeplot` to learn what each of them controls.
-1. Given a hypothetical point pattern, what characteristics would it need to meet for the mean and median centers to coincide? 
-1. The choice of extent definition you adopt may influence your final results significantly. To further internalise this realisation, compute the density of photographs in the example we have seen using each of the extent definitions covered (minimum bounding/rotate circle/rectangle, convex hull and alpha shape). Remember the density can be obtained by dividing the number of photographs by the area of the extent.
-1. How do you think the density of quadrants affect quadrat statistics?
-1. Can you use information from Ripley's functions to inform the choice of DBSCAN parameters? How? Use the example with Tokyo photographs covered above to illustrate your ideas.
+1. What is the trade-off when picking the hexagon granularity when "hexbinning"? Put another way, can we pick a "good" number of bins for all problems? If not, how would you recommend to select a specific number of bins?
+2. Kernel Density Estimation (KDE) gets around the need to partition space in "buckets" to count points inside each of them. But, can you think of the limitations of applying this technique? To explore them, reproduce the KDE figure in the chapter, but change the arguments of the type of kernel (`kernel`) and the size of the bandwidth (`bw`). Consult the documentation of `seaborn.kdeplot` to learn what each of them controls. What happens when the bandwidth is very small? How does that relate to the number of bins in the hexbin plot?
+3. Given a hypothetical point pattern, what characteristics would it need to meet for the mean and median centers to coincide? 
+4. Using `libpysal.cg.alpha_shape`, plot what happens to the alpha hull for $\alpha = 0,.2,.4,.6,.8,1,1.5,2,4$. What happens as `alpha` increases?
+5. The choice of extent definition you adopt may influence your final results significantly. To further internalise this realisation, compute the density of photographs in the example we have seen using each of the extent definitions covered (minimum bounding/rotate circle/rectangle, convex hull and alpha shape). Remember the density can be obtained by dividing the number of photographs by the area of the extent.
+6. Given the discussions in question 1 and 2, how do you think the density of quadrants affect quadrat statistics?
+7. Can you use information from Ripley's functions to inform the choice of DBSCAN parameters? How? Use the example with Tokyo photographs covered above to illustrate your ideas.

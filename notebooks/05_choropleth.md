@@ -712,12 +712,13 @@ packages in the data stack that the user can turn to.
 
 ## Questions
 
-1. A variable such as population density measured for census tracts in a metropolitan area can display a high degree of skewness. What is an appropriate choice for a choropleth classification for such a variable?
+1. A variable (such as population density measured for census tracts in a metropolitan area) can display a high degree of skewness. That is, the distribution may be very asymmetric, either with a few very values and a bulk of low ones; or a few very low values with a bulk of high values. What is an appropriate choice for a choropleth classification for a skewed variable?
 2. Provide two solutions to the problem of ties when applying quantile classification to the following series: $y=[2,2,2,2,2,2,4,7,8,9,20,21]$ and $k=4$. Discuss the merits of each approach.
-3. Which classifiers are appropriate for data that displays a high degree of multi-modality in its statistical distribution?
-4. Contrast and compare classed choropleth maps with class-less choropleth maps? What are the strengths and limitations of each type of visualization for spatial data?
-5. In what ways do choropleth classifiers treat intra-class and inter-class heterogeneity differently? What are the implications of these choices?
-6. To what extent do most commonly employed choropleth classification methods take the geographical distribution of the variable into consideration? Can you think of ways to incorporate the spatial features of a variable into a classification?
-7. Discuss the similarities between  the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?
-8. The Fisher-Jenks classifier will always dominate other k-classifiers for a given data set, with respect to statistical fit. Given this, why might one decide on choosing a different k-classifier for a particular data set?
+3. Which classifiers are appropriate for data that displays a high degree of multi-modality in its statistical distribution? 
+4. Are there any colormaps that work well for multi-modal data?
+5. Contrast and compare classed choropleth maps with class-less (i.e. continuous-scale) choropleth maps? What are the strengths and limitations of each type of visualization for spatial data?
+6. In what ways do choropleth classifiers treat intra-class and inter-class heterogeneity differently? What are the implications of these choices?
+7. To what extent do most commonly employed choropleth classification methods take the geographical distribution of the variable into consideration? Can you think of ways to incorporate the spatial features of a variable into a classification for a choropleth map?
+8. Discuss the similarities between the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?
+9. The Fisher-Jenks classifier will always have more internally-homogenou classes than other k-classifiers. Given this, why might one decide on choosing a different k-classifier for a particular data set?
 
