@@ -5,13 +5,8 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-<<<<<<< HEAD
       format_version: '1.3'
       jupytext_version: 1.10.2
-=======
-      format_version: '1.2'
-      jupytext_version: 1.5.2
->>>>>>> 5260ac88ced171b69d78b3691dbb45a8fdd38b38
   kernelspec:
     display_name: Python 3
     language: python
