@@ -1047,17 +1047,28 @@ These are the starkest contrasts in the map, and result in the most distinctive 
 
 1. Rook contiguity & Queen contiguity are two of three kinds of contiguity that are defined in terms of chess analogies. The third kind, *Bishop contiguity*, applies when two observations are considered connected when they share single vertices, but are considered *disconnected* if they share an edge. This means that observations that exhibit Queen contiguity are those that exhibit either Rook or Bishop contiguity. Using the Rook and Queen contiguity matrices we built for San Diego and the `Wsets.w_difference` function, are there any Bishop-contiguous observations in San Diego? 
 
-2. Different kinds of spatial weights objects can result in very different kinds of graph structures. Considering the `cardinalities` of the Queen, Block, and union of Queen & Block, which graph type has the highest average cardinality? Why might this be the case? Which graph has more nonzero entries?
+2. Different kinds of spatial weights objects can result in very different kinds of graph structures. Considering the `cardinalities` of the Queen, Block, and the union of Queen & Block, 
+    1. Which graph type has the highest average cardinality?
+    2. Which graph has more nonzero entries?
+    3. Why might this be the case?
 
-3. Comparing their average cardinality and percentage of nonzero links, which graph in this chapter has the *most sparse* structure? That is, which graph is the most sparsely connected?
+3. Graphs are considered "connected" when you can construct a path from any observation to every other observation. A "disconnected" graph has at least one node where there is no path from it to every other node. And, a "connected component" is a part of the graph that is connected internally, but is disconnected from another part of the graph. This is reported for every spatial weights object in its `w.n_components`. 
 
-4. In this chapter, we worked with regular *square* lattices using the `lat2W` function. In the same manner, the `hexLat2W` function can generate *hexagonal regular lattices*. For lattices of size (3,3), (6,6), and (9,9) for Rook & Queen `lat2W`, as well as for `hexLat2W`:
+    1. How many components does the Queen Contiguity weights for San Diego have?
+    2. Using a K-nearest Neighbor Graph for San Diego tracts where $k=1$, how many connected components are there in this graph?
+    3. Increase $k$ by one until the `n_components` is 1. Make a plot of the relationship between $k$ and $n_components$. 
+    4. What value of $k$ does `n_components` become 1?
+    5. How many non-zero links does this network have?
+
+4. Comparing their average cardinality and percentage of nonzero links, which graph in this chapter has the *most sparse* structure? That is, which graph is the most sparsely connected?
+
+5. In this chapter, we worked with regular *square* lattices using the `lat2W` function. In the same manner, the `hexLat2W` function can generate *hexagonal regular lattices*. For lattices of size (3,3), (6,6), and (9,9) for Rook & Queen `lat2W`, as well as for `hexLat2W`:
 
     1. examine the average cardinality. Does `lat2W` or `hexLat2W` have higher average cardinality? 
     2. Further, make a histogram of the cardinalities. Which type of lattice has higher variation in its number of neighbors? 
     3. Why is there no `rook=True` option in `hexLat2W`, as there is in `lat2W`?
 
-5. The *Voronoi diagram* is a common method to construct polygons from a point dataset. A Voronoi diagram is built up from *Voronoi cells*, each of which contains the area that is closer to its source point than any other source point in the diagram. Further, the Queen contiguity graph for a *Voronoi diagram* obeys a number of useful properties, since it is the *Delaunay Triangulation* of a set of points. 
+6. The *Voronoi diagram* is a common method to construct polygons from a point dataset. A Voronoi diagram is built up from *Voronoi cells*, each of which contains the area that is closer to its source point than any other source point in the diagram. Further, the Queen contiguity graph for a *Voronoi diagram* obeys a number of useful properties, since it is the *Delaunay Triangulation* of a set of points. 
     1. Using the following code, build and plot the voronoi diagram for the *centroids* of Mexican states, with the states and their centroids overlayed:
     ```python
     from pysal.lib.weights.distance import get_points_array
@@ -1077,19 +1088,19 @@ These are the starkest contrasts in the map, and result in the most distinctive 
     4. Make a plot of the Queen contiguity and Voronoi contiguity graphs to compare them visually, like we did with the block weights & Queen weights. How do the two graphs compare in terms of the length of their links and how they connect the Mexican states?
     5. Using `weights.set_operations`, find any links that are in the Voronoi contiguity graph, but not in the Queen contiguity graph. Alternatively, find any links that are in the Queen contiguity graph, but not the Voronoi contiguity graph. 
 
-6. Interoperability is important for the Python scientific stack. Thanks to standardization around the `numpy` array and the `scipy.sparse` array datastructures, it is simple and computationally-easy to convert objects from one representation to another:
+7. Interoperability is important for the Python scientific stack. Thanks to standardization around the `numpy` array and the `scipy.sparse` array datastructures, it is simple and computationally-easy to convert objects from one representation to another:
     1. Using `w.to_networkx()`, convert the Mexico Regions Queen+Block weights matrix to a `networkx` graph. Compute the Eigenvector Centrality of that new object using `networkx.eigenvector_centrality`
     2. Using `w.sparse`, compute the number of connected components in the Mexico Regions Block weights matrix using the `connected_components` function in `scipy.sparse.csgraph`. 
     3. Using `w.sparse`, compute the all-pairs shortest path matrix in the Mexico Queen weights matrix using the `shortest_path` function in `scipy.sparse.csgraph`. 
     
-7. While every node in a $k$-nearest neighbor graph has 5 neighbors, there is a conceptual difference between *indegree* and *outdegree* of nodes in a graph. The *outdegree* of a node is the number of outgoing links from a node; for a K-Nearest Neighbor graph, this is $k$ for every variable. The *indegree* of a node in a graph is the number of *incoming* links to that node; for a K-Nearest Neighbor graph, this is the number of other observations that pick the target as their nearest neighbor. The *indegree* of a node in the K-Nearest Neighbor graph can provide a measure of *hubbiness*, or how central a node is to other nodes. 
+8. While every node in a $k$-nearest neighbor graph has 5 neighbors, there is a conceptual difference between *indegree* and *outdegree* of nodes in a graph. The *outdegree* of a node is the number of outgoing links from a node; for a K-Nearest Neighbor graph, this is $k$ for every variable. The *indegree* of a node in a graph is the number of *incoming* links to that node; for a K-Nearest Neighbor graph, this is the number of other observations that pick the target as their nearest neighbor. The *indegree* of a node in the K-Nearest Neighbor graph can provide a measure of *hubbiness*, or how central a node is to other nodes. 
     1. Using the San Diego Tracts data, build a $k=6$ nearest neighbor weight and call it `knn_6`. 
     2. Verify that the $k=6$ by taking the row sum over the weights matrix in `knn_6.sparse`.
     3. Compute the indegree of each observation by taking the *column sum* over the weights matrix in `knn_6.sparse`, and divide by 6, the outdegree for all observations. 
     4. Make a histogram of the indegrees for the $k=6$ weights. How evenly-distributed is the distribution of indegrees?
     5. Make a new histogram of the indegree standardized by the outdegree when $k=26$. Does hubbiness reduce when increasing the number of $k$-nearest neighbors?
 
-8. Sometimes, graphs are not simple to construct. For the `san_diego_neighborhoods` dataset:
+9. Sometimes, graphs are not simple to construct. For the `san_diego_neighborhoods` dataset:
     1. Build the Queen contiguity weights, and plot the graph on top of the neighborhoods themselves. How many connected components does this Queen contiguity graph have? 
     2. Build the K-Nearest Neighbor graph for the default, $k=2$. How many connected components does this K-Nearest Neighbor graph have? 
     3. What is the smallest $k$ that you can find for the K-Nearest Neighbor graph to be fully-connected?

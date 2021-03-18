@@ -778,4 +778,5 @@ Beyond feature engineering, statistical techniques we discuss in this book (part
 4. Dasymetric mapping may introduce spurious spatial autocorrelation (see
    Chapters 6 and 7) through
    the interpolation process. How does this occur and why is it important to acknowledge?
-
+5. From the previous spatial regression chapter, is the SLX model a map matching or a map synthesis technique?
+6. Feature engineering is can be used in many different applied contexts. When might feature engineering actually *not* improve a model? 

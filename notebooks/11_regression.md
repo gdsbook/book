@@ -5,12 +5,12 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.2
+      format_version: '1.3'
+      jupytext_version: 1.10.2
   kernelspec:
-    display_name: Python [conda env:analysis]
+    display_name: Python 3
     language: python
-    name: conda-env-analysis-py
+    name: python3
 ---
 
 # Spatial Regression
@@ -644,15 +644,27 @@ m7 = spreg.GM_Lag(db[['log_price']].values, db[variable_names].values,
 print(m7.summary)
 ```
 
-Similarly to the effects in the SLX regression, changes in the spatial lag regression need to be interpreted with care. Here, `w_log_price` applies consistently over all observations, and actually changes the effective strength of each of the $\beta$ coefficients. Thus, it is useful to use predictions and scenario-building to predict $y$ when changing $X$, which allows you to analyze the *direct* and *indirect*components. 
+Similarly to the effects in the SLX regression, changes in the spatial lag regression need to be interpreted with care. Here, `w_log_price` applies consistently over all observations, and actually changes the effective strength of each of the $\beta$ coefficients. Thus, it is useful to use predictions and scenario-building to predict $y$ when changing $X$, which allows you to analyze the *direct* and *indirect* components. 
 
 #### Other ways of bringing space into regression
 
 While these are some kinds of spatial regressions, many other advanced spatial regression methods see routine use in statistics, data science, and applied analysis. For example, Generalized Additive Models {cite}`Gibbons_2015,Wood_2006` haven been used to apply spatial kernel smoothing directly within a regression function. Other similar smoothing methods, such as spatial Gaussian process models {cite}`Brunsdon_2010` or Kriging, conceptualize the dependence between locations as smooth as well. Other methods in spatial regression that consider graph-based geographies (rather than distance/kernel effects) include variations on conditional autoregressive model, which examines spatial relationships at locations *conditional* on their surroundings, rather than as jointly co-emergent with them. Full coverage of these topics is beyond the scope of this book, however, though {cite}`Banerjee_2008` provides a detailed and comprehensive discussion. 
 
 
-### Challenge
+## Questions
 
+1. One common kind of spatial econometric model is the "Spatial Durbin Model," which combines the SLX model with the spatial lag model. Alternatively, the "Spatial Durbin Error Model" combines the SLX model with the spatial error model. Fit a Spatial Durbin variant of the spaital models fit in this chapter. 
+    - Do these variants improve the model fit?
+    - What happens to the spatial autocorrelation parameters ($\rho$, $\lambda$) when the SLX term is added? Why might this occur?
+2. Fortunately for us, spatial error models recover the same estimates (asymptotically) as a typical OLS estimate, although their confidence intervals will change. Statistically, this occurs because OLS is *inefficient* when there is spatial correlation and/or spatial heteroskedasticity. How much do the confidence intervals change when the spatial error model is fit?
+3. One common justification for the SLX model (and the Spatial Durbin variants) is about *omitted, spatially-patterned variables*. That is, if an omitted variable is associated with the included variables *and* is spatially-patterned, then we can use the spatial structure of our existing variables to mimic the omitted variable. In our spatial lag model, 
+    - what variables might we be missing that are important to predict the price of an AirBnB?
+    - would these omitted variables have a similar spatial pattern to our included variables? why or why not? 
+4. Where *spatial* regression models generally focus on how nearby observations are similar to one another, *platial* models focus on how observations in the same spatial group are similar to one another. These are often dealt with using multilevel or spatial mixed-effect models. When do these two ideas work together well? And, when might these disagree?
+
+### Challenge Questions
+
+The following discussions are a bit challenging, but reflect extra enhancements to the discussions in the chapter that may solidify or enhance an advanced understanding of the material.   
 
 #### The random coast
 In the section analyzing our naive model residuals, we ran a classic two-sample $t$-test to identify whether or not our coastal and not-coastal residential districts tended to have the same prediction errors. Often, though, it's better to use straightforward, data-driven testing and simulation methods than assuming that the mathematical assumptions of the $t$-statistic are met.
@@ -741,5 +753,3 @@ So, the correlation between the observed residual and the average of $k$ randoml
 Thus, increasing the number of randomly-chosen neighbors does not significantly adjust the long-run average of zero.
 Taken together, we can conclude that there is distinct positive spatial dependence in the error. 
 This means that our over- and under-predictions are likely to cluster. 
-
-
