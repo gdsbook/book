@@ -863,7 +863,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;esda.join_counts.Join_Counts at 0x7f9df7723f90&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;esda.join_counts.Join_Counts at 0x7f2f34b13eb0&gt;
 </pre></div>
 </div>
 </div>
@@ -1149,7 +1149,7 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>180878.9180092599
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>180878.91800926204
 </pre></div>
 </div>
 </div>
@@ -1158,6 +1158,14 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_db</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db_osgb</span><span class="p">,</span> <span class="n">min_thr</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
+ There are 2 disconnected components.
+ There is 1 island with id: S12000027.
+  warnings.warn(message)
 </pre></div>
 </div>
 </div>
@@ -1192,49 +1200,39 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 <ol>
 <li><p>Return to the original <code class="docutils literal notranslate"><span class="pre">ref</span></code> table and pull out the <code class="docutils literal notranslate"><span class="pre">Pct_Rejected</span></code>
 variable. Let us explore patterns in rejected votes:</p>
-<ul class="simple">
-<li><p>Create a choropleth displaying its spatial distribution</p></li>
-<li><p>Build a spatial weights matrix with 8 nearest neighbors for the Local
-Authorities</p></li>
-<li><p>Create a Moran Scatter Plot</p></li>
-<li><p>Calculate Moran’s I</p></li>
-<li><p>Interpret what you find through this Moran’s analysis. What do we learn
-about the geography of vote rejection?</p></li>
-</ul>
+<ol class="simple">
+<li><p>Create a choropleth displaying the spatial distribution of <code class="docutils literal notranslate"><span class="pre">Pct_Rejected</span></code>.</p></li>
+<li><p>Build a spatial weights matrix with 8 nearest neighbors for the Local Authorities.</p></li>
+<li><p>Create a Moran Scatter Plot relating <code class="docutils literal notranslate"><span class="pre">Pct_Rejected</span></code> to its spatial lag.</p></li>
+<li><p>Calculate Moran’s <span class="math notranslate nohighlight">\(I\)</span> for <code class="docutils literal notranslate"><span class="pre">Pct_Rejected</span></code>.</p></li>
+<li><p>Interpret what you find through this Moran’s analysis. What do we learn about the geography of vote rejection?</p></li>
+</ol>
 </li>
 <li><p>Sometimes referendums require more than 50% to make the change they ask
 about. Let us imagine the EU referendum required 60% to succeed on leaving
 the EU.</p>
-<ul class="simple">
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code> to create a binary variable that takes a value of 1 if
-the percentage was larger than 60, 0 otherwise.</p></li>
-<li><p>Create a choropleth with the newly created variable. Are there any
-differences in the geographical pattern of the vote to leave the EU?</p></li>
-<li><p>Re-compute the Join Counts statistic for this new variable. What can we
-conclude? Are there any notable changes in the extent to which “Leave”
-votes were distributed spatially?</p></li>
-</ul>
+<ol class="simple">
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code> to create a binary variable that takes a value of 1 if the percentage was larger than 60, 0 otherwise.</p></li>
+<li><p>Create a choropleth with the newly created variable. Are there any differences in the geographical pattern of the vote to leave the EU?</p></li>
+<li><p>Re-compute the Join Counts statistic for this new variable. What can we conclude? Are there any notable changes in the extent to which “Leave” votes were distributed spatially?</p></li>
+</ol>
 </li>
 <li><p>Let us explore the effect of different weights matrices by returning to the
 global analysis we performed for the <code class="docutils literal notranslate"><span class="pre">Leave</span></code> variable.</p>
-<ul class="simple">
-<li><p>Create two additional KNN weights to those already built, one with four
-neighbours (you may call it <code class="docutils literal notranslate"><span class="pre">wk4</span></code>) and one with 12 neighbors (<code class="docutils literal notranslate"><span class="pre">wk12</span></code>)</p></li>
-<li><p>Create a choropleth that displays the spatial lag of <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code> using
-each of the two new matrices. How are they different? Why?</p></li>
-<li><p>Now generate Moran Scatter Plots using <code class="docutils literal notranslate"><span class="pre">wk4</span></code> and <code class="docutils literal notranslate"><span class="pre">wk12</span></code>. Do they differ
-from the one we created earlier in the chapter? How? Why?</p></li>
-<li><p>Calculate Moran’s I using all of the matrices and similarly compare
-results.</p></li>
-</ul>
+<ol class="simple">
+<li><p>Create two additional KNN weights to those already built, one with four neighbours (you may call it <code class="docutils literal notranslate"><span class="pre">wk4</span></code>) and one with 12 neighbors (<code class="docutils literal notranslate"><span class="pre">wk12</span></code>)</p></li>
+<li><p>Create a choropleth that displays the spatial lag of <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code> using each of the two new matrices. How are they different? Why?</p></li>
+<li><p>Now generate Moran Scatter Plots using <code class="docutils literal notranslate"><span class="pre">wk4</span></code> and <code class="docutils literal notranslate"><span class="pre">wk12</span></code>. Do they differ from the one we created earlier in the chapter? How? Why?</p></li>
+<li><p>Calculate Moran’s I using all of the matrices and similarly compare results.</p></li>
+</ol>
 </li>
 <li><p>Using the same spatial weights matrix throughout, calculate the following
 statistics of global spatial autocorrelation for the <code class="docutils literal notranslate"><span class="pre">Pct_Rejected</span></code>
 variable:</p>
 <ul class="simple">
-<li><p>Moran’s I</p></li>
-<li><p>Geary’s C</p></li>
-<li><p>Getis &amp; Ord’s G</p></li>
+<li><p>Moran’s <span class="math notranslate nohighlight">\(I\)</span></p></li>
+<li><p>Geary’s <span class="math notranslate nohighlight">\(C\)</span></p></li>
+<li><p>Getis &amp; Ord’s <span class="math notranslate nohighlight">\(G\)</span></p></li>
 </ul>
 <p>Describe the results. Do you draw substantially different conclusions from
 each statistic? If so, why?</p>
@@ -1246,6 +1244,8 @@ spatial autocorrelation.</p></li>
 <li><p>Think whether it is possible to find cases when Moran’s I and Getis &amp; Ord’s
 G dissagree substantially. What could drive such a result? What does that
 mean for the use and interpretation of both statistics?</p></li>
+<li><p>Using <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbor weights, can you find the <span class="math notranslate nohighlight">\(k\)</span> where Moran’s <span class="math notranslate nohighlight">\(I\)</span> is largest? Make a plot of the Moran’s <span class="math notranslate nohighlight">\(I\)</span> for each <span class="math notranslate nohighlight">\(k\)</span> you evaluate to show the relationship between the two.</p></li>
+<li><p>As in the previous question, at what value of <span class="math notranslate nohighlight">\(k\)</span> is the Geary’s <span class="math notranslate nohighlight">\(C\)</span> largest?</p></li>
 </ol>
 </div>
 </div>
