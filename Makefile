@@ -55,6 +55,7 @@ test:
                       --execute \
                       --output-dir=tests \
                       --ExecutePreprocessor.timeout=600 \
+                      --ExecutePreprocessor.ipython_hist_file='' \
                       notebooks/*.ipynb 
 
 	rm -rf tests
