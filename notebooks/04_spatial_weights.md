@@ -1038,7 +1038,7 @@ ax[2].axis([west, south, east, north]);
 These are the starkest contrasts in the map, and result in the most distinctive divisions between adjacent tracts' household incomes. 
 
 
-# Conclusion
+## Conclusion
 
 Spatial weights are central to how we *represent* spatial relationships in mathematical and computational environments. At their core, they are a "geo-graph," or a network defined by the geographcial relationships between observations. They form kind of a "spatial index," in that they record which observations have a specific geographcial relatinoship. Since spatial weights are fundamental to how "proximity" is represented in geographic data science, we will use them again and again throughout the book. 
 
