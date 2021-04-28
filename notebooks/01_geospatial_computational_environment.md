@@ -55,7 +55,7 @@ had arrived at their results, but also to ensure other members of the
 scientific community could study, understand, and replicate their findings.
 One of the most famous of these annotations are Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars:
 
-```python
+```python caption="Galileo's drawings of Jupyter and the Medician stars, showing the power of diagrams inside of scientific texts."
 url = ("https://upload.wikimedia.org/wikipedia/"\
        "commons/c/ca/Medicean_Stars.png")
 Image(url)
@@ -322,7 +322,7 @@ Finally, using a similar approach, we can also load and display local
 images, which we will so throughout the book. For that, we use the `Image`
 method:
 
-```python
+```python caption="This book's logo, built from Stamen Toner map tiles and from code."
 path = ("../infrastructure/logo/"\
         "logo_transparent-bg.png")
 display.Image(path)
@@ -346,7 +346,7 @@ Lab from a tablet.
 
 Jupyter Lab' interface has three main areas:
 
-```python
+```python caption="An annotated view of the Jupyterlab interface "
 path = ("../figures/jupyter_lab.png")
 display.Image(path)
 ```
@@ -633,7 +633,7 @@ With this, you can then head to your browser of preference (ideally Mozilla
 Firefox or Google Chrome) and point it to `localhost:8888`. This should render
 a landing page that looks approximately like this one:
 
-```python
+```python caption="The authentification screen for Jupyter notebooks"
 path = ("../figures/jupyter_landing_page.png")
 display.Image(path)
 ```

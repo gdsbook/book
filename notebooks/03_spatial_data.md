@@ -1,16 +1,3 @@
----
-jupytext:
-  formats: ipynb,md:myst
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.10.2
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
 
 # Spatial Data
 
@@ -548,14 +535,15 @@ In conclusion, this chapter provides an overview of the mappings between data mo
 
 ## Questions
 
-1. One way to convert from `Multi-`type geometries into many individual geometries is using the `explode()` method of a GeoDataFrame. Using the `explode()` method, how many islands are in Indonesia?
+1. One way to convert from `Multi-`type geometries into many individual geometries is using the `explode()` method of a GeoDataFrame. Using the `explode()` method, can you find out how many islands are in Indonesia?
 
-```{code-cell} ipython3
-gt_polygons.query('ADMIN == "Indonesia"').explode()
-```
+2. Using `osmnx`, are you able to extract the street graph for your hometown?
 
-2. As you have seen with the `osmnx.gdfs_from_graph()` method, it is possible to convert a graph into the constituent nodes and edges. Graphs have many other kinds of non-geographical representations. Many of these are provided in `networkx` methods that start with `to_`. How many representations are currently supported?
+3. As you have seen with the `osmnx.graph_to_gdfs()` method, it is possible to convert a graph into the constituent nodes and edges. Graphs have many other kinds of non-geographical representations. Many of these are provided in `networkx` methods that start with `to_`. How many representations of graphs are currently supported?
 
-3. Using `networkx.to_edgelist()`, what "extra" information does `osmnx` include when building the dataframe for edges?
+4. Using `networkx.to_edgelist()`, what "extra" information does `osmnx` include when building the dataframe for edges?
 
-4. Instead of computing the average elevation for each neighborhood in San Diego, can you find the neighborhood with *the highest point*? Can you find the neighborhood with *the largest elevation change*?
+5. Instead of computing the average elevation for each neighborhood in San Diego, can you answer the following queries?
+  - What neighborhood (or neighborhoods) have the *the highest average elevation*?
+  - What neighborhood (or neighborhoods) have *the highest point single point*?
+  - Can you find the neighborhood (or neighborhoods) with *the largest elevation change*?

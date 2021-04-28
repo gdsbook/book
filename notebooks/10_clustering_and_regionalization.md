@@ -159,7 +159,7 @@ This will help us draw a picture of the multi-faceted view of the tracts we
 want to capture with our clustering. Let's use choropleth maps for the
 nine attributes and compare these choropleth maps side-by-side:
 
-```python
+```python caption="The complex, multi-dimensional human geography of San Diego."
 f, axs = plt.subplots(nrows=3, ncols=3, figsize=(12, 12))
 # Make the axes accessible with single indexing
 axs = axs.flatten()
@@ -244,7 +244,7 @@ Given the 9 maps, there are 36 pairs of maps that must be compared. This is too
 many maps to process visually, so we can turn to an alternative tool to
 explicitly focus on the bivariate relations between each pair of attributes.
 
-```python
+```python caption="A scatter matrix demonstrating the various pair-wise dependencies between each of the variables considered in this section. Each 'facet', or little scatterplot, shows the relationship between the vairable in that column (as its horizontal axis) and that row (as its vertical axis). Since the diagonal represents the situation where the row and column have the same variable, it instead shows the univariate distribution of that variable."
 _ = seaborn.pairplot(db[cluster_variables], kind='reg', diag_kind='kde')
 ```
 
@@ -342,7 +342,7 @@ characteristics, mapping their labels allows to see to what extent similar areas
 to have similar locations.
 Thus, this gives us one map that incorporates the information of from all nine covariates.
 
-```python
+```python caption="Clusters in the sociodemographic data, found using K-means with k=5. Note that the large eastern part of San Diego actually contains few observations, since those tracts are larger."
 # Assign labels into a column
 db['k5cls'] = k5cls.labels_
 # Setup figure and ax
@@ -391,7 +391,7 @@ k5sizes
 
 And we can get a visual representation of cardinality as well:
 
-```python
+```python caption="The number of observations in each cluster type."
 _ = k5sizes.plot.bar()
 ```
 
@@ -413,7 +413,7 @@ areas
 
 And, to show this visually:
 
-```python
+```python caption="The area of each of the clusters."
 areas.plot.bar()
 ```
 
@@ -485,7 +485,7 @@ tidy_db.head()
 Now we are ready to plot. Below, we'll show the distribution of each cluster's values
 for each variable. This gives us the full distributional profile of each cluster:
 
-```python
+```python caption="Distributions of each variable for the different cluters."
 # Setup the facets
 facets = seaborn.FacetGrid(data=tidy_db, col='Attribute', hue='k5cls', \
                   sharey=False, sharex=False, aspect=2, col_wrap=3)
@@ -575,7 +575,7 @@ tidy_db = tidy_db.rename(columns={
 tidy_db.head()
 ```
 
-```python
+```python caption="Distributions of each variable in clusters obtained from Ward's hierarchical clutering."
 # Setup the facets
 facets = seaborn.FacetGrid(data=tidy_db, col='Attribute', hue='ward5', \
                   sharey=False, sharex=False, aspect=2, col_wrap=3)
@@ -589,7 +589,7 @@ However, the interpretation is analogous to that of the k-means example.
 On the spatial side, we can explore the geographical dimension of the
 clustering solution by making a map the clusters:
 
-```python
+```python caption="Map of socio-demographic clusters among San Diego tracts using Ward hierarchical clustering."
 db['ward5'] =model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -608,7 +608,7 @@ plt.show()
 And, to make comparisons simpler, we can display both the k-means and the AHC
 results side by side:
 
-```python
+```python caption="Two clutering solutions, one for the K-means solution, and the other for Ward's hierarchical clutering. Note that colorings cannot be directly compared between the two maps."
 db['ward5'] =model.labels_
 # Setup figure and ax
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
@@ -702,7 +702,7 @@ model.fit(db[cluster_variables])
 
 Let's inspect the output:
 
-```python
+```python caption="Spatially-constrained clusters, or 'regions', of San Diego using Ward's hierarchical clustering."
 db['ward5wq'] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -754,7 +754,7 @@ model.fit(db[cluster_variables])
 
 And plot the final regions:
 
-```python
+```python caption="Regions from a spatially-constrained sociodemographic clutering, using a different connectivity constraint."
 db['ward5wknn'] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
