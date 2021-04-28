@@ -15,5 +15,5 @@ jupyter:
 
 # References
 
-```{bibliography} references.bib
+```{bibliography}
 ```
