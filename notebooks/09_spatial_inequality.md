@@ -124,7 +124,7 @@ In general terms, measures of inequality focus on the dispersion present in an i
 seaborn.__version__
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Distribution of Per Capita Income at County Level in 1969."
 seaborn.set_theme(style='whitegrid')
 seaborn.histplot(x=pci_df['1969'], kde=True)
 ```
@@ -144,7 +144,7 @@ pci_df = (pci_df.set_crs(epsg=4326) # US Census default projection
                 .to_crs(epsg=5070)) # Albers Equal Area North America
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Map of Per Capita Income by County, 1969"
 pci_df.plot(
     column='1969', 
     scheme='Quantiles', 
@@ -153,7 +153,6 @@ pci_df.plot(
     legend_kwds={'loc': 'lower left'}, 
     figsize=(12, 12)
 )
-plt.title('Per Capita Income by County, 1969')
 plt.show()
 ```
 
@@ -182,7 +181,7 @@ def ineq_20_20(values):
     return top20 / bottom20
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="The ratio of the richest 20% versus the poorest 20% of counties (the 20:20 ratio) since 1969."
 years = numpy.arange(1969, 2018).astype(str)
 ratio_2020 = pci_df[years].apply(ineq_20_20, axis=0)
 ax = plt.plot(years, ratio_2020)
@@ -246,7 +245,7 @@ cumulative_share = shares.cumsum()
 
 With this, we can plot both the Lorenz curve and the line of perfect equality:
 
-```python
+```python caption="The Lorenz Curve for county Per Capita Income."
 f, ax = plt.subplots()
 ax.plot(share_of_population, cumulative_share, label='Lorenz Curve')
 ax.plot((0,1), (0,1), color='r', label='Perfect Equality')
@@ -282,7 +281,7 @@ lorenz_curves.head()
 
 By iterating over the columns of this dataframe, we can make a plot of the lorenz curves for each year:
 
-```python
+```python caption="Lorenz curves for county per capita incomes since 1969."
 f, ax = plt.subplots()
 ax.plot((0,1),(0,1), color='r')
 for year in lorenz_curves.columns:
@@ -325,7 +324,7 @@ inequalities.head()
 
 Which we can turn into a graphical representation through standard `pandas` plotting. The resulting pattern is similar to that of the 20:20 ratio above:
 
-```python
+```python caption="Gini coefficients for per capita income since 1969"
 inequalities.plot()
 ```
 
@@ -348,7 +347,7 @@ inequalities['theil'] = pci_df[years].apply(theil, axis=0)
 
 And generate a visual comparison of the evolution of both Gini and Theil's indices:
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Gini and Theil indices for county per capita income distributions since 1969."
 inequalities.plot(subplots=True, figsize=(15,6))
 ```
 
@@ -482,7 +481,7 @@ inequalities = inequalities.join(moran_stats)
 
 To show the overall inter-relationships between these statistics, we make another plot below:
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Relationship between the Gini & Theil inequality indices and Moran's I, a measure of spatial autocorrelation, for per capita incomes."
 inequalities.plot(subplots=True, figsize=(15,12))
 plt.show()
 ```
@@ -511,7 +510,7 @@ region_names = {
 
 We can visualised the regions with the names on the legend by first mapping the name to each region number, and then rendering a qualitative choropleth:
 
-```python
+```python caption="Map of census regions in the United States."
 pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
       .plot(
     "Region_Name",
@@ -533,7 +532,7 @@ rmeans = pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
 
 The resulting table has a row for each region and a column for each year. We can visualise these means to get a sense of their temporal trajectory:
 
-```python
+```python caption="Average county per capita incomes among census regions since 1969"
 rmeans.T.plot.line()
 ```
 
@@ -590,14 +589,14 @@ inequalities.drop('I-P value', axis=1, inplace=True)
 
 We can visualize them alongside our earlier results:
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Inequality indices (Gini, Theil), shown alongside Moran's I, with the Theil Decomposition into between-region and within-region components at bottom."
 inequalities.plot(subplots=True, figsize=(15,15))
 plt.show()
 ```
 
 Inference on these decompositions can be done using the `inequality.theil.TheilDSim` class, but we omit that here for brevity and report that, like the Moran's $I$, all of the Theil decompositions are statistically significant. Further, since the within and between components are interpreted as shares of the overall Theil index, we can compute the share of the Theil index due to the between-region inequality, and note that it also generally shares the same pattern, but does not see minima in the same places:
 
-```python
+```python caption="The share of inequality (measured by the Theil index) that is driven by between-region inequality has generally declined since 1969, although this has rebounded recently."
 inequalities['theil_between_share'] = inequalities['theil_between'] / inequalities['theil']
 inequalities['theil_between_share'].plot()
 plt.show()
@@ -717,7 +716,7 @@ wq.pct_nonzero
 
 Second, when spatial dependence is high, nearby observations will be similar. So, each "near difference" will also be small. Adding together a small number of small observations will generally be small, relative to the large differences between distant observations. Thus, small values of the "near" distances are indicative of spatial dependence. Indeed, we can see that as the spatial dependence weakens, the `near_diffs` get larger:
 
-```python
+```python caption="Relationship between the 'near differences' term of the Spatial Gini coefficient and Moran's I. The top, as a measure of spatial dissimilarity, should move in an opposite direction to the bottom, which measures spatial similarity (albeit in a different fashion)."
 inequalities['near_diffs'] = spatial_gini_results.near_diffs
 
 inequalities[['near_diffs', 'I']].plot.line(subplots=True, figsize=(15,6))

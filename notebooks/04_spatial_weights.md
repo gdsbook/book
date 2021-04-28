@@ -66,7 +66,7 @@ gdf = geopandas.GeoDataFrame({'geometry': polys,
                         'id': ['P-%s'%str(i).zfill(2) for i in range(len(polys))]})
 ```
 
-```python
+```python caption="A three-by-three grid of squares."
 ax = gdf.plot(facecolor='w', edgecolor='k')
 [plt.text(x, y, t, 
           verticalalignment='center',
@@ -89,7 +89,7 @@ w.neighbors
 
 Shown visually, we can see this plotted on top of the same grid of labelled polygons, using red dotted lines showing connetions between the polygons:
 
-```python
+```python caption="Grid cells connected by a red line are 'neighbors' under a 'Rook' contiguity rule."
 f,ax = plt.subplots(1,1, subplot_kw=dict(aspect='equal'))
 w.plot(gdf, edge_kws=dict(color='r', linestyle=':'), ax =ax)
 gdf.plot(facecolor='w', edgecolor='k', ax=ax)
@@ -154,7 +154,7 @@ w.neighbors
 
 In addition to this neighbors representation, we can also express the graph visually, as done before:
 
-```python
+```python caption="Grid cells connected by a red line are considered 'neighbors' under 'Queen' contiguity."
 f,ax = plt.subplots(1,1, subplot_kw=dict(aspect='equal'))
 w.plot(gdf, edge_kws=dict(color='r', linestyle=':'), ax =ax)
 gdf.plot(facecolor='w', edgecolor='k', ax=ax)
@@ -201,7 +201,7 @@ w.histogram
 We can obtain a quick visual representation by converting the cardinalities
 into a `pandas.Series` and creating a histogram:
 
-```python
+```python caption="Histogram of  cardinalities (i.e. the number of neighbors each cell has) in the Queen grid."
 pandas.Series(w.cardinalities).plot.hist(color='k');
 ```
 
@@ -252,7 +252,7 @@ wq = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 
 Like before, we can visualize the adjacency relationships, but they are much more difficult to see without showing a closer detail:
 
-```python
+```python caption="The Queen contiguity graph for San Diego tracts. Tracts connected with a red line are neighbors."
 ax = san_diego_tracts.plot(edgecolor='k', facecolor='w')
 wq.plot(san_diego_tracts, ax=ax, 
         edge_kws=dict(color='r', linestyle=':', linewidth=1),
@@ -262,7 +262,7 @@ ax.set_axis_off()
 
 So, showing more detail, we can get a glimpse of the complicated structure of the contiguity relationships between tracts in the center city:
 
-```python
+```python caption="An inset view of the Queen contiguity graph."
 ax = san_diego_tracts.plot(edgecolor='k', facecolor='w')
 f,ax = wq.plot(san_diego_tracts, ax=ax, 
         edge_kws=dict(color='r', linestyle=':', linewidth=1),
@@ -283,7 +283,7 @@ First we have a larger number of spatial units. The spatial weights are
 also much more sparse for the tracts than what we saw for our smaller toy
 layout. Moreover, the cardinalities have a radically different distribution:
 
-```python
+```python caption="Cardinalities for the Queen contiguity graph among San Diego Tracts"
 s = pandas.Series(wq.cardinalities)
 s.plot.hist(bins=s.unique().shape[0]);
 ```
@@ -293,7 +293,7 @@ queen neighbors. The most common number of neighbors is 6.
 
 There is also a function to create the rook weights for the same dataframe:
 
-```python
+```python caption="Cardinalities for the Rook contiguity graph among San Diego Tracts"
 wr = weights.contiguity.Rook.from_dataframe(san_diego_tracts)
 print(wr.pct_nonzero)
 s = pandas.Series(wr.cardinalities)
@@ -426,7 +426,7 @@ characteristics- can be preferred. Adaptive bandwidths are picked again using a 
 
 For example, using a subset of tracts in our San Diego dataset, we can see that the centroids of each tract are not exactly regularly-spaced, although others do nearly fall into a regular spacing:
 
-```python
+```python caption="Centroids of some tracts in San Diego are (nearly) evenly spaced."
 sub_30 = san_diego_tracts.query("sub_30 == True")
 ax = sub_30.plot(facecolor='w', edgecolor='k')
 sub_30.head(30).centroid.plot(color='r', ax=ax)
@@ -442,7 +442,7 @@ w_adaptive.bandwidth
 
 And, we can visualize what these kernels look like on the map, too, by focusing on an individual unit and showing how the distance deacy attenuates the weight by grabbing the corresponding row of the full kernel matrix:
 
-```python
+```python caption="A Gaussian kernel centered on two different tracts."
 full_matrix, ids = w_adaptive.full() 
 f,ax = plt.subplots(1,2,figsize=(12,6), subplot_kw=dict(aspect='equal'))
 sub_30.assign(weight_0 = full_matrix[0]).plot("weight_0", cmap='plasma', ax=ax[0])
@@ -721,12 +721,11 @@ relation between the states according to the specific definition.
 We first read in the data for Mexico:
 <!-- #endregion -->
 
-```python
+```python caption="States in Mexico"
 mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax)
 ax.set_axis_off()
-ax.set_title('Mexican States')
 plt.axis('equal')
 plt.show()
 
@@ -743,27 +742,25 @@ We will contrast the connectivity structure for the three following types of spa
 Beginning with Queen weights:
 <!-- #endregion -->
 
-```python
+```python caption="Queen weights among states in Mexico."
 queen_mx = weights.contiguity.Queen.from_dataframe(mx)
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax)
 queen_mx.plot(mx,edge_kws=dict(linewidth=1.5, color='orangered'), node_kws=dict(marker='*'),  ax=ax, )
 ax.set_axis_off()
-ax.set_title('Queen')
 plt.axis('equal')
 plt.show()
 ```
 
 For the block weights, we use the official designation of regions from the federal government:
 
-```python
+```python caption="Regions of Mexico"
 ax = mx.plot(column='INEGI2', categorical=True, cmap='Pastel2')
 block_mx = weights.util.block_weights(mx['INEGI2'].values)
 ax.set_axis_off()
-ax.set_title("Mexican Regions")
 ```
 
-```python
+```python caption="'Block' weights for Mexican states within regions."
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(column='INEGI2', categorical=True, 
         cmap='Pastel2', ax=ax)
@@ -771,14 +768,13 @@ block_mx.plot(mx, edge_kws=dict(linewidth=1.5,
                                 color='orangered'), 
                   node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Block')
 plt.axis('equal')
 plt.show()
 ```
 
 Next, we construct the union of queen contiguity and block weights
 
-```python
+```python caption="The union of Region-block and Queen weights for Mexican states. In this graph, a state's neighbors are either within the same region *or* are in a different region but sharing a point on the boundary."
 union_mx = weights.set_operations.w_union(block_mx, queen_mx)
 
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -787,14 +783,13 @@ union_mx.plot(mx, edge_kws=dict(linewidth=1.5,
                                 color='orangered'), 
               node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Union ')
 plt.axis('equal')
 plt.show()
 ```
 
 Finally, we compare the three neighbor graphs side by side:
 
-```python
+```python caption="The three graphs discussed above, shown side-by-side."
 f, axs = plt.subplots(1, 3, figsize=(18, 6))
 
 
@@ -805,7 +800,7 @@ mx.plot(column='INEGI2', categorical=True,
 queen_mx.plot(mx, edge_kws=dict(linewidth=1.5, color='orangered'), 
               node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Queen')
+ax.set_xlabel('Queen')
 ax.axis('equal')
 
 # Block
@@ -815,7 +810,7 @@ mx.plot(column='INEGI2', categorical=True,
 block_mx.plot(mx, edge_kws=dict(linewidth=1.5, color='orangered'), 
               node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Block weights')
+ax.set_xlabel('Block weights')
 ax.axis('equal')
 
 # Union
@@ -825,7 +820,7 @@ mx.plot(column='INEGI2', categorical=True,
 union_mx.plot(mx, edge_kws=dict(linewidth=1.5, color='orangered'), 
               node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Queen + Block')
+ax.set_xlabel('Queen + Block')
 plt.axis('equal')
 f.tight_layout()
 plt.show()
@@ -876,13 +871,14 @@ Below, we'll show one model-free way to identify empirical boundaries in your da
 
 First, let's consider the median household income for our census tracts in San Diego:
 
-```python
+```python caption="Household incomes in San Diego."
 f,ax = plt.subplots(1,2, figsize=(12,4))
 san_diego_tracts.plot('median_hh_income', ax=ax[0])
 ax[0].set_aspect('equal')
 ax[0].set_axis_off()
 san_diego_tracts['median_hh_income'].hist(ax=ax[1])
 ax[1].set_title("Median Household Income")
+plt.show()
 ```
 
 Now, we see some cases where there are very stark differences between neighboring areas, and some cases where there are essentially no difference between adjacent areas. Digging into this, we can examine the *distribution of differences* in neighboring areas using the adjacency list:
@@ -931,7 +927,7 @@ non_neighboring_diffs = (complement_wr * all_pairs).flatten()
 
 Now, we can compare the two distributions of the difference in wealth:
 
-```python
+```python caption="Diferences between median incomes among neighboring (and non-neighboring) tracts in San Diego."
 f = plt.figure(figsize=(12,3))
 plt.hist(non_neighboring_diffs, color='lightgrey', 
          edgecolor='k', density=True, bins=50, label='Nonneighbors')
@@ -976,7 +972,7 @@ for i in range(n_simulations):
 
 After running our simulations, we get many distributions of pairwise differences in household income. Below, we can see the shroud of all of the simulated differences, shown in black, and our observed differences, shown in red:
 
-```python
+```python caption="Differences between neighboring incomes for the observed map (orange) and maps arising from randomly-reshuffled maps (black) of tract median incomes."
 f = plt.figure(figsize=(12,3))
 plt.hist(adjlist_wealth['diff'], 
          color='salmon', bins=50, density=True,
@@ -1001,7 +997,7 @@ lower, median, upper = numpy.percentile(pooled_diffs, q=(.5,50,99.5))
 outside = (adjlist_wealth['diff'] < lower) | (adjlist_wealth['diff'] > upper)
 ```
 
-So, despite the fact that that our observed differences are less dispersed on average, we can identify three boundaries in the data that are in the top 1% most extreme differences in neighboring household incomes across the map. These boundaries are shown in the table below:
+So, despite the fact that that our observed differences are less dispersed on average, we can identify two boundaries in the data that are in the top 1% most extreme differences in neighboring household incomes across the map. These boundaries are shown in the table below:
 
 ```python
 adjlist_wealth[outside]
@@ -1011,7 +1007,7 @@ Note that one of these, observation $473$, appears in both boundaries. This mean
 
 It is most helpful, though, to visualize this on a map, focusing on the two boundaries around observation $473$, shown also in the larger context of San Diego incomes:
 
-```python
+```python caption="The two most stark differences in median household income among San Diego tracts."
 f,ax = plt.subplots(1, 3, figsize=(18,6))
 
 # Plot tracts
@@ -1040,6 +1036,11 @@ ax[2].axis([west, south, east, north]);
 ```
 
 These are the starkest contrasts in the map, and result in the most distinctive divisions between adjacent tracts' household incomes. 
+
+
+## Conclusion
+
+Spatial weights are central to how we *represent* spatial relationships in mathematical and computational environments. At their core, they are a "geo-graph," or a network defined by the geographcial relationships between observations. They form kind of a "spatial index," in that they record which observations have a specific geographcial relatinoship. Since spatial weights are fundamental to how "proximity" is represented in geographic data science, we will use them again and again throughout the book. 
 
 
 ## Questions
