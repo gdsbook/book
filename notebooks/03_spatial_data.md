@@ -1,7 +1,20 @@
+---
+jupyter:
+  jupytext:
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.2'
+      jupytext_version: 1.6.0
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
+---
 
 # Spatial Data
 
-```{code-cell} ipython3
+```python
 import pandas
 import osmnx
 import geopandas
@@ -13,7 +26,9 @@ from shapely.geometry import box
 import matplotlib.pyplot as plt
 ```
 
-This chapter grounds the ideas discussed in the previous one on a practical context. We consider how structures, and the models they represent, are implemented in Python, as well as how we can manipulate the data they contain. Rather than focusing on *file* formats used to store data, we will spend most of the chapter discussing how Python represents data *once read* from a file or database. We take this approach because these data structures are what we interact with during our data analysis: they our interface with the data. Indeed, part of the benefit of Python (and other computing languages) is *abstraction*. The complexities, particularities and quirks associated with each file format are removed as Python represents all data in a few standard ways, regardless of provenance. We take full advantage of this feature here. 
+This chapter grounds the ideas discussed in the previous two chapters into a practical context. We consider how structures, and the models they represent, are implemented in Python, as well as how we can manipulate the data they contain. This will happen alongside the code used to manipulate the data in a single computational laboratory notebook.
+
+Further, we will spend most of the chapter discussing how Python represents data *once read* from a file or database, rather than focusing on specific *file* formats used to store data,  We take this approach because these data structures are what we interact with during our data analysis: they our interface with the data. Indeed, part of the benefit of Python (and other computing languages) is *abstraction*. The complexities, particularities and quirks associated with each file format are removed as Python represents all data in a few standard ways, regardless of provenance. We take full advantage of this feature here. 
 
 We divide the chapter in two main parts. The first part looks at each of the three main data structures reviewed in Chapter 2 (*Geographic Thinking*): geographic tables, surfaces and spatial graphs. Second, we explore combinations of different data structures that depart from the traditional data model/structure matchings discussed in Chapter 2. We cover how one data in one structure can be effectively transfered to another, but also discuss why that might (or might not) be a good idea in some cases. A final note before we delve into the content of this book is in order: this is not a comprehensive account of *everything* that is possible with each of the data structures we present. Rather, you can think of it as a taster that we will build on throughout the book to showcase much of what is possible with Python.
 
@@ -29,13 +44,13 @@ Before proceeding, though, it helps to mention a quick clarification on terminol
 
 To understand the structure of geographic tables, it will help to read in the `countries_clean.gpkg` dataset included in this book that describes countries in the world. To read in this data, we can use the `read_file()` method in `geopandas`:^[We will generally use two curved brackets (such as `method_name()`) to denote a *function*, and will omit them (such as `package`) when referring to an object or package.]
 
-```{code-cell} ipython3
+```python
 gt_polygons = geopandas.read_file("../data/countries/countries_clean.gpkg")
 ```
 
 And we can examine the top of the table with the `.head()` method:
 
-```{code-cell} ipython3
+```python
 gt_polygons.head()
 ```
 
@@ -43,13 +58,13 @@ Each row of this table is a single country. Each country only has two features: 
 
 Geographic tables store geographic information as an additional column. But, how is this information encoded? To see, we can check the type of the object in the first row:
 
-```{code-cell} ipython3
+```python
 type(gt_polygons.geometry[0])
 ```
 
 In `geopandas` (as well as other packages representing geographic data), the `geometry` column has special traits which a "normal" column, such as `ADMIN`, does not. For example, when we plot the dataframe, the `geometry` column is used as the main shape to use in the plot:
 
-```{code-cell} ipython3
+```python
 gt_polygons.plot()
 ```
 
@@ -57,19 +72,19 @@ Changing geometries must be done carefully: since the `geometry` column is speci
 
 Let us make a map of both the boundary and the centroid of a country. First, to compute the centroid, we can use the `gt_polygons.geometry.centroid` property. This gives us the point that minimizes the average distance from all other points on the boundary of the shape. Storing that back to a column, called `centroid`:
 
-```{code-cell} ipython3
+```python
 gt_polygons['centroid'] = gt_polygons.geometry.centroid
 ```
 
 We now have an additional feature:
 
-```{code-cell} ipython3
+```python
 gt_polygons.head()
 ```
 
 Despite the fact that `centroid` is a geometry, it is not currently set as the geometry for our table. We can switch to the `centroid` column using the `set_geometry()` method. Finally, we can plot the centroid and the boundary of each country by switching the geometry column with `set_geometry`:
 
-```{code-cell} ipython3
+```python
 # Plot centroids
 ax = gt_polygons.set_geometry('centroid')\
                 .plot('ADMIN', 
@@ -88,21 +103,21 @@ Note how we can create a map by calling `.plot()` on a `GeoDataFrame`. We can th
 
 Thus, as should now be clear, nearly any kind of geographic object can be represented in one (or more) geometry column(s). Thinking about the number of different kinds of shapes or geometries one could draw quickly boggles the mind. Fortunately the Open Geospatial Consortium (OGC) has defined a set of "abstract" types that can be used to define any kind of geometry. This specification, codified in ISO 19125-1---the "simple features" specification---defines the formal relationships between these types: a `Point` is a zero-dimensional location with an x and y coordinate; a `LineString` is a path composed of a set of more than one `Point`, and a `Polygon` is a surface that has at least one LineString that starts and stops with the same coordinate. All of these types *also* have `Multi` variants that indicate a collection of multiple geometries of the same type. So, for instance, Bolivia is represented as a single polygon:
 
-```{code-cell} ipython3
+```python
 gt_polygons.query('ADMIN == "Bolivia"')
 ```
 
-```{code-cell} ipython3
+```python
 gt_polygons.query('ADMIN == "Bolivia"').plot();
 ```
 
 while Indonesia is a `MultiPolygon` containing many `Polygons` for each individual island in the country:
 
-```{code-cell} ipython3
+```python
 gt_polygons.query('ADMIN == "Indonesia"')
 ```
 
-```{code-cell} ipython3
+```python
 gt_polygons.query('ADMIN == "Indonesia"').plot()
 ```
 
@@ -110,19 +125,19 @@ In many cases, geographic tables will have geometries of a single type; records 
 
 Throughout this book, we will use geographic tables extensively, storing polygons, but also points and lines. We will explore lines a bit more in the second part of this chapter but, for now, let us stop on points for a second. As mentioned above, these are the simplest type of feature in that they do not have any dimension, only a pair of coordinates attached to them. This means that points can sometimes be stored in a non-geographic table, simply using one column for each coordinate. We find an example of this on the Tokyo dataset we will use more later. The data is stored as a comma-separated value table, or `.csv`:
 
-```{code-cell} ipython3
+```python
 gt_points = pandas.read_csv("../data/tokyo/tokyo_clean.csv")
 ```
 
 Since we have read it with `pandas`, the table is loaded as a `DataFrame`, with no explicit spatial dimension:
 
-```{code-cell} ipython3
+```python
 type(gt_points)
 ```
 
 If we inspect the table, we find there is not a `geometry` column:
 
-```{code-cell} ipython3
+```python
 gt_points.head()
 ```
 
@@ -130,7 +145,7 @@ Many point datasets are provided in this format. To make the most of them, it is
 
 1. Turn coordinates into geometries:
 
-```{code-cell} ipython3
+```python
 pt_geoms = geopandas.points_from_xy(x=gt_points["longitude"],
                                     y=gt_points["latitude"],
                                     crs="EPSG:4326"
@@ -139,7 +154,7 @@ pt_geoms = geopandas.points_from_xy(x=gt_points["longitude"],
 
 2. Create a `GeoDataFrame` object:
 
-```{code-cell} ipython3
+```python
 gt_points = geopandas.GeoDataFrame(gt_points,
                                    geometry=pt_geoms
                                   )
@@ -147,7 +162,7 @@ gt_points = geopandas.GeoDataFrame(gt_points,
 
 And now `gt_points` looks and feels exactly like the one of countries we have seen before, with the difference the `geometry` column stores `POINT` geometries:
 
-```{code-cell} ipython3
+```python
 gt_points.head()
 ```
 
@@ -157,19 +172,19 @@ Surfaces are used to record data from a field data model. In theory, a field is 
 
 To explore how Python represents surfaces, we will use an extract for the Brazillian city of Sao Paulo of a [global population dataset](../data/ghsl/build_ghsl_extract). This dataset records population counts in cells of the same dimensions uniformly covering the surface of the Earth. Our extract is available as a GeoTIF file, a variation of the TIF image format that includes geographic information. We can use the `open_rasterio()` method from the `xarray` package to read in the GeoTIF:
 
-```{code-cell} ipython3
+```python
 pop = xarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
 ```
 
 This reads the data into a `DataArray` object:
 
-```{code-cell} ipython3
+```python
 type(pop)
 ```
 
 `xarray` is a package to work with multi-dimensional labelled arrays. Let's unpack this: we can use arrays of not only two dimensions as in a table with rows and columns, but with an arbitrary number of them; each of these dimensions are "tracked" by an index that makes it easy and efficient to manipulate. In `xarray`, these indices are called coordinates, and they can be retrieved from our `DataArray` through the `coords` attribute:
 
-```{code-cell} ipython3
+```python
 pop.coords
 ```
 
@@ -177,7 +192,7 @@ Interestingly, our surface has *three* dimensions: `x`, `y`, and `band`. The for
 
 An `xarray.DataArray` object contains additional information about the values stored under the `attrs` attribute:
 
-```{code-cell} ipython3
+```python
 pop.attrs
 ```
 
@@ -185,25 +200,25 @@ In this case, we can see this includes information required to convert pixels in
 
 Thus, our `DataArray` has three dimensions:
 
-```{code-cell} ipython3
+```python
 pop.shape
 ```
 
 A common operation will be to reduce this to only the two geographic ones. We can do this with the `sel` operator, which allows us to select data by the value of their coordinates:
 
-```{code-cell} ipython3
+```python
 pop.sel(band=1)
 ```
 
 The resulting object is thus a two-dimensional array. Similar to geographic tables, we can quickly plot the values in our dataset:
 
-```{code-cell} ipython3
+```python
 pop.sel(band=1).plot()
 ```
 
 This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g. `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
 
-```{code-cell} ipython3
+```python
 pop.where(pop!=-200)\
    .sel(band=1)\
    .plot(cmap="RdPu")
@@ -219,50 +234,50 @@ In this chapter, we briefly review a different way of representing spatial graph
 
 For illustration, we will rely on the `osmnx` library, which can query data from OpenStreetMap. For example, we extract the street-based graph of Yoyogi Park, near our earlier data from Tokyo:
 
-```{code-cell} ipython3
+```python
 %%time
 graph = osmnx.graph_from_place("Yoyogi Park, Shibuya, Tokyo, Japan")
 ```
 
 The code snippet above sends the query to the OpenStreetMap server, which returns back the data to `osmnx` to process it into the `graph` Python representation.
 
-```{code-cell} ipython3
+```python
 type(graph)
 ```
 
 We can have a quick inspection of the structure of the graph with the `plot_graph` method:
 
-```{code-cell} ipython3
+```python
 osmnx.plot_graph(graph)
 ```
 
 The resultant `graph` object is actually a `MultiDiGraph` from `networkx`, a graph library written in Python. The graph here is stored as a collection of 106 nodes (street intersections):
 
-```{code-cell} ipython3
+```python
 len(graph.nodes)
 ```
 
 and 287 edges (streets) that connect them:
 
-```{code-cell} ipython3
+```python
 len(graph.edges)
 ```
 
 Each of these elements can be queried to obtain more information such as the location and ID of a node:
 
-```{code-cell} ipython3
+```python
 graph.nodes[1520546819]
 ```
 
 The characteristics of an edge:
 
-```{code-cell} ipython3
+```python
 graph.edges[(1520546819, 3010293622, 0)]
 ```
 
 Or how the different components of the graph relate to each other. For example, what other nodes are directly connected to node `1520546819`?
 
-```{code-cell} ipython3
+```python
 list(graph.adj[1520546819].keys())
 ```
 
@@ -285,37 +300,37 @@ We will see two ways of going from surfaces to tables: one converts every pixel 
 
 Technically, going from surface to table involves traversing from `xarray` to `pandas` objects. This is actually a well established bridge. To illustrate it with a example, let's revisit the [population counts in [Sao Paulo](../data/ghsl/build_ghsl_extract) used earlier. We can read the surface into a `DataArray` object with the `open_rasterio()` method:
 
-```{code-cell} ipython3
+```python
 surface = xarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
 ```
 
 Transferring to a table is as simple as calling the `DataArray`'s `to_series()` method:
 
-```{code-cell} ipython3
+```python
 t_surface = surface.to_series()
 ```
 
 The resulting object is a `pandas.Series` object indexed on each of the dimensions of the original `DataArray`:
 
-```{code-cell} ipython3
+```python
 t_surface.head()
 ```
 
 At this point, everything we know about `pandas` and tabular data applies! For example, it might be more convenient to express it as a `DataFrame`:
 
-```{code-cell} ipython3
+```python
 t_surface = t_surface.reset_index().rename(columns={0: "Value"})
 ```
 
 With the power of a tabular library, some queries and filter operations become much easier. For example, finding cells with more than 1,000 people can be done with the usual `query()` method^[Although, if all you want to do is this type of query, `xarray` is well equiped for this kind of task too.]:
 
-```{code-cell} ipython3
+```python
 t_surface.query("Value > 1000").info()
 ```
 
 The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a fully-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a simple function that takes a row from our table and the resolution of the surface, and returns its geometry:
 
-```{code-cell} ipython3
+```python
 def row2cell(row, res_xy):
     res_x, res_y = res_xy
     minX = row["x"]
@@ -328,13 +343,13 @@ def row2cell(row, res_xy):
 
 For example:
 
-```{code-cell} ipython3
+```python
 row2cell(t_surface.loc[0, :], surface.attrs["res"])
 ```
 
 One of the benefits of this approach is we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:
 
-```{code-cell} ipython3
+```python
 max_polys = t_surface.query("Value > 1000")\
                      .apply(row2cell, 
                             res_xy=surface.attrs["res"], 
@@ -345,7 +360,7 @@ max_polys = geopandas.GeoSeries(max_polys, crs=surface.attrs["crs"])
 
 And generate a map with the same tooling that we use for any standard geo-table:
 
-```{code-cell} ipython3
+```python
 ax = max_polys.plot(edgecolor="red", 
                     figsize=(9, 9)
                    )
@@ -357,7 +372,7 @@ cx.add_basemap(ax,
 
 Finally, once we have operated on the data as a table, we may want to return to a surface-like data structure. This involves taking the same journey in the oposite direction as how we started. The sister method of `to_series` in `xarray` is `from_series`:
 
-```{code-cell} ipython3
+```python
 new_da = xarray.DataArray.from_series(
     t_surface.set_index(["band", "y", "x"])["Value"]
 )
@@ -370,34 +385,34 @@ A second use case involves moving surfaces directly into geographic tables by ag
 
 Let's start by reading the data. First, the elevation model:
 
-```{code-cell} ipython3
+```python
 dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(band=1)
 dem.where(dem > 0).plot.imshow()
 ```
 
 And the neighbourhood areas (tracts) from the Census:
 
-```{code-cell} ipython3
+```python
 sd_tracts = geopandas.read_file("../data/sandiego/sandiego_tracts.gpkg")
 sd_tracts.plot()
 ```
 
 There are several approaches to compute the average altitude of each neighbourhood. We will use `rioxarray`to clip parts of the surface *within* a given set of geometries. Let's start with a single polygon. For the illustration, we will use the largest one, located on the eastern side of San Diego. We can find the ID of the polygon with:
 
-```{code-cell} ipython3
+```python
 largest_tract_id = sd_tracts.query(f"area_sqm == {sd_tracts['area_sqm'].max()}").index[0]
 largest_tract_id
 ```
 
 And then pull out the polygon itself for the illustration:
 
-```{code-cell} ipython3
+```python
 largest_tract = sd_tracts.loc[largest_tract_id, "geometry"]
 ```
 
 Clipping the section of the surface that is within the polygon in the DEM can be achieved with the `rioxarray` extension to clip surfaces based on geometries:
 
-```{code-cell} ipython3
+```python
 dem_clip = dem.rio.clip([largest_tract.__geo_interface__], 
                         crs=sd_tracts.crs
                        )
@@ -406,13 +421,13 @@ dem_clip.where(dem_clip > 0).plot()
 
 Once we have elevation measurements for all the pixels within the tract, the average one can be calculated with `mean()`:
 
-```{code-cell} ipython3
+```python
 dem_clip.where(dem_clip > 0).mean()
 ```
 
 Now, to scale this to the entire geo-table, there are several approaches, each with benefits and disadvantages. We opt for applying the method above to each row of the table. We define an auxilliary function that takes a row containing one of our tracts and returns its elevation:
 
-```{code-cell} ipython3
+```python
 def get_mean_elevation(row):
     geom = row["geometry"].__geo_interface__
     section = dem.rio.clip([geom], crs=sd_tracts.crs)
@@ -422,13 +437,13 @@ def get_mean_elevation(row):
 
 Applied to the same tract, it returns the same average elevation:
 
-```{code-cell} ipython3
+```python
 get_mean_elevation(sd_tracts.loc[largest_tract_id, :])
 ```
 
 This method can then be run on each polygon in our series using the `apply`:
 
-```{code-cell} ipython3
+```python
 elevations = sd_tracts.head().apply(get_mean_elevation, axis=1)
 elevations
 ```
@@ -437,7 +452,7 @@ This simple approach illustrates the main idea well: find the cells that pertain
 
 However, this approach can be quite slow in big data. A more efficient alternative for our example is using the `rasterstats` library. This is a purpose-built library to construct so-called "zonal statistics" from surfaces. Here, the "zones" are the polygons and the "surface" is our `DataArray`. Generally, this library will be faster than the simpler approach used above, but may be more difficult to extend or adapt:
 
-```{code-cell} ipython3
+```python
 %%time
 from rasterstats import zonal_stats
 
@@ -447,13 +462,13 @@ elevations2 = zonal_stats(sd_tracts.to_crs(dem.rio.crs),
 elevations2 = pandas.DataFrame(elevations2)
 ```
 
-```{code-cell} ipython3
+```python
 elevations2.head()
 ```
 
 To visualize these results, we can make an elevation map:
 
-```{code-cell} ipython3
+```python
 f, axs = plt.subplots(1, 3, figsize=(15, 5))
 dem.where(dem > 0)\
    .rio.reproject(sd_tracts.crs)\
@@ -468,7 +483,7 @@ The case for converting tables into surfaces is perhaps less controversial. This
 
 From a purely technical perspective, for datasets with too many points, representing every point in the data on a screen can be seriously overcrowded:
 
-```{code-cell} ipython3
+```python
 gt_points.plot()
 ```
 
@@ -476,7 +491,7 @@ In the image above, it is hard to tell anything about the density of points in t
 
 In Python, we can rely on the `datashader` library, which does all the computation in a very efficient way. This process involves two main steps. First, we set up the grid (or canvas, `cvs`) into which we want to aggregate points:
 
-```{code-cell} ipython3
+```python
 cvs = datashader.Canvas(plot_width=60,
                         plot_height=60
                        )
@@ -484,7 +499,7 @@ cvs = datashader.Canvas(plot_width=60,
 
 Then we "transfer" the points into the grid:
 
-```{code-cell} ipython3
+```python
 grid = cvs.points(gt_points, 
                   x="longitude", 
                   y="latitude"
@@ -493,7 +508,7 @@ grid = cvs.points(gt_points,
 
 The resulting `grid` is a standard `DataArray` object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the re-sampled data allows for is much greater than when the points were visualized alone:
 
-```{code-cell} ipython3
+```python
 f, axs = plt.subplots(1, 2, figsize=(14, 6))
 gt_points.plot(ax=axs[0])
 grid.plot(ax=axs[1]);
@@ -507,23 +522,23 @@ We start with the `graph` object from the [previous section](#Spatial-graphs). R
 
 However, in some cases, we may want to convert the graph into a structure that allows us to operate on each component of the network independently. For example, we may want to map streets, calculate segment lengths, or draw buffers around each intersection. These are all operations that do not require topological information, that are standard for geo-tables and that are irrelevant to the graph structure. In this context, it makes sense to convert our `graph` to two geo-tables, one for intersections (the graph nodes) and one for street segments (the graph edges). In `osmnx`, we can do that with the built-in converter:
 
-```{code-cell} ipython3
+```python
 gt_intersections, gt_lines = osmnx.graph_to_gdfs(graph)
 ```
 
 Now each of the resulting geo-tables behaves as a collection of geographic objects, because it is:
 
-```{code-cell} ipython3
+```python
 gt_intersections.head()
 ```
 
-```{code-cell} ipython3
+```python
 gt_lines.info()
 ```
 
 If we were in the opposite situation, where we had a set of street segments and their intersections in geo-table form, we can generate the graph representation with the `graph_from_gdfs` sister method:
 
-```{code-cell} ipython3
+```python
 new_graph = osmnx.graph_from_gdfs(gt_intersections, gt_lines)
 ```
 
