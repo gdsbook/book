@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -47,7 +47,7 @@ from shapely.geometry import Polygon
 
 A contiguous pair of spatial units are those who share a common border. At first
 glance this seems straightforward, however, in practice matters turn out to be
-no so simple. The first complication is that there are different notions of
+not so simple. The first complication is that there are different notions of
 contiguity to consider. First, though, let's use a simple example of a three-by-three grid:
 
 ```python
@@ -125,7 +125,7 @@ w.nonzero
 
 Thus, we can save a significant amount of memory and lose no information by storing these sparse representations, which only record the non-zero values. 
 
-More generally, the spatial weights for our 3-by-3 grid can be represented as a matrix that has 9 rows and 9 columns, matching the number of polygons $(n=9)$. An important thing to note is that geography has more than one dimension. When compared to common representations of relationships *in time* used in data science, using information about spatial relationships can be more complex: spatial relationships are bi-directional, while temporal relationships are unidirectional. Further complicating things, the ordering of the observations in the weights matrix is ambiguous. The first row is not first for a specific reason. Here we simply use the alphanumeric ordering of the unit identifiers to match a polygon with a row or column of the matrix, but any arbitrary rule could be followed and the weights matrix would look different. The graph, however, would be isomorphic.. 
+More generally, the spatial weights for our 3-by-3 grid can be represented as a matrix that has 9 rows and 9 columns, matching the number of polygons $(n=9)$. An important thing to note is that geography has more than one dimension. When compared to common representations of relationships *in time* used in data science, using information about spatial relationships can be more complex: spatial relationships are bi-directional, while temporal relationships are unidirectional. Further complicating things, the ordering of the observations in the weights matrix is ambiguous. The first row is not first for a specific reason. Here we simply use the alphanumeric ordering of the unit identifiers to match a polygon with a row or column of the matrix, but any arbitrary rule could be followed and the weights matrix would look different. The graph, however, would be isomorphic.
 
 Spatial weights matrices may look familiar to those acquainted with social
 networks and graph theory in which **adjacency** matrices play a central role in
@@ -309,8 +309,8 @@ particular case of a regular lattice. The principle to keep in mind is that we
 consider contiguous (and hence call neighbours) observations which share part
 of their border coordinates. In the queen case, a single point is enough to make
 the join. For rook neighbours, we require a join to consist of one or more
-shared edges. This distinction is probably less relevant in the real world that
-in appears in the grid example above, and it is probably down to geocoding
+shared edges. This distinction is probably less relevant in the real world than
+it appears in the grid example above, and it is probably down to geocoding
 issues rather than substantive differences. In any case, there are special cases
 where this distinction can matter and it is useful to be familiar with the
 differences between the two approaches and how to apply them.
@@ -341,7 +341,7 @@ wk4 = weights.distance.KNN.from_dataframe(san_diego_tracts, k=4)
 
 The centroids are attributes of the polygon shapes that PySAL calculates from
 the spatial information stored in the `GeoDataFrame`. Since we are dealing with
-polygons in this case, PySAL uses inter-centroid distances to distance determine the
+polygons in this case, PySAL uses inter-centroid distances to determine the
 $k$ nearest observations to each polygon. 
 
 The knn weights displays no island problem:
@@ -398,7 +398,7 @@ than the bandwidth, the weights are set to zero.
 
 The default values for kernels are to use a triangular kernel with a bandwidth distance
 equal to the maximum knn=2 distance
-for all observations. The latter implies a so-called fixed bandwidth were all
+for all observations. The latter implies a so-called fixed bandwidth where all
 observations use the same distance for the cut-off. We can inspect this from
 the generated `W` object:
 
@@ -452,7 +452,7 @@ ax[1].set_title("Kernel centered on 18th tract")
 [ax_.set_axis_off() for ax_ in ax]
 ```
 
-What the kernel looks like can be strongly affected by the structure of spatial proximity, so any part of the map can look quite different from any othe rpart of the map. By imposing a clear distance decay over several of the neighbors of each observation,
+What the kernel looks like can be strongly affected by the structure of spatial proximity, so any part of the map can look quite different from any other part of the map. By imposing a clear distance decay over several of the neighbors of each observation,
 kernel weights incorporate Tobler's law very explicitly. Often, this comes at the cost of
 increased memory requirements, as every single pair of observations within the
 bandwidth distance is considered:
@@ -541,7 +541,7 @@ knn4_bad.histogram
 ```
 
 Next, let us take curvature into account. To do this, we require the
-radious of the Earth expressed in a given metric. PySAL provides this number
+radius of the Earth expressed in a given metric. PySAL provides this number
 in both miles and kilometres. For the sake of the example, we will use miles:
 
 ```python
@@ -551,7 +551,7 @@ radius
 
 With this measure at hand, we can pass it to the weights constructor (either
 straight from a shapefile or from a `GeoDataFrame`) and distances will be
-expressed in the units we have used for the radious, that is in miles in our
+expressed in the units we have used for the radius, that is in miles in our
 case:
 
 ```python
@@ -635,7 +635,7 @@ To connect it in our initial matrix, we need to create a copy of the `neighbors`
 neighbors = wr.neighbors.copy()
 ```
 
-and then we are change the entry for the island observation to include its
+and then we change the entry for the island observation to include its
 nearest neighbor (`102`) as well as update `102` to have `103` as a neighbor:
 
 ```python
