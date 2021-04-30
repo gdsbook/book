@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -17,8 +17,8 @@ jupyter:
 
 ## Part I: Building Blocks
 
-- [Geospatial Computational Environment](01_geospatial_computational_environment)
-- [Geographic Thinking for Data Scientists](02_geo_thinking)
+- [Geographic Thinking for Data Scientists](01_geo_thinking)
+- [Geospatial Computational Environment](02_geospatial_computational_environment)
 - [Spatial data](03_spatial_data)
 - [Spatial weights](04_spatial_weights)
 
