@@ -21,7 +21,7 @@ warnings.filterwarnings("ignore")
 # Local Spatial Autocorrelation
 
 
-In the previous chapter we explored the use of global measures of spatial autocorrelation to ask the question of whether the overall spatial distribution of our attribute of interest was reflective of a geographically random process, or not. These statistics are useful as the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. In these cases formal modeling of the spatial dimensions of the processes should next be carried out. On the other hand, spatial autocorrelation can sometimes arise from data processing operations in which cases the dependence is a form of non-random noise rather than due to substantive processes. Irrespective of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical anaylsis.
+In the previous chapter we explored the use of global measures of spatial autocorrelation to ask the question of whether the overall spatial distribution of our attribute of interest was reflective of a geographically random process, or not. These statistics are useful as the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. In these cases formal modeling of the spatial dimensions of the processes should next be carried out. On the other hand, spatial autocorrelation can sometimes arise from data processing operations in which cases the dependence is a form of non-random noise rather than due to substantive processes. Irrespective of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis.
 
 For these reasons the ability to determine whether  spatial autocorrelation is present in a geographically referenced data set is a critical component of the spatial data science toolbox. That said, the global measures of spatial autocorrelation are "whole map" statistics, meaning that the single statistic pertains to the complete data set. In other words, global autocorrelation statistics allow us to detect *clustering* in a geographically referenced dataset. For example,
 Moran's I is good tool to summarize a dataset into a single value that informs
@@ -30,7 +30,7 @@ measure to identify areas within the map where specific types of values (e.g.
 high, low) are located. In other words, Moran's I can tell us values are
 clustered overall, but it will not inform us about where the *clusters* are.
 For that purpose, we need to use a local measure of spatial autocorrelation.
-Local measures consider each single observation and operate on them, as oposed
+Local measures consider each single observation and operate on them, as opposed
 to on the overall dataset, as global measures do. Because of that, they are not
 good at summarizing a map, but they allow to obtain further insights about
 interesting geographical subsets of the data. In this chapter, we consider
@@ -122,13 +122,13 @@ w.transform = 'R'
 
 ## Motivating Local Spatial Autocorrelation
 
-To better understand the underpinning of local autorocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:
+To better understand the underpinning of local autocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:
 
 ```python
 db['w_Pct_Leave'] = weights.spatial_lag.lag_spatial(w, db['Pct_Leave'])
 ```
 
-And their respective standardized versions, where we substract the average and divide by the standard deviation:
+And their respective standardized versions, where we subtract the average and divide by the standard deviation:
 
 ```python
 db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )\
@@ -148,7 +148,7 @@ seaborn.regplot(x='Pct_Leave_std', y='w_Pct_Leave_std', data=db, ci=None)
 plt.show()
 ```
 
-Using standardised values allows us to divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: above and below the average. This, in turn, divides a Moran Plot in four quadrants, depending on whether a given area displays a value above the mean (high) or below (low), and how its spatial lag behaves:
+Using standardized values allows us to divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: above and below the average. This, in turn, divides a Moran Plot in four quadrants, depending on whether a given area displays a value above the mean (high) or below (low), and how its spatial lag behaves:
 
 * High-high (HH)
 * Low-high (LH)
@@ -196,13 +196,13 @@ In Python, we can calculate LISAs in a very streamlined way thanks to `PySAL`:
 lisa = esda.moran.Moran_Local(db['Pct_Leave'], w)
 ```
 
-All we need to pass is the variable of interest -proportion of Leave votes in this context- and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a lisa object that has a number of attibutes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using seaborn:
+All we need to pass is the variable of interest -proportion of Leave votes in this context- and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object that has a number of attributes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using `seaborn`:
 
 ```python
 seaborn.distplot(lisa.Is)
 ```
 
-This reveals a rather skewed distribution due to the dominance of the positive forms of spatial association. Here it is important to keep in mind that the high positive values arise from value simularity in space, and this can be due to either high values being next to high values *or* low values next to low values. The local $I_i$ values themselves cannot distinguish between these two.
+This reveals a rather skewed distribution due to the dominance of the positive forms of spatial association. Here it is important to keep in mind that the high positive values arise from value similarity in space, and this can be due to either high values being next to high values *or* low values next to low values. The local $I_i$ values themselves cannot distinguish between these two.
 
 The values in the left tail of the density represent locations displaying negative spatial association. There are also two forms, a high value surrounded by low values, or a low value surrounded by high valued neighboring observations. And, again, the  $I_i$ value cannot distinguish between the two cases.
 
@@ -315,7 +315,7 @@ counts
 Showing that the high-high (1), and low-low (3), values are predominant.
 
 
-Care must be taken, however, in the interpretation of these first two maps, as the underlying statistical signifcance of the local values has not been considered.
+Care must be taken, however, in the interpretation of these first two maps, as the underlying statistical significance of the local values has not been considered.
 
 
 Instead, what is typically done is to create a map, a cluster map as it is usually called, that extracts the significant observations (those that are highly unlikely to have come from pure chance) and plots them with a specific color depending on their quadrant category.
@@ -339,7 +339,7 @@ Thus, the first five values are statistically significant, while the last five o
 Let us stop for second on these two steps. First, the `significant` column. Similarly as with global Moran's I, `PySAL` is automatically computing a p-value for each LISA. Because not every observation represents a statistically significant one, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar situation from pure chance. Following a similar reasoning as with global Moran's I, we select 5% as the threshold for statistical significance. To identify these values, we create a variable, `significant`, that contains `True` if the p-value of the observation satisfies the condition, and `False` otherwise. We can check this is the case:
 
 
-Next we consider the `q` attribute signifying what quadrant the local value is, but now mask these values using are newly created signficance indicator:
+Next we consider the `q` attribute signifying what quadrant the local value is, but now mask these values using are newly created significance indicator:
 
 ```python
 hotspot = 1 * (sig * lisa.q==1)

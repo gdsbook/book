@@ -46,7 +46,7 @@ disparities can benefit from an explicitly spatial treatment.
 Social and economic inequality is often at the top of policy makers' agendas.
 Its study has always drawn considerable attention in academic circles.
 Much of the focus has been on *interpersonal income inequality*, yet there is a growing recognition
-that the question of *interregional income inequality* requires further 
+that the question of *inter-regional income inequality* requires further 
 attention as the growing gaps between poor and rich regions have been identified
 as key drivers of political polarization in developing and developed countries
 {cite}`Rodriguez_Pose_2018`.
@@ -90,7 +90,7 @@ pci_df.columns
 ```
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-Inspection of the column names reveals that the table is organised around one row per county, and with the years as columns, together with information about the particular record.
+Inspection of the column names reveals that the table is organized around one row per county, and with the years as columns, together with information about the particular record.
 This format is an example of a [*wide* longitudinal data set](https://en.wikipedia.org/wiki/Wide_and_narrow_data).
 In wide-format data, each column represents a different time period, meaning that each row represents a set of measurements made about the same "entity" over time (as well as any unique identifying information about that entity.)
 This contrasts with a *narrow* or *long* format, where each row describes an entity at a specific point in time. 
@@ -120,7 +120,7 @@ pci_df.query('NAME == "Jackson" & STATEFP == "28"')
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ## Global Inequality
 
-We begin our examination of inequality by focusing on several global measures of income inequlity. Here, "global" means that the measure is concerned with the overall nature of inequality within the income distribution. That is, these measures focus on the direct disparity between rich and poor, considering nothing about where the rich and poor live. Several classic measures of inequality are available for this purpose. 
+We begin our examination of inequality by focusing on several global measures of income inequality. Here, "global" means that the measure is concerned with the overall nature of inequality within the income distribution. That is, these measures focus on the direct disparity between rich and poor, considering nothing about where the rich and poor live. Several classic measures of inequality are available for this purpose. 
 
 In general terms, measures of inequality focus on the dispersion present in an income distribution. In the case of regional or spatial inequality, the distributions describe the average or per-capita incomes for spatial units, such as for counties, census tracts, or regions. For our US county data, we can visualize the distribution of per capita incomes for the first year in the sample as follows:
 <!-- #endregion -->
@@ -161,7 +161,7 @@ pci_df.plot(
 plt.show()
 ```
 
-The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. The kernel density estimate is a *feature*-based representation, and the map is a *geographic* representation. Both are useful for developing a more compehensive understanding. To gain insights on the level of inequality in the distribution, we'll discuss a few indices common in the statistical and econometric literatures. 
+The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. The kernel density estimate is a *feature*-based representation, and the map is a *geographic* representation. Both are useful for developing a more comprehensive understanding. To gain insights on the level of inequality in the distribution, we'll discuss a few indices common in the statistical and econometric literatures. 
 
 ### 20:20 Ratio
 
@@ -273,7 +273,7 @@ def lorenz(y):
     return pop_shares, income_shares
 ```
 
-We can use the same strategy as above to calculate the lorenz curves for all the years in our datasets:
+We can use the same strategy as above to calculate the Lorenz curves for all the years in our datasets:
 ```python
 lorenz_curves = pci_df[years].apply(lorenz, axis=0)
 ```
@@ -284,7 +284,7 @@ Practically, this becomes a dataframe with columns for each year. Rows contain t
 lorenz_curves.head()
 ```
 
-By iterating over the columns of this dataframe, we can make a plot of the lorenz curves for each year:
+By iterating over the columns of this dataframe, we can make a plot of the Lorenz curves for each year:
 
 ```python caption="Lorenz curves for county per capita incomes since 1969."
 f, ax = plt.subplots()
@@ -294,7 +294,7 @@ for year in lorenz_curves.columns:
     ax.plot(year_pop_shares, year_inc_shares, color='k', alpha=.05)
 ```
 
-The compression of the Lorenze curves makes it difficult to ascertain the temporal pattern in inequality. Focusing explicilty on the Gini coefficients may shed more light on the evolution of inequality over time. 
+The compression of the Lorenz curves makes it difficult to ascertain the temporal pattern in inequality. Focusing explicitly on the Gini coefficients may shed more light on the evolution of inequality over time. 
 
 Remember the Gini coefficient represents the area in between the Lorenz curve and that of perfect equality. The measure can be calculated directly through the `Gini` class in `inequality`. For 1969, this implies:
 
@@ -395,8 +395,8 @@ $$\delta_l = (Y_l - y_i) +  (y_i - \bar{y})$$
 
 The first term is the difference between the individual's income and per-capita income in the individual's region of residence, while the second term is the difference between the region's per capita income and average national per capita income.
 
-In regional studies, the intraregional personal income distribution is typically
-not available. As a result, the assumption is often made that intraregional
+In regional studies, the intra-regional personal income distribution is typically
+not available. As a result, the assumption is often made that intra-regional
 personal inequality is zero. In other words, all individuals in the same region
 have identical incomes. With this assumption in hand, the first term vanishes:
 $Y_l -y_i = 0$, leading to:[^reg] 
@@ -417,8 +417,8 @@ $$
 This means that each individual in a region has an equal contribution to the
 overall level of national interpersonal inequality, given by $(y_i - \bar{y})$,
 while the region in question contributes $N_i(y_i - \bar{y})$. While it may seem
-that the assumption of zero intraregional interepersonal income inequality is
-overly restrictive, it serves to isolate the nature of interregional income
+that the assumption of zero intra-regional interpersonal income inequality is
+overly restrictive, it serves to isolate the nature of inter-regional income
 inequality. That is, inequality between places, rather than inequality between
 people within those places. In essence, this strategy shifts the question up one
 level in the spatial hierarchy by aggregating micro-level individual data to
@@ -497,7 +497,7 @@ Second, despite this decline, there is never a year in which the spatial autocor
 
 One common objection to the analysis of inequality in aggregate relates to lack of detail about the scale at which inequality is most important. Inequality can be driven by differences between groups and not by discrepancies in income between similar individuals. That is, there is always the possibility that observed inequality can be "explained" by a confounding variate, such as age, sex, or education. For example, income differences between older and younger people can "explain" a large part of the societal inequality in wealth: older people have much longer to acquire experience, and thus are generally paid more for that experience. Younger people do not have as much experience, so young people (on average) have lower incomes than older people. 
 
-To combat this issue, it is often useful to *decompose* inequality indices into constituent groups. This allows us to understand how much of inequality is driven by aggregate group differences and how much is driven by observation-level inequality. This also allows us to characterize how unequal each group is separately. In geographic applications, these groups are usually spatially defined, in that *regions* are contiguous geographic groups of observations. This section dicusses regional inequality decompositions as a way to introduce geography into the study of inequality. 
+To combat this issue, it is often useful to *decompose* inequality indices into constituent groups. This allows us to understand how much of inequality is driven by aggregate group differences and how much is driven by observation-level inequality. This also allows us to characterize how unequal each group is separately. In geographic applications, these groups are usually spatially defined, in that *regions* are contiguous geographic groups of observations. This section discusses regional inequality decompositions as a way to introduce geography into the study of inequality. 
 
 Let's illustrate these ideas with our income dataset. The table records the United States Census Bureau region a county belongs to in the `Region` variable. These divide the country into eight regions, each assigned a number that relates to its name as specified below:
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
@@ -513,7 +513,7 @@ region_names = {
 }
 ```
 
-We can visualised the regions with the names on the legend by first mapping the name to each region number, and then rendering a qualitative choropleth:
+We can visualize the regions with the names on the legend by first mapping the name to each region number, and then rendering a qualitative choropleth:
 
 ```python caption="Map of census regions in the United States."
 pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
@@ -535,14 +535,14 @@ rmeans = pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
                [years]
 ```
 
-The resulting table has a row for each region and a column for each year. We can visualise these means to get a sense of their temporal trajectory:
+The resulting table has a row for each region and a column for each year. We can visualize these means to get a sense of their temporal trajectory:
 
 ```python caption="Average county per capita incomes among census regions since 1969"
 rmeans.T.plot.line();
 ```
 
 One way to introduce geography into the analysis of inequality is to use geographical delineations to define groups for decompositions. For example, Theil's $T$, which we encountered previously, can be decomposed using regions into so called *between* and *within* regional inequality components.
-To proceed in this direction, we first re-conceptualise our observations of per capita incomes for $m$ regional economies as $y = \left( y_1, y_2, \ldots, y_m \right)$. These are grouped into $\omega$ mutually exclusive regions. Formally, this means that when $m_g$ represents the number of areas assigned to region $g$, the total number of areas must be equal to the count of all the areas in each region: $\sum_{g=1}^{\omega} m_g=m$.[^mut-ex] With this notation, Theil's index from above can be rewritten to emphasize its between and within components:
+To proceed in this direction, we first re-conceptualize our observations of per capita incomes for $m$ regional economies as $y = \left( y_1, y_2, \ldots, y_m \right)$. These are grouped into $\omega$ mutually exclusive regions. Formally, this means that when $m_g$ represents the number of areas assigned to region $g$, the total number of areas must be equal to the count of all the areas in each region: $\sum_{g=1}^{\omega} m_g=m$.[^mut-ex] With this notation, Theil's index from above can be rewritten to emphasize its between and within components:
 
 [^mut-ex]: This would be violated, for example, if one area were in two regions. This area would get "double counted" in this total. 
 
@@ -563,7 +563,7 @@ to what is done above for the case of interpersonal inequality, the estimate of
 the between region (group) component of the decomposition is based on setting
 the incomes of all economies (individuals) belonging to a region (group) equal
 to that of the regional (group) average of these per capita incomes. Now,
-however, intraregional inequality between economies within the same region is
+however, intra-regional inequality between economies within the same region is
 explicitly considered in the second component.[^weight]
 
 [^weight]: The regional decomposition does not involve weighting the regions by their respective population. See  {cite}`Gluschenko_2018` for further details. 
@@ -607,7 +607,7 @@ inequalities['theil_between_share'].plot()
 plt.show()
 ```
 
- The between-region share of inequality is at its lowest in the mid-2000s, not in the mid-1990s. This suggests that regional differences were very important in the 1970s and 80s, but this importance has been waning, relative to the inequality *within* US Census Regions. 
+ The between-region share of inequality is at its lowest in the mid-2000s, not in the mid-1990s. This suggests that regional differences were very important in the 1970s and 1980s, but this importance has been waning, relative to the inequality *within* US Census Regions. 
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
@@ -618,7 +618,7 @@ plt.show()
 
 While regional decompositions are useful, they do not tell the whole story. Indeed, a "region" is just a special kind of group; its "geography" is only made manifest through group membership (*is the county "in" the region or not?*). This kind of "place-based" thinking, while geographic, is not necessarily *spatial*. It does not incorporate the notions of distance or proximity into the study of inequality. The geographical locations of the regions could be re-arranged without impact, so long as the group membership structure is maintained. While, arguably, shuffling regions around means they are no longer "regions," the statistical methods would be no different. 
 
-The final approach we review here is an explicit integration of space within traditional, non-spatial measure. In particular, we consider a *spatialised* version of the Gini coefficient, introduced by {cite}`Rey_2012`. The spatial Gini is designed to consider
+The final approach we review here is an explicit integration of space within traditional, non-spatial measure. In particular, we consider a *spatialized* version of the Gini coefficient, introduced by {cite}`Rey_2012`. The spatial Gini is designed to consider
 the role of spatial adjacency in a decomposition of the traditional Gini. The original index can be formulated focusing on the set of pairwise absolute differences in incomes:
 
 $$G = \frac{\sum_i \sum_j \left | y_i - y_j \right|}{2 n^2 \bar{x}} $$
@@ -635,9 +635,9 @@ $$G = \frac{\sum_i \sum_j w_{i,j}\left | x_i - x_j \right|}{2 n^2 \bar{x}} +   \
 
 with the first term being the component among neighbors and the second term being the component among non-neighbors. The "spatial Gini", then, is the first component that describes the differences between nearby observations. 
 
-The spatial Gini allows for a consideration of spatial dependence in inequality. If spatial depenedence is very strong and positive, incomes are very similar among nearby observations, so the inequality of "near" differences will be small. Most of the inequality in the society will be driven by disparities in income between distant places. In contrast, when dependence is very weak (or even negative), then the two components may equalize. Inference on the spatial Gini can be based on random spatial permutations of the income values, as we have seen elsewhere in this book. This tests whether the distribution of the compoents are different from that obtained when incomes are randomly distributed across the map. 
+The spatial Gini allows for a consideration of spatial dependence in inequality. If spatial dependence is very strong and positive, incomes are very similar among nearby observations, so the inequality of "near" differences will be small. Most of the inequality in the society will be driven by disparities in income between distant places. In contrast, when dependence is very weak (or even negative), then the two components may equalize. Inference on the spatial Gini can be based on random spatial permutations of the income values, as we have seen elsewhere in this book. This tests whether the distribution of the components are different from that obtained when incomes are randomly distributed across the map. 
 
-The spatial Gini also provides a useful complement to the regional decomposition used in the Theil statistic. The latter does not consider pairwise relationships between observations, while the spatial Gini does. By considering the pairwise relationships between observations, the Gini coefficient is more sensitive, and can also be more strongly affected by small groups of significanatly wealthy observations.  
+The spatial Gini also provides a useful complement to the regional decomposition used in the Theil statistic. The latter does not consider pairwise relationships between observations, while the spatial Gini does. By considering the pairwise relationships between observations, the Gini coefficient is more sensitive, and can also be more strongly affected by small groups of significantly wealthy observations.  
 
 We can estimate spatial Gini coefficients using the `Gini_Spatial` class:
 
@@ -663,7 +663,7 @@ The aspatial Gini is stored in the `g` attribute, just like for the aspatial cla
 gs69.g
 ```
 
-The share of the overall gini coefficient that is due to the "far" differences is stored in the `wcg` share:
+The share of the overall Gini coefficient that is due to the "far" differences is stored in the `wcg` share:
 
 ```python
 gs69.wcg_share
@@ -675,7 +675,7 @@ The $p$-value for this tests whether the component measuring inequality among ne
 gs69.p_sim
 ```
 
-The value is statistically significant for 1969, indicating that inequality between neighboring pairs of counties is different from the inequality between county paris that are not geographically proximate.
+The value is statistically significant for 1969, indicating that inequality between neighboring pairs of counties is different from the inequality between county pairs that are not geographically proximate.
 
 We can apply the same statistic over each year in the sample using the function-by-column approach as before. In this case, we want to return the statistic itself, as well as the decomposition between variation in the neighbors and that for non-neighbors, and the pseudo P-values:
 
@@ -730,11 +730,11 @@ inequalities[['near_diffs', 'I']].plot.line(subplots=True, figsize=(15,6))
 ## Conclusion
 
 
-Inequality is an important social phenomenon, and its geography is an important concern for social scientists. Geographical disparities in well-being have been pointed to as a major driver behind the rise of right-wing populist movements in the U.S. and Europe {cite}`Rodriguez_Pose_2018`. Thus, understanding the nature of these disparities and their evolution is a challenge for both science and policy.
+Inequality is an important social phenomenon, and its geography is an important concern for social scientists. Geographical disparities in well-being have been pointed to as a major driver behind the rise of right-wing populist movements in the US and Europe {cite}`Rodriguez_Pose_2018`. Thus, understanding the nature of these disparities and their evolution is a challenge for both science and policy.
 
 This chapter discusses methods to assess inequality, as well as examine its spatial and regional structure. We have seen the Gini coefficient and Theil index as examples of global measures to summarize the overall level of inequality. As is often the case in many areas of spatial analysis, the straightforward adoption of methods from economics and sociology to spatial data can  often be fruitful but, at the same time, can miss key elements of the spatial story. In the context of spatial income disparities, we have highlighted the  differences between personal and regional inequality. From this vantage, we have reviewed three approaches to incorporate geography and space in the study of inequality. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as those for spatial autocorrelation discussed in chapters [6](06_spatial_autocorrelation) and [7](07_local_autocorrelation). 
 
-Before leaving the topic of spatial inequality, we note that there is much more that can be said about inequality and related concepts. Inequality is generally concerned with the static snapshot of the regional income distribution and the shares of that distribution that each region holds. Those shares are reflected in the variance or spread of the distribution. However, this is only one moment of the distribution, and a comprehensive understanding of disparities requires analysis of the distribution's location (mean) and shape (modes, kurtosis, skewness) as well as dispersion. Morevoer, movements of individual regions within the distribution over time, or what is referred to as *spatial income mobility* are critical to our understanding of the dynamics of spatial disparities. Full consideration of these concepts is beyond the scope of this chapter. Interested readers are directed to {cite}`Rey2014` as an entry point to these more advanced topics.
+Before leaving the topic of spatial inequality, we note that there is much more that can be said about inequality and related concepts. Inequality is generally concerned with the static snapshot of the regional income distribution and the shares of that distribution that each region holds. Those shares are reflected in the variance or spread of the distribution. However, this is only one moment of the distribution, and a comprehensive understanding of disparities requires analysis of the distribution's location (mean) and shape (modes, kurtosis, skewness) as well as dispersion. Moreover, movements of individual regions within the distribution over time, or what is referred to as *spatial income mobility* are critical to our understanding of the dynamics of spatial disparities. Full consideration of these concepts is beyond the scope of this chapter. Interested readers are directed to {cite}`Rey2014` as an entry point to these more advanced topics.
 
 
 
@@ -747,11 +747,11 @@ Before leaving the topic of spatial inequality, we note that there is much more 
 
 1. Why is the study of regional income inequality important? In what ways is the study of regional income inequality different from the study of personal income inequality?
 
-2. Given that the Theil and Gini statistics appear to have similar time paths, why would a researcher choose to use both measures when analysing the dynamics of regional disparities? Why not just one one or the other?
+2. Given that the Theil and Gini statistics appear to have similar time paths, why would a researcher choose to use both measures when analyzing the dynamics of regional disparities? Why not just one one or the other?
 
 3. What aspects of a regional income distribution are not captured by a Theil or Gini coefficient? Why are these omissions important, and what approaches might be used to address these limitations?
 
-4. How might the measure of interregional income inequality be affected by the choice of the regionalization scheme (i.e., how the different spatial units are grouped to form regions)?
+4. How might the measure of inter-regional income inequality be affected by the choice of the regionalization scheme (i.e., how the different spatial units are grouped to form regions)?
 
 5. What is the relationship between spatial income inequality and the spatial dependence of regional incomes?
 

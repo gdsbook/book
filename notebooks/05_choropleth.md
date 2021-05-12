@@ -194,7 +194,7 @@ ei5
 
  Note that each of the intervals, however, has equal width of
 $w=4093.8$. This value of $k=5$ also coincides with the default classification
-in the Seaborn histogram displayed in Figure 1. It should also be noted that the first class is closed on the lower bound,
+in the `seaborn` histogram displayed in Figure 1. It should also be noted that the first class is closed on the lower bound,
 in contrast to the general approach defined in Equation (1).
 
 
@@ -277,7 +277,7 @@ p
 
 ### Mean-standard deviation
 
-Our third classifer uses the sample mean $\bar{x} =
+Our third classifier uses the sample mean $\bar{x} =
 \frac{1}{n} \sum_{i=1}^n x_i$ and sample standard deviation $s = \sqrt{
 \frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})  }$ to define class boundaries as
 some distance from the sample mean, with the distance being a multiple of the
@@ -302,7 +302,7 @@ vast majority of values in the middle class.
 
 The maximum breaks classifier decides where to set the break points between
 classes by considering the difference between sorted values. That is, rather
-than considering a value of the dataset in itself, it looks at how appart each
+than considering a value of the dataset in itself, it looks at how apart each
 value is from the next one in the sorted sequence. The classifier then places
 the the $k-1$ break points in between the pairs of values most stretched apart from
 each other in the entire sequence, proceeding in descending order relative to
@@ -317,7 +317,7 @@ Maximum breaks is an appropriate approach when we are interested in making sure
 observations in each class are separated from those in neighboring classes. As
 such, it works well in cases where the distribution of values is not unimodal.
 In addition, the algorithm is relatively fast to compute. However, its
-simplicitly can sometimes cause unexpected results. To the extent in only
+simplicity can sometimes cause unexpected results. To the extent in only
 considers the top $k-1$ differences between consecutive values, other more nuanced
 within-group differences and dissimilarities can be ignored.
 
@@ -335,7 +335,7 @@ bp = mapclassify.BoxPlot(mx['PCGDP1940'])
 bp
 ```
 
-Any values falling into either of the extreme classes are defined as outlers.
+Any values falling into either of the extreme classes are defined as outliers.
 Note that because the income values are non-negative by definition, the lower
 outlier class has an inadmissible upper bound meaning that lower outliers would
 not be possible for this sample.
@@ -353,7 +353,7 @@ neighboring internal classes.
 
 ### Head-Tail Breaks
 
-The head tail algorithm {cite}`Jiang_2013` is based on a recursive partioning of the data using splits around
+The head tail algorithm {cite}`Jiang_2013` is based on a recursive partitioning of the data using splits around
 iterative means. The splitting process continues until the distributions within each of
 the classes no longer display a heavy-tailed distribution in the sense that
 there is a balance between the number of smaller and larger values assigned to
@@ -409,7 +409,7 @@ Finally, the max-p classifiers adopts the algorithm underlying the max-p region
 building method {cite}`Duque_2011` to the case of map classification. It is similar in spirit to
 Jenks Caspall in that it considers greedy swapping between adjacent classes to
 improve the objective function. It is a heuristic, however, so unlike
-Fisher-Jenks, there is no optimial solution guaranteed:
+Fisher-Jenks, there is no optimal solution guaranteed:
 
 ```python
 mp5 = mapclassify.MaxP(mx['PCGDP1940'], k=5)
@@ -436,7 +436,7 @@ distribution of the attribute values. We will return to a joint consideration of
 the statistical and spatial distribution of the attribute values in comparison
 of classifiers below.
 
-For map classification, one optimiality criterion that
+For map classification, one optimality criterion that
 can be used is a measure of fit. In PySAL the "absolute deviation around class
 medians" (ADCM) is calculated and provides a measure of fit that allows for
 comparison of alternative classifiers for the same value of $k$.
@@ -453,7 +453,7 @@ ax = seaborn.barplot(y='Classifier', x='ADCM', data=data)
 ```
 
 As is to be expected, the Fisher-Jenks classifier dominates all other k=5
-classifiers with an ACDM of 23,729. Interestingly, the equal interval classifier
+classifiers with an ADCM of 23,729. Interestingly, the equal interval classifier
 performs well despite the problems associated with being sensitive to the
 extreme values in the distribution. The mean-standard deviation classifier has a
 very poor fit due to the skewed nature of the data and the concentrated
@@ -502,13 +502,13 @@ t.style.applymap(highlight_values)
 ```
 
 Inspection of this table reveals a number of interesting results. First, the
-only Mexican state that is treated consistantly across the k=5 classifiers is
+only Mexican state that is treated consistently across the k=5 classifiers is
 Baja California Norte which is placed in the highest class by all classifiers.
 Second, the mean-standard deviation classifier has an empty first class due to
-the inadmissible upper bound and the overconcentration of values in the central
+the inadmissible upper bound and the over-concentration of values in the central
 class (2).
 
-Finally, we can consider a meso-level view of the clasification
+Finally, we can consider a meso-level view of the classification
 results by comparing the number of values assigned to each class across the
 different classifiers:
 
@@ -525,7 +525,7 @@ is kept in class 1 in equal intervals, but assigned to class 2 by Fisher Jenks.
 
 ## Color
 
-Having considered the evaluation of the statisitcal distribution of
+Having considered the evaluation of the statistical distribution of
 the attribute values and the alternative classification approaches, the next
 step is to select the symbolization and color scheme. Together with the choice of classifier, these will determine the overall
 effectiveness of the choropleth map in representing the spatial
@@ -544,7 +544,7 @@ plt.show()
 ```
 
 Prior to examining the attribute values it is important to note that the
-spatial units for these states are far from homogenous in their shapes and
+spatial units for these states are far from homogeneous in their shapes and
 sizes. This can have major impacts on our brain's pattern recognition capabilities
 as we tend to be drawn to the larger polygons. Yet, when we considered the
 statistical distribution above, each observation was given equal weight. Thus,
@@ -552,7 +552,7 @@ the spatial distribution becomes more complicated to evaluate from a visual and
 statistical perspective.
 
 With this qualification in mind, we will explore the construction of choropleth
-maps using geopandas:
+maps using `geopandas`:
 
 ```python
 mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
@@ -575,8 +575,8 @@ plt.axis('equal')
 plt.show()
 ```
 
-The default color map used by geopandas is viridis, which is a multi-hue
-sequential scheme, with the darker (ligher) hues representing lower (higher)
+The default color map used by `geopandas` is viridis, which is a multi-hue
+sequential scheme, with the darker (lighter) hues representing lower (higher)
 values for the attribute in question. The choice of a color scheme for a
 choropleth map should be based on the type of variable under consideration
 {cite}`Brewer1997mapping`. Generally, a distinction is drawn between three
@@ -602,7 +602,7 @@ plt.axis('equal')
 plt.show()
 ```
 
-which now uses a single-hue sequent,ial color map with the lighter shades representing lower values. One difficulty with this map is that the poor states in the southern portion of Mexico blend into the background of the map display. This can be adjusted by overriding the `edgecolor`:
+which now uses a single-hue sequential color map with the lighter shades representing lower values. One difficulty with this map is that the poor states in the southern portion of Mexico blend into the background of the map display. This can be adjusted by overriding the `edgecolor`:
 
 
 ```python
@@ -666,7 +666,7 @@ that groups individual states in contiguous clusters of similar characteristics:
 mx['HANSON98'].head()
 ```
 
-This regionalization scheme partions Mexico into 5 regions. A naive (and
+This regionalization scheme partitions Mexico into 5 regions. A naive (and
 incorrect) way to display this would be to treat the region variable as
 sequential and use a `UserDefined` classifier to display the regions:
 
@@ -725,5 +725,5 @@ packages in the data stack that the user can turn to.
 6. In what ways do choropleth classifiers treat intra-class and inter-class heterogeneity differently? What are the implications of these choices?
 7. To what extent do most commonly employed choropleth classification methods take the geographical distribution of the variable into consideration? Can you think of ways to incorporate the spatial features of a variable into a classification for a choropleth map?
 8. Discuss the similarities between the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?
-9. The Fisher-Jenks classifier will always have more internally-homogenou classes than other k-classifiers. Given this, why might one decide on choosing a different k-classifier for a particular data set?
+9. The Fisher-Jenks classifier will always have more internally homogeneous classes than other k-classifiers. Given this, why might one decide on choosing a different k-classifier for a particular data set?
 

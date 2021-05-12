@@ -241,7 +241,7 @@ since there is strong positive autocorrelation in all of the input variables.
 
 Spatial autocorrelation only describes relationships between a single observation at a time.
 So, the fact that all of the clustering variables are positively autocorrelated does not tell us 
-about the way the attributes covary over space. For that, we need to consider the
+about the way the attributes co-vary over space. For that, we need to consider the
 spatial correlation between variables. Here, we will measure this using the
 bivariate correlation in the maps of covariates themselves.
 
@@ -266,7 +266,7 @@ pair of variables. Several of these cells indicate positive linear
 associations (`median_age` Vs. `median_house_value`, `median_house_value` Vs. `median_no_rooms`)
 while other cells display negative correlation (`median_house_value` Vs. `pct_rented`,
 `median_no_rooms` Vs. `pct_rented`, and `median_age` Vs. `pct_rented`). The one variable
-that tends to have consistenty weak association with the other variables is
+that tends to have consistently weak association with the other variables is
 `tt_work`, and in part this appears to reflect its rather concentrated 
 distribution as seen on the lower right diagonal corner cell.
 
@@ -282,7 +282,7 @@ clusters ($k$), where the number of clusters is typically much smaller than the
 number of observations to be clustered. Each cluster is given a unique label,
 and these labels are mapped. Using the clusters' profile and label, the map of 
 labels can be interpreted to get a sense of the spatial distribution of 
-sociodemographic traits. The power of (geodemographic) clustering comes
+socio-demographic traits. The power of (geodemographic) clustering comes
 from taking statistical variation across several dimensions and compressing it
 into a single categorical one that we can visualize through a map. To
 demonstrate the variety of approaches in clustering, we will show two
@@ -292,7 +292,7 @@ distinct but very popular clustering algorithms: k-means and Ward's hierarchical
 
 K-means is probably the most widely used approach to
 cluster a dataset. The algorithm groups observations into a
-prespecified number of clusters so that that each observation is
+pre-specified number of clusters so that that each observation is
 closer to the mean of its own cluster than it is to the mean of any other cluster.
 The k-means problem is solved by iterating between an assignment step and an update step. 
 First, all observations are randomly assigned one of the $k$ labels. Next, the 
@@ -467,7 +467,7 @@ cluster profiles is be to draw the distributions of cluster members' data.
 To do this we need to "tidy up" the dataset. A tidy dataset ([Wickham,
 2014](https://www.jstatsoft.org/article/view/v059i10)) is one where every row is
 an observation, and every column is a variable. Thus, a few steps are required 
-to tidy up our labelled data:
+to tidy up our labeled data:
 
 ```python
 # Index db on cluster ID

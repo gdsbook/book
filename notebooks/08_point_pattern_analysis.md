@@ -36,11 +36,11 @@ from sklearn.cluster import DBSCAN
 
 ## Introduction
 
-Points are spatial entities that can be understood in two fundamentally different ways. On the one hand, points can be seen as fixed objects in space, which is to say their location is taken as given (*exogenous*). In this interpretation, the location of an observed point is considered as secondary to the value observed at the point. Think of this like measuring the number of cars traversing a given road intersection; the location is fixed, and the data of interest comes from the measurement taken at that location. The analysis of this kind of point data is very similar to that of other types of spatial data such as polygons and lines. On the other hand, an observation occuring at a point can also be thought of as a site of measurement from an underlying geographically-continuous process. In this case, the measurement could theoretically take place anywhere, but was only carried out or conducted in certain locations. Think of this as measuring the length of birds' wings: the location at which birds are measured reflects the underlying geographical process of bird movement and foraging, and the length of the birds' wings may reflect an underlying ecological process that varies by bird. This kind of approach means that both the location and the measurement matter. This is the perspective we will adopt in the rest of the chapter.
+Points are spatial entities that can be understood in two fundamentally different ways. On the one hand, points can be seen as fixed objects in space, which is to say their location is taken as given (*exogenous*). In this interpretation, the location of an observed point is considered as secondary to the value observed at the point. Think of this like measuring the number of cars traversing a given road intersection; the location is fixed, and the data of interest comes from the measurement taken at that location. The analysis of this kind of point data is very similar to that of other types of spatial data such as polygons and lines. On the other hand, an observation occurring at a point can also be thought of as a site of measurement from an underlying geographically-continuous process. In this case, the measurement could theoretically take place anywhere, but was only carried out or conducted in certain locations. Think of this as measuring the length of birds' wings: the location at which birds are measured reflects the underlying geographical process of bird movement and foraging, and the length of the birds' wings may reflect an underlying ecological process that varies by bird. This kind of approach means that both the location and the measurement matter. This is the perspective we will adopt in the rest of the chapter.
 
-When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a *point pattern*. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is geo-tagged photographs: they could technically happen in many locations but we usually find photos tend to concentrate only in a handful of them. Point patterns can be *marked*, if more attributes are provided with the location, or *unmarked*, if only the coordinates of where the event occured are provided. Continuing the photo example, an unmarked pattern would result if only the location where are taken is used for analysis, while we would be speaking of a marked point pattern if other attributes, such as the time, camera model, or a "image quality score" was provided with the location.
+When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a *point pattern*. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is geo-tagged photographs: they could technically happen in many locations but we usually find photos tend to concentrate only in a handful of them. Point patterns can be *marked*, if more attributes are provided with the location, or *unmarked*, if only the coordinates of where the event occurred are provided. Continuing the photo example, an unmarked pattern would result if only the location where are taken is used for analysis, while we would be speaking of a marked point pattern if other attributes, such as the time, camera model, or a "image quality score" was provided with the location.
 
-Point pattern analysis is thus concerned with the visualization, description, statistical characerization, and modeling of point patterns, trying to understand the generating process that gives rise and explains the observed data. Common questions in this domain include:
+Point pattern analysis is thus concerned with the visualization, description, statistical characterization, and modeling of point patterns, trying to understand the generating process that gives rise and explains the observed data. Common questions in this domain include:
 
 - *What does the pattern look like?* 
 - *What is the nature of the distribution of points?* 
@@ -58,15 +58,15 @@ In this chapter, we provide an introduction to point patters through geo-tagged 
 
 ## The Tokyo photographs dataset
 
-The rise of new forms of data such as geotagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rethorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, {cite}`Goodchild2007citizens`). In this chapter we will explore metadata from a sample of georeferenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. 
+The rise of new forms of data such as geo-tagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rhetorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, {cite}`Goodchild2007citizens`). In this chapter we will explore metadata from a sample of geo-referenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. 
 
-To get started, let's load the flickr data first:
+To get started, let's load the Flickr data first:
 
 ```python
 db = pandas.read_csv('../data/tokyo/tokyo_clean.csv')
 ```
 
-The table contains the following information about the sample of 10,000 photographs: the ID of the user who took the photo; the location expressed as latitude and longitude columns; a transformed version of those coordinates expressed in Pseudo Mercator; the timestamp when the photo was taken; and the url where the picture they refer to is stored online:
+The table contains the following information about the sample of 10,000 photographs: the ID of the user who took the photo; the location expressed as latitude and longitude columns; a transformed version of those coordinates expressed in Pseudo Mercator; the timestamp when the photo was taken; and the URL where the picture they refer to is stored online:
 
 ```python
 db.info()
@@ -90,9 +90,9 @@ seaborn.jointplot(x='longitude', y='latitude', data=db, s=0.5);
 ```
 
 
-This is a good start: we can see dots tend to be concentrated in the center of the covered area in a very (apparently) not random. Furthermore, within the broad pattern, we can also see there seems to be more localised clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb. 
+This is a good start: we can see dots tend to be concentrated in the center of the covered area in a very (apparently) not random. Furthermore, within the broad pattern, we can also see there seems to be more localized clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb. 
 
-Start with the context. The easiest way to provide additional context is by ovelaying a tile map from the internet. Let us quickly call `contextily` for that, and integrate it with `jointplot`:
+Start with the context. The easiest way to provide additional context is by overlaying a tile map from the internet. Let us quickly call `contextily` for that, and integrate it with `jointplot`:
 
 ```python
 # Generate scatter plot
@@ -114,7 +114,7 @@ Note how we can pull out the axis where the points are plotted and add the basem
 
 Consider our second problem: cluttering. When too many photos are concentrated in some areas of, plotting opaque dots on top of one another can make it hard to discern any pattern and explore its nature. For example, in the middle of the map, towards the right, there appears to be the highest concentration of pictures taken; the sheer amount of dots on the maps in some parts obscures whether all of that area receives as many pics or whether, within there, some places receive a particularly high degree of attention.
 
-One solution to get around cluttering relates to what we referred to earlier as moving from {ref}`"tables to surfaces" <ch03-surfaces_as_tables>`. We can now recast this approach as a *spatial* or *2-dimensional histogram*. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleths may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin 2-d histogram is straightforward in Python using the `hexbin` function:
+One solution to get around cluttering relates to what we referred to earlier as moving from {ref}`"tables to surfaces" <ch03-surfaces_as_tables>`. We can now recast this approach as a *spatial* or *2-dimensional histogram*. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleth maps may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin 2-d histogram is straightforward in Python using the `hexbin` function:
 
 
 ```python
@@ -143,11 +143,11 @@ ax.set_axis_off()
 ```
 
 
-Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localised areas and that the previous map was obscuring this.
+Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localized areas and that the previous map was obscuring this.
 
 ### Kernel Density Estimation (KDE)
 
-Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretisation of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a gaussian kernel in Python is rather straightfoward:
+Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel in Python is rather straightforward:
 
 
 ```python
@@ -174,18 +174,18 @@ ax.set_axis_off()
 ```
 
 
-The result is a smoother output that captures the same structure of the hexbin but "eases" the transitions between different areas. This provides a better generalisation of the theoretical probability that a picture *might* occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares. 
+The result is a smoother output that captures the same structure of the hexbin but "eases" the transitions between different areas. This provides a better generalization of the theoretical probability that a picture *might* occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares. 
 
 
 ## Centrography
 
-Centrography is the analysis of centrality in a point pattern. By "centrality," we mean the general location and dispersion of the pattern. If the hexbin above can be seen as a "spatial histogram", centrography is the point pattern equivalent of measures of central tendency such as the mean. These measures are useful because they allow us to summarise spatial distributions in smaller sets of information (e.g. a single point). Many different indices are used in centrography to provide an indication of "where" a point pattern is, how tightly the point pattern clusters around its center, or how irregular its shape is. 
+Centrography is the analysis of centrality in a point pattern. By "centrality," we mean the general location and dispersion of the pattern. If the hexbin above can be seen as a "spatial histogram", centrography is the point pattern equivalent of measures of central tendency such as the mean. These measures are useful because they allow us to summarize spatial distributions in smaller sets of information (e.g. a single point). Many different indices are used in centrography to provide an indication of "where" a point pattern is, how tightly the point pattern clusters around its center, or how irregular its shape is. 
 
 
 
 ### Tendency
 
-A common measure of central tendency for a point pattern is its *center of mass*. For marked point patterns, the center of mass identifies a central point close to observations that have higher values in their marked attribute. For unmarked point patterns, the center of mass is equivalent to the *mean center*, or average of the coordinate values. In addition, the *median center* is analogous to the *median* elsewhere, and represents a point where half of the data is above or below the point & half is to its left or right. We can analyze the mean center with our flickr point pattern using the `pointpats` package in Python. 
+A common measure of central tendency for a point pattern is its *center of mass*. For marked point patterns, the center of mass identifies a central point close to observations that have higher values in their marked attribute. For unmarked point patterns, the center of mass is equivalent to the *mean center*, or average of the coordinate values. In addition, the *median center* is analogous to the *median* elsewhere, and represents a point where half of the data is above or below the point & half is to its left or right. We can analyze the mean center with our Flickr point pattern using the `pointpats` package in Python. 
 
 
 ```python
@@ -244,7 +244,7 @@ A measure of dispersion that is common in centrography is the *standard distance
 ```python
 centrography.std_distance(db[['x','y']])
 ```
-This means that, on average, pictures are taken around 8800 metres away from the mean center. 
+This means that, on average, pictures are taken around 8800 meters away from the mean center. 
 
 Another helpful visualization is the *standard deviational ellipse*, or *standard ellipse*. This is an ellipse drawn from the data that reflects both its center and dispersion. To visualize this, we first compute the axes and rotation using the `ellipse` function in `pointpats`:
 
@@ -289,7 +289,7 @@ plt.show()
 
 The last collection of centrography measures we will discuss characterizes the extent of a point cloud. Four shapes are useful, and reflect varying levels of how "tightly" they bind the pattern. 
 
-Below, we'll walk through how to construct each example and visualize them at the end. To make things more clear, we'll use the flickr photos for the most prolific user in the dataset (ID: `95795770`) to show how different these results can be.
+Below, we'll walk through how to construct each example and visualize them at the end. To make things more clear, we'll use the Flickr photos for the most prolific user in the dataset (ID: `95795770`) to show how different these results can be.
 
 
 ```python
@@ -297,7 +297,7 @@ user = db.query('user_id == "95795770@N00"')
 coordinates = user[['x','y']].values
 ```
 
-First, we'll compute the **convex hull**, which is the tighest *convex* shape that encloses the user's photos. By *convex*, we mean that the shape never "doubles back" on itself; it has no divets, valleys, crenelations, or holes. All of its interior angles are smaller than 180 degrees.  This is computed using the `centrography.hull` method.
+First, we'll compute the **convex hull**, which is the tightest *convex* shape that encloses the user's photos. By *convex*, we mean that the shape never "doubles back" on itself; it has no divets, valleys, crenelations, or holes. All of its interior angles are smaller than 180 degrees.  This is computed using the `centrography.hull` method.
 
 
 ```python
@@ -399,7 +399,7 @@ Finally, the **minimum bounding circle** is the smallest circle that can be draw
 (center_x, center_y), radius = centrography.minimum_bounding_circle(coordinates)
 ```
 
-Now, to visualize these, we'll convert the raw vertices into matplotlib patches: 
+Now, to visualize these, we'll convert the raw vertices into `matplotlib` patches: 
 
 
 ```python
@@ -505,7 +505,7 @@ The first set of techniques, **quadrat** statistics, receive their name after th
 from pointpats import distance_statistics, QStatistic, random, PointPattern
 ```
 
-For the purposes of illustration, it also helps to provide a pattern derived from a known *completely spatially random* process. That is, the location and number of points is totally random; there is neither clustering nor dispersion. In point pattern analysis, this is known as a *poisson point process*. 
+For the purposes of illustration, it also helps to provide a pattern derived from a known *completely spatially random* process. That is, the location and number of points is totally random; there is neither clustering nor dispersion. In point pattern analysis, this is known as a *Poisson point process*. 
 
 To simulate these processes from a given point set, you can use the `pointpats.random` module. 
 
@@ -562,7 +562,7 @@ qstat.plot()
 ```
 
 
-In this case, for the default of a three by three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small p-value:
+In this case, for the default of a three by three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer Flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small p-value:
 
 
 ```python
@@ -603,7 +603,7 @@ Thus, quadrat counts can have issues with irregular study areas, and care should
 
 The second group of spatial statistics we consider focuses on the distributions of two quantities in a point pattern: nearest neighbor distances and what we will term "gaps" in the pattern. They derive from seminal work by {cite}`Ripley1991` on how to characterize clustering or co-location in point patterns. Each of these characterize an aspect of the point pattern as we increase the distance range from each point to calculate them. 
 
-The first function, Ripley's $G$, focuses on the distribution of nearest neighbor distances. That is, the $G$ function summarises the distances between each point in the pattern and their nearest neighbor. In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are *mutual* nearest neighbors (and so have arrows going in both directions) but some are not. 
+The first function, Ripley's $G$, focuses on the distribution of nearest neighbor distances. That is, the $G$ function summarizes the distances between each point in the pattern and their nearest neighbor. In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are *mutual* nearest neighbors (and so have arrows going in both directions) but some are not. 
 
 
 ```python tags=["hide-input"]
@@ -639,7 +639,7 @@ plt.show()
 ```
 
 
-Ripley's $G$ keeps track of the proportion of points for which the nearest neighbor is within a given distance threshold, and plots that cumulative percentage against the increasing distance radiuses. The distribution of these cumulative percentage has a distinctive shape under completely spatially random processes. The intuition behind Ripley's G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the cumulative distribution of nearest neighbor distances over increasing distance thresholds, and comparing it to that of a set of simulated patterns that follow a known spatially-random process. Usually, a spatial Poisson point process is used as such reference distribution. 
+Ripley's $G$ keeps track of the proportion of points for which the nearest neighbor is within a given distance threshold, and plots that cumulative percentage against the increasing distance radii. The distribution of these cumulative percentage has a distinctive shape under completely spatially random processes. The intuition behind Ripley's G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the cumulative distribution of nearest neighbor distances over increasing distance thresholds, and comparing it to that of a set of simulated patterns that follow a known spatially-random process. Usually, a spatial Poisson point process is used as such reference distribution. 
 
 To do this in the `pointpats` package, we can use the `g_test` function, which computes both the `G` function for the empirical data *and* these hypothetical replications under a completely spatially random process.
 
@@ -654,7 +654,7 @@ Thinking about these distributions of distances, a "clustered" pattern must have
 
 We can visualize this below. On the left, we plot the $G(d)$ function, with distance-to-point ($d$) on the horizontal axis and the fraction of nearest neighbor distances smaller than $d$ on the right axis. In red, the empirical cumulative distribution of nearest neighbor distances is shown. In blue, simulations (like the `random` pattern shown in the previous section) are shown. The bright blue line represents the average of all simulations, and the darker blue/black band around it represents the middle 95% of simulations. 
 
-In this plot, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user's flickr photographs are *closer* to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is *clustered.*
+In this plot, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user's Flickr photographs are *closer* to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is *clustered.*
 
 
 ```python tags=["hide-input"]
@@ -751,10 +751,10 @@ From the many spatial point clustering algorithms, we will cover one called DBSC
 From the point of view of DBSCAN, a cluster is a concentration of at least `m` points, each of them within a distance of `r` of at least another point in the cluster. Following this definition, the algorithm classifies each point in our pattern into three categories:
 
 * *Noise*, for those points outside a cluster.
-* *Cores*, for those points inside a cluster whith at least `m` points in the cluster within distance `r`.
+* *Cores*, for those points inside a cluster with at least `m` points in the cluster within distance `r`.
 * *Borders* for points inside a cluster with less than `m` other points in the cluster within distance `r`.
 
-The flexibility (but also some of the limitations) of the algorithm resides in that both `m` and `r` need to be prespecified by the user before running DBSCAN. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing `DBSCAN` in Python:
+The flexibility (but also some of the limitations) of the algorithm resides in that both `m` and `r` need to be specified by the user before running DBSCAN. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing `DBSCAN` in Python:
 
 
 ```python
@@ -785,7 +785,7 @@ The labels object always has the same length as the number of points used to run
 lbls = pandas.Series(clusterer.labels_, index=db.index)
 ```
 
-Now we already have the clusters, we can proceed to visualize them. There are many ways in which this can be done. We will start just by coloring points in a cluster in red and noise in grey:
+Now we already have the clusters, we can proceed to visualize them. There are many ways in which this can be done. We will start just by coloring points in a cluster in red and noise in gray:
 
 
 ```python
@@ -816,7 +816,7 @@ plt.show()
 
 Although informative, the result of this run is not particularly satisfactory. There are *way* too many points that are classified as "noise".
 
-This is because we have run DBSCAN with the default parameters: a radious of 0.5 and a minimum of five points per cluster. Since our data is expressed in metres, a radius of half a metre will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs. 
+This is because we have run DBSCAN with the default parameters: a radius of 0.5 and a minimum of five points per cluster. Since our data is expressed in meters, a radius of half a meter will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs. 
 
 If we change those parameters, can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:
 
@@ -826,7 +826,7 @@ If we change those parameters, can pick up more general patterns. For example, l
 minp = numpy.round(db.shape[0] * 0.01)
 minp
 ```
-At the same time, let us expand the maximum radious to say, 500 metres. Then we can re-run the algorithm and plot the output, all in the same cell this time:
+At the same time, let us expand the maximum radius to say, 500 meters. Then we can re-run the algorithm and plot the output, all in the same cell this time:
 
 
 ```python
@@ -865,7 +865,7 @@ plt.show()
 
 ## Conclusion
 
-Overall, this chapter has provided an overview of methods to analyze point patterns. We have begun our point journey by visualising their location and learning way to overcome the "cluttering" challenge that large point patterns present us with. From graphical display, we have moved to statistical characterisation of their spatial distribution. In this context, we have learnt about  central tendency dispersion and extent, and we have positioned these measures as the point pattern counterparts of traditional statistics such as the mean or the standard deviation. These measures provide a summary of an entire pattern, but tell us little about the spatial organisation of each point. To that end, we have introduced the quadrat and Ripley's functions. These statistical devices help us in characterising whether a point pattern is spatially clustered or dispersed. We have wrapped up the chapter going one step further and exploring methods to identify the location of clusters: areas of the map with high density of points. Taken altogether, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about point patterns that represent widely varied phenomena in the world, from the location where photographs where taken to the distribution of bird nests, to the clustering of bike crashes in a city.
+Overall, this chapter has provided an overview of methods to analyze point patterns. We have begun our point journey by visualizing their location and learning way to overcome the "cluttering" challenge that large point patterns present us with. From graphical display, we have moved to statistical characterization of their spatial distribution. In this context, we have learned about  central tendency dispersion and extent, and we have positioned these measures as the point pattern counterparts of traditional statistics such as the mean or the standard deviation. These measures provide a summary of an entire pattern, but tell us little about the spatial organization of each point. To that end, we have introduced the quadrat and Ripley's functions. These statistical devices help us in characterizing whether a point pattern is spatially clustered or dispersed. We have wrapped up the chapter going one step further and exploring methods to identify the location of clusters: areas of the map with high density of points. Taken altogether, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about point patterns that represent widely varied phenomena in the world, from the location where photographs where taken to the distribution of bird nests, to the clustering of bike crashes in a city.
 
 
 
@@ -875,6 +875,6 @@ Overall, this chapter has provided an overview of methods to analyze point patte
 2. Kernel Density Estimation (KDE) gets around the need to partition space in "buckets" to count points inside each of them. But, can you think of the limitations of applying this technique? To explore them, reproduce the KDE figure in the chapter, but change the arguments of the type of kernel (`kernel`) and the size of the bandwidth (`bw`). Consult the documentation of `seaborn.kdeplot` to learn what each of them controls. What happens when the bandwidth is very small? How does that relate to the number of bins in the hexbin plot?
 3. Given a hypothetical point pattern, what characteristics would it need to meet for the mean and median centers to coincide? 
 4. Using `libpysal.cg.alpha_shape`, plot what happens to the alpha hull for $\alpha = 0,.2,.4,.6,.8,1,1.5,2,4$. What happens as `alpha` increases?
-5. The choice of extent definition you adopt may influence your final results significantly. To further internalise this realisation, compute the density of photographs in the example we have seen using each of the extent definitions covered (minimum bounding/rotate circle/rectangle, convex hull and alpha shape). Remember the density can be obtained by dividing the number of photographs by the area of the extent.
+5. The choice of extent definition you adopt may influence your final results significantly. To further internalize this realization, compute the density of photographs in the example we have seen using each of the extent definitions covered (minimum bounding/rotate circle/rectangle, convex hull and alpha shape). Remember the density can be obtained by dividing the number of photographs by the area of the extent.
 6. Given the discussions in question 1 and 2, how do you think the density of quadrants affect quadrat statistics?
 7. Can you use information from Ripley's functions to inform the choice of DBSCAN parameters? How? Use the example with Tokyo photographs covered above to illustrate your ideas.
