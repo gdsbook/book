@@ -454,7 +454,7 @@
 <h1>Spatial Data<a class="headerlink" href="#spatial-data" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">osmnx</span>
 <span class="kn">import</span> <span class="nn">geopandas</span>
 <span class="kn">import</span> <span class="nn">rioxarray</span>
@@ -480,7 +480,7 @@
 <p>To understand the structure of geographic tables, it will help to read in the <code class="docutils literal notranslate"><span class="pre">countries_clean.gpkg</span></code> dataset included in this book that describes countries in the world. To read in this data, we can use the <code class="docutils literal notranslate"><span class="pre">read_file()</span></code> method in <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>:^[We will generally use two curved brackets (such as <code class="docutils literal notranslate"><span class="pre">method_name()</span></code>) to denote a <em>function</em>, and will omit them (such as <code class="docutils literal notranslate"><span class="pre">package</span></code>) when referring to an object or package.]</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/countries/countries_clean.gpkg&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/countries/countries_clean.gpkg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -488,16 +488,73 @@
 <p>And we can examine the top of the table with the <code class="docutils literal notranslate"><span class="pre">.head()</span></code> method:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ADMIN</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Indonesia</td>
+      <td>MULTIPOLYGON (((13102705.696 463877.598, 13102...</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Malaysia</td>
+      <td>MULTIPOLYGON (((13102705.696 463877.598, 13101...</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Chile</td>
+      <td>MULTIPOLYGON (((-7737827.685 -1979875.500, -77...</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Bolivia</td>
+      <td>POLYGON ((-7737827.685 -1979875.500, -7737828....</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Peru</td>
+      <td>MULTIPOLYGON (((-7737827.685 -1979875.500, -77...</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>Each row of this table is a single country. Each country only has two features: the administrative name of the country and the geometry of the country’s boundary. The name of the country is encoded in the <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code> column using the Python <code class="docutils literal notranslate"><span class="pre">str</span></code> type, which is used to store text-based data. The geometry of the country’s boundary is stored in the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column, and is encoded using a special class in Python that is used to represent geometric objects. As with other table-based data structures in Python, every row and column have an index that identifies them uniquely and is rendered in bold on the lefthand side of the table. This geographic table is an instance of the <code class="docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code> object, used throughout Python’s ecosystem to represent geographic data.</p>
 <p>Geographic tables store geographic information as an additional column. But, how is this information encoded? To see, we can check the type of the object in the first row:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>shapely.geometry.multipolygon.MultiPolygon
 </pre></div>
 </div>
 </div>
@@ -505,16 +562,22 @@
 <p>In <code class="docutils literal notranslate"><span class="pre">geopandas</span></code> (as well as other packages representing geographic data), the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column has special traits which a “normal” column, such as <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code>, does not. For example, when we plot the dataframe, the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column is used as the main shape to use in the plot:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_10_1.png" src="../_images/03_spatial_data_10_1.png" />
 </div>
 </div>
 <p>Changing geometries must be done carefully: since the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column is special, there are special functions to adjust the geometry. For example, if we wanted to represent each country using its <em>centroid</em>, a point in the middle of the shape, then we must take care to make sure that a new geometry column was set properly using the <code class="docutils literal notranslate"><span class="pre">set_geometry()</span></code> method. This can be useful when you want to work with two different geometric representations of the same underlying sample.</p>
 <p>Let us make a map of both the boundary and the centroid of a country. First, to compute the centroid, we can use the <code class="docutils literal notranslate"><span class="pre">gt_polygons.geometry.centroid</span></code> property. This gives us the point that minimizes the average distance from all other points on the boundary of the shape. Storing that back to a column, called <code class="docutils literal notranslate"><span class="pre">centroid</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="p">[</span><span class="s1">&#39;centroid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gt_polygons</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="p">[</span><span class="s1">&#39;centroid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gt_polygons</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">centroid</span>
 </pre></div>
 </div>
 </div>
@@ -522,15 +585,73 @@
 <p>We now have an additional feature:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ADMIN</th>
+      <th>geometry</th>
+      <th>centroid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Indonesia</td>
+      <td>MULTIPOLYGON (((13102705.696 463877.598, 13102...</td>
+      <td>POINT (13055431.810 -248921.141)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Malaysia</td>
+      <td>MULTIPOLYGON (((13102705.696 463877.598, 13101...</td>
+      <td>POINT (12211696.493 422897.505)</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Chile</td>
+      <td>MULTIPOLYGON (((-7737827.685 -1979875.500, -77...</td>
+      <td>POINT (-7959811.948 -4915458.802)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Bolivia</td>
+      <td>POLYGON ((-7737827.685 -1979875.500, -7737828....</td>
+      <td>POINT (-7200010.945 -1894653.148)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>Peru</td>
+      <td>MULTIPOLYGON (((-7737827.685 -1979875.500, -77...</td>
+      <td>POINT (-8277554.831 -1032942.536)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>Despite the fact that <code class="docutils literal notranslate"><span class="pre">centroid</span></code> is a geometry, it is not currently set as the geometry for our table. We can switch to the <code class="docutils literal notranslate"><span class="pre">centroid</span></code> column using the <code class="docutils literal notranslate"><span class="pre">set_geometry()</span></code> method. Finally, we can plot the centroid and the boundary of each country by switching the geometry column with <code class="docutils literal notranslate"><span class="pre">set_geometry</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot centroids</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot centroids</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">gt_polygons</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s1">&#39;centroid&#39;</span><span class="p">)</span>\
                 <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;ADMIN&#39;</span><span class="p">,</span> 
                       <span class="n">markersize</span><span class="o">=</span><span class="mi">5</span>
@@ -545,43 +666,126 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_16_1.png" src="../_images/03_spatial_data_16_1.png" />
+</div>
 </div>
 <p>Note how we can create a map by calling <code class="docutils literal notranslate"><span class="pre">.plot()</span></code> on a <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>. We can thematically color each feature based on a column by passing the name of that column to the plot method (as we do on with <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code> in this case).</p>
 <p>Thus, as should now be clear, nearly any kind of geographic object can be represented in one (or more) geometry column(s). Thinking about the number of different kinds of shapes or geometries one could draw quickly boggles the mind. Fortunately the Open Geospatial Consortium (OGC) has defined a set of “abstract” types that can be used to define any kind of geometry. This specification, codified in ISO 19125-1—the “simple features” specification—defines the formal relationships between these types: a <code class="docutils literal notranslate"><span class="pre">Point</span></code> is a zero-dimensional location with an x and y coordinate; a <code class="docutils literal notranslate"><span class="pre">LineString</span></code> is a path composed of a set of more than one <code class="docutils literal notranslate"><span class="pre">Point</span></code>, and a <code class="docutils literal notranslate"><span class="pre">Polygon</span></code> is a surface that has at least one LineString that starts and stops with the same coordinate. All of these types <em>also</em> have <code class="docutils literal notranslate"><span class="pre">Multi</span></code> variants that indicate a collection of multiple geometries of the same type. So, for instance, Bolivia is represented as a single polygon:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Bolivia&quot;&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Bolivia&quot;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ADMIN</th>
+      <th>geometry</th>
+      <th>centroid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>3</th>
+      <td>Bolivia</td>
+      <td>POLYGON ((-7737827.685 -1979875.500, -7737828....</td>
+      <td>POINT (-7200010.945 -1894653.148)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Bolivia&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Bolivia&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/03_spatial_data_19_0.png" src="../_images/03_spatial_data_19_0.png" />
 </div>
 </div>
 <p>while Indonesia is a <code class="docutils literal notranslate"><span class="pre">MultiPolygon</span></code> containing many <code class="docutils literal notranslate"><span class="pre">Polygons</span></code> for each individual island in the country:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Indonesia&quot;&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Indonesia&quot;&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ADMIN</th>
+      <th>geometry</th>
+      <th>centroid</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Indonesia</td>
+      <td>MULTIPOLYGON (((13102705.696 463877.598, 13102...</td>
+      <td>POINT (13055431.810 -248921.141)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Indonesia&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Indonesia&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_22_1.png" src="../_images/03_spatial_data_22_1.png" />
 </div>
 </div>
 <p>In many cases, geographic tables will have geometries of a single type; records will <em>all</em> be <code class="docutils literal notranslate"><span class="pre">Point</span></code> or <code class="docutils literal notranslate"><span class="pre">LineString</span></code>, for instance. However, there is no formal requirement that a <em>geographic table</em> has geometries that all have the same type.</p>
 <p>Throughout this book, we will use geographic tables extensively, storing polygons, but also points and lines. We will explore lines a bit more in the second part of this chapter but, for now, let us stop on points for a second. As mentioned above, these are the simplest type of feature in that they do not have any dimension, only a pair of coordinates attached to them. This means that points can sometimes be stored in a non-geographic table, simply using one column for each coordinate. We find an example of this on the Tokyo dataset we will use more later. The data is stored as a comma-separated value table, or <code class="docutils literal notranslate"><span class="pre">.csv</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/tokyo/tokyo_clean.csv&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;../data/tokyo/tokyo_clean.csv&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -589,7 +793,12 @@
 <p>Since we have read it with <code class="docutils literal notranslate"><span class="pre">pandas</span></code>, the table is loaded as a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>, with no explicit spatial dimension:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">gt_points</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">gt_points</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>pandas.core.frame.DataFrame
 </pre></div>
 </div>
 </div>
@@ -597,10 +806,92 @@
 <p>If we inspect the table, we find there is not a <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user_id</th>
+      <th>longitude</th>
+      <th>latitude</th>
+      <th>date_taken</th>
+      <th>photo/video_page_url</th>
+      <th>x</th>
+      <th>y</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>10727420@N00</td>
+      <td>139.700499</td>
+      <td>35.674000</td>
+      <td>2010-04-09 17:26:25.0</td>
+      <td>http://www.flickr.com/photos/10727420@N00/4545...</td>
+      <td>1.555139e+07</td>
+      <td>4.255856e+06</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8819274@N04</td>
+      <td>139.766521</td>
+      <td>35.709095</td>
+      <td>2007-02-10 16:08:40.0</td>
+      <td>http://www.flickr.com/photos/8819274@N04/26503...</td>
+      <td>1.555874e+07</td>
+      <td>4.260667e+06</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>62068690@N00</td>
+      <td>139.765632</td>
+      <td>35.694482</td>
+      <td>2008-12-21 15:45:31.0</td>
+      <td>http://www.flickr.com/photos/62068690@N00/3125...</td>
+      <td>1.555864e+07</td>
+      <td>4.258664e+06</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>49503094041@N01</td>
+      <td>139.784391</td>
+      <td>35.548589</td>
+      <td>2011-11-11 05:48:54.0</td>
+      <td>http://www.flickr.com/photos/49503094041@N01/6...</td>
+      <td>1.556073e+07</td>
+      <td>4.238684e+06</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>40443199@N00</td>
+      <td>139.768753</td>
+      <td>35.671521</td>
+      <td>2006-04-06 16:42:49.0</td>
+      <td>http://www.flickr.com/photos/40443199@N00/2482...</td>
+      <td>1.555899e+07</td>
+      <td>4.255517e+06</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>Many point datasets are provided in this format. To make the most of them, it is convenient to convert them into <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code> tables. There are two steps involved in this process:</p>
 <ol class="simple">
@@ -608,7 +899,7 @@
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pt_geoms</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">gt_points</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">],</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pt_geoms</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">gt_points</span><span class="p">[</span><span class="s2">&quot;longitude&quot;</span><span class="p">],</span>
                                     <span class="n">y</span><span class="o">=</span><span class="n">gt_points</span><span class="p">[</span><span class="s2">&quot;latitude&quot;</span><span class="p">],</span>
                                     <span class="n">crs</span><span class="o">=</span><span class="s2">&quot;EPSG:4326&quot;</span>
                                    <span class="p">)</span>
@@ -621,7 +912,7 @@
 </ol>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">gt_points</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">gt_points</span><span class="p">,</span>
                                    <span class="n">geometry</span><span class="o">=</span><span class="n">pt_geoms</span>
                                   <span class="p">)</span>
 </pre></div>
@@ -631,10 +922,98 @@
 <p>And now <code class="docutils literal notranslate"><span class="pre">gt_points</span></code> looks and feels exactly like the one of countries we have seen before, with the difference the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column stores <code class="docutils literal notranslate"><span class="pre">POINT</span></code> geometries:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>user_id</th>
+      <th>longitude</th>
+      <th>latitude</th>
+      <th>date_taken</th>
+      <th>photo/video_page_url</th>
+      <th>x</th>
+      <th>y</th>
+      <th>geometry</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>10727420@N00</td>
+      <td>139.700499</td>
+      <td>35.674000</td>
+      <td>2010-04-09 17:26:25.0</td>
+      <td>http://www.flickr.com/photos/10727420@N00/4545...</td>
+      <td>1.555139e+07</td>
+      <td>4.255856e+06</td>
+      <td>POINT (139.70050 35.67400)</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>8819274@N04</td>
+      <td>139.766521</td>
+      <td>35.709095</td>
+      <td>2007-02-10 16:08:40.0</td>
+      <td>http://www.flickr.com/photos/8819274@N04/26503...</td>
+      <td>1.555874e+07</td>
+      <td>4.260667e+06</td>
+      <td>POINT (139.76652 35.70909)</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>62068690@N00</td>
+      <td>139.765632</td>
+      <td>35.694482</td>
+      <td>2008-12-21 15:45:31.0</td>
+      <td>http://www.flickr.com/photos/62068690@N00/3125...</td>
+      <td>1.555864e+07</td>
+      <td>4.258664e+06</td>
+      <td>POINT (139.76563 35.69448)</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>49503094041@N01</td>
+      <td>139.784391</td>
+      <td>35.548589</td>
+      <td>2011-11-11 05:48:54.0</td>
+      <td>http://www.flickr.com/photos/49503094041@N01/6...</td>
+      <td>1.556073e+07</td>
+      <td>4.238684e+06</td>
+      <td>POINT (139.78439 35.54859)</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>40443199@N00</td>
+      <td>139.768753</td>
+      <td>35.671521</td>
+      <td>2006-04-06 16:42:49.0</td>
+      <td>http://www.flickr.com/photos/40443199@N00/2482...</td>
+      <td>1.555899e+07</td>
+      <td>4.255517e+06</td>
+      <td>POINT (139.76875 35.67152)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 </div>
 <div class="section" id="surfaces">
@@ -643,7 +1022,7 @@
 <p>To explore how Python represents surfaces, we will use an extract for the Brazillian city of Sao Paulo of a <a class="reference internal" href="../data/ghsl/build_ghsl_extract.html"><span class="doc std std-doc">global population dataset</span></a>. This dataset records population counts in cells of the same dimensions uniformly covering the surface of the Earth. Our extract is available as a GeoTIF file, a variation of the TIF image format that includes geographic information. We can use the <code class="docutils literal notranslate"><span class="pre">open_rasterio()</span></code> method from the <code class="docutils literal notranslate"><span class="pre">xarray</span></code> package to read in the GeoTIF:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/ghsl/ghsl_sao_paulo.tif&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/ghsl/ghsl_sao_paulo.tif&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -651,7 +1030,12 @@
 <p>This reads the data into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>xarray.core.dataarray.DataArray
 </pre></div>
 </div>
 </div>
@@ -659,7 +1043,15 @@
 <p><code class="docutils literal notranslate"><span class="pre">xarray</span></code> is a package to work with multi-dimensional labelled arrays. Let’s unpack this: we can use arrays of not only two dimensions as in a table with rows and columns, but with an arbitrary number of them; each of these dimensions are “tracked” by an index that makes it easy and efficient to manipulate. In <code class="docutils literal notranslate"><span class="pre">xarray</span></code>, these indices are called coordinates, and they can be retrieved from our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> through the <code class="docutils literal notranslate"><span class="pre">coords</span></code> attribute:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">coords</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">coords</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Coordinates:
+  * band     (band) int64 1
+  * y        (y) float64 -2.822e+06 -2.822e+06 ... -2.926e+06 -2.926e+06
+  * x        (x) float64 -4.482e+06 -4.482e+06 ... -4.365e+06 -4.365e+06
 </pre></div>
 </div>
 </div>
@@ -668,7 +1060,20 @@
 <p>An <code class="docutils literal notranslate"><span class="pre">xarray.DataArray</span></code> object contains additional information about the values stored under the <code class="docutils literal notranslate"><span class="pre">attrs</span></code> attribute:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">attrs</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">attrs</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;transform&#39;: (250.0, 0.0, -4482000.0, 0.0, -250.0, -2822000.0),
+ &#39;crs&#39;: &#39;+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs=True&#39;,
+ &#39;res&#39;: (250.0, 250.0),
+ &#39;is_tiled&#39;: 0,
+ &#39;nodatavals&#39;: (-200.0,),
+ &#39;scales&#39;: (1.0,),
+ &#39;offsets&#39;: (0.0,),
+ &#39;AREA_OR_POINT&#39;: &#39;Area&#39;,
+ &#39;grid_mapping&#39;: &#39;spatial_ref&#39;}
 </pre></div>
 </div>
 </div>
@@ -677,7 +1082,12 @@
 <p>Thus, our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> has three dimensions:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">shape</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">shape</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(1, 416, 468)
 </pre></div>
 </div>
 </div>
@@ -685,27 +1095,407 @@
 <p>A common operation will be to reduce this to only the two geographic ones. We can do this with the <code class="docutils literal notranslate"><span class="pre">sel</span></code> operator, which allows us to select data by the value of their coordinates:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray (y: 416, x: 468)&gt;
+[194688 values with dtype=float32]
+Coordinates:
+    band     int64 1
+  * y        (y) float64 -2.822e+06 -2.822e+06 ... -2.926e+06 -2.926e+06
+  * x        (x) float64 -4.482e+06 -4.482e+06 ... -4.365e+06 -4.365e+06
+Attributes:
+    transform:      (250.0, 0.0, -4482000.0, 0.0, -250.0, -2822000.0)
+    crs:            +proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +...
+    res:            (250.0, 250.0)
+    is_tiled:       0
+    nodatavals:     (-200.0,)
+    scales:         (1.0,)
+    offsets:        (0.0,)
+    AREA_OR_POINT:  Area
+    grid_mapping:   spatial_ref</pre><div class='xr-wrap' hidden><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div><ul class='xr-dim-list'><li><span class='xr-has-index'>y</span>: 416</li><li><span class='xr-has-index'>x</span>: 468</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-f14455e5-d412-4ba8-97ee-1b7a84f277f7' class='xr-array-in' type='checkbox' checked><label for='section-f14455e5-d412-4ba8-97ee-1b7a84f277f7' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>...</span></div><div class='xr-array-data'><pre>[194688 values with dtype=float32]</pre></div></div></li><li class='xr-section-item'><input id='section-fcc70923-ece4-43c9-b0f4-e6af2ec1055f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-fcc70923-ece4-43c9-b0f4-e6af2ec1055f' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>band</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-c4f1729c-3d34-44ca-a847-ae5ce52d4adc' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-c4f1729c-3d34-44ca-a847-ae5ce52d4adc' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-551a5fca-4058-4d4e-a991-dd2e72f0c968' class='xr-var-data-in' type='checkbox'><label for='data-551a5fca-4058-4d4e-a991-dd2e72f0c968' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(1)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-2.822e+06 ... -2.926e+06</div><input id='attrs-efa00794-0b35-4474-91e4-8718e7465dd4' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-efa00794-0b35-4474-91e4-8718e7465dd4' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-f2da51fd-e373-4ad4-9447-1013c215ece4' class='xr-var-data-in' type='checkbox'><label for='data-f2da51fd-e373-4ad4-9447-1013c215ece4' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-2822125., -2822375., -2822625., ..., -2925375., -2925625., -2925875.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-4.482e+06 ... -4.365e+06</div><input id='attrs-0ca5944f-a36b-4e1e-b1f3-b1f94ed3402a' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-0ca5944f-a36b-4e1e-b1f3-b1f94ed3402a' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e5fe41e3-c3d5-4c2e-ab95-7bf808e1b908' class='xr-var-data-in' type='checkbox'><label for='data-e5fe41e3-c3d5-4c2e-ab95-7bf808e1b908' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-4481875., -4481625., -4481375., ..., -4365625., -4365375., -4365125.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-8836e2c3-bdab-413d-b12b-eecd6bae3ead' class='xr-section-summary-in' type='checkbox'  checked><label for='section-8836e2c3-bdab-413d-b12b-eecd6bae3ead' class='xr-section-summary' >Attributes: <span>(9)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>transform :</span></dt><dd>(250.0, 0.0, -4482000.0, 0.0, -250.0, -2822000.0)</dd><dt><span>crs :</span></dt><dd>+proj=moll +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs=True</dd><dt><span>res :</span></dt><dd>(250.0, 250.0)</dd><dt><span>is_tiled :</span></dt><dd>0</dd><dt><span>nodatavals :</span></dt><dd>(-200.0,)</dd><dt><span>scales :</span></dt><dd>(1.0,)</dd><dt><span>offsets :</span></dt><dd>(0.0,)</dd><dt><span>AREA_OR_POINT :</span></dt><dd>Area</dd><dt><span>grid_mapping :</span></dt><dd>spatial_ref</dd></dl></div></li></ul></div></div></div></div>
 </div>
 <p>The resulting object is thus a two-dimensional array. Similar to geographic tables, we can quickly plot the values in our dataset:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh at 0x7fcac28c1340&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_48_1.png" src="../_images/03_spatial_data_48_1.png" />
 </div>
 </div>
 <p>This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g. <code class="docutils literal notranslate"><span class="pre">NaN</span></code>) but with an impossible value. If we return to the <code class="docutils literal notranslate"><span class="pre">attrs</span></code> printout above, we can see how the <code class="docutils literal notranslate"><span class="pre">nodatavals</span></code> attribute specifies missing data recorded with -200. With that in mind, we can use the <code class="docutils literal notranslate"><span class="pre">where()</span></code> method to select only values that are <em>not</em> -200:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pop</span><span class="o">!=-</span><span class="mi">200</span><span class="p">)</span>\
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pop</span><span class="o">!=-</span><span class="mi">200</span><span class="p">)</span>\
    <span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
    <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdPu&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh at 0x7fcac1b75c10&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_50_1.png" src="../_images/03_spatial_data_50_1.png" />
 </div>
 </div>
 <p>The colorbar now looks more sensible, and indicates <em>real</em> counts, rather than including the missing data placeholder values.</p>
@@ -717,8 +1507,14 @@
 <p>For illustration, we will rely on the <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> library, which can query data from OpenStreetMap. For example, we extract the street-based graph of Yoyogi Park, near our earlier data from Tokyo:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
 <span class="n">graph</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_from_place</span><span class="p">(</span><span class="s2">&quot;Yoyogi Park, Shibuya, Tokyo, Japan&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 986 ms, sys: 12.5 ms, total: 998 ms
+Wall time: 996 ms
 </pre></div>
 </div>
 </div>
@@ -726,7 +1522,12 @@
 <p>The code snippet above sends the query to the OpenStreetMap server, which returns back the data to <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> to process it into the <code class="docutils literal notranslate"><span class="pre">graph</span></code> Python representation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>networkx.classes.multidigraph.MultiDiGraph
 </pre></div>
 </div>
 </div>
@@ -734,7 +1535,13 @@
 <p>We can have a quick inspection of the structure of the graph with the <code class="docutils literal notranslate"><span class="pre">plot_graph</span></code> method:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">osmnx</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">osmnx</span><span class="o">.</span><span class="n">plot_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/03_spatial_data_56_0.png" src="../_images/03_spatial_data_56_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&lt;Figure size 576x576 with 1 Axes&gt;, &lt;AxesSubplot:&gt;)
 </pre></div>
 </div>
 </div>
@@ -742,7 +1549,12 @@
 <p>The resultant <code class="docutils literal notranslate"><span class="pre">graph</span></code> object is actually a <code class="docutils literal notranslate"><span class="pre">MultiDiGraph</span></code> from <code class="docutils literal notranslate"><span class="pre">networkx</span></code>, a graph library written in Python. The graph here is stored as a collection of 106 nodes (street intersections):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>106
 </pre></div>
 </div>
 </div>
@@ -750,7 +1562,12 @@
 <p>and 287 edges (streets) that connect them:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>287
 </pre></div>
 </div>
 </div>
@@ -758,7 +1575,12 @@
 <p>Each of these elements can be queried to obtain more information such as the location and ID of a node:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1520546819</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1520546819</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;y&#39;: 35.6711267, &#39;x&#39;: 139.6925951, &#39;street_count&#39;: 4}
 </pre></div>
 </div>
 </div>
@@ -766,7 +1588,16 @@
 <p>The characteristics of an edge:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="mi">1520546819</span><span class="p">,</span> <span class="mi">3010293622</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="mi">1520546819</span><span class="p">,</span> <span class="mi">3010293622</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;osmid&#39;: 138670840,
+ &#39;highway&#39;: &#39;footway&#39;,
+ &#39;oneway&#39;: False,
+ &#39;length&#39;: 59.113,
+ &#39;geometry&#39;: &lt;shapely.geometry.linestring.LineString at 0x7fcac1f54ee0&gt;}
 </pre></div>
 </div>
 </div>
@@ -774,7 +1605,12 @@
 <p>Or how the different components of the graph relate to each other. For example, what other nodes are directly connected to node <code class="docutils literal notranslate"><span class="pre">1520546819</span></code>?</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">adj</span><span class="p">[</span><span class="mi">1520546819</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">adj</span><span class="p">[</span><span class="mi">1520546819</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[3010293622, 5764960322, 1913626649, 1520546959]
 </pre></div>
 </div>
 </div>
@@ -795,7 +1631,7 @@
 <p>Technically, going from surface to table involves traversing from <code class="docutils literal notranslate"><span class="pre">xarray</span></code> to <code class="docutils literal notranslate"><span class="pre">pandas</span></code> objects. This is actually a well established bridge. To illustrate it with a example, let’s revisit the [population counts in <a class="reference internal" href="../data/ghsl/build_ghsl_extract.html"><span class="doc std std-doc">Sao Paulo</span></a> used earlier. We can read the surface into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object with the <code class="docutils literal notranslate"><span class="pre">open_rasterio()</span></code> method:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">surface</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/ghsl/ghsl_sao_paulo.tif&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">surface</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/ghsl/ghsl_sao_paulo.tif&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -803,7 +1639,7 @@
 <p>Transferring to a table is as simple as calling the <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>’s <code class="docutils literal notranslate"><span class="pre">to_series()</span></code> method:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span> <span class="o">=</span> <span class="n">surface</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span> <span class="o">=</span> <span class="n">surface</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -811,7 +1647,18 @@
 <p>The resulting object is a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> object indexed on each of the dimensions of the original <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>band  y           x         
+1     -2822125.0  -4481875.0   -200.0
+                  -4481625.0   -200.0
+                  -4481375.0   -200.0
+                  -4481125.0   -200.0
+                  -4480875.0   -200.0
+dtype: float32
 </pre></div>
 </div>
 </div>
@@ -819,7 +1666,7 @@
 <p>At this point, everything we know about <code class="docutils literal notranslate"><span class="pre">pandas</span></code> and tabular data applies! For example, it might be more convenient to express it as a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span> <span class="o">=</span> <span class="n">t_surface</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Value&quot;</span><span class="p">})</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span> <span class="o">=</span> <span class="n">t_surface</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Value&quot;</span><span class="p">})</span>
 </pre></div>
 </div>
 </div>
@@ -827,7 +1674,22 @@
 <p>With the power of a tabular library, some queries and filter operations become much easier. For example, finding cells with more than 1,000 people can be done with the usual <code class="docutils literal notranslate"><span class="pre">query()</span></code> method^[Although, if all you want to do is this type of query, <code class="docutils literal notranslate"><span class="pre">xarray</span></code> is well equiped for this kind of task too.]:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Value &gt; 1000&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t_surface</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Value &gt; 1000&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+Int64Index: 7734 entries, 3785 to 181296
+Data columns (total 4 columns):
+ #   Column  Non-Null Count  Dtype  
+---  ------  --------------  -----  
+ 0   band    7734 non-null   int64  
+ 1   y       7734 non-null   float64
+ 2   x       7734 non-null   float64
+ 3   Value   7734 non-null   float32
+dtypes: float32(1), float64(2), int64(1)
+memory usage: 271.9 KB
 </pre></div>
 </div>
 </div>
@@ -835,7 +1697,7 @@
 <p>The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a fully-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a simple function that takes a row from our table and the resolution of the surface, and returns its geometry:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">row2cell</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">res_xy</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">row2cell</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">res_xy</span><span class="p">):</span>
     <span class="n">res_x</span><span class="p">,</span> <span class="n">res_y</span> <span class="o">=</span> <span class="n">res_xy</span>
     <span class="n">minX</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span>
     <span class="n">maxX</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">res_x</span>
@@ -850,15 +1712,17 @@
 <p>For example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">row2cell</span><span class="p">(</span><span class="n">t_surface</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">surface</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;res&quot;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">row2cell</span><span class="p">(</span><span class="n">t_surface</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="n">surface</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;res&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/03_spatial_data_80_0.svg" src="../_images/03_spatial_data_80_0.svg" /></div>
 </div>
 <p>One of the benefits of this approach is we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">max_polys</span> <span class="o">=</span> <span class="n">t_surface</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Value &gt; 1000&quot;</span><span class="p">)</span>\
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">max_polys</span> <span class="o">=</span> <span class="n">t_surface</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;Value &gt; 1000&quot;</span><span class="p">)</span>\
                      <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">row2cell</span><span class="p">,</span> 
                             <span class="n">res_xy</span><span class="o">=</span><span class="n">surface</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;res&quot;</span><span class="p">],</span> 
                             <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
@@ -871,7 +1735,7 @@
 <p>And generate a map with the same tooling that we use for any standard geo-table:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">max_polys</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">max_polys</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> 
                     <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
                    <span class="p">)</span>
 <span class="n">cx</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> 
@@ -881,17 +1745,390 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/03_spatial_data_84_0.png" src="../_images/03_spatial_data_84_0.png" />
+</div>
 </div>
 <p>Finally, once we have operated on the data as a table, we may want to return to a surface-like data structure. This involves taking the same journey in the oposite direction as how we started. The sister method of <code class="docutils literal notranslate"><span class="pre">to_series</span></code> in <code class="docutils literal notranslate"><span class="pre">xarray</span></code> is <code class="docutils literal notranslate"><span class="pre">from_series</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_da</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span><span class="o">.</span><span class="n">from_series</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_da</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">DataArray</span><span class="o">.</span><span class="n">from_series</span><span class="p">(</span>
     <span class="n">t_surface</span><span class="o">.</span><span class="n">set_index</span><span class="p">([</span><span class="s2">&quot;band&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">])[</span><span class="s2">&quot;Value&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="n">new_da</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray &#x27;Value&#x27; (band: 1, y: 416, x: 468)&gt;
+array([[[-200., -200., -200., ..., -200., -200., -200.],
+        [-200., -200., -200., ..., -200., -200., -200.],
+        [-200., -200., -200., ..., -200., -200., -200.],
+        ...,
+        [-200., -200., -200., ..., -200., -200., -200.],
+        [-200., -200., -200., ..., -200., -200., -200.],
+        [-200., -200., -200., ..., -200., -200., -200.]]], dtype=float32)
+Coordinates:
+  * band     (band) int64 1
+  * y        (y) float64 -2.926e+06 -2.926e+06 ... -2.822e+06 -2.822e+06
+  * x        (x) float64 -4.482e+06 -4.482e+06 ... -4.365e+06 -4.365e+06</pre><div class='xr-wrap' hidden><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'>'Value'</div><ul class='xr-dim-list'><li><span class='xr-has-index'>band</span>: 1</li><li><span class='xr-has-index'>y</span>: 416</li><li><span class='xr-has-index'>x</span>: 468</li></ul></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-11cbae15-4c6e-4d84-8403-3426d8c17ec8' class='xr-array-in' type='checkbox' checked><label for='section-11cbae15-4c6e-4d84-8403-3426d8c17ec8' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>-200.0 -200.0 -200.0 -200.0 -200.0 ... -200.0 -200.0 -200.0 -200.0</span></div><div class='xr-array-data'><pre>array([[[-200., -200., -200., ..., -200., -200., -200.],
+        [-200., -200., -200., ..., -200., -200., -200.],
+        [-200., -200., -200., ..., -200., -200., -200.],
+        ...,
+        [-200., -200., -200., ..., -200., -200., -200.],
+        [-200., -200., -200., ..., -200., -200., -200.],
+        [-200., -200., -200., ..., -200., -200., -200.]]], dtype=float32)</pre></div></div></li><li class='xr-section-item'><input id='section-814cdae8-5564-4363-9efb-3e56d18f6da5' class='xr-section-summary-in' type='checkbox'  checked><label for='section-814cdae8-5564-4363-9efb-3e56d18f6da5' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>band</span></div><div class='xr-var-dims'>(band)</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-3c67ca1d-4886-4d3f-9f56-4026882deaca' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-3c67ca1d-4886-4d3f-9f56-4026882deaca' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4afee1ee-ea4b-4d2c-a5af-0659f8cdeb2f' class='xr-var-data-in' type='checkbox'><label for='data-4afee1ee-ea4b-4d2c-a5af-0659f8cdeb2f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([1])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>y</span></div><div class='xr-var-dims'>(y)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-2.926e+06 ... -2.822e+06</div><input id='attrs-bc9b7a12-2575-40be-89d2-b3585539709e' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-bc9b7a12-2575-40be-89d2-b3585539709e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-86f94ad5-f2d3-4835-b3d6-b066814375f0' class='xr-var-data-in' type='checkbox'><label for='data-86f94ad5-f2d3-4835-b3d6-b066814375f0' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-2925875., -2925625., -2925375., ..., -2822625., -2822375., -2822125.])</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>x</span></div><div class='xr-var-dims'>(x)</div><div class='xr-var-dtype'>float64</div><div class='xr-var-preview xr-preview'>-4.482e+06 ... -4.365e+06</div><input id='attrs-638f9888-f735-4be0-b290-45140d9f05c3' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-638f9888-f735-4be0-b290-45140d9f05c3' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-755d1e69-1c6d-44d4-b492-60843109d037' class='xr-var-data-in' type='checkbox'><label for='data-755d1e69-1c6d-44d4-b492-60843109d037' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array([-4481875., -4481625., -4481375., ..., -4365625., -4365375., -4365125.])</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-f51d45d1-a407-47ba-83bf-6fc7b4a3dd45' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-f51d45d1-a407-47ba-83bf-6fc7b4a3dd45' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 </div>
 <div class="section" id="pixels-to-polygons">
@@ -900,26 +2137,43 @@
 <p>Let’s start by reading the data. First, the elevation model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">dem</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.image.AxesImage at 0x7fcaabe0e3a0&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_88_1.png" src="../_images/03_spatial_data_88_1.png" />
 </div>
 </div>
 <p>And the neighbourhood areas (tracts) from the Census:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sd_tracts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/sandiego/sandiego_tracts.gpkg&quot;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sd_tracts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/sandiego/sandiego_tracts.gpkg&quot;</span><span class="p">)</span>
 <span class="n">sd_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_90_1.png" src="../_images/03_spatial_data_90_1.png" />
 </div>
 </div>
 <p>There are several approaches to compute the average altitude of each neighbourhood. We will use <code class="docutils literal notranslate"><span class="pre">rioxarray</span></code>to clip parts of the surface <em>within</em> a given set of geometries. Let’s start with a single polygon. For the illustration, we will use the largest one, located on the eastern side of San Diego. We can find the ID of the polygon with:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">largest_tract_id</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;area_sqm == </span><span class="si">{</span><span class="n">sd_tracts</span><span class="p">[</span><span class="s1">&#39;area_sqm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">largest_tract_id</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;area_sqm == </span><span class="si">{</span><span class="n">sd_tracts</span><span class="p">[</span><span class="s1">&#39;area_sqm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">largest_tract_id</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>627
 </pre></div>
 </div>
 </div>
@@ -927,7 +2181,7 @@
 <p>And then pull out the polygon itself for the illustration:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">largest_tract</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">largest_tract_id</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">largest_tract</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">largest_tract_id</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -935,26 +2189,389 @@
 <p>Clipping the section of the surface that is within the polygon in the DEM can be achieved with the <code class="docutils literal notranslate"><span class="pre">rioxarray</span></code> extension to clip surfaces based on geometries:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem_clip</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">largest_tract</span><span class="o">.</span><span class="n">__geo_interface__</span><span class="p">],</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem_clip</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">largest_tract</span><span class="o">.</span><span class="n">__geo_interface__</span><span class="p">],</span> 
                         <span class="n">crs</span><span class="o">=</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">crs</span>
                        <span class="p">)</span>
 <span class="n">dem_clip</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem_clip</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.collections.QuadMesh at 0x7fcaabf07640&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_96_1.png" src="../_images/03_spatial_data_96_1.png" />
+</div>
 </div>
 <p>Once we have elevation measurements for all the pixels within the tract, the average one can be calculated with <code class="docutils literal notranslate"><span class="pre">mean()</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dem_clip</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem_clip</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem_clip</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem_clip</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div><svg style="position: absolute; width: 0; height: 0; overflow: hidden">
+<defs>
+<symbol id="icon-database" viewBox="0 0 32 32">
+<path d="M16 0c-8.837 0-16 2.239-16 5v4c0 2.761 7.163 5 16 5s16-2.239 16-5v-4c0-2.761-7.163-5-16-5z"></path>
+<path d="M16 17c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+<path d="M16 26c-8.837 0-16-2.239-16-5v6c0 2.761 7.163 5 16 5s16-2.239 16-5v-6c0 2.761-7.163 5-16 5z"></path>
+</symbol>
+<symbol id="icon-file-text2" viewBox="0 0 32 32">
+<path d="M28.681 7.159c-0.694-0.947-1.662-2.053-2.724-3.116s-2.169-2.030-3.116-2.724c-1.612-1.182-2.393-1.319-2.841-1.319h-15.5c-1.378 0-2.5 1.121-2.5 2.5v27c0 1.378 1.122 2.5 2.5 2.5h23c1.378 0 2.5-1.122 2.5-2.5v-19.5c0-0.448-0.137-1.23-1.319-2.841zM24.543 5.457c0.959 0.959 1.712 1.825 2.268 2.543h-4.811v-4.811c0.718 0.556 1.584 1.309 2.543 2.268zM28 29.5c0 0.271-0.229 0.5-0.5 0.5h-23c-0.271 0-0.5-0.229-0.5-0.5v-27c0-0.271 0.229-0.5 0.5-0.5 0 0 15.499-0 15.5 0v7c0 0.552 0.448 1 1 1h7v19.5z"></path>
+<path d="M23 26h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 22h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+<path d="M23 18h-14c-0.552 0-1-0.448-1-1s0.448-1 1-1h14c0.552 0 1 0.448 1 1s-0.448 1-1 1z"></path>
+</symbol>
+</defs>
+</svg>
+<style>/* CSS stylesheet for displaying xarray objects in jupyterlab.
+ *
+ */
+
+:root {
+  --xr-font-color0: var(--jp-content-font-color0, rgba(0, 0, 0, 1));
+  --xr-font-color2: var(--jp-content-font-color2, rgba(0, 0, 0, 0.54));
+  --xr-font-color3: var(--jp-content-font-color3, rgba(0, 0, 0, 0.38));
+  --xr-border-color: var(--jp-border-color2, #e0e0e0);
+  --xr-disabled-color: var(--jp-layout-color3, #bdbdbd);
+  --xr-background-color: var(--jp-layout-color0, white);
+  --xr-background-color-row-even: var(--jp-layout-color1, white);
+  --xr-background-color-row-odd: var(--jp-layout-color2, #eeeeee);
+}
+
+html[theme=dark],
+body.vscode-dark {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #1F1F1F;
+  --xr-disabled-color: #515151;
+  --xr-background-color: #111111;
+  --xr-background-color-row-even: #111111;
+  --xr-background-color-row-odd: #313131;
+}
+
+.xr-wrap {
+  display: block;
+  min-width: 300px;
+  max-width: 700px;
+}
+
+.xr-text-repr-fallback {
+  /* fallback to plain text repr when CSS is not injected (untrusted notebook) */
+  display: none;
+}
+
+.xr-header {
+  padding-top: 6px;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+  border-bottom: solid 1px var(--xr-border-color);
+}
+
+.xr-header > div,
+.xr-header > ul {
+  display: inline;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.xr-obj-type,
+.xr-array-name {
+  margin-left: 2px;
+  margin-right: 10px;
+}
+
+.xr-obj-type {
+  color: var(--xr-font-color2);
+}
+
+.xr-sections {
+  padding-left: 0 !important;
+  display: grid;
+  grid-template-columns: 150px auto auto 1fr 20px 20px;
+}
+
+.xr-section-item {
+  display: contents;
+}
+
+.xr-section-item input {
+  display: none;
+}
+
+.xr-section-item input + label {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-item input:enabled + label {
+  cursor: pointer;
+  color: var(--xr-font-color2);
+}
+
+.xr-section-item input:enabled + label:hover {
+  color: var(--xr-font-color0);
+}
+
+.xr-section-summary {
+  grid-column: 1;
+  color: var(--xr-font-color2);
+  font-weight: 500;
+}
+
+.xr-section-summary > span {
+  display: inline-block;
+  padding-left: 0.5em;
+}
+
+.xr-section-summary-in:disabled + label {
+  color: var(--xr-font-color2);
+}
+
+.xr-section-summary-in + label:before {
+  display: inline-block;
+  content: '►';
+  font-size: 11px;
+  width: 15px;
+  text-align: center;
+}
+
+.xr-section-summary-in:disabled + label:before {
+  color: var(--xr-disabled-color);
+}
+
+.xr-section-summary-in:checked + label:before {
+  content: '▼';
+}
+
+.xr-section-summary-in:checked + label > span {
+  display: none;
+}
+
+.xr-section-summary,
+.xr-section-inline-details {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.xr-section-inline-details {
+  grid-column: 2 / -1;
+}
+
+.xr-section-details {
+  display: none;
+  grid-column: 1 / -1;
+  margin-bottom: 5px;
+}
+
+.xr-section-summary-in:checked ~ .xr-section-details {
+  display: contents;
+}
+
+.xr-array-wrap {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 20px auto;
+}
+
+.xr-array-wrap > label {
+  grid-column: 1;
+  vertical-align: top;
+}
+
+.xr-preview {
+  color: var(--xr-font-color3);
+}
+
+.xr-array-preview,
+.xr-array-data {
+  padding: 0 5px !important;
+  grid-column: 2;
+}
+
+.xr-array-data,
+.xr-array-in:checked ~ .xr-array-preview {
+  display: none;
+}
+
+.xr-array-in:checked ~ .xr-array-data,
+.xr-array-preview {
+  display: inline-block;
+}
+
+.xr-dim-list {
+  display: inline-block !important;
+  list-style: none;
+  padding: 0 !important;
+  margin: 0;
+}
+
+.xr-dim-list li {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+}
+
+.xr-dim-list:before {
+  content: '(';
+}
+
+.xr-dim-list:after {
+  content: ')';
+}
+
+.xr-dim-list li:not(:last-child):after {
+  content: ',';
+  padding-right: 5px;
+}
+
+.xr-has-index {
+  font-weight: bold;
+}
+
+.xr-var-list,
+.xr-var-item {
+  display: contents;
+}
+
+.xr-var-item > div,
+.xr-var-item label,
+.xr-var-item > .xr-var-name span {
+  background-color: var(--xr-background-color-row-even);
+  margin-bottom: 0;
+}
+
+.xr-var-item > .xr-var-name:hover span {
+  padding-right: 5px;
+}
+
+.xr-var-list > li:nth-child(odd) > div,
+.xr-var-list > li:nth-child(odd) > label,
+.xr-var-list > li:nth-child(odd) > .xr-var-name span {
+  background-color: var(--xr-background-color-row-odd);
+}
+
+.xr-var-name {
+  grid-column: 1;
+}
+
+.xr-var-dims {
+  grid-column: 2;
+}
+
+.xr-var-dtype {
+  grid-column: 3;
+  text-align: right;
+  color: var(--xr-font-color2);
+}
+
+.xr-var-preview {
+  grid-column: 4;
+}
+
+.xr-var-name,
+.xr-var-dims,
+.xr-var-dtype,
+.xr-preview,
+.xr-attrs dt {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+.xr-var-name:hover,
+.xr-var-dims:hover,
+.xr-var-dtype:hover,
+.xr-attrs dt:hover {
+  overflow: visible;
+  width: auto;
+  z-index: 1;
+}
+
+.xr-var-attrs,
+.xr-var-data {
+  display: none;
+  background-color: var(--xr-background-color) !important;
+  padding-bottom: 5px !important;
+}
+
+.xr-var-attrs-in:checked ~ .xr-var-attrs,
+.xr-var-data-in:checked ~ .xr-var-data {
+  display: block;
+}
+
+.xr-var-data > table {
+  float: right;
+}
+
+.xr-var-name span,
+.xr-var-data,
+.xr-attrs {
+  padding-left: 25px !important;
+}
+
+.xr-attrs,
+.xr-var-attrs,
+.xr-var-data {
+  grid-column: 1 / -1;
+}
+
+dl.xr-attrs {
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 125px auto;
+}
+
+.xr-attrs dt,
+.xr-attrs dd {
+  padding: 0;
+  margin: 0;
+  float: left;
+  padding-right: 10px;
+  width: auto;
+}
+
+.xr-attrs dt {
+  font-weight: normal;
+  grid-column: 1;
+}
+
+.xr-attrs dt:hover span {
+  display: inline-block;
+  background: var(--xr-background-color);
+  padding-right: 10px;
+}
+
+.xr-attrs dd {
+  grid-column: 2;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.xr-icon-database,
+.xr-icon-file-text2 {
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em;
+  height: 1.5em !important;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+}
+</style><pre class='xr-text-repr-fallback'>&lt;xarray.DataArray ()&gt;
+array(585.11375946)
+Coordinates:
+    band         int64 1
+    spatial_ref  int64 0</pre><div class='xr-wrap' hidden><div class='xr-header'><div class='xr-obj-type'>xarray.DataArray</div><div class='xr-array-name'></div></div><ul class='xr-sections'><li class='xr-section-item'><div class='xr-array-wrap'><input id='section-140cb646-a810-4984-88ff-544947b89d75' class='xr-array-in' type='checkbox' checked><label for='section-140cb646-a810-4984-88ff-544947b89d75' title='Show/hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-array-preview xr-preview'><span>585.1</span></div><div class='xr-array-data'><pre>array(585.11375946)</pre></div></div></li><li class='xr-section-item'><input id='section-2ad87573-057c-47e3-846f-dad9e939bac2' class='xr-section-summary-in' type='checkbox'  checked><label for='section-2ad87573-057c-47e3-846f-dad9e939bac2' class='xr-section-summary' >Coordinates: <span>(2)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>band</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>1</div><input id='attrs-862c48a7-ec57-433d-9a27-2b15691e4778' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-862c48a7-ec57-433d-9a27-2b15691e4778' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-4adb30d3-576a-4e5b-94a8-c2d3c5b17325' class='xr-var-data-in' type='checkbox'><label for='data-4adb30d3-576a-4e5b-94a8-c2d3c5b17325' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><div class='xr-var-data'><pre>array(1)</pre></div></li><li class='xr-var-item'><div class='xr-var-name'><span>spatial_ref</span></div><div class='xr-var-dims'>()</div><div class='xr-var-dtype'>int64</div><div class='xr-var-preview xr-preview'>0</div><input id='attrs-2b6b4441-a93d-4ed6-bd02-b623ac1d8d0e' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-2b6b4441-a93d-4ed6-bd02-b623ac1d8d0e' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b68802c0-630a-47ac-a889-12313b5d34a3' class='xr-var-data-in' type='checkbox'><label for='data-b68802c0-630a-47ac-a889-12313b5d34a3' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>crs_wkt :</span></dt><dd>GEOGCS[&quot;WGS 84&quot;,DATUM[&quot;WGS_1984&quot;,SPHEROID[&quot;WGS 84&quot;,6378137,298.257223563,AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]],AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]],PRIMEM[&quot;Greenwich&quot;,0,AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]],UNIT[&quot;degree&quot;,0.0174532925199433,AUTHORITY[&quot;EPSG&quot;,&quot;9122&quot;]],AXIS[&quot;Longitude&quot;,EAST],AXIS[&quot;Latitude&quot;,NORTH]]</dd><dt><span>semi_major_axis :</span></dt><dd>6378137.0</dd><dt><span>semi_minor_axis :</span></dt><dd>6356752.314245179</dd><dt><span>inverse_flattening :</span></dt><dd>298.257223563</dd><dt><span>reference_ellipsoid_name :</span></dt><dd>WGS 84</dd><dt><span>longitude_of_prime_meridian :</span></dt><dd>0.0</dd><dt><span>prime_meridian_name :</span></dt><dd>Greenwich</dd><dt><span>geographic_crs_name :</span></dt><dd>WGS 84</dd><dt><span>grid_mapping_name :</span></dt><dd>latitude_longitude</dd><dt><span>spatial_ref :</span></dt><dd>GEOGCS[&quot;WGS 84&quot;,DATUM[&quot;WGS_1984&quot;,SPHEROID[&quot;WGS 84&quot;,6378137,298.257223563,AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]],AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]],PRIMEM[&quot;Greenwich&quot;,0,AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]],UNIT[&quot;degree&quot;,0.0174532925199433,AUTHORITY[&quot;EPSG&quot;,&quot;9122&quot;]],AXIS[&quot;Longitude&quot;,EAST],AXIS[&quot;Latitude&quot;,NORTH]]</dd><dt><span>GeoTransform :</span></dt><dd>-116.61847222222221 0.0002777777777777725 0.0 33.42902777777778 0.0 -0.0002777777777777784</dd></dl></div><div class='xr-var-data'><pre>array(0)</pre></div></li></ul></div></li><li class='xr-section-item'><input id='section-f3ff5734-c552-4cdc-9dea-b0313d219292' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-f3ff5734-c552-4cdc-9dea-b0313d219292' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div></div></div>
 </div>
 <p>Now, to scale this to the entire geo-table, there are several approaches, each with benefits and disadvantages. We opt for applying the method above to each row of the table. We define an auxilliary function that takes a row containing one of our tracts and returns its elevation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_mean_elevation</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_mean_elevation</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
     <span class="n">geom</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">__geo_interface__</span>
     <span class="n">section</span> <span class="o">=</span> <span class="n">dem</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">clip</span><span class="p">([</span><span class="n">geom</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
     <span class="n">ele</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">section</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">section</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
@@ -966,7 +2583,12 @@
 <p>Applied to the same tract, it returns the same average elevation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">get_mean_elevation</span><span class="p">(</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">largest_tract_id</span><span class="p">,</span> <span class="p">:])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_mean_elevation</span><span class="p">(</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">largest_tract_id</span><span class="p">,</span> <span class="p">:])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>585.1137594576915
 </pre></div>
 </div>
 </div>
@@ -974,8 +2596,18 @@
 <p>This method can then be run on each polygon in our series using the <code class="docutils literal notranslate"><span class="pre">apply</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elevations</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_mean_elevation</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevations</span> <span class="o">=</span> <span class="n">sd_tracts</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">get_mean_elevation</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">elevations</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0      7.144268
+1     35.648492
+2     53.711389
+3     91.358777
+4    187.311972
+dtype: float64
 </pre></div>
 </div>
 </div>
@@ -984,7 +2616,7 @@
 <p>However, this approach can be quite slow in big data. A more efficient alternative for our example is using the <code class="docutils literal notranslate"><span class="pre">rasterstats</span></code> library. This is a purpose-built library to construct so-called “zonal statistics” from surfaces. Here, the “zones” are the polygons and the “surface” is our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. Generally, this library will be faster than the simpler approach used above, but may be more difficult to extend or adapt:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%%</span><span class="n">time</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
 <span class="kn">from</span> <span class="nn">rasterstats</span> <span class="kn">import</span> <span class="n">zonal_stats</span>
 
 <span class="n">elevations2</span> <span class="o">=</span> <span class="n">zonal_stats</span><span class="p">(</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="p">),</span>
@@ -994,18 +2626,88 @@
 </pre></div>
 </div>
 </div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">elevations2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2.26 s, sys: 253 ms, total: 2.51 s
+Wall time: 2.53 s
 </pre></div>
 </div>
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevations2</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>min</th>
+      <th>max</th>
+      <th>mean</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>-12.0</td>
+      <td>18.0</td>
+      <td>3.538397</td>
+      <td>3594</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>-2.0</td>
+      <td>94.0</td>
+      <td>35.616395</td>
+      <td>5709</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>-5.0</td>
+      <td>121.0</td>
+      <td>48.742630</td>
+      <td>10922</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>31.0</td>
+      <td>149.0</td>
+      <td>91.358777</td>
+      <td>4415</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>-32.0</td>
+      <td>965.0</td>
+      <td>184.284941</td>
+      <td>701973</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
 <p>To visualize these results, we can make an elevation map:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
 <span class="n">dem</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dem</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>\
    <span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span><span class="n">sd_tracts</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>\
    <span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -1013,6 +2715,12 @@
 <span class="n">sd_tracts</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">elevation</span><span class="o">=</span><span class="n">elevations2</span><span class="p">[</span><span class="s2">&quot;mean&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;elevation&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_109_1.png" src="../_images/03_spatial_data_109_1.png" />
 </div>
 </div>
 </div>
@@ -1023,16 +2731,22 @@
 <p>From a purely technical perspective, for datasets with too many points, representing every point in the data on a screen can be seriously overcrowded:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_points</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+</pre></div>
+</div>
+<img alt="../_images/03_spatial_data_111_1.png" src="../_images/03_spatial_data_111_1.png" />
 </div>
 </div>
 <p>In the image above, it is hard to tell anything about the density of points in the centre of the image due to <em>overplotting</em>: while points <em>theoretically</em> have no width, they must in order for us to see them! Therefore, point <em>markers</em> often plot on top of one another, obscuring the true pattern and density in dense areas. Converting the dataset from a geo-table into a surface involves laying out a grid and counting how many points fall within each cell. In one sense, this is the reverse operation to what we saw when computing zonal statistics in the previous section: instead of aggregating cells into objects, we aggregate objects into cells. Both operations, however, involve aggregation that reduces the amount of information present in order to make the (new) data more manageable.</p>
 <p>In Python, we can rely on the <code class="docutils literal notranslate"><span class="pre">datashader</span></code> library, which does all the computation in a very efficient way. This process involves two main steps. First, we set up the grid (or canvas, <code class="docutils literal notranslate"><span class="pre">cvs</span></code>) into which we want to aggregate points:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cvs</span> <span class="o">=</span> <span class="n">datashader</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cvs</span> <span class="o">=</span> <span class="n">datashader</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="n">plot_width</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
                         <span class="n">plot_height</span><span class="o">=</span><span class="mi">60</span>
                        <span class="p">)</span>
 </pre></div>
@@ -1042,7 +2756,7 @@
 <p>Then we “transfer” the points into the grid:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">cvs</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">gt_points</span><span class="p">,</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">cvs</span><span class="o">.</span><span class="n">points</span><span class="p">(</span><span class="n">gt_points</span><span class="p">,</span> 
                   <span class="n">x</span><span class="o">=</span><span class="s2">&quot;longitude&quot;</span><span class="p">,</span> 
                   <span class="n">y</span><span class="o">=</span><span class="s2">&quot;latitude&quot;</span>
                  <span class="p">)</span>
@@ -1053,11 +2767,14 @@
 <p>The resulting <code class="docutils literal notranslate"><span class="pre">grid</span></code> is a standard <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the re-sampled data allows for is much greater than when the points were visualized alone:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">gt_points</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">grid</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/03_spatial_data_117_0.png" src="../_images/03_spatial_data_117_0.png" />
 </div>
 </div>
 </div>
@@ -1068,7 +2785,7 @@
 <p>However, in some cases, we may want to convert the graph into a structure that allows us to operate on each component of the network independently. For example, we may want to map streets, calculate segment lengths, or draw buffers around each intersection. These are all operations that do not require topological information, that are standard for geo-tables and that are irrelevant to the graph structure. In this context, it makes sense to convert our <code class="docutils literal notranslate"><span class="pre">graph</span></code> to two geo-tables, one for intersections (the graph nodes) and one for street segments (the graph edges). In <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>, we can do that with the built-in converter:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_intersections</span><span class="p">,</span> <span class="n">gt_lines</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_to_gdfs</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_intersections</span><span class="p">,</span> <span class="n">gt_lines</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_to_gdfs</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1076,14 +2793,111 @@
 <p>Now each of the resulting geo-tables behaves as a collection of geographic objects, because it is:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_intersections</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_intersections</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>y</th>
+      <th>x</th>
+      <th>street_count</th>
+      <th>highway</th>
+      <th>geometry</th>
+    </tr>
+    <tr>
+      <th>osmid</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>886196069</th>
+      <td>35.670087</td>
+      <td>139.694333</td>
+      <td>3</td>
+      <td>NaN</td>
+      <td>POINT (139.69433 35.67009)</td>
+    </tr>
+    <tr>
+      <th>886196073</th>
+      <td>35.669725</td>
+      <td>139.699508</td>
+      <td>3</td>
+      <td>NaN</td>
+      <td>POINT (139.69951 35.66972)</td>
+    </tr>
+    <tr>
+      <th>886196100</th>
+      <td>35.669442</td>
+      <td>139.699708</td>
+      <td>3</td>
+      <td>NaN</td>
+      <td>POINT (139.69971 35.66944)</td>
+    </tr>
+    <tr>
+      <th>886196106</th>
+      <td>35.670422</td>
+      <td>139.698564</td>
+      <td>4</td>
+      <td>NaN</td>
+      <td>POINT (139.69856 35.67042)</td>
+    </tr>
+    <tr>
+      <th>886196117</th>
+      <td>35.671256</td>
+      <td>139.697470</td>
+      <td>3</td>
+      <td>NaN</td>
+      <td>POINT (139.69747 35.67126)</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gt_lines</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_lines</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+MultiIndex: 287 entries, (886196069, 1520546857, 0) to (7684088896, 3010293702, 0)
+Data columns (total 8 columns):
+ #   Column    Non-Null Count  Dtype   
+---  ------    --------------  -----   
+ 0   osmid     287 non-null    object  
+ 1   highway   287 non-null    object  
+ 2   oneway    287 non-null    bool    
+ 3   length    287 non-null    float64 
+ 4   geometry  287 non-null    geometry
+ 5   bridge    8 non-null      object  
+ 6   name      9 non-null      object  
+ 7   access    2 non-null      object  
+dtypes: bool(1), float64(1), geometry(1), object(5)
+memory usage: 26.9+ KB
 </pre></div>
 </div>
 </div>
@@ -1091,7 +2905,7 @@
 <p>If we were in the opposite situation, where we had a set of street segments and their intersections in geo-table form, we can generate the graph representation with the <code class="docutils literal notranslate"><span class="pre">graph_from_gdfs</span></code> sister method:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">new_graph</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_from_gdfs</span><span class="p">(</span><span class="n">gt_intersections</span><span class="p">,</span> <span class="n">gt_lines</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">new_graph</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_from_gdfs</span><span class="p">(</span><span class="n">gt_intersections</span><span class="p">,</span> <span class="n">gt_lines</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

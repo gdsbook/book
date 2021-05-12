@@ -482,14 +482,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/cenpy/remote.py:224: SyntaxWarning: &quot;is not&quot; with a literal. Did you mean &quot;!=&quot;?
-  if index is not &quot;&quot;:
-/opt/conda/lib/python3.8/site-packages/cenpy/tiger.py:186: SyntaxWarning: &quot;is&quot; with a literal. Did you mean &quot;==&quot;?
-  if kwargs.get(&quot;returnGeometry&quot;, &quot;true&quot;) is &quot;false&quot;:
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell tag_hide-cell docutils container">
 <div class="cell_input docutils container">
@@ -541,7 +533,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_8_0.svg" src="../_images/12_feature_engineering_8_0.svg" /></div>
+<img alt="../_images/12_feature_engineering_9_0.svg" src="../_images/12_feature_engineering_9_0.svg" /></div>
 </div>
 <p>Using this polygon, we can use the <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we’ll request POIs within San Diego that are “restaurants” or “bars,” according to their metadata stored in OpenStreetMap. (<em>note: this step requires internet connection as it is querying a remote server</em>):</p>
 <div class="cell docutils container">
@@ -554,8 +546,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 424 ms, sys: 15.2 ms, total: 439 ms
-Wall time: 18.3 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 323 ms, sys: 7.64 ms, total: 331 ms
+Wall time: 330 ms
 </pre></div>
 </div>
 </div>
@@ -568,13 +560,9 @@ Wall time: 18.3 s
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>amenity
 bar            308
-restaurant    1016
+restaurant    1014
 Name: amenity, dtype: int64
 </pre></div>
 </div>
@@ -595,7 +583,7 @@ Name: amenity, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_14_0.png" src="../_images/12_feature_engineering_14_0.png" />
+<img alt="../_images/12_feature_engineering_15_0.png" src="../_images/12_feature_engineering_15_0.png" />
 </div>
 </div>
 <p>Now, for some feature engineering, it may be extremely useful to know whether an Airbnb is located in a “hot” location, with a lot of restaurants and bars to choose from. Alternatively, if Airbnbs are very remote, they might not be as lucrative for short, expensive “city-break” reservations. That is, Airbnb users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be <em>willing to pay more</em> for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the Airbnb.</p>
@@ -615,10 +603,6 @@ Name: amenity, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
 Name: WGS 84
 Axis Info [ellipsoidal]:
@@ -715,19 +699,18 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>The resulting joined object <code class="docutils literal notranslate"><span class="pre">joined</span></code> contains a row for every pair of POI and AirBnb that are linked. From there, we can apply a group-by operation, using the AirBnb ID, and count how many POIs each AirBnb has within 500m of distance:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poi_count</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>\
-                  <span class="p">[</span><span class="s2">&quot;osmid&quot;</span><span class="p">]</span>\
-                  <span class="o">.</span><span class="n">count</span><span class="p">()</span>\
-                  <span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;poi_count&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poi_count</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+    <span class="s2">&quot;id&quot;</span>
+<span class="p">)[</span>
+    <span class="s2">&quot;osmid&quot;</span>
+<span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span>
+    <span class="s1">&#39;poi_count&#39;</span>
+<span class="p">)</span>
 <span class="n">poi_count</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_html"><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -787,32 +770,28 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <p>We can visualise now the distribution of counts to get a sense of how “well-served” AirBnb properties are arranged over space:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="n">airbnbs_w_counts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;poi_count&quot;</span><span class="p">,</span>
-                      <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
-                      <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                      <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                      <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
-                     <span class="p">)</span>
-<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> 
-                       <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
-                       <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
-                      <span class="p">)</span>
+<span class="n">airbnbs_w_counts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;poi_count&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+<span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_31_0.png" src="../_images/12_feature_engineering_31_0.png" />
+<img alt="../_images/12_feature_engineering_32_0.png" src="../_images/12_feature_engineering_32_0.png" />
 </div>
 </div>
 </div>
@@ -828,19 +807,12 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span><span class="p">)</span>
-<span class="n">rioshow</span><span class="p">(</span><span class="n">dem</span><span class="p">)</span>
+<span class="n">rioshow</span><span class="p">(</span><span class="n">dem</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_34_1.png" src="../_images/12_feature_engineering_34_1.png" />
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
-</pre></div>
-</div>
+<img alt="../_images/12_feature_engineering_35_0.png" src="../_images/12_feature_engineering_35_0.png" />
 </div>
 </div>
 <p>Let’s first check the CRS is aligned with our sample of point locations:</p>
@@ -873,19 +845,20 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Now, we can  apply this logic to a sequence of coordinates. For that, we need to extract them from the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abb_xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> 
-                            <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span>
-                           <span class="p">})</span><span class="o">.</span><span class="n">to_records</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abb_xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">}</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_records</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">abb_xys</span><span class="p">),</span>
-                             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Elevation&quot;</span><span class="p">],</span>
-                             <span class="n">index</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">index</span>
-                            <span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">dem</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">abb_xys</span><span class="p">),</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Elevation&quot;</span><span class="p">],</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">index</span>
+<span class="p">)</span>
 <span class="n">elevation</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -941,27 +914,26 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="n">airbnbs</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">elevation</span><span class="p">)</span>\
-       <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;Elevation&quot;</span><span class="p">,</span>
-             <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
-             <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-             <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-             <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
-            <span class="p">)</span>
-<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> 
-                       <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
-                       <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
-                       <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span>
-                      <span class="p">)</span>
+<span class="n">airbnbs</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+    <span class="n">elevation</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Elevation&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+<span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_43_1.png" src="../_images/12_feature_engineering_43_1.png" />
+<img alt="../_images/12_feature_engineering_44_0.png" src="../_images/12_feature_engineering_44_0.png" />
 </div>
 </div>
 </div>
@@ -975,12 +947,6 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -991,14 +957,9 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_bed_home_locations</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">two_bed_homes</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> 
-                                             <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_bed_home_locations</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">two_bed_homes</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1007,8 +968,9 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">total_bounds</span>
-<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> 
-                      <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">))</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1027,15 +989,17 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Y values&#39;)
 </pre></div>
 </div>
-<img alt="../_images/12_feature_engineering_50_1.png" src="../_images/12_feature_engineering_50_1.png" />
+<img alt="../_images/12_feature_engineering_51_1.png" src="../_images/12_feature_engineering_51_1.png" />
 </div>
 </div>
 <p>With these coordinates, we can make a geodataframe containing the grid cells at which we would like to predict:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
-<span class="n">grid_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
-                                                                   <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+<span class="n">grid_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1043,27 +1007,20 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">two_bed_homes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">two_bed_homes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_53_1.png" src="../_images/12_feature_engineering_53_1.png" />
+<img alt="../_images/12_feature_engineering_54_0.png" src="../_images/12_feature_engineering_54_0.png" />
 </div>
 </div>
 <p>With this done, we can now construct the predictions. First we train the model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span>
+    <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1075,12 +1032,6 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1089,14 +1040,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../_images/12_feature_engineering_58_2.png" src="../_images/12_feature_engineering_58_2.png" />
+<img alt="../_images/12_feature_engineering_59_1.png" src="../_images/12_feature_engineering_59_1.png" />
 </div>
 </div>
 <p>You can see that the surface gets smoother as you increase the number of nearest neighbors to consider:</p>
@@ -1105,9 +1052,11 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k_neighbors</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)):</span>
     <span class="n">facet</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>\
-                          <span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span><span class="p">)</span>\
-                          <span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span>
+        <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+        <span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
     <span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">facet</span><span class="p">)</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k_neighbors</span><span class="si">}</span><span class="s2"> neighbors&quot;</span><span class="p">)</span>
@@ -1115,11 +1064,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_60_1.png" src="../_images/12_feature_engineering_60_1.png" />
+<img alt="../_images/12_feature_engineering_61_0.png" src="../_images/12_feature_engineering_61_0.png" />
 </div>
 </div>
 <p>Focusing in on central San Diego tells the story a bit more clearly, since there are more points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface.</p>
@@ -1130,20 +1075,21 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">central_x</span><span class="p">,</span> <span class="n">central_y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_xmin</span><span class="p">,</span> <span class="n">central_xmax</span><span class="p">),</span> 
-                                      <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_ymin</span><span class="p">,</span> <span class="n">central_ymax</span><span class="p">))</span>
-<span class="n">central_grid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">central_x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">central_y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
-<span class="n">central_grid_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">central_x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
-                                                                           <span class="n">y</span><span class="o">=</span><span class="n">central_y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">central_x</span><span class="p">,</span> <span class="n">central_y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_xmin</span><span class="p">,</span> <span class="n">central_xmax</span><span class="p">),</span> 
+    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_ymin</span><span class="p">,</span> <span class="n">central_ymax</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">central_grid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
+    <span class="p">(</span><span class="n">central_x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">central_y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+<span class="p">)</span>
+<span class="n">central_grid_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span>
+        <span class="n">x</span><span class="o">=</span><span class="n">central_x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">central_y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1154,9 +1100,11 @@ Datum: NAD83 (High Accuracy Reference Network)
 
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k_neighbors</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)):</span>
     <span class="n">facet</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span><span class="p">)</span>\
-                          <span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span><span class="p">)</span>\
-                          <span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">central_grid</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span>
+        <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+        <span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">central_grid</span><span class="p">)</span>
     <span class="n">central_grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">facet</span><span class="p">)</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k_neighbors</span><span class="si">}</span><span class="s2"> neighbors&quot;</span><span class="p">)</span>
@@ -1164,7 +1112,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_64_0.png" src="../_images/12_feature_engineering_64_0.png" />
+<img alt="../_images/12_feature_engineering_65_0.png" src="../_images/12_feature_engineering_65_0.png" />
 </div>
 </div>
 <p>Plenty more of these methods are implemented in <code class="docutils literal notranslate"><span class="pre">scikit-learn.neighbors</span></code>, as well as kriging methods in <code class="docutils literal notranslate"><span class="pre">GSTools</span></code> and geographically-weighted regression in <code class="docutils literal notranslate"><span class="pre">mgwr</span></code>.</p>
@@ -1186,14 +1134,8 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-/opt/conda/lib/python3.8/site-packages/pyproj/crs/crs.py:53: FutureWarning: &#39;+init=&lt;authority&gt;:&lt;code&gt;&#39; syntax is deprecated. &#39;&lt;authority&gt;:&lt;code&gt;&#39; is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
-  return _prepare_from_string(&quot; &quot;.join(pjargs))
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2.83 s, sys: 72.6 ms, total: 2.91 s
-Wall time: 28.9 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2.47 s, sys: 62.1 ms, total: 2.54 s
+Wall time: 1min 26s
 </pre></div>
 </div>
 </div>
@@ -1202,12 +1144,6 @@ Wall time: 28.9 s
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span><span class="o">.</span><span class="n">area</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1265,10 +1201,6 @@ dtypes: float64(8), geometry(1), int64(13), object(6)
 memory usage: 1.4+ MB
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 </div>
 </div>
 </div>
@@ -1285,23 +1217,16 @@ memory usage: 1.4+ MB
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-/opt/conda/lib/python3.8/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
-  for feature in features_lst:
-</pre></div>
-</div>
-</div>
 </div>
 <p>We are ready to interpolate:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">interpolated</span> <span class="o">=</span> <span class="n">area_interpolate</span><span class="p">(</span><span class="n">source_df</span><span class="o">=</span><span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
-                                <span class="n">target_df</span><span class="o">=</span><span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
-                                <span class="n">extensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">],</span>
-                                <span class="n">intensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
-                               <span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">interpolated</span> <span class="o">=</span> <span class="n">area_interpolate</span><span class="p">(</span>
+    <span class="n">source_df</span><span class="o">=</span><span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
+    <span class="n">target_df</span><span class="o">=</span><span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
+    <span class="n">extensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">],</span>
+    <span class="n">intensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1323,22 +1248,29 @@ memory usage: 1.4+ MB
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">maxX</span><span class="p">,</span> <span class="n">maxY</span> <span class="o">=</span> <span class="n">interpolated</span><span class="o">.</span><span class="n">total_bounds</span>
-<span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>\
-      <span class="o">.</span><span class="n">cx</span><span class="p">[</span><span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span> <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span><span class="p">]</span>\
-      <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span> 
-            <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> 
-            <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-            <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-           <span class="p">)</span>
+<span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
+    <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
+<span class="p">)</span><span class="o">.</span><span class="n">cx</span><span class="p">[</span>
+    <span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span> <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span>
+<span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span> 
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> 
+    <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>
 
-<span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>\
-  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
+    <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
 
-<span class="n">interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span>
-                  <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
-                  <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                  <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                 <span class="p">)</span>
+<span class="n">interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="p">)</span>
 
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">minX</span><span class="p">,</span> <span class="n">maxX</span><span class="p">)</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">minY</span><span class="p">,</span> <span class="n">maxY</span><span class="p">)</span>
@@ -1350,11 +1282,7 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_79_1.png" src="../_images/12_feature_engineering_79_1.png" />
+<img alt="../_images/12_feature_engineering_80_0.png" src="../_images/12_feature_engineering_80_0.png" />
 </div>
 </div>
 <p>And density:</p>
@@ -1363,22 +1291,29 @@ memory usage: 1.4+ MB
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
 <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">maxX</span><span class="p">,</span> <span class="n">maxY</span> <span class="o">=</span> <span class="n">interpolated</span><span class="o">.</span><span class="n">total_bounds</span>
-<span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>\
-      <span class="o">.</span><span class="n">cx</span><span class="p">[</span><span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span> <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span><span class="p">]</span>\
-      <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> 
-            <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> 
-            <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-            <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-           <span class="p">)</span>
+<span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
+    <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
+<span class="p">)</span><span class="o">.</span><span class="n">cx</span><span class="p">[</span>
+    <span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span> <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span>
+<span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> 
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> 
+    <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span>
 
-<span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span>\
-  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
+    <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span>
+<span class="p">)</span>
 
-<span class="n">interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span>
-                  <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
-                  <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                  <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                 <span class="p">)</span>
+<span class="n">interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="p">)</span>
 
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">minX</span><span class="p">,</span> <span class="n">maxX</span><span class="p">)</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">minY</span><span class="p">,</span> <span class="n">maxY</span><span class="p">)</span>
@@ -1390,11 +1325,7 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_81_1.png" src="../_images/12_feature_engineering_81_1.png" />
+<img alt="../_images/12_feature_engineering_82_0.png" src="../_images/12_feature_engineering_82_0.png" />
 </div>
 </div>
 </div>
@@ -1417,12 +1348,6 @@ memory usage: 1.4+ MB
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <p>Now, we can get the average size of surrounding Airbnbs directly as the spatial lag:</p>
 <div class="cell docutils container">
@@ -1434,7 +1359,9 @@ memory usage: 1.4+ MB
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_average_bedrooms</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_average_bedrooms</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
+    <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1452,7 +1379,7 @@ memory usage: 1.4+ MB
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &quot;Average of nearby\n listings&#39; bedrooms&quot;)
 </pre></div>
 </div>
-<img alt="../_images/12_feature_engineering_89_1.png" src="../_images/12_feature_engineering_89_1.png" />
+<img alt="../_images/12_feature_engineering_90_1.png" src="../_images/12_feature_engineering_90_1.png" />
 </div>
 </div>
 <p>If we were instead interested in the most common number of bedrooms, rather than the average, we could use the <code class="docutils literal notranslate"><span class="pre">lag_categorical</span></code> function:</p>
@@ -1464,23 +1391,13 @@ memory usage: 1.4+ MB
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/spatial_lag.py:167: DeprecationWarning: `np.int` is a deprecated alias for the builtin `int`. To silence this warning, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
-Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
-  normalized_labels = np.zeros(y.shape, dtype=np.int)
-/opt/conda/lib/python3.8/site-packages/numpy/core/fromnumeric.py:3419: RuntimeWarning: Mean of empty slice.
-  return _methods._mean(a, axis=axis, dtype=dtype,
-/opt/conda/lib/python3.8/site-packages/numpy/core/_methods.py:188: RuntimeWarning: invalid value encountered in double_scalars
-  ret = ret.dtype.type(ret / rcount)
-</pre></div>
-</div>
-</div>
 </div>
 <p>Since we are now treating the number of bedrooms as a discrete feature, we can use a crosstab from <code class="docutils literal notranslate"><span class="pre">pandas</span></code> to examine the relationship between a listing and the typical size of listings nearby:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">crosstab</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">bedrooms</span><span class="p">,</span> 
-                           <span class="n">local_mode</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">crosstab</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">crosstab</span><span class="p">(</span>
+    <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">bedrooms</span><span class="p">,</span> <span class="n">local_mode</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="p">)</span>
 <span class="n">crosstab</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;nearby&quot;</span>
 <span class="n">crosstab</span>
 </pre></div>
@@ -1529,22 +1446,22 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
   <tbody>
     <tr>
       <th>0.0</th>
-      <td>4</td>
-      <td>391</td>
+      <td>6</td>
+      <td>390</td>
       <td>39</td>
-      <td>7</td>
-      <td>1</td>
-      <td>1</td>
+      <td>6</td>
       <td>2</td>
+      <td>1</td>
+      <td>1</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1.0</th>
-      <td>1</td>
-      <td>3066</td>
-      <td>214</td>
+      <td>3</td>
+      <td>3065</td>
+      <td>215</td>
       <td>33</td>
-      <td>19</td>
+      <td>17</td>
       <td>4</td>
       <td>0</td>
       <td>1</td>
@@ -1553,8 +1470,8 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
       <th>2.0</th>
       <td>1</td>
       <td>978</td>
-      <td>267</td>
-      <td>13</td>
+      <td>269</td>
+      <td>11</td>
       <td>3</td>
       <td>1</td>
       <td>0</td>
@@ -1563,23 +1480,23 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
     <tr>
       <th>3.0</th>
       <td>2</td>
-      <td>427</td>
-      <td>165</td>
-      <td>35</td>
+      <td>430</td>
+      <td>162</td>
+      <td>36</td>
       <td>12</td>
-      <td>3</td>
+      <td>2</td>
       <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>4.0</th>
       <td>0</td>
-      <td>165</td>
-      <td>58</td>
-      <td>10</td>
+      <td>166</td>
+      <td>60</td>
+      <td>9</td>
       <td>31</td>
-      <td>6</td>
-      <td>3</td>
+      <td>5</td>
+      <td>2</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1587,8 +1504,8 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
       <td>0</td>
       <td>50</td>
       <td>17</td>
-      <td>3</td>
-      <td>9</td>
+      <td>2</td>
+      <td>10</td>
       <td>19</td>
       <td>0</td>
       <td>0</td>
@@ -1596,12 +1513,12 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
     <tr>
       <th>6.0</th>
       <td>0</td>
-      <td>14</td>
-      <td>8</td>
-      <td>1</td>
-      <td>3</td>
+      <td>13</td>
+      <td>9</td>
       <td>2</td>
+      <td>4</td>
       <td>1</td>
+      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1656,12 +1573,6 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">d500_w</span><span class="o">.</span><span class="n">to_adjlist</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1734,17 +1645,17 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 <p>If we had the values for each for the neighbors in this adjacency list table, then we could use a <code class="docutils literal notranslate"><span class="pre">groupby()</span></code> to summarize the values of observations connected to a given focal observation. This merge can be done directly with the original data, linking the <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> key in the adjacency list back to that observation in our source table:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">adjlist</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]],</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbor&#39;</span><span class="p">,</span> 
-                        <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">adjlist</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]],</span> 
+    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbor&#39;</span><span class="p">,</span> 
+    <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span>
+<span class="p">)</span>
 <span class="n">adjlist</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_html"><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -1817,10 +1728,6 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>focal
 0       1.0
 1       2.0
@@ -1846,7 +1753,9 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>So, we can use our 500m weights from before to build the average again:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">average_within_500</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">average_within_500</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
+    <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1867,14 +1776,6 @@ Name: bedrooms, Length: 6035, dtype: float64
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_difference</span><span class="p">(</span>
     <span class="n">d1k_w</span><span class="p">,</span> <span class="n">d500_w</span><span class="p">,</span> <span class="n">constrained</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
- There are 60 disconnected components.
- There are 32 islands with ids: 762, 907, 976, 1003, 1776, 1867, 2789, 2841, 3130, 3138, 3184, 3604, 3748, 3962, 3989, 4366, 4443, 4627, 4764, 4885, 4989, 5014, 5536, 5733, 5756, 5790, 5796, 5808, 6005, 6026, 6049, 6068.
-  warnings.warn(message)
 </pre></div>
 </div>
 </div>
@@ -1941,10 +1842,10 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f69a907aac0&gt;
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7ff5501afb50&gt;
 </pre></div>
 </div>
-<img alt="../_images/12_feature_engineering_110_1.png" src="../_images/12_feature_engineering_110_1.png" />
+<img alt="../_images/12_feature_engineering_111_1.png" src="../_images/12_feature_engineering_111_1.png" />
 </div>
 </div>
 </div>
@@ -1957,14 +1858,6 @@ Name: bedrooms, Length: 6035, dtype: float64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hdbscan</span> <span class="kn">import</span> <span class="n">HDBSCAN</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/hdbscan/plots.py:448: DeprecationWarning: invalid escape sequence \l
-  axis.set_ylabel(&#39;$\lambda$ value&#39;)
-/opt/conda/lib/python3.8/site-packages/hdbscan/robust_single_linkage_.py:141: DeprecationWarning: invalid escape sequence \{
-  &quot;&quot;&quot;Perform robust single linkage clustering from a vector array
 </pre></div>
 </div>
 </div>
@@ -1985,19 +1878,6 @@ Name: bedrooms, Length: 6035, dtype: float64
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:275: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
-Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
-  alg = KDTreeBoruvkaAlgorithm(tree, min_samples, metric=metric,
-/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:56: DeprecationWarning: `np.int` is a deprecated alias for the builtin `int`. To silence this warning, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
-Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
-  condensed_tree = condense_tree(single_linkage_tree,
-/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:59: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
-Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
-  labels, probabilities, stabilities = get_clusters(condensed_tree,
-</pre></div>
-</div>
-</div>
 </div>
 <p>The spatial distribution of these clusters gives us a sense of the geographical distribution of the observations. To help us visualize the clusters, we can construct the convex hull of the observations in each dectected cluster:</p>
 <div class="cell docutils container">
@@ -2006,46 +1886,41 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <p>Since humans tend to make locational decisions hierarchically (in that they pick <em>San Diego</em>, then they pick a particular <em>part</em> of San Diego (such as the Gaslamp Quarter), then they pick a house in that part), this clustering process might give us a reasonable insight into the enclaves of competition between Airbnbs:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
-<span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
-                    <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                    <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span>
-                    <span class="p">)</span>
+<span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+    <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span>
+<span class="p">)</span>
 <span class="n">hulls</span><span class="p">[</span><span class="n">hulls</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,)</span>
-<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> 
-                       <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
-                       <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
-                      <span class="p">)</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_120_1.png" src="../_images/12_feature_engineering_120_1.png" />
+<img alt="../_images/12_feature_engineering_121_0.png" src="../_images/12_feature_engineering_121_0.png" />
 </div>
 </div>
 <p>Regardless, this cluster label certainly communicates some information about the price of a listing, since the distributions of prices are substantially different across the detected clusters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">,</span> <span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
-                            <span class="n">flierprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> 
-                            <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">())</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span>
+    <span class="s2">&quot;price&quot;</span><span class="p">,</span> 
+    <span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
+    <span class="n">flierprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> 
+    <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;competition cluster&quot;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;price ($)&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
@@ -2056,11 +1931,7 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_122_1.png" src="../_images/12_feature_engineering_122_1.png" />
+<img alt="../_images/12_feature_engineering_123_0.png" src="../_images/12_feature_engineering_123_0.png" />
 </div>
 </div>
 </div>

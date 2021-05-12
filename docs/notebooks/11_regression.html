@@ -550,20 +550,6 @@ This dataset contains house intrinsic characteristics, both continuous (number o
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/spglm/utils.py:367: SyntaxWarning: &quot;is not&quot; with a literal. Did you mean &quot;!=&quot;?
-  if resetlist is not ():
-/opt/conda/lib/python3.8/site-packages/spvcm/utils.py:149: SyntaxWarning: &quot;is&quot; with a literal. Did you mean &quot;==&quot;?
-  if np.isinf(ldet) or sgn is 0:
-/opt/conda/lib/python3.8/site-packages/spvcm/abstracts.py:268: SyntaxWarning: &quot;is&quot; with a literal. Did you mean &quot;==&quot;?
-  if chains is () and kwargs != dict():
-/opt/conda/lib/python3.8/site-packages/spvcm/abstracts.py:270: SyntaxWarning: &quot;is not&quot; with a literal. Did you mean &quot;!=&quot;?
-  if chains is not ():
-/opt/conda/lib/python3.8/site-packages/spvcm/plotting.py:37: SyntaxWarning: &quot;is&quot; with a literal. Did you mean &quot;==&quot;?
-  if thin is None or thin is 0:
-</pre></div>
-</div>
-</div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -607,10 +593,18 @@ memory usage: 954.8+ KB
 <p>These are the explanatory variables we will use throughout the chapter.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">variable_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;accommodates&#39;</span><span class="p">,</span> <span class="s1">&#39;bathrooms&#39;</span><span class="p">,</span> <span class="s1">&#39;bedrooms&#39;</span><span class="p">,</span> 
-                  <span class="s1">&#39;beds&#39;</span><span class="p">,</span> <span class="s1">&#39;rt_Private_room&#39;</span><span class="p">,</span> <span class="s1">&#39;rt_Shared_room&#39;</span><span class="p">,</span>
-                  <span class="s1">&#39;pg_Condominium&#39;</span><span class="p">,</span> <span class="s1">&#39;pg_House&#39;</span><span class="p">,</span> 
-                  <span class="s1">&#39;pg_Other&#39;</span><span class="p">,</span> <span class="s1">&#39;pg_Townhouse&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">variable_names</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;accommodates&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;bathrooms&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;bedrooms&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;beds&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;rt_Private_room&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;rt_Shared_room&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pg_Condominium&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;pg_House&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;pg_Other&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;pg_Townhouse&#39;</span>
+<span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -634,8 +628,12 @@ P = \alpha + \mathbf{X}\beta + \epsilon
 <p>Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>, <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>). In the context of this chapter, it makes sense to start with <code class="docutils literal notranslate"><span class="pre">PySAL</span></code> as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with <span class="math notranslate nohighlight">\(X\)</span> as the list defined, we only need the following line of code:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m1</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m1</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+    <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> 
+    <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -716,8 +714,13 @@ Therefore, we might want to see whether or not our errors are higher or lower de
 <span class="n">coastal</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">is_coastal</span><span class="p">]</span>
 <span class="n">not_coastal</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="o">~</span><span class="n">is_coastal</span><span class="p">]</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Coastal&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">not_coastal</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
-         <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Not Coastal&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="n">not_coastal</span><span class="p">,</span> 
+    <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> 
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Not Coastal&#39;</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">vlines</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
@@ -725,16 +728,13 @@ Therefore, we might want to see whether or not our errors are higher or lower de
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_11_0.png" src="../_images/11_regression_11_0.png" />
+<img alt="../_images/11_regression_12_0.png" src="../_images/11_regression_12_0.png" />
 </div>
 </div>
 <p>While it appears that the neighborhoods on the coast have only slightly higher average errors (and have lower variance in their prediction errors), the two distributions are significantly distinct from one another when compared using a classic <span class="math notranslate nohighlight">\(t\)</span> test:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> 
-             <span class="n">not_coastal</span><span class="p">,</span>
-<span class="c1">#             permutations=9999 not yet available in scipy</span>
-             <span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">stats</span><span class="o">.</span><span class="n">ttest_ind</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">not_coastal</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -752,26 +752,33 @@ For us to determine whether this is the case, we might be interested in the full
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;residual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span>
-<span class="n">medians</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;neighborhood&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">residual</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;hood_residual&#39;</span><span class="p">)</span>
+<span class="n">medians</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+    <span class="s2">&quot;neighborhood&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">residual</span><span class="o">.</span><span class="n">median</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span>
+    <span class="s1">&#39;hood_residual&#39;</span>
+<span class="p">)</span>
 
 <span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-<span class="n">seaborn</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">,</span> <span class="s1">&#39;residual&#39;</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span>
-                <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">medians</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
-                              <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">,</span>
-                              <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                   <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;hood_residual&#39;</span><span class="p">),</span> <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span><span class="p">)</span>
+<span class="n">seaborn</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span>
+    <span class="s1">&#39;neighborhood&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;residual&#39;</span><span class="p">,</span> 
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">medians</span><span class="p">,</span> 
+        <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+        <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">,</span>
+        <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+        <span class="s1">&#39;hood_residual&#39;</span><span class="p">),</span> <span class="n">palette</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span>
+<span class="p">)</span>
 <span class="n">f</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
-  warnings.warn(
-</pre></div>
-</div>
-<img alt="../_images/11_regression_16_1.png" src="../_images/11_regression_16_1.png" />
+<img alt="../_images/11_regression_17_0.png" src="../_images/11_regression_17_0.png" />
 </div>
 </div>
 <p>No neighborhood is disjoint from one another, but some do appear to be higher than others, such as the well-known downtown tourist neighborhoods areas of the Gaslamp Quarter, Little Italy, or The Core.
@@ -789,32 +796,24 @@ For this example, we’ll start off with a <span class="math notranslate nohighl
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
- There are 1849 disconnected components.
-  warnings.warn(message)
-</pre></div>
-</div>
-</div>
 </div>
 <p>This means that, when we compute the <em>spatial lag</em> of that knn weight and the residual, we get the residual of the airbnb listing closest to each observation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
-                     <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">),</span>
-                     <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
+    <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
+    <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
+    <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">),</span>
+    <span class="n">ci</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Model Residuals - $u$&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Spatial Lag of Model Residuals - $W u$&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
-  warnings.warn(
-</pre></div>
-</div>
-<img alt="../_images/11_regression_20_1.png" src="../_images/11_regression_20_1.png" />
+<img alt="../_images/11_regression_21_0.png" src="../_images/11_regression_21_0.png" />
 </div>
 </div>
 <p>In this plot, we see that our prediction errors tend to cluster!
@@ -832,21 +831,21 @@ Recalling the <em>local Moran</em> statistics, we can identify certain areas whe
 <span class="n">outliers</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">,</span> <span class="n">knn</span><span class="p">,</span> <span class="n">permutations</span><span class="o">=</span><span class="mi">9999</span><span class="p">)</span>
 <span class="n">error_clusters</span> <span class="o">=</span> <span class="p">(</span><span class="n">outliers</span><span class="o">.</span><span class="n">q</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="c1"># only the cluster cores</span>
 <span class="n">error_clusters</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">outliers</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;=</span> <span class="mf">.001</span><span class="p">)</span> <span class="c1"># filtering out non-significant clusters</span>
-<span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">error_clusters</span> <span class="o">=</span> <span class="n">error_clusters</span><span class="p">,</span>
-          <span class="n">local_I</span> <span class="o">=</span> <span class="n">outliers</span><span class="o">.</span><span class="n">Is</span><span class="p">)</span>\
-  <span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;error_clusters&quot;</span><span class="p">)</span>\
-  <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;local_I&#39;</span><span class="p">)</span>\
-  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;local_I&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">);</span>
+<span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+    <span class="n">error_clusters</span> <span class="o">=</span> <span class="n">error_clusters</span><span class="p">,</span>
+    <span class="n">local_I</span> <span class="o">=</span> <span class="n">outliers</span><span class="o">.</span><span class="n">Is</span>
+<span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+    <span class="s2">&quot;error_clusters&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+    <span class="s1">&#39;local_I&#39;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="s1">&#39;local_I&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;bwr&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span>
+<span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
- There are 3 disconnected components.
-  warnings.warn(message)
-</pre></div>
-</div>
-<img alt="../_images/11_regression_23_1.png" src="../_images/11_regression_23_1.png" />
+<img alt="../_images/11_regression_24_0.png" src="../_images/11_regression_24_0.png" />
 </div>
 </div>
 <p>Thus, these areas tend to be locations where our model significantly underpredicts the nightly airbnb price both for that specific observation and observations in its immediate surroundings.
@@ -884,7 +883,7 @@ Often, this reflects the fact that processes are not the same everywhere in the 
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
 </pre></div>
 </div>
-<img alt="../_images/11_regression_26_1.png" src="../_images/11_regression_26_1.png" />
+<img alt="../_images/11_regression_27_1.png" src="../_images/11_regression_27_1.png" />
 </div>
 </div>
 <div class="cell docutils container">
@@ -897,8 +896,12 @@ Often, this reflects the fact that processes are not the same everywhere in the 
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m2</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">balboa_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
-                  <span class="n">name_y</span> <span class="o">=</span> <span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span> <span class="o">=</span> <span class="n">balboa_names</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m2</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+    <span class="n">db</span><span class="p">[</span><span class="n">balboa_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+    <span class="n">name_y</span> <span class="o">=</span> <span class="s1">&#39;log_price&#39;</span><span class="p">,</span> 
+    <span class="n">name_x</span> <span class="o">=</span> <span class="n">balboa_names</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -966,18 +969,17 @@ Koenker-Bassett test             11         132.860           0.0000
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
-<span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
-                <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">),</span>
-                <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">);</span>
+<span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
+    <span class="n">m2</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
+    <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> 
+    <span class="n">line_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">),</span>
+    <span class="n">ci</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/seaborn/_decorators.py:36: FutureWarning: Pass the following variables as keyword args: x, y. From version 0.12, the only valid positional argument will be `data`, and passing other arguments without an explicit keyword will result in an error or misinterpretation.
-  warnings.warn(
-</pre></div>
-</div>
-<img alt="../_images/11_regression_32_1.png" src="../_images/11_regression_32_1.png" />
+<img alt="../_images/11_regression_33_0.png" src="../_images/11_regression_33_0.png" />
 </div>
 </div>
 <p>Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is <em>positive</em>, meaning that people are paying a premium to be <em>further</em> from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this. Further, the next chapter is an extensive treatment of spatial fixed effects, presenting many more spatial feature engineering methods. Here, we have only showed how to include these engineered features in a standard linear modelling framework.</p>
@@ -1021,7 +1023,7 @@ using <code class="docutils literal notranslate"><span class="pre">statsmodels</
 ======================================================================================
 Model:                      OLS                    Adj. R-squared:           0.709    
 Dependent Variable:         log_price              AIC:                      7229.6640
-Date:                       2021-03-17 22:29       BIC:                      7599.1365
+Date:                       2021-05-12 14:42       BIC:                      7599.1365
 No. Observations:           6110                   Log-Likelihood:           -3559.8  
 Df Model:                   54                     F-statistic:              276.9    
 Df Residuals:               6055                   Prob (F-statistic):       0.00     
@@ -1099,11 +1101,16 @@ Kurtosis:                  6.500                Condition No.:                13
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># PySAL implementation</span>
-<span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                       <span class="n">db</span><span class="p">[</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-                       <span class="n">constant_regi</span><span class="o">=</span><span class="s1">&#39;many&#39;</span><span class="p">,</span> <span class="n">cols2regi</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">variable_names</span><span class="p">),</span>
-                       <span class="n">regime_err_sep</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                       <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+    <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">db</span><span class="p">[</span><span class="s1">&#39;neighborhood&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+    <span class="n">constant_regi</span><span class="o">=</span><span class="s1">&#39;many&#39;</span><span class="p">,</span>
+    <span class="n">cols2regi</span><span class="o">=</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">variable_names</span><span class="p">),</span>
+    <span class="n">regime_err_sep</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> 
+    <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m4</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1298,22 +1305,26 @@ dtype: float64
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> 
-                        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-                        <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
-<span class="n">neighborhoods</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">neighborhood_effects</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
-                    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbourhood&#39;</span><span class="p">,</span> 
-                    <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>\
-                  <span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;fixed_effect&#39;</span><span class="p">])</span>\
-                  <span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;fixed_effect&#39;</span><span class="p">,</span>
-                        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">neighborhoods</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">neighborhood_effects</span><span class="p">,</span> 
+    <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbourhood&#39;</span><span class="p">,</span> 
+    <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span>
+    <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;fixed_effect&#39;</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="s1">&#39;fixed_effect&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+<span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;San Diego Neighborhood Fixed Effects&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_46_0.png" src="../_images/11_regression_46_0.png" />
+<img alt="../_images/11_regression_47_0.png" src="../_images/11_regression_47_0.png" />
 </div>
 </div>
 <div class="section" id="spatial-regimes">
@@ -1328,11 +1339,15 @@ dtype: float64
 <p>To implement this in Python, we use the <code class="docutils literal notranslate"><span class="pre">OLS_Regimes</span></code> class in <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>, which does most of the heavy lifting for us:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                          <span class="n">db</span><span class="p">[</span><span class="s1">&#39;coastal&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
-                          <span class="n">constant_regi</span><span class="o">=</span><span class="s1">&#39;many&#39;</span><span class="p">,</span>
-                          <span class="n">regime_err_sep</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                          <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+    <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">db</span><span class="p">[</span><span class="s1">&#39;coastal&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span>
+    <span class="n">constant_regi</span><span class="o">=</span><span class="s1">&#39;many&#39;</span><span class="p">,</span>
+    <span class="n">regime_err_sep</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> 
+    <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m4</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1494,9 +1509,15 @@ by first creating a list of all of those names, and then applying <code class="d
 <code class="docutils literal notranslate"><span class="pre">lag_spatial</span></code> to each of them:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wx</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s1">&#39;pg&#39;</span><span class="p">)</span>\
-        <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>\
-        <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s1">&#39;w_&#39;</span><span class="o">+</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;w_pg_Apartment&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wx</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+    <span class="n">like</span><span class="o">=</span><span class="s1">&#39;pg&#39;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+    <span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s1">&#39;w_&#39;</span><span class="o">+</span><span class="n">c</span>
+<span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+    <span class="s1">&#39;w_pg_Apartment&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1507,10 +1528,12 @@ relies on (they are essentially additional exogenous variables):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">slx_exog</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">wx</span><span class="p">)</span>
-<span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
-                  <span class="n">slx_exog</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                  <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;l_price&#39;</span><span class="p">,</span> 
-               <span class="n">name_x</span><span class="o">=</span><span class="n">slx_exog</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+<span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+    <span class="n">slx_exog</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;l_price&#39;</span><span class="p">,</span> 
+    <span class="n">name_x</span><span class="o">=</span><span class="n">slx_exog</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m5</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1649,7 +1672,8 @@ Name: 2, dtype: object
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db_scenario</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">db_scenario</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pg_Apartment&#39;</span><span class="p">,</span> <span class="s1">&#39;pg_Condominium&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="c1"># make Apartment 0 and condo 1</span>
+<span class="c1"># make Apartment 0 and condo 1</span>
+<span class="n">db_scenario</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;pg_Apartment&#39;</span><span class="p">,</span> <span class="s1">&#39;pg_Condominium&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1691,9 +1715,15 @@ Name: 2, dtype: object
 <p>Now, we need to <em>also</em> update the spatial lag variates:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wx_scenario</span> <span class="o">=</span> <span class="n">db_scenario</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">like</span><span class="o">=</span><span class="s1">&#39;pg&#39;</span><span class="p">)</span>\
-                         <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>\
-                         <span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s1">&#39;w_&#39;</span><span class="o">+</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;w_pg_Apartment&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wx_scenario</span> <span class="o">=</span> <span class="n">db_scenario</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+    <span class="n">like</span><span class="o">=</span><span class="s1">&#39;pg&#39;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">y</span><span class="p">:</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+    <span class="n">columns</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="s1">&#39;w_&#39;</span><span class="o">+</span><span class="n">c</span>
+<span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+    <span class="s1">&#39;w_pg_Apartment&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2024,8 +2054,13 @@ example, we can use a general method of moments that account for
 heterogeneity (Arraiz et al., 2010):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m6</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Error_Het</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                           <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m6</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Error_Het</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+    <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> 
+    <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> 
+    <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m6</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2085,8 +2120,13 @@ lag of all the explanatory variables is used as instrument for the endogenous
 lag:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m7</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Lag</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
-                     <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m7</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">GM_Lag</span><span class="p">(</span>
+    <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
+    <span class="n">db</span><span class="p">[</span><span class="n">variable_names</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+    <span class="n">w</span><span class="o">=</span><span class="n">knn</span><span class="p">,</span> 
+    <span class="n">name_y</span><span class="o">=</span><span class="s1">&#39;log_price&#39;</span><span class="p">,</span> 
+    <span class="n">name_x</span><span class="o">=</span><span class="n">variable_names</span>
+<span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">m7</span><span class="o">.</span><span class="n">summary</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -2168,32 +2208,50 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n_simulations</span> <span class="o">=</span> <span class="mi">100</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">coastal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> 
-           <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Coastal&#39;</span><span class="p">,</span> 
-           <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">not_coastal</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
-           <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Not Coastal&#39;</span><span class="p">,</span> 
-           <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="n">coastal</span><span class="p">,</span> 
+    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> 
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> 
+    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Coastal&#39;</span><span class="p">,</span> 
+    <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+    <span class="n">not_coastal</span><span class="p">,</span> 
+    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> 
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
+    <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Not Coastal&#39;</span><span class="p">,</span> 
+    <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 <span class="k">for</span> <span class="n">simulation</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_simulations</span><span class="p">):</span>
     <span class="n">shuffled_residuals</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">n</span><span class="p">)]</span>
-    <span class="n">random_coast</span><span class="p">,</span> <span class="n">random_notcoast</span> <span class="o">=</span> <span class="p">(</span><span class="n">shuffled_residuals</span><span class="p">[</span><span class="n">is_coastal</span><span class="p">],</span> 
-                                     <span class="n">shuffled_residuals</span><span class="p">[</span><span class="o">~</span><span class="n">is_coastal</span><span class="p">])</span>
+    <span class="n">random_coast</span><span class="p">,</span> <span class="n">random_notcoast</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">shuffled_residuals</span><span class="p">[</span><span class="n">is_coastal</span><span class="p">],</span> 
+        <span class="n">shuffled_residuals</span><span class="p">[</span><span class="o">~</span><span class="n">is_coastal</span><span class="p">]</span>
+    <span class="p">)</span>
     <span class="k">if</span> <span class="n">simulation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Simulations&#39;</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">label</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">random_coast</span><span class="p">,</span> 
-                <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-                <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
-                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.05</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
-                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> 
-                <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">random_coast</span><span class="p">,</span> 
-                <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-                <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
-                <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.05</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
-                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> 
-                <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+        <span class="n">random_coast</span><span class="p">,</span> 
+        <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+        <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.05</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
+        <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> 
+        <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span>
+        <span class="n">random_coast</span><span class="p">,</span> 
+        <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+        <span class="n">histtype</span><span class="o">=</span><span class="s1">&#39;step&#39;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.05</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> 
+        <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> 
+        <span class="n">cumulative</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
@@ -2202,7 +2260,7 @@ Instruments: W_accommodates, W_bathrooms, W_bedrooms, W_beds,
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_80_0.png" src="../_images/11_regression_80_0.png" />
+<img alt="../_images/11_regression_81_0.png" src="../_images/11_regression_81_0.png" />
 </div>
 </div>
 </div>
@@ -2223,28 +2281,15 @@ We won’t spend too much time on this theory specifically, but we can quickly a
     <span class="n">knn</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
     <span class="n">lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">)</span>
     <span class="n">random_residual</span> <span class="o">=</span> <span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="p">))]</span> 
-    <span class="n">random_lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">random_residual</span><span class="p">)</span> <span class="c1"># identical to random neighbors in KNN </span>
-    <span class="n">correlations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">nulls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">random_lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
- There are 1849 disconnected components.
-  warnings.warn(message)
-/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
- There are 9 disconnected components.
-  warnings.warn(message)
-/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
- There are 4 disconnected components.
-  warnings.warn(message)
-/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
- There are 3 disconnected components.
-  warnings.warn(message)
-/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
- There are 2 disconnected components.
-  warnings.warn(message)
+    <span class="n">random_lag_residual</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
+        <span class="n">knn</span><span class="p">,</span> <span class="n">random_residual</span>
+    <span class="p">)</span> <span class="c1"># identical to random neighbors in KNN </span>
+    <span class="n">correlations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">nulls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">numpy</span><span class="o">.</span><span class="n">corrcoef</span><span class="p">(</span><span class="n">m1</span><span class="o">.</span><span class="n">u</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">random_lag_residual</span><span class="o">.</span><span class="n">flatten</span><span class="p">())[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -2264,7 +2309,7 @@ We won’t spend too much time on this theory specifically, but we can quickly a
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/11_regression_83_0.png" src="../_images/11_regression_83_0.png" />
+<img alt="../_images/11_regression_84_0.png" src="../_images/11_regression_84_0.png" />
 </div>
 </div>
 <p>Clearly, the two curves are different. The observed correlation reaches a peak around <span class="math notranslate nohighlight">\(r=.34\)</span> when around 20 nearest listings are used. This means that adding more than 20 nearest neighbors does not significantly change the correlation in the residuals. Further, the lowest correlation is for the single nearest neighbor, and correlation rapidly increases as more neighbors are added close to the listing. Thus, this means that there does appear to be an unmeasured spatial structure in the residuals, since they are more similar to one another when they are near than when they are far apart. Further, while it’s not shown here (since computationally, it becomes intractable), as the number of nearest neighbors gets very large (approaching the number of observations in the dataset), the average of the <span class="math notranslate nohighlight">\(k\)</span>th nearest neighbors’ residuals goes to zero, the global average of residuals. This means that the correlation of the residuals and a vector that is nearly constant begins to approach zero.</p>
