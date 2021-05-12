@@ -13,6 +13,11 @@ jupyter:
     name: python3
 ---
 
+```python tags=["remove-cell"]
+import warnings
+warnings.filterwarnings("ignore")
+```
+
 # Geospatial Computational Environment
 ## Computational Tools for Geographic Data Science
 
