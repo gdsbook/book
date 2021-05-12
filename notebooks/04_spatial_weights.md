@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.2'
-      jupytext_version: 1.5.2
+      jupytext_version: 1.6.0
   kernelspec:
     display_name: Python 3
     language: python
@@ -47,7 +47,7 @@ from shapely.geometry import Polygon
 
 A contiguous pair of spatial units are those who share a common border. At first
 glance this seems straightforward, however, in practice matters turn out to be
-no so simple. The first complication is that there are different notions of
+not so simple. The first complication is that there are different notions of
 contiguity to consider. First, though, let's use a simple example of a three-by-three grid:
 
 ```python
@@ -66,7 +66,7 @@ gdf = geopandas.GeoDataFrame({'geometry': polys,
                         'id': ['P-%s'%str(i).zfill(2) for i in range(len(polys))]})
 ```
 
-```python
+```python caption="A three-by-three grid of squares."
 ax = gdf.plot(facecolor='w', edgecolor='k')
 [plt.text(x, y, t, 
           verticalalignment='center',
@@ -89,7 +89,7 @@ w.neighbors
 
 Shown visually, we can see this plotted on top of the same grid of labelled polygons, using red dotted lines showing connetions between the polygons:
 
-```python
+```python caption="Grid cells connected by a red line are 'neighbors' under a 'Rook' contiguity rule."
 f,ax = plt.subplots(1,1, subplot_kw=dict(aspect='equal'))
 w.plot(gdf, edge_kws=dict(color='r', linestyle=':'), ax =ax)
 gdf.plot(facecolor='w', edgecolor='k', ax=ax)
@@ -125,7 +125,7 @@ w.nonzero
 
 Thus, we can save a significant amount of memory and lose no information by storing these sparse representations, which only record the non-zero values. 
 
-More generally, the spatial weights for our 3-by-3 grid can be represented as a matrix that has 9 rows and 9 columns, matching the number of polygons $(n=9)$. An important thing to note is that geography has more than one dimension. When compared to common representations of relationships *in time* used in data science, using information about spatial relationships can be more complex: spatial relationships are bi-directional, while temporal relationships are unidirectional. Further complicating things, the ordering of the observations in the weights matrix is ambiguous. The first row is not first for a specific reason. Here we simply use the alphanumeric ordering of the unit identifiers to match a polygon with a row or column of the matrix, but any arbitrary rule could be followed and the weights matrix would look different. The graph, however, would be isomorphic.. 
+More generally, the spatial weights for our 3-by-3 grid can be represented as a matrix that has 9 rows and 9 columns, matching the number of polygons $(n=9)$. An important thing to note is that geography has more than one dimension. When compared to common representations of relationships *in time* used in data science, using information about spatial relationships can be more complex: spatial relationships are bi-directional, while temporal relationships are unidirectional. Further complicating things, the ordering of the observations in the weights matrix is ambiguous. The first row is not first for a specific reason. Here we simply use the alphanumeric ordering of the unit identifiers to match a polygon with a row or column of the matrix, but any arbitrary rule could be followed and the weights matrix would look different. The graph, however, would be isomorphic.
 
 Spatial weights matrices may look familiar to those acquainted with social
 networks and graph theory in which **adjacency** matrices play a central role in
@@ -154,7 +154,7 @@ w.neighbors
 
 In addition to this neighbors representation, we can also express the graph visually, as done before:
 
-```python
+```python caption="Grid cells connected by a red line are considered 'neighbors' under 'Queen' contiguity."
 f,ax = plt.subplots(1,1, subplot_kw=dict(aspect='equal'))
 w.plot(gdf, edge_kws=dict(color='r', linestyle=':'), ax =ax)
 gdf.plot(facecolor='w', edgecolor='k', ax=ax)
@@ -201,7 +201,7 @@ w.histogram
 We can obtain a quick visual representation by converting the cardinalities
 into a `pandas.Series` and creating a histogram:
 
-```python
+```python caption="Histogram of  cardinalities (i.e. the number of neighbors each cell has) in the Queen grid."
 pandas.Series(w.cardinalities).plot.hist(color='k');
 ```
 
@@ -252,7 +252,7 @@ wq = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 
 Like before, we can visualize the adjacency relationships, but they are much more difficult to see without showing a closer detail:
 
-```python
+```python caption="The Queen contiguity graph for San Diego tracts. Tracts connected with a red line are neighbors."
 ax = san_diego_tracts.plot(edgecolor='k', facecolor='w')
 wq.plot(san_diego_tracts, ax=ax, 
         edge_kws=dict(color='r', linestyle=':', linewidth=1),
@@ -262,7 +262,7 @@ ax.set_axis_off()
 
 So, showing more detail, we can get a glimpse of the complicated structure of the contiguity relationships between tracts in the center city:
 
-```python
+```python caption="An inset view of the Queen contiguity graph."
 ax = san_diego_tracts.plot(edgecolor='k', facecolor='w')
 f,ax = wq.plot(san_diego_tracts, ax=ax, 
         edge_kws=dict(color='r', linestyle=':', linewidth=1),
@@ -283,7 +283,7 @@ First we have a larger number of spatial units. The spatial weights are
 also much more sparse for the tracts than what we saw for our smaller toy
 layout. Moreover, the cardinalities have a radically different distribution:
 
-```python
+```python caption="Cardinalities for the Queen contiguity graph among San Diego Tracts"
 s = pandas.Series(wq.cardinalities)
 s.plot.hist(bins=s.unique().shape[0]);
 ```
@@ -293,7 +293,7 @@ queen neighbors. The most common number of neighbors is 6.
 
 There is also a function to create the rook weights for the same dataframe:
 
-```python
+```python caption="Cardinalities for the Rook contiguity graph among San Diego Tracts"
 wr = weights.contiguity.Rook.from_dataframe(san_diego_tracts)
 print(wr.pct_nonzero)
 s = pandas.Series(wr.cardinalities)
@@ -309,8 +309,8 @@ particular case of a regular lattice. The principle to keep in mind is that we
 consider contiguous (and hence call neighbours) observations which share part
 of their border coordinates. In the queen case, a single point is enough to make
 the join. For rook neighbours, we require a join to consist of one or more
-shared edges. This distinction is probably less relevant in the real world that
-in appears in the grid example above, and it is probably down to geocoding
+shared edges. This distinction is probably less relevant in the real world than
+it appears in the grid example above, and it is probably down to geocoding
 issues rather than substantive differences. In any case, there are special cases
 where this distinction can matter and it is useful to be familiar with the
 differences between the two approaches and how to apply them.
@@ -341,7 +341,7 @@ wk4 = weights.distance.KNN.from_dataframe(san_diego_tracts, k=4)
 
 The centroids are attributes of the polygon shapes that PySAL calculates from
 the spatial information stored in the `GeoDataFrame`. Since we are dealing with
-polygons in this case, PySAL uses inter-centroid distances to distance determine the
+polygons in this case, PySAL uses inter-centroid distances to determine the
 $k$ nearest observations to each polygon. 
 
 The knn weights displays no island problem:
@@ -398,7 +398,7 @@ than the bandwidth, the weights are set to zero.
 
 The default values for kernels are to use a triangular kernel with a bandwidth distance
 equal to the maximum knn=2 distance
-for all observations. The latter implies a so-called fixed bandwidth were all
+for all observations. The latter implies a so-called fixed bandwidth where all
 observations use the same distance for the cut-off. We can inspect this from
 the generated `W` object:
 
@@ -426,7 +426,7 @@ characteristics- can be preferred. Adaptive bandwidths are picked again using a 
 
 For example, using a subset of tracts in our San Diego dataset, we can see that the centroids of each tract are not exactly regularly-spaced, although others do nearly fall into a regular spacing:
 
-```python
+```python caption="Centroids of some tracts in San Diego are (nearly) evenly spaced."
 sub_30 = san_diego_tracts.query("sub_30 == True")
 ax = sub_30.plot(facecolor='w', edgecolor='k')
 sub_30.head(30).centroid.plot(color='r', ax=ax)
@@ -442,7 +442,7 @@ w_adaptive.bandwidth
 
 And, we can visualize what these kernels look like on the map, too, by focusing on an individual unit and showing how the distance deacy attenuates the weight by grabbing the corresponding row of the full kernel matrix:
 
-```python
+```python caption="A Gaussian kernel centered on two different tracts."
 full_matrix, ids = w_adaptive.full() 
 f,ax = plt.subplots(1,2,figsize=(12,6), subplot_kw=dict(aspect='equal'))
 sub_30.assign(weight_0 = full_matrix[0]).plot("weight_0", cmap='plasma', ax=ax[0])
@@ -452,7 +452,7 @@ ax[1].set_title("Kernel centered on 18th tract")
 [ax_.set_axis_off() for ax_ in ax]
 ```
 
-What the kernel looks like can be strongly affected by the structure of spatial proximity, so any part of the map can look quite different from any othe rpart of the map. By imposing a clear distance decay over several of the neighbors of each observation,
+What the kernel looks like can be strongly affected by the structure of spatial proximity, so any part of the map can look quite different from any other part of the map. By imposing a clear distance decay over several of the neighbors of each observation,
 kernel weights incorporate Tobler's law very explicitly. Often, this comes at the cost of
 increased memory requirements, as every single pair of observations within the
 bandwidth distance is considered:
@@ -541,7 +541,7 @@ knn4_bad.histogram
 ```
 
 Next, let us take curvature into account. To do this, we require the
-radious of the Earth expressed in a given metric. PySAL provides this number
+radius of the Earth expressed in a given metric. PySAL provides this number
 in both miles and kilometres. For the sake of the example, we will use miles:
 
 ```python
@@ -551,7 +551,7 @@ radius
 
 With this measure at hand, we can pass it to the weights constructor (either
 straight from a shapefile or from a `GeoDataFrame`) and distances will be
-expressed in the units we have used for the radious, that is in miles in our
+expressed in the units we have used for the radius, that is in miles in our
 case:
 
 ```python
@@ -635,7 +635,7 @@ To connect it in our initial matrix, we need to create a copy of the `neighbors`
 neighbors = wr.neighbors.copy()
 ```
 
-and then we are change the entry for the island observation to include its
+and then we change the entry for the island observation to include its
 nearest neighbor (`102`) as well as update `102` to have `103` as a neighbor:
 
 ```python
@@ -721,12 +721,11 @@ relation between the states according to the specific definition.
 We first read in the data for Mexico:
 <!-- #endregion -->
 
-```python
+```python caption="States in Mexico"
 mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax)
 ax.set_axis_off()
-ax.set_title('Mexican States')
 plt.axis('equal')
 plt.show()
 
@@ -743,27 +742,25 @@ We will contrast the connectivity structure for the three following types of spa
 Beginning with Queen weights:
 <!-- #endregion -->
 
-```python
+```python caption="Queen weights among states in Mexico."
 queen_mx = weights.contiguity.Queen.from_dataframe(mx)
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax)
 queen_mx.plot(mx,edge_kws=dict(linewidth=1.5, color='orangered'), node_kws=dict(marker='*'),  ax=ax, )
 ax.set_axis_off()
-ax.set_title('Queen')
 plt.axis('equal')
 plt.show()
 ```
 
 For the block weights, we use the official designation of regions from the federal government:
 
-```python
+```python caption="Regions of Mexico"
 ax = mx.plot(column='INEGI2', categorical=True, cmap='Pastel2')
 block_mx = weights.util.block_weights(mx['INEGI2'].values)
 ax.set_axis_off()
-ax.set_title("Mexican Regions")
 ```
 
-```python
+```python caption="'Block' weights for Mexican states within regions."
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(column='INEGI2', categorical=True, 
         cmap='Pastel2', ax=ax)
@@ -771,14 +768,13 @@ block_mx.plot(mx, edge_kws=dict(linewidth=1.5,
                                 color='orangered'), 
                   node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Block')
 plt.axis('equal')
 plt.show()
 ```
 
 Next, we construct the union of queen contiguity and block weights
 
-```python
+```python caption="The union of Region-block and Queen weights for Mexican states. In this graph, a state's neighbors are either within the same region *or* are in a different region but sharing a point on the boundary."
 union_mx = weights.set_operations.w_union(block_mx, queen_mx)
 
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -787,14 +783,13 @@ union_mx.plot(mx, edge_kws=dict(linewidth=1.5,
                                 color='orangered'), 
               node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Union ')
 plt.axis('equal')
 plt.show()
 ```
 
 Finally, we compare the three neighbor graphs side by side:
 
-```python
+```python caption="The three graphs discussed above, shown side-by-side."
 f, axs = plt.subplots(1, 3, figsize=(18, 6))
 
 
@@ -805,7 +800,7 @@ mx.plot(column='INEGI2', categorical=True,
 queen_mx.plot(mx, edge_kws=dict(linewidth=1.5, color='orangered'), 
               node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Queen')
+ax.set_xlabel('Queen')
 ax.axis('equal')
 
 # Block
@@ -815,7 +810,7 @@ mx.plot(column='INEGI2', categorical=True,
 block_mx.plot(mx, edge_kws=dict(linewidth=1.5, color='orangered'), 
               node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Block weights')
+ax.set_xlabel('Block weights')
 ax.axis('equal')
 
 # Union
@@ -825,7 +820,7 @@ mx.plot(column='INEGI2', categorical=True,
 union_mx.plot(mx, edge_kws=dict(linewidth=1.5, color='orangered'), 
               node_kws=dict(marker='*'), ax=ax)
 ax.set_axis_off()
-ax.set_title('Queen + Block')
+ax.set_xlabel('Queen + Block')
 plt.axis('equal')
 f.tight_layout()
 plt.show()
@@ -876,13 +871,14 @@ Below, we'll show one model-free way to identify empirical boundaries in your da
 
 First, let's consider the median household income for our census tracts in San Diego:
 
-```python
+```python caption="Household incomes in San Diego."
 f,ax = plt.subplots(1,2, figsize=(12,4))
 san_diego_tracts.plot('median_hh_income', ax=ax[0])
 ax[0].set_aspect('equal')
 ax[0].set_axis_off()
 san_diego_tracts['median_hh_income'].hist(ax=ax[1])
 ax[1].set_title("Median Household Income")
+plt.show()
 ```
 
 Now, we see some cases where there are very stark differences between neighboring areas, and some cases where there are essentially no difference between adjacent areas. Digging into this, we can examine the *distribution of differences* in neighboring areas using the adjacency list:
@@ -931,7 +927,7 @@ non_neighboring_diffs = (complement_wr * all_pairs).flatten()
 
 Now, we can compare the two distributions of the difference in wealth:
 
-```python
+```python caption="Diferences between median incomes among neighboring (and non-neighboring) tracts in San Diego."
 f = plt.figure(figsize=(12,3))
 plt.hist(non_neighboring_diffs, color='lightgrey', 
          edgecolor='k', density=True, bins=50, label='Nonneighbors')
@@ -976,7 +972,7 @@ for i in range(n_simulations):
 
 After running our simulations, we get many distributions of pairwise differences in household income. Below, we can see the shroud of all of the simulated differences, shown in black, and our observed differences, shown in red:
 
-```python
+```python caption="Differences between neighboring incomes for the observed map (orange) and maps arising from randomly-reshuffled maps (black) of tract median incomes."
 f = plt.figure(figsize=(12,3))
 plt.hist(adjlist_wealth['diff'], 
          color='salmon', bins=50, density=True,
@@ -1001,7 +997,7 @@ lower, median, upper = numpy.percentile(pooled_diffs, q=(.5,50,99.5))
 outside = (adjlist_wealth['diff'] < lower) | (adjlist_wealth['diff'] > upper)
 ```
 
-So, despite the fact that that our observed differences are less dispersed on average, we can identify three boundaries in the data that are in the top 1% most extreme differences in neighboring household incomes across the map. These boundaries are shown in the table below:
+So, despite the fact that that our observed differences are less dispersed on average, we can identify two boundaries in the data that are in the top 1% most extreme differences in neighboring household incomes across the map. These boundaries are shown in the table below:
 
 ```python
 adjlist_wealth[outside]
@@ -1011,7 +1007,7 @@ Note that one of these, observation $473$, appears in both boundaries. This mean
 
 It is most helpful, though, to visualize this on a map, focusing on the two boundaries around observation $473$, shown also in the larger context of San Diego incomes:
 
-```python
+```python caption="The two most stark differences in median household income among San Diego tracts."
 f,ax = plt.subplots(1, 3, figsize=(18,6))
 
 # Plot tracts
@@ -1042,22 +1038,38 @@ ax[2].axis([west, south, east, north]);
 These are the starkest contrasts in the map, and result in the most distinctive divisions between adjacent tracts' household incomes. 
 
 
+## Conclusion
+
+Spatial weights are central to how we *represent* spatial relationships in mathematical and computational environments. At their core, they are a "geo-graph," or a network defined by the geographcial relationships between observations. They form kind of a "spatial index," in that they record which observations have a specific geographcial relatinoship. Since spatial weights are fundamental to how "proximity" is represented in geographic data science, we will use them again and again throughout the book. 
+
+
 ## Questions
 
 
 1. Rook contiguity & Queen contiguity are two of three kinds of contiguity that are defined in terms of chess analogies. The third kind, *Bishop contiguity*, applies when two observations are considered connected when they share single vertices, but are considered *disconnected* if they share an edge. This means that observations that exhibit Queen contiguity are those that exhibit either Rook or Bishop contiguity. Using the Rook and Queen contiguity matrices we built for San Diego and the `Wsets.w_difference` function, are there any Bishop-contiguous observations in San Diego? 
 
-2. Different kinds of spatial weights objects can result in very different kinds of graph structures. Considering the `cardinalities` of the Queen, Block, and union of Queen & Block, which graph type has the highest average cardinality? Why might this be the case? Which graph has more nonzero entries?
+2. Different kinds of spatial weights objects can result in very different kinds of graph structures. Considering the `cardinalities` of the Queen, Block, and the union of Queen & Block, 
+    1. Which graph type has the highest average cardinality?
+    2. Which graph has more nonzero entries?
+    3. Why might this be the case?
 
-3. Comparing their average cardinality and percentage of nonzero links, which graph in this chapter has the *most sparse* structure? That is, which graph is the most sparsely connected?
+3. Graphs are considered "connected" when you can construct a path from any observation to every other observation. A "disconnected" graph has at least one node where there is no path from it to every other node. And, a "connected component" is a part of the graph that is connected internally, but is disconnected from another part of the graph. This is reported for every spatial weights object in its `w.n_components`. 
 
-4. In this chapter, we worked with regular *square* lattices using the `lat2W` function. In the same manner, the `hexLat2W` function can generate *hexagonal regular lattices*. For lattices of size (3,3), (6,6), and (9,9) for Rook & Queen `lat2W`, as well as for `hexLat2W`:
+    1. How many components does the Queen Contiguity weights for San Diego have?
+    2. Using a K-nearest Neighbor Graph for San Diego tracts where $k=1$, how many connected components are there in this graph?
+    3. Increase $k$ by one until the `n_components` is 1. Make a plot of the relationship between $k$ and $n_components$. 
+    4. What value of $k$ does `n_components` become 1?
+    5. How many non-zero links does this network have?
+
+4. Comparing their average cardinality and percentage of nonzero links, which graph in this chapter has the *most sparse* structure? That is, which graph is the most sparsely connected?
+
+5. In this chapter, we worked with regular *square* lattices using the `lat2W` function. In the same manner, the `hexLat2W` function can generate *hexagonal regular lattices*. For lattices of size (3,3), (6,6), and (9,9) for Rook & Queen `lat2W`, as well as for `hexLat2W`:
 
     1. examine the average cardinality. Does `lat2W` or `hexLat2W` have higher average cardinality? 
     2. Further, make a histogram of the cardinalities. Which type of lattice has higher variation in its number of neighbors? 
     3. Why is there no `rook=True` option in `hexLat2W`, as there is in `lat2W`?
 
-5. The *Voronoi diagram* is a common method to construct polygons from a point dataset. A Voronoi diagram is built up from *Voronoi cells*, each of which contains the area that is closer to its source point than any other source point in the diagram. Further, the Queen contiguity graph for a *Voronoi diagram* obeys a number of useful properties, since it is the *Delaunay Triangulation* of a set of points. 
+6. The *Voronoi diagram* is a common method to construct polygons from a point dataset. A Voronoi diagram is built up from *Voronoi cells*, each of which contains the area that is closer to its source point than any other source point in the diagram. Further, the Queen contiguity graph for a *Voronoi diagram* obeys a number of useful properties, since it is the *Delaunay Triangulation* of a set of points. 
     1. Using the following code, build and plot the voronoi diagram for the *centroids* of Mexican states, with the states and their centroids overlayed:
     ```python
     from pysal.lib.weights.distance import get_points_array
@@ -1077,19 +1089,19 @@ These are the starkest contrasts in the map, and result in the most distinctive 
     4. Make a plot of the Queen contiguity and Voronoi contiguity graphs to compare them visually, like we did with the block weights & Queen weights. How do the two graphs compare in terms of the length of their links and how they connect the Mexican states?
     5. Using `weights.set_operations`, find any links that are in the Voronoi contiguity graph, but not in the Queen contiguity graph. Alternatively, find any links that are in the Queen contiguity graph, but not the Voronoi contiguity graph. 
 
-6. Interoperability is important for the Python scientific stack. Thanks to standardization around the `numpy` array and the `scipy.sparse` array datastructures, it is simple and computationally-easy to convert objects from one representation to another:
+7. Interoperability is important for the Python scientific stack. Thanks to standardization around the `numpy` array and the `scipy.sparse` array datastructures, it is simple and computationally-easy to convert objects from one representation to another:
     1. Using `w.to_networkx()`, convert the Mexico Regions Queen+Block weights matrix to a `networkx` graph. Compute the Eigenvector Centrality of that new object using `networkx.eigenvector_centrality`
     2. Using `w.sparse`, compute the number of connected components in the Mexico Regions Block weights matrix using the `connected_components` function in `scipy.sparse.csgraph`. 
     3. Using `w.sparse`, compute the all-pairs shortest path matrix in the Mexico Queen weights matrix using the `shortest_path` function in `scipy.sparse.csgraph`. 
     
-7. While every node in a $k$-nearest neighbor graph has 5 neighbors, there is a conceptual difference between *indegree* and *outdegree* of nodes in a graph. The *outdegree* of a node is the number of outgoing links from a node; for a K-Nearest Neighbor graph, this is $k$ for every variable. The *indegree* of a node in a graph is the number of *incoming* links to that node; for a K-Nearest Neighbor graph, this is the number of other observations that pick the target as their nearest neighbor. The *indegree* of a node in the K-Nearest Neighbor graph can provide a measure of *hubbiness*, or how central a node is to other nodes. 
+8. While every node in a $k$-nearest neighbor graph has 5 neighbors, there is a conceptual difference between *indegree* and *outdegree* of nodes in a graph. The *outdegree* of a node is the number of outgoing links from a node; for a K-Nearest Neighbor graph, this is $k$ for every variable. The *indegree* of a node in a graph is the number of *incoming* links to that node; for a K-Nearest Neighbor graph, this is the number of other observations that pick the target as their nearest neighbor. The *indegree* of a node in the K-Nearest Neighbor graph can provide a measure of *hubbiness*, or how central a node is to other nodes. 
     1. Using the San Diego Tracts data, build a $k=6$ nearest neighbor weight and call it `knn_6`. 
     2. Verify that the $k=6$ by taking the row sum over the weights matrix in `knn_6.sparse`.
     3. Compute the indegree of each observation by taking the *column sum* over the weights matrix in `knn_6.sparse`, and divide by 6, the outdegree for all observations. 
     4. Make a histogram of the indegrees for the $k=6$ weights. How evenly-distributed is the distribution of indegrees?
     5. Make a new histogram of the indegree standardized by the outdegree when $k=26$. Does hubbiness reduce when increasing the number of $k$-nearest neighbors?
 
-8. Sometimes, graphs are not simple to construct. For the `san_diego_neighborhoods` dataset:
+9. Sometimes, graphs are not simple to construct. For the `san_diego_neighborhoods` dataset:
     1. Build the Queen contiguity weights, and plot the graph on top of the neighborhoods themselves. How many connected components does this Queen contiguity graph have? 
     2. Build the K-Nearest Neighbor graph for the default, $k=2$. How many connected components does this K-Nearest Neighbor graph have? 
     3. What is the smallest $k$ that you can find for the K-Nearest Neighbor graph to be fully-connected?

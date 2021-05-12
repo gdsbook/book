@@ -5,12 +5,12 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.2
+      format_version: '1.3'
+      jupytext_version: 1.10.2
   kernelspec:
-    display_name: Python [conda env:analysis]
+    display_name: Python 3
     language: python
-    name: conda-env-analysis-py
+    name: python3
 ---
 
 # Spatial Regression
@@ -127,7 +127,7 @@ To examine this, we first might want to split our data up by regions and see if 
 One reasonable theory might be that our model does not include any information about *beaches*, a critical aspect of why people live and vacation in San Diego. 
 Therefore, we might want to see whether or not our errors are higher or lower depending on whether or not an airbnb is in a "beach" neighborhood, a neighborhood near the ocean:
 
-```python
+```python caption="Distributions of prediction errors (residuals) for the basic linear model. Residuals for coastal Airbnbs are generally positive, meaning that the model under-predicts their prices." tags=[]
 is_coastal = db.coastal.astype(bool)
 coastal = m1.u[is_coastal]
 not_coastal = m1.u[~is_coastal]
@@ -157,7 +157,7 @@ For us to determine whether this is the case, we might be interested in the full
 
 To make this more clear, we'll first sort the data by the median residual in that neighborhood, and then make a box plot, which shows the distribution of residuals in each neighborhood:
 
-```python
+```python caption="Boxplot of prediction errors by neighborhood in San Diego, showing that the basic model systematically over- (or under-) predicts the nightly price of some neighborhoods' Airbnbs." tags=[]
 db['residual'] = m1.u
 medians = db.groupby("neighborhood").residual.median().to_frame('hood_residual')
 
@@ -190,7 +190,7 @@ knn = weights.KNN.from_dataframe(db, k=1)
 
 This means that, when we compute the *spatial lag* of that knn weight and the residual, we get the residual of the airbnb listing closest to each observation.
 
-```python
+```python caption="The relationship between prediction error for an Airbnb and the nearest Airbnb's prediction error. This suggests that if an Airbnb's nightly price is over-predicted, its nearby Airbnbs will also be over-predicted." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
 ax = seaborn.regplot(m1.u.flatten(), lag_residual.flatten(), 
                      line_kws=dict(color='orangered'),
@@ -212,7 +212,7 @@ Given this behavior, let's look at the stable $k=20$ number of neighbors.
 Examining the relationship between this stable *surrounding* average and the focal Airbnb, we can even find clusters in our model error. 
 Recalling the *local Moran* statistics, we can identify certain areas where our predictions of the nightly (log) Airbnb price tend to be significantly off:
 
-```python
+```python caption="Map of cluters in regression errors, according to the Local Moran's $I_i$." tags=[]
 knn.reweight(k=20, inplace=True)
 outliers = esda.moran.Moran_Local(m1.u, knn, permutations=9999)
 error_clusters = (outliers.q % 2 == 1) # only the cluster cores
@@ -256,7 +256,7 @@ For a start, one relevant proximity-driven variable that could influence our mod
 
 Therefore, this is sometimes called a *spatially-patterned omitted covariate*: geographic information our model needs to make good precitions which we have left out of our model. Therefore, let's build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize the structure of this distance covariate itself:
 
-```python
+```python caption="A map showing the 'Distance to Balboa Park' variable." tags=[]
 db.plot('d2balboa', marker='.', s=5)
 ```
 
@@ -278,7 +278,7 @@ print(m2.summary)
 
 And, there still appears to be spatial structure in our model's errors:
 
-```python
+```python caption="The relationship between prediction error and the nearest Airbnb's prediction error for the model including the 'Distance to Balboa Park' variable. Note the much stronger relationship here than before." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m2.u)
 seaborn.regplot(m2.u.flatten(), lag_residual.flatten(), 
                 line_kws=dict(color='orangered'),
@@ -358,7 +358,7 @@ sd_path = '../data/airbnb/neighbourhoods.geojson'
 neighborhoods = geopandas.read_file(sd_path)
 ```
 
-```python
+```python caption="Neighborhood effects on Airbnb nightly prices. Neighborhoods shown in grey are 'not statistically significant' in their effect on Airbnb prices." tags=[]
 ax = neighborhoods.plot(color='k', 
                         alpha=0.5,
                         figsize=(12,6))
@@ -644,15 +644,27 @@ m7 = spreg.GM_Lag(db[['log_price']].values, db[variable_names].values,
 print(m7.summary)
 ```
 
-Similarly to the effects in the SLX regression, changes in the spatial lag regression need to be interpreted with care. Here, `w_log_price` applies consistently over all observations, and actually changes the effective strength of each of the $\beta$ coefficients. Thus, it is useful to use predictions and scenario-building to predict $y$ when changing $X$, which allows you to analyze the *direct* and *indirect*components. 
+Similarly to the effects in the SLX regression, changes in the spatial lag regression need to be interpreted with care. Here, `w_log_price` applies consistently over all observations, and actually changes the effective strength of each of the $\beta$ coefficients. Thus, it is useful to use predictions and scenario-building to predict $y$ when changing $X$, which allows you to analyze the *direct* and *indirect* components. 
 
 #### Other ways of bringing space into regression
 
 While these are some kinds of spatial regressions, many other advanced spatial regression methods see routine use in statistics, data science, and applied analysis. For example, Generalized Additive Models {cite}`Gibbons_2015,Wood_2006` haven been used to apply spatial kernel smoothing directly within a regression function. Other similar smoothing methods, such as spatial Gaussian process models {cite}`Brunsdon_2010` or Kriging, conceptualize the dependence between locations as smooth as well. Other methods in spatial regression that consider graph-based geographies (rather than distance/kernel effects) include variations on conditional autoregressive model, which examines spatial relationships at locations *conditional* on their surroundings, rather than as jointly co-emergent with them. Full coverage of these topics is beyond the scope of this book, however, though {cite}`Banerjee_2008` provides a detailed and comprehensive discussion. 
 
 
-### Challenge
+## Questions
 
+1. One common kind of spatial econometric model is the "Spatial Durbin Model," which combines the SLX model with the spatial lag model. Alternatively, the "Spatial Durbin Error Model" combines the SLX model with the spatial error model. Fit a Spatial Durbin variant of the spaital models fit in this chapter. 
+    - Do these variants improve the model fit?
+    - What happens to the spatial autocorrelation parameters ($\rho$, $\lambda$) when the SLX term is added? Why might this occur?
+2. Fortunately for us, spatial error models recover the same estimates (asymptotically) as a typical OLS estimate, although their confidence intervals will change. Statistically, this occurs because OLS is *inefficient* when there is spatial correlation and/or spatial heteroskedasticity. How much do the confidence intervals change when the spatial error model is fit?
+3. One common justification for the SLX model (and the Spatial Durbin variants) is about *omitted, spatially-patterned variables*. That is, if an omitted variable is associated with the included variables *and* is spatially-patterned, then we can use the spatial structure of our existing variables to mimic the omitted variable. In our spatial lag model, 
+    - what variables might we be missing that are important to predict the price of an AirBnB?
+    - would these omitted variables have a similar spatial pattern to our included variables? why or why not? 
+4. Where *spatial* regression models generally focus on how nearby observations are similar to one another, *platial* models focus on how observations in the same spatial group are similar to one another. These are often dealt with using multilevel or spatial mixed-effect models. When do these two ideas work together well? And, when might these disagree?
+
+### Challenge Questions
+
+The following discussions are a bit challenging, but reflect extra enhancements to the discussions in the chapter that may solidify or enhance an advanced understanding of the material.   
 
 #### The random coast
 In the section analyzing our naive model residuals, we ran a classic two-sample $t$-test to identify whether or not our coastal and not-coastal residential districts tended to have the same prediction errors. Often, though, it's better to use straightforward, data-driven testing and simulation methods than assuming that the mathematical assumptions of the $t$-statistic are met.
@@ -663,7 +675,7 @@ Below, we do this; running 100 simulated re-assignments of districts to either "
 
 Below, the black lines represent our simulations, and the colored patches below them represents the observed distribution of residuals. If the black lines tend to be on the left of the colored patch, then, the simulations (where prediction error is totally random with respect to our categories of "coastal" and "not coastal") tend to have more negative residuals than our actual model. If the black lines tend to be on the right, then they tend to have more positive residuals. As a refresher, positive residuals mean that our model is underpredicting, and negative residuals mean that our model is overpredicting. Below, our simulations provide direct evidence for the claim that our model may be systematically underpredicting coastal price and overpredicting non-coastal prices. 
 
-```python
+```python caption="Distributions showing the differences between coastal and non-coastal prediction errors. Some 'random' simulations are shown in black in each plot, where observations are randomly assigned to either 'Coastal' or 'Not Coastal' groups." tags=[]
 n_simulations = 100
 f, ax = plt.subplots(1,2,figsize=(12,3), sharex=True, sharey=True)
 ax[0].hist(coastal, color='r', alpha=.5, 
@@ -721,7 +733,7 @@ for order in range(1, 51, 5):
     nulls.append(numpy.corrcoef(m1.u.flatten(), random_lag_residual.flatten())[0,1])
 ```
 
-```python
+```python caption="Correlogram showing the change in correlation between prediction error at an Airbnb and its surroundings as the number of nearest neighbors increase. The null hypothesis, where residuals are shuffled around the map, shows no significant correlation at any distance. " tags=[]
 plt.plot(range(1,51,5), correlations)
 plt.plot(range(1,51,5), nulls, color='orangered')
 plt.hlines(numpy.mean(correlations[-3:]),*plt.xlim(),linestyle=':', color='k')
@@ -741,5 +753,3 @@ So, the correlation between the observed residual and the average of $k$ randoml
 Thus, increasing the number of randomly-chosen neighbors does not significantly adjust the long-run average of zero.
 Taken together, we can conclude that there is distinct positive spatial dependence in the error. 
 This means that our over- and under-predictions are likely to cluster. 
-
-
