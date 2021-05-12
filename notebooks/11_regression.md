@@ -6,12 +6,17 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.2
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
     name: python3
 ---
+
+```python tags=["remove-cell"]
+import warnings
+warnings.filterwarnings("ignore")
+```
 
 # Spatial Regression
 
@@ -74,10 +79,18 @@ db.info()
 These are the explanatory variables we will use throughout the chapter.
 
 ```python
-variable_names = ['accommodates', 'bathrooms', 'bedrooms', 
-                  'beds', 'rt_Private_room', 'rt_Shared_room',
-                  'pg_Condominium', 'pg_House', 
-                  'pg_Other', 'pg_Townhouse']
+variable_names = [
+    'accommodates', 
+    'bathrooms', 
+    'bedrooms', 
+    'beds', 
+    'rt_Private_room', 
+    'rt_Shared_room',
+    'pg_Condominium', 
+    'pg_House', 
+    'pg_Other', 
+    'pg_Townhouse'
+]
 ```
 
 ## Non-spatial regression, a (very) quick refresh
@@ -101,8 +114,12 @@ A regression can be seen as a multivariate extension of bivariate correlations. 
 Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. `statsmodels`, `scikit-learn`, `PySAL`). In the context of this chapter, it makes sense to start with `PySAL` as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with $X$ as the list defined, we only need the following line of code:
 
 ```python
-m1 = spreg.OLS(db[['log_price']].values, db[variable_names].values,
-                name_y='log_price', name_x=variable_names)
+m1 = spreg.OLS(
+    db[['log_price']].values, 
+    db[variable_names].values,
+    name_y='log_price', 
+    name_x=variable_names
+)
 ```
 
 We use the command `OLS`, part of the `spreg` sub-package, and specify the dependent variable (the log of the price, so we can interpret results in terms of percentage change) and the explanatory ones. Note that both objects need to be arrays, so we extract them from the `pandas.DataFrame` object using `.values`.
@@ -132,8 +149,13 @@ is_coastal = db.coastal.astype(bool)
 coastal = m1.u[is_coastal]
 not_coastal = m1.u[~is_coastal]
 plt.hist(coastal, density=True, label='Coastal')
-plt.hist(not_coastal, histtype='step',
-         density=True, linewidth=4, label='Not Coastal')
+plt.hist(
+    not_coastal, 
+    histtype='step',
+    density=True, 
+    linewidth=4, 
+    label='Not Coastal'
+)
 plt.vlines(0,0,1, linestyle=":", color='k', linewidth=4)
 plt.legend()
 plt.show()
@@ -142,10 +164,7 @@ plt.show()
 While it appears that the neighborhoods on the coast have only slightly higher average errors (and have lower variance in their prediction errors), the two distributions are significantly distinct from one another when compared using a classic $t$ test:
 
 ```python
-stats.ttest_ind(coastal, 
-             not_coastal,
-#             permutations=9999 not yet available in scipy
-             )
+stats.ttest_ind(coastal, not_coastal)
 ```
 
 There are more sophisticated (and harder to fool) tests that may be applicable for this data, however. We cover them in the [Challenge](#Challenge) section. 
@@ -159,15 +178,26 @@ To make this more clear, we'll first sort the data by the median residual in tha
 
 ```python caption="Boxplot of prediction errors by neighborhood in San Diego, showing that the basic model systematically over- (or under-) predicts the nightly price of some neighborhoods' Airbnbs." tags=[]
 db['residual'] = m1.u
-medians = db.groupby("neighborhood").residual.median().to_frame('hood_residual')
+medians = db.groupby(
+    "neighborhood"
+).residual.median().to_frame(
+    'hood_residual'
+)
 
 f = plt.figure(figsize=(15,3))
 ax = plt.gca()
-seaborn.boxplot('neighborhood', 'residual', ax = ax,
-                data=db.merge(medians, how='left',
-                              left_on='neighborhood',
-                              right_index=True)
-                   .sort_values('hood_residual'), palette='bwr')
+seaborn.boxplot(
+    'neighborhood', 
+    'residual', 
+    ax = ax,
+    data=db.merge(
+        medians, 
+        how='left',
+        left_on='neighborhood',
+        right_index=True
+    ).sort_values(
+        'hood_residual'), palette='bwr'
+)
 f.autofmt_xdate()
 plt.show()
 ```
@@ -192,9 +222,12 @@ This means that, when we compute the *spatial lag* of that knn weight and the re
 
 ```python caption="The relationship between prediction error for an Airbnb and the nearest Airbnb's prediction error. This suggests that if an Airbnb's nightly price is over-predicted, its nearby Airbnbs will also be over-predicted." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
-ax = seaborn.regplot(m1.u.flatten(), lag_residual.flatten(), 
-                     line_kws=dict(color='orangered'),
-                     ci=None)
+ax = seaborn.regplot(
+    m1.u.flatten(), 
+    lag_residual.flatten(), 
+    line_kws=dict(color='orangered'),
+    ci=None
+)
 ax.set_xlabel('Model Residuals - $u$')
 ax.set_ylabel('Spatial Lag of Model Residuals - $W u$');
 ```
@@ -217,11 +250,16 @@ knn.reweight(k=20, inplace=True)
 outliers = esda.moran.Moran_Local(m1.u, knn, permutations=9999)
 error_clusters = (outliers.q % 2 == 1) # only the cluster cores
 error_clusters &= (outliers.p_sim <= .001) # filtering out non-significant clusters
-db.assign(error_clusters = error_clusters,
-          local_I = outliers.Is)\
-  .query("error_clusters")\
-  .sort_values('local_I')\
-  .plot('local_I', cmap='bwr', marker='.');
+db.assign(
+    error_clusters = error_clusters,
+    local_I = outliers.Is
+).query(
+    "error_clusters"
+).sort_values(
+    'local_I'
+).plot(
+    'local_I', cmap='bwr', marker='.'
+);
 ```
 
 Thus, these areas tend to be locations where our model significantly underpredicts the nightly airbnb price both for that specific observation and observations in its immediate surroundings. 
@@ -266,8 +304,12 @@ balboa_names = variable_names + ['d2balboa']
 ```
 
 ```python
-m2 = spreg.OLS(db[['log_price']].values, db[balboa_names].values, 
-                  name_y = 'log_price', name_x = balboa_names)
+m2 = spreg.OLS(
+    db[['log_price']].values, 
+    db[balboa_names].values, 
+    name_y = 'log_price', 
+    name_x = balboa_names
+)
 ```
 
 Unfortunately, when you inspect the regression diagnostics and output, you see that this covariate is not quite as helpful as we might anticipate. It is not statistically significant at conventional significance levels, the model fit does not substantially change:
@@ -280,9 +322,12 @@ And, there still appears to be spatial structure in our model's errors:
 
 ```python caption="The relationship between prediction error and the nearest Airbnb's prediction error for the model including the 'Distance to Balboa Park' variable. Note the much stronger relationship here than before." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m2.u)
-seaborn.regplot(m2.u.flatten(), lag_residual.flatten(), 
-                line_kws=dict(color='orangered'),
-                ci=None);
+seaborn.regplot(
+    m2.u.flatten(), 
+    lag_residual.flatten(), 
+    line_kws=dict(color='orangered'),
+    ci=None
+);
 ```
 
 Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is *positive*, meaning that people are paying a premium to be *further* from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this. Further, the next chapter is an extensive treatment of spatial fixed effects, presenting many more spatial feature engineering methods. Here, we have only showed how to include these engineered features in a standard linear modelling framework. 
@@ -323,11 +368,16 @@ The second approach leverages `PySAL` Regimes functionality, which allows the us
 
 ```python
 # PySAL implementation
-m4 = spreg.OLS_Regimes(db[['log_price']].values, db[variable_names].values,
-                       db['neighborhood'].tolist(),
-                       constant_regi='many', cols2regi=[False]*len(variable_names),
-                       regime_err_sep=False,
-                       name_y='log_price', name_x=variable_names)
+m4 = spreg.OLS_Regimes(
+    db[['log_price']].values, 
+    db[variable_names].values,
+    db['neighborhood'].tolist(),
+    constant_regi='many',
+    cols2regi=[False]*len(variable_names),
+    regime_err_sep=False,
+    name_y='log_price', 
+    name_x=variable_names
+)
 print(m4.summary)
 ```
 
@@ -359,15 +409,19 @@ neighborhoods = geopandas.read_file(sd_path)
 ```
 
 ```python caption="Neighborhood effects on Airbnb nightly prices. Neighborhoods shown in grey are 'not statistically significant' in their effect on Airbnb prices." tags=[]
-ax = neighborhoods.plot(color='k', 
-                        alpha=0.5,
-                        figsize=(12,6))
-neighborhoods.merge(neighborhood_effects, how='left',
-                    left_on='neighbourhood', 
-                    right_index=True)\
-                  .dropna(subset=['fixed_effect'])\
-                  .plot('fixed_effect',
-                        ax=ax)
+ax = neighborhoods.plot(
+    color='k', alpha=0.5, figsize=(12,6)
+)
+neighborhoods.merge(
+    neighborhood_effects, 
+    how='left',
+    left_on='neighbourhood', 
+    right_index=True
+).dropna(
+    subset=['fixed_effect']
+).plot(
+    'fixed_effect', ax=ax
+)
 ax.set_title("San Diego Neighborhood Fixed Effects")
 plt.show()
 ```
@@ -387,11 +441,15 @@ To illustrate this approach, we will use the "spatial differentiator" of whether
 To implement this in Python, we use the `OLS_Regimes` class in `PySAL`, which does most of the heavy lifting for us:
 
 ```python
-m4 = spreg.OLS_Regimes(db[['log_price']].values, db[variable_names].values,
-                          db['coastal'].tolist(),
-                          constant_regi='many',
-                          regime_err_sep=False,
-                          name_y='log_price', name_x=variable_names)
+m4 = spreg.OLS_Regimes(
+    db[['log_price']].values, 
+    db[variable_names].values,
+    db['coastal'].tolist(),
+    constant_regi='many',
+    regime_err_sep=False,
+    name_y='log_price', 
+    name_x=variable_names
+)
 print(m4.summary)
 ```
 
@@ -480,9 +538,15 @@ by first creating a list of all of those names, and then applying `PySAL`'s
 `lag_spatial` to each of them:
 
 ```python
-wx = db.filter(like='pg')\
-        .apply(lambda y: weights.spatial_lag.lag_spatial(knn, y))\
-        .rename(columns=lambda c: 'w_'+c).drop('w_pg_Apartment', axis=1)
+wx = db.filter(
+    like='pg'
+).apply(
+    lambda y: weights.spatial_lag.lag_spatial(knn, y)
+).rename(
+    columns=lambda c: 'w_'+c
+).drop(
+    'w_pg_Apartment', axis=1
+)
 ```
 
 Once computed, we can run the model using OLS estimation because, in this
@@ -491,10 +555,12 @@ relies on (they are essentially additional exogenous variables):
 
 ```python
 slx_exog = db[variable_names].join(wx)
-m5 = spreg.OLS(db[['log_price']].values, 
-                  slx_exog.values,
-                  name_y='l_price', 
-               name_x=slx_exog.columns.tolist())
+m5 = spreg.OLS(
+    db[['log_price']].values, 
+    slx_exog.values,
+    name_y='l_price', 
+    name_x=slx_exog.columns.tolist()
+)
 print(m5.summary)
 ```
 
@@ -540,7 +606,8 @@ This is an apartment. Let's make a copy of our data and change this apartment in
 
 ```python
 db_scenario = db.copy()
-db_scenario.loc[2, ['pg_Apartment', 'pg_Condominium']] = [0,1] # make Apartment 0 and condo 1
+# make Apartment 0 and condo 1
+db_scenario.loc[2, ['pg_Apartment', 'pg_Condominium']] = [0,1]
 ```
 
 We've successfully made the change:
@@ -552,9 +619,15 @@ db_scenario.loc[2]
 Now, we need to *also* update the spatial lag variates:
 
 ```python
-wx_scenario = db_scenario.filter(like='pg')\
-                         .apply(lambda y: weights.spatial_lag.lag_spatial(knn, y))\
-                         .rename(columns=lambda c: 'w_'+c).drop('w_pg_Apartment', axis=1)
+wx_scenario = db_scenario.filter(
+    like='pg'
+).apply(
+    lambda y: weights.spatial_lag.lag_spatial(knn, y)
+).rename(
+    columns=lambda c: 'w_'+c
+).drop(
+    'w_pg_Apartment', axis=1
+)
 ```
 
 And build a new exogenous $\mathbf{X}$ matrix, including the a constant 1 as the leading column
@@ -614,8 +687,13 @@ example, we can use a general method of moments that account for
 heterogeneity (Arraiz et al., 2010):
 
 ```python
-m6 = spreg.GM_Error_Het(db[['log_price']].values, db[variable_names].values,
-                           w=knn, name_y='log_price', name_x=variable_names)
+m6 = spreg.GM_Error_Het(
+    db[['log_price']].values, 
+    db[variable_names].values,
+    w=knn, 
+    name_y='log_price', 
+    name_x=variable_names
+)
 print(m6.summary)
 ```
 
@@ -639,8 +717,13 @@ lag of all the explanatory variables is used as instrument for the endogenous
 lag:
 
 ```python
-m7 = spreg.GM_Lag(db[['log_price']].values, db[variable_names].values,
-                     w=knn, name_y='log_price', name_x=variable_names)
+m7 = spreg.GM_Lag(
+    db[['log_price']].values, 
+    db[variable_names].values,
+    w=knn, 
+    name_y='log_price', 
+    name_x=variable_names
+)
 print(m7.summary)
 ```
 
@@ -678,32 +761,50 @@ Below, the black lines represent our simulations, and the colored patches below 
 ```python caption="Distributions showing the differences between coastal and non-coastal prediction errors. Some 'random' simulations are shown in black in each plot, where observations are randomly assigned to either 'Coastal' or 'Not Coastal' groups." tags=[]
 n_simulations = 100
 f, ax = plt.subplots(1,2,figsize=(12,3), sharex=True, sharey=True)
-ax[0].hist(coastal, color='r', alpha=.5, 
-           density=True, bins=30, label='Coastal', 
-           cumulative=True)
-ax[1].hist(not_coastal, color='b', alpha=.5,
-           density=True, bins=30, label='Not Coastal', 
-           cumulative=True)
+ax[0].hist(
+    coastal, 
+    color='r', 
+    alpha=.5, 
+    density=True, 
+    bins=30, 
+    label='Coastal', 
+    cumulative=True
+)
+ax[1].hist(
+    not_coastal, 
+    color='b', 
+    alpha=.5,
+    density=True, 
+    bins=30, 
+    label='Not Coastal', 
+    cumulative=True
+)
 for simulation in range(n_simulations):
     shuffled_residuals = m1.u[numpy.random.permutation(m1.n)]
-    random_coast, random_notcoast = (shuffled_residuals[is_coastal], 
-                                     shuffled_residuals[~is_coastal])
+    random_coast, random_notcoast = (
+        shuffled_residuals[is_coastal], 
+        shuffled_residuals[~is_coastal]
+    )
     if simulation == 0:
         label = 'Simulations'
     else:
         label = None
-    ax[0].hist(random_coast, 
-                density=True, 
-                histtype='step',
-                color='k', alpha=.05, bins=30, 
-                label=label, 
-                cumulative=True)
-    ax[1].hist(random_coast, 
-                density=True, 
-                histtype='step',
-                color='k', alpha=.05, bins=30, 
-                label=label, 
-                cumulative=True)
+    ax[0].hist(
+        random_coast, 
+        density=True, 
+        histtype='step',
+        color='k', alpha=.05, bins=30, 
+        label=label, 
+        cumulative=True
+    )
+    ax[1].hist(
+        random_coast, 
+        density=True, 
+        histtype='step',
+        color='k', alpha=.05, bins=30, 
+        label=label, 
+        cumulative=True
+    )
 ax[0].legend()
 ax[1].legend()
 plt.tight_layout()
@@ -728,9 +829,15 @@ for order in range(1, 51, 5):
     knn.transform = 'r'
     lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
     random_residual = m1.u[numpy.random.permutation(len(m1.u))] 
-    random_lag_residual = weights.spatial_lag.lag_spatial(knn, random_residual) # identical to random neighbors in KNN 
-    correlations.append(numpy.corrcoef(m1.u.flatten(), lag_residual.flatten())[0,1])
-    nulls.append(numpy.corrcoef(m1.u.flatten(), random_lag_residual.flatten())[0,1])
+    random_lag_residual = weights.spatial_lag.lag_spatial(
+        knn, random_residual
+    ) # identical to random neighbors in KNN 
+    correlations.append(
+        numpy.corrcoef(m1.u.flatten(), lag_residual.flatten())[0,1]
+    )
+    nulls.append(
+        numpy.corrcoef(m1.u.flatten(), random_lag_residual.flatten())[0,1]
+    )
 ```
 
 ```python caption="Correlogram showing the change in correlation between prediction error at an Airbnb and its surroundings as the number of nearest neighbors increase. The null hypothesis, where residuals are shuffled around the map, shows no significant correlation at any distance. " tags=[]

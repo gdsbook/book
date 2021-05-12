@@ -6,13 +6,18 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.5.2
+      format_version: '1.3'
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
     name: python3
 ---
+
+```python tags=["remove-cell"]
+import warnings
+warnings.filterwarnings("ignore")
+```
 
 # Spatial Inequality
 
@@ -126,7 +131,7 @@ seaborn.__version__
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Distribution of Per Capita Income at County Level in 1969."
 seaborn.set_theme(style='whitegrid')
-seaborn.histplot(x=pci_df['1969'], kde=True)
+seaborn.histplot(x=pci_df['1969'], kde=True);
 ```
 
 
@@ -518,7 +523,7 @@ pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
     legend=True,
     categorical=True,
     legend_kwds=dict(bbox_to_anchor=(1.2,.5))
-)
+);
 ```
 
 Let's peak into income changes for each region. To do that, we can apply a split-apply-combine pattern that groups counties by region, calculates its mean, and combines it into a table:
@@ -533,7 +538,7 @@ rmeans = pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
 The resulting table has a row for each region and a column for each year. We can visualise these means to get a sense of their temporal trajectory:
 
 ```python caption="Average county per capita incomes among census regions since 1969"
-rmeans.T.plot.line()
+rmeans.T.plot.line();
 ```
 
 One way to introduce geography into the analysis of inequality is to use geographical delineations to define groups for decompositions. For example, Theil's $T$, which we encountered previously, can be decomposed using regions into so called *between* and *within* regional inequality components.
@@ -751,7 +756,3 @@ Before leaving the topic of spatial inequality, we note that there is much more 
 5. What is the relationship between spatial income inequality and the spatial dependence of regional incomes?
 
 <!-- #endregion -->
-
-```python
-
-```

@@ -6,12 +6,19 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.2
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
     name: python3
 ---
+
+```python tags=["remove-cell"]
+import warnings
+warnings.filterwarnings("ignore")
+# ipykernel warnings should get fixed w/ new release:
+# https://github.com/ipython/ipykernel/pull/617
+```
 
 # Spatial Feature Engineering
 
@@ -164,10 +171,13 @@ joined = geopandas.sjoin(
 The resulting joined object `joined` contains a row for every pair of POI and AirBnb that are linked. From there, we can apply a group-by operation, using the AirBnb ID, and count how many POIs each AirBnb has within 500m of distance:
 
 ```python
-poi_count = joined.groupby("id")\
-                  ["osmid"]\
-                  .count()\
-                  .to_frame('poi_count')
+poi_count = joined.groupby(
+    "id"
+)[
+    "osmid"
+].count().to_frame(
+    'poi_count'
+)
 poi_count.head()
 ```
 
@@ -183,16 +193,18 @@ We can visualise now the distribution of counts to get a sense of how "well-serv
 
 ```python caption="Number of POIs within 500m from each Airbnb." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
-airbnbs_w_counts.plot(column="poi_count",
-                      scheme="quantiles",
-                      alpha=0.5,
-                      legend=True,
-                      ax=ax
-                     )
-contextily.add_basemap(ax, 
-                       crs=airbnbs_albers.crs.to_string(), 
-                       source=contextily.providers.Stamen.Toner
-                      )
+airbnbs_w_counts.plot(
+    column="poi_count",
+    scheme="quantiles",
+    alpha=0.5,
+    legend=True,
+    ax=ax
+)
+contextily.add_basemap(
+    ax, 
+    crs=airbnbs_albers.crs.to_string(), 
+    source=contextily.providers.Stamen.Toner
+)
 ```
 
 ### Assigning point values from surfaces: elevation of AirBnbs
@@ -209,7 +221,7 @@ Let us bring the elevation surface:
 
 ```python caption="Digital elevation model of the San Diego area." tags=[]
 dem = rasterio.open("../data/nasadem/nasadem_sd.tif")
-rioshow(dem)
+rioshow(dem);
 ```
 
 Let's first check the CRS is aligned with our sample of point locations:
@@ -229,16 +241,17 @@ list(dem.sample([(-117.24592208862305, 32.761619109301606)]))
 Now, we can  apply this logic to a sequence of coordinates. For that, we need to extract them from the `geometry` object:
 
 ```python
-abb_xys = pandas.DataFrame({"X": airbnbs.geometry.x, 
-                            "Y": airbnbs.geometry.y
-                           }).to_records(index=False)
+abb_xys = pandas.DataFrame(
+    {"X": airbnbs.geometry.x, "Y": airbnbs.geometry.y}
+).to_records(index=False)
 ```
 
 ```python
-elevation = pandas.DataFrame(dem.sample(abb_xys),
-                             columns=["Elevation"],
-                             index=airbnbs.index
-                            )
+elevation = pandas.DataFrame(
+    dem.sample(abb_xys),
+    columns=["Elevation"],
+    index=airbnbs.index
+)
 elevation.head()
 ```
 
@@ -246,18 +259,21 @@ Now we have a table with the elevation of each  AirBnb property, we can plot the
 
 ```python caption="Elevation above sea level at each Airbnb." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
-airbnbs.join(elevation)\
-       .plot(column="Elevation",
-             scheme="quantiles",
-             legend=True,
-             alpha=0.5,
-             ax=ax
-            )
-contextily.add_basemap(ax, 
-                       crs=airbnbs.crs.to_string(), 
-                       source=contextily.providers.Stamen.TerrainBackground,
-                       alpha=0.5
-                      )
+airbnbs.join(
+    elevation
+).plot(
+    column="Elevation",
+    scheme="quantiles",
+    legend=True,
+    alpha=0.5,
+    ax=ax
+)
+contextily.add_basemap(
+    ax, 
+    crs=airbnbs.crs.to_string(), 
+    source=contextily.providers.Stamen.TerrainBackground,
+    alpha=0.5
+)
 ```
 
 ### Point Interpolation using sklearn 
@@ -275,16 +291,18 @@ two_bed_homes = airbnbs[airbnbs['bedrooms']==2 & airbnbs['rt_Entire_home/apt']]
 ```
 
 ```python
-two_bed_home_locations = numpy.column_stack((two_bed_homes.geometry.x, 
-                                             two_bed_homes.geometry.y))
+two_bed_home_locations = numpy.column_stack(
+    (two_bed_homes.geometry.x, two_bed_homes.geometry.y)
+)
 ```
 
 To plot the interpolated surface, we must also construct a grid of locations for which we will make predictions. This can be done using `numpy.meshgrid`, which constructs all the combinations of the input dimensions as a grid of outputs. 
 
 ```python
 xmin, ymin, xmax, ymax = airbnbs.total_bounds
-x, y = numpy.meshgrid(numpy.linspace(xmin, xmax), 
-                      numpy.linspace(ymin,ymax))
+x, y = numpy.meshgrid(
+    numpy.linspace(xmin, xmax), numpy.linspace(ymin,ymax)
+)
 ```
 
 ```python caption="Example grid showing the coordiantes used for interpolation." tags=[]
@@ -299,19 +317,23 @@ With these coordinates, we can make a geodataframe containing the grid cells at 
 
 ```python
 grid = numpy.column_stack((x.flatten(), y.flatten()))
-grid_df = geopandas.GeoDataFrame(geometry=geopandas.points_from_xy(x=x.flatten(), 
-                                                                   y=y.flatten()))
+grid_df = geopandas.GeoDataFrame(
+    geometry=geopandas.points_from_xy(
+        x=x.flatten(), y=y.flatten())
+)
 ```
 
 ```python caption="Grid underlaid Airbnb locations used for interpolation." tags=[]
 ax = grid_df.plot(markersize=1)
-two_bed_homes.plot(ax=ax, color='red')
+two_bed_homes.plot(ax=ax, color='red');
 ```
 
 With this done, we can now construct the predictions. First we train the model:
 
 ```python
-model = KNeighborsRegressor(n_neighbors=10, weights='distance').fit(two_bed_home_locations, two_bed_homes.price)
+model = KNeighborsRegressor(
+    n_neighbors=10, weights='distance'
+).fit(two_bed_home_locations, two_bed_homes.price)
 ```
 
 And then we predict at the grid cells:
@@ -330,9 +352,11 @@ You can see that the surface gets smoother as you increase the number of nearest
 f,ax = plt.subplots(1,8, figsize=(16,4))
 for i,k_neighbors in enumerate(numpy.geomspace(2, 100, 8).astype(int)):
     facet = ax[i]
-    predictions = KNeighborsRegressor(n_neighbors=k_neighbors, weights='distance')\
-                          .fit(two_bed_home_locations, two_bed_homes.price)\
-                          .predict(grid)
+    predictions = KNeighborsRegressor(
+        n_neighbors=k_neighbors, weights='distance'
+    ).fit(
+        two_bed_home_locations, two_bed_homes.price
+    ).predict(grid)
     grid_df.plot(predictions, ax=facet)
     facet.axis('off')
     facet.set_title(f"{k_neighbors} neighbors")
@@ -346,11 +370,18 @@ central_xmin, central_ymin, central_xmax, central_ymax = central_sd_bounds
 ```
 
 ```python
-central_x, central_y = numpy.meshgrid(numpy.linspace(central_xmin, central_xmax), 
-                                      numpy.linspace(central_ymin, central_ymax))
-central_grid = numpy.column_stack((central_x.flatten(), central_y.flatten()))
-central_grid_df = geopandas.GeoDataFrame(geometry=geopandas.points_from_xy(x=central_x.flatten(), 
-                                                                           y=central_y.flatten()))
+central_x, central_y = numpy.meshgrid(
+    numpy.linspace(central_xmin, central_xmax), 
+    numpy.linspace(central_ymin, central_ymax)
+)
+central_grid = numpy.column_stack(
+    (central_x.flatten(), central_y.flatten())
+)
+central_grid_df = geopandas.GeoDataFrame(
+    geometry=geopandas.points_from_xy(
+        x=central_x.flatten(), y=central_y.flatten()
+    )
+)
 ```
 
 ```python caption="Focus on downtown San Diego predictions for nearest neighbor interpolation." tags=[]
@@ -358,9 +389,11 @@ f,ax = plt.subplots(1,5, figsize=(16,4), sharex=True, sharey=True)
 
 for i,k_neighbors in enumerate(numpy.geomspace(2, 100, 5).astype(int)):
     facet = ax[i]
-    predictions = KNeighborsRegressor(n_neighbors=k_neighbors, weights='distance')\
-                          .fit(two_bed_home_locations, two_bed_homes.price)\
-                          .predict(central_grid)
+    predictions = KNeighborsRegressor(
+        n_neighbors=k_neighbors, weights='distance'
+    ).fit(
+        two_bed_home_locations, two_bed_homes.price
+    ).predict(central_grid)
     central_grid_df.plot(predictions, ax=facet)
     facet.axis('off')
     facet.set_title(f"{k_neighbors} neighbors")
@@ -422,11 +455,12 @@ h3 = geopandas.read_file("../data/h3_grid/sd_h3_grid.gpkg")
 We are ready to interpolate:
 
 ```python
-interpolated = area_interpolate(source_df=sd_pop.to_crs(epsg=3311),
-                                target_df=h3.to_crs(epsg=3311),
-                                extensive_variables=["B02001_001E"],
-                                intensive_variables=["density"]
-                               )
+interpolated = area_interpolate(
+    source_df=sd_pop.to_crs(epsg=3311),
+    target_df=h3.to_crs(epsg=3311),
+    extensive_variables=["B02001_001E"],
+    intensive_variables=["density"]
+)
 ```
 
 There is quite a bit going on in the cell above, let us unpack it:
@@ -443,22 +477,29 @@ A good first approach to examine the output is by comparing the source and the t
 f, axs = plt.subplots(1, 3, figsize=(18, 6))
 
 minX, minY, maxX, maxY = interpolated.total_bounds
-sd_pop.to_crs(epsg=3311)\
-      .cx[minX:maxX, minY:maxY]\
-      .plot(column="B02001_001E", 
-            scheme="quantiles", 
-            k=10,
-            ax=axs[0]
-           )
+sd_pop.to_crs(
+    epsg=3311
+).cx[
+    minX:maxX, minY:maxY
+].plot(
+    column="B02001_001E", 
+    scheme="quantiles", 
+    k=10,
+    ax=axs[0]
+)
 
-h3.to_crs(epsg=3311)\
-  .plot(ax=axs[1], markersize=0.5)
+h3.to_crs(
+    epsg=3311
+).plot(
+    ax=axs[1], markersize=0.5
+)
 
-interpolated.plot(column="B02001_001E",
-                  scheme="quantiles",
-                  k=10,
-                  ax=axs[2]
-                 )
+interpolated.plot(
+    column="B02001_001E",
+    scheme="quantiles",
+    k=10,
+    ax=axs[2]
+)
 
 axs[0].set_xlim(minX, maxX)
 axs[0].set_ylim(minY, maxY)
@@ -474,22 +515,29 @@ And density:
 f, axs = plt.subplots(1, 3, figsize=(18, 6))
 
 minX, minY, maxX, maxY = interpolated.total_bounds
-sd_pop.to_crs(epsg=3311)\
-      .cx[minX:maxX, minY:maxY]\
-      .plot(column="density", 
-            scheme="quantiles", 
-            k=10,
-            ax=axs[0]
-           )
+sd_pop.to_crs(
+    epsg=3311
+).cx[
+    minX:maxX, minY:maxY
+].plot(
+    column="density", 
+    scheme="quantiles", 
+    k=10,
+    ax=axs[0]
+)
 
-h3.to_crs(epsg=3311)\
-  .plot(ax=axs[1], markersize=0.5)
+h3.to_crs(
+    epsg=3311
+).plot(
+    ax=axs[1], markersize=0.5
+)
 
-interpolated.plot(column="density",
-                  scheme="quantiles",
-                  k=10,
-                  ax=axs[2]
-                 )
+interpolated.plot(
+    column="density",
+    scheme="quantiles",
+    k=10,
+    ax=axs[2]
+)
 
 axs[0].set_xlim(minX, maxX)
 axs[0].set_ylim(minY, maxY)
@@ -527,7 +575,9 @@ d500_w.transform = 'r'
 ```
 
 ```python
-local_average_bedrooms = weights.lag_spatial(d500_w, airbnbs_albers[['bedrooms']].values)
+local_average_bedrooms = weights.lag_spatial(
+    d500_w, airbnbs_albers[['bedrooms']].values
+)
 ```
 
 While related, these features contain quite distinct pieces of information, and both may prove useful in modelling: 
@@ -549,8 +599,9 @@ local_mode = weights.lag_categorical(
 Since we are now treating the number of bedrooms as a discrete feature, we can use a crosstab from `pandas` to examine the relationship between a listing and the typical size of listings nearby:
 
 ```python
-crosstab = pandas.crosstab(airbnbs_albers.bedrooms, 
-                           local_mode.flatten())
+crosstab = pandas.crosstab(
+    airbnbs_albers.bedrooms, local_mode.flatten()
+)
 crosstab.columns.name = "nearby"
 crosstab
 ```
@@ -568,8 +619,12 @@ adjlist.head()
 If we had the values for each for the neighbors in this adjacency list table, then we could use a `groupby()` to summarize the values of observations connected to a given focal observation. This merge can be done directly with the original data, linking the `neighbor` key in the adjacency list back to that observation in our source table: 
 
 ```python
-adjlist = adjlist.merge(airbnbs_albers[['bedrooms']], left_on='neighbor', 
-                        right_index=True, how='left')
+adjlist = adjlist.merge(
+    airbnbs_albers[['bedrooms']], 
+    left_on='neighbor', 
+    right_index=True, 
+    how='left'
+)
 adjlist.head()
 ```
 
@@ -588,7 +643,9 @@ Sometimes, analysts might want to use multiple "bands" of buffer features. This 
 So, we can use our 500m weights from before to build the average again:
 
 ```python
-average_within_500 = weights.lag_spatial(d500_w, airbnbs_albers[['bedrooms']].values)
+average_within_500 = weights.lag_spatial(
+    d500_w, airbnbs_albers[['bedrooms']].values
+)
 ```
 
 Then, we need to build the graph of airbnbs that fall *between* 500m and 1km from one another. To start, we build the `DistanceBand` graph of all listings closer than 1km:
@@ -664,26 +721,31 @@ Since humans tend to make locational decisions hierarchically (in that they pick
 
 ```python caption="Cluters in the locations of Airbnbs within San Diego." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
-airbnbs_albers.plot(column=labels,
-                    categorical=True,
-                    alpha=0.5,
-                    legend=False,
-                    ax=ax, marker='.'
-                    )
+airbnbs_albers.plot(
+    column=labels,
+    categorical=True,
+    alpha=0.5,
+    legend=False,
+    ax=ax, marker='.'
+)
 hulls[hulls.index >=0].boundary.plot(color='k', ax=ax,)
-contextily.add_basemap(ax, 
-                       crs=airbnbs_albers.crs.to_string(), 
-                       source=contextily.providers.Stamen.Toner
-                      )
+contextily.add_basemap(
+    ax, 
+    crs=airbnbs_albers.crs.to_string(), 
+    source=contextily.providers.Stamen.Toner
+)
 ```
 
 Regardless, this cluster label certainly communicates some information about the price of a listing, since the distributions of prices are substantially different across the detected clusters:
 
 ```python caption="Boxplot of price by detected 'competition cluter.' The clusters do vary significantly in prices, and could be used to train a model." tags=[]
 f = plt.figure(figsize=(8,3))
-ax = airbnbs_albers.boxplot("price", by=labels, 
-                            flierprops=dict(marker=None), 
-                            ax=plt.gca())
+ax = airbnbs_albers.boxplot(
+    "price", 
+    by=labels, 
+    flierprops=dict(marker=None), 
+    ax=plt.gca()
+)
 ax.set_xlabel("competition cluster")
 ax.set_ylabel("price ($)")
 plt.gcf().suptitle(None)

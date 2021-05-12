@@ -5,13 +5,18 @@ jupyter:
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.6.0
+      format_version: '1.3'
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
     name: python3
 ---
+
+```python tags=["remove-cell"]
+import warnings
+warnings.filterwarnings("ignore")
+```
 
 # Spatial Weights
 
