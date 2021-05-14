@@ -472,7 +472,7 @@
 <h1>Point Pattern Analysis<a class="headerlink" href="#point-pattern-analysis" title="Permalink to this headline">¶</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
@@ -507,7 +507,7 @@
 <p>To get started, let’s load the Flickr data first:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/tokyo/tokyo_clean.csv&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/tokyo/tokyo_clean.csv&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -515,7 +515,25 @@
 <p>The table contains the following information about the sample of 10,000 photographs: the ID of the user who took the photo; the location expressed as latitude and longitude columns; a transformed version of those coordinates expressed in Pseudo Mercator; the timestamp when the photo was taken; and the URL where the picture they refer to is stored online:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;pandas.core.frame.DataFrame&#39;&gt;
+RangeIndex: 10000 entries, 0 to 9999
+Data columns (total 7 columns):
+ #   Column                Non-Null Count  Dtype  
+---  ------                --------------  -----  
+ 0   user_id               10000 non-null  object 
+ 1   longitude             10000 non-null  float64
+ 2   latitude              10000 non-null  float64
+ 3   date_taken            10000 non-null  object 
+ 4   photo/video_page_url  10000 non-null  object 
+ 5   x                     10000 non-null  float64
+ 6   y                     10000 non-null  float64
+dtypes: float64(4), object(3)
+memory usage: 547.0+ KB
 </pre></div>
 </div>
 </div>
@@ -529,17 +547,20 @@
 <p>The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatter plot with <code class="docutils literal notranslate"><span class="pre">seaborn</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span><span class="p">);</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_11_0.png" src="../_images/08_point_pattern_analysis_11_0.png" />
 </div>
 </div>
 <p>This is a good start: we can see dots tend to be concentrated in the center of the covered area in a very (apparently) not random. Furthermore, within the broad pattern, we can also see there seems to be more localized clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb.</p>
 <p>Start with the context. The easiest way to provide additional context is by overlaying a tile map from the internet. Let us quickly call <code class="docutils literal notranslate"><span class="pre">contextily</span></code> for that, and integrate it with <code class="docutils literal notranslate"><span class="pre">jointplot</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
 <span class="n">joint_axes</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="s1">&#39;longitude&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.5</span>
 <span class="p">)</span>
@@ -551,6 +572,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_13_0.png" src="../_images/08_point_pattern_analysis_13_0.png" />
+</div>
 </div>
 <p>Note how we can pull out the axis where the points are plotted and add the basemap there, specifying the CRS as WGS84, since we are plotting longitude and latitude. Compared to the previous plot, adding a basemap to our initial plot makes the pattern of Flickr data clearer.</p>
 </div>
@@ -560,7 +584,7 @@
 <p>One solution to get around cluttering relates to what we referred to earlier as moving from <a class="reference internal" href="03_spatial_data.html#ch03-surfaces-as-tables"><span class="std std-ref">“tables to surfaces”</span></a>. We can now recast this approach as a <em>spatial</em> or <em>2-dimensional histogram</em>. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleth maps may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin 2-d histogram is straightforward in Python using the <code class="docutils literal notranslate"><span class="pre">hexbin</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Generate and add hexbin with 50 hexagons in each </span>
 <span class="c1"># dimension, no borderlines, half transparency,</span>
@@ -585,6 +609,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_16_0.png" src="../_images/08_point_pattern_analysis_16_0.png" />
+</div>
 </div>
 <p>Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localized areas and that the previous map was obscuring this.</p>
 </div>
@@ -593,7 +620,7 @@
 <p>Grids are the spatial equivalent of a histogram: the user decides how many “buckets”, and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. <span id="id2">[<a class="reference internal" href="references.html#id41"><span>Sil86</span></a>]</span>), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel in Python is rather straightforward:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Generate and add KDE with a shading of 50 gradients </span>
 <span class="c1"># coloured contours, 75% of transparency,</span>
@@ -616,6 +643,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_18_0.png" src="../_images/08_point_pattern_analysis_18_0.png" />
+</div>
 </div>
 <p>The result is a smoother output that captures the same structure of the hexbin but “eases” the transitions between different areas. This provides a better generalization of the theoretical probability that a picture <em>might</em> occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares.</p>
 </div>
@@ -628,14 +658,14 @@
 <p>A common measure of central tendency for a point pattern is its <em>center of mass</em>. For marked point patterns, the center of mass identifies a central point close to observations that have higher values in their marked attribute. For unmarked point patterns, the center of mass is equivalent to the <em>mean center</em>, or average of the coordinate values. In addition, the <em>median center</em> is analogous to the <em>median</em> elsewhere, and represents a point where half of the data is above or below the point &amp; half is to its left or right. We can analyze the mean center with our Flickr point pattern using the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package in Python.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pointpats</span> <span class="kn">import</span> <span class="n">centrography</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pointpats</span> <span class="kn">import</span> <span class="n">centrography</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mean_center</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">mean_center</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">mean_center</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">mean_center</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]])</span>
 <span class="n">med_center</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">euclidean_median</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]])</span>
 </pre></div>
 </div>
@@ -644,7 +674,7 @@
 <p>It is easiest to visualize this by plotting the point pattern and its mean center alongside one another:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate scatter plot</span>
 <span class="n">joint_axes</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">jointplot</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">9</span>
 <span class="p">)</span>
@@ -674,6 +704,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_25_0.png" src="../_images/08_point_pattern_analysis_25_0.png" />
+</div>
 </div>
 <p>The discrepancy between the two centers is caused by the skew; there are many “clusters” of pictures far out in West and South Tokyo, whereas North and East Tokyo is densely packed, but drops off very quickly. Thus, the far out clusters of pictures pulls the mean center to the west and south, relative to the median center.</p>
 </div>
@@ -682,7 +715,12 @@
 <p>A measure of dispersion that is common in centrography is the <em>standard distance</em>. This measure provides the average distance away from the center of the point cloud (such as measured by the center of mass). This is also simple to compute using <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>, using the <code class="docutils literal notranslate"><span class="pre">std_distance</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centrography</span><span class="o">.</span><span class="n">std_distance</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">centrography</span><span class="o">.</span><span class="n">std_distance</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>8778.218564382098
 </pre></div>
 </div>
 </div>
@@ -691,14 +729,14 @@
 <p>Another helpful visualization is the <em>standard deviational ellipse</em>, or <em>standard ellipse</em>. This is an ellipse drawn from the data that reflects both its center and dispersion. To visualize this, we first compute the axes and rotation using the <code class="docutils literal notranslate"><span class="pre">ellipse</span></code> function in <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="n">rotation</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="n">rotation</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]])</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Ellipse</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Ellipse</span>
 
 <span class="c1"># Set up figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
@@ -728,6 +766,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_31_0.png" src="../_images/08_point_pattern_analysis_31_0.png" />
+</div>
 </div>
 </div>
 <div class="section" id="extent">
@@ -736,7 +777,7 @@
 <p>Below, we’ll walk through how to construct each example and visualize them at the end. To make things more clear, we’ll use the Flickr photos for the most prolific user in the dataset (ID: <code class="docutils literal notranslate"><span class="pre">95795770</span></code>) to show how different these results can be.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">user</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;user_id == &quot;95795770@N00&quot;&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">user</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;user_id == &quot;95795770@N00&quot;&#39;</span><span class="p">)</span>
 <span class="n">coordinates</span> <span class="o">=</span> <span class="n">user</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 </pre></div>
 </div>
@@ -745,7 +786,7 @@
 <p>First, we’ll compute the <strong>convex hull</strong>, which is the tightest <em>convex</em> shape that encloses the user’s photos. By <em>convex</em>, we mean that the shape never “doubles back” on itself; it has no divets, valleys, crenelations, or holes. All of its interior angles are smaller than 180 degrees.  This is computed using the <code class="docutils literal notranslate"><span class="pre">centrography.hull</span></code> method.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">convex_hull_vertices</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">hull</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">convex_hull_vertices</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">hull</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -754,7 +795,7 @@
 <p>In contrast, you can think of an alpha shape as the space made from rolling a <em>small</em> balls around the shape. Since the ball is smaller, it rolls into the dips &amp; valleys created between points. As that ball gets bigger, the alpha shape becomes the convex hull. But, for small balls, the shape can get very tight indeed. In fact, if alpha gets too small, it “slips” through the points, resulting in <em>more than one hull!</em> As such, the <code class="docutils literal notranslate"><span class="pre">pysal</span></code> package has an <code class="docutils literal notranslate"><span class="pre">alpha_shape_auto</span></code> function to find the smallest <em>single</em> alpha shape, so that you don’t have to guess at how big the ball needs to be.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpysal</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">libpysal</span>
 <span class="n">alpha_shape</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">circs</span> <span class="o">=</span> <span class="n">libpysal</span><span class="o">.</span><span class="n">cg</span><span class="o">.</span><span class="n">alpha_shape_auto</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">return_circles</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -763,7 +804,7 @@
 <p>To illustrate, the figure below has the tightest single alpha shape shown in green and the original source points shown in black. The “bounding” circles shown in the figure all have a radius of <span class="math notranslate nohighlight">\(8652\)</span> meters. The circles are plotted where our “bounding” disk touches two or three of the points in the point cloud. You can see that the circles “cut into” the convex hull, shown in blue dashed lines, up until they touch two (or three) points. Any tighter, and the circle would disconnect one of the points on the boundary of the alpha shape.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">descartes</span> <span class="kn">import</span> <span class="n">PolygonPatch</span> <span class="c1">#to plot the alpha shape easily</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">descartes</span> <span class="kn">import</span> <span class="n">PolygonPatch</span> <span class="c1">#to plot the alpha shape easily</span>
 <span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">))</span>
 
 <span class="c1"># Plot a green alpha shape</span>
@@ -822,12 +863,15 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_39_0.png" src="../_images/08_point_pattern_analysis_39_0.png" />
+</div>
 </div>
 <p>We will cover three more bounding shapes, all of them rectangles or circles. First, two kinds of <strong>minimum bounding rectangles</strong>. They both are constructed as the tightest <em>rectangle</em> that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the <strong>minimum rotated rectangle</strong> provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated.</p>
 <p>For the minimum rotated rectangle, we will use the <code class="docutils literal notranslate"><span class="pre">minimum_rotated_rectangle</span></code> function from the <code class="docutils literal notranslate"><span class="pre">pointpats.centrography</span></code> module.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Commented out until functionality is added to pointpats</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Commented out until functionality is added to pointpats</span>
 <span class="c1">#min_rot_rect = centrography.minimum_rotated_rectangle(coordinates)</span>
 </pre></div>
 </div>
@@ -836,7 +880,7 @@
 <p>And, for the minimum bounding rectangle without rotation, we will use the <code class="docutils literal notranslate"><span class="pre">minimum_bounding_rectangle</span></code> function from the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">min_rect_vertices</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">minimum_bounding_rectangle</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">min_rect_vertices</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">minimum_bounding_rectangle</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -844,7 +888,7 @@
 <p>Finally, the <strong>minimum bounding circle</strong> is the smallest circle that can be drawn to enclose the entire dataset. Often, this circle is bigger than the minimum bounding rectangle. It is implemented in the <code class="docutils literal notranslate"><span class="pre">minimum_bounding_circle</span></code> function in <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span><span class="p">),</span> <span class="n">radius</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">minimum_bounding_circle</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">center_x</span><span class="p">,</span> <span class="n">center_y</span><span class="p">),</span> <span class="n">radius</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">minimum_bounding_circle</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -852,7 +896,7 @@
 <p>Now, to visualize these, we’ll convert the raw vertices into <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> patches:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">Rectangle</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">Circle</span><span class="p">,</span> <span class="n">Rectangle</span>
 <span class="kn">from</span> <span class="nn">descartes</span> <span class="kn">import</span> <span class="n">PolygonPatch</span>
 
 <span class="c1"># Make a purple alpha shape</span>
@@ -917,7 +961,7 @@
 <p>Finally, we’ll plot the patches together with the photograph locations below:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
 
 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">alpha_shape_patch</span><span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">convex_hull_patch</span><span class="p">)</span>
@@ -939,6 +983,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_49_0.png" src="../_images/08_point_pattern_analysis_49_0.png" />
+</div>
 </div>
 <p>Each gives a different impression of the area enclosing the user’s range of photographs. In this, you can see that the the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle &amp; circle are the “loosest” shapes, in that they contain the most area outside of the user’s typical area. But, they’re also the simplest shapes to draw and understand.</p>
 </div>
@@ -949,7 +996,7 @@
 <p>The first set of techniques, <strong>quadrat</strong> statistics, receive their name after their approach to split the data up into small areas (quadrants). Once created, these “buckets” are used to examinee the uniformity of counts across them. The second set of techniques all derive from Ripley (1988), and involve measurements of the distance between points in a point pattern.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pointpats</span> <span class="kn">import</span> <span class="n">distance_statistics</span><span class="p">,</span> <span class="n">QStatistic</span><span class="p">,</span> <span class="n">random</span><span class="p">,</span> <span class="n">PointPattern</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pointpats</span> <span class="kn">import</span> <span class="n">distance_statistics</span><span class="p">,</span> <span class="n">QStatistic</span><span class="p">,</span> <span class="n">random</span><span class="p">,</span> <span class="n">PointPattern</span>
 </pre></div>
 </div>
 </div>
@@ -958,14 +1005,14 @@
 <p>To simulate these processes from a given point set, you can use the <code class="docutils literal notranslate"><span class="pre">pointpats.random</span></code> module.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">random_pattern</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">random_pattern</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">coordinates</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed photographs&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">random_pattern</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Random&#39;</span><span class="p">)</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
@@ -977,18 +1024,21 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_55_0.png" src="../_images/08_point_pattern_analysis_55_0.png" />
+</div>
 </div>
 <p>As you can see, the simulation (by default) works with the bounding box of the input point pattern. To simulate from more restricted areas formed by the point pattern, pass those hulls to the simulator! For example, to generate a random pattern within the alpha shapes:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">random_pattern_ashape</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">alpha_shape</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">random_pattern_ashape</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">alpha_shape</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">coordinates</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">coordinates</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Observed&#39;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">random_pattern_ashape</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Random&#39;</span><span class="p">)</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
@@ -1000,6 +1050,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_58_0.png" src="../_images/08_point_pattern_analysis_58_0.png" />
+</div>
 </div>
 <div class="section" id="quadrat-statistics">
 <h3>Quadrat statistics<a class="headerlink" href="#quadrat-statistics" title="Permalink to this headline">¶</a></h3>
@@ -1007,16 +1060,24 @@
 <p>In the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package, you can visualize the results using the following <code class="docutils literal notranslate"><span class="pre">QStatistic.plot()</span></code> method. This shows the grid used to count the events, as well as the underlying pattern:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qstat</span> <span class="o">=</span> <span class="n">QStatistic</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qstat</span> <span class="o">=</span> <span class="n">QStatistic</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span>
 <span class="n">qstat</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_60_0.png" src="../_images/08_point_pattern_analysis_60_0.png" />
 </div>
 </div>
 <p>In this case, for the default of a three by three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer Flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small p-value:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qstat</span><span class="o">.</span><span class="n">chi2_pvalue</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qstat</span><span class="o">.</span><span class="n">chi2_pvalue</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0
 </pre></div>
 </div>
 </div>
@@ -1024,16 +1085,24 @@
 <p>In contrast, our totally random point process will have nearly the same points in every cell:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null</span> <span class="o">=</span> <span class="n">QStatistic</span><span class="p">(</span><span class="n">random_pattern</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null</span> <span class="o">=</span> <span class="n">QStatistic</span><span class="p">(</span><span class="n">random_pattern</span><span class="p">)</span>
 <span class="n">qstat_null</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_64_0.png" src="../_images/08_point_pattern_analysis_64_0.png" />
 </div>
 </div>
 <p>This means its p-value will be large, and likely not significant:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null</span><span class="o">.</span><span class="n">chi2_pvalue</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null</span><span class="o">.</span><span class="n">chi2_pvalue</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.9618976755879519
 </pre></div>
 </div>
 </div>
@@ -1041,16 +1110,24 @@
 <p>Be careful, however: the fact that quadrat counts are measured in a <em>regular tiling</em> that is overlaid on top of the potentially irregular extent of our pattern can mislead us. In particular, irregular <em>but random</em> patterns can be mistakenly found “significant” by this approach. Consider our random set generated within the alpha shape polygon, with the quadrat grid overlaid on top:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null_ashape</span> <span class="o">=</span> <span class="n">QStatistic</span><span class="p">(</span><span class="n">random_pattern_ashape</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null_ashape</span> <span class="o">=</span> <span class="n">QStatistic</span><span class="p">(</span><span class="n">random_pattern_ashape</span><span class="p">)</span>
 <span class="n">qstat_null_ashape</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_68_0.png" src="../_images/08_point_pattern_analysis_68_0.png" />
 </div>
 </div>
 <p>The quadrat test finds this to be <em>statistically nonrandom</em>, while our simulating process ensured that <em>within the given study area</em>, the pattern is a complete spatially-random process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null_ashape</span><span class="o">.</span><span class="n">chi2_pvalue</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">qstat_null_ashape</span><span class="o">.</span><span class="n">chi2_pvalue</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.1446106336337376e-27
 </pre></div>
 </div>
 </div>
@@ -1063,7 +1140,7 @@
 <p>The first function, Ripley’s <span class="math notranslate nohighlight">\(G\)</span>, focuses on the distribution of nearest neighbor distances. That is, the <span class="math notranslate nohighlight">\(G\)</span> function summarizes the distances between each point in the pattern and their nearest neighbor. In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are <em>mutual</em> nearest neighbors (and so have arrows going in both directions) but some are not.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># this code should be hidden in the book, and only the plot visible!</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># this code should be hidden in the book, and only the plot visible!</span>
 <span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">random_pattern</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="o">*</span><span class="n">random_pattern</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
@@ -1095,12 +1172,15 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_73_0.png" src="../_images/08_point_pattern_analysis_73_0.png" />
+</div>
 </div>
 <p>Ripley’s <span class="math notranslate nohighlight">\(G\)</span> keeps track of the proportion of points for which the nearest neighbor is within a given distance threshold, and plots that cumulative percentage against the increasing distance radii. The distribution of these cumulative percentage has a distinctive shape under completely spatially random processes. The intuition behind Ripley’s G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the cumulative distribution of nearest neighbor distances over increasing distance thresholds, and comparing it to that of a set of simulated patterns that follow a known spatially-random process. Usually, a spatial Poisson point process is used as such reference distribution.</p>
 <p>To do this in the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package, we can use the <code class="docutils literal notranslate"><span class="pre">g_test</span></code> function, which computes both the <code class="docutils literal notranslate"><span class="pre">G</span></code> function for the empirical data <em>and</em> these hypothetical replications under a completely spatially random process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">g_test</span> <span class="o">=</span> <span class="n">distance_statistics</span><span class="o">.</span><span class="n">g_test</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">g_test</span> <span class="o">=</span> <span class="n">distance_statistics</span><span class="o">.</span><span class="n">g_test</span><span class="p">(</span>
     <span class="n">coordinates</span><span class="p">,</span> <span class="n">support</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">keep_simulations</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>
@@ -1112,7 +1192,7 @@
 <p>In this plot, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user’s Flickr photographs are <em>closer</em> to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is <em>clustered.</em></p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> 
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> 
                     <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span>
 <span class="c1"># plot all the simulations with very fine lines</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">g_test</span><span class="o">.</span><span class="n">support</span><span class="p">,</span> <span class="n">g_test</span><span class="o">.</span><span class="n">simulations</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.01</span><span class="p">)</span>
@@ -1145,12 +1225,15 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_77_0.png" src="../_images/08_point_pattern_analysis_77_0.png" />
+</div>
 </div>
 <p>The second function we introduce is Ripley’s <span class="math notranslate nohighlight">\(F\)</span>. Where the <span class="math notranslate nohighlight">\(G\)</span> function works by analyzing the distance <em>between</em> points in the pattern, the <em>F</em> function works by analyzing the distance <em>to</em> points in the pattern from locations in empty space. That is why the <span class="math notranslate nohighlight">\(F\)</span> function is called the “the empty space function”, since it characterizes the typical distance from arbitrary points in empty space to the point pattern. More explicitly, the <span class="math notranslate nohighlight">\(F\)</span> accumulates, for a growing distance range, the percentage of points that can be found within that range from a random point pattern generated within the extent of the observed pattern. If the pattern has large gaps or empty areas, the <span class="math notranslate nohighlight">\(F\)</span> function will increase slowly. But, if the pattern is highly dispersed, then the <span class="math notranslate nohighlight">\(F\)</span> function will increase rapidly. The shape of this cumulative distribution is then compared to those constructed by calculating the same cumulative distribution between the random pattern and an additional, random one generated in each simulation step.</p>
 <p>We can use similar tooling to investigate the <span class="math notranslate nohighlight">\(F\)</span> function, since it is so mathematically similar to the <span class="math notranslate nohighlight">\(G\)</span> function. This is implemented identically using the <code class="docutils literal notranslate"><span class="pre">f_test</span></code> function in <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>. Since the <span class="math notranslate nohighlight">\(F\)</span> function estimated for the observed pattern increases <em>much</em> more slowly than the <span class="math notranslate nohighlight">\(F\)</span> functions for the simulated patterns, we can be confident that there are many gaps in our pattern; i.e. the pattern is <em>clustered</em>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f_test</span> <span class="o">=</span> <span class="n">distance_statistics</span><span class="o">.</span><span class="n">f_test</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f_test</span> <span class="o">=</span> <span class="n">distance_statistics</span><span class="o">.</span><span class="n">f_test</span><span class="p">(</span>
     <span class="n">coordinates</span><span class="p">,</span> <span class="n">support</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">keep_simulations</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>
@@ -1159,7 +1242,7 @@
 </div>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
     <span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">gridspec_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">width_ratios</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
 <span class="p">)</span>
 
@@ -1194,6 +1277,9 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_80_0.png" src="../_images/08_point_pattern_analysis_80_0.png" />
+</div>
 </div>
 <p>Ripley’s “alphabet” extends to several other letter-named functions that can be used for conducting point pattern analysis in this vein. Good “next steps” in your point pattern analysis journey include the book by <span id="id4">[<a class="reference internal" href="references.html#id7"><span>BRT15</span></a>]</span>; and the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> documentation for guidance on how to run these in Python.</p>
 </div>
@@ -1211,10 +1297,15 @@
 <p>The flexibility (but also some of the limitations) of the algorithm resides in that both <code class="docutils literal notranslate"><span class="pre">m</span></code> and <code class="docutils literal notranslate"><span class="pre">r</span></code> need to be specified by the user before running DBSCAN. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing <code class="docutils literal notranslate"><span class="pre">DBSCAN</span></code> in Python:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define DBSCAN</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define DBSCAN</span>
 <span class="n">clusterer</span> <span class="o">=</span> <span class="n">DBSCAN</span><span class="p">()</span>
 <span class="c1"># Fit to our data</span>
 <span class="n">clusterer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">]])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>DBSCAN()
 </pre></div>
 </div>
 </div>
@@ -1222,8 +1313,13 @@
 <p>Following the standard interface in scikit-learn, we first define the algorithm we want to run (creating the <code class="docutils literal notranslate"><span class="pre">clusterer</span></code> object) and then we <em>fit</em> it to our data. Once fit, <code class="docutils literal notranslate"><span class="pre">clusterer</span></code> contains the required information to access all the results of the algorithm. The <code class="docutils literal notranslate"><span class="pre">core_sample_indices_</span></code> attribute contains the indices (order, starting from zero) of each point which is classified as a <em>core</em>. We can have a peek into it to see what it looks like:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print the first 5 elements of `cs`</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print the first 5 elements of `cs`</span>
 <span class="n">clusterer</span><span class="o">.</span><span class="n">core_sample_indices_</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([ 1, 22, 30, 36, 42])
 </pre></div>
 </div>
 </div>
@@ -1232,7 +1328,12 @@
 <p>The second attribute of interest is <code class="docutils literal notranslate"><span class="pre">labels_</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">clusterer</span><span class="o">.</span><span class="n">labels_</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">clusterer</span><span class="o">.</span><span class="n">labels_</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([-1,  0, -1, -1, -1])
 </pre></div>
 </div>
 </div>
@@ -1240,7 +1341,7 @@
 <p>The labels object always has the same length as the number of points used to run DBSCAN. Each value represents the index of the cluster a point belongs to. If the point is classified as <em>noise</em>, it receives a -1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make thinks easier later on, let us turn the labels into a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object that we can index in the same way as our collection of points:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">lbls</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">clusterer</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lbls</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">clusterer</span><span class="o">.</span><span class="n">labels_</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1248,7 +1349,7 @@
 <p>Now we already have the clusters, we can proceed to visualize them. There are many ways in which this can be done. We will start just by coloring points in a cluster in red and noise in gray:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup figure and axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Subset points that are not part of any cluster (noise)</span>
 <span class="n">noise</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">lbls</span><span class="o">==-</span><span class="mi">1</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]]</span>
@@ -1273,15 +1374,23 @@
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_91_0.png" src="../_images/08_point_pattern_analysis_91_0.png" />
+</div>
 </div>
 <p>Although informative, the result of this run is not particularly satisfactory. There are <em>way</em> too many points that are classified as “noise”.</p>
 <p>This is because we have run DBSCAN with the default parameters: a radius of 0.5 and a minimum of five points per cluster. Since our data is expressed in meters, a radius of half a meter will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs.</p>
 <p>If we change those parameters, can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Obtain the number of points 1% of the total represents</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Obtain the number of points 1% of the total represents</span>
 <span class="n">minp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)</span>
 <span class="n">minp</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>100.0
 </pre></div>
 </div>
 </div>
@@ -1289,7 +1398,7 @@
 <p>At the same time, let us expand the maximum radius to say, 500 meters. Then we can re-run the algorithm and plot the output, all in the same cell this time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rerun DBSCAN</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Rerun DBSCAN</span>
 <span class="n">clusterer</span> <span class="o">=</span> <span class="n">DBSCAN</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">min_samples</span><span class="o">=</span><span class="n">minp</span><span class="p">)</span>
 <span class="n">clusterer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">]])</span>
 <span class="c1"># Turn labels into a Series</span>
@@ -1321,6 +1430,9 @@
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/08_point_pattern_analysis_95_0.png" src="../_images/08_point_pattern_analysis_95_0.png" />
 </div>
 </div>
 </div>
