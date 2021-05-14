@@ -43,7 +43,7 @@ import rasterio
 from rasterio.plot import show as rioshow
 ```
 
-```python tags=["hide-cell"]
+```python tags=["remove-cell"]
 osmnx.config(
     overpass_settings='[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
 )
@@ -87,13 +87,23 @@ airbnbs_ch = airbnbs.unary_union.convex_hull
 airbnbs_ch
 ```
 
-Using this polygon, we can use the `osmnx` package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we'll request POIs within San Diego that are "restaurants" or "bars," according to their metadata stored in OpenStreetMap. (*note: this step requires internet connection as it is querying a remote server*):
+Using this polygon, we can use the `osmnx` package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we'll request POIs within San Diego that are "restaurants" or "bars," according to their metadata stored in OpenStreetMap. Once returned, we only keep a few columns to keep the table small and tidy:
 
 ```python
 %%time
 pois = osmnx.geometries_from_polygon(
     airbnbs_ch, tags={"amenity": ['restaurant', 'bar']}
-)
+)[["unique_id", "osmid", "amenity", "cuisine", "name", "geometry"]]
+```
+
+```python tags=["remove-cell"]
+pois.to_file("../data/cache/sd_pois.gpkg", driver="GPKG")
+```
+
+The code snippet above sends a query to the OpenStreetMap server to fetch the data on amenities. Note that it _requires_ internet connectivity to work. If you are working on the book _without_ connectivity, a cached version of the dataset is available on the data folder and can be read as:
+
+```python
+pois = geopandas.read_file("../data/cache/sd_pois.gpkg")
 ```
 
 This provides us with every location within our convex hull that is tagged as a "restaurant" or "bar" its metadata on OpenStreetMap. Overall, this provides us with about 1300 points of interest: 
@@ -416,6 +426,16 @@ sd_pop = acs.from_msa(
     level = "tract",
     variables=['B02001_001E']
 )
+```
+
+```python tags=["remove-cell"]
+sd_pop.to_file("../data/cache/sd_census.gpkg", driver="GPKG")
+```
+
+The code snippet above sends a query to the Census Bureau server to fetch the data for San Diego. Note that it _requires_ internet connectivity to work. If you are working on the book _without_ connectivity, a cached version of the dataset is available on the data folder and can be read as:
+
+```python
+sd_pop = geopandas.read_file("../data/cache/sd_census.gpkg")
 ```
 
 And calculate population density:
