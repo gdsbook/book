@@ -109,7 +109,7 @@ mx[['NAME', 'PCGDP1940']].head()
 
 Which displays the following statistical distribution:
 
-```python
+```python caption="Per capita Gross Domestic Product Distribution, Mexican States 1940." tags=[]
 h = seaborn.distplot(mx['PCGDP1940'], bins=5, rug=True);
 ```
 
@@ -443,7 +443,7 @@ comparison of alternative classifiers for the same value of $k$.
 
 To see this, we can compare different classifiers for $k=5$ on the Mexico data:
 
-```python
+```python caption="Absolute Deviation around Class Medians. Alternative classification schemes, Mexican State PCGDP1940." tags=[]
 class5 = q5, ei5, ht, mb5, msd, fj5, jc5
 fits = numpy.array([ c.adcm for c in class5])
 data = pandas.DataFrame(fits)
@@ -533,7 +533,7 @@ distribution of the attribute values.
 
 Let us start by refreshing the `mx` object and exploring the base polygons for the Mexican states:
 
-```python
+```python caption="Mexican States" tags=[]
 mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax, color='blue', edgecolor='grey')
@@ -554,7 +554,7 @@ statistical perspective.
 With this qualification in mind, we will explore the construction of choropleth
 maps using `geopandas`:
 
-```python
+```python caption="Quantile Classification, Mexcian PCGDP1940." tags=[]
 mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles')
@@ -566,7 +566,7 @@ plt.show()
 
 Note that the default for the legend is two report two decimal places. If we desire, this can be changed by overriding the `fmt` parameter:
 
-```python
+```python caption="Legend Formatting. Quantile Classification, Mexcian PCGDP1940." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', legend_kwds={'fmt':'{:.0f}'})
 ax.set_axis_off()
@@ -592,7 +592,7 @@ types of numerical attributes:
 
 Our attribute is measured in dollars and is characterized as a *sequential* attribute. To choose an appropriate sequential scheme we can override the `cmap` parameter:
 
-```python
+```python caption="Sequential Color Map (Blues). Quantile Classification, Mexcian PCGDP1940." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', legend_kwds={'fmt':'{:.0f}'}, \
          cmap='Blues')
@@ -605,7 +605,7 @@ plt.show()
 which now uses a single-hue sequential color map with the lighter shades representing lower values. One difficulty with this map is that the poor states in the southern portion of Mexico blend into the background of the map display. This can be adjusted by overriding the `edgecolor`:
 
 
-```python
+```python caption="Modification of  polygon edge color for clarity. Quantile Classification, Mexcian PCGDP1940." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.plot(ax=ax, column='PCGDP1940', legend=True, scheme='Quantiles', legend_kwds={'fmt':'{:.0f}'}, \
          cmap='Blues', edgecolor='k')
@@ -615,7 +615,7 @@ plt.axis('equal')
 plt.show()
 ```
 
-### Diverging Color Schemes
+for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file; done | sort -k 2 -n -r | less### Diverging Color Schemes
 
 A slightly different type of attribute is the so-called "diverging" values attribute. This is
 useful when one wishes to place equal emphasis on mid-range critical values as
@@ -641,11 +641,11 @@ Here we have created four classes for the rank changes: [-inf, -5), [-5, 0), [0,
 any period has a rank of 1 and therefore when considering the change in ranks, a
 negative change reflects moving down the income distribution.
 
-```python
+```python caption="Diverging Color Map. Equal Interval Classification, Mexcian PCGDP1940 (ranks)." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 mx.assign(cl=cls).plot(ax=ax, column='cl', categorical=True, cmap='RdYlBu',
            scheme='equal_interval', k=4)
-ax.set_axis_off()
+ax.set_axis_off
 ax.set_title('PCGDP1940')
 plt.axis('equal')
 plt.show()
@@ -677,8 +677,8 @@ h5.fmt = '{:.0f}'
 h5
 ```
 
-```python
-_ = h5.plot(mx, axis_on=False)
+```python caption="Incorrect Color Map: Sequential Map used for Qualitiative Variable (Region)." tags=[]
+tmp = h5.plot(mx, axis_on=False)
 ```
 
 This is not correct because the region variable is not on an interval scale, so
@@ -690,8 +690,8 @@ than those in the north, as the color map implies an intensity gradient.
 A more appropriate visualization
 is to use a "qualitative" color palette:
 
-```python
-_ = h5.plot(mx, cmap='Pastel1', axis_on=False)
+```python caption="Correct Color Map: Qualitative  Variable (Region)." tags=[]
+tmp = h5.plot(mx, cmap='Pastel1', axis_on=False)
 ```
 
 ## Conclusion
