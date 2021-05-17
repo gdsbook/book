@@ -45,7 +45,7 @@ If we *know* that errors tend to be larger in some areas than in other areas (or
 
 Spatial structure in our errors might arise from when geography *should be* an attribute somehow, but we are not sure exactly how to include it in our model. 
 They might also arise because there is some *other* feature whose omission causes the spatial patterns in the error we see; if this additional feature were included, the structure would disappear. 
-Or, it might arise from the complex interactions and interdependences between the features that we have chosen to use as predictors, resulting in intrinsic structure in mis-prediction. 
+Or, it might arise from the complex interactions and interdependencies between the features that we have chosen to use as predictors, resulting in intrinsic structure in mis-prediction. 
 Most of the predictors we use in models of social processes contain *embodied* spatial information: patterning intrinsic to the feature that we get for free in the model. 
 If we intend to or not, using a spatially-patterned predictor in a model can result in spatially-patterned errors; using more than one can amplify this effect. 
 Thus, *regardless of whether or not the true process is explicitly geographic*, additional information about the spatial relationships between our observations or more information about nearby sites can make our predictions better. 
@@ -53,7 +53,7 @@ Thus, *regardless of whether or not the true process is explicitly geographic*, 
 ### The Data: San Diego AirBnB
 
 To learn a little more about how regression works, we'll examine some information about AirBnB in San Diego, CA. 
-This dataset contains house intrinsic characteristics, both continuous (number of beds as in `beds`) and categorical (type of renting or, in AirBnb jargon, property group as in the series of `pg_X` binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, `d2balboa` or neigbourhood id, `neighbourhood_cleansed`).
+This dataset contains house intrinsic characteristics, both continuous (number of beds as in `beds`) and categorical (type of renting or, in AirBnB jargon, property group as in the series of `pg_X` binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, `d2balboa` or neighborhood id, `neighbourhood_cleansed`).
 
 ```python
 %matplotlib inline
@@ -103,7 +103,7 @@ $$
 P_i = \alpha + \sum_k \mathbf{X}_{ik}\beta_k  + \epsilon_i
 $$
 
-where $P_i$ is the AirBnb price of house $i$, and $X$ is a set of covariates that we use to explain such price. $\beta$ is a vector of parameters that give us information about in which way and to what extent each variable is related to the price, and $\alpha$, the constant term, is the average house price when all the other variables are zero. The term $\epsilon_i$ is usually referred to as "error" and captures elements that influence the price of a house but are not included in $X$. We can also express this relation in matrix form, excluding subindices for $i$, which yields:
+where $P_i$ is the AirBnB price of house $i$, and $X$ is a set of covariates that we use to explain such price. $\beta$ is a vector of parameters that give us information about in which way and to what extent each variable is related to the price, and $\alpha$, the constant term, is the average house price when all the other variables are zero. The term $\epsilon_i$ is usually referred to as "error" and captures elements that influence the price of a house but are not included in $X$. We can also express this relation in matrix form, excluding subindices for $i$, which yields:
 
 $$
 P = \alpha + \mathbf{X}\beta + \epsilon
@@ -132,17 +132,17 @@ print(m1.summary)
 
 A full detailed explanation of the output is beyond the scope of this chapter, so we will focus on the relevant bits for our main purpose. This is concentrated on the `Coefficients` section, which gives us the estimates for $\beta_k$ in our model. In other words, these numbers express the relationship between each explanatory variable and the dependent one, once the effect of confounding factors has been accounted for. Keep in mind however that regression is no magic; we are only discounting the effect of confounding factors that we include in the model, not of *all* potentially confounding factors.
 
-Results are largely as expected: houses tend to be significantly more expensive if they accommodate more people (`accommodates`), if they have more bathrooms and bedrooms and if they are a condominium or part of the "other" category of house type. Conversely, given a number of rooms, houses with more beds (ie. listings that are more "crowded") tend to go for cheaper, as it is the case for properties where one does not rent the entire house but only a room (`rt_Private_room`) or even shares it (`rt_Shared_room`). Of course, you might conceptually doubt the assumption that it is possible to *arbitrarily* change the number of beds within an Airbnb without eventually changing the number of people it accommodates, but methods to address these concerns using *interaction effects* won't be discussed here. 
+Results are largely as expected: houses tend to be significantly more expensive if they accommodate more people (`accommodates`), if they have more bathrooms and bedrooms and if they are a condominium or part of the "other" category of house type. Conversely, given a number of rooms, houses with more beds (i.e.. listings that are more "crowded") tend to go for cheaper, as it is the case for properties where one does not rent the entire house but only a room (`rt_Private_room`) or even shares it (`rt_Shared_room`). Of course, you might conceptually doubt the assumption that it is possible to *arbitrarily* change the number of beds within an AirBnB without eventually changing the number of people it accommodates, but methods to address these concerns using *interaction effects* won't be discussed here. 
 
 ### Hidden Structures
 
 In general, our model performs well, being able to predict slightly more than 65% ($R^2=0.67$) of the variation in the mean nightly price using the covariates we've discussed above.
 But, our model might display some clustering in errors. 
 To interrogate this, we can do a few things. 
-One simple concept might be to look at the correlation between the error in predicting an airbnb and the error in predicting its nearest neighbor. 
+One simple concept might be to look at the correlation between the error in predicting an AirBnB and the error in predicting its nearest neighbor. 
 To examine this, we first might want to split our data up by regions and see if we've got some spatial structure in our residuals. 
 One reasonable theory might be that our model does not include any information about *beaches*, a critical aspect of why people live and vacation in San Diego. 
-Therefore, we might want to see whether or not our errors are higher or lower depending on whether or not an airbnb is in a "beach" neighborhood, a neighborhood near the ocean:
+Therefore, we might want to see whether or not our errors are higher or lower depending on whether or not an AirBnB is in a "beach" neighborhood, a neighborhood near the ocean:
 
 ```python caption="Distributions of prediction errors (residuals) for the basic linear model. Residuals for coastal Airbnbs are generally positive, meaning that the model under-predicts their prices." tags=[]
 is_coastal = db.coastal.astype(bool)
@@ -206,19 +206,19 @@ No neighborhood is disjoint from one another, but some do appear to be higher th
 Thus, there may be a distinctive effect of intangible neighborhood fashionableness that matters in this model. 
 
 Noting that many of the most over- and under-predicted neighborhoods are near one another in the city, it may also be the case that there is some sort of *contagion* or spatial spillovers in the nightly rent price. 
-This often is apparent when individuals seek to price their airbnb listings to compete with similar nearby listings. 
+This often is apparent when individuals seek to price their AirBnB listings to compete with similar nearby listings. 
 Since our model is not aware of this behavior, its errors may tend to cluster. 
 One exceptionally simple way we can look into this structure is by examining the relationship between an observation's residuals and its surrounding residuals. 
 
 To do this, we will use *spatial weights* to represent the geographic relationships between observations. 
 We cover spatial weights in detail in another chapter, so we will not repeat ourselves here.
-For this example, we'll start off with a $KNN$ matrix where $k=1$, meaning we're focusing only on the linkages of each airbnb to their closest other listing.
+For this example, we'll start off with a $KNN$ matrix where $k=1$, meaning we're focusing only on the linkages of each AirBnB to their closest other listing.
 
 ```python
 knn = weights.KNN.from_dataframe(db, k=1)
 ```
 
-This means that, when we compute the *spatial lag* of that knn weight and the residual, we get the residual of the airbnb listing closest to each observation.
+This means that, when we compute the *spatial lag* of that $KNN$ weight and the residual, we get the residual of the AirBnB listing closest to each observation.
 
 ```python caption="The relationship between prediction error for an Airbnb and the nearest Airbnb's prediction error. This suggests that if an Airbnb's nightly price is over-predicted, its nearby Airbnbs will also be over-predicted." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
@@ -234,16 +234,16 @@ ax.set_ylabel('Spatial Lag of Model Residuals - $W u$');
 
 In this plot, we see that our prediction errors tend to cluster!
 Above, we show the relationship between our prediction error at each site and the prediction error at the site nearest to it. 
-Here, we're using this nearest site to stand in for the *surroundings* of that Airbnb. 
-This means that, when the model tends to overpredict a given Airbnb's nightly log price, sites around that Airbnb are more likely to *also be overpredicted*. 
+Here, we're using this nearest site to stand in for the *surroundings* of that AirBnB. 
+This means that, when the model tends to over-predict a given AirBnB's nightly log price, sites around that AirBnB are more likely to *also be over-predicted*. 
 
 
-An interesting property of this relationship is that it tends to stabilize as the number of nearest neighbors used to construct each Airbnb's surroundings increases.
+An interesting property of this relationship is that it tends to stabilize as the number of nearest neighbors used to construct each AirBnB's surroundings increases.
 Consult the [Challenge](#Challenge) section for more on this property. 
 
 Given this behavior, let's look at the stable $k=20$ number of neighbors.
-Examining the relationship between this stable *surrounding* average and the focal Airbnb, we can even find clusters in our model error. 
-Recalling the *local Moran* statistics, we can identify certain areas where our predictions of the nightly (log) Airbnb price tend to be significantly off:
+Examining the relationship between this stable *surrounding* average and the focal AirBnB, we can even find clusters in our model error. 
+Recalling the *local Moran* statistics, we can identify certain areas where our predictions of the nightly (log) AirBnB price tend to be significantly off:
 
 ```python caption="Map of cluters in regression errors, according to the Local Moran's $I_i$." tags=[]
 knn.reweight(k=20, inplace=True)
@@ -262,7 +262,7 @@ db.assign(
 );
 ```
 
-Thus, these areas tend to be locations where our model significantly underpredicts the nightly airbnb price both for that specific observation and observations in its immediate surroundings. 
+Thus, these areas tend to be locations where our model significantly under-predicts the nightly AirBnB price both for that specific observation and observations in its immediate surroundings. 
 This is critical since, if we can identify how these areas are structured &mdash; if they have a *consistent geography* that we can model &mdash; then we might make our predictions even better, or at least not systematically mis-predict prices in some areas while correctly predicting prices in other areas. 
 
 Since significant under- and over-predictions do appear to cluster in a highly structured way, we might be able to use a better model to fix the geography of our model errors. 
@@ -290,9 +290,9 @@ Often, this reflects the fact that processes are not the same everywhere in the 
 
 #### Proximity variables
 
-For a start, one relevant proximity-driven variable that could influence our model is based on the listings proximity to Balboa Park. A common tourist destination, Balboa park is a central recreation hub for the city of San Diego, containing many museums and the San Diego zoo. Thus, it could be the case that people searching for Airbnbs in San Diego are willing to pay a premium to live closer to the park. If this were true *and* we omitted this from our model, we may indeed see a significant spatial pattern caused by this distance decay effect. 
+For a start, one relevant proximity-driven variable that could influence our model is based on the listings proximity to Balboa Park. A common tourist destination, Balboa park is a central recreation hub for the city of San Diego, containing many museums and the San Diego zoo. Thus, it could be the case that people searching for AirBnBs in San Diego are willing to pay a premium to live closer to the park. If this were true *and* we omitted this from our model, we may indeed see a significant spatial pattern caused by this distance decay effect. 
 
-Therefore, this is sometimes called a *spatially-patterned omitted covariate*: geographic information our model needs to make good precitions which we have left out of our model. Therefore, let's build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize the structure of this distance covariate itself:
+Therefore, this is sometimes called a *spatially-patterned omitted covariate*: geographic information our model needs to make good predictions which we have left out of our model. Therefore, let's build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize the structure of this distance covariate itself:
 
 ```python caption="A map showing the 'Distance to Balboa Park' variable." tags=[]
 db.plot('d2balboa', marker='.', s=5)
@@ -330,7 +330,7 @@ seaborn.regplot(
 );
 ```
 
-Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is *positive*, meaning that people are paying a premium to be *further* from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this. Further, the next chapter is an extensive treatment of spatial fixed effects, presenting many more spatial feature engineering methods. Here, we have only showed how to include these engineered features in a standard linear modelling framework. 
+Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an AirBnB; the coefficient estimate is *positive*, meaning that people are paying a premium to be *further* from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this. Further, the next chapter is an extensive treatment of spatial fixed effects, presenting many more spatial feature engineering methods. Here, we have only showed how to include these engineered features in a standard linear modeling framework. 
 
 
 ### Spatial Heterogeneity
@@ -343,7 +343,7 @@ $$
 \log{P_i} = \alpha_r + \sum_k \mathbf{X}_{ik}\beta_k  + \epsilon_i
 $$
 
-where the main difference is that we are now allowing the constant term, $\alpha$, to vary by neighbourhood $r$, $\alpha_r$.
+where the main difference is that we are now allowing the constant term, $\alpha$, to vary by neighborhood $r$, $\alpha_r$.
 
 Programmatically, we will show two different ways can estimate this: one,
 using `statsmodels`; and two, with `PySAL`. First, we will use `statsmodels`. This package provides a formula-like API, which allows us to express the *equation* we wish to estimate directly:
@@ -428,7 +428,7 @@ plt.show()
 
 #### Spatial Regimes
 
-At the core of estimating spatial FEs is the idea that, instead of assuming the dependent variable behaves uniformly over space, there are systematic effects following a geographical pattern that affect its behaviour. In other words, spatial FEs introduce econometrically the notion of spatial heterogeneity. They do this in the simplest possible form: by allowing the constant term to vary geographically. The other elements of the regression are left untouched and hence apply uniformly across space. The idea of spatial regimes (SRs) is to generalize the spatial FE approach to allow not only the constant term to vary but also any other explanatory variable. This implies that the equation we will be estimating is:
+At the core of estimating spatial FEs is the idea that, instead of assuming the dependent variable behaves uniformly over space, there are systematic effects following a geographical pattern that affect its behavior. In other words, spatial FEs introduce econometrically the notion of spatial heterogeneity. They do this in the simplest possible form: by allowing the constant term to vary geographically. The other elements of the regression are left untouched and hence apply uniformly across space. The idea of spatial regimes (SRs) is to generalize the spatial FE approach to allow not only the constant term to vary but also any other explanatory variable. This implies that the equation we will be estimating is:
 
 $$
 \log{P_i} = \alpha_r + \sum_k \mathbf{X}_{ki}\beta_{k-r} + \epsilon_i
@@ -436,7 +436,7 @@ $$
 
 where we are not only allowing the constant term to vary by region ($\alpha_r$), but also every other parameter ($\beta_{k-r}$).
 
-To illustrate this approach, we will use the "spatial differentiator" of whether a house is in a coastal neighbourhood or not (`coastal_neig`) to define the regimes. The rationale behind this choice is that renting a house close to the ocean might be a strong enough pull that people might be willing to pay at different *rates* for each of the house's characteristics.
+To illustrate this approach, we will use the "spatial differentiator" of whether a house is in a coastal neighborhood or not (`coastal_neig`) to define the regimes. The rationale behind this choice is that renting a house close to the ocean might be a strong enough pull that people might be willing to pay at different *rates* for each of the house's characteristics.
 
 To implement this in Python, we use the `OLS_Regimes` class in `PySAL`, which does most of the heavy lifting for us:
 
@@ -461,11 +461,11 @@ encompasses many of the kinds of spatial effects we may be interested in when we
 linear regressions. However, in other cases, our focus is on the effect of the *spatial
 configuration* of the observations, and the extent to which that has an effect on the
 outcome we are considering. For example, we might think that the price of a house not
-only depends on whether it is a townhouse or an appartment, but also on
+only depends on whether it is a townhouse or an apartment, but also on
 whether it is surrounded by many more townhouses than skyscrapers with more
-appartments. This, we could hypothesise, might be related to the different "look and feel" a
-neighbourhood with low-height, historic buildings has as compared to one with
-modern highrises. To the extent these two different spatial configurations
+apartments. This, we could hypothesize, might be related to the different "look and feel" a
+neighborhood with low-height, historic buildings has as compared to one with
+modern high-rises. To the extent these two different spatial configurations
 enter differently the house price determination process, we will be
 interested in capturing not only the characteristics of a house, but also of
 its surrounding ones.
@@ -484,7 +484,7 @@ formally encapsulated: through *spatial weights matrices ($\mathbf{W}$)*, which 
 #### Exogenous effects: The SLX Model
 
 Let us come back to the house price example we have been working with. So far, we
-have hypothesized that the price of a house rented in San Diego through AirBnb can
+have hypothesized that the price of a house rented in San Diego through AirBnB can
 be explained using information about its own characteristics as well as some 
 relating to its location such as the neighborhood or the distance to the main
 park in the city. However, it is also reasonable to think that prospective renters
@@ -497,7 +497,7 @@ considering not only a given explanatory variable, but also its spatial lag. In 
 example case, in addition to including a dummy for the type of house (`pg_XXX`), we 
 can also include the spatial lag of each type of house. This addition implies
 we are also including as explanatory factor of the price of a given house the proportion 
-neighbouring houses in each type. Mathematically, this implies estimating the following model:
+neighboring houses in each type. Mathematically, this implies estimating the following model:
 
 $$
 \log(P_i) = \alpha + \sum^{p}_{k=1}X_{ij}\beta_j + \sum^{p}_{k=1}\left(\sum^{N}_{j=1}w_{ij}x_{jk}\right)\gamma_k + \epsilon_i
@@ -566,7 +566,7 @@ print(m5.summary)
 
 The way to interpret the table of results is similar to that of any other
 non-spatial regression. The variables we included in the original regression
-display similar behaviour, albeit with small changes in size, and can be
+display similar behavior, albeit with small changes in size, and can be
 interpreted also in a similar way. The spatial lag of each type of property
 (`w_pg_XXX`) is the new addition. We observe that, except for the case
 of townhouses (same as with the binary variable, `pg_Townhouse`), they are all
@@ -574,7 +574,7 @@ significant, suggesting our initial hypothesis on the role of the surrounding
 houses might indeed be at work here. 
 
 As an illustration, let's look at some of the direct/indirect effects. 
-The direct effect of the `pg_Condominium` variable means that condominimums are
+The direct effect of the `pg_Condominium` variable means that condominiums are
 typically 11% more expensive ($\beta_{pg\_Condominium}=0.1063$) than the benchmark
 property type, apartments. More relevant to this section, any given house surrounded by 
 condominiums *also* receives a price premium. But, since $pg_Condominium$ is a dummy variable,
@@ -596,7 +596,7 @@ m5.predy
 
 To build new predictions, we need to follow the equation stated above.
 
-Showing this process below, let's first change a property to be a condominimum. Consider the third observation, which is the first apartment in the data:
+Showing this process below, let's first change a property to be a condominium. Consider the third observation, which is the first apartment in the data:
 
 ```python
 db.loc[2]
@@ -736,7 +736,7 @@ While these are some kinds of spatial regressions, many other advanced spatial r
 
 ## Questions
 
-1. One common kind of spatial econometric model is the "Spatial Durbin Model," which combines the SLX model with the spatial lag model. Alternatively, the "Spatial Durbin Error Model" combines the SLX model with the spatial error model. Fit a Spatial Durbin variant of the spaital models fit in this chapter. 
+1. One common kind of spatial econometric model is the "Spatial Durbin Model," which combines the SLX model with the spatial lag model. Alternatively, the "Spatial Durbin Error Model" combines the SLX model with the spatial error model. Fit a Spatial Durbin variant of the spatial models fit in this chapter. 
     - Do these variants improve the model fit?
     - What happens to the spatial autocorrelation parameters ($\rho$, $\lambda$) when the SLX term is added? Why might this occur?
 2. Fortunately for us, spatial error models recover the same estimates (asymptotically) as a typical OLS estimate, although their confidence intervals will change. Statistically, this occurs because OLS is *inefficient* when there is spatial correlation and/or spatial heteroskedasticity. How much do the confidence intervals change when the spatial error model is fit?
@@ -756,7 +756,7 @@ To do this, we can shuffle our assignments to coast and not-coast, and check whe
 
 Below, we do this; running 100 simulated re-assignments of districts to either "coast" or "not coast," and comparing the distributions of randomly-assigned residuals to the observed distributions of residuals. Further, we do this plotting by the *empirical cumulative density function*, not the histogram directly. This is because the *empirical cumulative density function* is usually easier to examine visually, especially for subtle differences. 
 
-Below, the black lines represent our simulations, and the colored patches below them represents the observed distribution of residuals. If the black lines tend to be on the left of the colored patch, then, the simulations (where prediction error is totally random with respect to our categories of "coastal" and "not coastal") tend to have more negative residuals than our actual model. If the black lines tend to be on the right, then they tend to have more positive residuals. As a refresher, positive residuals mean that our model is underpredicting, and negative residuals mean that our model is overpredicting. Below, our simulations provide direct evidence for the claim that our model may be systematically underpredicting coastal price and overpredicting non-coastal prices. 
+Below, the black lines represent our simulations, and the colored patches below them represents the observed distribution of residuals. If the black lines tend to be on the left of the colored patch, then, the simulations (where prediction error is totally random with respect to our categories of "coastal" and "not coastal") tend to have more negative residuals than our actual model. If the black lines tend to be on the right, then they tend to have more positive residuals. As a refresher, positive residuals mean that our model is under-predicting, and negative residuals mean that our model is over-predicting. Below, our simulations provide direct evidence for the claim that our model may be systematically under-predicting coastal price and over-predicting non-coastal prices. 
 
 ```python caption="Distributions showing the differences between coastal and non-coastal prediction errors. Some 'random' simulations are shown in black in each plot, where observations are randomly assigned to either 'Coastal' or 'Not Coastal' groups." tags=[]
 n_simulations = 100

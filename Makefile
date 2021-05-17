@@ -60,3 +60,19 @@ test:
 
 	rm -rf tests
 	echo "########\n\nAll blocks passed\n\n########"
+    
+pack_site: html
+	rm -f gdsbook_site.zip
+	cd docs && zip -r ../gdsbook_site.zip ./
+
+pack_content:
+	rm -f gdsbook_content.zip
+	rm -rf gdsbook_content
+	mkdir gdsbook_content
+	mkdir gdsbook_content/notebooks
+	cp notebooks/*.ipynb gdsbook_content/notebooks
+	cp -r figures gdsbook_content/figures
+	cp -r data gdsbook_content/data
+	cp README.md gdsbook_content/README.md
+	cd gdsbook_content && zip -r ../gdsbook_content.zip ./
+	rm -r gdsbook_content

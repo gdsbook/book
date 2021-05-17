@@ -32,7 +32,7 @@ these. In particular, we will discuss computational notebooks, open-source
 packages, and reproducible platforms. Having covered the conceptual
 background, we will turn to a practical introduction of the key infrastructure
 that makes up this book: Jupyter Notebooks and JupyterLab, Python packages,
-and a containerised platform to run the book.
+and a containerized platform to run the book.
 
 
 ## Open Science
@@ -41,7 +41,7 @@ The term Open Science has grown in popularity in recent years. Although it is
 used in a variety of contexts with slightly different meanings, a general
 sense of the intuition behind Open Science is the understanding that the
 scientific process, at its core, is meant to be transparent and accessible.
-In this context, the focus on openess is not to be seen as an "add-on" that
+In this context, the focus on openness is not to be seen as an "add-on" that
 changes the general approach only cosmetically, but as a key component of what
 makes science Science. Indeed the scientific process, understood as one where
 we "build on the shoulders of Giants" and progress through dialectic, can only
@@ -50,7 +50,7 @@ community can access and study both results _and_ the process that created
 them.
 
 To better understand the argument behind modern Open Science, it is useful
-to take a historical perspective. The idea of openness was engrained at the
+to take a historical perspective. The idea of openness was ingrained at the
 core of early scientists. In fact that was one of the key differentials with
 their contemporary "alchemists" which, in many respects, were working on
 similar topics albeit in a much more opaque way {cite}`Nielsen_2020`. Scientists
@@ -75,7 +75,7 @@ volume has grown immensely since the early days of science, and this has
 affected our ability to understand our literature as a whole. 
 
 Why is there a sense that Science is no longer open and
-transparent in the way Galileo's diaries were? Although certinaly not the only
+transparent in the way Galileo's diaries were? Although certainly not the only
 or even the most important one, technology plays a role. The process and workflow
 of original scientists relied on a set of "analog" technologies for which an
 "analog" parallel set of tools was developed to keep track and document
@@ -116,7 +116,7 @@ infrastructure (and how you too can reproduce it at home!).
 
 ### Computational notebooks
 
-Computational notebooks are the XXIst Century sibling of Galileo's notebooks.
+Computational notebooks are the twenty-first Century sibling of Galileo's notebooks.
 Like their predecessors, they allow researchers, (data) scientists, and
 computational practitioners to record their practices and steps taken as they
 are going about their work; unlike the pen and paper approach, computational
@@ -145,7 +145,7 @@ of the research cycle. To widen the range of possibilities and
 applications, notebooks are designed to be easily convertible into other
 formats. For example, while a specific application is required to open and edit
 most notebook file formats, no additional software is required to convert them
-into pdf files that can be read, printed, and annotated without the need of technical
+into PDF files that can be read, printed, and annotated without the need of technical
 software.
 
 Notebooks represent the top layer on the reproducibility stack. They can capture
@@ -162,21 +162,21 @@ to only include the parts of the work that are unique to the application being
 recorded in the notebook, and to avoid duplication. From this it follows that
 if a piece of code is used several times across the notebook, or even across
 several notebooks, that functionality should probably be taken out of the
-notebook and into a centralised place where it can be accessed whenever
+notebook and into a centralized place where it can be accessed whenever
 needed. In other words, such functionality should be turned into a package.
 
-Packages are modular, flexible and repurposable compilations of code. Unlike
+Packages are modular, flexible and reusable compilations of code. Unlike
 notebooks, they do not capture specific applications but abstractions of
 functionality that can be used in a variety of contexts. Their function is to
 avoid duplication "downstream" by encapsulating functionality in a way that
 can be accessed and used in a variety of contexts without having to re-write
 code every time it is needed. In doing so, packages (or libraries, an
-interchangeable term in this context) embody the famous hacker moto of D.R.Y.:
+interchangeable term in this context) embody the famous hacker motto of D.R.Y.:
 "don't repeat yourself".
 
 Open source packages are packages whose code is available to inspect, modify
 and redistribute. They fulfill the same functions as any package in terms of
-modularising code, but they also enable transparency as any user can
+modularizing code, but they also enable transparency as any user can
 access the exposed functionality _and_ the underlying code that
 generates it. For this reason, for code packages to serve Open Science and
 reproducibility, they need to be open source.
@@ -207,13 +207,13 @@ notebook.
 
 Unlike open source packages, the notion of reproducible platforms is not as
 widespread and generally agreed upon. Its necessity has only become apparent more
-recently, and work on providing them in standardised ways is less developed
+recently, and work on providing them in standardized ways is less developed
 than in the case of notebook technology or code packaging and distribution.
 Nevertheless, some inroads are being made. One area which has experienced
 significant progress in recent years and holds great promise in this context is
 container technology. Containers are a lightweight version of a virtual
 machine, which is a program that enables an entire operating system to run
-compartimentalised on top of another operating system. Containers allow to
+compartmentalized on top of another operating system. Containers allow to
 encapsulate an entire environment (or platform) in a format that is easy to
 transfer and reproduce in a variety of computational contexts. The most
 popular technology for containers nowadays is Docker, and the opportunities
@@ -229,7 +229,7 @@ data science are starting to be explored {cite}`Cook_2017`.
 This book uses notebooks as the main format in which its content is created and
 distributed. Each chapter is written as a separate notebook and can
 be run interactively. At the same time, we collect all chapters and convert
-them into different formats for "static consumption" (ie. read only), either
+them into different formats for "static consumption" (i.e.. read only), either
 in HTML format for the web, or PDF to be printed in a physical copy.
 This section will present the specific format of notebooks we use, and
 illustrate its building blocks in a way that allows you to then follow the
@@ -256,12 +256,12 @@ integrate $\LaTeX$ notation. This means we can write most forms of narrative
 relying on markdown, which is more straightforward, and rely on $\LaTeX$ for
 more sophisticated parts, such as equations. Covering Markdown rules in detail
 is beyond the scope of this chapter, but the interested reader can inspect the
-[official Github specification](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax) 
-of the so-called Github-flavored markdown, the one adopted by the notebook.
+[official GitHub specification](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax) 
+of the so-called GitHub-Flavored markdown, the one adopted by the notebook.
 
 Code cells are text boxes that contain computer code. In the case of this
 book, all code will be Python, but Jupyter notebooks are flexible enough to
-work with other languages (see the offical list of Jupyter-supported kernels
+work with other languages (see the official list of Jupyter-supported kernels
 [here](https://github.com/jupyter/jupyter/wiki/Jupyter-kernels)).
 Aesthetically, code cells look as follows:
 
@@ -339,7 +339,7 @@ Our recommended way to interact with Jupyter notebooks is through Jupyter Lab.
 Jupyter Lab is an interface to the Jupyter ecosystem that brings together
 several tools for data science into a consistent interface that enables the user
 to accomplish most of her workflows. It is built as a web app following a
-client-server architechture. This means the computation is decoupled from the
+client-server architecture. This means the computation is decoupled from the
 interface. This decoupling allows each to be hosted in the most convenient and
 efficient solution. For example, you might be following this book
 interactively in your laptop. In this case, it is likely both the server that
@@ -358,14 +358,14 @@ display.Image(path)
 
 At the top we find a menu bar (red box in the figure) that allows us to open,
 create and interact with files, as well as to modify the appearance and 
-behaviour of Jupyter Lab. The largest real estate is occupied by the main
+behavior of Jupyter Lab. The largest real estate is occupied by the main
 pane (blue box). By default, there is an option to create a new notebook, open
 a console, a terminal session, a (markdown) text file, and a window for
 contextual help. Jupyter Lab provides a flexible workspace in that the user
 can open as many windows as needed and rearrange them as desired by dragging
 and dropping. Finally, on the left of the main pane we find the side pane
 (green box),
-which has several tabs that toggle on and off different auxilliary information.
+which has several tabs that toggle on and off different auxiliary information.
 By default, we find a file browser based on the folder from where the session
 has been launched. But we can also switch to a pane that lists all the
 currently open kernels and terminal sessions, a list of all the commands in the
@@ -383,7 +383,7 @@ programming language used widely in data science. To give a couple of examples o
 relevance, it powers [most of the company Dropbox's main product](https://www.quora.com/How-does-dropbox-use-python-What-features-are-implemented-in-it-any-tangentially-related-material?share=1), and is also heavily
 [used](https://www.python.org/about/success/usa/) to control satellites at NASA.
 A great deal of Science is also done in Python, from [research in
-astronomy](https://www.youtube.com/watch?v=mLuIB8aW2KA) at UC Berkley, to
+astronomy](https://www.youtube.com/watch?v=mLuIB8aW2KA) at UC Berkeley, to
 [courses in economics](https://lectures.quantecon.org/py/) by Nobel Prize-winning professors. 
 
 This book uses Python because it is a good language for beginners and 
@@ -446,7 +446,7 @@ an example. The simplest way to import a library is by typing the following:
 import geopandas
 ```
 
-We now have access to the entire library of methods and clases, which we
+We now have access to the entire library of methods and classes, which we
 can call by prepending `geopandas.` to the name of the function we want.
 Sometimes, however, we will want to shorten the name to save keystrokes. This
 approach, called _aliasing_, can be done as follows:
@@ -492,7 +492,7 @@ into the notebook itself, you can use the following `help` function instead:
 help(geopandas.read_file)
 ```
 
-### Containerised platform
+### Containerized platform
 
 As mentioned [earlier in this chapter](#Reproducible-platforms), 
 reproducible platforms encompass technology and practices that help 
@@ -528,7 +528,7 @@ are going to run it on. Instead, we are downloading the software in the form
 that was installed when the container was originally built and packaged,
 and for the operating system that was also packaged originally. This is the real
 advantage: build once, run everywhere. For the experienced reader,
-this might sound very much like their older syster: virtual machines. Although
+this might sound very much like their older system: virtual machines. Although
 there are similarities between both technologies, containers are more 
 lightweight and can be run much more swiftly than virtual machines.
 This box that is isolated interacts with the rest of the computer through
@@ -541,7 +541,7 @@ stored outside in the host machine.
 
 "Containers are great but, how can I install and run one?", you might be
 asking yourself at this point. First, you will need to install Docker on your
-machine. This assumes you have administrative rights (ie. you can install
+machine. This assumes you have administrative rights (i.e.. you can install
 software). If that is the case, you can go to the Docker website 
 ([https://www.docker.com/])(https://www.docker.com/)) and install the version
 that suits your operating system. Note that, although container
