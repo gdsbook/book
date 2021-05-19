@@ -289,7 +289,7 @@ import IPython.display as display
 This makes available additional functionality that allows us to embed rich
 content. For example, we can include a YouTube clip by passing the video ID:
 
-```python attributes={"classes": [], "id": "", "n": "4"}
+```python caption="Embedding rich media in a notebook." tags=[]
 display.YouTubeVideo('iinQDhsdE9s')
 ```
 
@@ -319,7 +319,7 @@ for this book, for example, we can embed interactive maps with an `iframe`:
 ```python attributes={"classes": [], "id": "", "n": "6"}
 osm = """
 <iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-2.9662737250328064%2C53.400500637844594%2C-2.964626848697662%2C53.402550738394034&amp;layer=mapnik" style="border: 1px solid black"></iframe><br/><small><a href="http://www.openstreetmap.org/#map=19/53.40153/-2.96545">View Larger Map</a></small>
-"""
+"""logo_transparent-bg.png
 display.HTML(osm)
 ```
 
@@ -328,8 +328,7 @@ images, which we will so throughout the book. For that, we use the `Image`
 method:
 
 ```python caption="This book's logo, built from Stamen Toner map tiles and from code."
-path = ("../infrastructure/logo/"\
-        "logo_transparent-bg.png")
+path = ("../infrastructure/logo/logo_transparent-bg.png")
 display.Image(path)
 ```
 

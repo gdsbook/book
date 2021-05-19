@@ -90,7 +90,7 @@ db.info()
 
 And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
 
-```python
+```python caption="BREXIT Vote: Pct_Leave" tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(column='Pct_Leave', 
         cmap='viridis', 
@@ -163,7 +163,7 @@ The first row (`E08000012`) represents Liverpool, which was a notorious "Remaine
 
 To end this section visually, the smoothing nature of the lag can be appreciated in the following map comparison:
 
-```python
+```python caption="BREXIT Leave vote and its spatial lag." tags=[]
 
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 ax1, ax2 = axs
