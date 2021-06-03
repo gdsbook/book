@@ -21,24 +21,26 @@ warnings.filterwarnings("ignore")
 # Geospatial Computational Environment
 ## Computational Tools for Geographic Data Science
 
-```python
+```python tags=["remove-cell"]
 from IPython.display import Image
 ```
 
 This chapter provides an overview of the scientific and computational context
-in which the book is framed. First, we will explore debates around Open
-Science, its origins, and how the computational community is responding to
-these. In particular, we will discuss computational notebooks, open-source
+in which the book is framed. Many of the ideas discussed here apply beyond Geographic
+Data Science but, since they have been a fundamental pillar in shaping the
+character of the book, we consider them worth discussing. First, we will explore debates around Open
+Science, its origins, and how the computational community is responding.
+In particular, we will discuss computational notebooks, open-source
 packages, and reproducible platforms. Having covered the conceptual
 background, we will turn to a practical introduction of the key infrastructure
-that makes up this book: Jupyter Notebooks and JupyterLab, Python packages,
+this book relies on: Jupyter Notebooks and JupyterLab, Python packages,
 and a containerized platform to run the book.
 
 
 ## Open Science
 
 The term Open Science has grown in popularity in recent years. Although it is
-used in a variety of contexts with slightly different meanings, a general
+used in a variety of contexts with slightly different meanings {cite}`cruwell2019seven`, a general
 sense of the intuition behind Open Science is the understanding that the
 scientific process, at its core, is meant to be transparent and accessible.
 In this context, the focus on openness is not to be seen as an "add-on" that
@@ -56,29 +58,28 @@ their contemporary "alchemists" which, in many respects, were working on
 similar topics albeit in a much more opaque way {cite}`Nielsen_2020`. Scientists
 would record the field or lab experiments on paper notebooks or diaries,
 providing enough detail to, first, remember what they had done and how they
-had arrived at their results, but also to ensure other members of the
+had arrived at their results; but also to ensure other members of the
 scientific community could study, understand, and replicate their findings.
 One of the most famous of these annotations are Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars:
 
-```python caption="Galileo's drawings of Jupyter and the Medician stars, showing the power of diagrams inside of scientific texts."
+```python caption="Galileo's drawings of Jupyter and the Medician stars, showing the power of diagrams inside of scientific texts." tags=["hide-input"]
 url = ("https://upload.wikimedia.org/wikipedia/"\
        "commons/c/ca/Medicean_Stars.png")
-Image(url)
+Image(url, width=500)
 ```
 
 There is a growing perception that much of the original ethos of Science to
 operate through transparency and accessibility has been lost. A series of
 recent big profile scandals have even prompted some to call it a state of
-crisis {cite}`Ioannidis_2007`. This "crisis" arises because the analyses that scientists conduct
-are difficult to repeat, let alone understand. Both article length and publication
-volume has grown immensely since the early days of science, and this has 
-affected our ability to understand our literature as a whole. 
+crisis {cite}`Ioannidis_2007`. This "crisis" arises because the analyses 
+that scientists conduct are difficult to repeat, or even understand in 
+detail the steps that were taken to arrive at results.
 
 Why is there a sense that Science is no longer open and
 transparent in the way Galileo's diaries were? Although certainly not the only
 or even the most important one, technology plays a role. The process and workflow
-of original scientists relied on a set of "analog" technologies for which an
-"analog" parallel set of tools was developed to keep track and document
+of original scientists relied on a set of analog technologies for which an
+analog parallel set of tools was developed to keep track and document
 progress. Hence the paper notebooks where biologists drew species, or chemists
 painstakingly detailed each step they took in the lab. In the case of social
 sciences, this was probably easier in the sense that quantitative data was not
@@ -100,7 +101,7 @@ term but, in one variant or another, its definition alludes to the need of
 scientific results to be accompanied by enough information and detail so they
 could be repeated by a third party. Since much of modern science is mediated
 through computers, reproducibility thus poses important challenges for the
-tools and practices the scientific community builds and relies on. Although
+computational tools and practices the scientific community builds and relies on. Although
 there is a variety of approaches, in this book we focus on what we see as the
 emerging consensus. This framework enables to record and express entire
 workflows in a way that is both transparent and that fosters efficiency and
@@ -121,11 +122,13 @@ Like their predecessors, they allow researchers, (data) scientists, and
 computational practitioners to record their practices and steps taken as they
 are going about their work; unlike the pen and paper approach, computational
 notebooks are fully integrated in the technological paradigm in which research
-and computation takes place today. For these reasons, they are rapidly becoming the
+takes place today. For these reasons, they are rapidly becoming the
 modern-day version of the traditional academic paper, the main vehicle on
 which (computational) knowledge is created, shared, and consumed.
-Computational notebooks (or notebooks, from now on) are also spreading their
-reach into industry practices, being used, for example, in reports.
+Computational notebooks (or notebooks, from now on) are spreading their
+reach into industry practices, being used, for example, in reports. Although,
+they were designed within a broader scope of application, computational notebooks
+have several advantages for Geographic Data Science work {cite}`boeingAB2020`.
 
 All implementations of notebooks share a series of 
 core features. First, a notebook comprises a single file that stores narrative text,
@@ -133,7 +136,7 @@ computer code, and the output produced by code. Storing both
 narrative and computational work in a _single file_ means that the entire
 workflow can be recorded and documented in the same place, without having to 
 resort to ancillary devices (like a paper notebook). A second feature of
-notebooks is that they allow for _interactive work_. Modern computational work
+notebooks is that they allow _interactive work_. Modern computational work
 benefits from the ability to try, fail, tinker, and iterate quickly until a
 working solution is found. Notebooks embody this quality and enable the user
 to work interactively. Whether the computation takes place on a laptop or
@@ -184,13 +187,13 @@ reproducibility, they need to be open source.
 ### Reproducible platforms
 
 For computational work to be fully reproducible and open, it needs to be
-possible to replicate in a different (computational) environment than where it
+possible to replicate it in a different (computational) environment than where it
 was originally created. This means that it is not sufficient to specify in a
 notebook the code that creates the final outputs, and to rely on open source
 packages for more general functionality; the environment specified by those
 two components needs to be reproducible too. This statement, which might seem
 obvious and straightforward, is not always so due to the scale and complexity
-of modern computational workflows and infrastructures. The old saying of "if
+of modern computational workflows and infrastructures. The old saying "if
 it works on my laptop, what's the problem?" is not enough any more, it needs
 to work on "any laptop" (or computer).
 
@@ -329,7 +332,7 @@ method:
 
 ```python caption="This book's logo, built from Stamen Toner map tiles and from code."
 path = ("../infrastructure/logo/logo_transparent-bg.png")
-display.Image(path)
+display.Image(path, width=500)
 ```
 
 #### Jupyter Lab
@@ -352,7 +355,7 @@ Jupyter Lab' interface has three main areas:
 
 ```python caption="An annotated view of the Jupyterlab interface "
 path = ("../figures/jupyter_lab.png")
-display.Image(path)
+display.Image(path, width=500)
 ```
 
 At the top we find a menu bar (red box in the figure) that allows us to open,
@@ -639,7 +642,7 @@ a landing page that looks approximately like this one:
 
 ```python caption="The authentification screen for Jupyter notebooks"
 path = ("../figures/jupyter_landing_page.png")
-display.Image(path)
+display.Image(path, width=500)
 ```
 
 To access the lab, copy the token from the terminal (in the example above,
