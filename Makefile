@@ -5,7 +5,7 @@ lab:
                -p 4000:4000 \
                -p 8888:8888 \
                --user root \
-			   -e NB_UID=1001 \
+			   -e NB_UID=$UID \
 			   -e NB_GID=100 \
                -v ${PWD}:/home/jovyan/work \
                darribas/gds_dev:6.1
@@ -14,7 +14,7 @@ lablocal:
                -p 4000:4000 \
                -p 8888:8888 \
                --user root \
-			   -e NB_UID=1000 \
+			   -e NB_UID=$UID \
 			   -e NB_GID=100 \
                -v ${PWD}:/home/jovyan/work \
                darribas/gds_dev:6.1
