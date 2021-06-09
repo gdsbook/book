@@ -129,7 +129,7 @@ In general terms, measures of inequality focus on the dispersion present in an i
 seaborn.__version__
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Distribution of Per Capita Income at County Level in 1969."
+```python caption="Distribution of Per Capita Income at County Level in 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 seaborn.set_theme(style='whitegrid')
 seaborn.histplot(x=pci_df['1969'], kde=True);
 ```
@@ -149,7 +149,7 @@ pci_df = (pci_df.set_crs(epsg=4326) # US Census default projection
                 .to_crs(epsg=5070)) # Albers Equal Area North America
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Map of Per Capita Income by County, 1969"
+```python caption="Map of Per Capita Income by County, 1969" ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.plot(
     column='1969', 
     scheme='Quantiles', 
@@ -186,7 +186,7 @@ def ineq_20_20(values):
     return top20 / bottom20
 ```
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="The ratio of the richest 20% versus the poorest 20% of counties (the 20:20 ratio) since 1969."
+```python caption="The ratio of the richest 20% versus the poorest 20% of counties (the 20:20 ratio) since 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 years = numpy.arange(1969, 2018).astype(str)
 ratio_2020 = pci_df[years].apply(ineq_20_20, axis=0)
 ax = plt.plot(years, ratio_2020)
@@ -352,7 +352,7 @@ inequalities['theil'] = pci_df[years].apply(theil, axis=0)
 
 And generate a visual comparison of the evolution of both Gini and Theil's indices:
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Gini and Theil indices for county per capita income distributions since 1969."
+```python caption="Gini and Theil indices for county per capita income distributions since 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 inequalities.plot(subplots=True, figsize=(15,6))
 ```
 
@@ -486,7 +486,7 @@ inequalities = inequalities.join(moran_stats)
 
 To show the overall inter-relationships between these statistics, we make another plot below:
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Relationship between the Gini & Theil inequality indices and Moran's I, a measure of spatial autocorrelation, for per capita incomes."
+```python caption="Relationship between the Gini & Theil inequality indices and Moran's I, a measure of spatial autocorrelation, for per capita incomes." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 inequalities.plot(subplots=True, figsize=(15,12))
 plt.show()
 ```
@@ -594,7 +594,7 @@ inequalities.drop('I-P value', axis=1, inplace=True)
 
 We can visualize them alongside our earlier results:
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="Inequality indices (Gini, Theil), shown alongside Moran's I, with the Theil Decomposition into between-region and within-region components at bottom."
+```python caption="Inequality indices (Gini, Theil), shown alongside Moran's I, with the Theil Decomposition into between-region and within-region components at bottom." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 inequalities.plot(subplots=True, figsize=(15,15))
 plt.show()
 ```
