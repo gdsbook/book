@@ -62,7 +62,7 @@ had arrived at their results; but also to ensure other members of the
 scientific community could study, understand, and replicate their findings.
 One of the most famous of these annotations are Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars:
 
-```python caption="Galileo's drawings of Jupyter and the Medician stars, showing the power of diagrams inside of scientific texts." tags=["hide-input"]
+```python caption="Galileo's drawings of Jupyter and the Medician stars, showing the power of diagrams inside of scientific texts." tags=["remove-input"]
 url = ("https://upload.wikimedia.org/wikipedia/"\
        "commons/c/ca/Medicean_Stars.png")
 Image(url, width=250)
@@ -368,7 +368,7 @@ Jupyter Lab' interface has three main areas: [^jlab]
 [^jlab]: Depending on the version of JupyterLab you are using, the layout and appearance
 may slightly change.
 
-```python caption="An annotated view of the Jupyterlab interface " tags=["hide-input"]
+```python caption="An annotated view of the Jupyterlab interface " tags=["remove-input"]
 path = "../figures/jupyter_lab.png"
 display.Image(path, width=500)
 ```
@@ -681,7 +681,7 @@ With this, you can then head to your browser of preference (ideally Mozilla
 Firefox or Google Chrome) and point it to `localhost:8888`. This should render
 a landing page that looks approximately like this one:
 
-```python caption="The authentification screen for Jupyter notebooks" tags=["hide-input"]
+```python caption="The authentification screen for Jupyter notebooks" tags=["remove-input"]
 path = ("../figures/jupyter_landing_page.png")
 display.Image(path, width=500)
 ```
