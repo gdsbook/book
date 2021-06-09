@@ -47,21 +47,24 @@ terms, these processes are called *multivariate processes*, as opposed to
 *univariate processes*, where only a single variable acts at once.
 Clustering is a fundamental method of geographical analysis that draws insights
 from large, complex multivariate processes. It works by finding similarities among the
-many dimensions in a multivariate process, condensing them down into a simpler representation
+many dimensions in a multivariate process, condensing them down into a simpler representation.
 Thus, through clustering, a complex and difficult to understand process is recast into a simpler one
-that even non-technical audiences can look at and understand. 
+that even non-technical audiences can work with. 
 
-Often, clustering involves sorting observations into groups. For these groups to be more
-meaningful than any single initial dimension, members of a group should be more
+Clustering as we discuss it in this chapter borrows heavily from unsupervised statistical learning {cite}`friedman2001elements`.
+Often, clustering involves sorting observations into groups without any prior idea on what
+the groups are (or, in machine learning jargon, without any labels, hence the _unsupervised_ nature).
+These groups are delineated so that members of a group should be more
 similar to one another than they are to members of a different group.
 Each group is referred to as a *cluster* while the process of assigning
 objects to groups is known as *clustering*. If done well, these clusters can be
 characterized by their *profile*, a simple summary of what members of a group
-are like in terms of the original multivariate process.
+are like in terms of the original multivariate phenomenon.
 
 Since a good cluster is more
 similar internally than it is to any other cluster, these cluster-level profiles
-provide a convenient shorthand to describe the original complex multivariate process.
+provide a convenient shorthand to describe the original complex multivariate phenomenon
+we are interested in.
 Observations in one group may have consistently high 
 scores on some traits but low scores on others. 
 The analyst only needs to look at the profile of a cluster in order to get a
@@ -75,15 +78,14 @@ In the context of explicitly spatial questions, a related concept, the *region*,
 is also instrumental. A *region* is similar to a *cluster*, in the sense that
 all members of a region have been grouped together, and the region should provide 
 a shorthand for the original data. 
-Further, for a region to be analytically useful, its members also should
+For a region to be analytically useful, its members also should
 display stronger similarity to each other than they do to the members of other regions. 
 However, regions are more complex than clusters because they combine this
-similarity in profile with additional information about the geography of their members.
-In short, regions are like clusters (since they have a coherent profile), but they
-also have a coherent geography&mdash;members of a region should also be
-located near one another.
+similarity in profile with additional information about the location of their members.
+In short, regions are like clusters (since they have a consistent profile) where all its members
+are geographically consistent.
 
-The process of creating regions is called regionalization.
+The process of creating regions is called regionalization {cite}`duque2007supervised`.
 A regionalization is a special kind of clustering where the objective is 
 to group observations which are similar in their statistical attributes,
 but also in their spatial location. In this sense, regionalization embeds the same
@@ -97,28 +99,30 @@ always need to hold for all regions, and in certain contexts it makes
 sense to relax connectivity or to impose different types of spatial constraints. 
 
 In this chapter we consider clustering techniques and regionalization methods which will
-allow us to do exactly that. In the process, we will explore the characteristics
-of neighborhoods in San Diego.
-We will extract common patterns from the
+allow us to do exactly that. In the process, we will explore the socioeconomic
+characteristics of neighborhoods in San Diego. We will extract common patterns from the
 cloud of multidimensional data that the Census Bureau produces about small areas
 through the American Community Survey. We begin with an exploration of the
-multivariate data about San Diego by suggesting some ways to examine the 
-statistical and spatial distribution of the data before carrying out any
- clustering. Focusing on the individual variables, as well as their pairwise
+multivariate nature of our dataset by suggesting some ways to examine the 
+statistical and spatial distribution before carrying out any
+clustering. Focusing on the individual variables, as well as their pairwise
 associations, can help guide the subsequent application of clusterings or regionalizations. 
 
 We then consider geodemographic approaches to clustering&mdash;the application
 of multivariate clustering to spatially referenced demographic data.
 Two popular clustering algorithms are employed: k-means and Ward's hierarchical method.
-Mapping the spatial distribution of the resulting clusters 
+As we will see, mapping the spatial distribution of the resulting clusters 
 reveals interesting insights on the socioeconomic structure of the San Diego
 metropolitan area. We also see that in many cases, clusters are spatially 
 fragmented. That is, a cluster may actually consist of different areas that are not
 spatially connected. Indeed, some clusters will have their members strewn all over the map. 
 This will illustrate why connectivity might be important when building insight
 about spatial data, since these clusters will not at all provide intelligible regions. 
-So, we then will move on to regionalization, exploring different approaches that
+With this insight in mind, we will move on to regionalization, exploring different approaches that
 incorporate geographical constraints into the exploration of the social structure of San Diego.
+Applying a regionalization approach is not always necessarily preferable but it can provide
+additional insights into the spatial structure of the multivariate statistical relationships
+that traditional clustering is unable to articulate.
 
 ## Data
 
@@ -135,8 +139,8 @@ db.columns
 ```
 
 To make things easier later on, let us collect the variables we will use to
-characterize Census tracts. These variables capture different aspects of the socio-
-economic reality of each area and, taken together, they provide a comprehensive
+characterize Census tracts. These variables capture different aspects of the 
+socioeconomic reality of each area and, taken together, provide a comprehensive
 characterization of San Diego as a whole:
 
 ```python
@@ -153,16 +157,12 @@ cluster_variables =  [
 ]
 ```
 
-### Exploring the data
-
-Now let's start building up our understanding of this
+Let's start building up our understanding of this
 dataset through both visual and summary statistical measures.
-
-We will start by
-looking at the spatial distribution of each variable alone.
+The first stop is considering the spatial distribution of each variable alone.
 This will help us draw a picture of the multi-faceted view of the tracts we
-want to capture with our clustering. Let's use choropleth maps for the
-nine attributes and compare these choropleth maps side-by-side:
+want to capture with our clustering. Let's use (quantile) choropleth maps for
+each attribute and compare them side-by-side:
 
 ```python caption="The complex, multi-dimensional human geography of San Diego."
 f, axs = plt.subplots(nrows=3, ncols=3, figsize=(12, 12))
@@ -173,8 +173,13 @@ for i, col in enumerate(cluster_variables):
     # select the axis where the map will go
     ax = axs[i]
     # Plot the map
-    db.plot(column=col, ax=ax, scheme='Quantiles', 
-            linewidth=0, cmap='RdPu')
+    db.plot(
+        column=col, 
+        ax=ax,
+        scheme='Quantiles', 
+        linewidth=0,
+        cmap='RdPu'
+    )
     # Remove axis clutter
     ax.set_axis_off()
     # Set the axis title to the name of variable being plotted
@@ -183,13 +188,14 @@ for i, col in enumerate(cluster_variables):
 plt.show()
 ```
 
-Many visual patterns jump out from the maps, revealing both commonalities as
+Several visual patterns jump out from the maps, revealing both commonalities as
 well as differences across the spatial distributions of the individual variables.
 Several variables tend to increase in value from the east to the west
 (`pct_rented`, `median_house_value`, `median_no_rooms`, and `tt_work`) while others
 have a spatial trend in the opposite direction (`pct_white`, `pct_hh_female`,
-`pct_bachelor`, `median_age`). This is actually desirable; when variables have
-different spatial distributions, each variable to contributes distinct 
+`pct_bachelor`, `median_age`). This will help show the strengths of clustering;
+when variables have
+different spatial distributions, each variable contributes distinct 
 information to the profiles of each cluster. However, if all variables display very similar 
 spatial patterns, the amount of useful information across the maps is 
 actually smaller than it appears, so cluster profiles may be much less useful as well.
@@ -197,21 +203,14 @@ It is also important to consider whether the variables display any
 spatial autocorrelation, as this will affect the spatial structure of the
 resulting clusters. 
 
-Recall from chapter XXX that Moran's I is a commonly used
-measure for global spatial autocorrelation. 
-Let us get a quick sense to what
-extent this is present in our dataset.
-First, we need to build a spatial weights matrix that encodes the spatial
-relationships in our San Diego data. We will start with queen contiguity:
+Recall from [Chapter 6](06_spatial_autocorrelation) that Moran's I is a commonly used
+measure for global spatial autocorrelation. We can use it to formalise some of the
+intuitions built from the maps. Recall from earlier in the book that we will need
+to represent the spatial configuration of the data points through a spatial weights
+matrix. We will start with queen contiguity:
 
 ```python
 w = Queen.from_dataframe(db)
-```
-
-As we have seen before, `w` does not contain any islands:
-
-```python
-w.islands
 ```
 
 Now let's calculate Moran's I for the variables being used. This will measure
@@ -222,32 +221,34 @@ the extent to which each variable contains spatial structure:
 numpy.random.seed(123456)
 # Calculate Moran's I for each variable
 mi_results = [Moran(db[variable], w) for variable in cluster_variables]
+# Structure results as a list of tuples
+mi_results = [
+    (variable, res.I, res.p_sim) for variable,res in zip(cluster_variables, mi_results)
+]
 # Display on table
-table = pandas.DataFrame([(variable, res.I, res.p_sim) \
-                          for variable,res \
-                          in zip(cluster_variables, mi_results)
-                         ], columns=['Variable', "Moran's I", 'P-value']
-                        )\
-              .set_index('Variable')
+table = pandas.DataFrame(
+    mi_results,
+    columns=['Variable', "Moran's I", 'P-value']
+).set_index('Variable')
 table
 ```
 
 Each of the variables displays significant positive spatial autocorrelation,
-suggesting that Tobler's law is alive and well in the socioeconomic geography of San
-Diego County. This means we also should expect the clusters we find will have
-a non random spatial distribution. In particular, we would expect clusters to have
-a modest amount of spatial coherence in addition to the coherence in their profiles,
-since there is strong positive autocorrelation in all of the input variables.
+suggesting clear spatial structure in the socioeconomic geography of San
+Diego. This means it is likely the clusters we find will have
+a non random spatial distribution.
 
-Spatial autocorrelation only describes relationships between a single observation at a time.
-So, the fact that all of the clustering variables are positively autocorrelated does not tell us 
-about the way the attributes co-vary over space. For that, we need to consider the
-spatial correlation between variables. Here, we will measure this using the
-bivariate correlation in the maps of covariates themselves.
-
-Given the 9 maps, there are 36 pairs of maps that must be compared. This is too 
-many maps to process visually, so we can turn to an alternative tool to
-explicitly focus on the bivariate relations between each pair of attributes.
+Spatial autocorrelation only describes relationships between observations for a
+single attribute at a time.
+So, the fact that all of the clustering variables are positively autocorrelated does not
+say much about how attributes co-vary over space. To explore cross-attribute relationships,
+we need to consider the spatial correlation between variables. We will take our first dip
+in this direction exploring the bivariate correlation in the maps of covariates themselves.
+This would mean that we would be comparing each pair of chroplets to look for associations
+and differences. Given there are nine attributes, there are 36 pairs of maps that must be
+compared. These are too many maps to process visually. Instead, we focus directly
+on the bivariate relationhips between each pair of attributes, devoid for now of geography
+and use a scatterplot matrix.
 
 ```python caption="A scatter matrix demonstrating the various pair-wise dependencies between each of the variables considered in this section. Each 'facet', or little scatterplot, shows the relationship between the vairable in that column (as its horizontal axis) and that row (as its vertical axis). Since the diagonal represents the situation where the row and column have the same variable, it instead shows the univariate distribution of that variable."
 _ = seaborn.pairplot(db[cluster_variables], kind='reg', diag_kind='kde')
@@ -255,8 +256,8 @@ _ = seaborn.pairplot(db[cluster_variables], kind='reg', diag_kind='kde')
 
 Two different types of plots are contained in the scatterplot matrix. On the
 diagonal are the density functions for the nine attributes. These allow for an
-inspection of the overall morphology of the attribute's value distribution.
-Examining these we see that our selection of variables includes those that are
+inspection of the univariate distribution of the values for each attribute.
+Examining these we see that our selection of variables includes some that are
 negatively skewed (`pct_white` and `pct_hh_female`) as well as positively skewed
 (`median_house_value`, `pct_bachelor`, and `tt_work`).
 
@@ -270,12 +271,17 @@ that tends to have consistently weak association with the other variables is
 `tt_work`, and in part this appears to reflect its rather concentrated 
 distribution as seen on the lower right diagonal corner cell.
 
+Exploring univariate and bivariate relationships is a good first step into building
+a fully multivariate understanding of a dataset. To take it to the next level, we would
+want to know to what extent these pair-wise relationships hold across different attributes,
+and whether there are patterns in the "location" of observations within the scatter plots.
+For example, do nearby dots in each scatterplot of the matrix represent the _same_ observations?
+This type of questions are exactly what clustering helps us explore.
+
 ## Geodemographic Clusters in San Diego Census Tracts
 
-We now will move
-beyond the implicitly bi-variate focus to consider the full multidimensional
-nature of this data set. Geodemographic analysis is a form of multivariate
-clustering where the observations represent geographical areas. The output
+Geodemographic analysis is a form of multivariate
+clustering where the observations represent geographical areas {cite}`webber2018predictive`. The output
 of these clusterings is nearly always mapped. Altogether, these methods use
 multivariate clustering algorithms to construct a known number of
 clusters ($k$), where the number of clusters is typically much smaller than the 
