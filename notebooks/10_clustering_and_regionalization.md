@@ -361,7 +361,7 @@ characteristics, mapping their labels allows to see to what extent similar areas
 to have similar locations.
 Thus, this gives us one map that incorporates the information of from all nine covariates.
 
-```python caption="Clusters in the sociodemographic data, found using K-means with k=5. Note that the large eastern part of San Diego actually contains few observations, since those tracts are larger."
+```python caption="Clusters in the sociodemographic data, found using K-means with k=5. Note that the large eastern part of San Diego actually contains few observations, since those tracts are larger." tags=[]
 # Assign labels into a column
 db['k5cls'] = k5cls.labels_
 # Setup figure and ax
@@ -372,10 +372,6 @@ db.plot(
 )
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-plt.axis('equal')
-# Add title
-plt.title(r'Geodemographic Clusters (k-means, $k=5$)')
 # Display the map
 plt.show()
 ```
@@ -435,7 +431,7 @@ areas
 And, to show this visually:
 
 ```python caption="The area of each of the clusters."
-areas.plot.bar()
+_ = areas.plot.bar()
 ```
 
 Our visual impression is confirmed: cluster 3 contains tracts that
@@ -469,7 +465,7 @@ give wrong impressions about the type of data distribution they represent. To
 obtain more detailed profiles, we can use the `describe` command in `pandas`, 
 after grouping our observations by their clusters:
 
-```python
+```python tags=["hide-output"] jupyter={"outputs_hidden": true}
 # Group table by cluster label, keep the variables used 
 # for clustering, and obtain their descriptive summary
 k5desc = db.groupby('k5cls')[cluster_variables].describe()
@@ -616,7 +612,7 @@ tidy_db.head()
 
 And create a plot of the profiles' distributions:
 
-```python caption="Distributions of each variable in clusters obtained from Ward's hierarchical clutering."
+```python caption="Distributions of each variable in clusters obtained from Ward's hierarchical clutering." tags=["hide-input"]
 # Setup the facets
 facets = seaborn.FacetGrid(
     data=tidy_db,
@@ -638,11 +634,12 @@ On the spatial side, we can explore the geographical dimension of the
 clustering solution by making a map of the clusters. To make the comparison
 with k-means simpler, we will display both side by side:
 
-```python caption="Two clutering solutions, one for the K-means solution, and the other for Ward's hierarchical clutering. Note that colorings cannot be directly compared between the two maps."
+```python caption="Two clutering solutions, one for the K-means solution, and the other for Ward's hierarchical clutering. Note that colorings cannot be directly compared between the two maps." tags=["hide-input"]
 db['ward5'] =model.labels_
 # Setup figure and ax
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 
+            ### K-Means ###
 ax = axs[0]
 # Plot unique values choropleth including a legend and with no boundary lines
 db.plot(
@@ -650,11 +647,10 @@ db.plot(
 )
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-ax.axis('equal')
 # Add title
 ax.set_title('K-Means solution ($k=5$)')
 
+            ### AHC ###
 ax = axs[1]
 # Plot unique values choropleth including a legend and with no boundary lines
 db.plot(
@@ -662,8 +658,6 @@ db.plot(
 )
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-ax.axis('equal')
 # Add title
 ax.set_title('AHC solution ($k=5$)')
 
@@ -741,7 +735,7 @@ model.fit(db[cluster_variables])
 
 Let's inspect the output:
 
-```python caption="Spatially-constrained clusters, or 'regions', of San Diego using Ward's hierarchical clustering."
+```python caption="Spatially-constrained clusters, or 'regions', of San Diego using Ward's hierarchical clustering." tags=["hide-input"]
 db['ward5wq'] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -749,13 +743,8 @@ f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(column='ward5wq', categorical=True, legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-plt.axis('equal')
-# Add title
-plt.title(r'Geodemographic Regions (Ward, $k=5$, Queen Contiguity)')
 # Display the map
 plt.show()
-
 ```
 
 Introducing the spatial constraint results in fully-connected clusters with much
@@ -796,7 +785,7 @@ model.fit(db[cluster_variables])
 
 And plot the final regions:
 
-```python caption="Regions from a spatially-constrained sociodemographic clutering, using a different connectivity constraint."
+```python caption="Regions from a spatially-constrained sociodemographic clutering, using a different connectivity constraint." tags=["hide-input"]
 db['ward5wknn'] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -804,10 +793,6 @@ f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(column='ward5wknn', categorical=True, legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-plt.axis('equal')
-# Add title
-plt.title('Geodemographic Regions (Ward, $k=5$, four nearest neighbors)')
 # Display the map
 plt.show()
 ```
