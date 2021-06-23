@@ -84,7 +84,7 @@ Note that the data is provided as a `.csv` file, so the spatial information is e
 The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatter plot with `seaborn`:
 
 
-```python
+```python caption="Tokyo points jointplot, longitude and latitude." tags=[]
 # Generate scatter plot
 seaborn.jointplot(x='longitude', y='latitude', data=db, s=0.5);
 ```
@@ -94,7 +94,7 @@ This is a good start: we can see dots tend to be concentrated in the center of t
 
 Start with the context. The easiest way to provide additional context is by overlaying a tile map from the internet. Let us quickly call `contextily` for that, and integrate it with `jointplot`:
 
-```python
+```python caption="Tokyo points jointplot, longitude and latitude, with basemap via contextily." tags=[]
 # Generate scatter plot
 joint_axes = seaborn.jointplot(
     x='longitude', y='latitude', data=db, s=0.5
@@ -117,7 +117,7 @@ Consider our second problem: cluttering. When too many photos are concentrated i
 One solution to get around cluttering relates to what we referred to earlier as moving from {ref}`"tables to surfaces" <ch03-surfaces_as_tables>`. We can now recast this approach as a *spatial* or *2-dimensional histogram*. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleth maps may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin 2-d histogram is straightforward in Python using the `hexbin` function:
 
 
-```python
+```python caption="Tokyo points Hex Binning" tags=[]
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(12, 9))
 # Generate and add hexbin with 50 hexagons in each 
@@ -150,7 +150,7 @@ Voila, this allows a lot more detail! It is now clear that the majority of photo
 Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel in Python is rather straightforward:
 
 
-```python
+```python caption="Tokyo points Kernel Density." tags=[]
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Generate and add KDE with a shading of 50 gradients 
@@ -201,7 +201,7 @@ med_center = centrography.euclidean_median(db[['x', 'y']])
 It is easiest to visualize this by plotting the point pattern and its mean center alongside one another:
 
 
-```python
+```python caption="Tokyo points Mean and Median Centers." tags=[]
 # Generate scatter plot
 joint_axes = seaborn.jointplot(
     x='x', y='y', data=db, s=0.75, height=9
@@ -254,7 +254,7 @@ major, minor, rotation = centrography.ellipse(db[['x','y']])
 ```
 
 
-```python
+```python caption="Tokyo points Standard Deviational Ellipse." tags=[]
 from matplotlib.patches import Ellipse
 
 # Set up figure and axis
@@ -317,7 +317,7 @@ alpha_shape, alpha, circs = libpysal.cg.alpha_shape_auto(coordinates, return_cir
 To illustrate, the figure below has the tightest single alpha shape shown in green and the original source points shown in black. The "bounding" circles shown in the figure all have a radius of $8652$ meters. The circles are plotted where our "bounding" disk touches two or three of the points in the point cloud. You can see that the circles "cut into" the convex hull, shown in blue dashed lines, up until they touch two (or three) points. Any tighter, and the circle would disconnect one of the points on the boundary of the alpha shape. 
 
 
-```python
+```python caption="Tokyo points Tightest Alpha Shape, Bounding Circles, Convex Hull." tags=[]
 from descartes import PolygonPatch #to plot the alpha shape easily
 f,ax = plt.subplots(1,1, figsize=(9,9))
 
@@ -468,7 +468,7 @@ circ_patch = Circle(
 Finally, we'll plot the patches together with the photograph locations below:
 
 
-```python
+```python caption="Tokyo points Tightest Alpha Shape, Bounding Circles, Convex Hull, Bounding Rectangle.." tags=[]
 f,ax = plt.subplots(1, figsize=(10,10))
 
 ax.add_patch(alpha_shape_patch)
@@ -517,7 +517,7 @@ random_pattern = random.poisson(coordinates, size=len(coordinates))
 ```
 
 
-```python
+```python caption="Tokyo points Observed and Random Patterns." tags=[]
 f,ax = plt.subplots(1, figsize=(9, 9))
 plt.scatter(*coordinates.T, color='k', marker='.', label='Observed photographs')
 plt.scatter(*random_pattern.T, color='r', marker='x', label='Random')
@@ -538,7 +538,7 @@ random_pattern_ashape = random.poisson(alpha_shape, size=len(coordinates))
 ```
 
 
-```python
+```python caption="Tokyo points, random and observed patterns within Alpha shape." tags=[]
 f,ax = plt.subplots(1, figsize=(9, 9))
 plt.scatter(*coordinates.T, color='k', marker='.', label='Observed')
 plt.scatter(*random_pattern_ashape.T, color='r', marker='x', label='Random')
@@ -558,7 +558,7 @@ Quadrat statistics examine the spatial distribution of points in an area in term
 In the `pointpats` package, you can visualize the results using the following `QStatistic.plot()` method. This shows the grid used to count the events, as well as the underlying pattern:
 
 
-```python
+```python caption="Tokyo points, Quadrat Counts" tags=[]
 qstat = QStatistic(coordinates)
 qstat.plot()
 ```
@@ -573,7 +573,7 @@ qstat.chi2_pvalue
 In contrast, our totally random point process will have nearly the same points in every cell:
 
 
-```python
+```python caption="Tokyo Radom points, Quadrat Counts" tags=[]
 qstat_null = QStatistic(random_pattern)
 qstat_null.plot()
 ```
@@ -587,7 +587,7 @@ qstat_null.chi2_pvalue
 ```
 Be careful, however: the fact that quadrat counts are measured in a *regular tiling* that is overlaid on top of the potentially irregular extent of our pattern can mislead us. In particular, irregular *but random* patterns can be mistakenly found "significant" by this approach. Consider our random set generated within the alpha shape polygon, with the quadrat grid overlaid on top:
 
-```python
+```python caption="Tokyo Random points constrained to Alpha shape, Quadrat Counts" tags=[]
 qstat_null_ashape = QStatistic(random_pattern_ashape)
 qstat_null_ashape.plot()
 ```
@@ -608,7 +608,7 @@ The second group of spatial statistics we consider focuses on the distributions 
 The first function, Ripley's $G$, focuses on the distribution of nearest neighbor distances. That is, the $G$ function summarizes the distances between each point in the pattern and their nearest neighbor. In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are *mutual* nearest neighbors (and so have arrows going in both directions) but some are not. 
 
 
-```python tags=["hide-input"]
+```python caption="Tokyo points and nearest neighbor graph." tags=["hide-input"]
 # this code should be hidden in the book, and only the plot visible!
 f,ax = plt.subplots(1,2,figsize=(8,4), sharex=True, sharey=True)
 ax[0].scatter(*random_pattern.T, color='red')
@@ -659,7 +659,7 @@ We can visualize this below. On the left, we plot the $G(d)$ function, with dist
 In this plot, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user's Flickr photographs are *closer* to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is *clustered.*
 
 
-```python tags=["hide-input"]
+```python caption="Tokyo points, Ripley's G Function." tags=["hide-input"]
 f,ax = plt.subplots(1,2,figsize=(9,3), 
                     gridspec_kw=dict(width_ratios=(6,3)))
 # plot all the simulations with very fine lines
@@ -705,7 +705,7 @@ f_test = distance_statistics.f_test(
 ```
 
 
-```python tags=["hide-input"]
+```python caption="Tokyo points, Cluster vs. non-cluster points." tags=["hide-input"]
 f,ax = plt.subplots(
     1,2,figsize=(9,3), gridspec_kw=dict(width_ratios=(6,3))
 )
@@ -790,7 +790,7 @@ lbls = pandas.Series(clusterer.labels_, index=db.index)
 Now we already have the clusters, we can proceed to visualize them. There are many ways in which this can be done. We will start just by coloring points in a cluster in red and noise in gray:
 
 
-```python
+```python caption="Tokyo points, DBSCAN clusters."
 # Setup figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Subset points that are not part of any cluster (noise)
@@ -831,7 +831,7 @@ minp
 At the same time, let us expand the maximum radius to say, 500 meters. Then we can re-run the algorithm and plot the output, all in the same cell this time:
 
 
-```python
+```python caption="Tokyo points, Clusters with DBSCAN and minp=0.01." tags=[]
 # Rerun DBSCAN
 clusterer = DBSCAN(eps=500, min_samples=minp)
 clusterer.fit(db[['x', 'y']])

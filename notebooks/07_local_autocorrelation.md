@@ -90,7 +90,7 @@ lads.crs
 
 And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
 
-```python
+```python caption="BREXIT Leave vote, % leave." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(column='Pct_Leave', 
         cmap='viridis', 
@@ -139,7 +139,7 @@ db['w_Pct_Leave_std'] = ( db['w_Pct_Leave'] - db['w_Pct_Leave'].mean() )\
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
 
-```python
+```python caption="BREXIT Leave vote, % leave Moran Scatter Plot." tags=[]
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
@@ -157,7 +157,7 @@ Using standardized values allows us to divide each variable (the percentage that
 
 Graphically, this can be captured as follows:
 
-```python
+```python caption="BREXIT Leave vote, % leave Moran Scatter Plot Quadrants." tags=[]
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
@@ -198,7 +198,7 @@ lisa = esda.moran.Moran_Local(db['Pct_Leave'], w)
 
 All we need to pass is the variable of interest -proportion of Leave votes in this context- and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object that has a number of attributes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using `seaborn`:
 
-```python
+```python caption="BREXIT Leave vote, reference distribution LISA statistics Pct_Leave." tags=[]
 seaborn.distplot(lisa.Is)
 ```
 
@@ -209,7 +209,7 @@ The values in the left tail of the density represent locations displaying negati
 
 Because of their very nature, looking at the numerical result of LISAs is not always the most useful way to exploit all the information they can provide. Remember we are calculating a statistic for every single observation in the data so, if we have many of them, it will be difficult to extract any meaningful pattern. In this context, a choropleth can help. At first glance, this may seem to suggest that a map of the $I_i$  values would be a useful way to visualize the spatial distribution:
 
-```python
+```python caption="BREXIT Leave vote,  Pct_Leave LISA statistics spatial distribution ." tags=[]
 f, ax = plt.subplots(1, figsize=(9,9))
 db['Is'] = lisa.Is
 db.plot(column='Is', cmap='viridis', scheme='quantiles',
@@ -223,7 +223,7 @@ ax.set_axis_off()
 
 However, this does not inform us in any way about what type of spatial correlation each area is experiencing. For example, are the yellow areas in Scotland similar to those in the East cluster of high values too? Also, we know that values around zero will not be statistically significant. Which ones are thus significant and non-significant from a statistical point of view? In other words, which ones can be considered statistical clusters and which ones noise? To answer these questions, we need to bring in additional information that we have obtained when calculating the LISA statistics. Let us first build a four-plot figure that brings all these different perspectives together:
 
-```python
+```python caption="BREXIT Leave vote, Pct_Leave. LISA (TL), Quadrant (TR), Signficance (BL), Cluster Map (BR)." tags=[]
 # Set up figure and axes
 f, axs = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
 # Make the axes accessible with single indexing
@@ -425,7 +425,7 @@ def g_map(g, geog, ax):
     return ax
 ```
 
-```python
+```python caption="BREXIT Leave vote, Pct_Leave, Getis-Ord G (L) and G* (R) statistics." tags=[]
 # Setup figure and axes
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 # Loop over the two statistics and generate the map
