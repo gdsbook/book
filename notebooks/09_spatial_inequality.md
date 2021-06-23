@@ -129,7 +129,7 @@ In general terms, measures of inequality focus on the dispersion present in an i
 seaborn.__version__
 ```
 
-```python caption="Distribution of Per Capita Income at County Level in 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python caption="Distribution of U.S. Per Capita Income at County Level in 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 seaborn.set_theme(style='whitegrid')
 seaborn.histplot(x=pci_df['1969'], kde=True);
 ```
@@ -149,7 +149,7 @@ pci_df = (pci_df.set_crs(epsg=4326) # US Census default projection
                 .to_crs(epsg=5070)) # Albers Equal Area North America
 ```
 
-```python caption="Map of Per Capita Income by County, 1969" ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python caption="Quintiles of Per Capita Income by County, 1969" ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 pci_df.plot(
     column='1969', 
     scheme='Quantiles', 
@@ -250,7 +250,7 @@ cumulative_share = shares.cumsum()
 
 With this, we can plot both the Lorenz curve and the line of perfect equality:
 
-```python caption="The Lorenz Curve for county Per Capita Income."
+```python caption="The Lorenz Curve for county Per Capita Income 1969." tags=[]
 f, ax = plt.subplots()
 ax.plot(share_of_population, cumulative_share, label='Lorenz Curve')
 ax.plot((0,1), (0,1), color='r', label='Perfect Equality')
@@ -360,7 +360,7 @@ The time paths of the Gini and the Theil coefficients show striking
 similarities. At first glance, this might suggest that the indices are
 substitutes for one another. However, they are not perfectly correlated: 
 
-```python
+```python caption="Relationhsip between Gini and Theil indices for county per capita income distributions since 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} tags=[]
 seaborn.regplot(x='theil', y='gini', data=inequalities)
 ```
 

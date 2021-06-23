@@ -204,7 +204,7 @@ db[['Pct_Leave', 'Leave']].tail()
 
 Which we can visualize readily:
 
-```python
+```python caption="BREXIT Leave vote, Leave Majority." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(ax=ax, column='Leave', categorical=True, legend=True, 
         edgecolor='0.5', linewidth=0.25, cmap='Set3', 
@@ -318,7 +318,7 @@ db['Pct_Leave_lag_std'] = ( db['Pct_Leave_lag'] - db['Pct_Leave_lag'].mean() )\
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
 
-```python
+```python caption="BREXIT Leave vote, % leave Moran Scatter Plot." tags=[]
 f, ax = plt.subplots(1, figsize=(6, 6))
 seaborn.regplot(x='Pct_Leave_std', y='Pct_Leave_lag_std', 
                 ci=None, data=db, line_kws={'color':'r'})
@@ -362,7 +362,7 @@ That is a very low value, particularly considering it is actually the minimum va
 
 Thanks to the `splot` visualization module in PySAL, we can obtain a quick representation of the statistic that combines the Moran Plot (right) with a graphic of the empirical test that we carry out to obtain `p_sim` (left):
 
-```python
+```python caption="BREXIT Leave vote, Moran's I distribution and Scatter Plot." tags=[]
 plot_moran(moran);
 ```
 
