@@ -27,13 +27,11 @@ borrowed from [GDS'17 - Lab
 
 ```python
 from esda.moran import Moran
-import libpysal.weights.set_operations as Wsets
 from libpysal.weights import Queen, KNN
 import seaborn 
 import pandas
 import geopandas 
 import numpy
-from sklearn.cluster import KMeans, AgglomerativeClustering
 import matplotlib.pyplot as plt
 ```
 
@@ -47,21 +45,24 @@ terms, these processes are called *multivariate processes*, as opposed to
 *univariate processes*, where only a single variable acts at once.
 Clustering is a fundamental method of geographical analysis that draws insights
 from large, complex multivariate processes. It works by finding similarities among the
-many dimensions in a multivariate process, condensing them down into a simpler representation
+many dimensions in a multivariate process, condensing them down into a simpler representation.
 Thus, through clustering, a complex and difficult to understand process is recast into a simpler one
-that even non-technical audiences can look at and understand. 
+that even non-technical audiences can work with. 
 
-Often, clustering involves sorting observations into groups. For these groups to be more
-meaningful than any single initial dimension, members of a group should be more
+Clustering as we discuss it in this chapter borrows heavily from unsupervised statistical learning {cite}`friedman2001elements`.
+Often, clustering involves sorting observations into groups without any prior idea on what
+the groups are (or, in machine learning jargon, without any labels, hence the _unsupervised_ nature).
+These groups are delineated so that members of a group should be more
 similar to one another than they are to members of a different group.
 Each group is referred to as a *cluster* while the process of assigning
 objects to groups is known as *clustering*. If done well, these clusters can be
 characterized by their *profile*, a simple summary of what members of a group
-are like in terms of the original multivariate process.
+are like in terms of the original multivariate phenomenon.
 
 Since a good cluster is more
 similar internally than it is to any other cluster, these cluster-level profiles
-provide a convenient shorthand to describe the original complex multivariate process.
+provide a convenient shorthand to describe the original complex multivariate phenomenon
+we are interested in.
 Observations in one group may have consistently high 
 scores on some traits but low scores on others. 
 The analyst only needs to look at the profile of a cluster in order to get a
@@ -75,15 +76,14 @@ In the context of explicitly spatial questions, a related concept, the *region*,
 is also instrumental. A *region* is similar to a *cluster*, in the sense that
 all members of a region have been grouped together, and the region should provide 
 a shorthand for the original data. 
-Further, for a region to be analytically useful, its members also should
+For a region to be analytically useful, its members also should
 display stronger similarity to each other than they do to the members of other regions. 
 However, regions are more complex than clusters because they combine this
-similarity in profile with additional information about the geography of their members.
-In short, regions are like clusters (since they have a coherent profile), but they
-also have a coherent geography&mdash;members of a region should also be
-located near one another.
+similarity in profile with additional information about the location of their members.
+In short, regions are like clusters (since they have a consistent profile) where all its members
+are geographically consistent.
 
-The process of creating regions is called regionalization.
+The process of creating regions is called regionalization {cite}`duque2007supervised`.
 A regionalization is a special kind of clustering where the objective is 
 to group observations which are similar in their statistical attributes,
 but also in their spatial location. In this sense, regionalization embeds the same
@@ -97,28 +97,30 @@ always need to hold for all regions, and in certain contexts it makes
 sense to relax connectivity or to impose different types of spatial constraints. 
 
 In this chapter we consider clustering techniques and regionalization methods which will
-allow us to do exactly that. In the process, we will explore the characteristics
-of neighborhoods in San Diego.
-We will extract common patterns from the
+allow us to do exactly that. In the process, we will explore the socioeconomic
+characteristics of neighborhoods in San Diego. We will extract common patterns from the
 cloud of multidimensional data that the Census Bureau produces about small areas
 through the American Community Survey. We begin with an exploration of the
-multivariate data about San Diego by suggesting some ways to examine the 
-statistical and spatial distribution of the data before carrying out any
- clustering. Focusing on the individual variables, as well as their pairwise
+multivariate nature of our dataset by suggesting some ways to examine the 
+statistical and spatial distribution before carrying out any
+clustering. Focusing on the individual variables, as well as their pairwise
 associations, can help guide the subsequent application of clusterings or regionalizations. 
 
 We then consider geodemographic approaches to clustering&mdash;the application
 of multivariate clustering to spatially referenced demographic data.
 Two popular clustering algorithms are employed: k-means and Ward's hierarchical method.
-Mapping the spatial distribution of the resulting clusters 
+As we will see, mapping the spatial distribution of the resulting clusters 
 reveals interesting insights on the socioeconomic structure of the San Diego
 metropolitan area. We also see that in many cases, clusters are spatially 
 fragmented. That is, a cluster may actually consist of different areas that are not
 spatially connected. Indeed, some clusters will have their members strewn all over the map. 
 This will illustrate why connectivity might be important when building insight
 about spatial data, since these clusters will not at all provide intelligible regions. 
-So, we then will move on to regionalization, exploring different approaches that
+With this insight in mind, we will move on to regionalization, exploring different approaches that
 incorporate geographical constraints into the exploration of the social structure of San Diego.
+Applying a regionalization approach is not always necessarily preferable but it can provide
+additional insights into the spatial structure of the multivariate statistical relationships
+that traditional clustering is unable to articulate.
 
 ## Data
 
@@ -135,8 +137,8 @@ db.columns
 ```
 
 To make things easier later on, let us collect the variables we will use to
-characterize Census tracts. These variables capture different aspects of the socio-
-economic reality of each area and, taken together, they provide a comprehensive
+characterize Census tracts. These variables capture different aspects of the 
+socioeconomic reality of each area and, taken together, provide a comprehensive
 characterization of San Diego as a whole:
 
 ```python
@@ -153,16 +155,12 @@ cluster_variables =  [
 ]
 ```
 
-### Exploring the data
-
-Now let's start building up our understanding of this
+Let's start building up our understanding of this
 dataset through both visual and summary statistical measures.
-
-We will start by
-looking at the spatial distribution of each variable alone.
+The first stop is considering the spatial distribution of each variable alone.
 This will help us draw a picture of the multi-faceted view of the tracts we
-want to capture with our clustering. Let's use choropleth maps for the
-nine attributes and compare these choropleth maps side-by-side:
+want to capture with our clustering. Let's use (quantile) choropleth maps for
+each attribute and compare them side-by-side:
 
 ```python caption="The complex, multi-dimensional human geography of San Diego."
 f, axs = plt.subplots(nrows=3, ncols=3, figsize=(12, 12))
@@ -173,8 +171,13 @@ for i, col in enumerate(cluster_variables):
     # select the axis where the map will go
     ax = axs[i]
     # Plot the map
-    db.plot(column=col, ax=ax, scheme='Quantiles', 
-            linewidth=0, cmap='RdPu')
+    db.plot(
+        column=col, 
+        ax=ax,
+        scheme='Quantiles', 
+        linewidth=0,
+        cmap='RdPu'
+    )
     # Remove axis clutter
     ax.set_axis_off()
     # Set the axis title to the name of variable being plotted
@@ -183,13 +186,14 @@ for i, col in enumerate(cluster_variables):
 plt.show()
 ```
 
-Many visual patterns jump out from the maps, revealing both commonalities as
+Several visual patterns jump out from the maps, revealing both commonalities as
 well as differences across the spatial distributions of the individual variables.
 Several variables tend to increase in value from the east to the west
 (`pct_rented`, `median_house_value`, `median_no_rooms`, and `tt_work`) while others
 have a spatial trend in the opposite direction (`pct_white`, `pct_hh_female`,
-`pct_bachelor`, `median_age`). This is actually desirable; when variables have
-different spatial distributions, each variable to contributes distinct 
+`pct_bachelor`, `median_age`). This will help show the strengths of clustering;
+when variables have
+different spatial distributions, each variable contributes distinct 
 information to the profiles of each cluster. However, if all variables display very similar 
 spatial patterns, the amount of useful information across the maps is 
 actually smaller than it appears, so cluster profiles may be much less useful as well.
@@ -197,21 +201,14 @@ It is also important to consider whether the variables display any
 spatial autocorrelation, as this will affect the spatial structure of the
 resulting clusters. 
 
-Recall from chapter XXX that Moran's I is a commonly used
-measure for global spatial autocorrelation. 
-Let us get a quick sense to what
-extent this is present in our dataset.
-First, we need to build a spatial weights matrix that encodes the spatial
-relationships in our San Diego data. We will start with queen contiguity:
+Recall from [Chapter 6](06_spatial_autocorrelation) that Moran's I is a commonly used
+measure for global spatial autocorrelation. We can use it to formalise some of the
+intuitions built from the maps. Recall from earlier in the book that we will need
+to represent the spatial configuration of the data points through a spatial weights
+matrix. We will start with queen contiguity:
 
 ```python
 w = Queen.from_dataframe(db)
-```
-
-As we have seen before, `w` does not contain any islands:
-
-```python
-w.islands
 ```
 
 Now let's calculate Moran's I for the variables being used. This will measure
@@ -222,32 +219,34 @@ the extent to which each variable contains spatial structure:
 numpy.random.seed(123456)
 # Calculate Moran's I for each variable
 mi_results = [Moran(db[variable], w) for variable in cluster_variables]
+# Structure results as a list of tuples
+mi_results = [
+    (variable, res.I, res.p_sim) for variable,res in zip(cluster_variables, mi_results)
+]
 # Display on table
-table = pandas.DataFrame([(variable, res.I, res.p_sim) \
-                          for variable,res \
-                          in zip(cluster_variables, mi_results)
-                         ], columns=['Variable', "Moran's I", 'P-value']
-                        )\
-              .set_index('Variable')
+table = pandas.DataFrame(
+    mi_results,
+    columns=['Variable', "Moran's I", 'P-value']
+).set_index('Variable')
 table
 ```
 
 Each of the variables displays significant positive spatial autocorrelation,
-suggesting that Tobler's law is alive and well in the socioeconomic geography of San
-Diego County. This means we also should expect the clusters we find will have
-a non random spatial distribution. In particular, we would expect clusters to have
-a modest amount of spatial coherence in addition to the coherence in their profiles,
-since there is strong positive autocorrelation in all of the input variables.
+suggesting clear spatial structure in the socioeconomic geography of San
+Diego. This means it is likely the clusters we find will have
+a non random spatial distribution.
 
-Spatial autocorrelation only describes relationships between a single observation at a time.
-So, the fact that all of the clustering variables are positively autocorrelated does not tell us 
-about the way the attributes co-vary over space. For that, we need to consider the
-spatial correlation between variables. Here, we will measure this using the
-bivariate correlation in the maps of covariates themselves.
-
-Given the 9 maps, there are 36 pairs of maps that must be compared. This is too 
-many maps to process visually, so we can turn to an alternative tool to
-explicitly focus on the bivariate relations between each pair of attributes.
+Spatial autocorrelation only describes relationships between observations for a
+single attribute at a time.
+So, the fact that all of the clustering variables are positively autocorrelated does not
+say much about how attributes co-vary over space. To explore cross-attribute relationships,
+we need to consider the spatial correlation between variables. We will take our first dip
+in this direction exploring the bivariate correlation in the maps of covariates themselves.
+This would mean that we would be comparing each pair of chroplets to look for associations
+and differences. Given there are nine attributes, there are 36 pairs of maps that must be
+compared. These are too many maps to process visually. Instead, we focus directly
+on the bivariate relationhips between each pair of attributes, devoid for now of geography
+and use a scatterplot matrix.
 
 ```python caption="A scatter matrix demonstrating the various pair-wise dependencies between each of the variables considered in this section. Each 'facet', or little scatterplot, shows the relationship between the vairable in that column (as its horizontal axis) and that row (as its vertical axis). Since the diagonal represents the situation where the row and column have the same variable, it instead shows the univariate distribution of that variable."
 _ = seaborn.pairplot(db[cluster_variables], kind='reg', diag_kind='kde')
@@ -255,8 +254,8 @@ _ = seaborn.pairplot(db[cluster_variables], kind='reg', diag_kind='kde')
 
 Two different types of plots are contained in the scatterplot matrix. On the
 diagonal are the density functions for the nine attributes. These allow for an
-inspection of the overall morphology of the attribute's value distribution.
-Examining these we see that our selection of variables includes those that are
+inspection of the univariate distribution of the values for each attribute.
+Examining these we see that our selection of variables includes some that are
 negatively skewed (`pct_white` and `pct_hh_female`) as well as positively skewed
 (`median_house_value`, `pct_bachelor`, and `tt_work`).
 
@@ -270,12 +269,17 @@ that tends to have consistently weak association with the other variables is
 `tt_work`, and in part this appears to reflect its rather concentrated 
 distribution as seen on the lower right diagonal corner cell.
 
+Exploring univariate and bivariate relationships is a good first step into building
+a fully multivariate understanding of a dataset. To take it to the next level, we would
+want to know to what extent these pair-wise relationships hold across different attributes,
+and whether there are patterns in the "location" of observations within the scatter plots.
+For example, do nearby dots in each scatterplot of the matrix represent the _same_ observations?
+This type of questions are exactly what clustering helps us explore.
+
 ## Geodemographic Clusters in San Diego Census Tracts
 
-We now will move
-beyond the implicitly bi-variate focus to consider the full multidimensional
-nature of this data set. Geodemographic analysis is a form of multivariate
-clustering where the observations represent geographical areas. The output
+Geodemographic analysis is a form of multivariate
+clustering where the observations represent geographical areas {cite}`webber2018predictive`. The output
 of these clusterings is nearly always mapped. Altogether, these methods use
 multivariate clustering algorithms to construct a known number of
 clusters ($k$), where the number of clusters is typically much smaller than the 
@@ -305,14 +309,24 @@ until no further reassignments are necessary.
 The nature of this algorithm requires us to select the number of clusters we 
 want to create. The right number of clusters is unknown in practice. For
 illustration, we will use $k=5$ in the `KMeans` implementation from
-`scikit-learn`. To proceed, we first create a `KMeans` clusterer:
+`scikit-learn`:
+
+```python
+# Initialise KMeans instance
+from sklearn.cluster import KMeans
+```
+This illustration will also be useful as virtually every algorithm in `scikit-learn`,
+the Python standard library for machine learning, can be run in a similar fashion.
+To proceed, we first create a `KMeans` clusterer object that contains the description of
+all the parameters the algorithm needs (in this case, only the number of clusters):
 
 ```python
 # Initialise KMeans instance
 kmeans = KMeans(n_clusters=5)
 ```
 
-Next, we call the `fit` method to actually apply the k-means algorithm to our data:
+Next, we call the `fit` method to compute the algorithm specified in `kmeans` to the variables
+we are interested in `db`:
 
 ```python
 # Set the seed for reproducibility
@@ -347,19 +361,17 @@ characteristics, mapping their labels allows to see to what extent similar areas
 to have similar locations.
 Thus, this gives us one map that incorporates the information of from all nine covariates.
 
-```python caption="Clusters in the sociodemographic data, found using K-means with k=5. Note that the large eastern part of San Diego actually contains few observations, since those tracts are larger."
+```python caption="Clusters in the sociodemographic data, found using K-means with k=5. Note that the large eastern part of San Diego actually contains few observations, since those tracts are larger." tags=[]
 # Assign labels into a column
 db['k5cls'] = k5cls.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot unique values choropleth including a legend and with no boundary lines
-db.plot(column='k5cls', categorical=True, legend=True, linewidth=0, ax=ax)
+db.plot(
+    column='k5cls', categorical=True, legend=True, linewidth=0, ax=ax
+)
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-plt.axis('equal')
-# Add title
-plt.title(r'Geodemographic Clusters (k-means, $k=5$)')
 # Display the map
 plt.show()
 ```
@@ -405,7 +417,7 @@ large clusters (0, 3), one medium sized cluster (2), and two small clusters (1,
 4). Cluster 3 is the largest when measured by the number of assigned tracts.
 This confirms our intuition from the map above, where we got the visual impression
 that tracts in cluster 3 seemed to have the largest area. Let's see if this is 
-the case. To do so we can use the `dissolve` operation in `geopandas`, which 
+the case. One way to do so involves using the `dissolve` operation in `geopandas`, which 
 combines all tracts belonging to each cluster into a single
 polygon object. After we have dissolved all the members of the clusters,
 we report the total land area of the cluster:
@@ -419,7 +431,7 @@ areas
 And, to show this visually:
 
 ```python caption="The area of each of the clusters."
-areas.plot.bar()
+_ = areas.plot.bar()
 ```
 
 Our visual impression is confirmed: cluster 3 contains tracts that
@@ -427,7 +439,7 @@ together comprise 6,636 square kilometers (approximately 2562 square miles),
 which accounts for over half of the total land area in the county:
 
 ```python
-areas[3]/areas.sum()
+areas[3] / areas.sum()
 ```
 
 Let's move on to build the profiles for each cluster. Again, the profiles is what
@@ -439,6 +451,8 @@ compute the means of each of the attributes in every cluster:
 # Group table by cluster label, keep the variables used 
 # for clustering, and obtain their mean
 k5means = db.groupby('k5cls')[cluster_variables].mean()
+# Transpose the table and print it rounding each value
+# to three decimals
 k5means.T.round(3)
 ```
 
@@ -451,7 +465,7 @@ give wrong impressions about the type of data distribution they represent. To
 obtain more detailed profiles, we can use the `describe` command in `pandas`, 
 after grouping our observations by their clusters:
 
-```python
+```python tags=["hide-output"] jupyter={"outputs_hidden": true}
 # Group table by cluster label, keep the variables used 
 # for clustering, and obtain their descriptive summary
 k5desc = db.groupby('k5cls')[cluster_variables].describe()
@@ -464,10 +478,9 @@ for cluster in k5desc.T:
 However, this approach quickly gets out of hand: more detailed profiles can simply
 return to an unwieldy mess of numbers. A better approach to constructing
 cluster profiles is be to draw the distributions of cluster members' data.
-To do this we need to "tidy up" the dataset. A tidy dataset ([Wickham,
-2014](https://www.jstatsoft.org/article/view/v059i10)) is one where every row is
-an observation, and every column is a variable. Thus, a few steps are required 
-to tidy up our labeled data:
+To do this we need to "tidy up" the dataset. A tidy dataset {cite}`wickham2014tidy`
+is one where every row is an observation, and every column is a variable. Thus, 
+a few steps are required  to tidy up our labeled data:
 
 ```python
 # Index db on cluster ID
@@ -480,9 +493,9 @@ tidy_db = tidy_db.stack()
 # Take indices into proper columns
 tidy_db = tidy_db.reset_index()
 # Rename column names
-tidy_db = tidy_db.rename(columns={
-                        'level_1': 'Attribute', 
-                        0: 'Values'})
+tidy_db = tidy_db.rename(
+    columns={'level_1': 'Attribute', 0: 'Values'}
+)
 # Check out result
 tidy_db.head()
 ```
@@ -492,13 +505,25 @@ for each variable. This gives us the full distributional profile of each cluster
 
 ```python caption="Distributions of each variable for the different cluters."
 # Setup the facets
-facets = seaborn.FacetGrid(data=tidy_db, col='Attribute', hue='k5cls', \
-                  sharey=False, sharex=False, aspect=2, col_wrap=3)
+facets = seaborn.FacetGrid(
+    data=tidy_db,
+    col='Attribute',
+    hue='k5cls',
+    sharey=False,
+    sharex=False,
+    aspect=2,
+    col_wrap=3
+)
 # Build the plot from `sns.kdeplot`
 _ = facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend()
 ```
 
-This allows us to see that, while some attributes such as the percentage of
+Note that we create the figure using the facetting functionality in `seaborn`, which
+streamlines notably the process to create multi-plot figures whose dimensions and
+content are data-driven. This happens in two steps: first, we set up the frame (`facets`),
+and then we "map" a function (`seaborn.kdeplot`) to the data, within such frame.
+
+The figure allows us to see that, while some attributes such as the percentage of
 female households (`pct_hh_female`) display largely the same distribution for
 each cluster, others paint a much more divided picture (e.g. `median_house_value`).
 Taken altogether, these graphs allow us to start delving into the multidimensional 
@@ -531,7 +556,13 @@ or with a only one ($k=1$).
 
 Enough of theory, let's get coding! In Python, AHC can be run
 with `scikit-learn` in very much the same way we did for k-means in the previous
-section. In this case, we use the `AgglomerativeClustering` class and again 
+section. First we need to import it:
+
+```python
+from sklearn.cluster import AgglomerativeClustering
+```
+
+In this case, we use the `AgglomerativeClustering` class and again 
 use the `fit` method to actually apply the clustering algorithm to our data:
 
 ```python
@@ -559,8 +590,7 @@ ward5means = db.groupby('ward5')[cluster_variables].mean()
 ward5means.T.round(3)
 ```
 
-And again, we can create a plot of the profiles' distributions (after properly 
-tidying up):
+And again, we can tidy our dataset:
 
 ```python
 # Index db on cluster ID
@@ -573,17 +603,26 @@ tidy_db = tidy_db.stack()
 # Take indices into proper columns
 tidy_db = tidy_db.reset_index()
 # Rename column names
-tidy_db = tidy_db.rename(columns={
-                        'level_1': 'Attribute', 
-                        0: 'Values'})
+tidy_db = tidy_db.rename(
+    columns={'level_1': 'Attribute', 0: 'Values'}
+)
 # Check out result
 tidy_db.head()
 ```
 
-```python caption="Distributions of each variable in clusters obtained from Ward's hierarchical clutering."
+And create a plot of the profiles' distributions:
+
+```python caption="Distributions of each variable in clusters obtained from Ward's hierarchical clutering." tags=["hide-input"]
 # Setup the facets
-facets = seaborn.FacetGrid(data=tidy_db, col='Attribute', hue='ward5', \
-                  sharey=False, sharex=False, aspect=2, col_wrap=3)
+facets = seaborn.FacetGrid(
+    data=tidy_db,
+    col='Attribute',
+    hue='ward5', 
+    sharey=False,
+    sharex=False,
+    aspect=2,
+    col_wrap=3
+)
 # Build the plot as a `sns.kdeplot`
 _ = facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend()
 ```
@@ -592,51 +631,33 @@ For the sake of brevity, we will not spend much time on the plots above.
 However, the interpretation is analogous to that of the k-means example.
 
 On the spatial side, we can explore the geographical dimension of the
-clustering solution by making a map the clusters:
+clustering solution by making a map of the clusters. To make the comparison
+with k-means simpler, we will display both side by side:
 
-```python caption="Map of socio-demographic clusters among San Diego tracts using Ward hierarchical clustering."
-db['ward5'] =model.labels_
-# Setup figure and ax
-f, ax = plt.subplots(1, figsize=(9, 9))
-# Plot unique values choropleth including a legend and with no boundary lines
-db.plot(column='ward5', categorical=True, legend=True, linewidth=0, ax=ax)
-# Remove axis
-ax.set_axis_off()
-# Keep axes proportionate
-plt.axis('equal')
-# Add title
-plt.title('Geodemographic Clusters (AHC, $k=5$)')
-# Display the map
-plt.show()
-```
-
-And, to make comparisons simpler, we can display both the k-means and the AHC
-results side by side:
-
-```python caption="Two clutering solutions, one for the K-means solution, and the other for Ward's hierarchical clutering. Note that colorings cannot be directly compared between the two maps."
+```python caption="Two clutering solutions, one for the K-means solution, and the other for Ward's hierarchical clutering. Note that colorings cannot be directly compared between the two maps." tags=["hide-input"]
 db['ward5'] =model.labels_
 # Setup figure and ax
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 
+            ### K-Means ###
 ax = axs[0]
 # Plot unique values choropleth including a legend and with no boundary lines
-db.plot(column='ward5', categorical=True, cmap='Set2', 
-        legend=True, linewidth=0, ax=ax)
+db.plot(
+    column='ward5', categorical=True, cmap='Set2', legend=True, linewidth=0, ax=ax
+)
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-ax.axis('equal')
 # Add title
 ax.set_title('K-Means solution ($k=5$)')
 
+            ### AHC ###
 ax = axs[1]
 # Plot unique values choropleth including a legend and with no boundary lines
-db.plot(column='k5cls', categorical=True, cmap='Set3',
-        legend=True, linewidth=0, ax=ax)
+db.plot(
+    column='k5cls', categorical=True, cmap='Set3', legend=True, linewidth=0, ax=ax
+)
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-ax.axis('equal')
 # Add title
 ax.set_title('AHC solution ($k=5$)')
 
@@ -646,9 +667,9 @@ plt.show()
 
 While we must remember our earlier caveat about how irregular polygons can 
 baffle our visual intuition, a closer visual inspection of the cluster geography
-suggests a clear pattern: although they are not identical, both clusterings capture
+suggests a clear pattern: although they are not identical, both clustering solutions capture
 very similar overall spatial structure. Furthermore, both solutions slightly violate 
-Tobler's law, since all of the clusters have disconnected components. The five
+Tobler's law in the sense all of the clusters have disconnected components. The five
 multivariate clusters in each case are actually composed of many disparate 
 geographical areas, strewn around the map according only to the structure of the
 data and not its geography. That is, in order to travel to
@@ -656,6 +677,8 @@ every tract belonging to a cluster, we would have to journey through
 other clusters as well.
 
 ## Spatially Constrained Hierarchical Clustering
+
+### Contiguity constraint
 
 Fragmented clusters are not intrinsically invalid, particularly if we are
 interested in exploring the overall structure and geography of multivariate
@@ -666,7 +689,7 @@ drawing electoral or census boundaries), they are nearly always distinct
 self-connected areas, unlike our clusters shown above. To ensure that clusters are
 not spatially fragmented, we turn to regionalization.
 
-Regionalization methods are clustering techniques that impose a spatial constraints
+Regionalization methods are clustering techniques that impose a spatial constraint
 on clusters. In other words, the result of a regionalization algorithm contains clusters with
 areas that are geographically coherent, in addition to having coherent data profiles. 
 Effectively, this means that regionalization methods construct clusters that are 
@@ -674,12 +697,14 @@ all internally-connected; these are the *regions*. Thus, a regions' members must
 be geographically *nested* within the region's boundaries.
 
 This type of nesting relationship is easy to identify
-in the real world. For example, counties nest within states, or, in the UK, 
-local super output areas (LSOAs) nest within middle super output areas (MSOAs). 
+in the real world. Census geographies provide good examples: counties nest within states
+in the US; or local super output areas (LSOAs) nest within middle super output areas 
+(MSOAs) in the UK. 
 The difference between these real-world nestings and the output of a regionalization
-algorithm is that the real-world nestings are aggregated according to administrative principles, but regions' members are aggregated according to a statistical technique. In the same manner as the
+algorithm is that the real-world nestings are aggregated according to administrative
+principles, while regions' members are aggregated according to statistical similarity. In the same manner as the
 clustering techniques explored above, these regionalization methods aggregate 
-observations that are similar in their covariates; the profiles of regions are useful
+observations that are similar in their attributes; the profiles of regions are useful
 in a similar manner as the profiles of clusters. But, in regionalization, the 
 clustering is also spatially constrained, so the region profiles and members will
 likely be different from the unconstrained solutions.
@@ -694,20 +719,23 @@ on the algorithm, they also require the desired number of output regions. For
 illustration, we will take the AHC algorithm we have just used above, and apply 
 an additional spatial constraint. In `scikit-learn`, this is done using
 our spatial weights matrix as a `connectivity` option.
-This will force the agglomerative algorithm to only allow observations to be grouped
+This parameter will force the agglomerative algorithm to only allow observations to be grouped
 in a cluster if they are also spatially connected:
 
 ```python
+# Set the seed for reproducibility
 numpy.random.seed(123456)
-model = AgglomerativeClustering(linkage='ward',
-                                            connectivity=w.sparse,
-                                            n_clusters=5)
+# Specify cluster model with spatial constraint
+model = AgglomerativeClustering(
+    linkage='ward', connectivity=w.sparse, n_clusters=5
+)
+# Fit algorithm to the data
 model.fit(db[cluster_variables])
 ```
 
 Let's inspect the output:
 
-```python caption="Spatially-constrained clusters, or 'regions', of San Diego using Ward's hierarchical clustering."
+```python caption="Spatially-constrained clusters, or 'regions', of San Diego using Ward's hierarchical clustering." tags=["hide-input"]
 db['ward5wq'] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -715,13 +743,8 @@ f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(column='ward5wq', categorical=True, legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-plt.axis('equal')
-# Add title
-plt.title(r'Geodemographic Regions (Ward, $k=5$, Queen Contiguity)')
 # Display the map
 plt.show()
-
 ```
 
 Introducing the spatial constraint results in fully-connected clusters with much
@@ -750,16 +773,19 @@ With this matrix connecting each tract to the four closest tracts, we can run
 another AHC regionalization:
 
 ```python
+# Set the seed for reproducibility
 numpy.random.seed(123456)
-model = AgglomerativeClustering(linkage='ward',
-                                            connectivity=w.sparse,
-                                            n_clusters=5)
+# Specify cluster model with spatial constraint
+model = AgglomerativeClustering(
+    linkage='ward', connectivity=w.sparse, n_clusters=5
+)
+# Fit algorithm to the data
 model.fit(db[cluster_variables])
 ```
 
 And plot the final regions:
 
-```python caption="Regions from a spatially-constrained sociodemographic clutering, using a different connectivity constraint."
+```python caption="Regions from a spatially-constrained sociodemographic clutering, using a different connectivity constraint." tags=["hide-input"]
 db['ward5wknn'] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -767,10 +793,6 @@ f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(column='ward5wknn', categorical=True, legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
-# Keep axes proportionate
-plt.axis('equal')
-# Add title
-plt.title('Geodemographic Regions (Ward, $k=5$, four nearest neighbors)')
 # Display the map
 plt.show()
 ```
@@ -794,9 +816,9 @@ connectivity of observations is modeled.
 
 ## Conclusion
 
-Overall, clustering and regionalization are two complementary tools to reduce the
-complexity in multivariate data and build better understandings of the spatial structure 
-of data. Often, there is simply too much data to examine every variables' map and its
+Overall, clustering and regionalization are two complementary tools to reduce
+complexity in multivariate data and build better understandings of their spatial structure.
+Often, there is simply too much data to examine every variables' map and its
 relation to all other variable maps. 
 Thus, clustering reduces this complexity into a single conceptual shorthand by which 
 people can easily describe complex and multifaceted data. 
@@ -808,7 +830,7 @@ be more similar to the cluster at large than they are to any other cluster.
 Many different clustering methods exist; they differ on how the "cluster at large" 
 is defined, and how "similar" members must be to clusters, or how these clusters
 are obtained.
-Regionalization is a special kind of clustering with an additional geographic requirement. 
+Regionalization is a special kind of clustering that imposes an additional geographic requirement. 
 Observations should be grouped so that each spatial cluster,
 or *region*, is spatially-coherent as well as data-coherent. 
 Thus, regionalization is often concerned with connectivity in a contiguity 
@@ -818,15 +840,15 @@ However, since many regionalization methods are defined for an arbitrary connect
 these graphs can be constructed according to different rules as well, such as the k-nearest neighbor graph. 
 
 In this chapter, we discussed the conceptual basis for clustering and regionalization, 
-as well showing why clustering is done. 
-Further, we have shown how to build clusters using spatial data science packages, 
-and how to interrogate the meaning of these clusters as well.
+as well as showing why clustering is done. 
+Further, we have demonstrated how to build clusters using a combination of (geographic) data 
+science packages, and how to interrogate the meaning of these clusters as well.
 More generally, clusters are often used in predictive and explanatory settings, 
 in addition to being used for exploratory analysis in their own right.
 Clustering and regionalization are intimately related to the analysis of spatial autocorrelation as well,
 since the spatial structure and covariation in multivariate spatial data is what
 determines the spatial structure and data profile of discovered clusters or regions.
-Thus, clustering and regionalization are essential tools for the spatial data scientist.
+Thus, clustering and regionalization are essential tools for the geographic data scientist.
 
 ## Questions
 
@@ -834,12 +856,19 @@ Thus, clustering and regionalization are essential tools for the spatial data sc
 2. Contrast and compare  the concepts of *clusters* and *regions*?
 3. In evaluating the quality of the solution to a regionalization problem, how might traditional measures of cluster evaluation be used? In what ways might those measures be limited and need expansion to consider the geographical dimensions of the problem?
 4. Discuss the implications for the processes of regionalization that follow from the number of *connected components* in the spatial weights matrix that would be used.
-5. True or false: The average silhouette score for a spatially constrained solution will be no larger than the average silhouette score for an unconstrained solution. Why, or why not? (add reference and  or explain silhouette)
-6. Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook being more dense than Queen graphs). 
+5. Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook being less dense than Queen graphs). 
     a. How might the sparsity of the weights matrix affect the quality of the clustering solution?
     b. Using `pysal.lib.weights.higher_order`, construct a second-order adjacency matrix of the weights matrix used in this chapter. 
     c. Compare the `pct_nonzero` for both matrices. 
     d. Rerun the analysis from this chapter using this new second-order weights matrix. What changes? 
-7. The idea of spatial dependence, that near things tend to be more related than distant things, is an extensively-studied property of spatial data. How might solutions to clustering and regionalization problems change if dependence is very strong and positive? very weak? very strong and negative? 
-8. In other areas of spatial analysis, multilevel models [1] recognize that sometimes, geographical regions are more similar internally than they are externally. That is, two observations in the same region are probably more similar than two observations in different regions. If this kind of dependence is very strong, what would happen to clustering and regionalization solutions?
-9. Using a spatial weights object obtained as `w = pysal.lib.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = pysal.lib.weights.lat2W(20,20, rook=False)` ?
+6. The idea of spatial dependence, that near things tend to be more related than distant things, is an extensively-studied property of spatial data. How might solutions to clustering and regionalization problems change if dependence is very strong and positive? very weak? very strong and negative? 
+
+---
+
+**DAB**: I don't understand this so I'd suggest to rephrase it or remove it
+
+7. In other areas of spatial analysis, multilevel models [1] recognize that sometimes, geographical regions are more similar internally than they are externally. That is, two observations in the same region are probably more similar than two observations in different regions. If this kind of dependence is very strong, what would happen to clustering and regionalization solutions?
+
+---
+
+8. Using a spatial weights object obtained as `w = pysal.lib.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = pysal.lib.weights.lat2W(20,20, rook=False)` ?
