@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.11.2
   kernelspec:
     display_name: Python 3
     language: python
@@ -207,7 +207,7 @@ db[['Pct_Leave', 'Leave']].tail()
 
 Which we can visualize readily:
 
-```python
+```python caption="BREXIT Leave Majority" tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(ax=ax, column='Leave', categorical=True, legend=True, 
         edgecolor='0.5', linewidth=0.25, cmap='Set3', 
@@ -321,7 +321,7 @@ db['Pct_Leave_lag_std'] = ( db['Pct_Leave_lag'] - db['Pct_Leave_lag'].mean() )\
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
 
-```python
+```python caption="Moran Scatter Plot BREXIT % Leave" tags=[]
 f, ax = plt.subplots(1, figsize=(6, 6))
 seaborn.regplot(x='Pct_Leave_std', y='Pct_Leave_lag_std', 
                 ci=None, data=db, line_kws={'color':'r'})
@@ -365,7 +365,7 @@ That is a very low value, particularly considering it is actually the minimum va
 
 Thanks to the `splot` visualization module in PySAL, we can obtain a quick representation of the statistic that combines the Moran Plot (right) with a graphic of the empirical test that we carry out to obtain `p_sim` (left):
 
-```python
+```python caption="Moran'I Permutation Distribtion and  Scatter Plot BREXIT % Leave" tags=[]
 plot_moran(moran);
 ```
 
