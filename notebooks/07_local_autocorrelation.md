@@ -21,33 +21,25 @@ warnings.filterwarnings("ignore")
 # Local Spatial Autocorrelation
 
 
-In the previous chapter we explored the use of global measures of spatial autocorrelation to ask the question of whether the overall spatial distribution of our attribute of interest was reflective of a geographically random process, or not. These statistics are useful as the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. In these cases formal modeling of the spatial dimensions of the processes should next be carried out. On the other hand, spatial autocorrelation can sometimes arise from data processing operations in which cases the dependence is a form of non-random noise rather than due to substantive processes. Irrespective of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis.
+In the previous chapter, we explored how to use global measures of spatial autocorrelation to determine whether the overall spatial distribution of our attribute of interest was reflective of a geographically random process. These statistics are useful: the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. This could represent *spillovers*, where outcomes at one site influence other sites, or could indicate *contagion*, where outcomes at one site *causally influence* other sites. In these cases formal modeling of the spatial dimensions of the processes should next be carried out. On the other hand, spatial autocorrelation can sometimes arise from data processing operations in which cases the dependence is a form of non-random noise rather than due to substantive processes. For example, when "down-sampling" geographic data, sometimes large patches of identical values can be created. These may only be artifacts of the interpolation, rather than substantive autocorrelation. Regardless of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis.
 
-For these reasons the ability to determine whether  spatial autocorrelation is present in a geographically referenced data set is a critical component of the spatial data science toolbox. That said, the global measures of spatial autocorrelation are "whole map" statistics, meaning that the single statistic pertains to the complete data set. In other words, global autocorrelation statistics allow us to detect *clustering* in a geographically referenced dataset. For example,
-Moran's I is good tool to summarize a dataset into a single value that informs
-about its degree of geographical clustering. However, it is not an appropriate
-measure to identify areas within the map where specific types of values (e.g.
-high, low) are located. In other words, Moran's I can tell us values are
-clustered overall, but it will not inform us about where the *clusters* are.
+For these reasons, the ability to determine whether spatial autocorrelation is present in a geographically referenced data set is a critical component of the geographic data science toolbox. That said, the global measures of spatial autocorrelation are "whole map" statistics, meaning that the single statistic pertains to the complete data set. For example,
+Moran's $I$ is good tool to summarize a dataset into a single value that measures the degree of geographical clustering (or dispersion, if negative). However, Moran's $I$ is does not indicate areas within the map where specific types of values (e.g.
+high, low) are located. 
+In other words, Moran's I can tell us whether values in our map *cluster* together (or disperse) overall, but it will not inform us about where specific *clusters* (or outliers) are.
+
 For that purpose, we need to use a local measure of spatial autocorrelation.
-Local measures consider each single observation and operate on them, as opposed
-to on the overall dataset, as global measures do. Because of that, they are not
-good at summarizing a map, but they allow to obtain further insights about
-interesting geographical subsets of the data. In this chapter, we consider
-Local Indicators of Spatial Association (LISAs) {cite}`Anselin1995local`, a
-local counter-part of global measures like Moran's I.
+Local measures of spatial autocorrelation focus on the relationships between each observation and its surroundings, rather than providing a single-number summary of these relationships across the map. Because of that, they do not summarize the map overall, but they allow to obtain further insights about interesting geographical subsets of the data. In this chapter, we consider
+Local Indicators of Spatial Association (LISAs) {cite}`Anselin1995local`, a local counter-part of global measures like Moran's I.
 
 
 
 
 ## An empirical illustration: the EU Referendum
 
-We continue with the same dataset we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:
+We continue with the same dataset about Brexit voting that we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:
 
 ```python
-# Display graphics within the notebook
-%matplotlib inline
-
 import matplotlib.pyplot as plt  # Graphics
 from matplotlib import colors
 import seaborn                   # Graphics
@@ -61,7 +53,6 @@ import contextily                # Background tiles
 ```python
 ref = pandas.read_csv('../data/brexit/brexit_vote.csv', 
                       index_col='Area_Code')
-ref.info()
 ```
 
 Now let us bring in the spatial data:
@@ -69,10 +60,9 @@ Now let us bring in the spatial data:
 ```python
 lads = geopandas.read_file("../data/brexit/local_authority_districts.geojson")\
                 .set_index('lad16cd')
-lads.info()
 ```
 
-And to "trim" the `DataFrame` so it only retains what we know we will need:
+Then, we need to "trim" the `DataFrame` so it only retains what we know we will need:
 
 ```python
 db = geopandas.GeoDataFrame(lads.join(ref[['Pct_Leave']]), crs=lads.crs)\
@@ -82,13 +72,13 @@ db = geopandas.GeoDataFrame(lads.join(ref[['Pct_Leave']]), crs=lads.crs)\
 db.info()
 ```
 
-Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes for the Leave alternative. For convenience, let us merge this with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), which will allow us to combine them with contextual tiles.
+Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union. For convenience, let us merge this with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), which will allow us to combine them with contextual tiles.
 
 ```python
 lads.crs
 ```
 
-And with this elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
+And with these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
 
 ```python caption="BREXIT Leave vote, % leave." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -100,9 +90,10 @@ db.plot(column='Pct_Leave',
         linewidth=0., 
         alpha=0.75, 
         legend=True,
-        legend_kwds={"loc": 2},
+        legend_kwds=dict(loc=2),
         ax=ax
        )
+
 contextily.add_basemap(ax, 
                        crs=db.crs, 
                        source=contextily.providers.Stamen.TerrainBackground,
@@ -111,7 +102,7 @@ contextily.add_basemap(ax,
 ax.set_axis_off()
 ```
 
-The final piece we need before we can delve into spatial autocorrelation is the spatial weights matrix. We will use eight nearest neighbors for the sake of comparison with the previous chapter. We also row-standardize the weights:
+The final piece we need before we can delve into spatial autocorrelation is the spatial weights matrix that records which observations are "near" one another. We will use eight nearest neighbors for the sake of comparison with the previous chapter. And, we will also row-standardize the weights, so that *spatial lags* reflect the average of the eight nearest neighbors. 
 
 ```python
 # Generate W from the GeoDataFrame
@@ -148,7 +139,7 @@ seaborn.regplot(x='Pct_Leave_std', y='w_Pct_Leave_std', data=db, ci=None)
 plt.show()
 ```
 
-Using standardized values allows us to divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: above and below the average. This, in turn, divides a Moran Plot in four quadrants, depending on whether a given area displays a value above the mean (high) or below (low), and how its spatial lag behaves:
+Using standardized values, we can immediately divide each variable (the percentage that voted to leave, and its spatial lag) in two groups. Those with above-average leave voting have positive standardized values, and those with below-average leave voting have negative standardized values. This, in turn, divides a Moran Plot in four quadrants, depending on whether a given area displays a value above the mean (high) or below (low) in either the original variable (`Pct_Leave`) or its spatial lag (`w_Pct_Leave_std`). 
 
 * High-high (HH)
 * Low-high (LH)
@@ -176,7 +167,7 @@ plt.show()
 
 ## Local Moran's I
 
-So far we have classified each observation in the dataset depending on its value and that of its neighbors. This is only half way into identifying areas of unusual concentration of values. To know whether each of the locations is a *statistically significant* cluster of a given kind, we again need to compare it with what we would expect if the data were allocated in a completely random way. After all, by definition, every observation will be of one kind of another, based on the comparison above. However, what we are interested in is whether the strength with which the values are concentrated is unusually high.
+So far we have classified each observation in the dataset depending on its value and that of its neighbors. This is only half way into identifying areas of unusual concentration of values. To know whether each of the locations represents a *statistically significant* cluster of a given kind, we again need to compare it with what we would expect if the data were allocated in a completely random way. After all, by definition, every observation will be of one kind of another, based on the comparison above. However, what we are interested in is whether the strength with which the values are concentrated is unusually high.
 
 This is exactly what LISAs are designed to do. A more detailed description of their statistical underpinnings is beyond the scope in this context, but we will provide some intuition about how they work. The core idea is to identify cases in which the comparison between the value of an observation and the average of its neighbors is either more similar (HH, LL) or dissimilar (HL, LH) than we would expect from pure chance. The mechanism to do this is similar to the one in the global Moran's I, but applied in this case to each observation, resulting then in as many statistics as original observations. The formal representation of the statistic can be written as:
 
@@ -186,7 +177,7 @@ $$
 
 where $m_2$ is the second moment (variance) of the distribution of values in the data, $z_i = y_i - \bar{y}$, $w_{i,j}$ is the spatial weight for the pair of observations $i$ and $j$, and $n$ is the number of observations.
 
-LISAs are widely used in many fields to identify clusters of values in space. They are a very useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For that, they have a prime place in the exploratory toolbox. Examples of contexts where LISAs can be useful include: identification of spatial clusters of poverty in regions, detection of ethnic enclaves, delineation of areas of particularly high/low activity of any phenomenon, etc.
+LISAs are widely used in many fields to identify geographical clusters of values or find geographcial outliers. They are a very useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For that, they have a prime place in the exploratory toolbox. Examples of contexts where LISAs can be useful include: identification of geographical clusters of poverty in regions, detection of ethnic enclaves, delineation of areas of particularly high/low activity of any phenomenon, etc.
 
 
 
@@ -196,10 +187,11 @@ In Python, we can calculate LISAs in a very streamlined way thanks to `PySAL`:
 lisa = esda.moran.Moran_Local(db['Pct_Leave'], w)
 ```
 
-All we need to pass is the variable of interest -proportion of Leave votes in this context- and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object that has a number of attributes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using `seaborn`:
+We need to pass the variable of interest -proportion of Leave votes in this context- and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object that has a number of attributes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using `seaborn`:
 
 ```python caption="BREXIT Leave vote, reference distribution LISA statistics Pct_Leave." tags=[]
-seaborn.distplot(lisa.Is)
+ax = seaborn.kdeplot(lisa.Is)
+seaborn.rugplot(lisa.Is, ax=ax)
 ```
 
 This reveals a rather skewed distribution due to the dominance of the positive forms of spatial association. Here it is important to keep in mind that the high positive values arise from value similarity in space, and this can be due to either high values being next to high values *or* low values next to low values. The local $I_i$ values themselves cannot distinguish between these two.
