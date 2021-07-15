@@ -312,8 +312,8 @@ In order to understand the intuition behind its math, it is useful to begin with
 ```python
 db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )\
                     / db['Pct_Leave'].std()
-db['Pct_Leave_lag_std'] = ( db['Pct_Leave_lag'] - db['Pct_Leave_lag'].mean() )\
-                    / db['Pct_Leave_lag'].std()
+db['Pct_Leave_lag_std'] = ( db['Pct_Leave_lag'] - db['Pct_Leave'].mean() )\
+                    / db['Pct_Leave'].std()
 ```
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
