@@ -50,13 +50,13 @@ Its study has always drawn considerable attention in academic circles.
 Much of the focus has been on *interpersonal income inequality*, yet there is a growing recognition
 that the question of *inter-regional income inequality* requires further 
 attention as the growing gaps between poor and rich regions have been identified
-as key drivers of political polarization in developing and developed countries
+as key drivers of civil unreset {cite}`ezcurra2019` and  political polarization in developing and developed countries
 {cite}`Rodriguez_Pose_2018`.
 
 Much of the study of inequalities has focused at the individual level: how do outcomes
 differ across individuals? This approach does not group individuals geographically. 
 In other words, it is not concerned with whether those differences follow a pattern,
-for example, at the regional level (e.g. *is most of the more disadvantaged population
+for example, at the regional level (e.g., *is most of the more disadvantaged population
 located in a particular section of the map?*).
 Indeed, while the two literatures (personal and regional inequality) are
 related, they have developed in a largely parallel fashion with limited
@@ -96,7 +96,7 @@ Inspection of the column names reveals that the table is organized around one ro
 This format is an example of a [*wide* longitudinal data set](https://en.wikipedia.org/wiki/Wide_and_narrow_data).
 In wide-format data, each column represents a different time period, meaning that each row represents a set of measurements made about the same "entity" over time (as well as any unique identifying information about that entity.)
 This contrasts with a *narrow* or *long* format, where each row describes an entity at a specific point in time. 
-Long data results in significant duplication for records and is generally worse for data storage, particularly in the geographic case. However, long form data is sometimes a more useful format when manipulating and analyzing data, as {cite}`Wickham_2014` discusses. Nonetheless, when analyzing *trajectories*, that is, the paths that entities take over time, wide data is more useful, and we will use that here. 
+Long data results in significant duplication for records and is generally worse for data storage, particularly in the geographic case. However, long form data is sometimes a more useful format when manipulating and analyzing data, as {cite}`wickham2014tidy` discusses. Nonetheless, when analyzing *trajectories*, that is, the paths that entities take over time, wide data is more useful, and we will use that here. 
 
 In this data, we have 3076 counties across 49 years, as well as 28 extra columns that describe each county. 
 <!-- 
@@ -327,7 +327,7 @@ inequalities.head()
 Which we can turn into a graphical representation through standard `pandas` plotting. The resulting pattern is similar to that of the 20:20 ratio above:
 
 ```python caption="Gini coefficients for per capita income since 1969"
-inequalities.plot()
+_ = _inequalities.plot()
 ```
 
 ### Theil's index
@@ -544,11 +544,11 @@ To proceed in this direction, we first re-conceptualize our observations of per 
 [^mut-ex]: This would be violated, for example, if one area were in two regions. This area would get "double counted" in this total. 
 
 $$
-\begin{align}
+\begin{aligned}
 T &= \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\sum_{i=1}^m y_i}\right] \right) \\
   &= \left[ \sum_{g=1}^{\omega} s_{g} \ln \left(\frac{m}{m_g} s_g \right)  \right] + \left[ \sum_{g=1}^{\omega} s_g \sum_{i \in g} s_{i,g} \ln \left(m_g s_{i,g}\right) \right] \\
   &= B + W \\
-\end{align}
+\end{aligned}
 $$
 
 where $s_g = \frac{\sum_{i \in g} y_i}{\sum_i y_i}$, and   $s_{i,g} = y_i / \sum_{i \in g} y_i$. 
@@ -727,7 +727,7 @@ inequalities[['near_diffs', 'I']].plot.line(subplots=True, figsize=(15,6))
 ## Conclusion
 
 
-Inequality is an important social phenomenon, and its geography is an important concern for social scientists. Geographical disparities in well-being have been pointed to as a major driver behind the rise of right-wing populist movements in the US and Europe {cite}`Rodriguez_Pose_2018`. Thus, understanding the nature of these disparities and their evolution is a challenge for both science and policy.
+Inequality is an important social phenomenon, and its geography is a growing concern for social scientists. Geographical disparities in well-being have been pointed to as a major driver behind the rise of right-wing populist movements in the US and Europe {cite}`Rodriguez_Pose_2018`. Thus, understanding the nature of these disparities and their evolution is a challenge for both science and policy.
 
 This chapter discusses methods to assess inequality, as well as examine its spatial and regional structure. We have seen the Gini coefficient and Theil index as examples of global measures to summarize the overall level of inequality. As is often the case in many areas of spatial analysis, the straightforward adoption of methods from economics and sociology to spatial data can  often be fruitful but, at the same time, can miss key elements of the spatial story. In the context of spatial income disparities, we have highlighted the  differences between personal and regional inequality. From this vantage, we have reviewed three approaches to incorporate geography and space in the study of inequality. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as those for spatial autocorrelation discussed in chapters [6](06_spatial_autocorrelation) and [7](07_local_autocorrelation). 
 
