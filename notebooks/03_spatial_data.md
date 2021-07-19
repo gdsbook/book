@@ -1,16 +1,22 @@
 ---
 jupyter:
   jupytext:
+    formats: ipynb,md
     text_representation:
       extension: .md
       format_name: markdown
-      format_version: '1.2'
-      jupytext_version: 1.6.0
+      format_version: '1.3'
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
     name: python3
 ---
+
+```python tags=["remove-cell"]
+import warnings
+warnings.filterwarnings("ignore")
+```
 
 # Spatial Data
 
@@ -24,6 +30,12 @@ import datashader
 import contextily as cx
 from shapely.geometry import box
 import matplotlib.pyplot as plt
+```
+
+```python tags=["remove-cell"]
+osmnx.config(
+    overpass_settings='[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
+)
 ```
 
 This chapter grounds the ideas discussed in the previous two chapters into a practical context. We consider how structures, and the models they represent, are implemented in Python, as well as how we can manipulate the data they contain. This will happen alongside the code used to manipulate the data in a single computational laboratory notebook. This, then, unites the two concepts. 
@@ -64,8 +76,8 @@ type(gt_polygons.geometry[0])
 
 In `geopandas` (as well as other packages representing geographic data), the `geometry` column has special traits which a "normal" column, such as `ADMIN`, does not. For example, when we plot the dataframe, the `geometry` column is used as the main shape to use in the plot:
 
-```python
-gt_polygons.plot()
+```python caption="Geopandas plot method." tags=[]
+gt_polygons.plot();
 ```
 
 Changing geometries must be done carefully: since the `geometry` column is special, there are special functions to adjust the geometry. For example, if we wanted to represent each country using its *centroid*, a point in the middle of the shape, then we must take care to make sure that a new geometry column was set properly using the `set_geometry()` method. This can be useful when you want to work with two different geometric representations of the same underlying sample. 
@@ -84,7 +96,7 @@ gt_polygons.head()
 
 Despite the fact that `centroid` is a geometry, it is not currently set as the geometry for our table. We can switch to the `centroid` column using the `set_geometry()` method. Finally, we can plot the centroid and the boundary of each country by switching the geometry column with `set_geometry`:
 
-```python
+```python caption="Plotting centroids and boundaries of polygon geometries." tags=[]
 # Plot centroids
 ax = gt_polygons.set_geometry('centroid')\
                 .plot('ADMIN', 
@@ -96,7 +108,7 @@ gt_polygons.plot('ADMIN',
                  facecolor='none', 
                  edgecolor='k', 
                  linewidth=.2
-                )
+                );
 ```
 
 Note how we can create a map by calling `.plot()` on a `GeoDataFrame`. We can thematically color each feature based on a column by passing the name of that column to the plot method (as we do on with `ADMIN` in this case).
@@ -107,7 +119,7 @@ Thus, as should now be clear, nearly any kind of geographic object can be repres
 gt_polygons.query('ADMIN == "Bolivia"')
 ```
 
-```python
+```python caption="Plotting based on a queary." tags=[]
 gt_polygons.query('ADMIN == "Bolivia"').plot();
 ```
 
@@ -117,8 +129,8 @@ while Indonesia is a `MultiPolygon` containing many `Polygons` for each individu
 gt_polygons.query('ADMIN == "Indonesia"')
 ```
 
-```python
-gt_polygons.query('ADMIN == "Indonesia"').plot()
+```python caption="Plotting Indonesia via a query." tags=[]
+gt_polygons.query('ADMIN == "Indonesia"').plot();
 ```
 
 In many cases, geographic tables will have geometries of a single type; records will *all* be `Point` or `LineString`, for instance. However, there is no formal requirement that a *geographic table* has geometries that all have the same type. 
@@ -188,7 +200,7 @@ type(pop)
 pop.coords
 ```
 
-Interestingly, our surface has *three* dimensions: `x`, `y`, and `band`. The former to track the latitude and longitude that each cell in our population grid covers. The third one has a single value (1) and, in this context, it is not very useful. But it is easy to imagine contexts where a third dimension would be useful. For example, an optical color image may have three bands: red, blue, and green. More powerful sensors may pick up additional bands, such as near infrared (NIR) or even radio bands. Or, a surface measured over time, like the geocubes that we discussed in Chapter 2, will have bands for each point in time at which the field is measured. A geographic surface will thus have two dimensions recording the location of cells (`x` and `y`), and at least one `band` that records other dimensions pertaining to our data.
+Interestingly, our surface has *three* dimensions: `x`, `y`, and `band`. The former two track the latitude and longitude that each cell in our population grid covers. The third one has a single value (1) and, in this context, it is not very useful. But it is easy to imagine contexts where a third dimension would be useful. For example, an optical color image may have three bands: red, blue, and green. More powerful sensors may pick up additional bands, such as near infrared (NIR) or even radio bands. Or, a surface measured over time, like the geocubes that we discussed in Chapter 2, will have bands for each point in time at which the field is measured. A geographic surface will thus have two dimensions recording the location of cells (`x` and `y`), and at least one `band` that records other dimensions pertaining to our data.
 
 An `xarray.DataArray` object contains additional information about the values stored under the `attrs` attribute:
 
@@ -212,18 +224,31 @@ pop.sel(band=1)
 
 The resulting object is thus a two-dimensional array. Similar to geographic tables, we can quickly plot the values in our dataset:
 
-```python
-pop.sel(band=1).plot()
+```python caption="Population surface, Sao Paulo" tags=[]
+pop.sel(band=1).plot();
 ```
 
 This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g. `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
 
-```python
+```python caption="Population surface, Sao Paulo, RdPU color map." tags=[]
 pop.where(pop!=-200)\
    .sel(band=1)\
-   .plot(cmap="RdPu")
+   .plot(cmap="RdPu");
 ```
 
+jupyter nbconvert --to notebook --execute captions.ipynb
+	cp ../book/infrastructure/logo/favicon.ico tmp_book/favicon.ico
+	jupyter-book build tmp_book --builder latex
+	sed -e 's/\\section/\\chapter/g' -e 's/\\subsection/\\section/g' -e 's/\\subsubsection/\\subsection/g' tmp_book/_build/latex/python.tex > tmp_book/_build/latex/python_1.tex
+	jupyter nbconvert --to notebook --execute latex.ipynb
+	cp infrastructure/crc/Krantz_AuthoredBook_v1.18/Krantz_AuthoredBook_v1.18/krantz.cls tmp_book/_build/latex/krantz.cls
+	cp tmp_book/*.tex tmp_book/_build/latex/.
+	cp tmp_book/_build/latex/part1.tex tmp_book/_build/latex/part1.md
+	pandoc tmp_book/_build/latex/part1.md -o tmp_book/_build/latex/part1.tex
+	cp tmp_book/_build/latex/part2.tex tmp_book/_build/latex/part2.md
+	pandoc tmp_book/_build/latex/part2.md -o tmp_book/_build/latex/part2.tex
+	cp tmp_book/_build/latex/part3.tex tmp_book/_build/latex/part3.md
+	pandoc tmp_book/_build/latex/part3.md -o tmp_book/_build/latex/part3.tex
 The colorbar now looks more sensible, and indicates *real* counts, rather than including the missing data placeholder values.
 
 ### Spatial graphs
@@ -239,7 +264,17 @@ For illustration, we will rely on the `osmnx` library, which can query data from
 graph = osmnx.graph_from_place("Yoyogi Park, Shibuya, Tokyo, Japan")
 ```
 
-The code snippet above sends the query to the OpenStreetMap server, which returns back the data to `osmnx` to process it into the `graph` Python representation.
+```python tags=["remove-cell"]
+osmnx.save_graphml(graph, "../data/cache/yoyogi_park_graph.graphml")
+```
+
+The code snippet above sends the query to the OpenStreetMap server to fetch the data. Note that the cell above _requires_ internet connectivity to work. If you are working on the book _without_ connectivity, a cached version of the graph is available on the data folder and can be read as:
+
+```python
+graph = osmnx.load_graphml("../data/cache/yoyogi_park_graph.graphml")
+```
+
+Once the data is returned to `osmnx`, it gets processed into the `graph` Python representation:
 
 ```python
 type(graph)
@@ -247,8 +282,8 @@ type(graph)
 
 We can have a quick inspection of the structure of the graph with the `plot_graph` method:
 
-```python
-osmnx.plot_graph(graph)
+```python caption="OSMNX graph for a street network." tags=[]
+osmnx.plot_graph(graph);
 ```
 
 The resultant `graph` object is actually a `MultiDiGraph` from `networkx`, a graph library written in Python. The graph here is stored as a collection of 106 nodes (street intersections):
@@ -360,7 +395,7 @@ max_polys = geopandas.GeoSeries(max_polys, crs=surface.attrs["crs"])
 
 And generate a map with the same tooling that we use for any standard geo-table:
 
-```python
+```python caption="Combining points with Contextily." tags=[]
 ax = max_polys.plot(edgecolor="red", 
                     figsize=(9, 9)
                    )
@@ -385,16 +420,16 @@ A second use case involves moving surfaces directly into geographic tables by ag
 
 Let's start by reading the data. First, the elevation model:
 
-```python
+```python caption="Digital Elevation Model as a raster." tags=[]
 dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(band=1)
-dem.where(dem > 0).plot.imshow()
+dem.where(dem > 0).plot.imshow();
 ```
 
 And the neighborhood areas (tracts) from the Census:
 
-```python
+```python caption="San Diego California Census Tracts." tags=[]
 sd_tracts = geopandas.read_file("../data/sandiego/sandiego_tracts.gpkg")
-sd_tracts.plot()
+sd_tracts.plot();
 ```
 
 There are several approaches to compute the average altitude of each neighborhood. We will use `rioxarray`to clip parts of the surface *within* a given set of geometries. Let's start with a single polygon. For the illustration, we will use the largest one, located on the eastern side of San Diego. We can find the ID of the polygon with:
@@ -412,11 +447,11 @@ largest_tract = sd_tracts.loc[largest_tract_id, "geometry"]
 
 Clipping the section of the surface that is within the polygon in the DEM can be achieved with the `rioxarray` extension to clip surfaces based on geometries:
 
-```python
+```python caption="DEM clipped to San Diego" tags=[]
 dem_clip = dem.rio.clip([largest_tract.__geo_interface__], 
                         crs=sd_tracts.crs
                        )
-dem_clip.where(dem_clip > 0).plot()
+dem_clip.where(dem_clip > 0).plot();
 ```
 
 Once we have elevation measurements for all the pixels within the tract, the average one can be calculated with `mean()`:
@@ -468,13 +503,13 @@ elevations2.head()
 
 To visualize these results, we can make an elevation map:
 
-```python
+```python caption="Digital Elevation Model Estimates by Census Tract, San Diego.." tags=[]
 f, axs = plt.subplots(1, 3, figsize=(15, 5))
 dem.where(dem > 0)\
    .rio.reproject(sd_tracts.crs)\
    .plot.imshow(ax=axs[0], add_colorbar=False)
 sd_tracts.plot(ax=axs[1])
-sd_tracts.assign(elevation=elevations2["mean"]).plot("elevation", ax=axs[2])
+sd_tracts.assign(elevation=elevations2["mean"]).plot("elevation", ax=axs[2]);
 ```
 
 ### Tables as surfaces
@@ -483,8 +518,8 @@ The case for converting tables into surfaces is perhaps less controversial. This
 
 From a purely technical perspective, for datasets with too many points, representing every point in the data on a screen can be seriously overcrowded:
 
-```python
-gt_points.plot()
+```python caption="Point locations of Tokyo Photographs." tags=[]
+gt_points.plot();
 ```
 
 In the image above, it is hard to tell anything about the density of points in the center of the image due to *overplotting*: while points *theoretically* have no width, they must in order for us to see them! Therefore, point *markers* often plot on top of one another, obscuring the true pattern and density in dense areas. Converting the dataset from a geo-table into a surface involves laying out a grid and counting how many points fall within each cell. In one sense, this is the reverse operation to what we saw when computing zonal statistics in the previous section: instead of aggregating cells into objects, we aggregate objects into cells. Both operations, however, involve aggregation that reduces the amount of information present in order to make the (new) data more manageable. 
@@ -508,7 +543,7 @@ grid = cvs.points(gt_points,
 
 The resulting `grid` is a standard `DataArray` object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the re-sampled data allows for is much greater than when the points were visualized alone:
 
-```python
+```python caption="Point locations of Tokyo Photographs, and Point Density as a Surface." tags=[]
 f, axs = plt.subplots(1, 2, figsize=(14, 6))
 gt_points.plot(ax=axs[0])
 grid.plot(ax=axs[1]);
