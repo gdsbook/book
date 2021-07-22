@@ -125,14 +125,14 @@ contextily.add_basemap(
 )
 ```
 
-Now, for some feature engineering, it may be extremely useful to know whether an AirBnB is located in a "hot" location, with a lot of restaurants and bars to choose from. Alternatively, if AirBnBs are very remote, they might not be as lucrative for short, expensive "city-break" reservations. That is, AirBnB users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be *willing to pay more* for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the AirBnB. 
+Now, for some feature engineering. It may be extremely useful to know whether an AirBnB is located in a "hot" location, with a lot of restaurants and bars to choose from. Alternatively, if AirBnBs are very remote, they might not be as lucrative for short, expensive "city-break" reservations. That is, AirBnB users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be *willing to pay more* for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the AirBnB. 
 
 Thus, we can *engineer features* in the AirBnB data using the nearby POIs. To do this, we can create a new feature for the AirBnB dataset --that is, a new column in `airbnbs`-- which incorporates information about how many POIs are *nearby* each property. This kind of "feature counting" is useful in applications where the mere presence of nearby features can affect the quantity we are modeling. 
 
 To do this kind of feature engineering, let us first walk through what we need to do at a conceptual level: 
 
 1. Decide what is *nearby*. This will dictate how far we go from each AirBnB when counting the number of "nearby" bars & restaurants. For this example, we will use 500 meter buffer, which is approximately the distance of a leisurely ten-minute walk.
-2. For each AirBnB, determine whether POIs are *within* a leisurely 10-minute walk. 
+2. For each AirBnB, determine whether POIs are *within* a leisurely ten-minute walk. 
 3. Count how many POIs are withing the specified radius of each AirBnB.
 
 At the end of this procedure, we have the number of bars & restaurants that are within a leisurely walk of the AirBnB, which might be useful in predicting the price of each AirBnB. 
@@ -168,7 +168,7 @@ airbnbs_albers['buffer_500m'] = airbnbs_albers.buffer(500)
 
 Now, `abb_buffer` contains a 500-meter circle around each AirBnB.
 
-Using these, we can count the number of POIs that are within these areas using a *spatial join*. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: `pois within airbnb_buffers`, where `within` is the predicate relating `pois` to `airbnb_buffers`. Predicates are not always *reversible*: no `airbnb_buffer` can be `within` a `poi`. In `geopandas`, we can compute all pairs of relations between the `pois` and `airbnb_buffers` efficiently using the `sjoin` function, which takes a `predicate` argument defining the requested relationship between the first & second argument. 
+Using these, we can count the number of POIs that are within these areas using a *spatial join*. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: `pois within airbnb_buffers`, where `within` is the predicate relating `pois` to `airbnb_buffers`. Predicates are not always *reversible*: no `airbnb_buffer` can be `within` a `poi`. In `geopandas`, we can compute all pairs of relations between the `pois` and `airbnb_buffers` efficiently using the `sjoin` function, which takes a `predicate` argument defining the requested relationship between the first and second argument. 
 
 ```python
 joined = geopandas.sjoin(
@@ -288,7 +288,7 @@ contextily.add_basemap(
 
 ### Point Interpolation using scikit-learn 
 
-In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is "spatial interpolation". For a continuous geographical field measured at a set of points, "spatial interpolation" methods provide us a way to guess at at the value a field would take at sites we do not measure. 
+In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is *spatial interpolation*. For a continuous geographical field measured at a set of points, *spatial interpolation* methods provide us a way to guess at at the value a field would take at sites we do not measure. 
 
 There are many sophisticated methods with which this can be done. *Kriging*, common in the sub-field of spatial statistics called "geostatistics," is one such practice based on the theory of *Gaussian Process Regression.* Another common approach, *geographically-weighted regression*, provides unique model estimates at every control point, as well as predictions for places where there is no data. Here, though, we'll use a very basic $k$-nearest neighbor prediction algorithm from `scikit-learn` to demonstrate the process. This process will select the nearest 10 listings, then compute the prediction using a weighted average of these nearest observations. To keep predictions relatively consistent, we will build an interpolation only for listings that are entire homes/apartments with two bedrooms:
 
@@ -460,7 +460,9 @@ j.info()
 
 The final case of map matching we consider is transfer of information from one polygon/areal geography to a different one. This is a common use-case when an analysis requires data that is provided at different levels of aggregation and different boundary delineations.
 
-There is a large literature around this problem under the umbrella of dasymetric mapping {cite}`eicher2001dasymetric`. The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to the other based on how much "geography" is shared. In its simplest case, we can do this based on area. In this case, we will assign values from the source geography to the target based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the "source", and that to which we want to transfer data the "target". If polygon A in the target is made up of 50% of polygon 1 in the source, 30% of polygon 2, and 20% of polygon 3, the estimate for A will be a weighted average between the values in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.
+There is a large literature around this problem under the umbrella of dasymetric mapping {cite}`eicher2001dasymetric`. The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to the other based on how much "geography" is shared. In its simplest case, we can do this based on area. In this case, we will assign values from the source geography to the target based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the "source", and that to which we want to transfer data the "target". Let's say we have a poverty rate  measure for each of three source polygons, 1, 2, 3, and we have a target polygon A for which we require an estimated poverty rate. If the intersections of polygon A with each of the source polygons amount to  50%, 30%, and 20% of the total area of polygon A, then the estimate  of the poverty rate for A will be a weighted average between the rates in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively. 
+
+We could also go in the other direction. If we had total population for polygon A, but population was not reported for polygons 1, 2, 3, we could use areal interpolation to allocate the population from A (now the source polygon) to each of the three target polygons. Polygon 1 would get 0.5 of the population of A, polygon 2 would get 0.3 of A's population, and C the remainder. Here we are assuming the area of A is completely exhausted by the areas of 1, 2, and 3, and that the latter polygons do not overlap with each other. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.
 
 To implement dasymetric mapping in Python, the best option is `tobler`, a package from the PySAL federation designed exactly for this goal. We will show here the simplest case, that of areal interpolation where apportioning is estimated based on area, but the package also provides more sophisticated approaches.
 
@@ -739,7 +741,7 @@ hulls = airbnbs_albers[['geometry']].dissolve(by=labels).convex_hull
 
 Since humans tend to make locational decisions hierarchically (in that they pick *San Diego*, then they pick a particular *part* of San Diego (such as the Gaslamp Quarter), then they pick a house in that part), this clustering process might give us a reasonable insight into the enclaves of competition between AirBnBs:
 
-```python caption="Cluters in the locations of Airbnbs within San Diego." tags=[]
+```python caption="Clusters in the locations of Airbnbs within San Diego." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 airbnbs_albers.plot(
     column=labels,
