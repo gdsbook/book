@@ -78,7 +78,7 @@ Although there are several variables that could be considered, we will focus on 
 lads.crs
 ```
 
-And with these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g. transparency through the `alpha` attribute) to make the final plot easier to read.
+And with these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the `alpha` attribute) to make the final plot easier to read.
 
 ```python caption="BREXIT Leave vote, % leave." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -179,7 +179,7 @@ $$
 
 where $m_2$ is the second moment (variance) of the distribution of values in the data, $z_i = y_i - \bar{y}$, $w_{i,j}$ is the spatial weight for the pair of observations $i$ and $j$, and $n$ is the number of observations.
 
-LISAs are widely used in many fields to identify geographical clusters of values or find geographcial outliers. They are a very useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For that, they have a prime place in the geographic data science toolbox. Among many other applications, LISAs have been used to identify geographical clusters of poverty, map ethnic enclaves, delineate areas of particularly high/low economic activity, or identify clusters of contagious disease. The Local Moran's $I_i$ statistic is only one of a wide variety of LISAs that can be used on many different types of spatial data.
+LISAs are widely used in many fields to identify geographical clusters of values or find geographcial outliers. They are a very useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For that, they have a prime place in the geographic data science toolbox. Among many other applications, LISAs have been used to identify geographical clusters of poverty {cite}`Dawson2018`, map ethnic enclaves {cite}`Johnston2010EPA`, delineate areas of particularly high/low economic activity {cite}`Torres2014`, or identify clusters of contagious disease {cite}`zhang2020`. The Local Moran's $I_i$ statistic is only one of a wide variety of LISAs that can be used on many different types of spatial data.
 
 
 In Python, we can calculate LISAs in a very streamlined way thanks to `PySAL`. To compute local Moran statistics, we use the `Moran_Local` function:
@@ -330,12 +330,12 @@ db[['sig','p-sim']].tail()
 Thus, the first five values are statistically significant, while the last five observations are not.
 
 
-Let us stop for second on these two steps. First, we consider the `significant` column. Akin to global Moran's I, `PySAL` automatically computes a p-value for each LISA. Because some LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar local statistic in random maps. A few different ways of generating random maps are considered by `PySAL`, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. 
+Let us stop for a second on these two steps. First, we consider the `significant` column. Akin to global Moran's I, `PySAL` automatically computes a p-value for each LISA. Because some LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar local statistic in random maps. A few different ways of generating random maps are considered by `PySAL`, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. 
 
 In addition, we follow a similar reasoning as with global Moran's I and use 5% as the threshold for statistical significance. To identify these values, we create a variable, `significant`, that contains `True` if the p-value of the observation satisfies the condition, and `False` otherwise.
 
 
-Next we construct our quadrant values using the `q` attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure.
+Next, we construct our quadrant values using the `q` attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure.
 
 ```python
 hotspot = 1 * (sig * lisa.q==1)
@@ -355,7 +355,7 @@ db['labels'] = labels
 pandas.value_counts(labels)
 ```
 
-This shows that the local statistics are main *not* statistically significant, but that among *significant* statistics, we see many more hotspots/coldspots than doughnuts/diamonds-in-the-rough. This is consistent with the skew we saw in the distribution of local statistics earlier. 
+This shows that the local statistics are mainly *not* statistically significant, but that among *significant* statistics, we see many more hotspots/coldspots than doughnuts/diamonds-in-the-rough. This is consistent with the skew we saw in the distribution of local statistics earlier. 
 
 Thus, with these labels, we can make the final cluster map in the lower right, which displays the output of the LISA statistics for the percentage of Leave votes in English, Welsh and Scottish local authorities. In bright red, we find those with an unusual concentration of high Leave proportions surrounded also by high Leave results. This corresponds with areas in the East and center of the map. In light red, we find the first type of spatial outliers: areas that still voted to Leave in high proportions, despite being surrounded by areas with more modest support for Leave. These correspond with some of the peripheral areas of London and and adjacent to Oxford. In darker blue we can see the spatial clusters of low support for the Leave campaign, which include London, Oxford and most of Scotland. Finally, in light blue we find the other type of spatial outlier: areas with lower percentages of Leave votes nearby areas of high concentration of supporters for Leave.
 
