@@ -52,7 +52,7 @@ Thus, *regardless of whether or not the true process is explicitly geographic*, 
 
 ### The Data: San Diego AirBnB
 
-To learn a little more about how regression works, we'll examine some information about AirBnB in San Diego, CA. 
+To learn a little more about how regression works, we'll examine some information about [AirBnB](https://www.airbnb.com/) in San Diego, CA. 
 This dataset contains house intrinsic characteristics, both continuous (number of beds as in `beds`) and categorical (type of renting or, in AirBnB jargon, property group as in the series of `pg_X` binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, `d2balboa` or neighborhood id, `neighbourhood_cleansed`).
 
 ```python
@@ -132,11 +132,11 @@ print(m1.summary)
 
 A full detailed explanation of the output is beyond the scope of this chapter, so we will focus on the relevant bits for our main purpose. This is concentrated on the `Coefficients` section, which gives us the estimates for $\beta_k$ in our model. In other words, these numbers express the relationship between each explanatory variable and the dependent one, once the effect of confounding factors has been accounted for. Keep in mind however that regression is no magic; we are only discounting the effect of confounding factors that we include in the model, not of *all* potentially confounding factors.
 
-Results are largely as expected: houses tend to be significantly more expensive if they accommodate more people (`accommodates`), if they have more bathrooms and bedrooms and if they are a condominium or part of the "other" category of house type. Conversely, given a number of rooms, houses with more beds (i.e.. listings that are more "crowded") tend to go for cheaper, as it is the case for properties where one does not rent the entire house but only a room (`rt_Private_room`) or even shares it (`rt_Shared_room`). Of course, you might conceptually doubt the assumption that it is possible to *arbitrarily* change the number of beds within an AirBnB without eventually changing the number of people it accommodates, but methods to address these concerns using *interaction effects* won't be discussed here. 
+Results are largely as expected: houses tend to be significantly more expensive if they accommodate more people (`accommodates`), if they have more bathrooms and bedrooms, and if they are a condominium or part of the "other" category of house type. Conversely, given a number of rooms, houses with more beds (i.e.. listings that are more "crowded") tend to go for cheaper, as it is the case for properties where one does not rent the entire house but only a room (`rt_Private_room`) or even shares it (`rt_Shared_room`). Of course, you might conceptually doubt the assumption that it is possible to *arbitrarily* change the number of beds within an AirBnB without eventually changing the number of people it accommodates, but methods to address these concerns using *interaction effects* won't be discussed here. 
 
 ### Hidden Structures
 
-In general, our model performs well, being able to predict slightly more than 65% ($R^2=0.67$) of the variation in the mean nightly price using the covariates we've discussed above.
+In general, our model performs well, being able to predict slightly about two-thirds ($R^2=0.67$) of the variation in the mean nightly price using the covariates we've discussed above.
 But, our model might display some clustering in errors. 
 To interrogate this, we can do a few things. 
 One simple concept might be to look at the correlation between the error in predicting an AirBnB and the error in predicting its nearest neighbor. 
@@ -579,16 +579,18 @@ typically 11% more expensive ($\beta_{pg\_Condominium}=0.1063$) than the benchma
 property type, apartments. More relevant to this section, any given house surrounded by 
 condominiums *also* receives a price premium. But, since $pg_Condominium$ is a dummy variable,
 the spatial lag at site $i$ represents the *percentage* of properties near $i$ that are
-condominiums, which is between $0$ and $1$.^[Discover this for yourself: what is the average of `numpy.array([True, True, True, False, False, True)]`?]
+condominiums, which is between $0$ and $1$.[^Discover]
 So, a *unit* change in this variable means that you would increase the condominium 
 percentage by 100%. Thus, a $.1$ increase in `w_pg_Condominium` (a change of ten percentage points)
 would result in a 5.92% increase in the property house price ($\beta_{w_pg\_Condominium} = 0.6$). 
 Similar interpretations can be derived for all other spatially lagged variables to derive the
 *indirect* effect of a change in the spatial lag. 
 
-However, to compute the indirect change for a given site $i$, you may need to examine the predicted values for $y_i$. In this example, since we are using a row-standardized weights matrix with twenty nearest neighbors, the impact of changing $x_i$ is the same for all of its neighbors and for any site $i$. Thus, the effect is always $\frac{\gamma}{20}$, or about $0.0296$. However, this would not be the same for many other kinds of weights (like `Kernel`, `Queen`, `Rook`, `DistanceBand`, or `Voronoi`), so we will demonstrate how to construct the indirect effect for a specific $i$:
+However, to compute the indirect change for a given site $i$, you may need to examine the predicted values for $y_i$. In this example, since we are using a row-standardized weights matrix with twenty nearest neighbors, the impact of changing $x_i$ is the same for all of its neighbors and for any site $i$. Thus, the effect is always $\frac{\gamma}{20}$, or about $0.0296$. However, this would not be the same for many other kinds of weights (like `Kernel`, `Queen`, `Rook`, `DistanceBand`, or `Voronoi`), so we will demonstrate how to construct the indirect effect for a specific $i$:condominium 
 
 First, predicted values for $y_i$ are stored in the `predy` attribute of any model:
+
+[^Discover]:Discover this for yourself: what is the average of `numpy.array([True, True, True, False, False, True)]`?
 
 ```python
 m5.predy
@@ -684,7 +686,7 @@ error term in a classical OLS model. Hence, alternative estimation methods are
 required. `PySAL` incorporates functionality to estimate several of the most
 advanced techniques developed by the literature on spatial econometrics. For
 example, we can use a general method of moments that account for 
-heterogeneity (Arraiz et al., 2010):
+heterogeneity {cite}`arraiz2010`:
 
 ```python
 m6 = spreg.GM_Error_Het(
