@@ -840,23 +840,81 @@ connectivity graph modeled by our weights matrix. Therefore, using k-nearest nei
 to constrain the agglomerative clustering may not result in regions that are connected
 according to a different connectivity rule, such as the queen contiguity rule used
 in the previous section. However, the regionalization here is fortuitous; even though
-we used the 4-nearest tracts to constrain connectivity, all but one of the clusters, 
-cluster 4, is *also* connected according to our earlier queen contiguity rule. 
+we used the 4-nearest tracts to constrain connectivity, all of our clusters are also connected according to the Queen contiguity rule. 
 
-At first glance, this may seem counter-intuitive. We did specify the spatial
-constraint, so our initial reaction is that the connectivity constraint is
-violated. However, this is not the case, since the constraint applies to the
-k-nearest neighbor graph, not the queen contiguity graph. Therefore, since tracts
-in this solution are considered as connected to their four closest neighbors,
-clusters can "leapfrog" over one another. Thus, it is important to recognize that
-the apparent spatial structure of regionalizations will depend on how the 
-connectivity of observations is modeled. 
+So, which one is a "better" regionalization? Well, regionalizations are often compared based on measures of *geographical coherence*, as well as measures of *cluster coherence*. The former involves measures of cluster *shape*:
+- are clusters evenly-sized, or are they very differently sized? 
+- are clusters very strangely-shaped, or are they compact?
+while the latter generally focuses on whether cluster observations are more similar to their current clusters than to other clusters. This *goodness of fit* is usually **better** for unconstrained clustering algorithms than for the corresponding regionalizations. We'll show this below. 
+
+
+### Geographical coherence
+
+
+First, though, one very simple measure of geographical coherence involves the "compactness" of a given shape. The most common of these measures is the isoperimetric quotient. This compares the area of the region to the area of a circle with the same perimeter as the region. To obtain the statistic, we can recognize that the circumference of the circle $c$ is the same as the perimeter of the region $i$, so $P_i = 2\pi r_c$. Then, the area of the isoperimetric circle is $A_c = \pi r_c^2 = \pi \left(\frac{P_i}{2 \pi}\right)^2$. Simplifying, we get:
+
+$$ IPQ_i = \frac{A_i}{A_c} = \frac{4 \pi A_i}{P_i^2}$$
+
+For this measure, more compact shapes have an IPQ closer to 1, whereas very elongated or spindly shapes will have IPQs closer to zero. For the clustering solutions, we would expect the IPQ to be very small indeed, since the perimeter of a cluster/region gets smaller the more boundaries that members share. 
+
+Computing this, then, can be done directly from the area and perimeter of a region:
+
+```python
+results = []
+for cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+    regions = db[[cluster_type, 'geometry']].dissolve(by=cluster_type)
+    ipqs = regions.area * 4 * numpy.pi / (regions.boundary.length**2)
+    results.append(ipqs.to_frame(cluster_type))
+pandas.concat(results, axis=1)
+```
+
+From this, we can see that the *shape* measures for the clusters are much better under the regionalizations than under the clustering solutions. As we'll show in the next section, this comes at the cost of goodness of fit. Alternatively, the two spatial solutions have different compactness values; the knn-based regions are much more compact than the queen weights-based solutions. The most compact region in the Queen regionalization is about at the median of the knn solutions. 
+
+Many other measures of shape regularity exist. Most of the well-used ones are implemented in the `esda.shapestats` module, which also documents the sensitivity of the different measures of shape. 
+
+
+### Feature coherence (goodness of fit)
+
+
+Many measures of the feature coherence, or *goodness of fit*, are implemented in scikit-learn's `metrics` module, which we used earlier to compute distances. This metrics module also contains a few goodness of fit statistics that measure, for example:
+- `metrics.calinski_harabasz_score()`: the within-cluster variance divided by the between-cluster variance
+- `metrics.silhouette_score()`: the average standardized distance from each observation to its "next best fit" cluster—the most similar cluster to which the observation is *not* currently assigned.
+To compute these, each scoring function requires both the original data and the labels which have been fit. We'll compute the CH score for all the different clusterings below:
+
+```python
+ch_scores = []
+for cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+    ch_score = metrics.calinski_harabasz_score(robust_scale(db[cluster_variables]), db[cluster_type])
+    ch_scores.append((cluster_type, ch_score))
+pandas.DataFrame(ch_scores, columns=['cluster type', 'CH score']).set_index('cluster type')
+```
+
+For all functions in `metrics` that end in "score", higher numbers indicate greater fit, whereas functions that end in `loss` work in the other direction. Thus, the K-means solution has the highest Calinski-Harabasz score, while the ward clustering comes second. The regionalizations both come *well* below the clusterings, too. As we said before, the improved geographical coherence comes at a pretty hefty cost in terms of feature goodness of fit. This is because regionalization is *constrained*, and mathematically *can not* achieve the same score as the unconstrained K-means solution, unless we get lucky and the k-means solution *is* a valid regionalization. 
+
+
+### Solution Similarity
+
+The `metrics` module also contains useful tools to compare whether the labellings generated from different clustering algorithms are similar, such as the Adjusted Rand Score or the Mutual Information Score. To show that, we can see how similar clusterings are to one another:
+
+```python
+ami_scores = []
+for i_cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+    for j_cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+        ami_score = metrics.adjusted_mutual_info_score(db[i_cluster_type], db[j_cluster_type])
+        ami_scores.append((i_cluster_type, j_cluster_type, ami_score))
+results = pandas.DataFrame(ami_scores, columns=['source', 'target', 'similarity'])
+results.pivot("source", "target", "similarity")
+```
+
+From this, we can see that the K-means and Ward clusterings are the most self-similar, and the two regionalizations are slightly less similar to one another than the clusterings. The regionalizations are generally *not* very similar to the clusterings, as would be expected from our discussions above. 
+
+
 
 ## Conclusion
 
 Overall, clustering and regionalization are two complementary tools to reduce
 complexity in multivariate data and build better understandings of their spatial structure.
-Often, there is simply too much data to examine every variables' map and its
+Often, there is simply too much data to examine every variable's map and its
 relation to all other variable maps. 
 Thus, clustering reduces this complexity into a single conceptual shorthand by which 
 people can easily describe complex and multifaceted data. 
@@ -865,7 +923,7 @@ with coherent *profiles*, or distinct and internally-consistent
 distributional/descriptive characteristics. 
 These profiles are the conceptual shorthand, since members of each cluster should
 be more similar to the cluster at large than they are to any other cluster. 
-Many different clustering methods exist; they differ on how the "cluster at large" 
+Many different clustering methods exist; they differ on how the cluster
 is defined, and how "similar" members must be to clusters, or how these clusters
 are obtained.
 Regionalization is a special kind of clustering that imposes an additional geographic requirement. 
@@ -876,6 +934,7 @@ graph for data collected in areas; this ensures that the regions that are identi
 are fully internally-connected. 
 However, since many regionalization methods are defined for an arbitrary connectivity structure,
 these graphs can be constructed according to different rules as well, such as the k-nearest neighbor graph. 
+Finally, while regionalizations are usually more geographically-coherent, they are also usually worse-fit to the features at hand. This reflects an intrinsic tradeoff that, in general, cannot be removed. 
 
 In this chapter, we discussed the conceptual basis for clustering and regionalization, 
 as well as showing why clustering is done. 
@@ -900,13 +959,4 @@ Thus, clustering and regionalization are essential tools for the geographic data
     c. Compare the `pct_nonzero` for both matrices. 
     d. Rerun the analysis from this chapter using this new second-order weights matrix. What changes? 
 6. The idea of spatial dependence, that near things tend to be more related than distant things, is an extensively-studied property of spatial data. How might solutions to clustering and regionalization problems change if dependence is very strong and positive? very weak? very strong and negative? 
-
----
-
-**DAB**: I don't understand this so I'd suggest to rephrase it or remove it
-
-7. In other areas of spatial analysis, multilevel models [1] recognize that sometimes, geographical regions are more similar internally than they are externally. That is, two observations in the same region are probably more similar than two observations in different regions. If this kind of dependence is very strong, what would happen to clustering and regionalization solutions?
-
----
-
 8. Using a spatial weights object obtained as `w = pysal.lib.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = pysal.lib.weights.lat2W(20,20, rook=False)` ?
