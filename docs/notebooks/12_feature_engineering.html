@@ -509,7 +509,7 @@
 </div>
 <div class="section" id="feature-engineering-using-map-matching">
 <h2>Feature Engineering Using Map Matching<a class="headerlink" href="#feature-engineering-using-map-matching" title="Permalink to this headline">¶</a></h2>
-<p>Space is the ultimate linkage key; map matching is all about exploiting this asset. Geographic information is collected at different scales, aggregated using bespoke geographic delineations, and ultimately stored in different datasets. Modeling and machine learning usually require the use of data aligned and coherently structured; to bring disparate geo-datasets together, the data scientist needs to be able to transfer information expressed for one geography into another. This is where map matching comes to rescue. By using geographical location, we can connect datasets that have no common key or that are otherwise completely unrelated. This is a “magic trick” that we can pull off because of location that would be much harder, or impossible, with data lacking spatial information.</p>
+<p>Space is the ultimate linkage key; map matching is all about exploiting this asset. Geographic information is collected at different scales, aggregated using bespoke geographic delineations, and ultimately stored in different datasets. Modeling and machine learning usually require the use of data aligned and coherently structured; to bring disparate geo-datasets together, the data scientist needs to be able to transfer information expressed for one geography into another. This is where map matching comes to the rescue. By using geographical location, we can connect datasets that have no common key or that are otherwise completely unrelated. This is a “magic trick” that we can pull off because of location that would be much harder, or impossible, with data lacking spatial information.</p>
 <p>The details, and difficulty, of this transfer of information from one geography to another one depend on the nature of the “source” and “target”, and on the precision with which we want to perform such transfer. In this context, there is always an inevitable trade-off between precision and sophistication: more precise transfer is usually possible at the expense of more advanced and involved techniques. Their additional cost in applying them, both in terms of cognitive load on the data scientist’s part or in terms of computation, must be weighted in on an individual basis: sometimes we need the best possible estimates, at all costs; sometimes “good enough” is, well, good enough.</p>
 <p>In this section, we cover a few cases that we consider represent the most common and widely used approaches. We begin with situations where we have two point datasets and all we need to calculate are descriptive statistics of one dataset to the observations in the other. We switch the type of data and consider how to attach information from a continuous grid, stored in a raster file, to a set of points. Then we show the equivalent case for “moving” information for a polygon geography to a point dataset. These are all cases that, in their simplest form, involve mostly traditional GIS operations (e.g., buffer construction, spatial joins) and little in the way of statistical modeling. As an example of a case that is more involved, we cover the transfer of information from a polygon geography to another, different polygon geography. For this final case, but also as a more general comment, we try to include examples that capture the essence of the method, but keep the technique as simple as possible. For almost any of these cases we cover, the reader can find more sophisticated techniques that usually yield more accurate estimates. Where possible, we try to signpost these.</p>
 <div class="section" id="counting-nearby-features">
@@ -537,8 +537,39 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 302 ms, sys: 0 ns, total: 302 ms
-Wall time: 301 ms
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">KeyError</span><span class="g g-Whitespace">                                  </span>Traceback (most recent call last)
+<span class="o">&lt;</span><span class="n">timed</span> <span class="n">exec</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+
+<span class="nn">~/anaconda3/envs/gdsbook/lib/python3.6/site-packages/geopandas/geodataframe.py</span> in <span class="ni">__getitem__</span><span class="nt">(self, key)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1297</span>         <span class="n">GeoDataFrame</span><span class="o">.</span>
+<span class="g g-Whitespace">   </span><span class="mi">1298</span>         <span class="s2">&quot;&quot;&quot;</span>
+<span class="ne">-&gt; </span><span class="mi">1299</span><span class="s2">         result = super(GeoDataFrame, self).__getitem__(key)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1300</span><span class="s2">         geo_col = self._geometry_column_name</span>
+<span class="g g-Whitespace">   </span><span class="mi">1301</span><span class="s2">         if isinstance(result, Series) and isinstance(result.dtype, GeometryDtype):</span>
+
+<span class="nn">~/anaconda3/envs/gdsbook/lib/python3.6/site-packages/pandas/core/frame.py</span> in <span class="ni">__getitem__</span><span class="nt">(self, key)</span>
+<span class="g g-Whitespace">   </span><span class="mi">2910</span><span class="s2">             if is_iterator(key):</span>
+<span class="g g-Whitespace">   </span><span class="mi">2911</span><span class="s2">                 key = list(key)</span>
+<span class="ne">-&gt; </span><span class="mi">2912</span><span class="s2">             indexer = self.loc._get_listlike_indexer(key, axis=1, raise_missing=True)[1]</span>
+<span class="g g-Whitespace">   </span><span class="mi">2913</span><span class="s2"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">2914</span><span class="s2">         # take() does not accept boolean indexers</span>
+
+<span class="nn">~/anaconda3/envs/gdsbook/lib/python3.6/site-packages/pandas/core/indexing.py</span> in <span class="ni">_get_listlike_indexer</span><span class="nt">(self, key, axis, raise_missing)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1252</span><span class="s2">             keyarr, indexer, new_indexer = ax._reindex_non_unique(keyarr)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1253</span><span class="s2"> </span>
+<span class="ne">-&gt; </span><span class="mi">1254</span><span class="s2">         self._validate_read_indexer(keyarr, indexer, axis, raise_missing=raise_missing)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1255</span><span class="s2">         return keyarr, indexer</span>
+<span class="g g-Whitespace">   </span><span class="mi">1256</span><span class="s2"> </span>
+
+<span class="nn">~/anaconda3/envs/gdsbook/lib/python3.6/site-packages/pandas/core/indexing.py</span> in <span class="ni">_validate_read_indexer</span><span class="nt">(self, key, indexer, axis, raise_missing)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1302</span><span class="s2">             if raise_missing:</span>
+<span class="g g-Whitespace">   </span><span class="mi">1303</span><span class="s2">                 not_found = list(set(key) - set(ax))</span>
+<span class="ne">-&gt; </span><span class="mi">1304</span><span class="s2">                 raise KeyError(f&quot;</span><span class="si">{not_found}</span><span class="s2"> not in index&quot;)</span>
+<span class="g g-Whitespace">   </span><span class="mi">1305</span><span class="s2"> </span>
+<span class="g g-Whitespace">   </span><span class="mi">1306</span><span class="s2">             # we skip the warning on Categorical</span>
+
+<span class="ne">KeyError</span>: &quot;[&#39;unique_id&#39;, &#39;osmid&#39;] not in index&quot;
 </pre></div>
 </div>
 </div>
@@ -547,6 +578,12 @@ Wall time: 301 ms
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/cache/sd_pois.gpkg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook/lib/python3.6/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
+  for feature in features_lst:
 </pre></div>
 </div>
 </div>
@@ -585,12 +622,12 @@ Name: amenity, dtype: int64
 <img alt="../_images/12_feature_engineering_18_0.png" src="../_images/12_feature_engineering_18_0.png" />
 </div>
 </div>
-<p>Now, for some feature engineering, it may be extremely useful to know whether an AirBnB is located in a “hot” location, with a lot of restaurants and bars to choose from. Alternatively, if AirBnBs are very remote, they might not be as lucrative for short, expensive “city-break” reservations. That is, AirBnB users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be <em>willing to pay more</em> for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the AirBnB.</p>
+<p>Now, for some feature engineering. It may be extremely useful to know whether an AirBnB is located in a “hot” location, with a lot of restaurants and bars to choose from. Alternatively, if AirBnBs are very remote, they might not be as lucrative for short, expensive “city-break” reservations. That is, AirBnB users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be <em>willing to pay more</em> for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the AirBnB.</p>
 <p>Thus, we can <em>engineer features</em> in the AirBnB data using the nearby POIs. To do this, we can create a new feature for the AirBnB dataset –that is, a new column in <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code>– which incorporates information about how many POIs are <em>nearby</em> each property. This kind of “feature counting” is useful in applications where the mere presence of nearby features can affect the quantity we are modeling.</p>
 <p>To do this kind of feature engineering, let us first walk through what we need to do at a conceptual level:</p>
 <ol class="simple">
 <li><p>Decide what is <em>nearby</em>. This will dictate how far we go from each AirBnB when counting the number of “nearby” bars &amp; restaurants. For this example, we will use 500 meter buffer, which is approximately the distance of a leisurely ten-minute walk.</p></li>
-<li><p>For each AirBnB, determine whether POIs are <em>within</em> a leisurely 10-minute walk.</p></li>
+<li><p>For each AirBnB, determine whether POIs are <em>within</em> a leisurely ten-minute walk.</p></li>
 <li><p>Count how many POIs are withing the specified radius of each AirBnB.</p></li>
 </ol>
 <p>At the end of this procedure, we have the number of bars &amp; restaurants that are within a leisurely walk of the AirBnB, which might be useful in predicting the price of each AirBnB.</p>
@@ -683,7 +720,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <p>Now, <code class="docutils literal notranslate"><span class="pre">abb_buffer</span></code> contains a 500-meter circle around each AirBnB.</p>
-<p>Using these, we can count the number of POIs that are within these areas using a <em>spatial join</em>. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: <code class="docutils literal notranslate"><span class="pre">pois</span> <span class="pre">within</span> <span class="pre">airbnb_buffers</span></code>, where <code class="docutils literal notranslate"><span class="pre">within</span></code> is the predicate relating <code class="docutils literal notranslate"><span class="pre">pois</span></code> to <code class="docutils literal notranslate"><span class="pre">airbnb_buffers</span></code>. Predicates are not always <em>reversible</em>: no <code class="docutils literal notranslate"><span class="pre">airbnb_buffer</span></code> can be <code class="docutils literal notranslate"><span class="pre">within</span></code> a <code class="docutils literal notranslate"><span class="pre">poi</span></code>. In <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>, we can compute all pairs of relations between the <code class="docutils literal notranslate"><span class="pre">pois</span></code> and <code class="docutils literal notranslate"><span class="pre">airbnb_buffers</span></code> efficiently using the <code class="docutils literal notranslate"><span class="pre">sjoin</span></code> function, which takes a <code class="docutils literal notranslate"><span class="pre">predicate</span></code> argument defining the requested relationship between the first &amp; second argument.</p>
+<p>Using these, we can count the number of POIs that are within these areas using a <em>spatial join</em>. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: <code class="docutils literal notranslate"><span class="pre">pois</span> <span class="pre">within</span> <span class="pre">airbnb_buffers</span></code>, where <code class="docutils literal notranslate"><span class="pre">within</span></code> is the predicate relating <code class="docutils literal notranslate"><span class="pre">pois</span></code> to <code class="docutils literal notranslate"><span class="pre">airbnb_buffers</span></code>. Predicates are not always <em>reversible</em>: no <code class="docutils literal notranslate"><span class="pre">airbnb_buffer</span></code> can be <code class="docutils literal notranslate"><span class="pre">within</span></code> a <code class="docutils literal notranslate"><span class="pre">poi</span></code>. In <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>, we can compute all pairs of relations between the <code class="docutils literal notranslate"><span class="pre">pois</span></code> and <code class="docutils literal notranslate"><span class="pre">airbnb_buffers</span></code> efficiently using the <code class="docutils literal notranslate"><span class="pre">sjoin</span></code> function, which takes a <code class="docutils literal notranslate"><span class="pre">predicate</span></code> argument defining the requested relationship between the first and second argument.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span>
@@ -938,7 +975,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 <div class="section" id="point-interpolation-using-scikit-learn">
 <h3>Point Interpolation using scikit-learn<a class="headerlink" href="#point-interpolation-using-scikit-learn" title="Permalink to this headline">¶</a></h3>
-<p>In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is “spatial interpolation”. For a continuous geographical field measured at a set of points, “spatial interpolation” methods provide us a way to guess at at the value a field would take at sites we do not measure.</p>
+<p>In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is <em>spatial interpolation</em>. For a continuous geographical field measured at a set of points, <em>spatial interpolation</em> methods provide us a way to guess at at the value a field would take at sites we do not measure.</p>
 <p>There are many sophisticated methods with which this can be done. <em>Kriging</em>, common in the sub-field of spatial statistics called “geostatistics,” is one such practice based on the theory of <em>Gaussian Process Regression.</em> Another common approach, <em>geographically-weighted regression</em>, provides unique model estimates at every control point, as well as predictions for places where there is no data. Here, though, we’ll use a very basic <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbor prediction algorithm from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> to demonstrate the process. This process will select the nearest 10 listings, then compute the prediction using a weighted average of these nearest observations. To keep predictions relatively consistent, we will build an interpolation only for listings that are entire homes/apartments with two bedrooms:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1132,17 +1169,17 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2.52 s, sys: 144 ms, total: 2.66 s
-Wall time: 42.1 s
-</pre></div>
-</div>
-</div>
 </div>
 <p>The code snippet above sends a query to the Census Bureau server to fetch the data for San Diego. Note that it <em>requires</em> internet connectivity to work. If you are working on the book <em>without</em> connectivity, a cached version of the dataset is available on the data folder and can be read as:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sd_pop</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/cache/sd_census.gpkg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook/lib/python3.6/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
+  for feature in features_lst:
 </pre></div>
 </div>
 </div>
@@ -1214,13 +1251,20 @@ memory usage: 1.4+ MB
 <div class="section" id="area-to-area-interpolation">
 <h3>Area to area interpolation<a class="headerlink" href="#area-to-area-interpolation" title="Permalink to this headline">¶</a></h3>
 <p>The final case of map matching we consider is transfer of information from one polygon/areal geography to a different one. This is a common use-case when an analysis requires data that is provided at different levels of aggregation and different boundary delineations.</p>
-<p>There is a large literature around this problem under the umbrella of dasymetric mapping <span id="id1">[<a class="reference internal" href="references.html#id57"><span>EB01</span></a>]</span>. The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to the other based on how much “geography” is shared. In its simplest case, we can do this based on area. In this case, we will assign values from the source geography to the target based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the “source”, and that to which we want to transfer data the “target”. If polygon A in the target is made up of 50% of polygon 1 in the source, 30% of polygon 2, and 20% of polygon 3, the estimate for A will be a weighted average between the values in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.</p>
+<p>There is a large literature around this problem under the umbrella of dasymetric mapping <span id="id1">[<a class="reference internal" href="references.html#id57"><span>EB01</span></a>]</span>. The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to the other based on how much “geography” is shared. In its simplest case, we can do this based on area. In this case, we will assign values from the source geography to the target based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the “source”, and that to which we want to transfer data the “target”. Let’s say we have a poverty rate  measure for each of three source polygons, 1, 2, 3, and we have a target polygon A for which we require an estimated poverty rate. If the intersections of polygon A with each of the source polygons amount to  50%, 30%, and 20% of the total area of polygon A, then the estimate  of the poverty rate for A will be a weighted average between the rates in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively.</p>
+<p>We could also go in the other direction. If we had total population for polygon A, but population was not reported for polygons 1, 2, 3, we could use areal interpolation to allocate the population from A (now the source polygon) to each of the three target polygons. Polygon 1 would get 0.5 of the population of A, polygon 2 would get 0.3 of A’s population, and C the remainder. Here we are assuming the area of A is completely exhausted by the areas of 1, 2, and 3, and that the latter polygons do not overlap with each other. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.</p>
 <p>To implement dasymetric mapping in Python, the best option is <code class="docutils literal notranslate"><span class="pre">tobler</span></code>, a package from the PySAL federation designed exactly for this goal. We will show here the simplest case, that of areal interpolation where apportioning is estimated based on area, but the package also provides more sophisticated approaches.</p>
 <p>For the example, we need two polygon layers. We will stick with San Diego and use the set of Census Tracts and the <a class="reference internal" href="../data/h3_grid/README.html"><span class="doc std std-doc">H3 hexagonal grid layer</span></a>. Our goal will be to create population estimates for each hexagon.</p>
 <p>First, let us load the H3 grid:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h3</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/h3_grid/sd_h3_grid.gpkg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook/lib/python3.6/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
+  for feature in features_lst:
 </pre></div>
 </div>
 </div>
