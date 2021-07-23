@@ -237,7 +237,7 @@ So, the fact that all of the clustering variables are positively autocorrelated 
 say much about how attributes co-vary over space. To explore cross-attribute relationships,
 we need to consider the spatial correlation between variables. We will take our first dip
 in this direction exploring the bivariate correlation in the maps of covariates themselves.
-This would mean that we would be comparing each pair of chropleths to look for associations
+This would mean that we would be comparing each pair of choropleths to look for associations
 and differences. Given there are nine attributes, there are 36 pairs of maps that must be
 compared. 
 
@@ -267,7 +267,7 @@ distribution as seen on the lower right diagonal corner cell.
 
 Indeed, this kind of concentration in values is something you need to be very aware of in clustering problems. This is because *distances between datapoints* are of paramount importance in clustering applications. Because distances are sensitive to the units of measurement, cluster solutions can change when you re-scale your data. 
 
-For example, say we locate an observation based on only two variables: house price and gini coefficient:
+For example, say we locate an observation based on only two variables: house price and gini coefficient. In this case:
 
 ```python
 db[['income_gini', 'median_house_value']].head()
@@ -469,7 +469,7 @@ _ = areas.plot.bar()
 ```
 
 Our visual impression is confirmed: cluster 1 contains tracts that
-together comprise 6,636 square kilometers (nearly 8000 square miles),
+together comprise 8622 square miles (about 22,330 square kilometers)
 which accounts for well over half of the total land area in the county:
 
 ```python
@@ -494,7 +494,7 @@ We see that cluster 3, for example, is composed of tracts that have
 the highest average `median_house_value`, and also the highest level of inequality
 (`income_gini`); and cluster 0 contains a younger population (`median_age`)
 who tend to live in housing units with fewer rooms (`median_no_rooms`).
-For interpretability, it is useful to consider the raw features, rather than scaled versions tha the clusterer sees. However, you can also give profiles in terms of re-scaled features. 
+For interpretability, it is useful to consider the raw features, rather than scaled versions that the clusterer sees. However, you can also give profiles in terms of re-scaled features. 
 
 Average values, however, can hide a great deal of detail and, in some cases,
 give wrong impressions about the type of data distribution they represent. To
@@ -845,13 +845,13 @@ we used the 4-nearest tracts to constrain connectivity, all of our clusters are 
 So, which one is a "better" regionalization? Well, regionalizations are often compared based on measures of *geographical coherence*, as well as measures of *cluster coherence*. The former involves measures of cluster *shape*:
 - are clusters evenly-sized, or are they very differently sized? 
 - are clusters very strangely-shaped, or are they compact?
-while the latter generally focuses on whether cluster observations are more similar to their current clusters than to other clusters. This *goodness of fit* is usually **better** for unconstrained clustering algorithms than for the corresponding regionalizations. We'll show this below. 
+while the latter generally focuses on whether cluster observations are more similar to their current clusters than to other clusters. This *goodness of fit* is usually better for unconstrained clustering algorithms than for the corresponding regionalizations. We'll show this below. 
 
 
 ### Geographical coherence
 
 
-First, though, one very simple measure of geographical coherence involves the "compactness" of a given shape. The most common of these measures is the isoperimetric quotient. This compares the area of the region to the area of a circle with the same perimeter as the region. To obtain the statistic, we can recognize that the circumference of the circle $c$ is the same as the perimeter of the region $i$, so $P_i = 2\pi r_c$. Then, the area of the isoperimetric circle is $A_c = \pi r_c^2 = \pi \left(\frac{P_i}{2 \pi}\right)^2$. Simplifying, we get:
+First, though, one very simple measure of geographical coherence involves the "compactness" of a given shape. The most common of these measures is the isoperimetric quotient {cite}`Horn1993`. This compares the area of the region to the area of a circle with the same perimeter as the region. To obtain the statistic, we can recognize that the circumference of the circle $c$ is the same as the perimeter of the region $i$, so $P_i = 2\pi r_c$. Then, the area of the isoperimetric circle is $A_c = \pi r_c^2 = \pi \left(\frac{P_i}{2 \pi}\right)^2$. Simplifying, we get:
 
 $$ IPQ_i = \frac{A_i}{A_c} = \frac{4 \pi A_i}{P_i^2}$$
 
@@ -862,9 +862,14 @@ Computing this, then, can be done directly from the area and perimeter of a regi
 ```python
 results = []
 for cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+    # compute the region polygons using a dissolve
     regions = db[[cluster_type, 'geometry']].dissolve(by=cluster_type)
+    # compute the actual isoperimetric quotient for these regions
     ipqs = regions.area * 4 * numpy.pi / (regions.boundary.length**2)
-    results.append(ipqs.to_frame(cluster_type))
+    # cast to a dataframe
+    result = ipqs.to_frame(cluster_type)
+    results.append(result)
+# stack the series together along columns
 pandas.concat(results, axis=1)
 ```
 
@@ -877,16 +882,28 @@ Many other measures of shape regularity exist. Most of the well-used ones are im
 
 
 Many measures of the feature coherence, or *goodness of fit*, are implemented in scikit-learn's `metrics` module, which we used earlier to compute distances. This metrics module also contains a few goodness of fit statistics that measure, for example:
-- `metrics.calinski_harabasz_score()`: the within-cluster variance divided by the between-cluster variance
+- `metrics.calinski_harabasz_score()` (CH): the within-cluster variance divided by the between-cluster variance
 - `metrics.silhouette_score()`: the average standardized distance from each observation to its "next best fit" cluster—the most similar cluster to which the observation is *not* currently assigned.
 To compute these, each scoring function requires both the original data and the labels which have been fit. We'll compute the CH score for all the different clusterings below:
 
 ```python
 ch_scores = []
 for cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
-    ch_score = metrics.calinski_harabasz_score(robust_scale(db[cluster_variables]), db[cluster_type])
+    # compute the CH score
+    ch_score = metrics.calinski_harabasz_score(
+    # using scaled variables
+        robust_scale(db[cluster_variables]), 
+    # using these labels
+        db[cluster_type]
+    )
+    # and append the cluster type with the CH score
     ch_scores.append((cluster_type, ch_score))
-pandas.DataFrame(ch_scores, columns=['cluster type', 'CH score']).set_index('cluster type')
+
+# re-arrange the scores into a dataframe for display 
+pandas.DataFrame(
+    ch_scores, 
+    columns=['cluster type', 'CH score']
+).set_index('cluster type')
 ```
 
 For all functions in `metrics` that end in "score", higher numbers indicate greater fit, whereas functions that end in `loss` work in the other direction. Thus, the K-means solution has the highest Calinski-Harabasz score, while the ward clustering comes second. The regionalizations both come *well* below the clusterings, too. As we said before, the improved geographical coherence comes at a pretty hefty cost in terms of feature goodness of fit. This is because regionalization is *constrained*, and mathematically *can not* achieve the same score as the unconstrained K-means solution, unless we get lucky and the k-means solution *is* a valid regionalization. 
@@ -898,11 +915,23 @@ The `metrics` module also contains useful tools to compare whether the labelling
 
 ```python
 ami_scores = []
+# for each cluster solution
 for i_cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+    # for every other clustering
     for j_cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
-        ami_score = metrics.adjusted_mutual_info_score(db[i_cluster_type], db[j_cluster_type])
+        # compute the adjusted mutual info between the two
+        ami_score = metrics.adjusted_mutual_info_score(
+            db[i_cluster_type], 
+            db[j_cluster_type]
+        )
+        # and save the pair of cluster types with the score
         ami_scores.append((i_cluster_type, j_cluster_type, ami_score))
-results = pandas.DataFrame(ami_scores, columns=['source', 'target', 'similarity'])
+# arrange the results into a dataframe
+results = pandas.DataFrame(
+    ami_scores, 
+    columns=['source', 'target', 'similarity']
+)
+# and spread the dataframe out into a square
 results.pivot("source", "target", "similarity")
 ```
 
@@ -954,9 +983,18 @@ Thus, clustering and regionalization are essential tools for the geographic data
 3. In evaluating the quality of the solution to a regionalization problem, how might traditional measures of cluster evaluation be used? In what ways might those measures be limited and need expansion to consider the geographical dimensions of the problem?
 4. Discuss the implications for the processes of regionalization that follow from the number of *connected components* in the spatial weights matrix that would be used.
 5. Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook being less dense than Queen graphs). 
+
     a. How might the sparsity of the weights matrix affect the quality of the clustering solution?
+    
     b. Using `pysal.lib.weights.higher_order`, construct a second-order adjacency matrix of the weights matrix used in this chapter. 
+    
     c. Compare the `pct_nonzero` for both matrices. 
+    
     d. Rerun the analysis from this chapter using this new second-order weights matrix. What changes? 
+ 
 6. The idea of spatial dependence, that near things tend to be more related than distant things, is an extensively-studied property of spatial data. How might solutions to clustering and regionalization problems change if dependence is very strong and positive? very weak? very strong and negative? 
-8. Using a spatial weights object obtained as `w = pysal.lib.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = pysal.lib.weights.lat2W(20,20, rook=False)` ?
+7. Using a spatial weights object obtained as `w = pysal.lib.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = pysal.lib.weights.lat2W(20,20, rook=False)` ?
+
+```python
+
+```
