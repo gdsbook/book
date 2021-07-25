@@ -423,6 +423,21 @@
      Changing the spatial constraint
     </a>
    </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#geographical-coherence">
+     Geographical coherence
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#feature-coherence-goodness-of-fit">
+     Feature coherence (goodness of fit)
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#solution-similarity">
+     Solution Similarity
+    </a>
+   </li>
   </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
@@ -468,25 +483,21 @@ borrowed from [GDS'17 - Lab
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>The world’s hardest questions are complex and multi-faceted.
-Effective methods to learn from data should recognize this. Many questions
+Effective methods to learn from data recognize this. Many questions
 and challenges are inherently multidimensional; they are affected, shaped, and
 defined by many different components all acting simultaneously. In statistical
 terms, these processes are called <em>multivariate processes</em>, as opposed to
 <em>univariate processes</em>, where only a single variable acts at once.
 Clustering is a fundamental method of geographical analysis that draws insights
-from large, complex multivariate processes. It works by finding similarities among the
-many dimensions in a multivariate process, condensing them down into a simpler representation.
-Thus, through clustering, a complex and difficult to understand process is recast into a simpler one
-that even non-technical audiences can work with.</p>
-<p>Clustering as we discuss it in this chapter borrows heavily from unsupervised statistical learning <span id="id1">[<a class="reference internal" href="references.html#id7"><span>FHT+01</span></a>]</span>.
-Often, clustering involves sorting observations into groups without any prior idea on what
-the groups are (or, in machine learning jargon, without any labels, hence the <em>unsupervised</em> nature).
+from large, complex multivariate processes. It works by finding similarities among the many dimensions in a multivariate process, condensing them down into a simpler representation.
+Thus, through clustering, a complex and difficult to understand process is recast into a simpler one that even non-technical audiences can use.</p>
+<p>Clustering (as we discuss it in this chapter) borrows heavily from unsupervised statistical learning <span id="id1">[<a class="reference internal" href="references.html#id7"><span>FHT+01</span></a>]</span>.
+Often, clustering involves sorting observations into groups without any prior idea about what the groups are (or, in machine learning jargon, without any labels, hence the <em>unsupervised</em> name).
 These groups are delineated so that members of a group should be more
 similar to one another than they are to members of a different group.
 Each group is referred to as a <em>cluster</em> while the process of assigning
 objects to groups is known as <em>clustering</em>. If done well, these clusters can be
-characterized by their <em>profile</em>, a simple summary of what members of a group
-are like in terms of the original multivariate phenomenon.</p>
+characterized by their <em>profile</em>, a simple summary of what members of a group are like in terms of the original multivariate phenomenon.</p>
 <p>Since a good cluster is more
 similar internally than it is to any other cluster, these cluster-level profiles
 provide a convenient shorthand to describe the original complex multivariate phenomenon
@@ -502,25 +513,24 @@ geographic structure of complex multivariate spatial data.</p>
 <p>In the context of explicitly spatial questions, a related concept, the <em>region</em>,
 is also instrumental. A <em>region</em> is similar to a <em>cluster</em>, in the sense that
 all members of a region have been grouped together, and the region should provide
-a shorthand for the original data.
+a shorthand for the original data within the region.
 For a region to be analytically useful, its members also should
 display stronger similarity to each other than they do to the members of other regions.
 However, regions are more complex than clusters because they combine this
-similarity in profile with additional information about the location of their members.
+similarity in profile with additional information about the location of their members: they should also describe a clear geographic area.
 In short, regions are like clusters (since they have a consistent profile) where all its members
 are geographically consistent.</p>
 <p>The process of creating regions is called regionalization <span id="id2">[<a class="reference internal" href="references.html#id6"><span>DRSurinach07</span></a>]</span>.
 A regionalization is a special kind of clustering where the objective is
 to group observations which are similar in their statistical attributes,
 but also in their spatial location. In this sense, regionalization embeds the same
-logic as standard clustering techniques, but also applies a series of
-spatial and/or geographical constraints. Often, these
+logic as standard clustering techniques, but also applies a series of geographical constraints. Often, these
 constraints relate to connectivity: two candidates can only be grouped together in the
 same region if there exists a path from one member to another member
 that never leaves the region. These paths often model the spatial relationships
 in the data, such as contiguity or proximity. However, connectivity does not
 always need to hold for all regions, and in certain contexts it makes
-sense to relax connectivity or to impose different types of spatial constraints.</p>
+sense to relax connectivity or to impose different types of geographic constraints.</p>
 <p>In this chapter we consider clustering techniques and regionalization methods which will
 allow us to do exactly that. In the process, we will explore the socioeconomic
 characteristics of neighborhoods in San Diego. We will extract common patterns from the
@@ -542,7 +552,7 @@ This will illustrate why connectivity might be important when building insight
 about spatial data, since these clusters will not at all provide intelligible regions.
 With this insight in mind, we will move on to regionalization, exploring different approaches that
 incorporate geographical constraints into the exploration of the social structure of San Diego.
-Applying a regionalization approach is not always necessarily preferable but it can provide
+Applying a regionalization approach is not always required but it can provide
 additional insights into the spatial structure of the multivariate statistical relationships
 that traditional clustering is unable to articulate.</p>
 </div>
@@ -765,11 +775,11 @@ So, the fact that all of the clustering variables are positively autocorrelated 
 say much about how attributes co-vary over space. To explore cross-attribute relationships,
 we need to consider the spatial correlation between variables. We will take our first dip
 in this direction exploring the bivariate correlation in the maps of covariates themselves.
-This would mean that we would be comparing each pair of chroplets to look for associations
+This would mean that we would be comparing each pair of choropleths to look for associations
 and differences. Given there are nine attributes, there are 36 pairs of maps that must be
-compared. These are too many maps to process visually. Instead, we focus directly
-on the bivariate relationhips between each pair of attributes, devoid for now of geography
-and use a scatterplot matrix.</p>
+compared.</p>
+<p>This would be too many maps to process visually. Instead, we focus directly
+on the bivariate relationships between each pair of attributes, devoid for now of geography, and use a scatterplot matrix.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">],</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;reg&#39;</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
@@ -795,7 +805,103 @@ while other cells display negative correlation (<code class="docutils literal no
 that tends to have consistently weak association with the other variables is
 <code class="docutils literal notranslate"><span class="pre">tt_work</span></code>, and in part this appears to reflect its rather concentrated
 distribution as seen on the lower right diagonal corner cell.</p>
-<p>Exploring univariate and bivariate relationships is a good first step into building
+<p>Indeed, this kind of concentration in values is something you need to be very aware of in clustering problems. This is because <em>distances between datapoints</em> are of paramount importance in clustering applications. Because distances are sensitive to the units of measurement, cluster solutions can change when you re-scale your data.</p>
+<p>For example, say we locate an observation based on only two variables: house price and gini coefficient. In this case:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;income_gini&#39;</span><span class="p">,</span> <span class="s1">&#39;median_house_value&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>income_gini</th>
+      <th>median_house_value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.5355</td>
+      <td>732900.000000</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.4265</td>
+      <td>473800.000000</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.4985</td>
+      <td>930600.000000</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.4003</td>
+      <td>478500.000000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.3196</td>
+      <td>515570.896382</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>The distance between observations in terms of these variates can be computed easily using <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span><span class="o">.</span><span class="n">pairwise_distances</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;income_gini&#39;</span><span class="p">,</span> <span class="s1">&#39;median_house_value&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">())</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([[     0.    , 259100.    , 197700.    , 254400.    , 217329.1036],
+       [259100.    ,      0.    , 456800.    ,   4700.    ,  41770.8964],
+       [197700.    , 456800.    ,      0.    , 452100.    , 415029.1036],
+       [254400.    ,   4700.    , 452100.    ,      0.    ,  37070.8964],
+       [217329.1036,  41770.8964, 415029.1036,  37070.8964,      0.    ]])
+</pre></div>
+</div>
+</div>
+</div>
+<p>In this case, we know that the housing values are in the hundreds of thousands, but the Gini coefficient (which we discussed in the previous chapter) is constrained to fall between zero and one. So, for example, the distance between the first two observations is nearly totally driven by the difference in median house value (which is 259100 dollars) and basically ignores the difference in the Gini coefficient (which is about .11). Indeed, a change of a single dollar in median house value will correspond to <em>the maximum possible</em> difference in Gini coefficients. So, a clusterer that uses this distance to determine classifications will pay a lot of attention to median house value, but very little to the Gini coefficient!</p>
+<p>Therefore, <em>as a rule</em>, we standardize our data when clustering. There are many different methods of standardization offered in the <code class="docutils literal notranslate"><span class="pre">sklearn.preprocessing</span></code> module, and these track to the main methods common in applied work. Three examples are <code class="docutils literal notranslate"><span class="pre">scale()</span></code>, which subtracts the mean and divides by the standard deviation:</p>
+<div class="math notranslate nohighlight">
+\[ z = \frac{x_i - \bar{x}}{\sigma_x}\]</div>
+<p>This “normalizes” the variate, ensuring that re-scaled variable has a mean of zero and a variance of one. However, the variable can still be quite skewed, bimodal, etc, and insofar as the mean and vairance may be affected by outliers in a given variate, the scaling can be too dramatic. One alternative intended to handle outliers better is <code class="docutils literal notranslate"><span class="pre">robust_scale()</span></code>, which uses the median and the interquartile range in the same fashion:</p>
+<div class="math notranslate nohighlight">
+\[ z = \frac{x_i - \tilde{x}}{\lceil x \rceil_{75} - \lceil x \rceil_{25}}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\lceil x \rceil_p\)</span> represents the value of the <span class="math notranslate nohighlight">\(p\)</span>th percentile of <span class="math notranslate nohighlight">\(x\)</span>. Alternatively, sometimes it is useful to ensure that the maximum of a variate is <span class="math notranslate nohighlight">\(1\)</span> and the minimum is zero. In this instance, the <code class="docutils literal notranslate"><span class="pre">minmax_scale()</span></code> is appropriate:</p>
+<div class="math notranslate nohighlight">
+\[ z = \frac{x - min(x)}{max(x-min(x))} \]</div>
+<p>In most clustering problems, the <code class="docutils literal notranslate"><span class="pre">robust_scale()</span></code> or <code class="docutils literal notranslate"><span class="pre">scale()</span></code> methods are useful. Further, transformations of the variate (such as log-transforming or Box-Cox transforms) can be used to nonlinearly rescale the variates, but these generally should be done before the above kinds of scaling. Here, we will analyze robust-scaled variables.</p>
+<p>In conclusion, exploring the univariate and bivariate relationships is a good first step into building
 a fully multivariate understanding of a dataset. To take it to the next level, we would
 want to know to what extent these pair-wise relationships hold across different attributes,
 and whether there are patterns in the “location” of observations within the scatter plots.
@@ -833,11 +939,12 @@ until no further reassignments are necessary.</p>
 <p>The nature of this algorithm requires us to select the number of clusters we
 want to create. The right number of clusters is unknown in practice. For
 illustration, we will use <span class="math notranslate nohighlight">\(k=5\)</span> in the <code class="docutils literal notranslate"><span class="pre">KMeans</span></code> implementation from
-<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>:</p>
+<code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Initialise KMeans instance</span>
 <span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">robust_scale</span>
 </pre></div>
 </div>
 </div>
@@ -861,7 +968,7 @@ we are interested in <code class="docutils literal notranslate"><span class="pre
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set the seed for reproducibility</span>
 <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
 <span class="c1"># Run K-Means algorithm</span>
-<span class="n">k5cls</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">])</span>
+<span class="n">k5cls</span> <span class="o">=</span> <span class="n">kmeans</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">robust_scale</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">]))</span>
 </pre></div>
 </div>
 </div>
@@ -875,35 +982,35 @@ records the cluster to which each observation is assigned:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 2, 2, 1, 0, 1, 1, 1, 1, 2, 1, 2,
-       3, 1, 4, 0, 1, 1, 1, 4, 1, 4, 1, 4, 4, 1, 0, 4, 4, 4, 1, 4, 4, 1,
-       4, 4, 4, 0, 1, 1, 4, 1, 1, 4, 4, 4, 4, 4, 4, 4, 1, 1, 1, 1, 1, 1,
-       4, 4, 0, 1, 1, 1, 4, 4, 1, 1, 4, 4, 1, 4, 0, 4, 0, 4, 4, 0, 1, 1,
-       1, 0, 3, 3, 0, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 4, 0, 1, 1, 1, 0, 1,
-       1, 0, 0, 4, 1, 4, 2, 4, 0, 4, 4, 4, 4, 1, 4, 4, 1, 0, 4, 4, 4, 4,
-       4, 1, 1, 1, 1, 4, 4, 1, 0, 4, 4, 4, 1, 4, 4, 0, 0, 0, 1, 2, 2, 2,
-       4, 4, 4, 4, 4, 2, 0, 0, 0, 1, 1, 1, 0, 1, 2, 1, 1, 2, 2, 0, 3, 1,
-       1, 1, 1, 0, 4, 1, 4, 4, 4, 4, 1, 1, 4, 4, 0, 1, 4, 4, 4, 1, 1, 1,
-       1, 4, 4, 4, 1, 1, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 1, 1, 4, 1, 4, 1,
-       1, 4, 1, 4, 1, 1, 0, 4, 0, 4, 0, 3, 4, 1, 2, 0, 4, 1, 1, 4, 2, 1,
-       4, 4, 1, 0, 0, 1, 2, 4, 1, 1, 1, 1, 1, 1, 1, 4, 1, 0, 0, 1, 1, 4,
-       4, 4, 4, 4, 4, 1, 4, 1, 4, 4, 4, 0, 0, 4, 4, 1, 4, 4, 4, 1, 0, 4,
-       4, 1, 4, 4, 4, 4, 4, 4, 1, 1, 4, 1, 1, 1, 4, 4, 0, 4, 1, 1, 1, 1,
-       1, 4, 1, 4, 4, 3, 4, 0, 1, 0, 0, 0, 0, 0, 1, 0, 4, 1, 1, 1, 1, 1,
-       4, 0, 0, 2, 4, 1, 1, 4, 1, 1, 1, 0, 4, 0, 4, 4, 0, 4, 4, 4, 0, 1,
-       4, 4, 4, 4, 4, 1, 4, 1, 4, 4, 1, 1, 1, 1, 4, 1, 2, 1, 1, 1, 1, 4,
-       1, 1, 4, 0, 4, 1, 1, 1, 4, 0, 4, 1, 4, 4, 1, 0, 2, 0, 4, 3, 0, 0,
-       0, 0, 1, 4, 1, 0, 1, 1, 1, 3, 0, 0, 1, 4, 4, 4, 1, 4, 4, 4, 4, 4,
-       1, 1, 4, 4, 4, 4, 4, 1, 4, 4, 4, 4, 1, 0, 4, 4, 1, 4, 1, 4, 1, 4,
-       4, 0, 4, 4, 4, 4, 1, 4, 4, 4, 1, 1, 4, 1, 0, 4, 1, 4, 4, 1, 1, 1,
-       4, 4, 2, 4, 1, 4, 4, 1, 0, 3, 0, 2, 2, 4, 0, 1, 1, 1, 4, 0, 0, 4,
-       1, 4, 0, 4, 1, 1, 4, 1, 4, 4, 2, 0, 0, 4, 2, 4, 4, 1, 1, 4, 4, 4,
-       4, 4, 1, 4, 0, 4, 4, 0, 1, 4, 4, 1, 4, 1, 4, 4, 4, 4, 1, 1, 0, 1,
-       0, 1, 1, 4, 4, 1, 1, 4, 1, 4, 4, 4, 1, 0, 1, 1, 4, 1, 1, 4, 1, 0,
-       0, 0, 4, 0, 0, 2, 1, 1, 1, 1, 4, 1, 1, 1, 1, 4, 2, 1, 1, 0, 4, 1,
-       1, 0, 1, 1, 1, 4, 1, 1, 4, 1, 1, 4, 0, 4, 4, 4, 0, 4, 4, 4, 4, 1,
-       4, 1, 4, 4, 4, 1, 1, 4, 1, 4, 1, 1, 0, 0, 4, 4, 1, 1, 1, 1, 1, 1,
-       4, 0, 0, 4, 0, 4, 1, 1, 1, 1, 1, 4], dtype=int32)
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([2, 1, 3, 1, 4, 2, 1, 1, 1, 2, 2, 3, 3, 1, 1, 1, 0, 2, 2, 3, 1, 4,
+       3, 0, 2, 2, 2, 2, 1, 0, 0, 2, 2, 0, 0, 1, 2, 0, 0, 0, 0, 0, 0, 1,
+       0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1,
+       0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 2, 1, 1, 1, 2, 1, 0, 1, 1, 1,
+       0, 2, 3, 3, 2, 2, 2, 1, 2, 1, 1, 1, 1, 2, 0, 1, 1, 0, 2, 1, 2, 0,
+       0, 2, 1, 0, 1, 0, 3, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0,
+       0, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 3, 1, 3, 3, 3,
+       1, 0, 0, 2, 0, 3, 1, 1, 1, 2, 2, 2, 2, 2, 3, 1, 0, 3, 3, 4, 3, 2,
+       0, 2, 1, 1, 0, 0, 0, 0, 0, 2, 0, 0, 2, 0, 2, 1, 0, 0, 0, 2, 2, 0,
+       0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1,
+       4, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 3, 0, 1, 3, 2, 0, 1, 2, 0, 3, 1,
+       1, 2, 1, 2, 1, 2, 3, 0, 0, 1, 0, 1, 2, 0, 0, 0, 0, 1, 1, 1, 1, 0,
+       2, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 2, 0, 0, 0, 1, 1, 0,
+       0, 2, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
+       1, 0, 1, 0, 1, 3, 0, 1, 2, 2, 1, 1, 1, 2, 1, 1, 0, 2, 0, 2, 2, 0,
+       2, 1, 2, 3, 0, 1, 2, 0, 0, 0, 1, 1, 0, 1, 0, 0, 4, 0, 0, 2, 1, 1,
+       0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 3, 4, 1, 0, 0, 0,
+       1, 4, 1, 1, 1, 1, 1, 1, 1, 2, 0, 1, 0, 0, 1, 1, 3, 2, 0, 3, 3, 3,
+       2, 1, 0, 2, 1, 1, 2, 0, 1, 3, 1, 2, 1, 2, 0, 2, 0, 2, 0, 0, 0, 0,
+       0, 1, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 1, 4, 0, 0, 1, 0, 1, 0, 2, 0,
+       0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 4, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0,
+       0, 1, 3, 0, 1, 1, 2, 1, 2, 3, 1, 3, 3, 0, 1, 1, 0, 1, 0, 1, 1, 0,
+       0, 2, 2, 0, 1, 2, 2, 0, 0, 1, 3, 1, 2, 0, 3, 0, 0, 0, 1, 0, 0, 0,
+       0, 2, 1, 0, 2, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 3, 1,
+       1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1,
+       1, 3, 0, 2, 1, 3, 0, 2, 1, 1, 2, 1, 1, 2, 1, 0, 3, 1, 2, 2, 0, 2,
+       0, 1, 0, 0, 0, 0, 2, 0, 2, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+       0, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1,
+       1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1], dtype=int32)
 </pre></div>
 </div>
 </div>
@@ -943,7 +1050,7 @@ Thus, this gives us one map that incorporates the information of from all nine c
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/10_clustering_and_regionalization_24_0.png" src="../_images/10_clustering_and_regionalization_24_0.png" />
+<img alt="../_images/10_clustering_and_regionalization_30_0.png" src="../_images/10_clustering_and_regionalization_30_0.png" />
 </div>
 </div>
 <p>The map provides a useful view of the clustering results; it allows for
@@ -954,7 +1061,7 @@ more distant from each other. We can see evidence of this in
 our cluster map, since clumps of tracts with the same color emerge. However, this
 visual inspection is obscured by the complexity of the underlying spatial
 units. Our eyes are drawn to the larger polygons in the eastern part of the
-county, giving the impression that cluster 1 is the dominant cluster. While this
+county, giving the impression that more observations fall into that cluster. While this
 seems to be true in terms of land area (and we will verify this below), there is
 more to the cluster pattern than this. Because the tract polygons are all
 different sizes and shapes, we cannot solely rely on our eyes to interpret
@@ -979,11 +1086,11 @@ considering cardinality, or the count of observations in each cluster:</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k5cls
-0    102
-1    240
-2     25
-3      9
-4    252
+0    248
+1    244
+2     88
+3     39
+4      9
 dtype: int64
 </pre></div>
 </div>
@@ -997,15 +1104,13 @@ dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/10_clustering_and_regionalization_28_0.png" src="../_images/10_clustering_and_regionalization_28_0.png" />
+<img alt="../_images/10_clustering_and_regionalization_34_0.png" src="../_images/10_clustering_and_regionalization_34_0.png" />
 </div>
 </div>
 <p>There are substantial differences in the sizes of the five clusters, with two very
-large clusters (0, 3), one medium sized cluster (2), and two small clusters (1,
-4). Cluster 3 is the largest when measured by the number of assigned tracts.
-This confirms our intuition from the map above, where we got the visual impression
-that tracts in cluster 3 seemed to have the largest area. Let’s see if this is
-the case. One way to do so involves using the <code class="docutils literal notranslate"><span class="pre">dissolve</span></code> operation in <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>, which
+large clusters (0,1), one medium sized cluster (2), and two small clusters (3,
+4). Cluster 0 is the largest when measured by the number of assigned tracts, but cluster 1 is not far behind. This confirms our discussion from the map above, where we got the visual impression that tracts in cluster 1 seemed to have the largest area by far, but we missed exactly how large cluster 0 would be.</p>
+<p>Let’s see if this is  the case. One way to do so involves using the <code class="docutils literal notranslate"><span class="pre">dissolve</span></code> operation in <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>, which
 combines all tracts belonging to each cluster into a single
 polygon object. After we have dissolved all the members of the clusters,
 we report the total land area of the cluster:</p>
@@ -1019,11 +1124,11 @@ we report the total land area of the cluster:</p>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k5cls
-0     639.178767
-1    4137.809886
-2     245.345027
-3      63.002389
-4    6636.436573
+0     739.184478
+1    8622.481814
+2    1335.721492
+3     315.428301
+4     708.956558
 Name: area_sqm, dtype: float64
 </pre></div>
 </div>
@@ -1037,28 +1142,27 @@ Name: area_sqm, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/10_clustering_and_regionalization_32_0.png" src="../_images/10_clustering_and_regionalization_32_0.png" />
+<img alt="../_images/10_clustering_and_regionalization_38_0.png" src="../_images/10_clustering_and_regionalization_38_0.png" />
 </div>
 </div>
-<p>Our visual impression is confirmed: cluster 3 contains tracts that
-together comprise 6,636 square kilometers (approximately 2562 square miles),
-which accounts for over half of the total land area in the county:</p>
+<p>Our visual impression is confirmed: cluster 1 contains tracts that
+together comprise 8622 square miles (about 22,330 square kilometers)
+which accounts for well over half of the total land area in the county:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">areas</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">areas</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">areas</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">areas</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.0053748175341845955
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7355953810798616
 </pre></div>
 </div>
 </div>
 </div>
 <p>Let’s move on to build the profiles for each cluster. Again, the profiles is what
 provides the conceptual shorthand, moving from the arbitrary label to a meaningful
-collection of observations with similar attributes. To build a basic profile, we can
-compute the means of each of the attributes in every cluster:</p>
+collection of observations with similar attributes. To build a basic profile, we can compute the means of each of the attributes in every cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
@@ -1099,223 +1203,97 @@ compute the means of each of the attributes in every cluster:</p>
   <tbody>
     <tr>
       <th>median_house_value</th>
-      <td>736881.373</td>
-      <td>500787.575</td>
-      <td>1168004.000</td>
-      <td>1876867.222</td>
-      <td>326728.968</td>
+      <td>356997.331</td>
+      <td>538463.934</td>
+      <td>544888.738</td>
+      <td>1292905.256</td>
+      <td>609385.655</td>
     </tr>
     <tr>
       <th>pct_white</th>
-      <td>0.805</td>
-      <td>0.722</td>
-      <td>0.841</td>
-      <td>0.909</td>
-      <td>0.658</td>
+      <td>0.620</td>
+      <td>0.787</td>
+      <td>0.741</td>
+      <td>0.874</td>
+      <td>0.583</td>
     </tr>
     <tr>
       <th>pct_rented</th>
-      <td>0.325</td>
-      <td>0.406</td>
-      <td>0.288</td>
-      <td>0.251</td>
-      <td>0.512</td>
+      <td>0.551</td>
+      <td>0.270</td>
+      <td>0.596</td>
+      <td>0.275</td>
+      <td>0.377</td>
     </tr>
     <tr>
       <th>pct_hh_female</th>
-      <td>0.104</td>
-      <td>0.102</td>
-      <td>0.107</td>
-      <td>0.117</td>
-      <td>0.106</td>
+      <td>0.108</td>
+      <td>0.114</td>
+      <td>0.065</td>
+      <td>0.109</td>
+      <td>0.095</td>
     </tr>
     <tr>
       <th>pct_bachelor</th>
-      <td>0.004</td>
-      <td>0.010</td>
+      <td>0.023</td>
+      <td>0.007</td>
+      <td>0.005</td>
       <td>0.002</td>
-      <td>0.002</td>
-      <td>0.020</td>
+      <td>0.007</td>
     </tr>
     <tr>
       <th>median_no_rooms</th>
-      <td>5.733</td>
-      <td>5.294</td>
-      <td>6.020</td>
-      <td>6.422</td>
-      <td>4.627</td>
+      <td>4.623</td>
+      <td>5.850</td>
+      <td>4.153</td>
+      <td>6.100</td>
+      <td>5.800</td>
     </tr>
     <tr>
       <th>income_gini</th>
-      <td>0.430</td>
-      <td>0.401</td>
-      <td>0.474</td>
-      <td>0.520</td>
-      <td>0.402</td>
+      <td>0.400</td>
+      <td>0.397</td>
+      <td>0.449</td>
+      <td>0.488</td>
+      <td>0.391</td>
     </tr>
     <tr>
       <th>median_age</th>
-      <td>41.600</td>
-      <td>37.211</td>
-      <td>44.436</td>
-      <td>50.544</td>
-      <td>34.246</td>
+      <td>32.783</td>
+      <td>42.057</td>
+      <td>32.590</td>
+      <td>46.356</td>
+      <td>33.500</td>
     </tr>
     <tr>
       <th>tt_work</th>
-      <td>2336.284</td>
-      <td>2539.429</td>
-      <td>2182.000</td>
-      <td>1237.778</td>
-      <td>2187.754</td>
+      <td>2238.883</td>
+      <td>2244.320</td>
+      <td>2349.511</td>
+      <td>1746.410</td>
+      <td>9671.556</td>
     </tr>
   </tbody>
 </table>
 </div></div></div>
 </div>
-<p>We see that cluster 4, for example, is composed of tracts that have
+<p>We see that cluster 3, for example, is composed of tracts that have
 the highest average <code class="docutils literal notranslate"><span class="pre">median_house_value</span></code>, and also the highest level of inequality
-(<code class="docutils literal notranslate"><span class="pre">income_gini</span></code>); and cluster 4 contains an older population (<code class="docutils literal notranslate"><span class="pre">median_age</span></code>)
-who tend to live in housing units with more rooms (<code class="docutils literal notranslate"><span class="pre">median_no_rooms</span></code>).
-Average values, however, can hide a great deal of detail and, in some cases,
+(<code class="docutils literal notranslate"><span class="pre">income_gini</span></code>); and cluster 0 contains a younger population (<code class="docutils literal notranslate"><span class="pre">median_age</span></code>)
+who tend to live in housing units with fewer rooms (<code class="docutils literal notranslate"><span class="pre">median_no_rooms</span></code>).
+For interpretability, it is useful to consider the raw features, rather than scaled versions that the clusterer sees. However, you can also give profiles in terms of re-scaled features.</p>
+<p>Average values, however, can hide a great deal of detail and, in some cases,
 give wrong impressions about the type of data distribution they represent. To
-obtain more detailed profiles, we can use the <code class="docutils literal notranslate"><span class="pre">describe</span></code> command in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>,
+obtain more detailed profiles, we could use the <code class="docutils literal notranslate"><span class="pre">describe</span></code> command in <code class="docutils literal notranslate"><span class="pre">pandas</span></code>,
 after grouping our observations by their clusters:</p>
-<div class="cell tag_hide-output docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group table by cluster label, keep the variables used </span>
 <span class="c1"># for clustering, and obtain their descriptive summary</span>
 <span class="n">k5desc</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">)[</span><span class="n">cluster_variables</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
 <span class="c1"># Loop over each cluster and print a table with descriptives</span>
 <span class="k">for</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">k5desc</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">---------</span><span class="se">\n\t</span><span class="s1">Cluster </span><span class="si">%i</span><span class="s1">&#39;</span><span class="o">%</span><span class="k">cluster</span>)
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1">---------</span><span class="se">\n\t</span><span class="s1">Cluster </span><span class="si">%i</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">cluster</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">k5desc</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">cluster</span><span class="p">]</span><span class="o">.</span><span class="n">unstack</span><span class="p">())</span>
 </pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>	---------
-	Cluster 0
-                    count           mean           std            min  \
-median_house_value  102.0  736881.372549  87489.733180  621600.000000   
-pct_white           102.0       0.805041      0.126212       0.476693   
-pct_rented          102.0       0.325356      0.205539       0.019410   
-pct_hh_female       102.0       0.103719      0.024251       0.022453   
-pct_bachelor        102.0       0.004370      0.006314       0.000000   
-median_no_rooms     102.0       5.733333      1.259761       2.300000   
-income_gini         102.0       0.429732      0.067163       0.300900   
-median_age          102.0      41.600000      6.418306      21.500000   
-tt_work             102.0    2336.284314   1253.010603     771.000000   
-
-                              25%            50%            75%            max  
-median_house_value  663400.000000  708200.000000  809225.000000  930600.000000  
-pct_white                0.752426       0.853539       0.895305       0.966185  
-pct_rented               0.143687       0.290194       0.471491       0.786959  
-pct_hh_female            0.091919       0.103113       0.120754       0.169700  
-pct_bachelor             0.000000       0.002871       0.005977       0.047335  
-median_no_rooms          4.600000       6.000000       6.775000       7.900000  
-income_gini              0.383750       0.424850       0.470500       0.666700  
-median_age              37.200000      42.300000      46.400000      54.400000  
-tt_work               1485.250000    2103.500000    2839.500000    8327.000000  
-
-	---------
-	Cluster 1
-                    count           mean           std         min  \
-median_house_value  240.0  500787.574698  57295.975694  414100.000   
-pct_white           240.0       0.722390      0.149383       0.000   
-pct_rented          240.0       0.405979      0.223881       0.000   
-pct_hh_female       240.0       0.101796      0.030586       0.000   
-pct_bachelor        240.0       0.010111      0.010658       0.000   
-median_no_rooms     240.0       5.294402      0.957028       2.800   
-income_gini         240.0       0.400898      0.048220       0.283   
-median_age          240.0      37.210522      7.389658      16.500   
-tt_work             240.0    2539.429167   1911.989514       0.000   
-
-                              25%            50%            75%            max  
-median_house_value  453750.000000  496850.000000  539675.000000  617000.000000  
-pct_white                0.667674       0.754861       0.823160       0.946018  
-pct_rented               0.225816       0.373094       0.541326       1.000000  
-pct_hh_female            0.091103       0.107624       0.119297       0.166396  
-pct_bachelor             0.002472       0.006677       0.015632       0.088600  
-median_no_rooms          4.700000       5.400000       6.000000       7.500000  
-income_gini              0.369650       0.403850       0.428775       0.553800  
-median_age              33.650000      37.100000      41.050000      72.500000  
-tt_work               1679.750000    2266.500000    3041.250000   24143.000000  
-
-	---------
-	Cluster 2
-                    count          mean            std            min  \
-median_house_value   25.0  1.168004e+06  120618.166404  972800.000000   
-pct_white            25.0  8.410426e-01       0.109941       0.542849   
-pct_rented           25.0  2.875354e-01       0.159089       0.089633   
-pct_hh_female        25.0  1.068837e-01       0.017825       0.068381   
-pct_bachelor         25.0  2.245429e-03       0.002630       0.000000   
-median_no_rooms      25.0  6.020000e+00       1.333229       4.000000   
-income_gini          25.0  4.741920e-01       0.042624       0.408200   
-median_age           25.0  4.443600e+01       9.200674      24.800000   
-tt_work              25.0  2.182000e+03    1321.458790     702.000000   
-
-                             25%           50%           75%           max  
-median_house_value  1.068400e+06  1.174600e+06  1.256300e+06  1.391700e+06  
-pct_white           8.087572e-01  8.755782e-01  9.118435e-01  9.461056e-01  
-pct_rented          1.525540e-01  2.407136e-01  4.432393e-01  6.360000e-01  
-pct_hh_female       9.007014e-02  1.075795e-01  1.230421e-01  1.303158e-01  
-pct_bachelor        0.000000e+00  1.354211e-03  4.228968e-03  8.325624e-03  
-median_no_rooms     4.800000e+00  6.200000e+00  7.300000e+00  7.800000e+00  
-income_gini         4.455000e-01  4.692000e-01  5.032000e-01  5.798000e-01  
-median_age          4.000000e+01  4.210000e+01  5.220000e+01  5.950000e+01  
-tt_work             1.207000e+03  1.943000e+03  2.900000e+03  6.686000e+03  
-
-	---------
-	Cluster 3
-                    count          mean            std           min  \
-median_house_value    9.0  1.876867e+06  177646.007321  1.583300e+06   
-pct_white             9.0  9.088069e-01       0.039216  8.349267e-01   
-pct_rented            9.0  2.514381e-01       0.098227  1.245819e-01   
-pct_hh_female         9.0  1.169440e-01       0.023233  7.169202e-02   
-pct_bachelor          9.0  2.002206e-03       0.003244  0.000000e+00   
-median_no_rooms       9.0  6.422222e+00       0.909365  5.100000e+00   
-income_gini           9.0  5.203444e-01       0.032293  4.737000e-01   
-median_age            9.0  5.054444e+01       4.640612  4.310000e+01   
-tt_work               9.0  1.237778e+03     368.902690  7.540000e+02   
-
-                             25%           50%           75%           max  
-median_house_value  1.675900e+06  2.000001e+06  2.000001e+06  2.000001e+06  
-pct_white           8.880597e-01  9.072782e-01  9.360583e-01  9.596588e-01  
-pct_rented          1.302682e-01  2.954939e-01  3.264249e-01  3.544750e-01  
-pct_hh_female       1.033566e-01  1.262837e-01  1.280858e-01  1.456606e-01  
-pct_bachelor        0.000000e+00  0.000000e+00  2.895753e-03  9.871245e-03  
-median_no_rooms     5.800000e+00  6.600000e+00  7.100000e+00  7.900000e+00  
-income_gini         5.048000e-01  5.110000e-01  5.280000e-01  5.763000e-01  
-median_age          4.860000e+01  5.100000e+01  5.280000e+01  5.800000e+01  
-tt_work             8.910000e+02  1.345000e+03  1.401000e+03  1.919000e+03  
-
-	---------
-	Cluster 4
-                    count           mean           std           min  \
-median_house_value  252.0  326728.968254  75348.415638  17900.000000   
-pct_white           252.0       0.657904      0.165296      0.126219   
-pct_rented          252.0       0.512041      0.214248      0.095565   
-pct_hh_female       252.0       0.106273      0.023002      0.022989   
-pct_bachelor        252.0       0.019860      0.013689      0.000000   
-median_no_rooms     252.0       4.626587      0.813462      2.600000   
-income_gini         252.0       0.402220      0.048714      0.287600   
-median_age          252.0      34.246032      5.825171     24.400000   
-tt_work             252.0    2187.753968    732.742273    592.000000   
-
-                              25%            50%            75%            max  
-median_house_value  306575.000000  346150.000000  373075.000000  413400.000000  
-pct_white                0.576520       0.692083       0.774278       0.951479  
-pct_rented               0.327662       0.520989       0.692279       0.946188  
-pct_hh_female            0.092775       0.105000       0.120620       0.161811  
-pct_bachelor             0.008788       0.018112       0.027612       0.069847  
-median_no_rooms          4.000000       4.550000       5.300000       6.300000  
-income_gini              0.369150       0.395500       0.428975       0.558100  
-median_age              30.200000      33.550000      36.450000      64.800000  
-tt_work               1689.000000    2109.500000    2682.000000    4915.000000  
-</pre></div>
-</div>
-</div>
 </div>
 <p>However, this approach quickly gets out of hand: more detailed profiles can simply
 return to an unwieldy mess of numbers. A better approach to constructing
@@ -1370,31 +1348,31 @@ a few steps are required  to tidy up our labeled data:</p>
   <tbody>
     <tr>
       <th>0</th>
-      <td>0</td>
+      <td>2</td>
       <td>median_house_value</td>
       <td>732900.000000</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0</td>
+      <td>2</td>
       <td>pct_white</td>
       <td>0.916988</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0</td>
+      <td>2</td>
       <td>pct_rented</td>
       <td>0.373913</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0</td>
+      <td>2</td>
       <td>pct_hh_female</td>
       <td>0.052896</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0</td>
+      <td>2</td>
       <td>pct_bachelor</td>
       <td>0.000000</td>
     </tr>
@@ -1422,7 +1400,7 @@ for each variable. This gives us the full distributional profile of each cluster
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/10_clustering_and_regionalization_42_0.png" src="../_images/10_clustering_and_regionalization_42_0.png" />
+<img alt="../_images/10_clustering_and_regionalization_47_0.png" src="../_images/10_clustering_and_regionalization_47_0.png" />
 </div>
 </div>
 <p>Note that we create the figure using the facetting functionality in <code class="docutils literal notranslate"><span class="pre">seaborn</span></code>, which
@@ -1479,7 +1457,7 @@ use the <code class="docutils literal notranslate"><span class="pre">fit</span><
 <span class="c1"># Iniciate the algorithm</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">AgglomerativeClustering</span><span class="p">(</span><span class="n">linkage</span><span class="o">=</span><span class="s1">&#39;ward&#39;</span><span class="p">,</span> <span class="n">n_clusters</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 <span class="c1"># Run clustering</span>
-<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">])</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">robust_scale</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">]))</span>
 <span class="c1"># Assign labels to main data table</span>
 <span class="n">db</span><span class="p">[</span><span class="s1">&#39;ward5&#39;</span><span class="p">]</span> <span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">labels_</span>
 </pre></div>
@@ -1496,11 +1474,11 @@ use the <code class="docutils literal notranslate"><span class="pre">fit</span><
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ward5
-0    141
-1    233
-2    222
-3     23
-4      9
+0    198
+1     10
+2     48
+3    287
+4     85
 dtype: int64
 </pre></div>
 </div>
@@ -1543,75 +1521,75 @@ dtype: int64
   <tbody>
     <tr>
       <th>median_house_value</th>
-      <td>703765.957</td>
-      <td>473097.931</td>
-      <td>316161.712</td>
-      <td>1184173.913</td>
-      <td>1876867.222</td>
+      <td>365932.350</td>
+      <td>625607.090</td>
+      <td>1202087.604</td>
+      <td>503608.711</td>
+      <td>503905.198</td>
     </tr>
     <tr>
       <th>pct_white</th>
-      <td>0.799</td>
-      <td>0.706</td>
-      <td>0.656</td>
-      <td>0.842</td>
-      <td>0.909</td>
+      <td>0.589</td>
+      <td>0.598</td>
+      <td>0.871</td>
+      <td>0.770</td>
+      <td>0.766</td>
     </tr>
     <tr>
       <th>pct_rented</th>
-      <td>0.327</td>
-      <td>0.420</td>
-      <td>0.523</td>
-      <td>0.293</td>
-      <td>0.251</td>
+      <td>0.573</td>
+      <td>0.360</td>
+      <td>0.285</td>
+      <td>0.287</td>
+      <td>0.657</td>
     </tr>
     <tr>
       <th>pct_hh_female</th>
       <td>0.105</td>
-      <td>0.102</td>
-      <td>0.106</td>
+      <td>0.098</td>
       <td>0.107</td>
-      <td>0.117</td>
+      <td>0.112</td>
+      <td>0.076</td>
     </tr>
     <tr>
       <th>pct_bachelor</th>
-      <td>0.005</td>
-      <td>0.011</td>
-      <td>0.021</td>
+      <td>0.023</td>
+      <td>0.006</td>
       <td>0.002</td>
-      <td>0.002</td>
+      <td>0.009</td>
+      <td>0.006</td>
     </tr>
     <tr>
       <th>median_no_rooms</th>
-      <td>5.695</td>
-      <td>5.222</td>
-      <td>4.575</td>
-      <td>5.939</td>
-      <td>6.422</td>
+      <td>4.566</td>
+      <td>5.860</td>
+      <td>6.010</td>
+      <td>5.738</td>
+      <td>3.904</td>
     </tr>
     <tr>
       <th>income_gini</th>
-      <td>0.421</td>
-      <td>0.401</td>
-      <td>0.403</td>
-      <td>0.478</td>
-      <td>0.520</td>
+      <td>0.405</td>
+      <td>0.394</td>
+      <td>0.480</td>
+      <td>0.394</td>
+      <td>0.442</td>
     </tr>
     <tr>
       <th>median_age</th>
-      <td>41.535</td>
-      <td>36.389</td>
-      <td>34.062</td>
-      <td>44.261</td>
-      <td>50.544</td>
+      <td>31.955</td>
+      <td>34.250</td>
+      <td>45.196</td>
+      <td>40.695</td>
+      <td>33.540</td>
     </tr>
     <tr>
       <th>tt_work</th>
-      <td>2305.206</td>
-      <td>2556.399</td>
-      <td>2172.563</td>
-      <td>2201.913</td>
-      <td>1237.778</td>
+      <td>2181.970</td>
+      <td>9260.400</td>
+      <td>1766.354</td>
+      <td>2268.718</td>
+      <td>2402.671</td>
     </tr>
   </tbody>
 </table>
@@ -1665,31 +1643,31 @@ dtype: int64
   <tbody>
     <tr>
       <th>0</th>
-      <td>0</td>
+      <td>4</td>
       <td>median_house_value</td>
       <td>732900.000000</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>0</td>
+      <td>4</td>
       <td>pct_white</td>
       <td>0.916988</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>0</td>
+      <td>4</td>
       <td>pct_rented</td>
       <td>0.373913</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>0</td>
+      <td>4</td>
       <td>pct_hh_female</td>
       <td>0.052896</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>0</td>
+      <td>4</td>
       <td>pct_bachelor</td>
       <td>0.000000</td>
     </tr>
@@ -1716,7 +1694,7 @@ dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/10_clustering_and_regionalization_54_0.png" src="../_images/10_clustering_and_regionalization_54_0.png" />
+<img alt="../_images/10_clustering_and_regionalization_60_0.png" src="../_images/10_clustering_and_regionalization_60_0.png" />
 </div>
 </div>
 <p>For the sake of brevity, we will not spend much time on the plots above.
@@ -1758,7 +1736,7 @@ with k-means simpler, we will display both side by side:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/10_clustering_and_regionalization_56_0.png" src="../_images/10_clustering_and_regionalization_56_0.png" />
+<img alt="../_images/10_clustering_and_regionalization_62_0.png" src="../_images/10_clustering_and_regionalization_62_0.png" />
 </div>
 </div>
 <p>While we must remember our earlier caveat about how irregular polygons can
@@ -1851,7 +1829,7 @@ in a cluster if they are also spatially connected:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/10_clustering_and_regionalization_60_0.png" src="../_images/10_clustering_and_regionalization_60_0.png" />
+<img alt="../_images/10_clustering_and_regionalization_66_0.png" src="../_images/10_clustering_and_regionalization_66_0.png" />
 </div>
 </div>
 <p>Introducing the spatial constraint results in fully-connected clusters with much
@@ -1917,7 +1895,7 @@ another AHC regionalization:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/10_clustering_and_regionalization_66_0.png" src="../_images/10_clustering_and_regionalization_66_0.png" />
+<img alt="../_images/10_clustering_and_regionalization_72_0.png" src="../_images/10_clustering_and_regionalization_72_0.png" />
 </div>
 </div>
 <p>Even though we have specified a spatial constraint, the constraint applies to the
@@ -1925,23 +1903,284 @@ connectivity graph modeled by our weights matrix. Therefore, using k-nearest nei
 to constrain the agglomerative clustering may not result in regions that are connected
 according to a different connectivity rule, such as the queen contiguity rule used
 in the previous section. However, the regionalization here is fortuitous; even though
-we used the 4-nearest tracts to constrain connectivity, all but one of the clusters,
-cluster 4, is <em>also</em> connected according to our earlier queen contiguity rule.</p>
-<p>At first glance, this may seem counter-intuitive. We did specify the spatial
-constraint, so our initial reaction is that the connectivity constraint is
-violated. However, this is not the case, since the constraint applies to the
-k-nearest neighbor graph, not the queen contiguity graph. Therefore, since tracts
-in this solution are considered as connected to their four closest neighbors,
-clusters can “leapfrog” over one another. Thus, it is important to recognize that
-the apparent spatial structure of regionalizations will depend on how the
-connectivity of observations is modeled.</p>
+we used the 4-nearest tracts to constrain connectivity, all of our clusters are also connected according to the Queen contiguity rule.</p>
+<p>So, which one is a “better” regionalization? Well, regionalizations are often compared based on measures of <em>geographical coherence</em>, as well as measures of <em>cluster coherence</em>. The former involves measures of cluster <em>shape</em>:</p>
+<ul class="simple">
+<li><p>are clusters evenly-sized, or are they very differently sized?</p></li>
+<li><p>are clusters very strangely-shaped, or are they compact?
+while the latter generally focuses on whether cluster observations are more similar to their current clusters than to other clusters. This <em>goodness of fit</em> is usually better for unconstrained clustering algorithms than for the corresponding regionalizations. We’ll show this below.</p></li>
+</ul>
+</div>
+<div class="section" id="geographical-coherence">
+<h3>Geographical coherence<a class="headerlink" href="#geographical-coherence" title="Permalink to this headline">¶</a></h3>
+<p>First, though, one very simple measure of geographical coherence involves the “compactness” of a given shape. The most common of these measures is the isoperimetric quotient <span id="id5">[<a class="reference internal" href="references.html#id65"><span>HHV93</span></a>]</span>. This compares the area of the region to the area of a circle with the same perimeter as the region. To obtain the statistic, we can recognize that the circumference of the circle <span class="math notranslate nohighlight">\(c\)</span> is the same as the perimeter of the region <span class="math notranslate nohighlight">\(i\)</span>, so <span class="math notranslate nohighlight">\(P_i = 2\pi r_c\)</span>. Then, the area of the isoperimetric circle is <span class="math notranslate nohighlight">\(A_c = \pi r_c^2 = \pi \left(\frac{P_i}{2 \pi}\right)^2\)</span>. Simplifying, we get:</p>
+<div class="math notranslate nohighlight">
+\[ IPQ_i = \frac{A_i}{A_c} = \frac{4 \pi A_i}{P_i^2}\]</div>
+<p>For this measure, more compact shapes have an IPQ closer to 1, whereas very elongated or spindly shapes will have IPQs closer to zero. For the clustering solutions, we would expect the IPQ to be very small indeed, since the perimeter of a cluster/region gets smaller the more boundaries that members share.</p>
+<p>Computing this, then, can be done directly from the area and perimeter of a region:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">cluster_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5wq&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5wknn&#39;</span><span class="p">):</span>
+    <span class="c1"># compute the region polygons using a dissolve</span>
+    <span class="n">regions</span> <span class="o">=</span> <span class="n">db</span><span class="p">[[</span><span class="n">cluster_type</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">cluster_type</span><span class="p">)</span>
+    <span class="c1"># compute the actual isoperimetric quotient for these regions</span>
+    <span class="n">ipqs</span> <span class="o">=</span> <span class="n">regions</span><span class="o">.</span><span class="n">area</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="n">regions</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">length</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># cast to a dataframe</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">ipqs</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">cluster_type</span><span class="p">)</span>
+    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="c1"># stack the series together along columns</span>
+<span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>k5cls</th>
+      <th>ward5</th>
+      <th>ward5wq</th>
+      <th>ward5wknn</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.022799</td>
+      <td>0.018571</td>
+      <td>0.054258</td>
+      <td>0.136049</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.063241</td>
+      <td>0.149260</td>
+      <td>0.106060</td>
+      <td>0.322734</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0.038124</td>
+      <td>0.046086</td>
+      <td>0.333108</td>
+      <td>0.623676</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0.048154</td>
+      <td>0.064358</td>
+      <td>0.185660</td>
+      <td>0.554410</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0.161781</td>
+      <td>0.027323</td>
+      <td>0.160388</td>
+      <td>0.148000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>From this, we can see that the <em>shape</em> measures for the clusters are much better under the regionalizations than under the clustering solutions. As we’ll show in the next section, this comes at the cost of goodness of fit. Alternatively, the two spatial solutions have different compactness values; the knn-based regions are much more compact than the queen weights-based solutions. The most compact region in the Queen regionalization is about at the median of the knn solutions.</p>
+<p>Many other measures of shape regularity exist. Most of the well-used ones are implemented in the <code class="docutils literal notranslate"><span class="pre">esda.shapestats</span></code> module, which also documents the sensitivity of the different measures of shape.</p>
+</div>
+<div class="section" id="feature-coherence-goodness-of-fit">
+<h3>Feature coherence (goodness of fit)<a class="headerlink" href="#feature-coherence-goodness-of-fit" title="Permalink to this headline">¶</a></h3>
+<p>Many measures of the feature coherence, or <em>goodness of fit</em>, are implemented in scikit-learn’s <code class="docutils literal notranslate"><span class="pre">metrics</span></code> module, which we used earlier to compute distances. This metrics module also contains a few goodness of fit statistics that measure, for example:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics.calinski_harabasz_score()</span></code> (CH): the within-cluster variance divided by the between-cluster variance</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">metrics.silhouette_score()</span></code>: the average standardized distance from each observation to its “next best fit” cluster—the most similar cluster to which the observation is <em>not</em> currently assigned.
+To compute these, each scoring function requires both the original data and the labels which have been fit. We’ll compute the CH score for all the different clusterings below:</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ch_scores</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">cluster_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5wq&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5wknn&#39;</span><span class="p">):</span>
+    <span class="c1"># compute the CH score</span>
+    <span class="n">ch_score</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">calinski_harabasz_score</span><span class="p">(</span>
+    <span class="c1"># using scaled variables</span>
+        <span class="n">robust_scale</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="n">cluster_variables</span><span class="p">]),</span> 
+    <span class="c1"># using these labels</span>
+        <span class="n">db</span><span class="p">[</span><span class="n">cluster_type</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="c1"># and append the cluster type with the CH score</span>
+    <span class="n">ch_scores</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">cluster_type</span><span class="p">,</span> <span class="n">ch_score</span><span class="p">))</span>
+
+<span class="c1"># re-arrange the scores into a dataframe for display </span>
+<span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">ch_scores</span><span class="p">,</span> 
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cluster type&#39;</span><span class="p">,</span> <span class="s1">&#39;CH score&#39;</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;cluster type&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>CH score</th>
+    </tr>
+    <tr>
+      <th>cluster type</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>k5cls</th>
+      <td>115.118055</td>
+    </tr>
+    <tr>
+      <th>ward5</th>
+      <td>98.529245</td>
+    </tr>
+    <tr>
+      <th>ward5wq</th>
+      <td>34.535716</td>
+    </tr>
+    <tr>
+      <th>ward5wknn</th>
+      <td>31.551020</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>For all functions in <code class="docutils literal notranslate"><span class="pre">metrics</span></code> that end in “score”, higher numbers indicate greater fit, whereas functions that end in <code class="docutils literal notranslate"><span class="pre">loss</span></code> work in the other direction. Thus, the K-means solution has the highest Calinski-Harabasz score, while the ward clustering comes second. The regionalizations both come <em>well</em> below the clusterings, too. As we said before, the improved geographical coherence comes at a pretty hefty cost in terms of feature goodness of fit. This is because regionalization is <em>constrained</em>, and mathematically <em>can not</em> achieve the same score as the unconstrained K-means solution, unless we get lucky and the k-means solution <em>is</em> a valid regionalization.</p>
+</div>
+<div class="section" id="solution-similarity">
+<h3>Solution Similarity<a class="headerlink" href="#solution-similarity" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">metrics</span></code> module also contains useful tools to compare whether the labellings generated from different clustering algorithms are similar, such as the Adjusted Rand Score or the Mutual Information Score. To show that, we can see how similar clusterings are to one another:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ami_scores</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># for each cluster solution</span>
+<span class="k">for</span> <span class="n">i_cluster_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5wq&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5wknn&#39;</span><span class="p">):</span>
+    <span class="c1"># for every other clustering</span>
+    <span class="k">for</span> <span class="n">j_cluster_type</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;k5cls&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5wq&#39;</span><span class="p">,</span> <span class="s1">&#39;ward5wknn&#39;</span><span class="p">):</span>
+        <span class="c1"># compute the adjusted mutual info between the two</span>
+        <span class="n">ami_score</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">adjusted_mutual_info_score</span><span class="p">(</span>
+            <span class="n">db</span><span class="p">[</span><span class="n">i_cluster_type</span><span class="p">],</span> 
+            <span class="n">db</span><span class="p">[</span><span class="n">j_cluster_type</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="c1"># and save the pair of cluster types with the score</span>
+        <span class="n">ami_scores</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i_cluster_type</span><span class="p">,</span> <span class="n">j_cluster_type</span><span class="p">,</span> <span class="n">ami_score</span><span class="p">))</span>
+<span class="c1"># arrange the results into a dataframe</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="n">ami_scores</span><span class="p">,</span> 
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span><span class="p">,</span> <span class="s1">&#39;similarity&#39;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="c1"># and spread the dataframe out into a square</span>
+<span class="n">results</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;similarity&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>target</th>
+      <th>k5cls</th>
+      <th>ward5</th>
+      <th>ward5wknn</th>
+      <th>ward5wq</th>
+    </tr>
+    <tr>
+      <th>source</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>k5cls</th>
+      <td>1.000000</td>
+      <td>0.574792</td>
+      <td>0.190921</td>
+      <td>0.200917</td>
+    </tr>
+    <tr>
+      <th>ward5</th>
+      <td>0.574792</td>
+      <td>1.000000</td>
+      <td>0.153525</td>
+      <td>0.178886</td>
+    </tr>
+    <tr>
+      <th>ward5wknn</th>
+      <td>0.190921</td>
+      <td>0.153525</td>
+      <td>1.000000</td>
+      <td>0.419933</td>
+    </tr>
+    <tr>
+      <th>ward5wq</th>
+      <td>0.200917</td>
+      <td>0.178886</td>
+      <td>0.419933</td>
+      <td>1.000000</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<p>From this, we can see that the K-means and Ward clusterings are the most self-similar, and the two regionalizations are slightly less similar to one another than the clusterings. The regionalizations are generally <em>not</em> very similar to the clusterings, as would be expected from our discussions above.</p>
 </div>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
 <p>Overall, clustering and regionalization are two complementary tools to reduce
 complexity in multivariate data and build better understandings of their spatial structure.
-Often, there is simply too much data to examine every variables’ map and its
+Often, there is simply too much data to examine every variable’s map and its
 relation to all other variable maps.
 Thus, clustering reduces this complexity into a single conceptual shorthand by which
 people can easily describe complex and multifaceted data.
@@ -1950,7 +2189,7 @@ with coherent <em>profiles</em>, or distinct and internally-consistent
 distributional/descriptive characteristics.
 These profiles are the conceptual shorthand, since members of each cluster should
 be more similar to the cluster at large than they are to any other cluster.
-Many different clustering methods exist; they differ on how the “cluster at large”
+Many different clustering methods exist; they differ on how the cluster
 is defined, and how “similar” members must be to clusters, or how these clusters
 are obtained.
 Regionalization is a special kind of clustering that imposes an additional geographic requirement.
@@ -1960,7 +2199,8 @@ Thus, regionalization is often concerned with connectivity in a contiguity
 graph for data collected in areas; this ensures that the regions that are identified
 are fully internally-connected.
 However, since many regionalization methods are defined for an arbitrary connectivity structure,
-these graphs can be constructed according to different rules as well, such as the k-nearest neighbor graph.</p>
+these graphs can be constructed according to different rules as well, such as the k-nearest neighbor graph.
+Finally, while regionalizations are usually more geographically-coherent, they are also usually worse-fit to the features at hand. This reflects an intrinsic tradeoff that, in general, cannot be removed.</p>
 <p>In this chapter, we discussed the conceptual basis for clustering and regionalization,
 as well as showing why clustering is done.
 Further, we have demonstrated how to build clusters using a combination of (geographic) data
@@ -1974,25 +2214,18 @@ Thus, clustering and regionalization are essential tools for the geographic data
 </div>
 <div class="section" id="questions">
 <h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
-<ol class="simple">
+<ol>
 <li><p>What disciplines employ regionalization? Cite concrete examples for each discipline you list.</p></li>
 <li><p>Contrast and compare  the concepts of <em>clusters</em> and <em>regions</em>?</p></li>
 <li><p>In evaluating the quality of the solution to a regionalization problem, how might traditional measures of cluster evaluation be used? In what ways might those measures be limited and need expansion to consider the geographical dimensions of the problem?</p></li>
 <li><p>Discuss the implications for the processes of regionalization that follow from the number of <em>connected components</em> in the spatial weights matrix that would be used.</p></li>
-<li><p>Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook being less dense than Queen graphs).
-a. How might the sparsity of the weights matrix affect the quality of the clustering solution?
-b. Using <code class="docutils literal notranslate"><span class="pre">pysal.lib.weights.higher_order</span></code>, construct a second-order adjacency matrix of the weights matrix used in this chapter.
-c. Compare the <code class="docutils literal notranslate"><span class="pre">pct_nonzero</span></code> for both matrices.
-d. Rerun the analysis from this chapter using this new second-order weights matrix. What changes?</p></li>
+<li><p>Consider two possible weights matrices for use in a spatially constrained clustering problem. Both form a single connected component for all the areal units. However, they differ in the sparsity of their adjacency graphs (think Rook being less dense than Queen graphs).</p>
+<p>a. How might the sparsity of the weights matrix affect the quality of the clustering solution?</p>
+<p>b. Using <code class="docutils literal notranslate"><span class="pre">pysal.lib.weights.higher_order</span></code>, construct a second-order adjacency matrix of the weights matrix used in this chapter.</p>
+<p>c. Compare the <code class="docutils literal notranslate"><span class="pre">pct_nonzero</span></code> for both matrices.</p>
+<p>d. Rerun the analysis from this chapter using this new second-order weights matrix. What changes?</p>
+</li>
 <li><p>The idea of spatial dependence, that near things tend to be more related than distant things, is an extensively-studied property of spatial data. How might solutions to clustering and regionalization problems change if dependence is very strong and positive? very weak? very strong and negative?</p></li>
-</ol>
-<hr class="docutils" />
-<p><strong>DAB</strong>: I don’t understand this so I’d suggest to rephrase it or remove it</p>
-<ol class="simple">
-<li><p>In other areas of spatial analysis, multilevel models [1] recognize that sometimes, geographical regions are more similar internally than they are externally. That is, two observations in the same region are probably more similar than two observations in different regions. If this kind of dependence is very strong, what would happen to clustering and regionalization solutions?</p></li>
-</ol>
-<hr class="docutils" />
-<ol class="simple">
 <li><p>Using a spatial weights object obtained as <code class="docutils literal notranslate"><span class="pre">w</span> <span class="pre">=</span> <span class="pre">pysal.lib.weights.lat2W(20,20)</span></code>, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for <code class="docutils literal notranslate"><span class="pre">w</span> <span class="pre">=</span> <span class="pre">pysal.lib.weights.lat2W(20,20,</span> <span class="pre">rook=False)</span></code> ?</p></li>
 </ol>
 </div>
