@@ -492,14 +492,14 @@ seaborn.heatmap(
         'PCGDP1940'
     )[
         [
-            'Equal Interval',
-            'Quantiles', 
-            'Mean-Standard Deviation',
-            'Maximum Breaks', 
             'Head-Tail Breaks', 
-            'Jenks Caspall',
             'Fisher-Jenks',
-            'MaxP'
+            'Maximum Breaks', 
+            'Equal Interval',
+            'MaxP',
+            'Quantiles', 
+            'Jenks Caspall',
+            'Mean-Standard Deviation',
         ]
     ].T,
     cmap='YlGn',
