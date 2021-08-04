@@ -102,7 +102,7 @@ value of the attribute for spatial location $i$, $j$ is a class index, and $c_j$
 represents the lower bound of interval $j$. Different classification schemes obtain from their definition of the class
 boundaries. The choice of the classification scheme should take into
 consideration the statistical distribution of the attribute values as well
-as the goal of our map (e.g. highlight outliers Vs accurately depict the distribution of values).
+as the goal of our map (e.g., highlight outliers Vs accurately depict the distribution of values).
 
 To illustrate these considerations, we will examine regional income data for the
 32 Mexican states used in the paper by {cite}`Rey_2010`. The variable we focus on is per capita gross domestic product
@@ -607,7 +607,7 @@ Note how, in this case, we switch borderlines to black so that we can distinguis
 
 ### Diverging Palettes
 
-A slightly different type of palette is the so-called "diverging" values attribute. This is
+A slightly different from the sequential one is the so-called "diverging" values palette. This is
 useful with continuous data when one wishes to place equal emphasis on mid-range critical values as
 well as extremes at both ends of the distribution. Light colors are used to
 emphasize the mid-range class while dark colors with contrasting hues are used
