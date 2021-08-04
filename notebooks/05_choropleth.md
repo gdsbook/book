@@ -108,14 +108,14 @@ To illustrate these considerations, we will examine regional income data for the
 32 Mexican states used in the paper by {cite}`Rey_2010`. The variable we focus on is per capita gross domestic product
 for 1940 (`PCGDP1940`):
 
-```python
+```python jupyter={"outputs_hidden": true} tags=[]
 mx = geopandas.read_file("../data/mexico/mexicojoin.shp")
 mx[['NAME', 'PCGDP1940']].head()
 ```
 
 Which displays the following statistical distribution:
 
-```python
+```python caption="Distribution of per capita GDP across 1940s Mexican States" tags=[]
 # Plot histogram
 ax = seaborn.histplot(mx['PCGDP1940'], bins=5)
 # Add rug on horizontal axis
@@ -699,7 +699,7 @@ classi
 
 If we now want to display these classes on a map, we can use a similar approach to how we have seen above, or use the built-in plotting method in `mapclassify`:
 
-```python
+```python caption="Choropleth map colored to focus on areas of southern Mexico eligible for a target policy, showcasting User-Defined map classifications." tags=[]
 classi.plot(
     mx,                      # Use geometries in the geo-table
     legend=True,             # Add a legend
