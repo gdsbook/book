@@ -249,7 +249,7 @@ x[0:10] = x.min()
 x
 ```
 
-And we will know run quantile classification:
+And we will now run quantile classification:
 
 ```python
 ties = mapclassify.Quantiles(x, k=5)
@@ -322,7 +322,7 @@ to:
 $$q_{0.25}-h \, IQR$$
 
 where $IQR = q_{0.75}-q_{0.25}$ is the
-inter-quartile range; and $h$ corresponds to the hinge, or the multiplier of the $IQR$ to obtain the bounds of the whiskers. The lower limit of the sixth class is set to $q_{0.75}+h \,
+inter-quartile range; and $h$ corresponds to the hinge, or the multiplier of the $IQR$ to obtain the bounds of the "whiskers" from a box-and-whisker plot of the data. The lower limit of the sixth class is set to $q_{0.75}+h \,
 IQR$. Intermediate classes have their upper limits set to the 0.25, 0.50 and
 0.75 percentiles of the attribute values.
 
@@ -486,7 +486,7 @@ mx['MaxP'] = mp5.yb
 With those in one place, we can display their labels in a heatmap. Note that, since our variable of interest is continuous, we can sort the rows of the table by their value (`.sort_values('PCGDP1940')`) and color each cell according to the label assigned to it by each classifier. To make the heatmap easier to read, we transpose it (`.T`) so Mexican states are displayed along the horizontal axis and classification schemes are along the vertical one.
 
 ```python caption="Assignment differences between alternative classification schemes, Mexican State PCGDP1940." tags=[]
-f, ax = plt.subplots(1, figsize=(12, 6))
+f, ax = plt.subplots(1, figsize=(9,3))
 seaborn.heatmap(
     mx.set_index('NAME').sort_values(
         'PCGDP1940'
@@ -506,7 +506,6 @@ seaborn.heatmap(
     cbar=False,
     ax=ax
 )
-plt.xticks(rotation=45)
 ax.set_xlabel('State ID');
 ```
 
@@ -673,7 +672,7 @@ a clear visual cue that regions in the south have larger values
 than those in the north, as the color map implies an intensity gradient.
 
 A more appropriate visualization
-is to use a "qualitative" color palette, which you can get by default if specifying
+is to use a "qualitative" color palette, which is used if you specify that
 the variable is categorical:
 
 ```python caption="Qualitative palette, Mexican regions." tags=[]
@@ -722,8 +721,7 @@ lbls = pandas.cut(
     mx['PCGDP2000'], [-numpy.inf, 10000, 12500, 15000, numpy.inf]
 )
 # Dynamically assign to geo-table and plot with a legend
-ax = mx.assign(lbls=lbls).plot(
-    'lbls', cmap='viridis_r', legend=True
+ax = mx.plot(lbls, cmap='viridis_r', legend=True
 )
 # Remove axis
 ax.set_axis_off();
