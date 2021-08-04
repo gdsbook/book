@@ -24,8 +24,6 @@ warnings.filterwarnings("ignore")
 
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-%matplotlib inline
-
 import seaborn
 import pandas
 import geopandas
@@ -33,6 +31,10 @@ import pysal
 import numpy
 import mapclassify
 import matplotlib.pyplot as plt
+from pysal.explore import inequality
+from pysal.explore import esda
+from pysal.lib import weights
+
 from matplotlib import rcParams
 rcParams['figure.figsize'] = 10, 5
 ```
@@ -48,13 +50,13 @@ Its study has always drawn considerable attention in academic circles.
 Much of the focus has been on *interpersonal income inequality*, yet there is a growing recognition
 that the question of *inter-regional income inequality* requires further 
 attention as the growing gaps between poor and rich regions have been identified
-as key drivers of political polarization in developing and developed countries
+as key drivers of civil unreset {cite}`ezcurra2019` and  political polarization in developing and developed countries
 {cite}`Rodriguez_Pose_2018`.
 
 Much of the study of inequalities has focused at the individual level: how do outcomes
 differ across individuals? This approach does not group individuals geographically. 
 In other words, it is not concerned with whether those differences follow a pattern,
-for example, at the regional level (e.g. *is most of the more disadvantaged population
+for example, at the regional level (e.g., *is most of the more disadvantaged population
 located in a particular section of the map?*).
 Indeed, while the two literatures (personal and regional inequality) are
 related, they have developed in a largely parallel fashion with limited
@@ -78,7 +80,7 @@ spatial dimensions of regional inequality dynamics.
 
 <!-- #endregion -->
 
-## Data: US State Per-Capita Income 1969-2017
+## Data: US State Per Capita Income 1969-2017
 
 The data used in this chapter contain repeated measurements for geographic regions over time.
 We consider the United States from 1969 to 2017; specifically, we will analyze median incomes at the county level. This perspective will allow to examine trends both in terms of how individual counties, states, or regions get richer or poorer, as well as how the overall distribution of income moves, skews, or spreads out. 
@@ -94,7 +96,7 @@ Inspection of the column names reveals that the table is organized around one ro
 This format is an example of a [*wide* longitudinal data set](https://en.wikipedia.org/wiki/Wide_and_narrow_data).
 In wide-format data, each column represents a different time period, meaning that each row represents a set of measurements made about the same "entity" over time (as well as any unique identifying information about that entity.)
 This contrasts with a *narrow* or *long* format, where each row describes an entity at a specific point in time. 
-Long data results in significant duplication for records and is generally worse for data storage, particularly in the geographic case. However, long form data is sometimes a more useful format when manipulating and analyzing data, as {cite}`Wickham_2014` discusses. Nonetheless, when analyzing *trajectories*, that is, the paths that entities take over time, wide data is more useful, and we will use that here. 
+Long data results in significant duplication for records and is generally worse for data storage, particularly in the geographic case. However, long form data is sometimes a more useful format when manipulating and analyzing data, as {cite}`wickham2014tidy` discusses. Nonetheless, when analyzing *trajectories*, that is, the paths that entities take over time, wide data is more useful, and we will use that here. 
 
 In this data, we have 3076 counties across 49 years, as well as 28 extra columns that describe each county. 
 <!-- 
@@ -122,22 +124,17 @@ pci_df.query('NAME == "Jackson" & STATEFP == "28"')
 
 We begin our examination of inequality by focusing on several global measures of income inequality. Here, "global" means that the measure is concerned with the overall nature of inequality within the income distribution. That is, these measures focus on the direct disparity between rich and poor, considering nothing about where the rich and poor live. Several classic measures of inequality are available for this purpose. 
 
-In general terms, measures of inequality focus on the dispersion present in an income distribution. In the case of regional or spatial inequality, the distributions describe the average or per-capita incomes for spatial units, such as for counties, census tracts, or regions. For our US county data, we can visualize the distribution of per capita incomes for the first year in the sample as follows:
+In general terms, measures of inequality focus on the dispersion present in an income distribution. In the case of regional or spatial inequality, the distributions describe the average or per capita incomes for spatial units, such as for counties, census tracts, or regions. For our US county data, we can visualize the distribution of per capita incomes for the first year in the sample as follows:
 <!-- #endregion -->
 
-```python
-seaborn.__version__
-```
-
 ```python caption="Distribution of U.S. Per Capita Income at County Level in 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-seaborn.set_theme(style='whitegrid')
 seaborn.histplot(x=pci_df['1969'], kde=True);
 ```
 
 
 Looking at this distribution, notice that the right side of the distribution is much longer than the left side. This long right tail is a prominent feature, and is common in the study of incomes and many other societal phenomena, as it reflects the fact that within a single income distribution, the super-rich are generally much more wealthy than the super-poor are deprived, compared to the average. 
 
-A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate of individual incomes. Here, we are using the per-capita incomes for each county. By contrast, in the wider inequality literature, the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced. This difference arises from the smoothing that is intrinsic to aggregation: the regional distributions are based on averages obtained from the individual distributions, and so the extremely high-income individuals are averaged with the rest of their county. The regional approach implies that, to avoid falling into the so-called "ecological fallacy", whereby individual conclusions are drawn from geographical aggregates, our conclusions will hold at the area level (the *county*) rather than the individual one (the *person*).
+A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate of individual incomes. Here, we are using the per capita incomes for each county. By contrast, in the wider inequality literature, the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced. This difference arises from the smoothing that is intrinsic to aggregation: the regional distributions are based on averages obtained from the individual distributions, and so the extremely high-income individuals are averaged with the rest of their county. The regional approach implies that, to avoid falling into the so-called "ecological fallacy", whereby individual conclusions are drawn from geographical aggregates, our conclusions will hold at the area level (the *county*) rather than the individual one (the *person*).
 
 
 The kernel density estimate (or histogram) is a powerful visualization device that captures the overall morphology of the *feature* distribution for this measure of income. At the same time, the plot is silent on the underlying *geographic distribution* of county incomes. We can look at this second view of the distribution using a choropleth map. To construct this, we can use the standard `geopandas` plotting tools. 
@@ -150,7 +147,7 @@ pci_df = (pci_df.set_crs(epsg=4326) # US Census default projection
 ```
 
 ```python caption="Quintiles of Per Capita Income by County, 1969" ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df.plot(
+ax = pci_df.plot(
     column='1969', 
     scheme='Quantiles', 
     legend=True, 
@@ -158,6 +155,7 @@ pci_df.plot(
     legend_kwds={'loc': 'lower left'}, 
     figsize=(12, 12)
 )
+ax.set_axis_off()
 plt.show()
 ```
 
@@ -190,11 +188,13 @@ def ineq_20_20(values):
 years = numpy.arange(1969, 2018).astype(str)
 ratio_2020 = pci_df[years].apply(ineq_20_20, axis=0)
 ax = plt.plot(years, ratio_2020)
+
 figure = plt.gcf()
 plt.xticks(years[::2])
 plt.ylabel("20:20 ratio")
 plt.xlabel("Year")
 figure.autofmt_xdate(rotation=45)
+
 plt.show()
 ```
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
@@ -202,12 +202,9 @@ The evolution of the ratio has a U-shaped pattern over time, bottoming out aroun
 <!-- #endregion -->
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-In addition to the 20/20 ratio, we will explore two more traditional measures of inequality: the Gini and Theil's indices. For these, we will use the `inequality` package from `pysal`:
+In addition to the 20/20 ratio, we will explore two more traditional measures of inequality: the Gini and Theil's indices. For these, we will use the `inequality` package from `pysal`.
 <!-- #endregion -->
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-from pysal.explore import inequality
-```
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ### Gini Index
@@ -330,14 +327,16 @@ inequalities.head()
 Which we can turn into a graphical representation through standard `pandas` plotting. The resulting pattern is similar to that of the 20:20 ratio above:
 
 ```python caption="Gini coefficients for per capita income since 1969"
-inequalities.plot()
+_ = _inequalities.plot()
 ```
 
 ### Theil's index
 
 A third commonly used measure of inequality is Theil's $T$ given as:
+
 $$T = \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\sum_{i=1}^m y_i}\right] \right)$$
-where $y_i$ is per-capita income in area $i$ among $m$ areas. Conceptually, this metric is related to the entropy of the income distribution, measuring how evenly-distributed incomes are across the population.
+
+where $y_i$ is per capita income in area $i$ among $m$ areas. Conceptually, this metric is related to the entropy of the income distribution, measuring how evenly-distributed incomes are across the population.
 
 The Theil index is also available in PySAL's `inequality`, so we can take a similar approach as above to calculate it for every year:
 
@@ -353,7 +352,7 @@ inequalities['theil'] = pci_df[years].apply(theil, axis=0)
 And generate a visual comparison of the evolution of both Gini and Theil's indices:
 
 ```python caption="Gini and Theil indices for county per capita income distributions since 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-inequalities.plot(subplots=True, figsize=(15,6))
+_ = inequalities.plot(subplots=True, figsize=(15,6))
 ```
 
 The time paths of the Gini and the Theil coefficients show striking
@@ -361,7 +360,7 @@ similarities. At first glance, this might suggest that the indices are
 substitutes for one another. However, they are not perfectly correlated: 
 
 ```python caption="Relationhsip between Gini and Theil indices for county per capita income distributions since 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} tags=[]
-seaborn.regplot(x='theil', y='gini', data=inequalities)
+_ = seaborn.regplot(x='theil', y='gini', data=inequalities)
 ```
 
 Indeed, as we shall see below, each index has
@@ -376,14 +375,14 @@ regional income inequality. To see this, we first need to express the
 relationships between the two types of inequality. Consider a country composed
 of $N$ individuals who are distributed over $m$ regions. Let $Y_l$ denote the
 income of individual $l$. Total personal income in region $i$ is given as $Y_i =
-\sum_{l \in i} Y_l$. Per-capita income in region $i$ is $y_i = \frac{Y_i}{N_i}$,
+\sum_{l \in i} Y_l$. per capita income in region $i$ is $y_i = \frac{Y_i}{N_i}$,
 where $N_i$ is the number of individuals in region $i$.
 
 At the national level,  the coefficient of variation in incomes could be used as an index of interpersonal income inequality. This would be:
 
 $$CV_{nat} = \sqrt{\frac{\sum_{l=1}^N (Y_l - \bar{y})^2}{N}}$$
 
-where $\bar{y}$ is the national average for per-capita income. The key component here is the sum
+where $\bar{y}$ is the national average for per capita income. The key component here is the sum
 of squares term, and unpacking this sheds light on personal versus regional
 inequality question:
 
@@ -393,7 +392,7 @@ An individual deviation, $\delta_l = Y_l - \bar{y}$, is the contribution to ineq
 
 $$\delta_l = (Y_l - y_i) +  (y_i - \bar{y})$$
 
-The first term is the difference between the individual's income and per-capita income in the individual's region of residence, while the second term is the difference between the region's per capita income and average national per capita income.
+The first term is the difference between the individual's income and per capita income in the individual's region of residence, while the second term is the difference between the region's per capita income and average national per capita income.
 
 In regional studies, the intra-regional personal income distribution is typically
 not available. As a result, the assumption is often made that intra-regional
@@ -445,10 +444,6 @@ in traditional global measures.
 
 <!-- #endregion -->
 
-```python
-from pysal.explore import esda
-from pysal.lib import weights
-```
 
 This approach helps us shed light on the properties of the spatial pattern of regional income data. We return to global measures of spatial autocorrelation that we encountered earlier in the book. The essence of this approach is to examine to what extent the spatial distribution of incomes is concentrated over space. For this, we use a queen spatial weights matrix and calculate Moran's I for
 each year in the sample:
@@ -516,7 +511,7 @@ region_names = {
 We can visualize the regions with the names on the legend by first mapping the name to each region number, and then rendering a qualitative choropleth:
 
 ```python caption="Map of census regions in the United States."
-pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
+ax = pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
       .plot(
     "Region_Name",
     linewidth=0,
@@ -524,6 +519,8 @@ pci_df.assign(Region_Name=pci_df.Region.map(region_names))\
     categorical=True,
     legend_kwds=dict(bbox_to_anchor=(1.2,.5))
 );
+ax.set_axis_off()
+
 ```
 
 Let's peak into income changes for each region. To do that, we can apply a split-apply-combine pattern that groups counties by region, calculates its mean, and combines it into a table:
@@ -547,11 +544,11 @@ To proceed in this direction, we first re-conceptualize our observations of per 
 [^mut-ex]: This would be violated, for example, if one area were in two regions. This area would get "double counted" in this total. 
 
 $$
-\begin{align}
+\begin{aligned}
 T &= \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\sum_{i=1}^m y_i}\right] \right) \\
   &= \left[ \sum_{g=1}^{\omega} s_{g} \ln \left(\frac{m}{m_g} s_g \right)  \right] + \left[ \sum_{g=1}^{\omega} s_g \sum_{i \in g} s_{i,g} \ln \left(m_g s_{i,g}\right) \right] \\
   &= B + W \\
-\end{align}
+\end{aligned}
 $$
 
 where $s_g = \frac{\sum_{i \in g} y_i}{\sum_i y_i}$, and   $s_{i,g} = y_i / \sum_{i \in g} y_i$. 
@@ -730,7 +727,7 @@ inequalities[['near_diffs', 'I']].plot.line(subplots=True, figsize=(15,6))
 ## Conclusion
 
 
-Inequality is an important social phenomenon, and its geography is an important concern for social scientists. Geographical disparities in well-being have been pointed to as a major driver behind the rise of right-wing populist movements in the US and Europe {cite}`Rodriguez_Pose_2018`. Thus, understanding the nature of these disparities and their evolution is a challenge for both science and policy.
+Inequality is an important social phenomenon, and its geography is a growing concern for social scientists. Geographical disparities in well-being have been pointed to as a major driver behind the rise of right-wing populist movements in the US and Europe {cite}`Rodriguez_Pose_2018`. Thus, understanding the nature of these disparities and their evolution is a challenge for both science and policy.
 
 This chapter discusses methods to assess inequality, as well as examine its spatial and regional structure. We have seen the Gini coefficient and Theil index as examples of global measures to summarize the overall level of inequality. As is often the case in many areas of spatial analysis, the straightforward adoption of methods from economics and sociology to spatial data can  often be fruitful but, at the same time, can miss key elements of the spatial story. In the context of spatial income disparities, we have highlighted the  differences between personal and regional inequality. From this vantage, we have reviewed three approaches to incorporate geography and space in the study of inequality. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as those for spatial autocorrelation discussed in chapters [6](06_spatial_autocorrelation) and [7](07_local_autocorrelation). 
 
