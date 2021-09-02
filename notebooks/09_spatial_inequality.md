@@ -750,7 +750,7 @@ The $p$-values are always small, suggesting that the contribution of the local t
 (spatial_gini_results.p_sim < 0.05).mean()
 ```
 
-While it may appear that the component due to "near differences" is quite small, this has two reasons. First, the number of "nearby" pairs are less than 1% of all pairs of observations:
+While it may appear that the component due to "near differences" is quite small, this has two reasons. First, the number of "nearby" pairs are less than 0.2% of all pairs of observations:
 
 ```python
 wq.pct_nonzero
