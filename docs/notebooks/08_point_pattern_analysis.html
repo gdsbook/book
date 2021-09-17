@@ -497,13 +497,12 @@
 <li><p><em>Is there any structure in the way locations are arranged over space? That is, are events clustered? or are they dispersed?</em></p></li>
 <li><p><em>Why do events occur in those places and not in others?</em></p></li>
 </ul>
-<p>These are the most common questions in the analysis of point patterns.</p>
 <p>At this point, it is useful to remind ourselves of an important distinction, that between process and pattern. The former relates to the underlying mechanism that is at work to generate the outcome we end up observing. Because of its abstract nature, we do not get to see it. However, in many contexts, the key focus of any analysis is to learn about <em>what</em> determines a given phenomenon and <em>how</em> those factors combine to generate it. In this context, “process” is associated with the <em>how</em>. “Pattern,” on the other hand, relates to the result of that process. In some cases, it is the only trace of the process we can observe and thus the only input we have to work with in order to reconstruct it. Although directly observable and, arguably, easier to tackle, pattern is only a reflection of process. The real challenge is not to characterize the former but to use it to work out the latter.</p>
 <p>In this chapter, we provide an introduction to point patters through geo-tagged Flickr photos from Tokyo. We will treat the phenomena represented in the data as events: photos could be taken of any place in Tokyo, but only certain locations are captured. Keep in mind this understanding of Tokyo photos is not immutable: one could conceive cases where it makes sense to take those locations as given and look at the properties of each of them ignoring their “event” aspect. However, in this context, we will focus on those questions that relate to location and the collective shape of locations. The use of these tools will allow us to transform a long list of unintelligible XY coordinates into tangible phenomena with a characteristic spatial structure, and to answer questions about the center, dispersion, and clustering of attractions in Tokyo for Flickr users.</p>
 </div>
 <div class="section" id="the-tokyo-photographs-dataset">
 <h2>The Tokyo photographs dataset<a class="headerlink" href="#the-tokyo-photographs-dataset" title="Permalink to this headline">¶</a></h2>
-<p>The rise of new forms of data such as geo-tagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rhetorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, <span id="id1">[<a class="reference internal" href="references.html#id35"><span>Goo07</span></a>]</span>). In this chapter we will explore metadata from a sample of geo-referenced images uploaded to <a class="reference external" href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a class="reference external" href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern.</p>
+<p>The rise of new forms of data such as geo-tagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why do certain places attract many more photographers than others? All these questions and more become more than just rhetorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, <span id="id1">[<a class="reference internal" href="references.html#id42"><span>Goo07</span></a>]</span>). In this chapter we will explore metadata from a sample of geo-referenced images uploaded to <a class="reference external" href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a class="reference external" href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern.</p>
 <p>To get started, let’s load the Flickr data first:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -553,10 +552,10 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_11_0.png" src="../_images/08_point_pattern_analysis_11_0.png" />
+<img alt="../_images/08_point_pattern_analysis_12_0.png" src="../_images/08_point_pattern_analysis_12_0.png" />
 </div>
 </div>
-<p>This is a good start: we can see dots tend to be concentrated in the center of the covered area in a very (apparently) not random. Furthermore, within the broad pattern, we can also see there seems to be more localized clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb.</p>
+<p>This is a good start: we can see dots tend to be concentrated in the center of the covered area in a non-random pattern. Furthermore, within the broad pattern, we can also see there seems to be more localized clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb.</p>
 <p>Start with the context. The easiest way to provide additional context is by overlaying a tile map from the internet. Let us quickly call <code class="docutils literal notranslate"><span class="pre">contextily</span></code> for that, and integrate it with <code class="docutils literal notranslate"><span class="pre">jointplot</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -573,7 +572,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_13_0.png" src="../_images/08_point_pattern_analysis_13_0.png" />
+<img alt="../_images/08_point_pattern_analysis_14_0.png" src="../_images/08_point_pattern_analysis_14_0.png" />
 </div>
 </div>
 <p>Note how we can pull out the axis where the points are plotted and add the basemap there, specifying the CRS as WGS84, since we are plotting longitude and latitude. Compared to the previous plot, adding a basemap to our initial plot makes the pattern of Flickr data clearer.</p>
@@ -610,14 +609,14 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_16_0.png" src="../_images/08_point_pattern_analysis_16_0.png" />
+<img alt="../_images/08_point_pattern_analysis_17_0.png" src="../_images/08_point_pattern_analysis_17_0.png" />
 </div>
 </div>
 <p>Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localized areas and that the previous map was obscuring this.</p>
 </div>
 <div class="section" id="kernel-density-estimation-kde">
 <h3>Kernel Density Estimation (KDE)<a class="headerlink" href="#kernel-density-estimation-kde" title="Permalink to this headline">¶</a></h3>
-<p>Grids are the spatial equivalent of a histogram: the user decides how many “buckets”, and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. <span id="id2">[<a class="reference internal" href="references.html#id52"><span>Sil86</span></a>]</span>), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel in Python is rather straightforward:</p>
+<p>Grids are the spatial equivalent of a histogram: the user decides how many “buckets”, and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g., the modifiable areal unit problem <span id="id2">[<a class="reference internal" href="references.html#id2"><span>Won04</span></a>]</span>). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. <span id="id3">[<a class="reference internal" href="references.html#id59"><span>Sil86</span></a>]</span>), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel in Python is rather straightforward:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
@@ -644,10 +643,10 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_18_0.png" src="../_images/08_point_pattern_analysis_18_0.png" />
+<img alt="../_images/08_point_pattern_analysis_19_0.png" src="../_images/08_point_pattern_analysis_19_0.png" />
 </div>
 </div>
-<p>The result is a smoother output that captures the same structure of the hexbin but “eases” the transitions between different areas. This provides a better generalization of the theoretical probability that a picture <em>might</em> occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares.</p>
+<p>The result is a smoother output that captures the same structure of the hexbin but “eases” the transitions between different areas. This provides a better generalization of the theoretical probability distribution over space.  Technically, the continuous nature of the KDE function implies that for any given point the probability of an event is 0. However, as the area around a point increases, the probability of an event within that area can be obtained.  This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares.</p>
 </div>
 </div>
 <div class="section" id="centrography">
@@ -705,7 +704,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_25_0.png" src="../_images/08_point_pattern_analysis_25_0.png" />
+<img alt="../_images/08_point_pattern_analysis_26_0.png" src="../_images/08_point_pattern_analysis_26_0.png" />
 </div>
 </div>
 <p>The discrepancy between the two centers is caused by the skew; there are many “clusters” of pictures far out in West and South Tokyo, whereas North and East Tokyo is densely packed, but drops off very quickly. Thus, the far out clusters of pictures pulls the mean center to the west and south, relative to the median center.</p>
@@ -726,7 +725,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <p>This means that, on average, pictures are taken around 8800 meters away from the mean center.</p>
-<p>Another helpful visualization is the <em>standard deviational ellipse</em>, or <em>standard ellipse</em>. This is an ellipse drawn from the data that reflects both its center and dispersion. To visualize this, we first compute the axes and rotation using the <code class="docutils literal notranslate"><span class="pre">ellipse</span></code> function in <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>:</p>
+<p>Another helpful visualization is the <em>standard deviational ellipse</em>, or <em>standard ellipse</em>. This is an ellipse drawn from the data that reflects its center, dispersion, and orientation. To visualize this, we first compute the axes and rotation using the <code class="docutils literal notranslate"><span class="pre">ellipse</span></code> function in <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="n">rotation</span> <span class="o">=</span> <span class="n">centrography</span><span class="o">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">db</span><span class="p">[[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span><span class="s1">&#39;y&#39;</span><span class="p">]])</span>
@@ -767,7 +766,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_31_0.png" src="../_images/08_point_pattern_analysis_31_0.png" />
+<img alt="../_images/08_point_pattern_analysis_32_0.png" src="../_images/08_point_pattern_analysis_32_0.png" />
 </div>
 </div>
 </div>
@@ -864,7 +863,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_39_0.png" src="../_images/08_point_pattern_analysis_39_0.png" />
+<img alt="../_images/08_point_pattern_analysis_40_0.png" src="../_images/08_point_pattern_analysis_40_0.png" />
 </div>
 </div>
 <p>We will cover three more bounding shapes, all of them rectangles or circles. First, two kinds of <strong>minimum bounding rectangles</strong>. They both are constructed as the tightest <em>rectangle</em> that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the <strong>minimum rotated rectangle</strong> provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated.</p>
@@ -984,7 +983,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_49_0.png" src="../_images/08_point_pattern_analysis_49_0.png" />
+<img alt="../_images/08_point_pattern_analysis_50_0.png" src="../_images/08_point_pattern_analysis_50_0.png" />
 </div>
 </div>
 <p>Each gives a different impression of the area enclosing the user’s range of photographs. In this, you can see that the the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle &amp; circle are the “loosest” shapes, in that they contain the most area outside of the user’s typical area. But, they’re also the simplest shapes to draw and understand.</p>
@@ -1025,7 +1024,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_55_0.png" src="../_images/08_point_pattern_analysis_55_0.png" />
+<img alt="../_images/08_point_pattern_analysis_56_0.png" src="../_images/08_point_pattern_analysis_56_0.png" />
 </div>
 </div>
 <p>As you can see, the simulation (by default) works with the bounding box of the input point pattern. To simulate from more restricted areas formed by the point pattern, pass those hulls to the simulator! For example, to generate a random pattern within the alpha shapes:</p>
@@ -1051,7 +1050,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_58_0.png" src="../_images/08_point_pattern_analysis_58_0.png" />
+<img alt="../_images/08_point_pattern_analysis_59_0.png" src="../_images/08_point_pattern_analysis_59_0.png" />
 </div>
 </div>
 <div class="section" id="quadrat-statistics">
@@ -1066,7 +1065,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_60_0.png" src="../_images/08_point_pattern_analysis_60_0.png" />
+<img alt="../_images/08_point_pattern_analysis_61_0.png" src="../_images/08_point_pattern_analysis_61_0.png" />
 </div>
 </div>
 <p>In this case, for the default of a three by three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer Flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small p-value:</p>
@@ -1091,7 +1090,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_64_0.png" src="../_images/08_point_pattern_analysis_64_0.png" />
+<img alt="../_images/08_point_pattern_analysis_65_0.png" src="../_images/08_point_pattern_analysis_65_0.png" />
 </div>
 </div>
 <p>This means its p-value will be large, and likely not significant:</p>
@@ -1116,7 +1115,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_68_0.png" src="../_images/08_point_pattern_analysis_68_0.png" />
+<img alt="../_images/08_point_pattern_analysis_69_0.png" src="../_images/08_point_pattern_analysis_69_0.png" />
 </div>
 </div>
 <p>The quadrat test finds this to be <em>statistically nonrandom</em>, while our simulating process ensured that <em>within the given study area</em>, the pattern is a complete spatially-random process.</p>
@@ -1136,7 +1135,7 @@ memory usage: 547.0+ KB
 </div>
 <div class="section" id="ripley-s-alphabet-of-functions">
 <h3>Ripley’s alphabet of functions<a class="headerlink" href="#ripley-s-alphabet-of-functions" title="Permalink to this headline">¶</a></h3>
-<p>The second group of spatial statistics we consider focuses on the distributions of two quantities in a point pattern: nearest neighbor distances and what we will term “gaps” in the pattern. They derive from seminal work by <span id="id3">[<a class="reference internal" href="references.html#id49"><span>Rip91</span></a>]</span> on how to characterize clustering or co-location in point patterns. Each of these characterize an aspect of the point pattern as we increase the distance range from each point to calculate them.</p>
+<p>The second group of spatial statistics we consider focuses on the distributions of two quantities in a point pattern: nearest neighbor distances and what we will term “gaps” in the pattern. They derive from seminal work by <span id="id4">[<a class="reference internal" href="references.html#id56"><span>Rip91</span></a>]</span> on how to characterize clustering or co-location in point patterns. Each of these characterize an aspect of the point pattern as we increase the distance range from each point to calculate them.</p>
 <p>The first function, Ripley’s <span class="math notranslate nohighlight">\(G\)</span>, focuses on the distribution of nearest neighbor distances. That is, the <span class="math notranslate nohighlight">\(G\)</span> function summarizes the distances between each point in the pattern and their nearest neighbor. In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are <em>mutual</em> nearest neighbors (and so have arrows going in both directions) but some are not.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
@@ -1173,7 +1172,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_73_0.png" src="../_images/08_point_pattern_analysis_73_0.png" />
+<img alt="../_images/08_point_pattern_analysis_74_0.png" src="../_images/08_point_pattern_analysis_74_0.png" />
 </div>
 </div>
 <p>Ripley’s <span class="math notranslate nohighlight">\(G\)</span> keeps track of the proportion of points for which the nearest neighbor is within a given distance threshold, and plots that cumulative percentage against the increasing distance radii. The distribution of these cumulative percentage has a distinctive shape under completely spatially random processes. The intuition behind Ripley’s G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the cumulative distribution of nearest neighbor distances over increasing distance thresholds, and comparing it to that of a set of simulated patterns that follow a known spatially-random process. Usually, a spatial Poisson point process is used as such reference distribution.</p>
@@ -1226,7 +1225,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_77_0.png" src="../_images/08_point_pattern_analysis_77_0.png" />
+<img alt="../_images/08_point_pattern_analysis_78_0.png" src="../_images/08_point_pattern_analysis_78_0.png" />
 </div>
 </div>
 <p>The second function we introduce is Ripley’s <span class="math notranslate nohighlight">\(F\)</span>. Where the <span class="math notranslate nohighlight">\(G\)</span> function works by analyzing the distance <em>between</em> points in the pattern, the <em>F</em> function works by analyzing the distance <em>to</em> points in the pattern from locations in empty space. That is why the <span class="math notranslate nohighlight">\(F\)</span> function is called the “the empty space function”, since it characterizes the typical distance from arbitrary points in empty space to the point pattern. More explicitly, the <span class="math notranslate nohighlight">\(F\)</span> accumulates, for a growing distance range, the percentage of points that can be found within that range from a random point pattern generated within the extent of the observed pattern. If the pattern has large gaps or empty areas, the <span class="math notranslate nohighlight">\(F\)</span> function will increase slowly. But, if the pattern is highly dispersed, then the <span class="math notranslate nohighlight">\(F\)</span> function will increase rapidly. The shape of this cumulative distribution is then compared to those constructed by calculating the same cumulative distribution between the random pattern and an additional, random one generated in each simulation step.</p>
@@ -1278,16 +1277,16 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_80_0.png" src="../_images/08_point_pattern_analysis_80_0.png" />
+<img alt="../_images/08_point_pattern_analysis_81_0.png" src="../_images/08_point_pattern_analysis_81_0.png" />
 </div>
 </div>
-<p>Ripley’s “alphabet” extends to several other letter-named functions that can be used for conducting point pattern analysis in this vein. Good “next steps” in your point pattern analysis journey include the book by <span id="id4">[<a class="reference internal" href="references.html#id18"><span>BRT15</span></a>]</span>; and the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> documentation for guidance on how to run these in Python.</p>
+<p>Ripley’s “alphabet” extends to several other letter-named functions that can be used for conducting point pattern analysis in this vein. Good “next steps” in your point pattern analysis journey include the book by <span id="id5">[<a class="reference internal" href="references.html#id25"><span>BRT15</span></a>]</span>; and the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> documentation for guidance on how to run these in Python.</p>
 </div>
 </div>
 <div class="section" id="identifying-clusters">
 <h2>Identifying clusters<a class="headerlink" href="#identifying-clusters" title="Permalink to this headline">¶</a></h2>
 <p>The previous two sections on exploratory spatial analysis of point patterns provide methods to characterize whether point patterns are dispersed or clustered in space. Another way to see the content in those sections is they help us explore the degree of overall <em>clustering</em>. However, knowing that a point pattern is clustered does not necessarily give us information about where that (set of) cluster(s) resides. To do this, we need to switch to a method able to identify areas of high density of points within our pattern. In other words, in this section we focus on the existence and location of <em>clusters</em>. This distinction between cluster<em>ing</em> and cluster<em>s</em> of points is analogue to that discussed in the context of spatial autocorrelation (Chapters <a class="reference internal" href="06_spatial_autocorrelation.html"><span class="doc std std-doc">6</span></a> and <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">7</span></a>. The notion is the same, the differences in the techniques we examine in each part of the book relate to the unique nature of points we referred to in the beginning of the book. Remember that, while the methods we explored in the earlier chapters take the location of the spatial objects (points, lines, polygons) as given and focus on understanding the configurations of values within those locations; the methods discussed in this chapter understand points as events that happen in particular locations but that could happen in a much broader set of places. Factoring in this underlying relevance of the location of an object itself is what makes the techniques in this chapter distinct.</p>
-<p>From the many spatial point clustering algorithms, we will cover one called DBSCAN (Density-Based Spatial Clustering of Applications, <span id="id5">[<a class="reference internal" href="references.html#id13"><span>EKS+96</span></a>]</span>. DBSCAN is a widely used algorithm that originated in the area of knowledge discovery and machine learning and that has since spread into many areas, including the analysis of spatial points. In part, its popularity resides in its intellectual simplicity and computational tractability. In some ways, we can think of DBSCAN as a point pattern counterpart of the local statistics we explored in <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">Chapter 7</span></a>. They do however differ in fundamental ways. Unlike the local statistics we have seen earlier, DBSCAN is not based on an inferential framework, but it is instead a deterministic algorithm. This implies that, unlike the measures seen before, we will not be able to estimate a measure of the degree to which the clusters found are compatible with cases of spatial randomness.</p>
+<p>From the many spatial point clustering algorithms, we will cover one called DBSCAN (Density-Based Spatial Clustering of Applications, <span id="id6">[<a class="reference internal" href="references.html#id20"><span>EKS+96</span></a>]</span>. DBSCAN is a widely used algorithm that originated in the area of knowledge discovery and machine learning and that has since spread into many areas, including the analysis of spatial points. In part, its popularity resides in its intellectual simplicity and computational tractability. In some ways, we can think of DBSCAN as a point pattern counterpart of the local statistics we explored in <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">Chapter 7</span></a>. They do however differ in fundamental ways. Unlike the local statistics we have seen earlier, DBSCAN is not based on an inferential framework, but it is instead a deterministic algorithm. This implies that, unlike the measures seen before, we will not be able to estimate a measure of the degree to which the clusters found are compatible with cases of spatial randomness.</p>
 <p>From the point of view of DBSCAN, a cluster is a concentration of at least <code class="docutils literal notranslate"><span class="pre">m</span></code> points, each of them within a distance of <code class="docutils literal notranslate"><span class="pre">r</span></code> of at least another point in the cluster. Following this definition, the algorithm classifies each point in our pattern into three categories:</p>
 <ul class="simple">
 <li><p><em>Noise</em>, for those points outside a cluster.</p></li>
@@ -1324,7 +1323,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 </div>
-<p>The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as it is the 23rd, 31st, 36th, and 43rd. This attribute has a variable length, depending on how many cores the algorithm finds.</p>
+<p>The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as are the 23rd, 31st, 36th, and 43rd points. This attribute has a variable length, depending on how many cores the algorithm finds.</p>
 <p>The second attribute of interest is <code class="docutils literal notranslate"><span class="pre">labels_</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1375,7 +1374,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_91_0.png" src="../_images/08_point_pattern_analysis_91_0.png" />
+<img alt="../_images/08_point_pattern_analysis_92_0.png" src="../_images/08_point_pattern_analysis_92_0.png" />
 </div>
 </div>
 <p>Although informative, the result of this run is not particularly satisfactory. There are <em>way</em> too many points that are classified as “noise”.</p>
@@ -1432,7 +1431,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_95_0.png" src="../_images/08_point_pattern_analysis_95_0.png" />
+<img alt="../_images/08_point_pattern_analysis_96_0.png" src="../_images/08_point_pattern_analysis_96_0.png" />
 </div>
 </div>
 </div>
@@ -1448,7 +1447,7 @@ memory usage: 547.0+ KB
 <li><p>Given a hypothetical point pattern, what characteristics would it need to meet for the mean and median centers to coincide?</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">libpysal.cg.alpha_shape</span></code>, plot what happens to the alpha hull for <span class="math notranslate nohighlight">\(\alpha = 0,.2,.4,.6,.8,1,1.5,2,4\)</span>. What happens as <code class="docutils literal notranslate"><span class="pre">alpha</span></code> increases?</p></li>
 <li><p>The choice of extent definition you adopt may influence your final results significantly. To further internalize this realization, compute the density of photographs in the example we have seen using each of the extent definitions covered (minimum bounding/rotate circle/rectangle, convex hull and alpha shape). Remember the density can be obtained by dividing the number of photographs by the area of the extent.</p></li>
-<li><p>Given the discussions in question 1 and 2, how do you think the density of quadrants affect quadrat statistics?</p></li>
+<li><p>Given the discussions in question 1 and 2, how do you think the density of quadrats affect quadrat statistics?</p></li>
 <li><p>Can you use information from Ripley’s functions to inform the choice of DBSCAN parameters? How? Use the example with Tokyo photographs covered above to illustrate your ideas.</p></li>
 </ol>
 </div>

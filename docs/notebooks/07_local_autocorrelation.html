@@ -424,7 +424,7 @@ high, low) are located.
 In other words, Moran’s I can tell us whether values in our map <em>cluster</em> together (or disperse) overall, but it will not inform us about where specific <em>clusters</em> (or outliers) are.</p>
 <p>For that purpose, we need to use a local measure of spatial autocorrelation.
 Local measures of spatial autocorrelation focus on the relationships between each observation and its surroundings, rather than providing a single-number summary of these relationships across the map. Because of that, they do not summarize the map overall, but they allow to obtain further insights about interesting geographical subsets of the data. In this chapter, we consider
-Local Indicators of Spatial Association (LISAs) <span id="id1">[<a class="reference internal" href="references.html#id60"><span>Ans95</span></a>]</span>, a local counter-part of global measures like Moran’s I.</p>
+Local Indicators of Spatial Association (LISAs) <span id="id1">[<a class="reference internal" href="references.html#id67"><span>Ans95</span></a>]</span>, a local counter-part of global measures like Moran’s I.</p>
 <div class="section" id="an-empirical-illustration-the-eu-referendum">
 <h2>An empirical illustration: the EU Referendum<a class="headerlink" href="#an-empirical-illustration-the-eu-referendum" title="Permalink to this headline">¶</a></h2>
 <p>We continue with the same dataset about Brexit voting that we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:</p>
@@ -538,7 +538,7 @@ Datum: World Geodetic System 1984
 <img alt="../_images/07_local_autocorrelation_13_0.png" src="../_images/07_local_autocorrelation_13_0.png" />
 </div>
 </div>
-<p>The final piece we need before we can delve into spatial autocorrelation is the spatial weights matrix that records which observations are “near” one another. We will use eight nearest neighbors for the sake of comparison with the previous chapter. And, we will also row-standardize the weights, so that <em>spatial lags</em> reflect the average of the eight nearest neighbors.</p>
+<p>As in the previous chapter, we require a spatial weights matrix to implement our statistic. Here, we will use eight nearest neighbors for the sake of the example, but the discussion in the earlier chapter on weights applies in this context, and other criteria would be valid too. We also row-standardize them:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate W from the GeoDataFrame</span>
@@ -629,7 +629,7 @@ Datum: World Geodetic System 1984
 I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_i z_i^2}{n}
 \]</div>
 <p>where <span class="math notranslate nohighlight">\(m_2\)</span> is the second moment (variance) of the distribution of values in the data, <span class="math notranslate nohighlight">\(z_i = y_i - \bar{y}\)</span>, <span class="math notranslate nohighlight">\(w_{i,j}\)</span> is the spatial weight for the pair of observations <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, and <span class="math notranslate nohighlight">\(n\)</span> is the number of observations.</p>
-<p>LISAs are widely used in many fields to identify geographical clusters of values or find geographcial outliers. They are a very useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For that, they have a prime place in the geographic data science toolbox. Among many other applications, LISAs have been used to identify geographical clusters of poverty <span id="id2">[<a class="reference internal" href="references.html#id61"><span>DSSC18</span></a>]</span>, map ethnic enclaves <span id="id3">[<a class="reference internal" href="references.html#id62"><span>JPF10</span></a>]</span>, delineate areas of particularly high/low economic activity <span id="id4">[<a class="reference internal" href="references.html#id63"><span>TPPGTZ14</span></a>]</span>, or identify clusters of contagious disease <span id="id5">[<a class="reference internal" href="references.html#id64"><span>ZRW+20</span></a>]</span>. The Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistic is only one of a wide variety of LISAs that can be used on many different types of spatial data.</p>
+<p>LISAs are widely used in many fields to identify geographical clusters of values or find geographcial outliers. They are a very useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For that, they have a prime place in the geographic data science toolbox. Among many other applications, LISAs have been used to identify geographical clusters of poverty <span id="id2">[<a class="reference internal" href="references.html#id68"><span>DSSC18</span></a>]</span>, map ethnic enclaves <span id="id3">[<a class="reference internal" href="references.html#id69"><span>JPF10</span></a>]</span>, delineate areas of particularly high/low economic activity <span id="id4">[<a class="reference internal" href="references.html#id70"><span>TPPGTZ14</span></a>]</span>, or identify clusters of contagious disease <span id="id5">[<a class="reference internal" href="references.html#id71"><span>ZRW+20</span></a>]</span>. The Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistic is only one of a wide variety of LISAs that can be used on many different types of spatial data.</p>
 <p>In Python, we can calculate LISAs in a very streamlined way thanks to <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>. To compute local Moran statistics, we use the <code class="docutils literal notranslate"><span class="pre">Moran_Local</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -955,7 +955,7 @@ dtype: int64
 </div>
 </div>
 <p>This shows that the local statistics are mainly <em>not</em> statistically significant, but that among <em>significant</em> statistics, we see many more hotspots/coldspots than doughnuts/diamonds-in-the-rough. This is consistent with the skew we saw in the distribution of local statistics earlier.</p>
-<p>Thus, with these labels, we can make the final cluster map in the lower right, which displays the output of the LISA statistics for the percentage of Leave votes in English, Welsh and Scottish local authorities. In bright red, we find those with an unusual concentration of high Leave proportions surrounded also by high Leave results. This corresponds with areas in the East and center of the map. In light red, we find the first type of spatial outliers: areas that still voted to Leave in high proportions, despite being surrounded by areas with more modest support for Leave. These correspond with some of the peripheral areas of London and and adjacent to Oxford. In darker blue we can see the spatial clusters of low support for the Leave campaign, which include London, Oxford and most of Scotland. Finally, in light blue we find the other type of spatial outlier: areas with lower percentages of Leave votes nearby areas of high concentration of supporters for Leave.</p>
+<p>Thus, with these labels, we can make the final cluster map in the lower right, which displays the output of the LISA statistics for the percentage of Leave votes in English, Welsh and Scottish local authorities. In bright red, we find those with an unusual concentration of high Leave proportions surrounded also by high Leave results. This corresponds with areas in the East and center of the map. In light red, we find the first type of spatial outliers: areas that still voted to Leave in high proportions, despite being surrounded by areas with more modest support for Leave. These correspond with some of the peripheral areas of London and and adjacent to Oxford. In darker blue we can see the spatial clusters of low support for the Leave campaign, which include London, Oxford, and most of Scotland. Finally, in light blue we find the other type of spatial outlier: areas with lower percentages of Leave votes nearby areas of high concentration of supporters for Leave.</p>
 </div>
 <div class="section" id="other-local-indices">
 <h2>Other local indices<a class="headerlink" href="#other-local-indices" title="Permalink to this headline">¶</a></h2>
@@ -1049,32 +1049,28 @@ dtype: int64
 </div>
 <div class="section" id="questions">
 <h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
-<ol>
+<ol class="simple">
 <li><p>Do the same Local Moran analysis done for <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, but using <code class="docutils literal notranslate"><span class="pre">Pct_Turnout</span></code>. Is there a geography to how involved people were in different places? Where was turnout percentage (relatively) higher or lower?</p></li>
 <li><p>Do the same Getis-Ord analysis done for <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, but using <code class="docutils literal notranslate"><span class="pre">Pct_Turnout</span></code>.</p></li>
 <li><p>Local Moran statistics are premised on a few distributional assumptions. One well-recognized concern with Moran statistics is when they are estimated for <em>rates</em>. Rate data is distinct from other kinds of data because it embeds the relationship between two quantities: the event and the population. For instance, in the case of Leave voting, the “event” is a person voting leave, and the “population” could be the number of eligible voters, the number of votes cast, or the total number of people. This usually only poses a problem for analysis when the event outcome is somehow dependent on the population.</p>
-<ol class="simple">
-<li><p>Using our past analytical steps, build a new <code class="docutils literal notranslate"><span class="pre">db</span></code> dataframe from <code class="docutils literal notranslate"><span class="pre">ref</span></code> and <code class="docutils literal notranslate"><span class="pre">lads</span></code> that contains the <code class="docutils literal notranslate"><span class="pre">Electorate</span></code>, <code class="docutils literal notranslate"><span class="pre">Votes_Cast</span></code>, and <code class="docutils literal notranslate"><span class="pre">Leave</span></code> columns.</p></li>
-</ol>
 <ul class="simple">
+<li><p>Using our past analytical steps, build a new <code class="docutils literal notranslate"><span class="pre">db</span></code> dataframe from <code class="docutils literal notranslate"><span class="pre">ref</span></code> and <code class="docutils literal notranslate"><span class="pre">lads</span></code> that contains the <code class="docutils literal notranslate"><span class="pre">Electorate</span></code>, <code class="docutils literal notranslate"><span class="pre">Votes_Cast</span></code>, and <code class="docutils literal notranslate"><span class="pre">Leave</span></code> columns.</p></li>
 <li><p>From this new dataframe, make scatterplots of:</p>
 <ul>
 <li><p>the number of votes cast and the percent leave vote</p></li>
 <li><p>the size of the electorate and the percent of leave vote</p></li>
 </ul>
 </li>
-</ul>
-<ol class="simple">
 <li><p>Based on your answers to the previous point, does it appear that there is a relationship between the event and the population size? Use <code class="docutils literal notranslate"><span class="pre">scipy.stats.kendalltau</span></code> or <code class="docutils literal notranslate"><span class="pre">scipy.stats.pearsonr</span></code>  to confirm your visual intuition.</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">esda.moran.Moran_Rate</span></code>, estimate a global Moran’s I that takes into account the rate structure of <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, using the <code class="docutils literal notranslate"><span class="pre">Electorate</span></code> as the population. Is this estimate different from the one obtained without taking into account the rate structure? What about when <code class="docutils literal notranslate"><span class="pre">Votes_Cast</span></code> is used for the population?</p></li>
 <li><p>Using <code class="docutils literal notranslate"><span class="pre">esda.moran.Moran_Local_Rate</span></code>, estimate <em>local</em> Moran’s I treating Leave data as a rate.</p>
-<ul class="simple">
+<ul>
 <li><p>does any site’s local I change? Make a scatterplot of the <code class="docutils literal notranslate"><span class="pre">lisa.Is</span></code> you estimated before and this new rate-based local Moran.</p></li>
 <li><p>does any site’s local I change their outlier/statistical significance classifications? Use <code class="docutils literal notranslate"><span class="pre">pandas.crosstab</span></code> to examine how many classifications change between the two kinds of statistic. Make sure to consider observations’ statistical significances in addition to their quadrant classification.</p></li>
 </ul>
 </li>
 <li><p>Make two maps, side by side, of the local statistics without rate correction and with rate correction. Does your interpretation of the maps change depending on the correction?</p></li>
-</ol>
+</ul>
 </li>
 <li><p>Local statistics use <em>permutation-based</em> inference for their significance testing. This means that, to test the statistical significance of a local relationship, values of the observed variable are <em>shuffled</em> around the map. These large numbers of <em>random</em> maps are then used to compare against the observed map. Local inference requires some restrictions on how each shuffle occurs, since each observation must be “fixed” and compared to randomly-shuffle neighboring observations. The distribution of local statistics for each “shuffle” is contained in the <code class="docutils literal notranslate"><span class="pre">.rlisas</span></code> attribute of a Local Moran object.</p>
 <ul class="simple">
