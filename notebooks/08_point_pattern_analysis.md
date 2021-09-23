@@ -47,7 +47,6 @@ Point pattern analysis is thus concerned with the visualization, description, st
 - *Is there any structure in the way locations are arranged over space? That is, are events clustered? or are they dispersed?*
 - *Why do events occur in those places and not in others?* 
 
-These are the most common questions in the analysis of point patterns. 
 
 At this point, it is useful to remind ourselves of an important distinction, that between process and pattern. The former relates to the underlying mechanism that is at work to generate the outcome we end up observing. Because of its abstract nature, we do not get to see it. However, in many contexts, the key focus of any analysis is to learn about *what* determines a given phenomenon and *how* those factors combine to generate it. In this context, "process" is associated with the *how*. "Pattern," on the other hand, relates to the result of that process. In some cases, it is the only trace of the process we can observe and thus the only input we have to work with in order to reconstruct it. Although directly observable and, arguably, easier to tackle, pattern is only a reflection of process. The real challenge is not to characterize the former but to use it to work out the latter.
 
@@ -58,7 +57,7 @@ In this chapter, we provide an introduction to point patters through geo-tagged 
 
 ## The Tokyo photographs dataset
 
-The rise of new forms of data such as geo-tagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why certain places attract many more photographers than others? All these questions and more become more than just rhetorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, {cite}`Goodchild2007citizens`). In this chapter we will explore metadata from a sample of geo-referenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. 
+The rise of new forms of data such as geo-tagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why do certain places attract many more photographers than others? All these questions and more become more than just rhetorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, {cite}`Goodchild2007citizens`). In this chapter we will explore metadata from a sample of geo-referenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. 
 
 To get started, let's load the Flickr data first:
 
@@ -90,7 +89,7 @@ seaborn.jointplot(x='longitude', y='latitude', data=db, s=0.5);
 ```
 
 
-This is a good start: we can see dots tend to be concentrated in the center of the covered area in a very (apparently) not random. Furthermore, within the broad pattern, we can also see there seems to be more localized clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb. 
+This is a good start: we can see dots tend to be concentrated in the center of the covered area in a non-random pattern. Furthermore, within the broad pattern, we can also see there seems to be more localized clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb. 
 
 Start with the context. The easiest way to provide additional context is by overlaying a tile map from the internet. Let us quickly call `contextily` for that, and integrate it with `jointplot`:
 
@@ -147,7 +146,7 @@ Voila, this allows a lot more detail! It is now clear that the majority of photo
 
 ### Kernel Density Estimation (KDE)
 
-Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g. MAUP). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel in Python is rather straightforward:
+Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g., the modifiable areal unit problem {cite}`wong2004`). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel in Python is rather straightforward:
 
 
 ```python caption="Tokyo points Kernel Density." tags=[]
@@ -174,7 +173,7 @@ ax.set_axis_off()
 ```
 
 
-The result is a smoother output that captures the same structure of the hexbin but "eases" the transitions between different areas. This provides a better generalization of the theoretical probability that a picture *might* occur at any given point. This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares. 
+The result is a smoother output that captures the same structure of the hexbin but "eases" the transitions between different areas. This provides a better generalization of the theoretical probability distribution over space.  Technically, the continuous nature of the KDE function implies that for any given point the probability of an event is 0. However, as the area around a point increases, the probability of an event within that area can be obtained.  This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares. 
 
 
 ## Centrography
@@ -246,7 +245,7 @@ centrography.std_distance(db[['x','y']])
 ```
 This means that, on average, pictures are taken around 8800 meters away from the mean center. 
 
-Another helpful visualization is the *standard deviational ellipse*, or *standard ellipse*. This is an ellipse drawn from the data that reflects both its center and dispersion. To visualize this, we first compute the axes and rotation using the `ellipse` function in `pointpats`:
+Another helpful visualization is the *standard deviational ellipse*, or *standard ellipse*. This is an ellipse drawn from the data that reflects its center, dispersion, and orientation. To visualize this, we first compute the axes and rotation using the `ellipse` function in `pointpats`:
 
 
 ```python
@@ -317,7 +316,7 @@ alpha_shape, alpha, circs = libpysal.cg.alpha_shape_auto(coordinates, return_cir
 To illustrate, the figure below has the tightest single alpha shape shown in green and the original source points shown in black. The "bounding" circles shown in the figure all have a radius of $8652$ meters. The circles are plotted where our "bounding" disk touches two or three of the points in the point cloud. You can see that the circles "cut into" the convex hull, shown in blue dashed lines, up until they touch two (or three) points. Any tighter, and the circle would disconnect one of the points on the boundary of the alpha shape. 
 
 
-```python caption="Tokyo points Tightest Alpha Shape, Bounding Circles, Convex Hull." tags=[]
+```python caption="Tokyo points Tightest Alpha Shape, Minimum Bounding Circles, Convex Hull." tags=[]
 from descartes import PolygonPatch #to plot the alpha shape easily
 f,ax = plt.subplots(1,1, figsize=(9,9))
 
@@ -468,7 +467,7 @@ circ_patch = Circle(
 Finally, we'll plot the patches together with the photograph locations below:
 
 
-```python caption="Tokyo points Tightest Alpha Shape, Bounding Circles, Convex Hull, Bounding Rectangle.." tags=[]
+```python caption="Tokyo points Tightest Alpha Shape, Minimum Bounding Circle, Convex Hull, Bounding Rectangle.." tags=[]
 f,ax = plt.subplots(1, figsize=(10,10))
 
 ax.add_patch(alpha_shape_patch)
@@ -773,7 +772,7 @@ Following the standard interface in scikit-learn, we first define the algorithm 
 # Print the first 5 elements of `cs`
 clusterer.core_sample_indices_[:5]
 ```
-The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as it is the 23rd, 31st, 36th, and 43rd. This attribute has a variable length, depending on how many cores the algorithm finds.
+The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as are the 23rd, 31st, 36th, and 43rd points. This attribute has a variable length, depending on how many cores the algorithm finds.
 
 The second attribute of interest is `labels_`:
 
@@ -878,5 +877,5 @@ Overall, this chapter has provided an overview of methods to analyze point patte
 3. Given a hypothetical point pattern, what characteristics would it need to meet for the mean and median centers to coincide? 
 4. Using `libpysal.cg.alpha_shape`, plot what happens to the alpha hull for $\alpha = 0,.2,.4,.6,.8,1,1.5,2,4$. What happens as `alpha` increases?
 5. The choice of extent definition you adopt may influence your final results significantly. To further internalize this realization, compute the density of photographs in the example we have seen using each of the extent definitions covered (minimum bounding/rotate circle/rectangle, convex hull and alpha shape). Remember the density can be obtained by dividing the number of photographs by the area of the extent.
-6. Given the discussions in question 1 and 2, how do you think the density of quadrants affect quadrat statistics?
+6. Given the discussions in question 1 and 2, how do you think the density of quadrats affect quadrat statistics?
 7. Can you use information from Ripley's functions to inform the choice of DBSCAN parameters? How? Use the example with Tokyo photographs covered above to illustrate your ideas.

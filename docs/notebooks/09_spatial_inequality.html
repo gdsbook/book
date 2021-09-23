@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e8f53015daec13862f6db5e763c41738.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
@@ -43,15 +43,15 @@
     <script src="../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
-    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
         const thebe_selector_input = "pre"
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="canonical" href="https://geographicdata.science/book/notebooks/09_spatial_inequality.html" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -85,7 +85,7 @@
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
         <ul class="nav bd-sidenav">
  <li class="toctree-l1">
@@ -369,7 +369,7 @@
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
             </div>
-            <nav id="bd-toc-nav">
+            <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#introduction">
@@ -394,11 +394,6 @@
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#gini-index">
      Gini Index
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#theil-s-index">
-     Theil’s index
     </a>
    </li>
   </ul>
@@ -453,36 +448,17 @@
                 
   <div class="section" id="spatial-inequality">
 <h1>Spatial Inequality<a class="headerlink" href="#spatial-inequality" title="Permalink to this headline">¶</a></h1>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span>
-<span class="kn">import</span> <span class="nn">pandas</span>
-<span class="kn">import</span> <span class="nn">geopandas</span>
-<span class="kn">import</span> <span class="nn">pysal</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">mapclassify</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">inequality</span>
-<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>
-<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
-
-<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
-<span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">5</span>
-</pre></div>
-</div>
-</div>
-</div>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>This chapter uses economic inequality to illustrate how the study of the evolution of social
 disparities can benefit from an explicitly spatial treatment.
 Social and economic inequality is often at the top of policy makers’ agendas.
 Its study has always drawn considerable attention in academic circles.
-Much of the focus has been on <em>interpersonal income inequality</em>, yet there is a growing recognition
+Much of the focus has been on <em>interpersonal income inequality</em>, on differences between individuals irrespective of the geographical area where they leave. Yet there is a growing recognition
 that the question of <em>inter-regional income inequality</em> requires further
 attention as the growing gaps between poor and rich regions have been identified
-as key drivers of civil unreset <span id="id1">[<a class="reference internal" href="references.html#id4"><span>Ezc19</span></a>]</span> and  political polarization in developing and developed countries
-<span id="id2">[<a class="reference internal" href="references.html#id50"><span>RP18</span></a>]</span>.</p>
+as key drivers of civil unrest <span id="id1">[<a class="reference internal" href="references.html#id11"><span>Ezc19</span></a>]</span> and  political polarization in developing and developed countries
+<span id="id2">[<a class="reference internal" href="references.html#id57"><span>RP18</span></a>]</span>.</p>
 <p>Much of the study of inequalities has focused at the individual level: how do outcomes
 differ across individuals? This approach does not group individuals geographically.
 In other words, it is not concerned with whether those differences follow a pattern,
@@ -493,10 +469,13 @@ related, they have developed in a largely parallel fashion with limited
 cross-fertilization. In this chapter, we examine how a spatially explicit focus
 can provide insights on the study of inequality and its dynamics. We hope this illustration
 can be useful in itself but also inspire the use of these methods in the study of
-other phenomena for which the regional perspective can bring value to the table.</p>
+other phenomena for which the regional perspective can bring value. This is also the only chapter where
+we explicitly deal with time as an additional dimension. Our presentation of inequalities takes
+an inherently temporal view, considering how different indices evolve over time the the extent to which a spatial pattern changes. Again, we hope the illustration we show here with inequality indices has value
+in itself, but also as inspiration for how to tackle time and dynamics in broader contexts.</p>
 <p>After discussing the data we employ, we begin with an introduction to classic methods for interpersonal income
 inequality analysis and how they have been adopted to the question of regional
-inequalities. These include a number of graphical tools along side familiar
+inequalities. These include a number of graphical tools alongside familiar
 indices of inequality. As we discuss more fully, the use of these classical
 methods in spatially referenced data, while useful in providing insights on some
 of the aspects of spatial inequality, fails to fully capture the nature of
@@ -504,14 +483,30 @@ geographical disparities and their dynamics. Thus, we next move to spatially
 explicit measures for regional inequality analysis. The chapter closes with
 some recent extensions of some classical measures to more fully examine the
 spatial dimensions of regional inequality dynamics.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">seaborn</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">pysal</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">mapclassify</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>
+<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 <div class="section" id="data-us-state-per-capita-income-1969-2017">
 <h2>Data: US State Per Capita Income 1969-2017<a class="headerlink" href="#data-us-state-per-capita-income-1969-2017" title="Permalink to this headline">¶</a></h2>
-<p>The data used in this chapter contain repeated measurements for geographic regions over time.
-We consider the United States from 1969 to 2017; specifically, we will analyze median incomes at the county level. This perspective will allow to examine trends both in terms of how individual counties, states, or regions get richer or poorer, as well as how the overall distribution of income moves, skews, or spreads out.</p>
+<p>For this chapter, we use data on average income per capita over time. Specifically, we consider the United States counties from 1969 to 2017. US Counties are small regions that fit hierarchically within states. This perspective will allow us to examine trends for individual observations (counties), or regions containing several of them in a geographically consistent way (states or Census regions which are collections of states). The temporal approach will reveal whether these entities get richer or poorer, as well as how the overall distribution of income moves, skews, or spreads out.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pci_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/us_county_income/uscountypcincome.gpkg&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pci_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
+    <span class="s1">&#39;../data/us_county_income/uscountypcincome.gpkg&#39;</span>
+<span class="p">)</span>
 <span class="n">pci_df</span><span class="o">.</span><span class="n">columns</span>
 </pre></div>
 </div>
@@ -533,11 +528,11 @@ We consider the United States from 1969 to 2017; specifically, we will analyze m
 </div>
 </div>
 <p>Inspection of the column names reveals that the table is organized around one row per county, and with the years as columns, together with information about the particular record.
-This format is an example of a <a class="reference external" href="https://en.wikipedia.org/wiki/Wide_and_narrow_data"><em>wide</em> longitudinal data set</a>.
+This format is an example of a <em>wide</em> longitudinal data set.
 In wide-format data, each column represents a different time period, meaning that each row represents a set of measurements made about the same “entity” over time (as well as any unique identifying information about that entity.)
-This contrasts with a <em>narrow</em> or <em>long</em> format, where each row describes an entity at a specific point in time.
-Long data results in significant duplication for records and is generally worse for data storage, particularly in the geographic case. However, long form data is sometimes a more useful format when manipulating and analyzing data, as <span id="id3">[<a class="reference internal" href="references.html#id5"><span>W+14</span></a>]</span> discusses. Nonetheless, when analyzing <em>trajectories</em>, that is, the paths that entities take over time, wide data is more useful, and we will use that here.</p>
-<p>In this data, we have 3076 counties across 49 years, as well as 28 extra columns that describe each county.</p>
+This contrasts with a <em>narrow</em>, <em>long</em> format, where each row describes an entity at a specific point in time.
+Long data results in significant duplication for records and is generally worse for data storage, particularly in the geographic case. However, long form data is sometimes a more useful format when manipulating and analyzing data, as <span id="id3">[<a class="reference internal" href="references.html#id12"><span>W+14</span></a>]</span> discusses. Nonetheless, when analyzing <em>trajectories</em>, that is, the paths that entities take over time, wide data is more useful, and we will use that here.</p>
+<p>In this dataset, we have 3076 counties across 49 years, as well as 28 extra columns that describe each county.</p>
 <!-- 
 ljw: we (1) don't discuss wide vs. long anywhere else in the book and (2) don't ever show a wide-to-long pivot using something like pandas.wide_to_long... We also don't need the LineCode filtering, since the final dataframe is already filtered by LineCode so that all LineCode==3.
 
@@ -557,272 +552,12 @@ dab:
 </div>
 </div>
 </div>
-<p>As an example, we can see the first few years for Jackson County, Mississippi (state code <code class="docutils literal notranslate"><span class="pre">28</span></code>) below:</p>
+<p>As an example, we can see the first ten years for Jackson County, Mississippi (state code <code class="docutils literal notranslate"><span class="pre">28</span></code>) below:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pci_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;NAME == &quot;Jackson&quot; &amp; STATEFP == &quot;28&quot;&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_html"><div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>STATEFP</th>
-      <th>COUNTYFP</th>
-      <th>COUNTYNS</th>
-      <th>GEOID</th>
-      <th>NAME</th>
-      <th>NAMELSAD</th>
-      <th>LSAD</th>
-      <th>CLASSFP</th>
-      <th>MTFCC</th>
-      <th>CSAFP</th>
-      <th>...</th>
-      <th>2012</th>
-      <th>2013</th>
-      <th>2014</th>
-      <th>2015</th>
-      <th>2016</th>
-      <th>2017</th>
-      <th>index</th>
-      <th>IndustryCl</th>
-      <th>Descript_1</th>
-      <th>geometry</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>1417</th>
-      <td>28</td>
-      <td>059</td>
-      <td>00695753</td>
-      <td>28059</td>
-      <td>Jackson</td>
-      <td>Jackson County</td>
-      <td>06</td>
-      <td>H1</td>
-      <td>G4020</td>
-      <td>None</td>
-      <td>...</td>
-      <td>34586</td>
-      <td>34494</td>
-      <td>34905</td>
-      <td>35429</td>
-      <td>35890</td>
-      <td>36449</td>
-      <td>NaN</td>
-      <td>None</td>
-      <td>None</td>
-      <td>POLYGON ((-88.82351 30.38205, -88.88453 30.677...</td>
-    </tr>
-  </tbody>
-</table>
-<p>1 rows × 77 columns</p>
-</div></div></div>
-</div>
-</div>
-<div class="section" id="global-inequality">
-<h2>Global Inequality<a class="headerlink" href="#global-inequality" title="Permalink to this headline">¶</a></h2>
-<p>We begin our examination of inequality by focusing on several global measures of income inequality. Here, “global” means that the measure is concerned with the overall nature of inequality within the income distribution. That is, these measures focus on the direct disparity between rich and poor, considering nothing about where the rich and poor live. Several classic measures of inequality are available for this purpose.</p>
-<p>In general terms, measures of inequality focus on the dispersion present in an income distribution. In the case of regional or spatial inequality, the distributions describe the average or per capita incomes for spatial units, such as for counties, census tracts, or regions. For our US county data, we can visualize the distribution of per capita incomes for the first year in the sample as follows:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">seaborn</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">pci_df</span><span class="p">[</span><span class="s1">&#39;1969&#39;</span><span class="p">],</span> <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/09_spatial_inequality_11_0.png" src="../_images/09_spatial_inequality_11_0.png" />
-</div>
-</div>
-<p>Looking at this distribution, notice that the right side of the distribution is much longer than the left side. This long right tail is a prominent feature, and is common in the study of incomes and many other societal phenomena, as it reflects the fact that within a single income distribution, the super-rich are generally much more wealthy than the super-poor are deprived, compared to the average.</p>
-<p>A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate of individual incomes. Here, we are using the per capita incomes for each county. By contrast, in the wider inequality literature, the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced. This difference arises from the smoothing that is intrinsic to aggregation: the regional distributions are based on averages obtained from the individual distributions, and so the extremely high-income individuals are averaged with the rest of their county. The regional approach implies that, to avoid falling into the so-called “ecological fallacy”, whereby individual conclusions are drawn from geographical aggregates, our conclusions will hold at the area level (the <em>county</em>) rather than the individual one (the <em>person</em>).</p>
-<p>The kernel density estimate (or histogram) is a powerful visualization device that captures the overall morphology of the <em>feature</em> distribution for this measure of income. At the same time, the plot is silent on the underlying <em>geographic distribution</em> of county incomes. We can look at this second view of the distribution using a choropleth map. To construct this, we can use the standard <code class="docutils literal notranslate"><span class="pre">geopandas</span></code> plotting tools.</p>
-<p>Before we can get to mapping, we note the data is expressed in longitude and latitude but this is <em>not</em> recorded on <code class="docutils literal notranslate"><span class="pre">pci_df</span></code>. We set the CRS explicitly and then change it to one more suitable for mapping, the Albers Equal Area projection for North America:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pci_df</span> <span class="o">=</span> <span class="p">(</span><span class="n">pci_df</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span> <span class="c1"># US Census default projection</span>
-                <span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">5070</span><span class="p">))</span> <span class="c1"># Albers Equal Area North America</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">pci_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;1969&#39;</span><span class="p">,</span> 
-    <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;Quantiles&#39;</span><span class="p">,</span> 
-    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
-    <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;loc&#39;</span><span class="p">:</span> <span class="s1">&#39;lower left&#39;</span><span class="p">},</span> 
-    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/09_spatial_inequality_15_0.png" src="../_images/09_spatial_inequality_15_0.png" />
-</div>
-</div>
-<p>The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. The kernel density estimate is a <em>feature</em>-based representation, and the map is a <em>geographic</em> representation. Both are useful for developing a more comprehensive understanding. To gain insights on the level of inequality in the distribution, we’ll discuss a few indices common in the statistical and econometric literatures.</p>
-<div class="section" id="ratio">
-<h3>20:20 Ratio<a class="headerlink" href="#ratio" title="Permalink to this headline">¶</a></h3>
-<p>One commonly used measure of inequality in a distribution is the so called 20:20 ratio, which is defined as the ratio of the incomes at the 80th percentile over that at the 20th percentile:</p>
-<!-- #endregion --><div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top20</span><span class="p">,</span> <span class="n">bottom20</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="s1">&#39;1969&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.2</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top20</span><span class="o">/</span><span class="n">bottom20</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.5022494887525562
-</pre></div>
-</div>
-</div>
-</div>
-<p>In 1969 the richest 20% of the counties had an income that was 1.5 times the poorest 20% of the counties. The 20:20 ratio has the advantage of being robust to outliers at the top and the bottom of the distribution. To look at the dynamics of this global inequality measure, one way is to create a function that calculates it for a given year, and apply it to all years in our time series:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ineq_20_20</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
-    <span class="n">top20</span><span class="p">,</span> <span class="n">bottom20</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.2</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">top20</span> <span class="o">/</span> <span class="n">bottom20</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">years</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1969</span><span class="p">,</span> <span class="mi">2018</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
-<span class="n">ratio_2020</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="n">years</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ineq_20_20</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">ratio_2020</span><span class="p">)</span>
-
-<span class="n">figure</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">years</span><span class="p">[::</span><span class="mi">2</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;20:20 ratio&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
-<span class="n">figure</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/09_spatial_inequality_21_0.png" src="../_images/09_spatial_inequality_21_0.png" />
-</div>
-</div>
-<p>The evolution of the ratio has a U-shaped pattern over time, bottoming out around 1994 after a long decline. Post 1994, however, the 20:20 ratio indicates there is increasing inequality up until 2013, where there is a turn towards lower income inequality between the counties.</p>
-<p>In addition to the 20/20 ratio, we will explore two more traditional measures of inequality: the Gini and Theil’s indices. For these, we will use the <code class="docutils literal notranslate"><span class="pre">inequality</span></code> package from <code class="docutils literal notranslate"><span class="pre">pysal</span></code>.</p>
-</div>
-<div class="section" id="gini-index">
-<h3>Gini Index<a class="headerlink" href="#gini-index" title="Permalink to this headline">¶</a></h3>
-<p>The Gini index is a longstanding measure of inequality based on the notion of cumulative wealth distribution. To construct a Lorenz curve, the cumulative share of wealth is plotted against the share of the population that owns that wealth. For example, in an extremely unequal society where few people own nearly all the wealth, the Lorenz curve increases very slowly at first, then skyrockets once the wealthiest people are included.</p>
-<p>In contrast, a “perfectly equal” society would look like a straight line connecting <span class="math notranslate nohighlight">\((0,0)\)</span> and <span class="math notranslate nohighlight">\((1,1)\)</span>. This is called the <em>line of perfect equality</em>, and represents the case where <span class="math notranslate nohighlight">\(p\)</span>% of the population owns exactly <span class="math notranslate nohighlight">\(p\)</span>% of the wealth. For example, this might mean that 50% of the population earns exactly 50% of the income, or 90% of the population owns 90% of the wealth. The main idea is that the share of wealth or income is exactly proportional to the share of population that owns that wealth or earns that income, which occurs only when everyone has the same income or owns the same amount of wealth.</p>
-<p>With these notions in mind, we can define the Gini index as the ratio of the area between the line of perfect equality and the Lorenz curve for a given income or wealth distribution, standardized by the area under the line of perfect equality (which is always <span class="math notranslate nohighlight">\(\frac{1}{2}\)</span>). Thus, the Gini index is a measure of the gap between a perfectly equal society and the observed society over every level of wealth/income.</p>
-<p>We can construct one of the Lorenz curves for 1969 by first computing the share of our population of counties that is below each observation. For that, we generate a cumulative series:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pci_df</span><span class="p">)</span>
-<span class="n">share_of_population</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Then, we consider the cumulative evolution of income. For this, we need to find out the proportion of total income that owned by each share of the population. Empirically, this can be computed in the following fashion. First, we sort county incomes:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">incomes</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="s1">&#39;1969&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Second, we find the overall percentage of income accumulated at each data point. To do this, we compute what percentage of the total income that of each county represents:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shares</span> <span class="o">=</span> <span class="n">incomes</span> <span class="o">/</span> <span class="n">incomes</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>and construct the <em>cumulative sum</em> of these shares, which reflects the sum of all of the shares of income up to the current one:</p>
-<div class="math notranslate nohighlight">
-\[ \texttt{CumSum(v, k)} = \sum_{i=1}^k v_i\]</div>
-<p>This starts at <span class="math notranslate nohighlight">\(0\)</span> and reaches <span class="math notranslate nohighlight">\(1\)</span> once the last share is included:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cumulative_share</span> <span class="o">=</span> <span class="n">shares</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>With this, we can plot both the Lorenz curve and the line of perfect equality:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">share_of_population</span><span class="p">,</span> <span class="n">cumulative_share</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Lorenz Curve&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Perfect Equality&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Share of population&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Share of income&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/09_spatial_inequality_33_0.png" src="../_images/09_spatial_inequality_33_0.png" />
-</div>
-</div>
-<p>The blue line is the Lorenz curve for county incomes in 1969. The Gini index is the area between it and the 45-degree line of equality shown in red, all standardized by the area underneath the line of equality.</p>
-<p>A first approach to examine how inequality has evolved is to plot the Lorenz curves for each year. One way to do this in Python involves creating a function that will compute the Lorenz curve for an arbitrary set of incomes. The following function encapsulates the steps shown above into a single shot:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">lorenz</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="n">incomes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-    <span class="n">income_shares</span> <span class="o">=</span> <span class="p">(</span><span class="n">incomes</span> <span class="o">/</span> <span class="n">incomes</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">pop_shares</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">N</span>
-    <span class="k">return</span> <span class="n">pop_shares</span><span class="p">,</span> <span class="n">income_shares</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>We can use the same strategy as above to calculate the Lorenz curves for all the years in our datasets:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lorenz_curves</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="n">years</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">lorenz</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>Practically, this becomes a dataframe with columns for each year. Rows contain the population shares (or income shares) as lists.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lorenz_curves</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pci_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+    <span class="s1">&#39;NAME == &quot;Jackson&quot; &amp; STATEFP == &quot;28&quot;&#39;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;1969&#39;</span><span class="p">:</span><span class="s1">&#39;1979&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -855,86 +590,270 @@ dab:
       <th>1976</th>
       <th>1977</th>
       <th>1978</th>
-      <th>...</th>
-      <th>2008</th>
-      <th>2009</th>
-      <th>2010</th>
-      <th>2011</th>
-      <th>2012</th>
-      <th>2013</th>
-      <th>2014</th>
-      <th>2015</th>
-      <th>2016</th>
-      <th>2017</th>
+      <th>1979</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-      <td>[0.00032509752925877764, 0.0006501950585175553...</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>[0.00012248644113964493, 0.0002529565611185806...</td>
-      <td>[0.00013470713147942766, 0.0002749742242147042...</td>
-      <td>[0.00013565871276465116, 0.0002735829350945102...</td>
-      <td>[0.000138851418132282, 0.0002856978062862818, ...</td>
-      <td>[0.00013772329900895125, 0.0002789403397482158...</td>
-      <td>[0.00013670247958589532, 0.0002822671421734887...</td>
-      <td>[0.00013545577965044458, 0.0002969630997663923...</td>
-      <td>[0.00013285409901160207, 0.0002894117453533050...</td>
-      <td>[0.0001243028615204895, 0.00025562579972132935...</td>
-      <td>[0.00012461982501385657, 0.0002617767612857009...</td>
-      <td>...</td>
-      <td>[0.00014337413757142982, 0.0002952111969255050...</td>
-      <td>[0.0001456829143536576, 0.00030689603606708245...</td>
-      <td>[0.00014395847223286045, 0.000300079481701999,...</td>
-      <td>[0.00014303960415837748, 0.0002879780824635754...</td>
-      <td>[0.00014868735880996665, 0.0003029537221659007...</td>
-      <td>[0.00014777376351708422, 0.0002978443977606638...</td>
-      <td>[0.00011563121829018938, 0.0002592947418121832...</td>
-      <td>[0.00010564770915523224, 0.0002539806359455832...</td>
-      <td>[0.00014203484354254357, 0.0002909593179418555...</td>
-      <td>[9.276898012960255e-05, 0.0002421381514532987,...</td>
+      <th>1417</th>
+      <td>2957</td>
+      <td>3121</td>
+      <td>3327</td>
+      <td>3939</td>
+      <td>4203</td>
+      <td>4547</td>
+      <td>5461</td>
+      <td>5927</td>
+      <td>6315</td>
+      <td>6619</td>
+      <td>6967</td>
     </tr>
   </tbody>
 </table>
-<p>2 rows × 49 columns</p>
 </div></div></div>
 </div>
-<p>By iterating over the columns of this dataframe, we can make a plot of the Lorenz curves for each year:</p>
+</div>
+<div class="section" id="global-inequality">
+<h2>Global Inequality<a class="headerlink" href="#global-inequality" title="Permalink to this headline">¶</a></h2>
+<p>We begin our examination of inequality by focusing on several global measures of income inequality. Here, “global” means that the measure is concerned with the overall nature of inequality within the income distribution. That is, these measures focus on the direct disparity between rich and poor, considering nothing about where the rich and poor live. Several classic measures of inequality are available for this purpose.</p>
+<p>In general terms, measures of inequality focus on the dispersion present in an income distribution. In the case of regional or spatial inequality, the distributions describe the average or per capita incomes for spatial units, such as for counties, census tracts, or regions. For our US county data, we can visualize the distribution of per capita incomes for the first year in the sample as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">seaborn</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">pci_df</span><span class="p">[</span><span class="s1">&#39;1969&#39;</span><span class="p">],</span> <span class="n">kde</span><span class="o">=</span><span class="kc">True</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/09_spatial_inequality_11_0.png" src="../_images/09_spatial_inequality_11_0.png" />
+</div>
+</div>
+<p>Looking at this distribution, notice that the right side of the distribution is much longer than the left side. This long right tail is a prominent feature, and is common in the study of incomes and many other societal phenomena, as it reflects the fact that within a single income distribution, the super-rich are generally much more wealthy than the super-poor are deprived, compared to the average.</p>
+<p>A key point to keep in mind here is that the unit of measurement in this data is a spatial aggregate of individual incomes. Here, we are using the per capita incomes for each county. By contrast, in the wider inequality literature, the observational unit is typically a household or individual. In the latter distributions, the degree of skewness is often more pronounced. This difference arises from the smoothing that is intrinsic to aggregation: the regional distributions are based on averages obtained from the individual distributions, and so the extremely high-income individuals are averaged with the rest of their county. The regional approach implies that, to avoid falling into the so-called “ecological fallacy”, whereby individual conclusions are drawn from geographical aggregates, our conclusions will hold at the area level (the <em>county</em>) rather than the individual one (the <em>person</em>).</p>
+<p>The kernel density estimate (or histogram) is a powerful visualization device that captures the overall morphology of the <em>feature</em> distribution for this measure of income. At the same time, the plot is silent on the underlying <em>geographic distribution</em> of county incomes. We can look at this second view of the distribution using a choropleth map. To construct this, we can use the standard <code class="docutils literal notranslate"><span class="pre">geopandas</span></code> plotting tools.</p>
+<p>Before we can get to mapping, we note the data is expressed in longitude and latitude but this is <em>not</em> recorded on <code class="docutils literal notranslate"><span class="pre">pci_df</span></code>. We set the CRS explicitly and then change it to one more suitable for mapping, the Albers Equal Area projection for North America:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pci_df</span> <span class="o">=</span> <span class="n">pci_df</span><span class="o">.</span><span class="n">set_crs</span><span class="p">(</span>
+    <span class="c1"># US Census default projection</span>
+    <span class="n">epsg</span><span class="o">=</span><span class="mi">4326</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
+    <span class="c1"># Albers Equal Area North America</span>
+    <span class="n">epsg</span><span class="o">=</span><span class="mi">5070</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>And the (quantile) choropleth for 1969 can be generated by:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">pci_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;1969&#39;</span><span class="p">,</span> 
+    <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;Quantiles&#39;</span><span class="p">,</span> 
+    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+    <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;loc&#39;</span><span class="p">:</span> <span class="s1">&#39;lower left&#39;</span><span class="p">},</span> 
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/09_spatial_inequality_16_0.png" src="../_images/09_spatial_inequality_16_0.png" />
+</div>
+</div>
+<p>The choropleth and the kernel density provide different visual depictions of the distribution of county incomes. The kernel density estimate is a <em>feature</em>-based representation, and the map is a <em>geographic</em>-based representation. Both are useful for developing a more comprehensive understanding. To gain insights on the level of inequality in the distribution, we’ll discuss a few indices common in the statistical and econometric literatures.</p>
+<div class="section" id="ratio">
+<h3>20:20 Ratio<a class="headerlink" href="#ratio" title="Permalink to this headline">¶</a></h3>
+<p>One commonly used measure of inequality in a distribution is the so called 20:20 ratio, which is defined as the ratio of the incomes at the 80th percentile over that at the 20th percentile:</p>
+<!-- #endregion --><div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top20</span><span class="p">,</span> <span class="n">bottom20</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="s1">&#39;1969&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.2</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">top20</span></code> (<code class="docutils literal notranslate"><span class="pre">bottom20</span></code>) objects contain the boundary value that separates the series between the top (bottom) 20% of the distribution and the rest. With these, we can generate the ratio:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">top20</span><span class="o">/</span><span class="n">bottom20</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1.5022494887525562
+</pre></div>
+</div>
+</div>
+</div>
+<p>In 1969 the richest 20% of the counties had an income that was 1.5 times the poorest 20% of the counties. The 20:20 ratio has the advantage of being robust to outliers at the top and the bottom of the distribution. To look at the dynamics of this global inequality measure, one way is to create a function that calculates it for a given year, and apply it to all years in our time series:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">ineq_20_20</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+    <span class="n">top20</span><span class="p">,</span> <span class="n">bottom20</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">.8</span><span class="p">,</span> <span class="mf">.2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">top20</span> <span class="o">/</span> <span class="n">bottom20</span>
+
+<span class="c1"># Generate range of strings from 1969 to 2018</span>
+<span class="n">years</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1969</span><span class="p">,</span> <span class="mi">2018</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="c1"># Compute 20:20 ratio for every year</span>
+<span class="n">ratio_2020</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="n">years</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">ineq_20_20</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># Plot evolution of 20:20 ratio</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">ratio_2020</span><span class="p">)</span>
+
+<span class="c1"># Grab figure generated in the plot</span>
+<span class="n">figure</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+<span class="c1"># Replace tick labels with every other year</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">years</span><span class="p">[::</span><span class="mi">2</span><span class="p">])</span>
+<span class="c1"># Set vertical label</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;20:20 ratio&quot;</span><span class="p">)</span>
+<span class="c1"># Set horizontal label</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Year&quot;</span><span class="p">)</span>
+<span class="c1"># Rotate year labels</span>
+<span class="n">figure</span><span class="o">.</span><span class="n">autofmt_xdate</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/09_spatial_inequality_22_0.png" src="../_images/09_spatial_inequality_22_0.png" />
+</div>
+</div>
+<p>The evolution of the ratio has a U-shaped pattern over time, bottoming out around 1994 after a long decline. Post 1994, however, the 20:20 ratio indicates there is increasing inequality up until 2013, where there is a turn towards lower income inequality between the counties.</p>
+<p>In addition to the 20/20 ratio, we will explore two more traditional measures of inequality: the Gini and Theil’s indices. For these, we will use the <code class="docutils literal notranslate"><span class="pre">inequality</span></code> package from <code class="docutils literal notranslate"><span class="pre">pysal</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">inequality</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="gini-index">
+<h3>Gini Index<a class="headerlink" href="#gini-index" title="Permalink to this headline">¶</a></h3>
+<p>The Gini index is a longstanding measure of inequality based on the notion of cumulative wealth distribution. The Gini is closely linked to another popular device called the Lorenz curve
+. To construct a Lorenz curve, the cumulative share of wealth is plotted against the share of the population that owns that wealth. For example, in an extremely unequal society where few people own nearly all the wealth, the Lorenz curve increases very slowly at first, then skyrockets once the wealthiest people are included.</p>
+<p>In contrast, a “perfectly equal” society would look like a straight line connecting <span class="math notranslate nohighlight">\((0,0)\)</span> and <span class="math notranslate nohighlight">\((1,1)\)</span>. This is called the <em>line of perfect equality</em>, and represents the case where <span class="math notranslate nohighlight">\(p\)</span>% of the population owns exactly <span class="math notranslate nohighlight">\(p\)</span>% of the wealth. For example, this might mean that 50% of the population earns exactly 50% of the income, or 90% of the population owns 90% of the wealth. The main idea is that the share of wealth or income is exactly proportional to the share of population that owns that wealth or earns that income, which occurs only when everyone has the same income or owns the same amount of wealth.</p>
+<p>With these notions in mind, we can define the Gini index as the ratio of the area between the line of perfect equality and the Lorenz curve for a given income or wealth distribution, standardized by the area under the line of perfect equality (which is always <span class="math notranslate nohighlight">\(\frac{1}{2}\)</span>). Thus, the Gini index is a measure of the gap between a perfectly equal society and the observed society over every level of wealth/income.</p>
+<p>We can construct the Lorenz curve for 1969 by first computing the share of our population of counties that is below each observation. For that, we generate a cumulative series:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pci_df</span><span class="p">)</span>
+<span class="n">share_of_population</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then, we consider the cumulative evolution of income. For this, we need to find out the proportion of total income owned by each share of the population. Empirically, this can be computed in the following fashion. First, we sort county incomes:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">incomes</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="s1">&#39;1969&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Second, we find the overall percentage of income accumulated at each data point. To do this, we compute what percentage of the total income that of each county represents:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">shares</span> <span class="o">=</span> <span class="n">incomes</span> <span class="o">/</span> <span class="n">incomes</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>and construct the <em>cumulative sum</em> of these shares, which reflects the sum of all of the shares of income up to the current one:</p>
+<div class="math notranslate nohighlight">
+\[ \texttt{CumSum(v, k)} = \sum_{i=1}^k v_i\]</div>
+<p>This starts at <span class="math notranslate nohighlight">\(0\)</span> and reaches <span class="math notranslate nohighlight">\(1\)</span> once the last share is included:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cumulative_share</span> <span class="o">=</span> <span class="n">shares</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>With this, we can plot both the Lorenz curve and the line of perfect equality:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate figure with one axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="c1"># Plot Lorenz Curve</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">share_of_population</span><span class="p">,</span> <span class="n">cumulative_share</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Lorenz Curve&#39;</span><span class="p">)</span>
+<span class="c1"># Plot line of perfect equality</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Perfect Equality&#39;</span><span class="p">)</span>
+<span class="c1"># Label horizontal axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Share of population&#39;</span><span class="p">)</span>
+<span class="c1"># Label vertical axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Share of income&#39;</span><span class="p">)</span>
+<span class="c1"># Add legend</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/09_spatial_inequality_35_0.png" src="../_images/09_spatial_inequality_35_0.png" />
+</div>
+</div>
+<p>The blue line is the Lorenz curve for county incomes in 1969. The Gini index is the area between it and the 45-degree line of equality shown in red, all standardized by the area underneath the line of equality.</p>
+<p>A first approach to examine how inequality has evolved is to plot the Lorenz curves for each year. One way to do this in Python involves creating a function that will compute the Lorenz curve for an arbitrary set of incomes. The following function encapsulates the steps shown above into a single shot:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">lorenz</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">incomes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">income_shares</span> <span class="o">=</span> <span class="p">(</span><span class="n">incomes</span> <span class="o">/</span> <span class="n">incomes</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">pop_shares</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">N</span>
+    <span class="k">return</span> <span class="n">pop_shares</span><span class="p">,</span> <span class="n">income_shares</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>For a single year, say 1969, our function would return a tuple with two arrays, one for each axis in the Lorenz curve plot:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lorenz</span><span class="p">(</span><span class="n">pci_df</span><span class="p">[</span><span class="s1">&#39;1969&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(array([3.25097529e-04, 6.50195059e-04, 9.75292588e-04, ...,
+        9.99349805e-01, 9.99674902e-01, 1.00000000e+00]),
+ array([1.22486441e-04, 2.52956561e-04, 3.83636778e-04, ...,
+        9.98429316e-01, 9.99176315e-01, 1.00000000e+00]))
+</pre></div>
+</div>
+</div>
+</div>
+<p>We can now use the same strategy as above to calculate the Lorenz curves for all the years in our datasets:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lorenz_curves</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="n">years</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">lorenz</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Practically, this becomes a dataframe with columns for each year. Rows contain the population shares (or income shares) as lists. We can then iterate over the columns (years) of this dataframe, generating a plot of the Lorenz curve for each year:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure with one axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="c1"># Plot line of perfect equality</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="c1"># Loop over every year in the series</span>
 <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">lorenz_curves</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="c1"># Extract the two arrays or each dimension</span>
     <span class="n">year_pop_shares</span><span class="p">,</span> <span class="n">year_inc_shares</span> <span class="o">=</span> <span class="n">lorenz_curves</span><span class="p">[</span><span class="n">year</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="c1"># Plot Lorenz curve for a given year</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">year_pop_shares</span><span class="p">,</span> <span class="n">year_inc_shares</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.05</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/09_spatial_inequality_41_0.png" src="../_images/09_spatial_inequality_41_0.png" />
+<img alt="../_images/09_spatial_inequality_43_0.png" src="../_images/09_spatial_inequality_43_0.png" />
 </div>
 </div>
 <p>The compression of the Lorenz curves makes it difficult to ascertain the temporal pattern in inequality. Focusing explicitly on the Gini coefficients may shed more light on the evolution of inequality over time.</p>
@@ -968,7 +887,7 @@ dab:
 </div>
 </div>
 </div>
-<p>PySAL’s Gini requires an <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> rather than a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> object, which we can pull out through the <code class="docutils literal notranslate"><span class="pre">values</span></code> attribute. This is passed to the <code class="docutils literal notranslate"><span class="pre">Gini</span></code> class, and we only return the value of the coefficient.</p>
+<p>PySAL’s Gini requires an <code class="docutils literal notranslate"><span class="pre">numpy.ndarray</span></code> rather than a <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> object, which we can pull out through the <code class="docutils literal notranslate"><span class="pre">values</span></code> attribute. This is passed to the <code class="docutils literal notranslate"><span class="pre">Gini</span></code> class, and we only return the value of the coefficient as a <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> object.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="n">years</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">gini_by_col</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s1">&#39;gini&#39;</span><span class="p">)</span>
@@ -1033,20 +952,15 @@ dab:
 <p>Which we can turn into a graphical representation through standard <code class="docutils literal notranslate"><span class="pre">pandas</span></code> plotting. The resulting pattern is similar to that of the 20:20 ratio above:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">_inequalities</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">));</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
-</pre></div>
-</div>
-<img alt="../_images/09_spatial_inequality_53_1.png" src="../_images/09_spatial_inequality_53_1.png" />
+<img alt="../_images/09_spatial_inequality_55_0.png" src="../_images/09_spatial_inequality_55_0.png" />
 </div>
 </div>
-</div>
-<div class="section" id="theil-s-index">
-<h3>Theil’s index<a class="headerlink" href="#theil-s-index" title="Permalink to this headline">¶</a></h3>
+<p>same### Theil’s index</p>
 <p>A third commonly used measure of inequality is Theil’s <span class="math notranslate nohighlight">\(T\)</span> given as:</p>
 <div class="math notranslate nohighlight">
 \[T = \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\sum_{i=1}^m y_i}\right] \right)\]</div>
@@ -1056,31 +970,26 @@ dab:
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">theil</span><span class="p">(</span><span class="n">column</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">inequality</span><span class="o">.</span><span class="n">theil</span><span class="o">.</span><span class="n">Theil</span><span class="p">(</span><span class="n">column</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+<span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="n">years</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">theil</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>And generate a visual comparison of its evolution over time:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="n">years</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">theil</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>And generate a visual comparison of the evolution of both Gini and Theil’s indices:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">inequalities</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">));</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/09_spatial_inequality_58_0.png" src="../_images/09_spatial_inequality_58_0.png" />
+<img alt="../_images/09_spatial_inequality_59_0.png" src="../_images/09_spatial_inequality_59_0.png" />
 </div>
 </div>
-<p>The time paths of the Gini and the Theil coefficients show striking
+<p>The time paths of the Gini and the Theil coefficients appear to show striking
 similarities. At first glance, this might suggest that the indices are
-substitutes for one another. However, they are not perfectly correlated:</p>
+substitutes for one another. However, if we plot them against each other, we can see they are not perfectly correlated:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;theil&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;gini&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">inequalities</span><span class="p">)</span>
@@ -1088,7 +997,7 @@ substitutes for one another. However, they are not perfectly correlated:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/09_spatial_inequality_60_0.png" src="../_images/09_spatial_inequality_60_0.png" />
+<img alt="../_images/09_spatial_inequality_61_0.png" src="../_images/09_spatial_inequality_61_0.png" />
 </div>
 </div>
 <p>Indeed, as we shall see below, each index has
@@ -1102,7 +1011,7 @@ regional income inequality. To see this, we first need to express the
 relationships between the two types of inequality. Consider a country composed
 of <span class="math notranslate nohighlight">\(N\)</span> individuals who are distributed over <span class="math notranslate nohighlight">\(m\)</span> regions. Let <span class="math notranslate nohighlight">\(Y_l\)</span> denote the
 income of individual <span class="math notranslate nohighlight">\(l\)</span>. Total personal income in region <span class="math notranslate nohighlight">\(i\)</span> is given as <span class="math notranslate nohighlight">\(Y_i =
-\sum_{l \in i} Y_l\)</span>. per capita income in region <span class="math notranslate nohighlight">\(i\)</span> is <span class="math notranslate nohighlight">\(y_i = \frac{Y_i}{N_i}\)</span>,
+\sum_{l \in i} Y_l\)</span>, and per capita income in region <span class="math notranslate nohighlight">\(i\)</span> is <span class="math notranslate nohighlight">\(y_i = \frac{Y_i}{N_i}\)</span>,
 where <span class="math notranslate nohighlight">\(N_i\)</span> is the number of individuals in region <span class="math notranslate nohighlight">\(i\)</span>.</p>
 <p>At the national level,  the coefficient of variation in incomes could be used as an index of interpersonal income inequality. This would be:</p>
 <div class="math notranslate nohighlight">
@@ -1177,17 +1086,12 @@ each year in the sample:</p>
 </div>
 </div>
 </div>
-<p>This time, our function returns a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object so that we pass it through <code class="docutils literal notranslate"><span class="pre">apply</span></code>, we get a well formatted table:</p>
+<p>This time, our function returns a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object so that when we pass it through <code class="docutils literal notranslate"><span class="pre">apply</span></code>, we get a well formatted table:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">moran_stats</span> <span class="o">=</span> <span class="n">pci_df</span><span class="p">[</span><span class="n">years</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">moran_by_col</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">moran_stats</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+
+<span class="n">moran_stats</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1252,10 +1156,10 @@ each year in the sample:</p>
 </div>
 </div>
 </div>
-<p>To show the overall inter-relationships between these statistics, we make another plot below:</p>
+<p>Which can be visualised by:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">12</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="p">[[</span><span class="s1">&#39;I&#39;</span><span class="p">,</span> <span class="s1">&#39;I-P value&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1264,13 +1168,13 @@ each year in the sample:</p>
 <img alt="../_images/09_spatial_inequality_76_0.png" src="../_images/09_spatial_inequality_76_0.png" />
 </div>
 </div>
-<p>Several patterns emerge from the time series of Moran’s I. Before delving into the details, it is worth noting that, while Gini and Theil follow a similar path, Moran’s I displays a distinct trajectory. There is a long-term decline in the value of Moran’s I. This suggests a gradual decline in the geographic structure of inequality with two implications: (a) per capita incomes are now less similar between nearby counties and (b), this has been consistently declining, regardless of whether inequality is high or low.
+<p>Several patterns emerge from the time series of Moran’s I. Before delving into the details, it is worth noting that, while Gini and Theil indices from previous figures follow a similar path, Moran’s I displays a distinct trajectory. There is a long-term decline in the value of Moran’s I. This suggests a gradual decline in the geographic structure of inequality with two implications: (a) per capita incomes are now less similar between nearby counties and (b), this has been consistently declining, regardless of whether inequality is high or low.
 Second, despite this decline, there is never a year in which the spatial autocorrelation is not statistically significant. In other words, there is a strong geographic structure in the distribution of regional incomes that needs to be accounted for when focusing on inequality questions.</p>
 </div>
 <div class="section" id="regional-decomposition-of-inequality">
 <h3>Regional Decomposition of Inequality<a class="headerlink" href="#regional-decomposition-of-inequality" title="Permalink to this headline">¶</a></h3>
 <p>One common objection to the analysis of inequality in aggregate relates to lack of detail about the scale at which inequality is most important. Inequality can be driven by differences between groups and not by discrepancies in income between similar individuals. That is, there is always the possibility that observed inequality can be “explained” by a confounding variate, such as age, sex, or education. For example, income differences between older and younger people can “explain” a large part of the societal inequality in wealth: older people have much longer to acquire experience, and thus are generally paid more for that experience. Younger people do not have as much experience, so young people (on average) have lower incomes than older people.</p>
-<p>To combat this issue, it is often useful to <em>decompose</em> inequality indices into constituent groups. This allows us to understand how much of inequality is driven by aggregate group differences and how much is driven by observation-level inequality. This also allows us to characterize how unequal each group is separately. In geographic applications, these groups are usually spatially defined, in that <em>regions</em> are contiguous geographic groups of observations. This section discusses regional inequality decompositions as a way to introduce geography into the study of inequality.</p>
+<p>To tackle this issue, it is often useful to <em>decompose</em> inequality indices into constituent groups. This allows us to understand how much of inequality is driven by aggregate group differences and how much is driven by observation-level inequality. This also allows us to characterize how unequal each group is separately. In geographic applications, these groups are usually spatially defined, in that <em>regions</em> are contiguous geographic groups of observations. This section discusses regional inequality decompositions as a way to introduce geography into the study of inequality.</p>
 <p>Let’s illustrate these ideas with our income dataset. The table records the United States Census Bureau region a county belongs to in the <code class="docutils literal notranslate"><span class="pre">Region</span></code> variable. These divide the country into eight regions, each assigned a number that relates to its name as specified below:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1298,8 +1202,8 @@ Second, despite this decline, there is never a year in which the spatial autocor
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">legend_kwds</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span><span class="mf">.5</span><span class="p">))</span>
-<span class="p">);</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -1310,10 +1214,14 @@ Second, despite this decline, there is never a year in which the spatial autocor
 <p>Let’s peak into income changes for each region. To do that, we can apply a split-apply-combine pattern that groups counties by region, calculates its mean, and combines it into a table:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rmeans</span> <span class="o">=</span> <span class="n">pci_df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Region_Name</span><span class="o">=</span><span class="n">pci_df</span><span class="o">.</span><span class="n">Region</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">region_names</span><span class="p">))</span>\
-               <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s1">&#39;Region_Name&#39;</span><span class="p">)</span>\
-               <span class="o">.</span><span class="n">mean</span><span class="p">()</span>\
-               <span class="p">[</span><span class="n">years</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rmeans</span> <span class="o">=</span> <span class="n">pci_df</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+    <span class="c1"># Create column with region name for each county</span>
+    <span class="n">Region_Name</span><span class="o">=</span><span class="n">pci_df</span><span class="o">.</span><span class="n">Region</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">region_names</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+    <span class="c1"># Group counties by region name</span>
+    <span class="n">by</span><span class="o">=</span><span class="s1">&#39;Region_Name&#39;</span>
+<span class="c1"># Calculate mean by region and save only year columns</span>
+<span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()[</span><span class="n">years</span><span class="p">]</span> 
 </pre></div>
 </div>
 </div>
@@ -1321,7 +1229,7 @@ Second, despite this decline, there is never a year in which the spatial autocor
 <p>The resulting table has a row for each region and a column for each year. We can visualize these means to get a sense of their temporal trajectory:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rmeans</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">();</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">rmeans</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">));</span>
 </pre></div>
 </div>
 </div>
@@ -1357,7 +1265,7 @@ explicitly considered in the second component.<a class="footnote-reference brack
 </div>
 </div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">theil_dr</span></code> object has the between and within components stored in the <code class="docutils literal notranslate"><span class="pre">bg</span></code> and <code class="docutils literal notranslate"><span class="pre">wg</span></code> attributes. The <code class="docutils literal notranslate"><span class="pre">bg</span></code> stands for the “between” component, and “wg” for the within component. For example the “between” component for each year is computed is:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">theil_dr</span></code> object has the between and within group components stored in the <code class="docutils literal notranslate"><span class="pre">bg</span></code> and <code class="docutils literal notranslate"><span class="pre">wg</span></code> attributes, respectively. For example the “between” component for each year is computed is:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">theil_dr</span><span class="o">.</span><span class="n">bg</span>
@@ -1384,29 +1292,27 @@ explicitly considered in the second component.<a class="footnote-reference brack
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil_between&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">theil_dr</span><span class="o">.</span><span class="n">bg</span>
 <span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil_within&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">theil_dr</span><span class="o">.</span><span class="n">wg</span>
-<span class="n">inequalities</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s1">&#39;I-P value&#39;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>We can visualize them alongside our earlier results:</p>
+<p>Inference on these decompositions can be done using the <code class="docutils literal notranslate"><span class="pre">inequality.theil.TheilDSim</span></code> class, but we omit that here for brevity and report that, like the Moran’s <span class="math notranslate nohighlight">\(I\)</span>, all of the Theil decompositions are statistically significant.</p>
+<p>Since the within and between components are interpreted as shares of the overall Theil index, we can compute the share of the Theil index due to the between-region inequality.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">15</span><span class="p">))</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil_between_share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil_between&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil&#39;</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="../_images/09_spatial_inequality_93_0.png" src="../_images/09_spatial_inequality_93_0.png" />
 </div>
-</div>
-<p>Inference on these decompositions can be done using the <code class="docutils literal notranslate"><span class="pre">inequality.theil.TheilDSim</span></code> class, but we omit that here for brevity and report that, like the Moran’s <span class="math notranslate nohighlight">\(I\)</span>, all of the Theil decompositions are statistically significant. Further, since the within and between components are interpreted as shares of the overall Theil index, we can compute the share of the Theil index due to the between-region inequality, and note that it also generally shares the same pattern, but does not see minima in the same places:</p>
+<p>We can visualize the three time series:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil_between_share&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil_between&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil&#39;</span><span class="p">]</span>
-<span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;theil_between_share&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="p">[</span>
+    <span class="p">[</span><span class="s1">&#39;theil_between&#39;</span><span class="p">,</span> <span class="s1">&#39;theil_within&#39;</span><span class="p">,</span> <span class="s1">&#39;theil_between_share&#39;</span><span class="p">]</span>
+<span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">8</span><span class="p">));</span>
 </pre></div>
 </div>
 </div>
@@ -1414,13 +1320,13 @@ explicitly considered in the second component.<a class="footnote-reference brack
 <img alt="../_images/09_spatial_inequality_95_0.png" src="../_images/09_spatial_inequality_95_0.png" />
 </div>
 </div>
-<p>The between-region share of inequality is at its lowest in the mid-2000s, not in the mid-1990s. This suggests that regional differences were very important in the 1970s and 1980s, but this importance has been waning, relative to the inequality <em>within</em> US Census Regions.</p>
+<p>The between-region share of inequality is at its lowest in the mid-2000s, not in the mid-1990s. This suggests that regional differences were very important in the 1970s and 1980s, but this importance has been waning, relative to the inequality <em>within</em> US Census Regions. The ratio also generally shares the same pattern, but does not see minima in the same places.</p>
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 </div>
 <div class="section" id="spatializing-classic-measures">
 <h3>Spatializing Classic Measures<a class="headerlink" href="#spatializing-classic-measures" title="Permalink to this headline">¶</a></h3>
 <p>While regional decompositions are useful, they do not tell the whole story. Indeed, a “region” is just a special kind of group; its “geography” is only made manifest through group membership (<em>is the county “in” the region or not?</em>). This kind of “place-based” thinking, while geographic, is not necessarily <em>spatial</em>. It does not incorporate the notions of distance or proximity into the study of inequality. The geographical locations of the regions could be re-arranged without impact, so long as the group membership structure is maintained. While, arguably, shuffling regions around means they are no longer “regions,” the statistical methods would be no different.</p>
-<p>The final approach we review here is an explicit integration of space within traditional, non-spatial measure. In particular, we consider a <em>spatialized</em> version of the Gini coefficient, introduced by <span id="id8">[<a class="reference internal" href="references.html#id47"><span>RS12</span></a>]</span>. The spatial Gini is designed to consider
+<p>The final approach we review here is an explicit integration of space within traditional, non-spatial measure. In particular, we consider a <em>spatialized</em> version of the Gini coefficient, introduced by <span id="id8">[<a class="reference internal" href="references.html#id54"><span>RS12</span></a>]</span>. The spatial Gini is designed to consider
 the role of spatial adjacency in a decomposition of the traditional Gini. The original index can be formulated focusing on the set of pairwise absolute differences in incomes:</p>
 <div class="math notranslate nohighlight">
 \[G = \frac{\sum_i \sum_j \left | y_i - y_j \right|}{2 n^2 \bar{x}} \]</div>
@@ -1429,7 +1335,7 @@ the role of spatial adjacency in a decomposition of the traditional Gini. The or
 \[
 \sum_i \sum_j \left |y_i - y_j \right | =\sum_i \sum_j \underset{\text{near differences}}{\left( w_{ij} \left |y_i - y_j \right | \right )} + \underset{\text{far differences}}{\left( (1-w_{ij})  \left |y_i - y_j \right | \right )}
 \]</div>
-<p>In this decomposition, <span class="math notranslate nohighlight">\(w_{ij}\)</span> is a binary variable that is <span class="math notranslate nohighlight">\(1\)</span> when <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are neighbors, and is zero otherwise. Recalling the spatial weights matrices from Chapter 4, this can be used directly from a spatial weights matrix.^[However, non-binary spatial weights matrices require a correction factor, and are not discussed here.] Thus, with this decomposition, the Spatial Gini can be stated as</p>
+<p>In this decomposition, <span class="math notranslate nohighlight">\(w_{ij}\)</span> is a binary variable that is <span class="math notranslate nohighlight">\(1\)</span> when <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> are neighbors, and is zero otherwise. Recalling the spatial weights matrices from <a class="reference internal" href="04_spatial_weights.html"><span class="doc std std-doc">Chapter 4</span></a>, this can be used directly from a spatial weights matrix.<a class="footnote-reference brackets" href="#sp-gini-ft" id="id9">4</a> Thus, with this decomposition, the Spatial Gini can be stated as</p>
 <div class="math notranslate nohighlight">
 \[G = \frac{\sum_i \sum_j w_{i,j}\left | x_i - x_j \right|}{2 n^2 \bar{x}} +   \frac{\sum_i \sum_j \left (1-w_{i,j} )| x_i - x_j \right|}{2 n^2 \bar{x}}\]</div>
 <p>with the first term being the component among neighbors and the second term being the component among non-neighbors. The “spatial Gini”, then, is the first component that describes the differences between nearby observations.</p>
@@ -1529,8 +1435,8 @@ the role of spatial adjacency in a decomposition of the traditional Gini. The or
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2min 8s, sys: 87.3 ms, total: 2min 8s
-Wall time: 2min 9s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 4min 26s, sys: 225 ms, total: 4min 26s
+Wall time: 4min 27s
 </pre></div>
 </div>
 </div>
@@ -1606,7 +1512,7 @@ Wall time: 2min 9s
 </table>
 </div></div></div>
 </div>
-<p>The <span class="math notranslate nohighlight">\(p\)</span>-values are always small, suggesting that the contribution of the local ties is always smaller than that that would be expected if incomes were distributed randomly in the map.^[While it is possible that the “near differences” component could be <em>larger</em> than expected, that would imply negative spatial dependence, which is generally rare in empirical work.] We can compute the percent of times the <span class="math notranslate nohighlight">\(p\)</span>-value is smaller than a threshold using the mean:</p>
+<p>The <span class="math notranslate nohighlight">\(p\)</span>-values are always small, suggesting that the contribution of the local ties is always smaller than that that would be expected if incomes were distributed randomly in the map.<a class="footnote-reference brackets" href="#near-diffs" id="id10">5</a> We can compute the percent of times the <span class="math notranslate nohighlight">\(p\)</span>-value is smaller than a threshold using the mean:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">spatial_gini_results</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -1619,7 +1525,7 @@ Wall time: 2min 9s
 </div>
 </div>
 </div>
-<p>While it may appear that the component due to “near differences” is quite small, this has two reasons. First, the number of “nearby” pairs are less than 1% of all pairs of observations:</p>
+<p>While it may appear that the component due to “near differences” is quite small, this has two reasons. First, the number of “nearby” pairs are less than 0.2% of all pairs of observations:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wq</span><span class="o">.</span><span class="n">pct_nonzero</span>
@@ -1632,29 +1538,28 @@ Wall time: 2min 9s
 </div>
 </div>
 </div>
-<p>Second, when spatial dependence is high, nearby observations will be similar. So, each “near difference” will also be small. Adding together a small number of small observations will generally be small, relative to the large differences between distant observations. Thus, small values of the “near” distances are indicative of spatial dependence. Indeed, we can see that as the spatial dependence weakens, the <code class="docutils literal notranslate"><span class="pre">near_diffs</span></code> get larger:</p>
+<p>Second, when spatial dependence is high, nearby observations will be similar. So, each “near difference” will also be small. Adding together a small number of small observations will generally be small, relative to the large differences between distant observations. Thus, small values of the “near” distances are indicative of spatial dependence. Indeed, we can see visually that as the spatial dependence weakens, the <code class="docutils literal notranslate"><span class="pre">near_diffs</span></code> get larger:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">inequalities</span><span class="p">[</span><span class="s1">&#39;near_diffs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">spatial_gini_results</span><span class="o">.</span><span class="n">near_diffs</span>
 
-<span class="n">inequalities</span><span class="p">[[</span><span class="s1">&#39;near_diffs&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">inequalities</span><span class="p">[[</span><span class="s1">&#39;near_diffs&#39;</span><span class="p">,</span> <span class="s1">&#39;I&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">line</span><span class="p">(</span>
+    <span class="n">subplots</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+<span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([&lt;AxesSubplot:&gt;, &lt;AxesSubplot:&gt;], dtype=object)
-</pre></div>
-</div>
-<img alt="../_images/09_spatial_inequality_120_1.png" src="../_images/09_spatial_inequality_120_1.png" />
+<img alt="../_images/09_spatial_inequality_120_0.png" src="../_images/09_spatial_inequality_120_0.png" />
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>Inequality is an important social phenomenon, and its geography is a growing concern for social scientists. Geographical disparities in well-being have been pointed to as a major driver behind the rise of right-wing populist movements in the US and Europe <span id="id9">[<a class="reference internal" href="references.html#id50"><span>RP18</span></a>]</span>. Thus, understanding the nature of these disparities and their evolution is a challenge for both science and policy.</p>
-<p>This chapter discusses methods to assess inequality, as well as examine its spatial and regional structure. We have seen the Gini coefficient and Theil index as examples of global measures to summarize the overall level of inequality. As is often the case in many areas of spatial analysis, the straightforward adoption of methods from economics and sociology to spatial data can  often be fruitful but, at the same time, can miss key elements of the spatial story. In the context of spatial income disparities, we have highlighted the  differences between personal and regional inequality. From this vantage, we have reviewed three approaches to incorporate geography and space in the study of inequality. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as those for spatial autocorrelation discussed in chapters <a class="reference internal" href="06_spatial_autocorrelation.html"><span class="doc std std-doc">6</span></a> and <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">7</span></a>.</p>
-<p>Before leaving the topic of spatial inequality, we note that there is much more that can be said about inequality and related concepts. Inequality is generally concerned with the static snapshot of the regional income distribution and the shares of that distribution that each region holds. Those shares are reflected in the variance or spread of the distribution. However, this is only one moment of the distribution, and a comprehensive understanding of disparities requires analysis of the distribution’s location (mean) and shape (modes, kurtosis, skewness) as well as dispersion. Moreover, movements of individual regions within the distribution over time, or what is referred to as <em>spatial income mobility</em> are critical to our understanding of the dynamics of spatial disparities. Full consideration of these concepts is beyond the scope of this chapter. Interested readers are directed to <span id="id10">[<a class="reference internal" href="references.html#id59"><span>Rey14</span></a>]</span> as an entry point to these more advanced topics.</p>
+<p>Inequality is an important social phenomenon, and its geography is a growing concern for social scientists. Geographical disparities in well-being have been pointed to as a major driver behind the rise of right-wing populist movements in the US and Europe <span id="id11">[<a class="reference internal" href="references.html#id57"><span>RP18</span></a>]</span>. Thus, understanding the nature of these disparities and their evolution is a challenge for both science and policy.</p>
+<p>This chapter discusses methods to assess inequality, as well as to examine its spatial and regional structure. We have seen the Gini coefficient and Theil index as examples of global measures to summarize the overall level of inequality. As is often the case in many areas of spatial analysis, the straightforward adoption of methods from economics and sociology to spatial data can  often be fruitful but, at the same time, can miss key elements of the spatial story. In the context of spatial income disparities, we have highlighted the  differences between personal and regional inequality. From this vantage, we have reviewed three approaches to incorporate geography and space in the study of inequality. Together, this gives us a good sense of how inequality manifests geographically, and how it is (possibly) distinct from other kinds of spatial measures, such as those for spatial autocorrelation discussed in chapters <a class="reference internal" href="06_spatial_autocorrelation.html"><span class="doc std std-doc">6</span></a> and <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">7</span></a>. Furthermore, in this chapter we have dipped our toes in spatiotemporal data, exploring how spatial patterns change and evolve over time.</p>
+<p>Before leaving the topic of spatial inequality, we note that there is much more that can be said about inequality and related concepts. Inequality is generally concerned with the static snapshot of the regional income distribution and the shares of that distribution that each region holds. Those shares are reflected in the variance or spread of the distribution. However, this is only one moment of the distribution, and a comprehensive understanding of disparities requires analysis of the distribution’s location (mean) and shape (modes, kurtosis, skewness) as well as dispersion. Moreover, movements of individual regions within the distribution over time, or what is referred to as <em>spatial income mobility</em> are critical to our understanding of the dynamics of spatial disparities. Full consideration of these concepts is beyond the scope of this chapter. Interested readers are directed to <span id="id12">[<a class="reference internal" href="references.html#id66"><span>Rey14</span></a>]</span> as an entry point to these more advanced topics.</p>
 </div>
 <div class="section" id="questions">
 <h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
@@ -1668,13 +1573,19 @@ Wall time: 2min 9s
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
 <dt class="label" id="reg"><span class="brackets"><a class="fn-backref" href="#id4">1</a></span></dt>
-<dd><p>It should also be noted that even at the national scale, the analysis of interpersonal income inequality also relies on aggregate data grouping individuals into income cohorts. See, for example, <span id="id11">[<a class="reference internal" href="references.html#id44"><span>PS03</span></a>]</span>.</p>
+<dd><p>It should also be noted that even at the national scale, the analysis of interpersonal income inequality also relies on aggregate data grouping individuals into income cohorts. See, for example, <span id="id13">[<a class="reference internal" href="references.html#id51"><span>PS03</span></a>]</span>.</p>
 </dd>
 <dt class="label" id="mut-ex"><span class="brackets"><a class="fn-backref" href="#id6">2</a></span></dt>
 <dd><p>This would be violated, for example, if one area were in two regions. This area would get “double counted” in this total.</p>
 </dd>
 <dt class="label" id="weight"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
-<dd><p>The regional decomposition does not involve weighting the regions by their respective population. See  <span id="id12">[<a class="reference internal" href="references.html#id33"><span>Glu18</span></a>]</span> for further details.</p>
+<dd><p>The regional decomposition does not involve weighting the regions by their respective population. See  <span id="id14">[<a class="reference internal" href="references.html#id40"><span>Glu18</span></a>]</span> for further details.</p>
+</dd>
+<dt class="label" id="sp-gini-ft"><span class="brackets"><a class="fn-backref" href="#id9">4</a></span></dt>
+<dd><p>However, non-binary spatial weights matrices require a correction factor, and are not discussed here.</p>
+</dd>
+<dt class="label" id="near-diffs"><span class="brackets"><a class="fn-backref" href="#id10">5</a></span></dt>
+<dd><p>While it is possible that the “near differences” component could be <em>larger</em> than expected, that would imply negative spatial dependence, which is generally rare in empirical work.</p>
 </dd>
 </dl>
 </div>
@@ -1703,12 +1614,32 @@ Wall time: 2min 9s
               </div>
               
         
-        <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="../intro_part_iii.html" title="previous page">Overview</a>
-    <a class='right-next' id="next-link" href="10_clustering_and_regionalization.html" title="next page">Clustering &amp; Regionalization</a>
 
-        </div>
+
+
+<div class='prev-next-bottom'>
+    
+    <div id="prev">
+        <a class="left-prev" href="../intro_part_iii.html" title="previous page">
+            <i class="prevnext-label fas fa-angle-left"></i>
+            <div class="prevnext-info">
+                <p class="prevnext-label">previous</p>
+                <p class="prevnext-title">Overview</p>
+            </div>
+        </a>
+    </div>
+     <div id="next">
+        <a class="right-next" href="10_clustering_and_regionalization.html" title="next page">
+            <div class="prevnext-info">
+                <p class="prevnext-label">next</p>
+                <p class="prevnext-title">Clustering &amp; Regionalization</p>
+            </div>
+            <i class="prevnext-label fas fa-angle-right"></i>
+        </a>
+     </div>
+
+</div>
         
         </div>
     </div>

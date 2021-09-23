@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/sphinx-book-theme.e8e5499552300ddf5d7adccae7cc3b70.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.e8f53015daec13862f6db5e763c41738.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
@@ -43,15 +43,15 @@
     <script src="../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
-    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
+    <script async="async" src="https://unpkg.com/thebe@0.5.1/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
         const thebe_selector_input = "pre"
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="../_static/sphinx-thebe.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["\\(", "\\)"]], "displayMath": [["\\[", "\\]"]], "processRefs": false, "processEnvironments": false}})</script>
     <link rel="canonical" href="https://geographicdata.science/book/notebooks/12_feature_engineering.html" />
     <link rel="shortcut icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
@@ -85,7 +85,7 @@
 </div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item active">
         <ul class="nav bd-sidenav">
  <li class="toctree-l1">
@@ -369,7 +369,7 @@
             <div class="tocsection onthispage pt-5 pb-3">
                 <i class="fas fa-list"></i> Contents
             </div>
-            <nav id="bd-toc-nav">
+            <nav id="bd-toc-nav" aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#what-is-spatial-feature-engineering">
@@ -423,6 +423,11 @@
     </a>
     <ul class="nav section-nav flex-column">
      <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#counting-neighbors">
+       Counting neighbors
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#distance-buffers-within-a-single-table">
        Distance buffers within a single table
       </a>
@@ -465,13 +470,12 @@
   <div class="section" id="spatial-feature-engineering">
 <h1>Spatial Feature Engineering<a class="headerlink" href="#spatial-feature-engineering" title="Permalink to this headline">¶</a></h1>
 <p>In machine learning and data science, we are often equipped with <em>tons</em> of data. Indeed, given the constellation of packages to query data services, free and open source data sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful <em>features</em> from this rich and deep sea of data.</p>
-<p>Where data is available, but not yet directly <em>usable</em>, <em>feature engineering</em> helps to construct useful data for modeling a given phenomenon of interest. In traditional machine learning, feature engineering involves applying additional <em>domain knowledge</em> to raw information in order to structure it in a manner that is meaningful for a model. Often, this involves some sort of <em>transformation</em> of the original dataset, which is a well-studied concept in both classical statistics and remains so in machine learning methods. While <em>feature engineering</em> always relies on this implicit domain knowledge, it is an extremely important part of adapting general-purpose algorithms to unique or distinctive problems facing the every-day data scientist.</p>
+<p>Where data is available, but not yet directly <em>usable</em>, <em>feature engineering</em> helps to construct representations or transformations of the original data that are more useful for modeling a given phenomenon of interest. In traditional machine learning, feature engineering involves applying additional <em>domain knowledge</em> to raw information in order to structure it in a manner that is meaningful for a model. Often, this involves some sort of <em>transformation</em> of the original dataset, which is a well-studied concept in both classical statistics and remains so in machine learning methods. While <em>feature engineering</em> always relies on this implicit domain knowledge, it is an extremely important part of adapting general-purpose algorithms to unique or distinctive problems facing the every-day data scientist.</p>
 <p>Geography is one of the most high-quality, ubiquitous ways to introduce <em>domain knowledge</em> into a problem: everything has a position in both <em>space</em> and <em>time</em>. And, while things that happen near to one another <em>in time</em> do not necessarily have a fundamental relationship, things that are <em>near</em> one another are often related. Thus, space is the ultimate <em>linkage key</em>, allowing us to connect different datasets together in order to improve our models and our predictions. This means that, even for <em>aspatial</em>, “non-geographic” data, you can use <em>spatial feature engineering</em> to create useful, highly-relevant features for your analysis.</p>
 <p>At its core, <em>spatial feature engineering</em> is the process of developing additional information from raw data using <em>geographic knowledge</em>. This distilling of information can occur <em>between</em> datasets, where geography is used to link information in separate datasets together; or <em>within</em> datasets, where geography can be used to augment the information available for one sample by borrowing from nearby ones. This chapter is structured following that distinction: for cases where geography connects <em>different</em> datasets, we adopt the term “Map Matching”, often used in industry; while we use the mirroring concept of “Map Synthesis” describing the use of geographical structure to derive new features from a given dataset. Technically speaking, some of the methods we review are similar across these two cases, or even the same; however they can be applied in the context of “matching” or “synthesis”, and we consider those conceptually different, hence their inclusion in both sections. Throughout the chapter, we use the AirBnB nightly rental prices in San Diego, as well as auxiliary datasets such as elevation or Census demographics.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span><span class="o">,</span> <span class="nn">pandas</span><span class="o">,</span> <span class="nn">libpysal.weights</span> <span class="k">as</span> <span class="nn">weights</span><span class="o">,</span> <span class="nn">contextily</span>
-<span class="kn">from</span> <span class="nn">tobler.area_weighted</span> <span class="kn">import</span> <span class="n">area_interpolate</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">cenpy</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
@@ -483,7 +487,7 @@
 </div>
 </div>
 </div>
-<p>Throughout this chapter, we will use a common dataset to which we want to append more information through geography. For the illustration, we will use the set of <a class="reference internal" href="../data/airbnb/regression_cleaning.html"><span class="doc std std-doc">AirBnB properties</span></a>. Let’s read it:</p>
+<p>Throughout this chapter, we will use the same dataset to which we want to append more information or augment, and we will do so through leveraging geography. For the illustration, we will use the set of <a class="reference internal" href="../data/airbnb/regression_cleaning.html"><span class="doc std std-doc">AirBnB properties</span></a> we have used in the <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">previous chapter</span></a>. Let’s read it:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/airbnb/regression_db.geojson&#39;</span><span class="p">)</span>
@@ -493,38 +497,39 @@
 </div>
 <div class="section" id="what-is-spatial-feature-engineering">
 <h2>What is spatial feature engineering?<a class="headerlink" href="#what-is-spatial-feature-engineering" title="Permalink to this headline">¶</a></h2>
-<p>At its core, <em>spatial feature engineering</em> is the process of developing additional information from raw data using <em>geographic knowledge</em>. This synthesis could occur <em>between</em> datasets, where geography is used to link samples in separate datasets together; or <em>within</em> datasets, where geography can be used to borrow information from nearby samples. Building linkages <em>between</em> datasets is often called “Map Matching”, while we use the term “Map Synthesis” to describe the use of geographical structure to derive new features from existing data. Both kinds of geographic feature engineering will be covered in this chapter, starting first with various methods for Map Matching when modeling AirBnB nightly rental prices in San Diego.</p>
+<p>At its core, <em>spatial feature engineering</em> is the process of developing additional information from raw data using <em>geographic knowledge</em>. This synthesis could occur <em>between</em> datasets, where geography is used to link samples in separate datasets together; or <em>within</em> datasets, where geography can be used to borrow information from nearby samples. Building linkages <em>between</em> datasets is often called “Map Matching”, while we use the term “Map Synthesis” to describe the use of geographical structure to derive new features from existing data. We will cover both kinds of feature engineering.</p>
 <p>To help us discuss this, a vocabulary is helpful. We will cover a few different kinds of features in this chapter, both of which can be constructed in either Map Synthesis or Map Matching operations:</p>
 <ul class="simple">
 <li><p>A <em>spatial summary feature</em> measures the attributes of observations that have some pre-specified spatial relationship with our target observations. This includes</p>
 <ul>
 <li><p>taking the average or median value of features within a neighborhood of each target observation.</p></li>
-<li><p>the <em>spatial lag</em>, used in previous chapters of this book (e.g., Chapters 3, 6, and 11), is a kind of spatial summary feature, since it reflects the average value of the data in the neighborhood around each point.</p></li>
+<li><p>the <em>spatial lag</em>, used in previous chapters of this book (e.g., Chapters <a class="reference internal" href="03_spatial_data.html"><span class="doc std std-doc">3</span></a>, <a class="reference internal" href="06_spatial_autocorrelation.html"><span class="doc std std-doc">6</span></a>, and <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">11</span></a>, is a kind of spatial summary feature, since it reflects the average value of the data in the neighborhood around each point.</p></li>
 <li><p>Other kinds of spatial summary features might include the count of observations within a given distance or the standard deviation of ten nearest observations.</p></li>
 <li><p>Summary features generally include <em>interpolated features</em> which involve a transfer of information from one spatial support to another, such as when the target locations are not the same as the locations in our ancillary data. Interpolated features become significantly more complex as well when the data is <em>areal</em>, as will be discussed later in this chapter.</p></li>
 </ul>
 </li>
-<li><p>A <em>proximity feature</em> measures the distance from a target observation to some other observation or position in the map. This might be done in a map matching context, as we did before with the distance to Balboa Park, or it might be done in a map synthesis context by measuring the distance to the nearest other observation.</p></li>
+<li><p>A <em>proximity feature</em> measures the distance from a target observation to some other observation or position in the map. This might be done in a map matching context, as we did before with the distance to Balboa Park in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>, or it might be done in a map synthesis context by measuring the distance to the nearest other observation.</p></li>
 </ul>
 </div>
 <div class="section" id="feature-engineering-using-map-matching">
 <h2>Feature Engineering Using Map Matching<a class="headerlink" href="#feature-engineering-using-map-matching" title="Permalink to this headline">¶</a></h2>
 <p>Space is the ultimate linkage key; map matching is all about exploiting this asset. Geographic information is collected at different scales, aggregated using bespoke geographic delineations, and ultimately stored in different datasets. Modeling and machine learning usually require the use of data aligned and coherently structured; to bring disparate geo-datasets together, the data scientist needs to be able to transfer information expressed for one geography into another. This is where map matching comes to the rescue. By using geographical location, we can connect datasets that have no common key or that are otherwise completely unrelated. This is a “magic trick” that we can pull off because of location that would be much harder, or impossible, with data lacking spatial information.</p>
 <p>The details, and difficulty, of this transfer of information from one geography to another one depend on the nature of the “source” and “target”, and on the precision with which we want to perform such transfer. In this context, there is always an inevitable trade-off between precision and sophistication: more precise transfer is usually possible at the expense of more advanced and involved techniques. Their additional cost in applying them, both in terms of cognitive load on the data scientist’s part or in terms of computation, must be weighted in on an individual basis: sometimes we need the best possible estimates, at all costs; sometimes “good enough” is, well, good enough.</p>
-<p>In this section, we cover a few cases that we consider represent the most common and widely used approaches. We begin with situations where we have two point datasets and all we need to calculate are descriptive statistics of one dataset to the observations in the other. We switch the type of data and consider how to attach information from a continuous grid, stored in a raster file, to a set of points. Then we show the equivalent case for “moving” information for a polygon geography to a point dataset. These are all cases that, in their simplest form, involve mostly traditional GIS operations (e.g., buffer construction, spatial joins) and little in the way of statistical modeling. As an example of a case that is more involved, we cover the transfer of information from a polygon geography to another, different polygon geography. For this final case, but also as a more general comment, we try to include examples that capture the essence of the method, but keep the technique as simple as possible. For almost any of these cases we cover, the reader can find more sophisticated techniques that usually yield more accurate estimates. Where possible, we try to signpost these.</p>
+<p>In this section, we cover a few cases that we consider represent the most common and widely used approaches. We begin with situations where we have two point datasets and all we need to calculate are descriptive statistics of one dataset to the observations in the other. We switch the type of data and consider how to attach information from a continuous grid, stored in a raster file, to a set of points. Then we show the equivalent case for “moving” information for a polygon geography to a point dataset. These are all cases that, in their simplest form, involve mostly traditional GIS operations (e.g., buffer construction, spatial joins) and little in the way of statistical modeling. As an example of a case that is more involved, we cover the transfer of information from a set of points to another set of points in different locations, and of a polygon geography to another different polygon geography. For these final cases, but also as more generally, we try to include examples that capture the essence of the method, but keep the technique as simple as possible. For almost any of these cases we cover, the reader can find more sophisticated techniques that usually yield more accurate estimates. Where possible, we try to signpost these.</p>
 <div class="section" id="counting-nearby-features">
 <h3>Counting <em>nearby</em> features<a class="headerlink" href="#counting-nearby-features" title="Permalink to this headline">¶</a></h3>
 <p>A first, conceptually straightforward, approach is to augment our dataset by counting how many points of a different dataset are in the vicinity of each observation. For example, we might want to know how many bars and restaurants each AirBnB has within a given radius. This count can then become an additional  feature of our dataset, stored in a new column of <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code>.</p>
-<p>To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> points. From Chapter 8, we can recall that there are a few different hulls that can be used. We’ll use the Convex Hull here, which is the smallest convex polygon that covers all of the points in the set.</p>
+<p>To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> points. From <a class="reference internal" href="08_point_pattern_analysis.html"><span class="doc std std-doc">Chapter 8</span></a>, we can recall that there are a few different hulls that can be used. We’ll use the Convex Hull here, which is the smallest convex polygon that covers all of the points in the set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_ch</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">unary_union</span><span class="o">.</span><span class="n">convex_hull</span>
-<span class="n">airbnbs_ch</span>
+<span class="n">geopandas</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([</span><span class="n">airbnbs_ch</span><span class="p">])</span><span class="o">.</span><span class="n">plot</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_9_0.svg" src="../_images/12_feature_engineering_9_0.svg" /></div>
+<img alt="../_images/12_feature_engineering_9_0.png" src="../_images/12_feature_engineering_9_0.png" />
+</div>
 </div>
 <p>Using this polygon, we can use the <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we’ll request POIs within San Diego that are “restaurants” or “bars,” according to their metadata stored in OpenStreetMap. Once returned, we only keep a few columns to keep the table small and tidy:</p>
 <div class="cell docutils container">
@@ -537,39 +542,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
-<span class="ne">KeyError</span><span class="g g-Whitespace">                                  </span>Traceback (most recent call last)
-<span class="o">&lt;</span><span class="n">timed</span> <span class="n">exec</span><span class="o">&gt;</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
-
-<span class="nn">~/anaconda3/envs/gdsbook/lib/python3.6/site-packages/geopandas/geodataframe.py</span> in <span class="ni">__getitem__</span><span class="nt">(self, key)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1297</span>         <span class="n">GeoDataFrame</span><span class="o">.</span>
-<span class="g g-Whitespace">   </span><span class="mi">1298</span>         <span class="s2">&quot;&quot;&quot;</span>
-<span class="ne">-&gt; </span><span class="mi">1299</span><span class="s2">         result = super(GeoDataFrame, self).__getitem__(key)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1300</span><span class="s2">         geo_col = self._geometry_column_name</span>
-<span class="g g-Whitespace">   </span><span class="mi">1301</span><span class="s2">         if isinstance(result, Series) and isinstance(result.dtype, GeometryDtype):</span>
-
-<span class="nn">~/anaconda3/envs/gdsbook/lib/python3.6/site-packages/pandas/core/frame.py</span> in <span class="ni">__getitem__</span><span class="nt">(self, key)</span>
-<span class="g g-Whitespace">   </span><span class="mi">2910</span><span class="s2">             if is_iterator(key):</span>
-<span class="g g-Whitespace">   </span><span class="mi">2911</span><span class="s2">                 key = list(key)</span>
-<span class="ne">-&gt; </span><span class="mi">2912</span><span class="s2">             indexer = self.loc._get_listlike_indexer(key, axis=1, raise_missing=True)[1]</span>
-<span class="g g-Whitespace">   </span><span class="mi">2913</span><span class="s2"> </span>
-<span class="g g-Whitespace">   </span><span class="mi">2914</span><span class="s2">         # take() does not accept boolean indexers</span>
-
-<span class="nn">~/anaconda3/envs/gdsbook/lib/python3.6/site-packages/pandas/core/indexing.py</span> in <span class="ni">_get_listlike_indexer</span><span class="nt">(self, key, axis, raise_missing)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1252</span><span class="s2">             keyarr, indexer, new_indexer = ax._reindex_non_unique(keyarr)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1253</span><span class="s2"> </span>
-<span class="ne">-&gt; </span><span class="mi">1254</span><span class="s2">         self._validate_read_indexer(keyarr, indexer, axis, raise_missing=raise_missing)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1255</span><span class="s2">         return keyarr, indexer</span>
-<span class="g g-Whitespace">   </span><span class="mi">1256</span><span class="s2"> </span>
-
-<span class="nn">~/anaconda3/envs/gdsbook/lib/python3.6/site-packages/pandas/core/indexing.py</span> in <span class="ni">_validate_read_indexer</span><span class="nt">(self, key, indexer, axis, raise_missing)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1302</span><span class="s2">             if raise_missing:</span>
-<span class="g g-Whitespace">   </span><span class="mi">1303</span><span class="s2">                 not_found = list(set(key) - set(ax))</span>
-<span class="ne">-&gt; </span><span class="mi">1304</span><span class="s2">                 raise KeyError(f&quot;</span><span class="si">{not_found}</span><span class="s2"> not in index&quot;)</span>
-<span class="g g-Whitespace">   </span><span class="mi">1305</span><span class="s2"> </span>
-<span class="g g-Whitespace">   </span><span class="mi">1306</span><span class="s2">             # we skip the warning on Categorical</span>
-
-<span class="ne">KeyError</span>: &quot;[&#39;unique_id&#39;, &#39;osmid&#39;] not in index&quot;
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 333 ms, sys: 214 ms, total: 548 ms
+Wall time: 313 ms
 </pre></div>
 </div>
 </div>
@@ -581,14 +555,8 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook/lib/python3.6/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
-  for feature in features_lst:
-</pre></div>
 </div>
-</div>
-</div>
-<p>This provides us with every location within our convex hull that is tagged as a “restaurant” or “bar” its metadata on OpenStreetMap. Overall, this provides us with about 1300 points of interest:</p>
+<p>This provides us with every location within our convex hull that is tagged in the metadata stored in OpenStreetMap as a “restaurant” or “bar”. Overall, this provides us with about 1300 points of interest:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;amenity&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">amenity</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
@@ -598,7 +566,7 @@
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>amenity
 bar            308
-restaurant    1014
+restaurant    1050
 Name: amenity, dtype: int64
 </pre></div>
 </div>
@@ -607,14 +575,22 @@ Name: amenity, dtype: int64
 <p>Once loaded into <code class="docutils literal notranslate"><span class="pre">pois</span></code> as a <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>, let’s take a peek at their location, as compared with AirBnB spots:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="c1"># Plot AirBnb properties</span>
 <span class="n">airbnbs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="c1"># Plot POIs in red</span>
 <span class="n">pois</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="c1"># Add Stamen&#39;s Toner basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span> 
     <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
     <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="c1"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -628,10 +604,10 @@ Name: amenity, dtype: int64
 <ol class="simple">
 <li><p>Decide what is <em>nearby</em>. This will dictate how far we go from each AirBnB when counting the number of “nearby” bars &amp; restaurants. For this example, we will use 500 meter buffer, which is approximately the distance of a leisurely ten-minute walk.</p></li>
 <li><p>For each AirBnB, determine whether POIs are <em>within</em> a leisurely ten-minute walk.</p></li>
-<li><p>Count how many POIs are withing the specified radius of each AirBnB.</p></li>
+<li><p>Count how many POIs are within the specified radius of each AirBnB.</p></li>
 </ol>
 <p>At the end of this procedure, we have the number of bars &amp; restaurants that are within a leisurely walk of the AirBnB, which might be useful in predicting the price of each AirBnB.</p>
-<p>With this, let us now translate the list above into code. For part 1., we need to be able to measure distances in meters. However, <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> is originally expressed in degrees, since it is provided in terms of locations in latitude and longitude:</p>
+<p>Let us now translate the list above into code. For part 1., we need to be able to measure distances in meters. However, <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> is originally expressed in degrees, since it is provided in terms of locations in latitude and longitude:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span>
@@ -639,6 +615,10 @@ Name: amenity, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
 Name: WGS 84
 Axis Info [ellipsoidal]:
@@ -723,30 +703,44 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Using these, we can count the number of POIs that are within these areas using a <em>spatial join</em>. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: <code class="docutils literal notranslate"><span class="pre">pois</span> <span class="pre">within</span> <span class="pre">airbnb_buffers</span></code>, where <code class="docutils literal notranslate"><span class="pre">within</span></code> is the predicate relating <code class="docutils literal notranslate"><span class="pre">pois</span></code> to <code class="docutils literal notranslate"><span class="pre">airbnb_buffers</span></code>. Predicates are not always <em>reversible</em>: no <code class="docutils literal notranslate"><span class="pre">airbnb_buffer</span></code> can be <code class="docutils literal notranslate"><span class="pre">within</span></code> a <code class="docutils literal notranslate"><span class="pre">poi</span></code>. In <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>, we can compute all pairs of relations between the <code class="docutils literal notranslate"><span class="pre">pois</span></code> and <code class="docutils literal notranslate"><span class="pre">airbnb_buffers</span></code> efficiently using the <code class="docutils literal notranslate"><span class="pre">sjoin</span></code> function, which takes a <code class="docutils literal notranslate"><span class="pre">predicate</span></code> argument defining the requested relationship between the first and second argument.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">joined</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Spatial join, appending attributes from right table to left one</span>
+<span class="n">joined</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span>
+    <span class="c1"># Right table - POIs</span>
     <span class="n">pois_albers</span><span class="p">,</span>
+    <span class="c1"># Left table - Airbnb with the geometry reset from the original</span>
+    <span class="c1"># points to the 500m buffer and selecting only `id` and</span>
+    <span class="c1"># `buffer_500m` column</span>
     <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s1">&#39;buffer_500m&#39;</span><span class="p">)[[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;buffer_500m&#39;</span><span class="p">]],</span>
+    <span class="c1"># Operation (spatial predicate) to use for the spatial join (`within`)</span>
     <span class="n">op</span><span class="o">=</span><span class="s2">&quot;within&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>The resulting joined object <code class="docutils literal notranslate"><span class="pre">joined</span></code> contains a row for every pair of POI and AirBnB that are linked. From there, we can apply a group-by operation, using the AirBnB ID, and count how many POIs each AirBnB has within 500m of distance:</p>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">joined</span></code> object contains a row for every pair of POI and AirBnB that are linked. From there, we can apply a group-by operation, using the AirBnB ID, and count how many POIs each AirBnB has within 500m of distance:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">poi_count</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group POIs by Airbnb ID (`id`)</span>
+<span class="n">poi_count</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
     <span class="s2">&quot;id&quot;</span>
+<span class="c1"># Keep only POI id column (`osmid`)</span>
 <span class="p">)[</span>
     <span class="s2">&quot;osmid&quot;</span>
+<span class="c1"># Count POIs by Airbnb + convert Series into DataFrame</span>
 <span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span>
     <span class="s1">&#39;poi_count&#39;</span>
 <span class="p">)</span>
+<span class="c1"># Print top of the table</span>
 <span class="n">poi_count</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
 <div class="output text_html"><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -806,11 +800,19 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+</div>
 </div>
 <p>We can visualize now the distribution of counts to get a sense of how “well-served” AirBnB properties are arranged over space:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Plot quantile map of No. of POIs for every Airbnb</span>
 <span class="n">airbnbs_w_counts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">column</span><span class="o">=</span><span class="s2">&quot;poi_count&quot;</span><span class="p">,</span>
     <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
@@ -818,11 +820,14 @@ Datum: NAD83 (High Accuracy Reference Network)
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
 <span class="p">)</span>
+<span class="c1"># Add basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span> 
     <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
     <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
@@ -839,16 +844,26 @@ Datum: NAD83 (High Accuracy Reference Network)
 <li><p>A sample of AirBnB property locations.</p></li>
 <li><p>A dataset of elevation. We will use here the <a class="reference internal" href="../data/nasadem/README.html"><span class="doc std std-doc">NASA DEM</span></a> surface for the San Diego area.</p></li>
 </ol>
-<p>Let us bring the elevation surface:</p>
+<p>Let  us open and plot the file with elevation data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span><span class="p">)</span>
-<span class="n">rioshow</span><span class="p">(</span><span class="n">dem</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Open file</span>
+<span class="n">dem</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;../data/nasadem/nasadem_sd.tif&quot;</span><span class="p">)</span>
+<span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="c1"># Display elevation data on created axis</span>
+<span class="n">rioshow</span><span class="p">(</span><span class="n">dem</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_38_0.png" src="../_images/12_feature_engineering_38_0.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+<img alt="../_images/12_feature_engineering_38_1.png" src="../_images/12_feature_engineering_38_1.png" />
 </div>
 </div>
 <p>Let’s first check the CRS is aligned with our sample of point locations:</p>
@@ -864,8 +879,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 </div>
-<p>We have opened the file with <code class="docutils literal notranslate"><span class="pre">rasterio</span></code>, which has not read the entire dataset just yet. This feature allows us to use this approach with files that are potentially very large, as only requested data is read into memory.</p>
-<p>To extract a discrete set of values from the elevation surface in <code class="docutils literal notranslate"><span class="pre">dem</span></code>, we can use <code class="docutils literal notranslate"><span class="pre">sample</span></code>. For a single location, this is how it works:</p>
+<p>We have opened the file with <code class="docutils literal notranslate"><span class="pre">rasterio</span></code>, which has not read the entire dataset just yet. This feature allows us to use this approach with files that are potentially very large, as only requested data is read into memory. To extract a discrete set of values from the elevation surface in <code class="docutils literal notranslate"><span class="pre">dem</span></code>, we can use <code class="docutils literal notranslate"><span class="pre">sample</span></code>. For a single location, this is how it works:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">list</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">sample</span><span class="p">([(</span><span class="o">-</span><span class="mf">117.24592208862305</span><span class="p">,</span> <span class="mf">32.761619109301606</span><span class="p">)]))</span>
@@ -881,20 +895,28 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Now, we can  apply this logic to a sequence of coordinates. For that, we need to extract them from the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">abb_xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create table with XY coordinates of Airbnb locations</span>
+<span class="n">abb_xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">}</span>
+<span class="c1"># Convert from DataFrame to array of XY pairs</span>
 <span class="p">)</span><span class="o">.</span><span class="n">to_records</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
+<p>And then we can apply the same logic as above to sample elevation for the list of Airbnb locations:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">elevation</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Save results as a DataFrame</span>
+<span class="n">elevation</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="c1"># Sequence of elevation measurements sampled at the Airbnb locations</span>
     <span class="n">dem</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">abb_xys</span><span class="p">),</span>
+    <span class="c1"># Name of the column to be created to store elevation</span>
     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Elevation&quot;</span><span class="p">],</span>
+    <span class="c1"># Row index, mirroring that of Airbnb locations</span>
     <span class="n">index</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">index</span>
 <span class="p">)</span>
+<span class="c1"># Print top of the table</span>
 <span class="n">elevation</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -949,9 +971,12 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Now we have a table with the elevation of each  AirBnB property, we can plot the site elevations on a map for visual inspection:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Join elevation data to original Airbnb table</span>
 <span class="n">airbnbs</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
     <span class="n">elevation</span>
+<span class="c1"># Plot elevation at each Airbnb location as a quantile choropleth</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Elevation&quot;</span><span class="p">,</span>
     <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
@@ -959,38 +984,55 @@ Datum: NAD83 (High Accuracy Reference Network)
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
 <span class="p">)</span>
+<span class="c1"># Add Stamen&#39;s terrain basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span> 
     <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
     <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_47_0.png" src="../_images/12_feature_engineering_47_0.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+<img alt="../_images/12_feature_engineering_48_1.png" src="../_images/12_feature_engineering_48_1.png" />
 </div>
 </div>
 </div>
 <div class="section" id="point-interpolation-using-scikit-learn">
 <h3>Point Interpolation using scikit-learn<a class="headerlink" href="#point-interpolation-using-scikit-learn" title="Permalink to this headline">¶</a></h3>
-<p>In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is <em>spatial interpolation</em>. For a continuous geographical field measured at a set of points, <em>spatial interpolation</em> methods provide us a way to guess at at the value a field would take at sites we do not measure.</p>
-<p>There are many sophisticated methods with which this can be done. <em>Kriging</em>, common in the sub-field of spatial statistics called “geostatistics,” is one such practice based on the theory of <em>Gaussian Process Regression.</em> Another common approach, <em>geographically-weighted regression</em>, provides unique model estimates at every control point, as well as predictions for places where there is no data. Here, though, we’ll use a very basic <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbor prediction algorithm from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> to demonstrate the process. This process will select the nearest 10 listings, then compute the prediction using a weighted average of these nearest observations. To keep predictions relatively consistent, we will build an interpolation only for listings that are entire homes/apartments with two bedrooms:</p>
+<p>In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is <em>spatial interpolation</em>. For a continuous geographical field measured at a set of points, <em>spatial interpolation</em> methods provide us a way to guess at the value a field would take at sites we do not measure.</p>
+<p>There are many sophisticated methods with which this can be done. <em>Kriging</em>, common in the sub-field of spatial statistics called “geostatistics,” is one such practice based on the theory of <em>Gaussian Process Regression.</em> Another common approach, <em>geographically-weighted regression</em>, provides unique model estimates at every control point, as well as predictions for places where there is no data. Here, though, we’ll use a fairly basic <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbor prediction algorithm from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> to demonstrate the process.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsRegressor</span>
 </pre></div>
 </div>
 </div>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_bed_homes</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="p">[</span><span class="n">airbnbs</span><span class="p">[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span> <span class="o">&amp;</span> <span class="n">airbnbs</span><span class="p">[</span><span class="s1">&#39;rt_Entire_home/apt&#39;</span><span class="p">]]</span>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
 </pre></div>
 </div>
 </div>
 </div>
+<p>This algorithm will select the nearest ten listings, then compute the prediction using a weighted average of these nearest observations. To keep predictions relatively consistent, we will build an interpolation only for listings that are entire homes/apartments with two bedrooms:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_bed_homes</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="p">[</span>
+    <span class="n">airbnbs</span><span class="p">[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span> <span class="o">&amp;</span> <span class="n">airbnbs</span><span class="p">[</span><span class="s1">&#39;rt_Entire_home/apt&#39;</span><span class="p">]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Once subset, we can extract the XY coordinates for each of them into a 2D array:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_bed_home_locations</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
@@ -999,11 +1041,19 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+</div>
 </div>
 <p>To plot the interpolated surface, we must also construct a grid of locations for which we will make predictions. This can be done using <code class="docutils literal notranslate"><span class="pre">numpy.meshgrid</span></code>, which constructs all the combinations of the input dimensions as a grid of outputs.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">total_bounds</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Extract bounding box of Airbnb locations</span>
+<span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">total_bounds</span>
+<span class="c1"># Generate X and Y meshes for the space within the bounding box</span>
 <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
     <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">)</span>
 <span class="p">)</span>
@@ -1011,27 +1061,34 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 </div>
+<p>To build an intuition on what they are, we can visualise both meshes side by side:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure</span>
+<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># Plot X mesh</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="c1"># Plot Y mesh</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="c1"># Label X mesh</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;X values&#39;</span><span class="p">)</span>
+<span class="c1"># Label Y mesh</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Y values&#39;</span><span class="p">)</span>
+<span class="c1"># Display</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, &#39;Y values&#39;)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_54_1.png" src="../_images/12_feature_engineering_54_1.png" />
+<img alt="../_images/12_feature_engineering_58_0.png" src="../_images/12_feature_engineering_58_0.png" />
 </div>
 </div>
 <p>With these coordinates, we can make a GeoDataFrame containing the grid cells at which we would like to predict:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Bind a 1D (flattened) of X and Y meshes into a 2D array</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+<span class="c1"># Convert a 1D (flattened) version of X and Y meshes into a geo-table</span>
 <span class="n">grid_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
     <span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span>
         <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
@@ -1040,15 +1097,26 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 </div>
+<p>We can visualise this grid together with the original Airbnb locations to get a better sense of what we have just built:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">two_bed_homes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">);</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot guid points with size 1</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Plot on top Airbnb locations in red</span>
+<span class="n">two_bed_homes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
+    <span class="n">ax</span><span class="p">,</span> 
+    <span class="n">crs</span><span class="o">=</span><span class="n">two_bed_homes</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerBackground</span>
+<span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_57_0.png" src="../_images/12_feature_engineering_57_0.png" />
+<img alt="../_images/12_feature_engineering_62_0.png" src="../_images/12_feature_engineering_62_0.png" />
 </div>
 </div>
 <p>With this done, we can now construct the predictions. First we train the model:</p>
@@ -1060,67 +1128,107 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
 </div>
-<p>And then we predict at the grid cells:</p>
+</div>
+</div>
+<p>And then we predict at the grid cell locations:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
 </div>
+</div>
+</div>
+<p>The result can be displayed as a continuous choropleth, for example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
 </pre></div>
 </div>
-<img alt="../_images/12_feature_engineering_62_1.png" src="../_images/12_feature_engineering_62_1.png" />
+<img alt="../_images/12_feature_engineering_68_1.png" src="../_images/12_feature_engineering_68_1.png" />
 </div>
 </div>
-<p>You can see that the surface gets smoother as you increase the number of nearest neighbors to consider:</p>
+<p>The map is a result not only of the underlying data but also the algorithm we have used. For example, you can see that the surface gets smoother as you increase the number of nearest neighbors to consider:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and 8 axes</span>
+<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="c1"># Loop over eight values equally spaced between 2 and 100</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k_neighbors</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)):</span>
+    <span class="c1"># Select axis to plot estimates for that value of k</span>
     <span class="n">facet</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="c1"># Set up a KNN regressor instance with k_neighbors neighbors</span>
     <span class="n">predictions</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span>
         <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span>
+    <span class="c1"># Fit instance to the 2-bed subset</span>
     <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
         <span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
+    <span class="c1"># Get predictions for locations on the grid</span>
     <span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+    <span class="c1"># Plot predictions</span>
     <span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">facet</span><span class="p">)</span>
+    <span class="c1"># Remove axis</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="c1"># Set axis title</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k_neighbors</span><span class="si">}</span><span class="s2"> neighbors&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_64_0.png" src="../_images/12_feature_engineering_64_0.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+<img alt="../_images/12_feature_engineering_70_1.png" src="../_images/12_feature_engineering_70_1.png" />
 </div>
 </div>
-<p>Focusing in on central San Diego tells the story a bit more clearly, since there are more points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface.</p>
+<p>Focusing in on central San Diego tells the story a bit more clearly, since there are interesting points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface. To visualise a zoom into the region, we begin by extracting its bounding box:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">central_sd_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">117.179832</span><span class="p">,</span> <span class="mf">32.655563</span><span class="p">,</span> <span class="o">-</span><span class="mf">117.020874</span><span class="p">,</span> <span class="mf">32.769909</span><span class="p">]</span>
-<span class="n">central_xmin</span><span class="p">,</span> <span class="n">central_ymin</span><span class="p">,</span> <span class="n">central_xmax</span><span class="p">,</span> <span class="n">central_ymax</span> <span class="o">=</span> <span class="n">central_sd_bounds</span>
+<span class="p">(</span>
+    <span class="n">central_xmin</span><span class="p">,</span> <span class="n">central_ymin</span><span class="p">,</span> <span class="n">central_xmax</span><span class="p">,</span> <span class="n">central_ymax</span>
+<span class="p">)</span> <span class="o">=</span> <span class="n">central_sd_bounds</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
 </pre></div>
 </div>
 </div>
 </div>
+<p>And repeating the process above for this area, including building the meshes of coordinates:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">central_x</span><span class="p">,</span> <span class="n">central_y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build X and Y meshes</span>
+<span class="n">central_x</span><span class="p">,</span> <span class="n">central_y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
     <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_xmin</span><span class="p">,</span> <span class="n">central_xmax</span><span class="p">),</span> 
     <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_ymin</span><span class="p">,</span> <span class="n">central_ymax</span><span class="p">)</span>
 <span class="p">)</span>
+<span class="c1"># Bind X and Y meshes in a 2D array</span>
 <span class="n">central_grid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
     <span class="p">(</span><span class="n">central_x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">central_y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
 <span class="p">)</span>
+<span class="c1"># Bind X and Y meshes in a geo-table</span>
 <span class="n">central_grid_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
     <span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span>
         <span class="n">x</span><span class="o">=</span><span class="n">central_x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">central_y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -1130,32 +1238,41 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 </div>
+<p>Finally we can reproduce the sequence of figures with different values of K only for the central part of the San Diego area:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and subplot</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Loop over five values equally spaced between 2 and 100</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k_neighbors</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)):</span>
+    <span class="c1"># Select axis to plot estimates for that value of k</span>
     <span class="n">facet</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="c1"># Set up a KNN regressor instance with k_neighbors neighbors</span>
     <span class="n">predictions</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span>
         <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span>
+    <span class="c1"># Fit instance to the 2-bed subset</span>
     <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
         <span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
+    <span class="c1"># Get predictions for locations on the grid</span>
     <span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">central_grid</span><span class="p">)</span>
+    <span class="c1"># Plot predictions</span>
     <span class="n">central_grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">facet</span><span class="p">)</span>
+    <span class="c1"># Remove axis</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="c1"># Set axis title</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k_neighbors</span><span class="si">}</span><span class="s2"> neighbors&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_68_0.png" src="../_images/12_feature_engineering_68_0.png" />
+<img alt="../_images/12_feature_engineering_76_0.png" src="../_images/12_feature_engineering_76_0.png" />
 </div>
 </div>
-<p>Plenty more of these methods are implemented in <code class="docutils literal notranslate"><span class="pre">scikit-learn.neighbors</span></code>, as well as kriging methods in <code class="docutils literal notranslate"><span class="pre">GSTools</span></code> and geographically-weighted regression in <code class="docutils literal notranslate"><span class="pre">mgwr</span></code>.</p>
+<p>Plenty more of these methods are implemented in <code class="docutils literal notranslate"><span class="pre">scikit-learn.neighbors</span></code>, as well as kriging methods in <code class="docutils literal notranslate"><span class="pre">GSTools</span></code> <span id="id1">[<a class="reference internal" href="references.html#id7"><span>MS21</span></a>]</span> and geographically-weighted regression in <code class="docutils literal notranslate"><span class="pre">mgwr</span></code> {cite}`oshan2019mgwr}.</p>
 </div>
 <div class="section" id="polygon-to-point">
 <h3>Polygon to point<a class="headerlink" href="#polygon-to-point" title="Permalink to this headline">¶</a></h3>
-<p>We now move on to a case where the information we are interested in matching to our set of points is stored for a polygon geography. For example, we would like to know the population density of the neighborhood in which each AirBnB is located. To determine density, we will download population estimates at the Census tract level, and “transfer” those estimates over to each AirBnB point. Geographically, the only challenge here is finding the containing polygon for each point, and then performing what is in spatial databases parlance known as a “spatial join”, by which we link the two layers through their spatial connection.</p>
+<p>We now move on to a case where the information we are interested in matching to our set of points is stored in a polygon geography. For example, we would like to know the population density of the neighborhood in which each AirBnB is located. This is conceptually similar to the sampling example above, but in the case the information we want to sample is not a surface but a geo-table of polygons. To determine density, we will download population estimates at the Census tract level, and “transfer” those estimates over to each AirBnB point. Geographically, the only challenge here is finding the containing polygon for each point, and then performing what is in spatial databases parlance known as a “spatial join”, by which we link the two layers through their spatial connection.</p>
 <p>Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1169,17 +1286,23 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+/opt/conda/lib/python3.8/site-packages/pyproj/crs/crs.py:53: FutureWarning: &#39;+init=&lt;authority&gt;:&lt;code&gt;&#39; syntax is deprecated. &#39;&lt;authority&gt;:&lt;code&gt;&#39; is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
+  return _prepare_from_string(&quot; &quot;.join(pjargs))
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2.77 s, sys: 236 ms, total: 3.01 s
+Wall time: 42.2 s
+</pre></div>
+</div>
+</div>
 </div>
 <p>The code snippet above sends a query to the Census Bureau server to fetch the data for San Diego. Note that it <em>requires</em> internet connectivity to work. If you are working on the book <em>without</em> connectivity, a cached version of the dataset is available on the data folder and can be read as:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sd_pop</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/cache/sd_census.gpkg&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook/lib/python3.6/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
-  for feature in features_lst:
 </pre></div>
 </div>
 </div>
@@ -1245,16 +1368,33 @@ dtypes: float64(8), geometry(1), int64(13), object(6)
 memory usage: 1.4+ MB
 </pre></div>
 </div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
 </div>
 </div>
 </div>
 <div class="section" id="area-to-area-interpolation">
 <h3>Area to area interpolation<a class="headerlink" href="#area-to-area-interpolation" title="Permalink to this headline">¶</a></h3>
 <p>The final case of map matching we consider is transfer of information from one polygon/areal geography to a different one. This is a common use-case when an analysis requires data that is provided at different levels of aggregation and different boundary delineations.</p>
-<p>There is a large literature around this problem under the umbrella of dasymetric mapping <span id="id1">[<a class="reference internal" href="references.html#id58"><span>EB01</span></a>]</span>. The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to the other based on how much “geography” is shared. In its simplest case, we can do this based on area. In this case, we will assign values from the source geography to the target based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the “source”, and that to which we want to transfer data the “target”. Let’s say we have a poverty rate  measure for each of three source polygons, 1, 2, 3, and we have a target polygon A for which we require an estimated poverty rate. If the intersections of polygon A with each of the source polygons amount to  50%, 30%, and 20% of the total area of polygon A, then the estimate  of the poverty rate for A will be a weighted average between the rates in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively.</p>
+<p>There is a large literature around this problem under the umbrella of dasymetric mapping <span id="id2">[<a class="reference internal" href="references.html#id65"><span>EB01</span></a>]</span>. The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to another based on how much “geography” is shared. In its simplest case, we can do this based on area. We will assign values from the former geography to the latter one based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the “source”, and that to which we want to transfer data the “target”. Let’s say we have a population count  measure for each of three source polygons, 1, 2, 3, and we have a target polygon A for which we require an estimated population. If the intersection of polygon A with each of the source polygons amounts to  50%, 30%, and 20% of the total area of polygon A respectively, then the population estimate for A will be a weighted average between the rates in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively.</p>
 <p>We could also go in the other direction. If we had total population for polygon A, but population was not reported for polygons 1, 2, 3, we could use areal interpolation to allocate the population from A (now the source polygon) to each of the three target polygons. Polygon 1 would get 0.5 of the population of A, polygon 2 would get 0.3 of A’s population, and C the remainder. Here we are assuming the area of A is completely exhausted by the areas of 1, 2, and 3, and that the latter polygons do not overlap with each other. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.</p>
 <p>To implement dasymetric mapping in Python, the best option is <code class="docutils literal notranslate"><span class="pre">tobler</span></code>, a package from the PySAL federation designed exactly for this goal. We will show here the simplest case, that of areal interpolation where apportioning is estimated based on area, but the package also provides more sophisticated approaches.</p>
-<p>For the example, we need two polygon layers. We will stick with San Diego and use the set of Census Tracts and the <a class="reference internal" href="../data/h3_grid/README.html"><span class="doc std std-doc">H3 hexagonal grid layer</span></a>. Our goal will be to create population estimates for each hexagon.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">tobler.area_weighted</span> <span class="kn">import</span> <span class="n">area_interpolate</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/rasterstats/io.py:24: DeprecationWarning: Using or importing the ABCs from &#39;collections&#39; instead of from &#39;collections.abc&#39; is deprecated since Python 3.3, and in 3.9 it will stop working
+  from collections import Iterable, Mapping
+</pre></div>
+</div>
+</div>
+</div>
+<p>For the example, we need two polygon layers. We will stick with San Diego and use the set of Census Tracts read above, and a grid layer built using the H3 hexagonal spatial index <span id="id3">[<a class="reference internal" href="references.html#id6"><span>Bro18</span></a>]</span>. Our goal will be to create population estimates for each hexagonal cell.</p>
 <p>First, let us load the H3 grid:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1263,7 +1403,9 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/serge/anaconda3/envs/gdsbook/lib/python3.6/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+/opt/conda/lib/python3.8/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
   for feature in features_lst:
 </pre></div>
 </div>
@@ -1272,10 +1414,15 @@ memory usage: 1.4+ MB
 <p>We are ready to interpolate:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">interpolated</span> <span class="o">=</span> <span class="n">area_interpolate</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Area interpolation from polygon geotable to polygon geo-table</span>
+<span class="n">interpolated</span> <span class="o">=</span> <span class="n">area_interpolate</span><span class="p">(</span>
+    <span class="c1"># Source geo-table (converted to EPSG:3311 CRS)</span>
     <span class="n">source_df</span><span class="o">=</span><span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
+    <span class="c1"># Target geo-table (converted to EPSG:3311 CRS)</span>
     <span class="n">target_df</span><span class="o">=</span><span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">),</span>
+    <span class="c1"># Extensive variables in `source_df` to be interpolated (e.g. population)</span>
     <span class="n">extensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">],</span>
+    <span class="c1"># Intensive variables in `source_df` to be interpolated (e.g. density)</span>
     <span class="n">intensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
@@ -1293,126 +1440,205 @@ memory usage: 1.4+ MB
 </ul>
 </li>
 </ul>
-<p>A good first approach to examine the output is by comparing the source and the target visually. Here is total population:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">interpolated</span></code> output object is a geo-table that contains the target polygons and estimates of the variable(s) we originally had for the source geography (population and density in this case). We can illustrate the transfer of information from one geography to the other with the following figure for total population estimates:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axes</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
+<span class="c1"># Extract bounding box from output for easier visual comparison</span>
 <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">maxX</span><span class="p">,</span> <span class="n">maxY</span> <span class="o">=</span> <span class="n">interpolated</span><span class="o">.</span><span class="n">total_bounds</span>
+<span class="c1"># Reproject tracts to EPSG:331</span>
 <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
     <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
+<span class="c1"># Clip to the bounding box</span>
 <span class="p">)</span><span class="o">.</span><span class="n">cx</span><span class="p">[</span>
     <span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span> <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span>
+<span class="c1"># Quantile choropleth for tract population</span>
 <span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span> 
     <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> 
     <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
+<span class="c1"># Reproject H3 hexagons to ESPG:3311</span>
 <span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
     <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
+<span class="c1"># Plot hexagons</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
+<span class="c1"># Plot hexagons with interpolated population</span>
 <span class="n">interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span>
     <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
+<span class="c1"># Adjust limits of tract map to hexagons bounding box</span>
+<span class="c1"># for easier visual comparison</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">minX</span><span class="p">,</span> <span class="n">maxX</span><span class="p">)</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">minY</span><span class="p">,</span> <span class="n">maxY</span><span class="p">)</span>
-
-<span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Population&quot;</span><span class="p">)</span>
-
+<span class="c1"># Display</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_86_0.png" src="../_images/12_feature_engineering_86_0.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+<img alt="../_images/12_feature_engineering_96_1.png" src="../_images/12_feature_engineering_96_1.png" />
 </div>
 </div>
-<p>And density:</p>
+<p>And similarly for density density:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axes</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 
+<span class="c1"># Extract bounding box from output for easier visual comparison</span>
 <span class="n">minX</span><span class="p">,</span> <span class="n">minY</span><span class="p">,</span> <span class="n">maxX</span><span class="p">,</span> <span class="n">maxY</span> <span class="o">=</span> <span class="n">interpolated</span><span class="o">.</span><span class="n">total_bounds</span>
+<span class="c1"># Reproject tracts to EPSG:331</span>
 <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
     <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
+<span class="c1"># Clip to the bounding box</span>
 <span class="p">)</span><span class="o">.</span><span class="n">cx</span><span class="p">[</span>
     <span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span> <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span>
+<span class="c1"># Quantile choropleth for tract population density</span>
 <span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> 
     <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> 
     <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
+<span class="c1"># Reproject H3 hexagons to ESPG:3311</span>
 <span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
     <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
+<span class="c1"># Plot hexagons</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
+<span class="c1"># Plot hexagons with interpolated population density</span>
 <span class="n">interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span>
     <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
+<span class="c1"># Adjust limits of tract map to hexagons bounding box</span>
+<span class="c1"># for easier visual comparison</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">minX</span><span class="p">,</span> <span class="n">maxX</span><span class="p">)</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">minY</span><span class="p">,</span> <span class="n">maxY</span><span class="p">)</span>
-
-<span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Population Density&quot;</span><span class="p">)</span>
-
+<span class="c1"># Display</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_88_0.png" src="../_images/12_feature_engineering_88_0.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+<img alt="../_images/12_feature_engineering_98_1.png" src="../_images/12_feature_engineering_98_1.png" />
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="feature-engineering-using-map-synthesis">
 <h2>Feature Engineering using Map Synthesis<a class="headerlink" href="#feature-engineering-using-map-synthesis" title="Permalink to this headline">¶</a></h2>
-<p>Feature engineering with map matching is most helpful when you have additional information to use in the analysis. And, with the wealth of freely available data from censuses, satellites, and open volunteered geographic information vendors such as OpenStreetMap, map matching can be a very powerful tool for enriching and improving your analyses. However, it is sometimes <em>also</em> useful to only examine the data you’ve got, and use the spatial structure within to build better features or better models. While this might be done using spatially-explicit models (like those covered in Chapter 11), it is also possible to use map synthesis to build spatial feature and improve your predictions.</p>
-<p>There is an extensive amount of map synthesis features. In addition to the two kinds of features discussed in map matching, there are other kinds of useful features that can be used in map synthesis that will be discussed below. First, we will return to spatial summary features. Second, we will examine some <em>regionalization features</em>, which detect and leverage geographical clusters in the data to improve prediction.</p>
+<p>Feature engineering with map matching is most helpful when you have additional information to use in the analysis. And, with the wealth of freely available data from censuses, satellites, and open volunteered geographic information vendors such as OpenStreetMap, map matching can be a very powerful tool for enriching and improving your analyses. However, it is sometimes <em>also</em> useful to only examine the data you’ve got, and use the spatial structure within to build better features or better models. While this might be done using spatially-explicit models (like those covered in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>, it is also possible to use map synthesis to build spatial features and improve model performance.</p>
+<p>There is an extensive amount of map synthesis features. In fact, many of them are usually derived for specific use cases and following the intuition of domain experts that can take technical guidance along the lines presented here. We discuss two main ones as an illustration, but reiterate the sky really is the limit in this category. First, we will return to spatial <em>summary</em> features. Second, we will examine <em>regionalization features</em>, which detect and leverage geographical clusters in the data to improve prediction.</p>
 <div class="section" id="spatial-summary-features-in-map-synthesis">
 <h3>Spatial Summary Features in Map Synthesis<a class="headerlink" href="#spatial-summary-features-in-map-synthesis" title="Permalink to this headline">¶</a></h3>
-<p>Just like in map matching, you can use spatial summary features in map synthesis to make better predictions. One clear method involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we can now refer only to the data on hand. Thus, we may want to determine whether nearby AirBnBs are “competing” with each AirBnB. We might do this by finding the distance to the nearest AirBnB with the same number of bedrooms, since two nearby listings that <em>also</em> sleep the same number of people likely will compete with one another for tenants.</p>
-<div class="section" id="distance-buffers-within-a-single-table">
-<h4>Distance buffers within a single table<a class="headerlink" href="#distance-buffers-within-a-single-table" title="Permalink to this headline">¶</a></h4>
-<p>We might do this by building a <code class="docutils literal notranslate"><span class="pre">DistanceBand</span></code> weight object, which considers AirBnB as “neighbors” if they are within the distance threshold.</p>
+<p>Just like in map matching, you can use spatial summary features in map synthesis to make create better models. One approach involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we now refer only to the data on hand. Thus, we may want to determine whether nearby AirBnBs are “competing” with each AirBnB. We might do this by finding the distance to the nearest AirBnB with the same number of bedrooms, since two nearby listings that <em>also</em> sleep the same number of people likely will compete with one another for tenants.</p>
+<div class="section" id="counting-neighbors">
+<h4>Counting neighbors<a class="headerlink" href="#counting-neighbors" title="Permalink to this headline">¶</a></h4>
+<p>A useful metric to characterise an observation in your data through geography is whether it is surrounded by other observations or not. This question (and the following one we cover) is another area of geographic data science where spatial weights matrices are useful.</p>
+<p>If we define to be “surrounded by other observations” as in “having many neighbors”, this translates into the cardinalities of a spatial weights matrix (ie. the number of neighbors recorded in the matrix for each observation).</p>
+<p>For example, we can “engineer a feature” that contains the number of Airbnb properties each property has within 500 metres by constructing a distance band object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d500_w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build distance band spatial weights matrix</span>
+<span class="n">d500_w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span>
     <span class="n">airbnbs_albers</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">silence_warnings</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 </div>
-</div>
-<p>Now, we can get the average size of surrounding AirBnBs directly as the spatial lag:</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d500_w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
 </pre></div>
 </div>
 </div>
 </div>
+<p>And extracting its cardinalities:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_average_bedrooms</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">card</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">d500_w</span><span class="o">.</span><span class="n">cardinalities</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">card</span></code> feature we have built will pick up areas of higher concentration of Airbnb properties with higher values, as we can see in the map below.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># Append cardinalities to main Airbnb geo-table</span>
+<span class="n">airbnbs</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+    <span class="n">card</span><span class="o">=</span><span class="n">card</span>
+<span class="c1"># Plot cardinality quantile choropleth</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;card&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Add basemap</span>
+<span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/12_feature_engineering_105_0.png" src="../_images/12_feature_engineering_105_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="distance-buffers-within-a-single-table">
+<h4>Distance buffers within a single table<a class="headerlink" href="#distance-buffers-within-a-single-table" title="Permalink to this headline">¶</a></h4>
+<p>If what we are interested in is finding the average number of bedrooms around each house, we might do this with using a row-standardised version of the <code class="docutils literal notranslate"><span class="pre">DistanceBand</span></code> weight object we have just built, which considers AirBnB as “neighbors” if they are within the distance threshold, and computing the spatial lag of the number of bedrooms.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Row standardise</span>
+<span class="n">d500_w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+<span class="c1"># Compute spatial lag of No. of bedrooms</span>
+<span class="n">local_average_bedrooms</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
     <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1422,23 +1648,31 @@ memory usage: 1.4+ MB
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">local_average_bedrooms</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Number of bedrooms&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Average of nearby</span><span class="se">\n</span><span class="s2"> listings&#39; bedrooms&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Average of nearby</span><span class="se">\n</span><span class="s2"> listings&#39; bedrooms&quot;</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0, 0.5, &quot;Average of nearby\n listings&#39; bedrooms&quot;)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_96_1.png" src="../_images/12_feature_engineering_96_1.png" />
+<img alt="../_images/12_feature_engineering_109_0.png" src="../_images/12_feature_engineering_109_0.png" />
 </div>
 </div>
-<p>If we were instead interested in the most common number of bedrooms, rather than the average, we could use the <code class="docutils literal notranslate"><span class="pre">lag_categorical</span></code> function:</p>
+<p>If we were instead interested in the most common number of bedrooms, rather than the average, we could use the <code class="docutils literal notranslate"><span class="pre">lag_categorical</span></code> function, which will consider each value as a category and return the most common value in each neighbor set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_mode</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_categorical</span><span class="p">(</span>
     <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/spatial_lag.py:167: DeprecationWarning: `np.int` is a deprecated alias for the builtin `int`. To silence this warning, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
+Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
+  normalized_labels = np.zeros(y.shape, dtype=np.int)
+/opt/conda/lib/python3.8/site-packages/numpy/core/fromnumeric.py:3419: RuntimeWarning: Mean of empty slice.
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/opt/conda/lib/python3.8/site-packages/numpy/core/_methods.py:188: RuntimeWarning: invalid value encountered in double_scalars
+  ret = ret.dtype.type(ret / rcount)
 </pre></div>
 </div>
 </div>
@@ -1480,11 +1714,9 @@ memory usage: 1.4+ MB
       <th>4.0</th>
       <th>5.0</th>
       <th>6.0</th>
-      <th>7.0</th>
     </tr>
     <tr>
       <th>bedrooms</th>
-      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -1497,90 +1729,82 @@ memory usage: 1.4+ MB
   <tbody>
     <tr>
       <th>0.0</th>
-      <td>6</td>
-      <td>392</td>
+      <td>5</td>
+      <td>391</td>
       <td>39</td>
-      <td>7</td>
+      <td>8</td>
       <td>1</td>
       <td>0</td>
-      <td>0</td>
-      <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>1.0</th>
-      <td>1</td>
-      <td>3067</td>
-      <td>213</td>
+      <td>2</td>
+      <td>3068</td>
+      <td>215</td>
       <td>32</td>
-      <td>19</td>
-      <td>5</td>
+      <td>17</td>
+      <td>4</td>
       <td>0</td>
-      <td>1</td>
     </tr>
     <tr>
       <th>2.0</th>
       <td>1</td>
-      <td>980</td>
-      <td>267</td>
-      <td>11</td>
+      <td>977</td>
+      <td>268</td>
+      <td>13</td>
       <td>3</td>
       <td>1</td>
-      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>3.0</th>
-      <td>2</td>
+      <td>3</td>
       <td>427</td>
-      <td>166</td>
-      <td>35</td>
+      <td>164</td>
+      <td>37</td>
       <td>11</td>
       <td>2</td>
-      <td>1</td>
       <td>0</td>
     </tr>
     <tr>
       <th>4.0</th>
       <td>0</td>
-      <td>162</td>
-      <td>57</td>
-      <td>12</td>
-      <td>34</td>
-      <td>6</td>
-      <td>2</td>
-      <td>0</td>
+      <td>168</td>
+      <td>55</td>
+      <td>11</td>
+      <td>31</td>
+      <td>5</td>
+      <td>3</td>
     </tr>
     <tr>
       <th>5.0</th>
       <td>0</td>
-      <td>50</td>
+      <td>53</td>
+      <td>16</td>
+      <td>3</td>
+      <td>8</td>
       <td>18</td>
-      <td>2</td>
-      <td>10</td>
-      <td>18</td>
-      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>6.0</th>
       <td>0</td>
-      <td>14</td>
-      <td>8</td>
-      <td>1</td>
+      <td>13</td>
+      <td>9</td>
+      <td>2</td>
       <td>3</td>
       <td>2</td>
-      <td>1</td>
       <td>0</td>
     </tr>
     <tr>
       <th>7.0</th>
       <td>0</td>
-      <td>6</td>
+      <td>5</td>
       <td>1</td>
       <td>2</td>
       <td>1</td>
-      <td>0</td>
-      <td>0</td>
+      <td>1</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1588,7 +1812,6 @@ memory usage: 1.4+ MB
       <td>0</td>
       <td>3</td>
       <td>1</td>
-      <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
@@ -1603,7 +1826,6 @@ memory usage: 1.4+ MB
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
     </tr>
     <tr>
       <th>10.0</th>
@@ -1614,16 +1836,22 @@ memory usage: 1.4+ MB
       <td>0</td>
       <td>0</td>
       <td>0</td>
-      <td>0</td>
     </tr>
   </tbody>
 </table>
 </div></div></div>
 </div>
-<p>If more complicated statistics are required. it can help to re-express the construction of summary statistics as a <em>reduction</em> of the <em>adjacency list</em> representation of our weights, as done in Chapter 3. To recap, the <em>adjacency list</em> is a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> where each row contains a single link in our graph. It contains the identifier for some <code class="docutils literal notranslate"><span class="pre">focal</span></code> observation, the identifier for some <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> observation, and a value for the <code class="docutils literal notranslate"><span class="pre">weight</span></code> of the link that connects the <code class="docutils literal notranslate"><span class="pre">focal</span></code> and <code class="docutils literal notranslate"><span class="pre">neighbor</span></code>:</p>
+<p>From the table we can see the most common case (N=3067) is properties with one bedroom surrounded mostly by other properties with also only one bedroom. Similarly we also find out, for example, that the two properties with ten bedrooms in the dataset are surrounded by properties with mostly two bedrooms. The remaining cells in the table can be interpreted in a similar fashion.</p>
+<p>If more complicated statistics are required, it can help to re-express the construction of summary statistics as a <em>reduction</em> of the <em>adjacency list</em> representation of our weights, as done in <a class="reference internal" href="03_spatial_data.html"><span class="doc std std-doc">Chapter 3</span></a>. To recap, the <em>adjacency list</em> is a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> where each row contains a single link in our graph. It contains the identifier for some <code class="docutils literal notranslate"><span class="pre">focal</span></code> observation, the identifier for some <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> observation, and a value for the <code class="docutils literal notranslate"><span class="pre">weight</span></code> of the link that connects the <code class="docutils literal notranslate"><span class="pre">focal</span></code> and <code class="docutils literal notranslate"><span class="pre">neighbor</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">d500_w</span><span class="o">.</span><span class="n">to_adjlist</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1707,6 +1935,10 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
 <div class="output text_html"><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -1779,6 +2011,10 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>focal
 0       1.0
 1       2.0
@@ -1801,7 +2037,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <div class="section" id="ring-buffer-features">
 <h4>“Ring” buffer features<a class="headerlink" href="#ring-buffer-features" title="Permalink to this headline">¶</a></h4>
 <p>Sometimes, analysts might want to use multiple “bands” of buffer features. This requires that we build summaries of the observations that fall <em>only within</em> a given range of distances, such as the typical size of houses that are further than 500m, but still within one kilometer. This kind of “ring buffer”, or annulus, is a common request in spatial analysis, and can be done in substantially the same way as before by increasing the <code class="docutils literal notranslate"><span class="pre">threshold</span></code> in a <code class="docutils literal notranslate"><span class="pre">DistanceBand</span></code> weight.</p>
-<p>So, we can use our 500m weights from before to build the average again:</p>
+<p>We can use our 500m weights from before to build the average again:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">average_within_500</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
@@ -1830,11 +2066,19 @@ Name: bedrooms, Length: 6035, dtype: float64
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
+ There are 60 disconnected components.
+ There are 32 islands with ids: 762, 907, 976, 1003, 1776, 1867, 2789, 2841, 3130, 3138, 3184, 3604, 3748, 3962, 3989, 4366, 4443, 4627, 4764, 4885, 4989, 5014, 5536, 5733, 5756, 5790, 5796, 5808, 6005, 6026, 6049, 6068.
+  warnings.warn(message)
+</pre></div>
+</div>
+</div>
 </div>
 <p>Then, we can compute the average size of listings between 500m and one kilometer in the same manner as before using our <code class="docutils literal notranslate"><span class="pre">d1k_exclusive</span></code> graph, which now omits all edges shorter than 500m.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span><span class="o">.</span><span class="n">transform</span><span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
 <span class="n">average_500m_to_1k</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
     <span class="n">d1k_exclusive</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="p">)</span>
@@ -1881,31 +2125,41 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>Thus, we can see that the two features definitely contain distinct, but related, information, and both may be valuable as features when attempting to predict features of interest.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">average_within_500</span><span class="p">,</span>
-            <span class="n">average_500m_to_1k</span><span class="p">,</span>
-            <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot scatter</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="n">average_within_500</span><span class="p">,</span>
+    <span class="n">average_500m_to_1k</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span>
+<span class="p">)</span>
+<span class="c1"># Rename horizontal axis</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Average size within 500 meters&quot;</span><span class="p">)</span>
+<span class="c1"># Rename vertical axis</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Average size</span><span class="se">\n</span><span class="s2"> beyond 500m but within 1km&quot;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
-         <span class="n">label</span><span class="o">=</span><span class="s1">&#39;1 to 1&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="c1"># Plot line of 45 degrees</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> 
+    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">,</span> 
+    <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> 
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;1 to 1&#39;</span>
+<span class="p">)</span>
+<span class="c1"># Add legend</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.legend.Legend at 0x7f0871d44550&gt;
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_117_1.png" src="../_images/12_feature_engineering_117_1.png" />
+<img alt="../_images/12_feature_engineering_130_0.png" src="../_images/12_feature_engineering_130_0.png" />
 </div>
 </div>
+<p>As the plot shows, although the relationship between both is positive, there is quite a bit of variation and departure from the (red) line of equality. These represent cases with either larger (above the line) or smaller (below) average size in the 500m to 1km ring than in the 500m buffer.</p>
 </div>
 </div>
 <div class="section" id="clustering-as-feature-engineering">
 <h3>Clustering as feature engineering<a class="headerlink" href="#clustering-as-feature-engineering" title="Permalink to this headline">¶</a></h3>
-<p>One unique way to use spatial or feature information <em>within</em> your data as a feature in your existing models is to use <em>clustering</em>, as we saw in Chapters 8 &amp; 10. This can provide an indication of whether an observation exists in a given “place” geographically, or if an observation is a specific “kind” of observation.</p>
-<p>Sometimes, this data reduction of many correlated variates into a derived feature can be useful in training models. This is more useful when the <em>spatial location</em> of a given observation indicates something useful about what kind of observation is taken at that location.</p>
-<p>While it would be <em>best</em> to use an explicitly-spatial model to examine this structure, we can cheat a little bit and use cluster labels themselves as features. For example, to cluster the listings based on their location, we can use hierarchical DBSCAN, an improved variant of the DBSCAN algorithm used in chapter 8.</p>
+<p>One unique way to use spatial or features information <em>within</em> your data as a feature in your existing models is to use <em>clustering</em>, as we saw in Chapters <a class="reference internal" href="08_point_pattern_analysis.html"><span class="doc std std-doc">8</span></a> &amp; <a class="reference internal" href="10_clustering_and_regionalization.html"><span class="doc std std-doc">10</span></a>, respectively. This can provide an indication of whether an observation exists in a given “place” geographically, or if an observation is a specific “kind” of observation. Data reduction of many variates into a derived categorical feature can be useful in training models. This is even more useful when the <em>spatial location</em> of a given observation indicates a useful characteristic about the kind of observation that may be found at that location.</p>
+<p>While sometimes we might prefer to introduce space and (co-)location through our model (as we did in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>), others we can instead use (spatial) cluster labels themselves as features. For example, to cluster the listings based on their location, we can use hierarchical DBSCAN <span id="id4">[<a class="reference internal" href="references.html#id5"><span>CMS13</span></a>]</span>, an improved variant of the traditional DBSCAN algorithm used in <a class="reference internal" href="08_point_pattern_analysis.html"><span class="doc std std-doc">Chapter 8</span></a>. We import it through its own package <span id="id5">[<a class="reference internal" href="references.html#id4"><span>MHA17</span></a>]</span>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hdbscan</span> <span class="kn">import</span> <span class="n">HDBSCAN</span>
@@ -1913,6 +2167,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 </div>
 </div>
+<p>To apply to our Airbnb data, we need the coordinates as a 2D array of XY pairs:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
@@ -1922,76 +2177,131 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 </div>
 </div>
-<p>With a little tuning, we can decide on an effective parameterization. Here, we’ll look for relatively large clusters of AirBnBs, those with about 100 listings or more.</p>
+<p>With a little tuning, we can decide on an effective parameterization. The main advantage of HDBSCAN over the traditional approach is that it reduces the number of tuning parameters from two to one: we only need to set the minimum number of observations we want to define a cluster. Here, we look for relatively large clusters of AirBnBs, those with about 25 listings or more, fit it to our array of coordinates and store the cluster labels identified:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">HDBSCAN</span><span class="p">(</span><span class="n">min_cluster_size</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)</span><span class="o">.</span><span class="n">labels_</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:275: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
+Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
+  alg = KDTreeBoruvkaAlgorithm(tree, min_samples, metric=metric,
+/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:56: DeprecationWarning: `np.int` is a deprecated alias for the builtin `int`. To silence this warning, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
+Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
+  condensed_tree = condense_tree(single_linkage_tree,
+/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:59: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
+Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
+  labels, probabilities, stabilities = get_clusters(condensed_tree,
+</pre></div>
 </div>
-<p>The spatial distribution of these clusters gives us a sense of the geographical distribution of the observations. To help us visualize the clusters, we can construct the convex hull of the observations in each detected cluster:</p>
+</div>
+</div>
+<p>The spatial distribution of these clusters will give us a sense of areas of San Diego with relatively high density of the observations. But the <code class="docutils literal notranslate"><span class="pre">labels</span></code> object does not contains clusters, only observation memberships. To derive those clusters geographically, we construct the convex hull of the observations in each detected cluster, creating thus a polygon that delimits every observation that is part of the cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hulls</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">convex_hull</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
 </div>
-<p>Since humans tend to make locational decisions hierarchically (in that they pick <em>San Diego</em>, then they pick a particular <em>part</em> of San Diego (such as the Gaslamp Quarter), then they pick a house in that part), this clustering process might give us a reasonable insight into the enclaves of competition between AirBnBs:</p>
+</div>
+</div>
+<p>The polygons in <code class="docutils literal notranslate"><span class="pre">hulls</span></code> provide an intermediate layer between the granularity of each individual location and the global scale of San Diego as a geographical unit. Since people tend to make locational decisions hierarchically (e.g. first select <em>San Diego</em> as a destination, then they pick a particular <em>part</em> of San Diego, then choose a house within the area), this approach might give us reasonable insight into enclaves of Airbnb properties:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="c1"># Plot individual Airbnb locations</span>
 <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="c1"># Colour by cluster label</span>
     <span class="n">column</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+    <span class="c1"># Consider label as categorical</span>
     <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># Add 50% of transparency</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">legend</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span>
+    <span class="c1"># Include legend</span>
+    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="c1"># Draw on axis `ax`</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> 
+    <span class="c1"># Use circle as marker</span>
+    <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+    <span class="c1"># Position legend outside the map</span>
+    <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bbox_to_anchor&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)}</span>
 <span class="p">)</span>
-<span class="n">hulls</span><span class="p">[</span><span class="n">hulls</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;=</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,)</span>
+<span class="c1"># Plot convex hull polygons for each cluster label</span>
+<span class="c1"># except that for -1 (observations classified as noise)</span>
+<span class="n">hulls</span><span class="p">[</span><span class="n">hulls</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="c1"># Add basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
     <span class="n">ax</span><span class="p">,</span> 
     <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
-    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">VoyagerNoLabels</span>
 <span class="p">)</span>
+<span class="c1"># Remove axes</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_127_0.png" src="../_images/12_feature_engineering_127_0.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+<img alt="../_images/12_feature_engineering_142_1.png" src="../_images/12_feature_engineering_142_1.png" />
 </div>
 </div>
-<p>Regardless, this cluster label certainly communicates some information about the price of a listing, since the distributions of prices are substantially different across the detected clusters:</p>
+<p>Note how the hierarchical nature of HDBSCAN, which picks density thresholds <em>locally</em> is at work in the map, where some of the clusters (e.g. orange ones in the north) display lower density than parts of the center which are <em>not</em> part of any cluster. These results also capture some information about the price of a listing. We can see this if we plot the distribution of prices across the detected clusters:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="c1"># Add box plots of price by HDBSCAN cluster</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span>
+    <span class="c1"># Plot distribution of &#39;price&#39;</span>
     <span class="s2">&quot;price&quot;</span><span class="p">,</span> 
+    <span class="c1"># Group by cluster label, generating one box plot/cluster</span>
     <span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
+    <span class="c1"># Do not display individual outlier observations</span>
     <span class="n">flierprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> 
+    <span class="c1"># Draw visualisation on the current axis (inside `f`)</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
 <span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;competition cluster&quot;</span><span class="p">)</span>
+<span class="c1"># Set label for horizontal axis</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;HDBSCAN cluster&quot;</span><span class="p">)</span>
+<span class="c1"># Set labels for vertical axis</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;price ($)&quot;</span><span class="p">)</span>
+
+<span class="c1"># Remove default figure title</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Price distribution by detected cluster&quot;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1250</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="c1"># Remove default axis title</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+<span class="c1"># Re-adjust vertical value range for easier legibility</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1250</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_129_0.png" src="../_images/12_feature_engineering_129_0.png" />
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
+  and should_run_async(code)
+</pre></div>
+</div>
+<img alt="../_images/12_feature_engineering_144_1.png" src="../_images/12_feature_engineering_144_1.png" />
 </div>
 </div>
+<p>If we want to capture the variation picked up by membership to these clusters in a regression model, we could use these labels as the basis for spatial fixed effects, for example, as we saw in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>.</p>
 </div>
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>Feature engineering is a powerful way to enrich your data analysis capabilities. It’s often within reach of your existing data analysis methods: at a minimum, it only requires that new variables are constructed from your existing data. At a maximum, feature engineering gives you the <em>ultimate linkage key</em>, a flexible and powerful tool with which you can unlock the value held in many <em>other</em> datasets that you may have access to.</p>
-<p>The main operations and methods that are involved in feature engineering, such as determining what the average value is in the area near each observation or identifying whether observations exist in a “cluster,” are fundamentally simple operations. Together, though, they build large, rich, and useful datasets that can be used directly in your existing methods of analysis.</p>
-<p>Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters 10 and 11) can leverage spatial structure <em>directly</em> during learning. These techniques can best simpler less-complicated models that learn from spatially-engineered features. However, the techniques in this chapter (and the methods that extend upon them) are immediately useful for most practicing data scientists, and can be integrated into nearly any analytical method or approach.</p>
+<p>Feature engineering is a powerful way to enrich your data and make the most out of them. It is often within reach whether you are able to mix in auxilliary data or not. At a minimum, it only requires that new variables are constructed from your existing data; however if you have access to more data, spatial feature engineering provides the <em>ultimate linkage key</em>, a flexible and powerful tool with which you can unlock the value held in many <em>other</em> datasets that you may have access to even if they are not obviously connected to your own.</p>
+<p>We have structured all the approaches presented in this chapter along two main groups: those which allow you to augment a given dataset, which we have termed <em>map synthesis</em>; and those that enable connecting disparate datasets through space. In both cases, each operation involved in feature engineering, such as determining what the average value is in the area near each observation or identifying whether observations exist as part of a “cluster”, are relatively simple operations. As building blocks that may be combined with each other, they build large, rich, and useful datasets that can be used directly in your existing methods of analysis.</p>
+<p>Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters <a class="reference internal" href="10_clustering_and_regionalization.html"><span class="doc std std-doc">10</span></a> and <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">11</span></a>) can leverage spatial structure <em>directly</em> during learning/inference. These techniques allow you to embed space in non-spatial models to make them “geography aware”. Furthermore, the techniques in this chapter (and the methods that extend upon them) are immediately useful for most practicing data scientists, and can be integrated into nearly any analytical method or approach.</p>
 </div>
 <div class="section" id="questions">
 <h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
@@ -2036,12 +2346,32 @@ the interpolation process. How does this occur and why is it important to acknow
               </div>
               
         
-        <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="11_regression.html" title="previous page">Spatial Regression</a>
-    <a class='right-next' id="next-link" href="../data/README.html" title="next page">Overview</a>
 
-        </div>
+
+
+<div class='prev-next-bottom'>
+    
+    <div id="prev">
+        <a class="left-prev" href="11_regression.html" title="previous page">
+            <i class="prevnext-label fas fa-angle-left"></i>
+            <div class="prevnext-info">
+                <p class="prevnext-label">previous</p>
+                <p class="prevnext-title">Spatial Regression</p>
+            </div>
+        </a>
+    </div>
+     <div id="next">
+        <a class="right-next" href="../data/README.html" title="next page">
+            <div class="prevnext-info">
+                <p class="prevnext-label">next</p>
+                <p class="prevnext-title">Overview</p>
+            </div>
+            <i class="prevnext-label fas fa-angle-right"></i>
+        </a>
+     </div>
+
+</div>
         
         </div>
     </div>
