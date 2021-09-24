@@ -23,7 +23,7 @@
 
     
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/sphinx-book-theme.e8f53015daec13862f6db5e763c41738.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.css?digest=c3fdc42140077d1ad13ad2f1588a4309" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
@@ -75,6 +75,10 @@
     
         <div class="navbar-brand-box">
     <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
       
       <img src="../_static/logo.png" class="logo" alt="logo">
       
@@ -129,7 +133,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="02_geospatial_computational_environment.html">
-   Geospatial Computational Environment
+   Computational Tools for Geographic Data Science
   </a>
  </li>
  <li class="toctree-l1">
@@ -377,6 +381,11 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#id1">
+   Spatial Weights
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#contiguity-weights">
    Contiguity Weights
   </a>
@@ -498,11 +507,29 @@
 </div>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>Spatial weights are one way to represent spatial graphs in geographic data science and spatial statistics. They are widely used constructs that represent geographic relationships between the observational units in a spatially referenced dataset. Implicity, they connect features in a geographic table through their spatial relationship. By expressing the notion of geographical proximity or connectedness, spatial weights are the main mechanism through which the spatial information in geographical data is brought to bear in the subsequent analysis.</p>
+<p>“Spatial weights” are one way to represent graphs in geographic data science and spatial statistics. They are widely used constructs that represent geographic relationships between the observational units in a spatially referenced dataset. Implicitly, spatial weights connect objects in a geographic table to one another using the spatial relationships between them. By expressing the notion of geographical proximity or connectedness, spatial weights are the main mechanism through which the spatial relationships in geographical data is brought to bear in the subsequent analysis.</p>
 <p>For example, proximity and adjacency are common spatial questions: <em>What neighborhoods are you surrounded by? How many gas stations are within 5 miles of my stalled car?</em>
-These are spatial questions that target specific information about the spatial configuration of a specific target (“a neighborhood,” “my stalled car”) and geographically connected relevant sites (“adjacent neighborhoods”, “nearby gas stations”). For us to use this information in statistical analysis, it’s often necessary to compute these relationships between all pairs of observations. This means that, for many applications in geographic data science, we are building a <em>topology</em>—a mathematical structure that expresses the geometric and spatial relationships between observations—that we can use to examine the data. Spatial weights matrices provide this topology, letting us embed all of our observations in space together, rather than asking and answering single questions about features nearby a unit.</p>
+These are spatial questions that target specific information about the spatial configuration of a specific target (“a neighborhood,” “my stalled car”) and geographically connected relevant sites (“adjacent neighborhoods”, “nearby gas stations”). For us to use this information in statistical analysis, it’s often necessary to compute these relationships between all pairs of observations. This means that, for many applications in geographic data science, we are building a <em>topology</em>—a mathematical structure that expresses the connectivity between observations—that we can use to examine the data. Spatial weights matrices express this topology, letting us embed all of our observations in space together, rather than asking and answering single questions about features nearby a unit.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">contextily</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">rioxarray</span>
+<span class="kn">import</span> <span class="nn">seaborn</span>
+<span class="kn">import</span> <span class="nn">pandas</span> 
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
+<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">cg</span> <span class="k">as</span> <span class="n">geometry</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="id1">
+<h2>Spatial Weights<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Since they provide a way to represent these spatial relationships, spatial weights are widely used throughout spatial and geographic data science.
-In this chapter, we first consider different approaches to construct spatial weights, distinguishing between those based on contiguity/adjacency relations from weights obtained from distance based relationships. We then discuss the case of hybrid weights which combine one or more spatial operations in deriving the neighbor relationships between observations. We illustrate all of these concepts through the spatial weights class in PySAL, which provides a rich set of methods and characteristics for spatial weights and it is stored under the <code class="docutils literal notranslate"><span class="pre">weights</span></code> submodule:</p>
+In this chapter, we first consider different approaches to construct spatial weights, distinguishing between those based on contiguity/adjacency relations from weights obtained from distance based relationships. We then discuss the case of hybrid weights which combine one or more spatial operations in deriving the neighbor relationships between observations. We illustrate all of these concepts through the spatial weights class in <code class="docutils literal notranslate"><span class="pre">pysal</span></code>, which provides a rich set of methods and characteristics for spatial weights and it is stored under the <code class="docutils literal notranslate"><span class="pre">weights</span></code> submodule:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>
@@ -510,14 +537,13 @@ In this chapter, we first consider different approaches to construct spatial wei
 </div>
 </div>
 </div>
-<p>We also demonstrate its sets functionality, which permits the derivation of weights through the application of notions from set theory. Throughout the chapter, we discuss common file formats used to store spatial weights of different types, and we include visual discussion of spatial weights, making these sometimes abstract constructs more intuitive.</p>
+<p>We also demonstrate its set-theoretic functionality, which permits the derivation of weights through the application of set operations. Throughout the chapter, we discuss common file formats used to store spatial weights of different types, and we include visual discussion of spatial weights, making these sometimes abstract constructs more intuitive.</p>
 </div>
 <div class="section" id="contiguity-weights">
 <h2>Contiguity Weights<a class="headerlink" href="#contiguity-weights" title="Permalink to this headline">¶</a></h2>
-<p>A contiguous pair of spatial units are those who share a common border. At first
-glance this seems straightforward, however, in practice matters turn out to be
-not so simple. The first complication is that there are different notions of
-contiguity to consider. Let’s start with the example of a three-by-three grid. We can create it as a geo-table from scratch:</p>
+<p>A contiguous pair of spatial objects are those who share a common border. At first
+glance this seems straightforward. However, in practice this turns out to be
+more complicated. The first complication is that there are different ways that objects can “share a common border.” Let’s start with the example of a three-by-three grid. We can create it as a geo-table from scratch:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get points in a grid</span>
@@ -541,7 +567,7 @@ contiguity to consider. Let’s start with the example of a three-by-three grid.
 </div>
 </div>
 </div>
-<p>which results in:</p>
+<p>which results in the grid shown in Figure 1.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot grid geotable</span>
@@ -564,7 +590,7 @@ contiguity to consider. Let’s start with the example of a three-by-three grid.
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_9_0.png" src="../_images/04_spatial_weights_9_0.png" />
+<img alt="../_images/04_spatial_weights_11_0.png" src="../_images/04_spatial_weights_11_0.png" />
 </div>
 </div>
 <p>A common way to express contiguity/adjacency relationships arises from an analogy to the legal moves that different chess pieces can make. <em>Rook</em> contiguity requires that the pair of polygons in
@@ -577,7 +603,7 @@ question share an <em>edge</em>. According to this definition, polygon <span cla
 </div>
 </div>
 </div>
-<p>Note the pattern we use to build the <code class="docutils literal notranslate"><span class="pre">w</span></code> object, which is similar across the library: we specify the criterium we want for the weights (<code class="docutils literal notranslate"><span class="pre">weights.contiguity.Rook</span></code>) and then the “constructor” we will use (<code class="docutils literal notranslate"><span class="pre">from_dataframe</span></code>). We can visualise the result plotted on top of the same grid of labeled polygons, using red dotted lines to represent the edges between a pair of nodes (polygon centroids in this case):</p>
+<p>Note the pattern we use to build the <code class="docutils literal notranslate"><span class="pre">w</span></code> object, which is similar across the library: we specify the criterium we want for the weights (<code class="docutils literal notranslate"><span class="pre">weights.contiguity.Rook</span></code>) and then the “constructor” we will use (<code class="docutils literal notranslate"><span class="pre">from_dataframe</span></code>). We can visualise the result plotted on top of the same grid of labeled polygons, using red dotted lines to represent the edges between a pair of nodes (polygon centroids in this case). We can see this in Figure 2.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure</span>
@@ -601,11 +627,11 @@ question share an <em>edge</em>. According to this definition, polygon <span cla
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_13_0.png" src="../_images/04_spatial_weights_13_0.png" />
+<img alt="../_images/04_spatial_weights_15_0.png" src="../_images/04_spatial_weights_15_0.png" />
 </div>
 </div>
-<p>The  <code class="docutils literal notranslate"><span class="pre">neighbors</span></code> attribute of our PySAL <span class="math notranslate nohighlight">\(W\)</span> object encodes the neighbor
-relationships by expressing the <em>focal</em> observation on the left (in the <code class="docutils literal notranslate"><span class="pre">key</span></code> of the dictionary), and expressing the <em>neighbors</em> to the <em>focal</em> in the list on the right (in the <code class="docutils literal notranslate"><span class="pre">value</span></code> of the dictionary). This representation has computational advantages as it exploits
+<p>The  <code class="docutils literal notranslate"><span class="pre">neighbors</span></code> attribute of our <code class="docutils literal notranslate"><span class="pre">pysal</span></code> <span class="math notranslate nohighlight">\(W\)</span> object encodes the neighbor
+relationships by expressing the <em>focal</em> observation on the left (in the <code class="docutils literal notranslate"><span class="pre">key</span></code> of the dictionary), and expressing the <em>neighbors</em> to the <em>focal</em> in the list on the right (in the <code class="docutils literal notranslate"><span class="pre">value</span></code> of the dictionary). This representation has computational advantages, as it exploits
 the sparse nature of contiguity weights matrices by recording only non-zero weights:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -782,7 +808,7 @@ representation if needed:</p>
 </table>
 </div></div></div>
 </div>
-<p>As you can see from the matrix above, most entries are zero. In fact out of all of the possible <span class="math notranslate nohighlight">\(9^2=81\)</span> linkages that there could be in this matrix, there are only twenty-four:</p>
+<p>As you can see from the matrix above, most entries are zero. In fact out of all of the possible <span class="math notranslate nohighlight">\(9^2=81\)</span> linkages that there could be in this matrix, there are only twenty-four non-zero entries:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wr</span><span class="o">.</span><span class="n">nonzero</span>
@@ -795,19 +821,19 @@ representation if needed:</p>
 </div>
 </div>
 </div>
-<p>Thus, we can save a significant amount of memory and lose no information by storing these sparse representations, which only record the non-zero values.</p>
-<p>More generally, the spatial weights for our 3-by-3 grid can be represented as a matrix that has 9 rows and 9 columns, matching the number of polygons <span class="math notranslate nohighlight">\((n=9)\)</span>. An important thing to note is that geography has more than one dimension. When compared to common representations of relationships <em>in time</em> used in data science, using information about spatial relationships can be more complex: spatial relationships are bi-directional, while temporal relationships are unidirectional. Further complicating things, the ordering of the observations in the weights matrix is ambiguous. The first row is not first for a specific reason. Here we simply use the alphanumeric ordering of the unit identifiers to match a polygon with a row or column of the matrix, but any arbitrary rule could be followed and the weights matrix would look different. The graph, however, would be isomorphic and retain the mapping of relationships.</p>
+<p>Thus, we can save a significant amount of memory and lose no information using these sparse representations, which only record the non-zero values.</p>
+<p>More generally, the spatial weights for our 3-by-3 grid can be represented as a matrix that has 9 rows and 9 columns, matching the number of polygons <span class="math notranslate nohighlight">\((n=9)\)</span>. An important thing to note is that geography has more than one dimension. When compared to common representations of relationships <em>in time</em> used in data science, using information about spatial relationships can be more complex: spatial relationships are bi-directional, while temporal relationships are unidirectional. Further complicating things, the ordering of the observations in the weights matrix is arbitrary. The first row is not first for a specific mathematical reason, it just happens to be the first entry in the input. Here we use the alphanumeric ordering of the unit identifiers to match a polygon with a row or column of the matrix, but any arbitrary rule could be followed and the weights matrix would look different. The graph, however, would be isomorphic and retain the mapping of relationships.</p>
 <p>Spatial weights matrices may look familiar to those acquainted with social
 networks and graph theory in which <strong>adjacency</strong> matrices play a central role in
 expressing connectivity between nodes. Indeed, spatial weights matrices can be
 understood as a graph adjacency matrix where each observation is a node and
 the spatial weight assigned between a pair represents the weight of the edge on
-a graph connecting the arcs. Sometimes, this is called the <strong>dual graph</strong> or <strong>line graph</strong> of the input geographic data. This is advantageous as geographic data science can
+a graph connecting the arcs. Sometimes, this is called the <strong>dual graph</strong> of the input geographic data. This is advantageous, as geographic data science can
 borrow from the rich graph theory literature. At the same time, spatial
 data has numerous distinguishing characteristics that necessitate the
 development of specialized procedures and concepts in the handling of spatial
 weights. This chapter will cover many of these features.</p>
-<p>Let’s get back to the Rook contiguity graph. A close inspection reveals that this criterion actually places
+<p>But for now, let’s get back to the Rook contiguity graph. A close inspection reveals that this criterion actually places
 a restriction on the spatial relation. More specifically, polygons <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(5\)</span>
 are not Rook neighbors, but they do in fact share a common border. However, in
 this instance the sharing is due to a common <em>vertex</em> rather than a shared
@@ -836,7 +862,7 @@ neighbor relations for this same configuration as follows:</p>
 </div>
 </div>
 </div>
-<p>In addition to this neighbors representation, we can also express the graph visually, as done before:</p>
+<p>In addition to this neighbors representation, we can also express the graph visually, as done before. This is shown in Figure 3.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure</span>
@@ -860,13 +886,12 @@ neighbor relations for this same configuration as follows:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_23_0.png" src="../_images/04_spatial_weights_23_0.png" />
+<img alt="../_images/04_spatial_weights_25_0.png" src="../_images/04_spatial_weights_25_0.png" />
 </div>
 </div>
 <p>By using <code class="docutils literal notranslate"><span class="pre">Contiguity.Queen</span></code> rather than <code class="docutils literal notranslate"><span class="pre">Contiguity.Rook</span></code>, we consider observations that share a vertex to be neighbors. The result is that the neighbors of <span class="math notranslate nohighlight">\(0\)</span> now include <span class="math notranslate nohighlight">\(4\)</span> along with <span class="math notranslate nohighlight">\(3\)</span> and <span class="math notranslate nohighlight">\(1\)</span>.</p>
-<p>Like the <code class="docutils literal notranslate"><span class="pre">neighbors</span></code> dictionary encodes the contiguity relations, the <code class="docutils literal notranslate"><span class="pre">weights</span></code> dictionary encodes the strength of the link connecting the focal to each neighbor. For contiguity
-weights, values are usually binary and, as in any <code class="docutils literal notranslate"><span class="pre">PySAL</span></code> <code class="docutils literal notranslate"><span class="pre">W</span></code> object, contained in its
-<code class="docutils literal notranslate"><span class="pre">weights</span></code> attribute:</p>
+<p>Akin to how the <code class="docutils literal notranslate"><span class="pre">neighbors</span></code> dictionary encodes the contiguity relations, the <code class="docutils literal notranslate"><span class="pre">weights</span></code> dictionary encodes the strength of the link connecting the focal to each neighbor. For contiguity
+weights, observations are usually either considered “linked” or “not linked,” so the resulting weights matrix is binary. As in any <code class="docutils literal notranslate"><span class="pre">pysal</span></code> <code class="docutils literal notranslate"><span class="pre">W</span></code> object, the actual weight values are contained in the <code class="docutils literal notranslate"><span class="pre">weights</span></code> attribute:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wq</span><span class="o">.</span><span class="n">weights</span>
@@ -930,7 +955,7 @@ into a <code class="docutils literal notranslate"><span class="pre">pandas.Serie
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_31_0.png" src="../_images/04_spatial_weights_31_0.png" />
+<img alt="../_images/04_spatial_weights_33_0.png" src="../_images/04_spatial_weights_33_0.png" />
 </div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">cardinalities</span></code> and <code class="docutils literal notranslate"><span class="pre">histogram</span></code> attributes help quickly spot asymmetries in
@@ -955,7 +980,8 @@ of joins.</p>
 </div>
 </div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">pct_nonzero</span></code> attribute provides a measure of the density (compliment of
+<p>Thus, the Queen weights here have just under twice the number of joins in this case.
+The <code class="docutils literal notranslate"><span class="pre">pct_nonzero</span></code> attribute provides a measure of the density (compliment of
 sparsity) of the spatial weights matrix (if we had it stored explicitly, which
 we don’t):</p>
 <div class="cell docutils container">
@@ -974,15 +1000,15 @@ we don’t):</p>
 <div class="section" id="spatial-weights-from-real-world-geographic-tables">
 <h3>Spatial Weights from real-world geographic tables<a class="headerlink" href="#spatial-weights-from-real-world-geographic-tables" title="Permalink to this headline">¶</a></h3>
 <p>The regular lattice map encountered above helps us to understand the logic and
-properties of PySAL’s spatial weights class. However, the artificial nature of
+properties of <code class="docutils literal notranslate"><span class="pre">pysal</span></code>’s spatial weights class. However, the artificial nature of
 that geography is of limited relevance to real world research problems.
-PySAL supports the construction of spatial weights objects from a
+<code class="docutils literal notranslate"><span class="pre">pysal</span></code> supports the construction of spatial weights objects from a
 number of commonly used spatial data formats. Here we demonstrate this
 functionality for the case of census tracts in San Diego, California. Most spatial
 data formats, such as shapefiles, are non-topological in that they encode the
 polygons as a collection of vertices defining the edges of the geometry’s
 boundary. No information about the neighbor relations is explicitly encoded, so we
-must construct it ourselves. Under the hood, PySAL uses efficient spatial indexing
+must construct it ourselves. Under the hood, <code class="docutils literal notranslate"><span class="pre">pysal</span></code> uses efficient spatial indexing
 structures to extract these.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -992,43 +1018,23 @@ structures to extract these.</p>
 </div>
 </div>
 </div>
-<p>Like before, we can visualize the adjacency relationships, but they are much more difficult to see without showing a closer detail:</p>
+<p>Like before, we can visualize the adjacency relationships, but they are much more difficult to see without showing a closer detail. This higher level of detail is shown in the right pane of the plot.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot tract geography</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-<span class="c1"># Plot graph connections</span>
-<span class="n">w_queen</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">san_diego_tracts</span><span class="p">,</span> 
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> 
-    <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-    <span class="n">node_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-<span class="p">)</span>
+<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="c1"># Plot graph connections</span>
+    <span class="n">w_queen</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">san_diego_tracts</span><span class="p">,</span> 
+        <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> 
+        <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+        <span class="n">node_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
 <span class="c1"># Remove the axis</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_39_0.png" src="../_images/04_spatial_weights_39_0.png" />
-</div>
-</div>
-<p>Showing more detail we can get a glimpse of the intricate structure of the contiguity relationships between tracts in the center city:</p>
-<div class="cell tag_hide-input docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot tract geography</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">san_diego_tracts</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-<span class="c1"># Plot graph connections</span>
-<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">w_queen</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">san_diego_tracts</span><span class="p">,</span> 
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> 
-    <span class="n">edge_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-    <span class="n">node_kws</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="c1"># Zoom to the city center</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">13040000</span><span class="p">,</span>  <span class="o">-</span><span class="mi">13020000</span><span class="p">,</span> <span class="mi">3850000</span><span class="p">,</span> <span class="mi">3860000</span><span class="p">])</span>
-<span class="c1"># Remove axis</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
+    <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="o">-</span><span class="mi">13040000</span><span class="p">,</span>  <span class="o">-</span><span class="mi">13020000</span><span class="p">,</span> <span class="mi">3850000</span><span class="p">,</span> <span class="mi">3860000</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -1067,7 +1073,7 @@ grid. Moreover, the cardinalities have a radically different distribution:</p>
 </div>
 </div>
 <p>As the minimum number of neighbors is 1, while there is one polygon with 29
-queen neighbors. The most common number of neighbors is 6. For comparison, we
+Queen neighbors. The most common number of neighbors is 6. For comparison, we
 can also plot the equivalent for rook weights of the same dataframe:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1086,18 +1092,17 @@ can also plot the equivalent for rook weights of the same dataframe:</p>
 </div>
 </div>
 <p>The cardinality histogram shifts downward due to the increasing sparsity of the
-weights for the rook case relative to the queen criterion. Conceptually, this makes sense: all Rook neighbors are also Queen neighbors, since Queen includes neighbors that share an edge; but, not all Queen neighbors are Rook neighbors, since some Queen neighbors only share a point on their boundaries in common.</p>
+weights for the rook case relative to the Queen criterion. Conceptually, this makes sense: all Rook neighbors are also Queen neighbors, since Queen includes neighbors that share an edge; but, not all Queen neighbors are Rook neighbors, since some Queen neighbors only share a point on their boundaries in common.</p>
 <p>The example above shows how the notion of contiguity, although more
 straightforward in the case of a grid, can be naturally extended beyond the
 particular case of a regular lattice. The principle to keep in mind is that we
 consider contiguous (and hence call neighbors) observations which share part
-of their border coordinates. In the queen case, a single point is enough to make
-the join. For rook neighbors, we require a join to consist of one or more
-shared edges. This distinction is probably less relevant in the real world than
-it appears in the grid example above, and it is probably down to geocoding
-issues rather than substantive differences. In any case, there are special cases
+of their border coordinates. In the Queen case, a single point is enough to make
+the join. For Rook neighbors, we require a join to consist of one or more
+shared edges. This distinction is less relevant in the real world than
+it appears in the grid example above. In any case, there are some cases
 where this distinction can matter and it is useful to be familiar with the
-differences between the two approaches and how to apply them.</p>
+differences between the two approaches.</p>
 </div>
 <div class="section" id="spatial-weights-from-surfaces">
 <h3>Spatial Weights from surfaces<a class="headerlink" href="#spatial-weights-from-surfaces" title="Permalink to this headline">¶</a></h3>
@@ -1110,7 +1115,7 @@ differences between the two approaches and how to apply them.</p>
 </div>
 </div>
 </div>
-<p>From version 2.4 onwards, PySAL added support to build spatial weights from <code class="docutils literal notranslate"><span class="pre">xarray.DataArray</span></code> objects.</p>
+<p>From version 2.4 onwards, <code class="docutils literal notranslate"><span class="pre">pysal</span></code> added support to build spatial weights from <code class="docutils literal notranslate"><span class="pre">xarray.DataArray</span></code> objects.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_sao_paulo</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Queen</span><span class="o">.</span><span class="n">from_xarray</span><span class="p">(</span><span class="n">sao_paulo</span><span class="p">)</span>
@@ -1118,7 +1123,7 @@ differences between the two approaches and how to apply them.</p>
 </div>
 </div>
 </div>
-<p>Although the internals differ quite a bit, once built, the objects are the same as if they were built from a geographic table.</p>
+<p>Although the internals differ quite a bit, once built, the objects are a sparse version of the same object that is constructed from a geographic table.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_sao_paulo</span>
@@ -1136,7 +1141,7 @@ differences between the two approaches and how to apply them.</p>
 <div class="section" id="distance-based-weights">
 <h2>Distance Based Weights<a class="headerlink" href="#distance-based-weights" title="Permalink to this headline">¶</a></h2>
 <p>In addition to contiguity, we can also define neighbor relations as a function of
-the distance separating spatial observations. Usually, this means that a matrix expressing the distances between all pairs of observations are required. These are then provided to a <strong>kernel</strong> function which uses the proximity information to model proximity as a smooth function of distance. PySAL implements a family of
+the distance separating spatial observations. Usually, this means that a matrix expressing the distances between all pairs of observations are required. These are then provided to a <strong>kernel</strong> function which uses the proximity information to model proximity as a smooth function of distance. <code class="docutils literal notranslate"><span class="pre">pysal</span></code> implements a family of
 distance functions. Here we illustrate a selection beginning with the notion
 of <em>nearest neighbor</em> weights.</p>
 <div class="section" id="k-nearest-neighbor-weights">
@@ -1146,7 +1151,7 @@ particular observation as containing its nearest <span class="math notranslate n
 user specifies the value of <span class="math notranslate nohighlight">\(k\)</span>. To illustrate this for the San Diego
 tracts we take <span class="math notranslate nohighlight">\(k=4\)</span>. This still leaves the issue of how to measure the distance
 between these polygon objects, however. To do so we develop a representative
-point for each of the polygons using the so called “center of mass” or centroid.</p>
+point for each of the polygons using the centroid.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wk4</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">san_diego_tracts</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
@@ -1154,9 +1159,9 @@ point for each of the polygons using the so called “center of mass” or centr
 </div>
 </div>
 </div>
-<p>The centroids are attributes of the polygon shapes that PySAL calculates from
-the spatial information stored in the <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>. Since we are dealing with
-polygons in this case, PySAL uses inter-centroid distances to determine the
+<p>The centroids are calculated from
+the spatial information stored in the <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code> as we have seen before. Since we are dealing with
+polygons in this case, <code class="docutils literal notranslate"><span class="pre">pysal</span></code> uses inter-centroid distances to determine the
 <span class="math notranslate nohighlight">\(k\)</span> nearest observations to each polygon.</p>
 <p>The k-nearest neighbor weights displays no island problem, that is <em>everyone</em> has at least one neighbor:</p>
 <div class="cell docutils container">
@@ -1191,18 +1196,18 @@ In such situations, we can turn to other types of distance-based weights.</p>
 <div class="section" id="kernel-weights">
 <h3>Kernel weights<a class="headerlink" href="#kernel-weights" title="Permalink to this headline">¶</a></h3>
 <p>The k-nearest neighbor rule assigns binary values to the weights for neighboring observations.
-PySAL also supports continuously valued weights to reflect Tobler’s first law
-<span id="id1">[<a class="reference internal" href="references.html#id61"><span>Tob70</span></a>]</span> in a more direct way: observations that are close to a unit have larger
+<code class="docutils literal notranslate"><span class="pre">pysal</span></code> also supports continuously valued weights to reflect Tobler’s first law
+<span id="id2">[<a class="reference internal" href="references.html#id61"><span>Tob70</span></a>]</span> in a more direct way: observations that are close to a unit have larger
 weights than more distant observations.</p>
 <p>Kernel weights are one of the most commonly-used kinds of distance weights. They
 reflect the case where similarity/spatial proximity is assumed or expected to
 decay with distance. The essence of kernel weights is that the weight between
 observations <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> is based on their distance, but it is further modulated by
-a kernel function with certain properties. PySAL implements several kernels.
+a kernel function with certain properties. <code class="docutils literal notranslate"><span class="pre">pysal</span></code> implements several kernels.
 All of them share the properties of distance decay (thus encoding Tobler’s First
 Law), but may decay at different rates with respect to distance.</p>
 <p>As a computational note, it is worth mentioning that many of these distance-based decay functions require more resources than the contiguity weights or K-nearest neighbor weights discussed above. This is because the contiguity &amp; k-nearest neighbor structures embed simple assumptions about how shapes relate in space, while kernel functions relax several of those assumptions. Thus, they provide more flexibility at the expense of computation.</p>
-<p>The simplest way to compute Kernel weights in PySAL involves a single function
+<p>The simplest way to compute Kernel weights in <code class="docutils literal notranslate"><span class="pre">pysal</span></code> involves a single function
 call:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1215,7 +1220,7 @@ call:</p>
 The value of the weights will be a function of two main options for
 kernel weights: choice of kernel function; and the bandwidth. The
 former controls how distance between <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span> is “modulated” to produce a
-the weight that goes in <span class="math notranslate nohighlight">\(w_{ij}\)</span>. In this respect, PySAL offers a large number
+the weight that goes in <span class="math notranslate nohighlight">\(w_{ij}\)</span>. In this respect, <code class="docutils literal notranslate"><span class="pre">pysal</span></code> offers a large number
 of functions that determine the shape of the distance
 decay function. The bandwidth specifies the distance from each focal unit over which
 the kernel function is applied. For observations separated by distances larger
@@ -1284,7 +1289,9 @@ characteristics- can be preferred.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build weights with adaptive bandwidth</span>
-<span class="n">w_adaptive</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">Kernel</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">sub_30</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="n">w_adaptive</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">Kernel</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span>
+    <span class="n">sub_30</span><span class="p">,</span><span class="n">fixed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">15</span>
+<span class="p">)</span>
 <span class="c1"># Print first five bandwidth values</span>
 <span class="n">w_adaptive</span><span class="o">.</span><span class="n">bandwidth</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>
 </pre></div>
@@ -1371,28 +1378,29 @@ other observations are within the buffer. If they are, they are assigned a
 weight of one in the spatial weights matrix, if not they receive a zero.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_bdb</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_bdb</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 <p>This creates a binary distance weights where every other observation within
 a distance of 1.5 is considered neighbor.</p>
-<p>Hybrid weights, also available in PySAL, are matrices that
-offer a blend of the threshold and continuous distance weights by truncating the
-neighbor pairs to include only those separated by less than some distance threshold.</p>
-<p>Let us for instance calculate a hybrid matrix that combines inverse distance
+<p>Distance band weights can also be continuously weighted. These could be seen as a kind of “censored” kernel, where the kernel function is applied only within a pre-specified distance. For example, let us calculate the DistanceBand weights that use inverse distance
 weights up to a certain threshold and then truncate the weights to zero for
 everyone else. For this example we will return to the small lattice example
 covered in the beginning:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_hy</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_hy</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span>
+    <span class="n">gdf</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>We apply a threshold of 1.5 for this illustration. PySAL truncates continuous
+<p>We apply a threshold of 1.5 for this illustration. <code class="docutils literal notranslate"><span class="pre">pysal</span></code> truncates continuous
 weights at this distance. It is important to keep in mind that the threshold
 distance must use the same units of distance as the units used to define the
 matrix.</p>
@@ -1438,13 +1446,13 @@ surface into account. This can be done before computing the spatial weights obje
 by transforming the coordinates of data points into a projected reference system. If
 this is not possible or convenient, an approximation that considers the
 curvature implicit in non-projected reference systems (e.g.
-longitude/latitude) can be a sufficient workaround. PySAL provides such
+longitude/latitude) can be a sufficient workaround. <code class="docutils literal notranslate"><span class="pre">pysal</span></code> provides such
 approximation as part of its functionality.</p>
 <p>To illustrate the relevance of ignoring this aspect altogether we will examine
 distance based weights for the case of counties in the state of Texas. First, let us compute
 a KNN-4 object that ignores the curvature of the Earth’s surface (note how we use
 in this case the <code class="docutils literal notranslate"><span class="pre">from_shapefile</span></code> constructor to build the weights directly from a
-shapefile):</p>
+shapefile full of polygons):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># ignore curvature of the earth</span>
@@ -1456,7 +1464,7 @@ shapefile):</p>
 </div>
 </div>
 <p>Next, let us take curvature into account. To do this, we require the
-radius of the Earth expressed in a given metric. PySAL provides this number
+radius of the Earth expressed in a given metric. <code class="docutils literal notranslate"><span class="pre">pysal</span></code> provides this number
 in both miles and kilometers. For the sake of the example, we will use miles:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1485,7 +1493,7 @@ case:</p>
 </div>
 </div>
 <p>Comparing the resulting neighbor sets, we see that ignoring the curvature of the
-Earth’s surface can create erroneous neighbor pairs:</p>
+Earth’s surface can create erroneous neighbor pairs. For example, the four <em>correct</em> nearest neighbors to observation 0 when accounting for the Earth’s curvature are 6, 4, 5, and 3. However, observation 13 is <em>ever so slightly</em> closer when computing the straight line distance instead of the distance that accounts for curvature.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">knn4</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -1515,15 +1523,12 @@ Earth’s surface can create erroneous neighbor pairs:</p>
 <div class="section" id="block-weights">
 <h2>Block Weights<a class="headerlink" href="#block-weights" title="Permalink to this headline">¶</a></h2>
 <p>A final type of spatial weight we examine here are block weights. In this case,
-it is membership in
-a group or set that defines the neighbor relationships. Block weights connect every
-observation in a data set that belongs to the same category in a list provided
-<em>ex-ante</em>. Usually, this list will have some relation to the spatial configuration
-of the data but, technically speaking, all one needs to create block
-weights is a list of memberships. In essence, a hierarchical structure groups
-individual observations and assigns a value of one to the weight for all
-pair-members of the group, and a value of zero to pairs involving observations
-belonging to different groups.</p>
+it is membership in geographic
+a group that defines the neighbor relationships. Block weights connect every
+observation in a data set that belong to the same category in a provided list.<a class="footnote-reference brackets" href="#regions" id="id3">1</a>
+In essence, a block weight structure groups
+individual observations and considers all members of the group as “near” one another. This means that they then have a value of one for every pair of observations in the same group. Contrariwise, all members <em>not</em> in that group are considered disconnected from any observation within the group, and given a value of zero.
+This is done for every group, so the resulting matrix looks like “blocks” of 1s stacked on the diagonal (assuming that observations in the same group are near one another in the input data table), hence the “block” weights.</p>
 <p>To demonstrate this class of spatial weights, we will use the tract dataset for
 San Diego and focus on their county membership:</p>
 <div class="cell docutils container">
@@ -1630,25 +1635,25 @@ weights command has worked out correctly, both should be neighbors:</p>
 </div>
 </div>
 <p>We can use block weights as an intermediate step in more involved analyses
-of spatial linkages. Suppose for example, the researcher wanted to allow for
+of “hybrid” spatial relationships. Suppose for example, the researcher wanted to allow for
 queen neighbors within counties but not for tracts across different counties.
-Tracts from different counties are not considered neighbors. To create such
+In this case, tracts from different counties would not be considered neighbors. To create such
 as spatial weights matrix would require a combination of the queen and the block
-criteria, and PySAL can implement that blending through one of the set operations.</p>
+criteria, and <code class="docutils literal notranslate"><span class="pre">pysal</span></code> can implement that blending through one of the set operations shown in the next section.</p>
 </div>
 <div class="section" id="set-operations-on-weights">
 <h2>Set Operations on Weights<a class="headerlink" href="#set-operations-on-weights" title="Permalink to this headline">¶</a></h2>
 <p>So far, we have seen different principles that guide how to build spatial
 weights matrices. In this section, we explore how we can create new matrices
 by <em>combining</em> different existing ones. This is useful in contexts where a
-single neighborhood rule has flaws or when theory or other guiding principles
-point in directions that require combining more than a single criterion.</p>
+single neighborhood rule is inapt or when guiding principles
+point to combinations of criteria.</p>
 <p>We will explore these ideas in the section by returning to the San Diego tracts.
 A number of ways exist to expand the basic criteria we have reviewed above and create
-hybrid or bespoke weights. In this example, we will generate a combination of the original contiguity
+hybrid weights. In this example, we will generate a combination of the original contiguity
 weights and the nearest neighbor weights. We will examine two different
-approaches that provide the same solution, thus illustrating the value of set
-operations in PySAL.</p>
+approaches that provide similar solutions, thus illustrating the value of set
+operations in <code class="docutils literal notranslate"><span class="pre">pysal</span></code>.</p>
 <div class="section" id="editing-connecting-disconnected-observations">
 <h3>Editing/connecting disconnected observations<a class="headerlink" href="#editing-connecting-disconnected-observations" title="Permalink to this headline">¶</a></h3>
 <p>Imagine one of our tracts was an island and did not have any neighbors in the contiguity case. This can
@@ -1728,6 +1733,7 @@ nearest neighbor (<code class="docutils literal notranslate"><span class="pre">1
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">neighbors</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">102</span><span class="p">)</span>
 <span class="n">neighbors</span><span class="p">[</span><span class="mi">102</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">103</span><span class="p">)</span>
 <span class="n">w_new</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">W</span><span class="p">(</span><span class="n">neighbors</span><span class="p">)</span>
+<span class="n">w_new</span><span class="p">[</span><span class="mi">103</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1735,8 +1741,8 @@ nearest neighbor (<code class="docutils literal notranslate"><span class="pre">1
 </div>
 <div class="section" id="using-the-union-of-matrices">
 <h3>Using the <code class="docutils literal notranslate"><span class="pre">union</span></code> of matrices<a class="headerlink" href="#using-the-union-of-matrices" title="Permalink to this headline">¶</a></h3>
-<p>A more elegant approach to the island problem makes use of PySAL’s support for
-<em>set theoretic operations</em> on PySAL weights:</p>
+<p>A more elegant approach to the island problem makes use of <code class="docutils literal notranslate"><span class="pre">pysal</span></code>’s support for
+<em>set theoretic operations</em> on <code class="docutils literal notranslate"><span class="pre">pysal</span></code> weights. For example, we can construct the <em>union</em> of two weighting schemes, connecting any pair of observations if they are connected in <em>either</em> the Rook or if they are nearest neighbors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_fixed_sets</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_union</span><span class="p">(</span><span class="n">w_rook</span><span class="p">,</span> <span class="n">wk1</span><span class="p">)</span>
@@ -1746,7 +1752,7 @@ nearest neighbor (<code class="docutils literal notranslate"><span class="pre">1
 </div>
 <p>It is important to mention that this approach is not exactly the same, at least
 in principle, as the one above. It could be that the nearest
-observation was not originally a neighbor and, in this case, the resulting
+observation was not originally a Rook neighbor and, in this case, the resulting
 matrices would differ. This is a rare but theoretically possible situation.</p>
 </div>
 </div>
@@ -1795,7 +1801,7 @@ criteria introduced to define neighbor relations. We first read in the data for 
 </div>
 </div>
 <ul class="simple">
-<li><p>A combination of block and queen that connects contiguous neighbors <em>within</em> the same region</p></li>
+<li><p>A combination of block and queen that connects contiguous neighbors <em>across</em> regions</p></li>
 </ul>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1870,7 +1876,7 @@ criteria introduced to define neighbor relations. We first read in the data for 
 <img alt="../_images/04_spatial_weights_129_0.png" src="../_images/04_spatial_weights_129_0.png" />
 </div>
 </div>
-<p>Queen and KNN graphs are relatively similar but, as one would expect, the KNN is sparser than Queen on areas with high density of irregular polygons (Queen will connect each to more than four), and denser in sparser areas with less but larger polygons (e.g. north-west). Focusing on the Queen and Block graphs, there are clear distinctions between the
+<p>Queen and KNN graphs are relatively similar but, as one would expect, the KNN is sparser than Queen in areas with high density of irregular polygons (Queen will connect each to more than four), and denser in sparser areas with less but larger polygons (e.g. north-west). Focusing on the Queen and Block graphs, there are clear distinctions between the
 connectivity structures. The Block graph is visually denser in particular areas relative to the
 Queen graph and this is captured in their sparsity measures:</p>
 <div class="cell docutils container">
@@ -1916,13 +1922,13 @@ component.</p>
 </div>
 <div class="section" id="use-case-boundary-detection">
 <h2>Use case: Boundary detection<a class="headerlink" href="#use-case-boundary-detection" title="Permalink to this headline">¶</a></h2>
-<p>We close the chapter with an illustration of how weights can be useful by themselves in Geographic Data Science. Not the application displayed below involves some concepts and code that are a bit more advanced than in the rest of the chapter. If you are up for the challenge, we think the insights it enables are worth the effort!</p>
+<p>We close the chapter with an illustration of how weights can be useful by themselves in geographic data science. Note that the application displayed below involves some concepts and code that are a bit more advanced than in the rest of the chapter. If you are up for the challenge, we think the insights it enables are worth the effort!</p>
 <p>Spatial weights are ubiquitous in the analysis of spatial patterns in data, since they provide a direct method to represent spatial structure.
 However, spatial weights are also useful in their own right, such as when examining latent structures directly in the graphs themselves or when using them to conduct descriptive analysis.
-One clear use case that arises in the analysis of social data is to characterize latent <em>data discontinuities</em>. By <em>data discontinuity</em>, we mean a single border (or collection of borders) where data for a variablee (or many variables) of interest change abruptly.
-These can be used in stochastic models of boundaries <span id="id2">[<a class="reference internal" href="references.html#id48"><span>LC05</span></a>,<a class="reference internal" href="references.html#id35"><span>FPP+10</span></a>,<a class="reference internal" href="references.html#id33"><span>DDPP19</span></a>]</span> or used to adapt classic empirical outlier detection methods.
+One clear use case that arises in the analysis of social data is to characterize latent <em>data discontinuities</em>. By <em>data discontinuity</em>, we mean a single border (or collection of borders) where data for a variable (or many variables) of interest change abruptly.
+These can be used in models of inequality <span id="id4">[<a class="reference internal" href="references.html#id48"><span>LC05</span></a>,<a class="reference internal" href="references.html#id35"><span>FPP+10</span></a>,<a class="reference internal" href="references.html#id33"><span>DDPP19</span></a>]</span> or used to adapt classic empirical outlier detection methods.
 Below, we’ll show one model-free way to identify empirical boundaries in your data.</p>
-<p>First, let’s consider the median household income for our census tracts in San Diego:</p>
+<p>First, let’s consider the median household income for our census tracts in San Diego, shown in Figure 12.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
@@ -2020,7 +2026,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
     <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
     <span class="n">suffixes</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;_focal&#39;</span><span class="p">,</span> <span class="s1">&#39;_neighbor&#39;</span><span class="p">)</span>
 <span class="p">)</span>
-<span class="n">adjlist_income</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">adjlist_income</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -2107,7 +2113,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </div>
 </div>
 </div>
-<p>With this information on difference we can now do a few things. First, we can compare whether or not this <em>distribution</em> is distinct from the distribution of non-neighboring tracts’ differences in wealth. This will give us a hint at the extent to which income follows a spatial pattern.</p>
+<p>With this information on difference we can now do a few things. First, we can compare whether or not this <em>distribution</em> is distinct from the distribution of non-neighboring tracts’ differences in wealth. This will give us a hint at the extent to which income follows a spatial pattern. This is also discussed more in depth in the spatial inequality chapter, specifically in reference to the Spatial Gini.</p>
 <p>To do this, we can first compute the all-pairs differences in income using the <code class="docutils literal notranslate"><span class="pre">numpy.subtract</span></code> function. Some functions in <code class="docutils literal notranslate"><span class="pre">numpy</span></code> have special functionality; these <code class="docutils literal notranslate"><span class="pre">ufuncs</span></code> (short for “universal functions”) often support special applications to your data. Here, we will use <code class="docutils literal notranslate"><span class="pre">numpy.subtract.outer</span></code> to take the difference over the “outer cartesian product” of two vectors.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2128,7 +2134,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </div>
 </div>
 </div>
-<p>Note <code class="docutils literal notranslate"><span class="pre">complement_wr</span></code> inserts a 0 where <code class="docutils literal notranslate"><span class="pre">w_rook</span></code> includes a 1, and viceversa. Using this complement, we can filter the <code class="docutils literal notranslate"><span class="pre">all_pairs</span></code> matrix to only consider the differences in median household income for tracts that are not neighboring:</p>
+<p>Note <code class="docutils literal notranslate"><span class="pre">complement_wr</span></code> inserts a 0 where <code class="docutils literal notranslate"><span class="pre">w_rook</span></code> includes a 1, and vice versa. Using this complement, we can filter the <code class="docutils literal notranslate"><span class="pre">all_pairs</span></code> matrix to only consider the differences in median household income for tracts that are not neighboring:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">non_neighboring_diffs</span> <span class="o">=</span> <span class="p">(</span><span class="n">complement_wr</span> <span class="o">*</span> <span class="n">all_pairs</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -2170,7 +2176,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </div>
 </div>
 <p>From this, we can see that the two distributions are distinct, with the distribution of difference in <em>non-neighboring</em> tracts being slightly more dispersed than that for <em>neighboring</em> tracts. Thus, on the whole, this means that neighboring tracts have more <em>smaller differences in wealth</em> than non-neighboring tracts. This is consistent with the behavior we will talk about in later chapters concerning <em>spatial autocorrelation</em>, the tendency for observations to be statistically more similar to nearby observations than they are to distant observations.</p>
-<p>The adjacency table we have build can also help us find our <em>most extreme</em> observed differences in income, hinting at invisible boundaries between the areas. Since our links are symmetric, the table sort is symmetric. We can then focus only on focal observations with <em>the most extreme</em> difference in wealth from their immediate neighbors, considering only on those where the <em>focal</em> is higher.</p>
+<p>The adjacency table we have build can also help us find our <em>most extreme</em> observed differences in income, hinting at possible hard boundaries between the areas. Since our links are symmetric, we can then focus only on focal observations with <em>the most extreme</em> difference in wealth from their immediate neighbors, considering only on those where the <em>focal</em> is higher, since they each have an equivalent <em>negative</em> back-link.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">extremes</span> <span class="o">=</span> <span class="n">adjlist_income</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">&#39;diff&#39;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -2255,8 +2261,8 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </table>
 </div></div></div>
 </div>
-<p>Thus, we see that observation <span class="math notranslate nohighlight">\(473\)</span> appears often on the the <code class="docutils literal notranslate"><span class="pre">focal</span></code> side, suggesting it’s quite distinct from its nearby polygons. We also see observation <span class="math notranslate nohighlight">\(343\)</span> in the <code class="docutils literal notranslate"><span class="pre">focal</span></code> column.</p>
-<p>To verify whether these differences are truly beyond the pale, we can use a map randomization strategy. In this case, we shuffle values across the map and compute <em>new</em> <code class="docutils literal notranslate"><span class="pre">diff</span></code> columns. This time, <code class="docutils literal notranslate"><span class="pre">diff</span></code> represents the difference between random neighbors, rather than the neighbor structure we did observe, encoded in our Rook contiguity matrix. Using many <code class="docutils literal notranslate"><span class="pre">diff</span></code> vectors, we can find the observed differences which tend to be much larger than those encountered in randomly-drawn maps of household income.</p>
+<p>Thus, we see that observation <span class="math notranslate nohighlight">\(473\)</span> appears often on the the <code class="docutils literal notranslate"><span class="pre">focal</span></code> side, suggesting it’s quite distinct from its nearby polygons.</p>
+<p>To verify whether these differences are truly significant, we can use a map randomization strategy. In this case, we shuffle values across the map and compute <em>new</em> <code class="docutils literal notranslate"><span class="pre">diff</span></code> columns. This time, <code class="docutils literal notranslate"><span class="pre">diff</span></code> represents the difference between random incomes, rather than the neighboring incomes we actually observed using our Rook contiguity matrix. Using many <code class="docutils literal notranslate"><span class="pre">diff</span></code> vectors, we can find the observed differences which tend to be much larger than those encountered in randomly-drawn maps of household income.</p>
 <p>To start, we can construct many random <code class="docutils literal notranslate"><span class="pre">diff</span></code> vectors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2445,7 +2451,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </table>
 </div></div></div>
 </div>
-<p>Note that one of these, observation <span class="math notranslate nohighlight">\(473\)</span>, appears in both boundaries. This means that the observation is likely to be <em>outlying</em>, extremely unlike <em>all</em> of its neighbors. These kinds of generalized neighborhood comparisons are discussed in the subsequent chapter on <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">local spatial autocorrelation</span></a>. For now we can visualize this on a map, focusing on the two boundaries around observation <span class="math notranslate nohighlight">\(473\)</span>, shown also in the larger context of San Diego incomes:</p>
+<p>Note that one of these, observation <span class="math notranslate nohighlight">\(473\)</span>, appears in both boundaries. This means that the observation is likely to be <em>outlying</em>, extremely unlike <em>all</em> of its neighbors. These kinds of generalized neighborhood comparisons are discussed in the subsequent chapter on local spatial autocorrelation. For now we can visualize this on a map, focusing on the two boundaries around observation <span class="math notranslate nohighlight">\(473\)</span>, shown also in the larger context of San Diego incomes:</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
@@ -2487,7 +2493,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </div>
 <div class="section" id="conclusion">
 <h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
-<p>Spatial weights are central to how we <em>represent</em> spatial relationships in mathematical and computational environments. At their core, they are a “geo-graph,” or a network defined by the geographical relationships between observations. They form kind of a “spatial index,” in that they record which observations have a specific geographical relationship. Since spatial weights are fundamental to how “proximity” is represented in geographic data science, we will use them again and again throughout the book.</p>
+<p>Spatial weights are central to how we <em>represent</em> spatial relationships in mathematical and computational environments. At their core, they are a “geo-graph,” or a network defined by the geographical relationships between observations. They form kind of a “spatial index,” in that they record which observations have a specific geographical relationship. Since spatial weights are fundamental to how spatial relationships are represented in geographic data science, we will use them again and again throughout the book.</p>
 </div>
 <div class="section" id="questions">
 <h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">¶</a></h2>
@@ -2567,6 +2573,12 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </ol>
 </li>
 </ol>
+<hr class="footnotes docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="regions"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
+<dd><p>Usually, this list will have some relation to the spatial configuration of the data but, technically speaking, all one needs to create block weights is a list of memberships.</p>
+</dd>
+</dl>
 </div>
 </div>
 
@@ -2622,7 +2634,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
         
         </div>
     </div>
-    <footer class="footer mt-5 mt-md-0">
+    <footer class="footer">
     <div class="container">
       <p>
         
