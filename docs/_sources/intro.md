@@ -53,7 +53,7 @@ Geographic Data Science, from setting up and organizing computational
 environments to preparing data, through to developing novel spatial insight
 and presenting it cogently to others. This kind of integrated approach is
 necessary for data science, and is particularly relevant in geographical settings 
-where mapping is of central impotance. 
+where mapping is of central importance. 
 
 
 ---
