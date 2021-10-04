@@ -708,6 +708,6 @@ To access the lab, copy the token from the terminal (in the example above,
 that would be `ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c`), enter it on
 the box and click on "Log in". Now you are in, and can view and execute the chapters in this book. 
 
-# Conclusion
+## Conclusion
 
 Reproducibility requires us to take our tools seriously. Since the onset of computational science, we have sought methods to keep the "code" that implements science linked tightly to the writing that explains it. Notebooks offer us a way to do this. Further, keeping in the spirit of open science from long ago, we will do better science if we keep our software public and open to the world. To guarantee that our code can, in fact, be executed, we must also document the environment in which the code is executed using tools like Docker. In the following chapter, we use these tools in concert with geographical thinking to learn about *geographic data science.*
