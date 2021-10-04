@@ -19,7 +19,7 @@ import warnings
 warnings.filterwarnings("ignore")
 ```
 
-# Spatial Inequality
+# Spatial Inequality Dynamics
 
 
 
@@ -231,7 +231,7 @@ from pysal.explore import inequality
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 ### Gini Index
 
-The Gini index is a longstanding measure of inequality based on the notion of cumulative wealth distribution. The Gini is closely linked to another popular device called the Lorenz curve
+The Gini index is a longstanding measure of inequality based on the notion of cumulative wealth distribution {cite}`manz2021`. The Gini is closely linked to another popular device called the Lorenz curve
 . To construct a Lorenz curve, the cumulative share of wealth is plotted against the share of the population that owns that wealth. For example, in an extremely unequal society where few people own nearly all the wealth, the Lorenz curve increases very slowly at first, then skyrockets once the wealthiest people are included. 
 
 In contrast, a "perfectly equal" society would look like a straight line connecting $(0,0)$ and $(1,1)$. This is called the *line of perfect equality*, and represents the case where $p$% of the population owns exactly $p$% of the wealth. For example, this might mean that 50% of the population earns exactly 50% of the income, or 90% of the population owns 90% of the wealth. The main idea is that the share of wealth or income is exactly proportional to the share of population that owns that wealth or earns that income, which occurs only when everyone has the same income or owns the same amount of wealth. 
@@ -365,9 +365,9 @@ Which we can turn into a graphical representation through standard `pandas` plot
 inequalities.plot(figsize=(10, 3));
 ```
 
-same### Theil's index
+### Theil's index
 
-A third commonly used measure of inequality is Theil's $T$ given as:
+A third commonly used measure of inequality is Theil's $T$ {cite}`manz2021` given as:
 
 $$T = \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\sum_{i=1}^m y_i}\right] \right)$$
 
@@ -523,7 +523,7 @@ Second, despite this decline, there is never a year in which the spatial autocor
 
 One common objection to the analysis of inequality in aggregate relates to lack of detail about the scale at which inequality is most important. Inequality can be driven by differences between groups and not by discrepancies in income between similar individuals. That is, there is always the possibility that observed inequality can be "explained" by a confounding variate, such as age, sex, or education. For example, income differences between older and younger people can "explain" a large part of the societal inequality in wealth: older people have much longer to acquire experience, and thus are generally paid more for that experience. Younger people do not have as much experience, so young people (on average) have lower incomes than older people. 
 
-To tackle this issue, it is often useful to *decompose* inequality indices into constituent groups. This allows us to understand how much of inequality is driven by aggregate group differences and how much is driven by observation-level inequality. This also allows us to characterize how unequal each group is separately. In geographic applications, these groups are usually spatially defined, in that *regions* are contiguous geographic groups of observations. This section discusses regional inequality decompositions as a way to introduce geography into the study of inequality. 
+To tackle this issue, it is often useful to *decompose* inequality indices into constituent groups. This allows us to understand how much of inequality is driven by aggregate group differences and how much is driven by observation-level inequality. This also allows us to characterize how unequal each group is separately. In geographic applications, these groups are usually spatially defined, in that *regions* are contiguous geographic groups of observations {cite}`shorrocks2005`. This section discusses regional inequality decompositions as a way to introduce geography into the study of inequality. 
 
 Let's illustrate these ideas with our income dataset. The table records the United States Census Bureau region a county belongs to in the `Region` variable. These divide the country into eight regions, each assigned a number that relates to its name as specified below:
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
@@ -654,9 +654,9 @@ While regional decompositions are useful, they do not tell the whole story. Inde
 The final approach we review here is an explicit integration of space within traditional, non-spatial measure. In particular, we consider a *spatialized* version of the Gini coefficient, introduced by {cite}`Rey_2012`. The spatial Gini is designed to consider
 the role of spatial adjacency in a decomposition of the traditional Gini. The original index can be formulated focusing on the set of pairwise absolute differences in incomes:
 
-$$G = \frac{\sum_i \sum_j \left | y_i - y_j \right|}{2 n^2 \bar{x}} $$
+$$G = \frac{\sum_i \sum_j \left | y_i - y_j \right|}{2 n^2 \bar{y}} $$
 
-Focusing on the set of pairwise absolute differences in income, we can de-compose this into the set of differences between "nearby" observations and the set of differences among "distant" observations. This is the main conceptual point of the "Spatial Gini" coefficient. This decomposition works similarly to the regional decomposition of the Theil index:
+where $n$ is the number of observations, and $\bar{y}$ is the mean regional income. Focusing on the set of pairwise absolute differences in income, we can de-compose this into the set of differences between "nearby" observations and the set of differences among "distant" observations. This is the main conceptual point of the "Spatial Gini" coefficient. This decomposition works similarly to the regional decomposition of the Theil index:
 
 $$
 \sum_i \sum_j \left |y_i - y_j \right | =\sum_i \sum_j \underset{\text{near differences}}{\left( w_{ij} \left |y_i - y_j \right | \right )} + \underset{\text{far differences}}{\left( (1-w_{ij})  \left |y_i - y_j \right | \right )}
