@@ -21,16 +21,14 @@ warnings.filterwarnings("ignore")
 # Local Spatial Autocorrelation
 
 
-In the previous chapter, we explored how to use global measures of spatial autocorrelation to determine whether the overall spatial distribution of our attribute of interest was reflective of a geographically random process. These statistics are useful: the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. This could represent *spillovers*, where outcomes at one site influence other sites, or could indicate *contagion*, where outcomes at one site *causally influence* other sites. In these cases formal modeling of the spatial dimensions of the processes should next be carried out. On the other hand, spatial autocorrelation can sometimes arise from data processing operations in which cases the dependence is a form of non-random noise rather than due to substantive processes. For example, when "down-sampling" geographic data, sometimes large patches of identical values can be created. These may only be artifacts of the interpolation, rather than substantive autocorrelation. Regardless of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis.
+In the previous chapter, we explored how global measures of spatial autocorrelation can help us determine whether the overall spatial distribution of our phenomenon of interest is compatible with a geographically random process. These statistics are useful: the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. This could represent *spillovers*, where outcomes at one site influence other sites; or could indicate *contagion*, where outcomes at one site *causally influence* other sites. As we will see later in [Chapter 11](11_regression), it could simply be the result of systematic spatial variation (or, as we will call it then, _heterogeneity_). Spatial autocorrelation also sometimes arises from data measurement and processing. In this case, the dependence is a form of non-random noise rather than due to substantive processes. For example, when "down-sampling" geographic data, sometimes large patches of identical values can be created. These may only be artifacts of the interpolation, rather than substantive autocorrelation. Regardless of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis. For these reasons, the ability to determine whether spatial autocorrelation is present in a geographically referenced data set is a critical component of the geographic data science toolbox. 
 
-For these reasons, the ability to determine whether spatial autocorrelation is present in a geographically referenced data set is a critical component of the geographic data science toolbox. That said, the global measures of spatial autocorrelation are "whole map" statistics, meaning that the single statistic pertains to the complete data set. For example,
-Moran's $I$ is good tool to summarize a dataset into a single value that measures the degree of geographical clustering (or dispersion, if negative). However, Moran's $I$ is does not indicate areas within the map where specific types of values (e.g.
-high, low) are located. 
+Despite their importance, global measures of spatial autocorrelation are "whole map" statistics. They provide a single summary for an entire data set. For example,
+Moran's $I$ is a good tool to summarize a dataset into a single value that captures the degree of geographical clustering (or dispersion, if negative). However, Moran's $I$ does not indicate areas within the map where specific types of values (e.g. high, low) are clustered, or instances of explicit dispersion. 
 In other words, Moran's I can tell us whether values in our map *cluster* together (or disperse) overall, but it will not inform us about where specific *clusters* (or outliers) are.
 
-For that purpose, we need to use a local measure of spatial autocorrelation.
-Local measures of spatial autocorrelation focus on the relationships between each observation and its surroundings, rather than providing a single-number summary of these relationships across the map. Because of that, they do not summarize the map overall, but they allow to obtain further insights about interesting geographical subsets of the data. In this chapter, we consider
-Local Indicators of Spatial Association (LISAs) {cite}`Anselin1995local`, a local counter-part of global measures like Moran's I.
+In this chapter, we introduce local measures of spatial autocorrelation.
+Local measures of spatial autocorrelation focus on the relationships between _each_ observation and its surroundings, rather than providing a single summary of these relationships across the map. In this sense, they are not summary statistics but scores that allow us to learn more about the spatial structure in our data. The general intuition behind the metrics however is similar to that of global ones. Some of them are even mathematically connected, where the global version can be decomposed into a collection of local ones. One such example are Local Indicators of Spatial Association (LISAs) {cite}`Anselin1995local`, which we use to build the understanding of local spatial autocorrelation, and on which we spend a good part of the chapter. Once such concepts are firmed, we introduce a couple alternative statistics that present complementary information or allow us to obtain similar insights for categorical data. Although very often these statistics are used with data expressed in geo-tables, there is nothing fundamentally connecting the two. In fact, the application of these methods to large surfaces is a promising area of work. For that reason, we close the chapter with an illustration of how one can run these statistics on data stored as surfaces.
 
 
 
@@ -50,56 +48,65 @@ from pysal.lib import weights
 import contextily                # Background tiles
 ```
 
+We read the vote data as a non-spatial table:
+
 ```python
-ref = pandas.read_csv('../data/brexit/brexit_vote.csv', 
-                      index_col='Area_Code')
+ref = pandas.read_csv(
+    '../data/brexit/brexit_vote.csv', 
+    index_col='Area_Code'
+)
 ```
 
-Now let us bring in the spatial data:
+And the spatial geometries for the local authority districts in Great Britain:
 
 ```python
-lads = geopandas.read_file("../data/brexit/local_authority_districts.geojson")\
-                .set_index('lad16cd')
+lads = geopandas.read_file(
+    "../data/brexit/local_authority_districts.geojson"
+).set_index('lad16cd')
 ```
 
-Then, we need to "trim" the `DataFrame` so it only retains what we know we will need:
+Then, we "trim" the `DataFrame` so it retains only what we know we will need, reproject it to spherical mercator, and drop rows with missing data:
 
 ```python
-db = geopandas.GeoDataFrame(lads.join(ref[['Pct_Leave']]), crs=lads.crs)\
-              .to_crs(epsg=3857)\
-              [['objectid', 'lad16nm', 'Pct_Leave', 'geometry']]\
-              .dropna()
+db = geopandas.GeoDataFrame(
+    lads.join(ref[['Pct_Leave']]), crs=lads.crs
+).to_crs(
+    epsg=3857
+)[
+    ['objectid', 'lad16nm', 'Pct_Leave', 'geometry']
+].dropna()
+
 db.info()
 ```
 
-Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union. For convenience, let us merge this with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), which will allow us to combine them with contextual tiles.
-
-```python
-lads.crs
-```
+Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union.
 
 And with these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the `alpha` attribute) to make the final plot easier to read.
 
 ```python caption="BREXIT Leave vote, % leave." tags=[]
+# Set up figure and a single axis
 f, ax = plt.subplots(1, figsize=(9, 9))
-db.plot(column='Pct_Leave', 
-        cmap='viridis', 
-        scheme='quantiles',
-        k=5, 
-        edgecolor='white', 
-        linewidth=0., 
-        alpha=0.75, 
-        legend=True,
-        legend_kwds=dict(loc=2),
-        ax=ax
-       )
-
-contextily.add_basemap(ax, 
-                       crs=db.crs, 
-                       source=contextily.providers.Stamen.TerrainBackground,
-                       
-                      )
-ax.set_axis_off()
+# Build choropleth
+db.plot(
+    column='Pct_Leave', 
+    cmap='viridis', 
+    scheme='quantiles',
+    k=5, 
+    edgecolor='white', 
+    linewidth=0., 
+    alpha=0.75, 
+    legend=True,
+    legend_kwds=dict(loc=2),
+    ax=ax
+)
+# Add basemap
+contextily.add_basemap(
+    ax, 
+    crs=db.crs, 
+    source=contextily.providers.CartoDB.VoyagerNoLabels
+)
+# Remove axes
+ax.set_axis_off();
 ```
 As in the previous chapter, we require a spatial weights matrix to implement our statistic. Here, we will use eight nearest neighbors for the sake of the example, but the discussion in the earlier chapter on weights applies in this context, and other criteria would be valid too. We also row-standardize them:
 
@@ -111,9 +118,11 @@ w = weights.distance.KNN.from_dataframe(db, k=8)
 w.transform = 'R'
 ```
 
+<!-- #region tags=[] -->
 ## Motivating Local Spatial Autocorrelation
 
-To better understand the underpinning of local autocorrelation, we will return to the Moran Plot as a graphical tool. Let us first calculate the spatial lag of our variable of interest:
+To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardised form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:
+<!-- #endregion -->
 
 ```python
 db['w_Pct_Leave'] = weights.spatial_lag.lag_spatial(w, db['Pct_Leave'])
@@ -122,21 +131,23 @@ db['w_Pct_Leave'] = weights.spatial_lag.lag_spatial(w, db['Pct_Leave'])
 And their respective standardized versions, where we subtract the average and divide by the standard deviation:
 
 ```python
-db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )\
-                    / db['Pct_Leave'].std()
-db['w_Pct_Leave_std'] = ( db['w_Pct_Leave'] - db['Pct_Leave'].mean() )\
-                    / db['Pct_Leave'].std()
+db['Pct_Leave_std'] = (
+    db['Pct_Leave'] - db['Pct_Leave'].mean()
+) / db['Pct_Leave'].std()
+db['w_Pct_Leave_std'] = (
+    db['w_Pct_Leave'] - db['Pct_Leave'].mean()
+) / db['Pct_Leave'].std()
 ```
 
-Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
+Technically speaking, creating a Moran Plot is very similar to creating any other scatter:
 
 ```python caption="BREXIT Leave vote, % leave Moran Scatter Plot." tags=[]
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
-seaborn.regplot(x='Pct_Leave_std', y='w_Pct_Leave_std', data=db, ci=None)
-# Display
-plt.show()
+seaborn.regplot(
+    x='Pct_Leave_std', y='w_Pct_Leave_std', data=db, ci=None
+);
 ```
 
 Using standardized values, we can immediately divide each variable (the percentage that voted to leave, and its spatial lag) in two groups. Those with above-average leave voting have positive standardized values, and those with below-average leave voting have negative standardized values. This, in turn, divides a Moran Plot in four quadrants, depending on whether a given area displays a value above the mean (high) or below (low) in either the original variable (`Pct_Leave`) or its spatial lag (`w_Pct_Leave_std`). 
@@ -478,8 +489,3 @@ Fotheringham, A. Stewart. 1997. "Trends in Quantitative Methods I: Stressing the
 More recent discussion on local statistics (in the context of spatial statistics more generally) is provided by Nelson:
 
 Nelson, Trisalyn. "Trends in Spatial Statistics." *The Professional Geographer* 64(1): 83-94. 
- 
-
-```python
-
-```
