@@ -227,7 +227,7 @@ pop.sel(band=1).plot();
 
 This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g., `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
 
-```python caption="Population surface of Sao Paulo, Brazil omitting "no data" values" tags=[]
+```python tags=[] caption="Population surface of Sao Paulo, Brazil omitting NAN values."
 pop.where(pop!=-200)\
    .sel(band=1)\
    .plot(cmap="RdPu");
