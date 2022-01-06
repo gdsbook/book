@@ -450,6 +450,13 @@ Similarly, inference can also be carried out by relying on computational simulat
 
 
 
+##  Further Reading
+
+- Anselin, L. (1989) "What is special about spatial data? Alternative perspectives on spatial data analysis." C Santa Barbara: National Center for Geographic Information and Analysis. Retrieved from https://escholarship.org/uc/item/3ph5k0d4
+- Wu, A.-M., and Kemp, K. K. (2019). Global Measures of Spatial Association. The Geographic Information Science & Technology Body of Knowledge (1st Quarter 2019 Edition), John P. Wilson (Ed.). DOI: 10.22224/gistbok/2019.1.12
+- Getis, A. (2007). Reflections on spatial autocorrelation. Regional Science & Urban Economics, 37: 491-496. DOI: 10.1016/j.regsciurbeco.2007.04.005 
+
+
 ## Questions
 
 1. Return to the original `ref` table and pull out the `Pct_Rejected`
@@ -489,10 +496,3 @@ Similarly, inference can also be carried out by relying on computational simulat
    mean for the use and interpretation of both statistics?
 7. Using $k$-nearest neighbor weights, can you find the $k$ where Moran's $I$ is largest? Make a plot of the Moran's $I$ for each $k$ you evaluate to show the relationship between the two.  
 8. As in the previous question, at what value of $k$ is the Geary's $C$ largest?
-
-
-##  Further Reading
-
-- Anselin, L. (1989) "What is special about spatial data? Alternative perspectives on spatial data analysis." C Santa Barbara: National Center for Geographic Information and Analysis. Retrieved from https://escholarship.org/uc/item/3ph5k0d4
-- Wu, A.-M., and Kemp, K. K. (2019). Global Measures of Spatial Association. The Geographic Information Science & Technology Body of Knowledge (1st Quarter 2019 Edition), John P. Wilson (Ed.). DOI: 10.22224/gistbok/2019.1.12 (link is external)
-- Getis, A. (2007). Reflections on spatial autocorrelation. Regional Science & Urban Economics, 37: 491-496. DOI: 10.1016/j.regsciurbeco.2007.04.005 
