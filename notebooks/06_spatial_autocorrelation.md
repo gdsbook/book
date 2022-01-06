@@ -452,9 +452,9 @@ Similarly, inference can also be carried out by relying on computational simulat
 
 ##  Further Reading
 
-- Anselin, L. (1989) "What is special about spatial data? Alternative perspectives on spatial data analysis." C Santa Barbara: National Center for Geographic Information and Analysis. Retrieved from https://escholarship.org/uc/item/3ph5k0d4
-- Wu, A.-M., and Kemp, K. K. (2019). Global Measures of Spatial Association. The Geographic Information Science & Technology Body of Knowledge (1st Quarter 2019 Edition), John P. Wilson (Ed.). DOI: 10.22224/gistbok/2019.1.12
-- Getis, A. (2007). Reflections on spatial autocorrelation. Regional Science & Urban Economics, 37: 491-496. DOI: 10.1016/j.regsciurbeco.2007.04.005 
+- {cite}`anselin1989special`. "What is special about spatial data? Alternative perspectives on spatial data analysis." UC Santa Barbara: National Center for Geographic Information and Analysis.
+- {cite}`wu2019global`. Global Measures of Spatial Association. The Geographic Information Science & Technology Body of Knowledge (1st Quarter 2019 Edition), John P. Wilson (Ed.). DOI: 10.22224/gistbok/2019.1.12
+- {cite}`getis2007reflections`. Reflections on spatial autocorrelation. Regional Science & Urban Economics, 37: 491-496. DOI: 10.1016/j.regsciurbeco.2007.04.005 
 
 
 ## Questions
