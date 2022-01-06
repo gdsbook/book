@@ -802,6 +802,7 @@ packages in the data stack that the user can turn to.
 - {cite}`slocum2014thematic`. Thematic Cartography and Geovisualization. Pearson.
 - {cite} `cromely2009choropleth`. "Choropleth map legend design for visualizing community health disparities." *International Journal of Health Geographics*, 8: 1-11.
 - {cite} `cromely1996comparison`. "A comparison of optimal classification strategies for choroplethic displays of spatiall aggregated data." *International Journal of Geographc Information Systems*, 10: 405-424.
+- {cite} `brewer2005designming`. Designing better maps: A guide for GIS Users. ESRI press.
 
 ## Questions
 
