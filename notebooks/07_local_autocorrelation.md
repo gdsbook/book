@@ -44,8 +44,9 @@ import seaborn                   # Graphics
 import geopandas                 # Spatial data manipulation
 import pandas                    # Tabular data manipulation
 import rioxarray                 # Surface data manipulation
+import xarray                    # Surface data manipulation
 from pysal.explore import esda   # Exploratory Spatial analytics
-from pysal.lib import weights
+from pysal.lib import weights    # Spatial weights
 import contextily                # Background tiles
 ```
 
@@ -483,25 +484,26 @@ Check:
 ## Bonus: local statistics on surfaces
 
 ```python
-pop = rioxarray.open_rasterio(
-    '../data/ghsl/ghsl_sao_paulo.tif'
-).sel(band=1)
+pop = xarray.open_rasterio('../data/ghsl/ghsl_sao_paulo.tif')
 ```
 
 ```python
-pop
+w_surface = weights.Queen.from_xarray(pop)
+w_surface.transform = 'r'
 ```
 
 ```python
-pop.plot()
+pop_values = pop.to_series()
+pop_values = pop_values[pop_values != pop.attrs['nodatavals'][0]]
 ```
 
 ```python
-pop.rio.nodata
+w_surface.transform = 'r'
+np.unique(w_surface.sparse.data)
 ```
 
-```python
-w_surface = weights.Queen.from_xarray(pop, 
+```python tags=[]
+pop_lisa = esda.moran.Moran_Local(pop_values, w_surface)
 ```
 
 ## Conclusion
