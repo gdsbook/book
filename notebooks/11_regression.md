@@ -1178,3 +1178,24 @@ So, the correlation between the observed residual and the average of $k$ randoml
 Thus, increasing the number of randomly-chosen neighbors does not significantly adjust the long-run average of zero.
 Taken together, we can conclude that there is distinct positive spatial dependence in the error. 
 This means that our over- and under-predictions are likely to cluster. 
+
+
+## Next Steps 
+
+For additional reading on the topics covered in this chapter, please consult the following resources: 
+
+For a more in-depth discussion of the fundamentals of spatial econometrics and applications in both GUI and command-line software, consult
+
+Anselin, Luc and Sergio Rey. 2014. *Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and PySAL.* GeoDa Press. 
+
+For additional mathematical detail and more extensive treatment of space-time models, consult: 
+
+Cressie, Noel and Christopher N. Wikle. 2011. *Statistics for Spatio-Temporal Data*. Singapore: Wiley Press. 
+
+For an alternative perspective on regression and critique of the spatial econometric perspective, consider:
+
+Gibbons, Stephen and Henry G. Overman. 2012. "Mostly Pointless Spatial Econometrics." *Journal of Regional Science* 52: 172-191. 
+
+And for a useful overview of the discussions around multilevel modelling, with references therein to further resources, consider: 
+
+Owen, Gwilym, Richard Harris, and Kelvyn Jones. "Under Examination: Multilevel models, geography and health research." *Progress in Human Geography* 40(3): 394-412. 
