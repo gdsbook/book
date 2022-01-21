@@ -657,7 +657,6 @@ knn4[0]
 knn4_bad[0]
 ```
 
-<!-- #region -->
 ## Block Weights 
 
 A final type of spatial weight we examine here are block weights. In this case, 
@@ -670,7 +669,6 @@ This is done for every group, so the resulting matrix looks like "blocks" of 1s 
 
 To demonstrate this class of spatial weights, we will use the tract dataset for
 San Diego and focus on their county membership:
-<!-- #endregion -->
 
 ```python
 san_diego_tracts[
@@ -805,7 +803,7 @@ we illustrate these concepts using the 32 states of Mexico.
 We compare the neighbor graphs that results from some of the 
 criteria introduced to define neighbor relations. We first read in the data for Mexico:
 
-```python 
+```python
 mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
 ```
 
@@ -1267,3 +1265,9 @@ Spatial weights are central to how we *represent* spatial relationships in mathe
 
 
 [^regions]: Usually, this list will have some relation to the spatial configuration of the data but, technically speaking, all one needs to create block weights is a list of memberships.
+
+## Next Steps
+
+For additional reading and further information on the topic of networks and spatial weights matrices, consider Chapter 3 of Anselin and Rey, *Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and PySAL*. Further, for more general thinking on networks in geography, consider: 
+
+Uitermark, Justus and Michiel van Meeteren. 2021. "Geographcial Network Analysis." *Tijdschrift voor economische en sociale geografie* 112: 337-350. 
