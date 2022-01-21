@@ -209,7 +209,7 @@ Because of their very nature, looking at the numerical result of LISAs is not al
 To answer these questions, we need to bring in additional information that we have computed when calculating the LISA statistics. We do this in four acts. The first one we have already mentioned: a straighforward choropleth of the local statistic of each area. The other three include information on the quadrant each area is assigned into, whether the statistic is considered significant or not, and a combination of those two in a single so-called _cluster_ map. A handy tool in this context is the `splot` library, part of the PySAL family, which provides a lightweight visualisation layer for spatial statistics:
 
 ```python
-from pysal.viz import splot
+from splot import esda as esdaplot
 ```
 
 With all pieces in place, let's first get busy building the figure:
@@ -224,8 +224,11 @@ axs = axs.flatten()
             # Choropleth of local statistics
 # Grab first axis in the figure
 ax = axs[0]
+# Assign new column with local statistics on-the-fly
+db.assign(
+    Is=lisa.Is
 # Plot choropleth of local statistics
-db.plot(
+).plot(
     column='Is', 
     cmap='plasma', 
     scheme='quantiles',
@@ -245,7 +248,7 @@ ax = axs[1]
 # quadrant, we "trick" the function by setting significance level to
 # 1 so all observations are treated as "significant" and thus assigned
 # a quadrant color
-splot.esda.lisa_cluster(lisa, db, p=1, ax=ax);
+esdaplot.lisa_cluster(lisa, db, p=1, ax=ax);
 
                     # Subplot 3 #
                 # Significance map
@@ -281,7 +284,7 @@ ax = axs[3]
 # Plot Quandrant colors In this case, we use a 5% significance
 # level to select polygons as part of statistically significant
 # clusters
-splot.esda.lisa_cluster(lisa, db, p=0.05, ax=ax);
+esdaplot.lisa_cluster(lisa, db, p=0.05, ax=ax);
 
                     # Figure styling #
 # Set title to each subplot
@@ -483,27 +486,133 @@ Check:
 
 ## Bonus: local statistics on surfaces
 
+
+[Intro to section]
+
+Read the data:
+
 ```python
 pop = xarray.open_rasterio('../data/ghsl/ghsl_sao_paulo.tif')
 ```
 
+Build weights from surface:
+
 ```python
-w_surface = weights.Queen.from_xarray(pop)
-w_surface.transform = 'r'
+w_surface = weights.Queen.from_xarray(pop, sparse=False)
 ```
+
+This is a bit more advanced and still experimental, so we have to take care of a few more things on our own:
+
+- Recast our `DataArray` into a `pandas.Series`
+- Remove rows for pixels with no data
+- Ensure both the data and the weights are in the same `dtype`
 
 ```python
 pop_values = pop.to_series()
-pop_values = pop_values[pop_values != pop.attrs['nodatavals'][0]]
+pop_values = pop_values[
+    pop_values != pop.attrs['nodatavals'][0]
+].astype(w_surface.sparse.dtype)
 ```
 
-```python
-w_surface.transform = 'r'
-np.unique(w_surface.sparse.data)
-```
+Now we have a standard weights matrix and a set of values associated with it, we can run a LISA just as we did before with a geo-table:
 
 ```python tags=[]
-pop_lisa = esda.moran.Moran_Local(pop_values, w_surface)
+pop_lisa = esda.moran.Moran_Local(pop_values, w_surface, n_jobs=-1)
+```
+
+To visualise it, we need to express the LISA results as a surface rather than as a table. To do this, we need the bridge built in PySAL:
+
+```python
+from libpysal.weights import raster
+```
+
+First, let's get the combination of quadrant and significance, as we did before in the Brexit case:
+
+```python
+sig_pop = pandas.Series(
+    pop_lisa.q * (pop_lisa.p_sim < 0.01), index=pop_values.index
+)
+```
+
+The `sig_pop` object is a `pandas.Series` that we need to express as a `DataArray`. To make that connection, we can use `w_surface`, which encodes the information required to build the surface:
+
+```python
+# Build `DataArray` from a set of values and weights
+lisa_da = raster.w2da(
+    sig_pop,                                      # Values
+    w_surface,                                    # Spatial weights
+    attrs={'nodatavals': pop.attrs['nodatavals']} # Value for missing data
+# Add CRS information in a compliant manner
+).rio.write_crs(pop.rio.crs)
+```
+
+The resulting `DataArray` only contains missing data pixels (expressed with the same value as the original `pop`), `0` for non-significant pixels, and 1-4 depending on the quadrant for HH, LH, LL, HL significant clusters, same as with the Brexit example before:
+
+```python
+lisa_da.to_series().unique()
+```
+
+Now let's create the colormap to encode clusters with the same colors that `splot` uses for geo-tables. For that, we need the method in `matplotlib` that builds a color map from a list of colors:
+
+```python
+from matplotlib.colors import ListedColormap
+```
+
+And the colors, which we express as a dictionary:
+
+```python
+# LISA colors
+lc = {
+    'ns': 'lightgrey', # Values of 0
+    'HH': '#d7191c',   # Values of 1
+    'LH': '#abd9e9',   # Values of 2
+    'LL': '#2c7bb6',   # Values of 3
+    'HL': '#fdae61',   # Values of 4
+}
+```
+
+With these pieces, we can create the colormap object:
+
+```python
+lisa_cmap = ListedColormap(
+    [lc['ns'], lc['HH'], lc['LH'], lc['LL'], lc['HL']]
+)
+```
+
+And make a figure that compares original values, with LISA clusters:
+
+```python
+# Set up figure and axis
+f, axs = plt.subplots(1, 2, figsize=(12, 6))
+                    # Subplot 1 #       
+# Select pixels that do not have the `nodata` value
+# (ie. they are not missing data)
+pop.where(
+    pop!=pop.rio.nodata
+# Plot surface with a horizontal colorbar
+).plot(
+    ax=axs[0], cbar_kwargs={"orientation": "horizontal"}
+)
+                    # Subplot 2 #
+# Select pixels with no missing data and rescale to [0, 1] by
+# dividing by 4 (maximum value in `lisa_da`) 
+(
+    lisa_da.where(lisa_da!=-200) / 4
+# Plot surface without a colorbar
+).plot(cmap=lisa_cmap, ax=axs[1], add_colorbar=False)
+                    # Aesthetics #
+# Subplot titles
+titles = ['Population by pixel', 'Population clusters']
+# Apply the following to each of the two subplots
+for i in range(2):
+    # Keep proportion of axes
+    axs[i].axis('equal')
+    # Remove axis
+    axs[i].set_axis_off()
+    # Add title
+    axs[i].set_title(titles[i])
+    # Add basemap
+    contextily.add_basemap(axs[i], crs=lisa_da.rio.crs)
 ```
 
 ## Conclusion
@@ -537,8 +646,7 @@ Local statistics are one of the most commonly-used tools in the geographic data 
     - Make a scatterplot of the two types of statistic, contained in `gostats.Zs` and `gostars.Zs` to examine how similar the two forms of the Getis-Ord statistic are. 
     - The two forms of the Getis-Ord statistic differ by their inclusion of the *site* value, $y_i$, in the value for the $G_i$ statistic at that site. So, make a scatterplot of the percent leave variable and the *difference* of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using `scipy.stats.kendalltau` or `scipy.stats.pearsonr`. 
 
-
- ## Next Steps
+## Next Steps
  
 For more thinking on the foundational methods and concepts in local testing, Fotheringham is a classic:
  
