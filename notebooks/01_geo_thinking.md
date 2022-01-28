@@ -139,6 +139,16 @@ Overall, this chapter provides a grounding for the concepts and language used in
 In some subsequent chapters, we will integrate information from many different data structures to study some processes; in other chapters, this will not be necessary.
 Recognizing these conceptual differences will be important throughout the book. 
 
-```python
+## Next Steps
 
-```
+For further information on the fundamental thinking and concepts behind geographic information, it helps to consider the influential paper by Goodchild, Yuan, and Cova about the fundamental concepts in geographic representation: 
+
+Goodchild, Michael, May Yuan, and Thomas Cova. 2007. "Towards a general theory of geographic representation in GIS." *International Journal of Geographical Information Science* 21(3): 329-260. 
+
+In addition, a very comprehensive conceptual overview is provided by Worboys and Duckham. Those dissuaded by its publication date will be surprised by the freshness of the conceptual and theoretical perspectives provided therein:
+
+Worboys, Michael and Matt Duckham. 2004. *GIS, A Computing Perspective*. CRC Press: Boca Raton. 
+
+Finally, for more information on where the geographic data science perspective *came from* both historically and conceptually, constult Gahegan's mannifesto: 
+
+Gahegan, Mark. 1999. "Guest Editorial: What is Geocomputation?" *Transactions in GIS* 3: 203-206.
