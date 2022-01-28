@@ -464,7 +464,7 @@ areas
 
 We can then use cluster shares to show visually a comparison of the two membership representations (based on land and tracts):
 
-```python
+```python caption="Measuring cluster size by the number of tracts per cluster and land area per cluster." tags=[]
 # Bind cluster figures in a single table
 area_tracts = pandas.DataFrame(
     {'No. Tracts': k5sizes, 'Area': areas}
