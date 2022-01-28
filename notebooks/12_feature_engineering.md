@@ -1021,3 +1021,18 @@ Beyond feature engineering, statistical techniques we discuss in this book (part
    the interpolation process. How does this occur and why is it important to acknowledge?
 5. From the previous spatial regression chapter, is the SLX model a map matching or a map synthesis technique?
 6. Feature engineering is can be used in many different applied contexts. When might feature engineering actually *not* improve a model? 
+
+
+## Next Steps
+
+For more information on machine learning methods, it is difficult to beat *Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani: 
+
+James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. *Introduction to Statistical Learning* (2nd Edition). Wiley: New York. 
+
+In addition, there are many geospatial relationships that can be leveraged to merge datasets together. These *spatial join* techniques often require quite a bit of background understanding in *geocomputation*, computation that focuses on the basic/fundamental geometric operations and relationships between geographic objects. However, simple introductions are offered by our partner book, 
+
+Tenkanen, Henrikki, Vuokko Heikinheimo, and David Whipp. 2023. *Python for Geographic Data Analysis*. CRC Press: Boca Raton, FL. https://pythongis.org
+
+Finally, references on geographic interpolation methods are sometimes hard to come by, but a good and readable introduction to the domain is offered by Comber and Zeng:
+
+Comber, Alexis and Wen Zeng. 2019. "Spatial Interpolation using areal features: A review of methods and opportunities using new forms of data with coded illustrations." *Geography Compass* 13.  https://doi.org/10.1111/gec3.12465

@@ -468,6 +468,14 @@ Local statistics are one of the most commonly-used tools in the geographic data 
     - Make a scatterplot of the two types of statistic, contained in `gostats.Zs` and `gostars.Zs` to examine how similar the two forms of the Getis-Ord statistic are. 
     - The two forms of the Getis-Ord statistic differ by their inclusion of the *site* value, $y_i$, in the value for the $G_i$ statistic at that site. So, make a scatterplot of the percent leave variable and the *difference* of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using `scipy.stats.kendalltau` or `scipy.stats.pearsonr`. 
 
-```python
 
-```
+ # Next Steps
+ 
+For more thinking on the foundational methods and concepts in local testing, Fotheringham is a classic:
+ 
+Fotheringham, A. Stewart. 1997. "Trends in Quantitative Methods I: Stressing the local." *Progress in Human Geography* 21(1): 88-96. 
+ 
+More recent discussion on local statistics (in the context of spatial statistics more generally) is provided by Nelson:
+
+Nelson, Trisalyn. "Trends in Spatial Statistics." *The Professional Geographer* 64(1): 83-94. 
+ 
