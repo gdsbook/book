@@ -449,14 +449,6 @@ Similarly, inference can also be carried out by relying on computational simulat
 
 
 
-
-##  Further Reading
-
-- {cite}`anselin1989special`. "What is special about spatial data? Alternative perspectives on spatial data analysis." UC Santa Barbara: National Center for Geographic Information and Analysis.
-- {cite}`wu2019global`. Global Measures of Spatial Association. The Geographic Information Science & Technology Body of Knowledge (1st Quarter 2019 Edition), John P. Wilson (Ed.). DOI: 10.22224/gistbok/2019.1.12
-- {cite}`getis2007reflections`. Reflections on spatial autocorrelation. Regional Science & Urban Economics, 37: 491-496. DOI: 10.1016/j.regsciurbeco.2007.04.005 
-
-
 ## Questions
 
 1. Return to the original `ref` table and pull out the `Pct_Rejected`
@@ -496,3 +488,17 @@ Similarly, inference can also be carried out by relying on computational simulat
    mean for the use and interpretation of both statistics?
 7. Using $k$-nearest neighbor weights, can you find the $k$ where Moran's $I$ is largest? Make a plot of the Moran's $I$ for each $k$ you evaluate to show the relationship between the two.  
 8. As in the previous question, at what value of $k$ is the Geary's $C$ largest?
+
+##  Next Steps
+
+For a timless conceptual overview to the approaches of spatial data analysis, consult {cite}`anselin1989special`:
+
+"What is special about spatial data? Alternative perspectives on spatial data analysis." UC Santa Barbara: National Center for Geographic Information and Analysis.
+
+The GIS Body of knowledge represents a large set of collected knowledge by geographers across many different domains. Thus, the GISBoK, as it's called, has a very good introductory discussion of global measures of spatial association, too, by {cite}`wu2019global`:
+
+Global Measures of Spatial Association. *The Geographic Information Science & Technology Body of Knowledge (1st Quarter 2019 Edition)*, John P. Wilson (Ed.). DOI: 10.22224/gistbok/2019.1.12
+
+Finally, a more personal, reflective perspective is offered by longstanding quantitative geographer Art Getis in his piece {cite}`getis2007reflections`:
+
+"Reflections on spatial autocorrelation." *Regional Science & Urban Economics*, 37: 491-496. DOI: 10.1016/j.regsciurbeco.2007.04.005 
