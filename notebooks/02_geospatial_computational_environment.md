@@ -711,3 +711,19 @@ the box and click on "Log in". Now you are in, and can view and execute the chap
 ## Conclusion
 
 Reproducibility requires us to take our tools seriously. Since the onset of computational science, we have sought methods to keep the "code" that implements science linked tightly to the writing that explains it. Notebooks offer us a way to do this. Further, keeping in the spirit of open science from long ago, we will do better science if we keep our software public and open to the world. To guarantee that our code can, in fact, be executed, we must also document the environment in which the code is executed using tools like Docker. In the following chapter, we use these tools in concert with geographical thinking to learn about *geographic data science.*
+
+
+# Next Steps
+
+
+For those interested in further reading on the topic, we suggest the following articles.  
+
+For more information on how to write "good" computational notebooks, consider: 
+
+Rule, Adam, Amanda Birmingham, Cristal Zuniga, Ilka Altintas, Shih-Cheng Huang, Rob Knight, Niema Moshiri, Mai H. Nguyen, Sara Brin Rosenthal, Fernando Pérez and others. 2019. "Ten Simple Rules for writing and sharing computational analyses in Jupyter Notebooks." *PLOS Computational Biology* 15(7).
+
+For additional perspective on how open code and reproducibility matters in geographic applications, consult the following publications:
+
+Rey, Sergio. 2009. "Show me the code: spatial analysis and open source." *Journal of Geographical Systems* 11(2): 191-207. 
+
+Brunsdon, Chris. 2015. "Quantitative Methods I: Reproducible Research and Quantitative Geography." *Progress in Human Geography* 40(5): 687-696. 
