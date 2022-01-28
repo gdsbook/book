@@ -307,13 +307,11 @@ $$
 
 where $n$ is the  number of observations, $z_{i}$ is the standardized value of the variable of interest at location $i$, and $w_{ij}$ is the cell corresponding to the $i$-th row and $j$-th column of a $W$ spatial weights matrix.
 
-In order to understand the intuition behind its math, it is useful to begin with a graphical interpretation: the Moran Plot. The Moran Plot is a way of visualizing a spatial dataset to explore the nature and strength of spatial autocorrelation. It is essentially a traditional scatter plot in which the variable of interest is displayed against its *spatial lag*. In order to be able to interpret values as above or below the mean, and their quantities in terms of standard deviations, the variable of interest is usually standardized by subtracting its mean and dividing it by its standard deviation:
+In order to understand the intuition behind its math, it is useful to begin with a graphical interpretation: the Moran Plot. The Moran Plot is a way of visualizing a spatial dataset to explore the nature and strength of spatial autocorrelation. It is essentially a traditional scatter plot in which the variable of interest is displayed against its *spatial lag*. In order to be able to interpret values as above or below the mean, the variable of interest is usually standardized by subtracting its mean:
 
 ```python
-db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )\
-                    / db['Pct_Leave'].std()
-db['Pct_Leave_lag_std'] = ( db['Pct_Leave_lag'] - db['Pct_Leave_lag'].mean() )\
-                    / db['Pct_Leave_lag'].std()
+db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )
+db['Pct_Leave_lag_std'] = ( db['Pct_Leave_lag'] - db['Pct_Leave_lag'].mean() )
 ```
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
@@ -451,7 +449,6 @@ Similarly, inference can also be carried out by relying on computational simulat
 
 
 
-
 ## Questions
 
 1. Return to the original `ref` table and pull out the `Pct_Rejected`
@@ -491,3 +488,17 @@ Similarly, inference can also be carried out by relying on computational simulat
    mean for the use and interpretation of both statistics?
 7. Using $k$-nearest neighbor weights, can you find the $k$ where Moran's $I$ is largest? Make a plot of the Moran's $I$ for each $k$ you evaluate to show the relationship between the two.  
 8. As in the previous question, at what value of $k$ is the Geary's $C$ largest?
+
+##  Next Steps
+
+For a timless conceptual overview to the approaches of spatial data analysis, consult {cite}`anselin1989special`:
+
+"What is special about spatial data? Alternative perspectives on spatial data analysis." UC Santa Barbara: National Center for Geographic Information and Analysis.
+
+The GIS Body of knowledge represents a large set of collected knowledge by geographers across many different domains. Thus, the GISBoK, as it's called, has a very good introductory discussion of global measures of spatial association, too, by {cite}`wu2019global`:
+
+Global Measures of Spatial Association. *The Geographic Information Science & Technology Body of Knowledge (1st Quarter 2019 Edition)*, John P. Wilson (Ed.). DOI: 10.22224/gistbok/2019.1.12
+
+Finally, a more personal, reflective perspective is offered by longstanding quantitative geographer Art Getis in his piece {cite}`getis2007reflections`:
+
+"Reflections on spatial autocorrelation." *Regional Science & Urban Economics*, 37: 491-496. DOI: 10.1016/j.regsciurbeco.2007.04.005 
