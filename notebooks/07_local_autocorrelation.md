@@ -492,13 +492,32 @@ Check:
 Read the data:
 
 ```python
-pop = xarray.open_rasterio('../data/ghsl/ghsl_sao_paulo.tif')
+pop = xarray.open_rasterio(
+    '../data/ghsl/ghsl_sao_paulo.tif'
+).sel(
+    x=slice(-4436000, -4427000), y=slice(-2875000, -2886000)
+)
 ```
 
 Build weights from surface:
 
 ```python
-w_surface = weights.Queen.from_xarray(pop, sparse=False)
+%%time
+w_surface = weights.Queen.from_xarray(pop.sel(band=1), sparse=False, k=1)
+```
+
+```python
+tmp1 = pop.sel(band=1).to_series()
+tmp = tmp1.reset_index()
+tmp = geopandas.GeoSeries(
+    geopandas.points_from_xy(tmp['x'], tmp['y'], crs=pop.rio.crs),
+    index=tmp1.index
+).to_frame().rename(columns={0: 'geometry'})
+```
+
+```python
+f, ax = plt.subplots(1, figsize=(20, 20))
+w_surface.plot(tmp, ax=ax);
 ```
 
 This is a bit more advanced and still experimental, so we have to take care of a few more things on our own:
@@ -508,6 +527,7 @@ This is a bit more advanced and still experimental, so we have to take care of a
 - Ensure both the data and the weights are in the same `dtype`
 
 ```python
+%%time
 pop_values = pop.to_series()
 pop_values = pop_values[
     pop_values != pop.attrs['nodatavals'][0]
@@ -530,7 +550,7 @@ First, let's get the combination of quadrant and significance, as we did before 
 
 ```python
 sig_pop = pandas.Series(
-    pop_lisa.q * (pop_lisa.p_sim < 0.01), index=pop_values.index
+    pop_lisa.q * (pop_lisa.p_sim < 1), index=pop_values.index
 )
 ```
 
@@ -581,7 +601,7 @@ lisa_cmap = ListedColormap(
 
 And make a figure that compares original values, with LISA clusters:
 
-```python
+```python tags=[]
 # Set up figure and axis
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
                     # Subplot 1 #       
@@ -591,7 +611,7 @@ pop.where(
     pop!=pop.rio.nodata
 # Plot surface with a horizontal colorbar
 ).plot(
-    ax=axs[0], cbar_kwargs={"orientation": "horizontal"}
+    ax=axs[0], add_colorbar=False#, cbar_kwargs={"orientation": "horizontal"}
 )
                     # Subplot 2 #
 # Select pixels with no missing data and rescale to [0, 1] by
