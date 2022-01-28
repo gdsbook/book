@@ -464,7 +464,7 @@ areas
 
 We can then use cluster shares to show visually a comparison of the two membership representations (based on land and tracts):
 
-```python
+```python caption="Measuring cluster size by the number of tracts per cluster and land area per cluster." tags=[]
 # Bind cluster figures in a single table
 area_tracts = pandas.DataFrame(
     {'No. Tracts': k5sizes, 'Area': areas}
@@ -1028,22 +1028,3 @@ Thus, clustering and regionalization are essential tools for the geographic data
  
 6. The idea of spatial dependence, that near things tend to be more related than distant things, is an extensively-studied property of spatial data. How might solutions to clustering and regionalization problems change if dependence is very strong and positive? very weak? very strong and negative? 
 7. Using a spatial weights object obtained as `w = pysal.lib.weights.lat2W(20,20)`, what are the number of unique ways to partition the graph into 20 clusters of 20 units each, subject to each cluster being a connected component? What are the unique number of possibilities for `w = pysal.lib.weights.lat2W(20,20, rook=False)` ?
-
-
-## Next Steps
-
-For a "classical" introduction to clustering methods in arbitrary data science problems, it is difficult to beat the *Introduction to Statistical Learning*: 
-
-James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. *Introduction to Statistical Learning* (2nd Edition). Wiley: New York. 
-
-For regionalization problems and methods, a useful discussion of the theory and operation of various heuristics and methods is provided by Duque, Ramos, and Suriñach:
-
-Duque, Juan Carlos, Raúl Ramos, and Jordi Suriñach. 2007. "Supervised Regionalization Methods: A survey." *International Regional Science Review* 30(3): 195-220. 
-
-Finally, methods for geodemographics are comprehensively covered in the book by Harris, Sleight, and Webber:
-
-Harris, Rich, Peter Sleight, and Richard Webber. 2005. *Geodemographics, GIS, and Neighbourhood Targeting.* Wiley. 
-
-And a more recent overview and discussion can also be provided by Singleton and Spielman:
-
-Singleton, Alex and Seth Spielman. 2014. "The past, present, and future of geodemographic research in the United States and the United Kingdom." *The Professional Geographer* 66(4): 558-567. 
