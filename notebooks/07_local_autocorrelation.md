@@ -484,6 +484,130 @@ Check:
 > [https://pysal.org/esda/notebooks/localjoincounts.html](https://pysal.org/esda/notebooks/localjoincounts.html)
 
 
+Create a binary variable that takes `1` when an area voted to leave (`Pct_Leave` > 50%):
+
+```python
+db['Leave'] = (db['Pct_Leave'] > 50) * 1
+db['Leave_txt'] = db['Leave'].map({0: 'Remain', 1: 'Leave'})
+```
+
+Run the univariate local joint count statistic:
+
+```python
+ljc_leave_stat = esda.Join_Counts_Local(connectivity=w).fit(db['Leave'])
+```
+
+Pull out results on a table indexed the same as the original geo-table:
+
+```python
+ljc_leave = pandas.DataFrame(
+    {'stat': ljc_leave_stat.LJC, 'p_sim': ljc_leave_stat.p_sim},
+    index=db.index
+)
+```
+
+Add variable to identify clusters:
+
+```python
+ljc_leave['cluster'] = ljc_leave['p_sim']
+not_na = ljc_leave[ljc_leave['p_sim'].notna()].index
+ljc_leave.loc[not_na, 'cluster'] = (ljc_leave.loc[not_na, 'p_sim'] < 0.01) * 1
+ljc_leave['cluster_txt'] = ljc_leave['cluster'].map(
+    {0: 'Not cluster', 1: 'Leave cluster'}
+)
+```
+
+Vis:
+
+```python tags=[]
+# Set up figure and axes
+f, axs = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
+# Make the axes accessible with single indexing
+axs = axs.flatten()
+
+                    # Subplot 1 #
+                # Original variable
+db.plot(
+    'Leave_txt', cmap='Accent_r', categorical=True, legend=True, ax=axs[0]
+)
+                    # Subplot 2 #
+                    # LJC statistic
+db.join(ljc_leave).plot(
+    'stat', scheme='fisherjenks', legend=True, ax=axs[1]
+)
+                    # Subplot 3 #
+                # Significance map
+db.plot(color='lightgrey', linewidth=0.1, ax=axs[2])
+db.join(ljc_leave).plot(
+    'p_sim', scheme='fisherjenks', cmap='RdPu', legend=True, ax=axs[2]
+)
+                    # Subplot 4 #
+                    # Cluster map
+db.plot(color='lightgrey', linewidth=0.1, ax=axs[3])
+db.join(ljc_leave).plot(
+    'cluster_txt', cmap='Set1', categorical=True, legend=True, ax=axs[3]
+)               
+                    # Figure styling #
+# Set title to each subplot
+for i, ax in enumerate(axs.flatten()):
+    ax.set_axis_off()
+    ax.set_title(
+        [
+            'Original variable', 
+            'LJC Statistic', 
+            'Significance map', 
+            'LJC Cluster Map (P < 1%)'
+        ][i], y=0
+    )
+# Tight layout to minimise in-betwee white space
+f.tight_layout()
+
+# Display the figure
+plt.show()
+```
+
+Now we can recreate the analysis to focus on Remain clusters:
+
+```python
+db['Remain'] = (db['Pct_Leave'] < 50) * 1
+
+ljc_remain_stat = esda.Join_Counts_Local(connectivity=w).fit(db['Remain'])
+
+ljc_remain = pandas.DataFrame(
+    {'stat': ljc_remain_stat.LJC, 'p_sim': ljc_remain_stat.p_sim},
+    index=db.index
+)
+
+ljc_remain['cluster_remain'] = ljc_remain['p_sim']
+not_na = ljc_remain[ljc_remain['p_sim'].notna()].index
+ljc_remain.loc[not_na, 'cluster_remain'] = (ljc_remain.loc[not_na, 'p_sim'] < 0.01) * 1
+ljc_remain['cluster_remain_txt'] = ljc_remain['cluster_remain'].map(
+    {0: 'Not cluster', 1: 'Remain cluster'}
+)
+```
+
+And merge both cluster results in a single column:
+
+```python
+clusters = ljc_remain['cluster_remain_txt']
+clusters.update(ljc_leave['cluster_txt'])
+```
+
+That we can then map:
+
+```python
+f, ax = plt.subplots(1, figsize=(9, 9))
+db.assign(clusters=clusters).plot(
+    'clusters', 
+    cmap='PiYG',
+    categorical=True, 
+    legend=True,
+    ax=ax
+)
+ax.set_axis_off()
+f.set_facecolor('lightgrey')
+```
+
 ## Bonus: local statistics on surfaces
 
 
@@ -495,29 +619,14 @@ Read the data:
 pop = xarray.open_rasterio(
     '../data/ghsl/ghsl_sao_paulo.tif'
 ).sel(
-    x=slice(-4436000, -4427000), y=slice(-2875000, -2886000)
+    x=slice(-4436000, -4427000), y=slice(-2875000, -2886000), band=1
 )
 ```
 
 Build weights from surface:
 
 ```python
-%%time
-w_surface = weights.Queen.from_xarray(pop.sel(band=1), sparse=False, k=1)
-```
-
-```python
-tmp1 = pop.sel(band=1).to_series()
-tmp = tmp1.reset_index()
-tmp = geopandas.GeoSeries(
-    geopandas.points_from_xy(tmp['x'], tmp['y'], crs=pop.rio.crs),
-    index=tmp1.index
-).to_frame().rename(columns={0: 'geometry'})
-```
-
-```python
-f, ax = plt.subplots(1, figsize=(20, 20))
-w_surface.plot(tmp, ax=ax);
+w_surface = weights.Queen.from_xarray(pop, sparse=False, k=1)
 ```
 
 This is a bit more advanced and still experimental, so we have to take care of a few more things on our own:
@@ -527,17 +636,20 @@ This is a bit more advanced and still experimental, so we have to take care of a
 - Ensure both the data and the weights are in the same `dtype`
 
 ```python
-%%time
 pop_values = pop.to_series()
 pop_values = pop_values[
     pop_values != pop.attrs['nodatavals'][0]
-].astype(w_surface.sparse.dtype)
+]#.astype(w_surface.sparse.dtype)
 ```
 
 Now we have a standard weights matrix and a set of values associated with it, we can run a LISA just as we did before with a geo-table:
 
+```python
+w_test = weights.WSP2W(weights.WSP(w_surface.sparse * 1.))
+```
+
 ```python tags=[]
-pop_lisa = esda.moran.Moran_Local(pop_values, w_surface, n_jobs=-1)
+pop_lisa = esda.moran.Moran_Local(pop_values.astype(w_test.sparse.dtype), w_test, n_jobs=-1)
 ```
 
 To visualise it, we need to express the LISA results as a surface rather than as a table. To do this, we need the bridge built in PySAL:
