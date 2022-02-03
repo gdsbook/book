@@ -795,3 +795,16 @@ Before leaving the topic of spatial inequality, we note that there is much more 
 5. What is the relationship between spatial income inequality and the spatial dependence of regional incomes?
 
 <!-- #endregion -->
+
+
+## Next Steps
+
+The literature on regional inequality has exploaded over the last two decades.
+
+For a recent review of the causes and policy responses see {cite}`corvers2021regional`
+
+Corvers, Frank and Ken Mayhew. 2021. "Regional inequalities: causes and cures." *Oxford Review of Economic Policy* 37(1): 1-16.
+
+Methodological issues in the spatial anlaysis of regional inequality are reviewed in {cite}`rey2009`
+
+Rey, Sergio J. and Julie Le Gallo. 2009. "Spatial analysis of regional convergence." In Mills, Terry C. and Kerry Patterson (eds.) *Palgrave Handbook of Econometrics* 1251-1290.
