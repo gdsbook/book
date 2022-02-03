@@ -799,12 +799,21 @@ Before leaving the topic of spatial inequality, we note that there is much more 
 
 ## Next Steps
 
-The literature on regional inequality has exploaded over the last two decades.
-
-For a recent review of the causes and policy responses see {cite}`corvers2021regional`
+The literature on regional inequality has exploaded over the last several decades.
+For recent reviews of the causes and policy responses see the following: 
 
 Corvers, Frank and Ken Mayhew. 2021. "Regional inequalities: causes and cures." *Oxford Review of Economic Policy* 37(1): 1-16.
 
-Methodological issues in the spatial anlaysis of regional inequality are reviewed in {cite}`rey2009`
+Rodríguez-Pose, Andrés. 2018. "The revenge of the places that don't matter (and what to do about it)." *Cambridge Journal of Regions, Economy and Society*, 11(1): 189-20.
 
-Rey, Sergio J. and Julie Le Gallo. 2009. "Spatial analysis of regional convergence." In Mills, Terry C. and Kerry Patterson (eds.) *Palgrave Handbook of Econometrics* 1251-1290.
+
+Methodologically, spatial analysis of regional disparities is generally covered in two strands of the literature. For work on spatial econometric modeling of convergence and divergence see:
+
+Arbia, Giuseppe. 2006. *Spatial econometrics: statistical foundations and applications to regional convergence*. Springer Science \& Business Media.
+
+The second branch of the methodological literature focuses on exploratory spatial data analysis of inequality and is reviewed in:
+
+Rey, Sergio J. and Julie Le Gallo. 2009. "Spatial anlaysis of economic convergence." In Terry C. Mills and Kerry Patterson (eds.) *Palgrave Handbook of Econometrics*, Palgrave, pages 1251-1290.
+
+
+
