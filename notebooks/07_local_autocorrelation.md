@@ -8,7 +8,7 @@ jupyter:
       format_version: '1.3'
       jupytext_version: 1.13.6
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: Python 3
     language: python
     name: python3
 ---
@@ -662,7 +662,7 @@ First, let's get the combination of quadrant and significance, as we did before 
 
 ```python
 sig_pop = pandas.Series(
-    pop_lisa.q * (pop_lisa.p_sim < 1), index=pop_values.index
+    pop_lisa.q * (pop_lisa.p_sim < .01), index=pop_values.index
 )
 ```
 
