@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.13.6
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -797,13 +797,6 @@ generation of views is critical to the work flow. Once the analysis is complete,
 and the final presentation quality maps are to be generated, there are excellent
 packages in the data stack that the user can turn to.
 
-## Further Reading
-
-- {cite}`slocum2014thematic`. Thematic Cartography and Geovisualization. Pearson.
-- {cite} `cromely2009choropleth`. "Choropleth map legend design for visualizing community health disparities." *International Journal of Health Geographics*, 8: 1-11.
-- {cite} `cromely1996comparison`. "A comparison of optimal classification strategies for choroplethic displays of spatiall aggregated data." *International Journal of Geographc Information Systems*, 10: 405-424.
-- {cite} `brewer2005designming`. Designing better maps: A guide for GIS Users. ESRI press.
-
 ## Questions
 
 1. A variable (such as population density measured for census tracts in a metropolitan area) can display a high degree of skewness. That is, the distribution may be very asymmetric, either with a few very values and a bulk of low ones; or a few very low values with a bulk of high values. What is an appropriate choice for a choropleth classification for a skewed variable?
@@ -815,6 +808,15 @@ packages in the data stack that the user can turn to.
 7. To what extent do most commonly employed choropleth classification methods take the geographical distribution of the variable into consideration? Can you think of ways to incorporate the spatial features of a variable into a classification for a choropleth map?
 8. Discuss the similarities between the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?
 9. The Fisher-Jenks classifier will always have more internally homogeneous classes than other k-classifiers. Given this, why might one decide on choosing a different k-classifier for a particular data set?
+
+## Next Steps
+
+We have but touched the surface of the large literature on choropleth mapping in particular, and geovisualization more generally. Readers interested in delving deeper into these topices are directed to the following:
+
+- {cite}`slocum2014thematic`. Thematic Cartography and Geovisualization. Pearson.
+- {cite} `cromely2009choropleth`. "Choropleth map legend design for visualizing community health disparities." *International Journal of Health Geographics*, 8: 1-11.
+- {cite} `cromely1996comparison`. "A comparison of optimal classification strategies for choroplethic displays of spatiall aggregated data." *International Journal of Geographc Information Systems*, 10: 405-424.
+- {cite} `brewer2005designming`. Designing better maps: A guide for GIS Users. ESRI press.
 
 
 ```python
