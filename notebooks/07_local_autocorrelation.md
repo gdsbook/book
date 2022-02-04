@@ -623,7 +623,7 @@ lisa_cmap
 
 At this point, we have all the pieces we need to build our cluster map. Let's put them together:
 
-```python tags=[]
+```python tags=[] caption="LISA map for Sao Paulo population surface."
 # Set up figure and axis
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
                     # Subplot 1 #       
