@@ -8,7 +8,7 @@ jupyter:
       format_version: '1.3'
       jupytext_version: 1.13.6
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -479,62 +479,101 @@ In this case, the results are virtually the same for $G_i$ and $G_i^*$. Also, at
 ## Bonus: local statistics on surfaces
 
 
-[Intro to section]
+Before we wrap up the chapter, we are going to cover an illustration that, conceptually, is very similar to the topics we have seen above but, from a technical standpoint, has a bit of a different spin. We will learn how to compute local Moran's I on data that are stored as a surface, rather than as a geo-table (as we have seen above). As we have seen earlier in the book, more and more data for which we might want to explore local spatial autocorrelation are being provided as surfaces rather than geo-tables. The trick to follow this illustration is to realise that, despite the data structure, surfaces also provide data spatially arranged and that, as such, we can apply the battery of tools we have learned in this chapter to better understand their spatial structure. 
 
-Read the data:
+Before we start, a note of caution. The functionality required to handle LISA on surfaces is still experimental and a bit rough around the edges. This is because, unlike the case of geo-tables, it has not been a common use-case for geographic data scientists and the tooling eco-system is not as evolved. Nevertheless, it is an exciting time to get started on this, because a lot is happening in this space, and the basic building blocks to develop a full-fledge eco-system are already in place. For this reason, we think it is important to cover in this chapter, even though some of the code we will use below is a bit more sophisticated than what we have seen above. Be patient and do not worry if you have to read things twice (or thrice!) before they start making sense. This is getting into geographic data scientist pro territory!
+
+For this case, we will use the GHSL dataset that contains an extract of gridded population for the metropolitan region of Sao Paulo (Brazil). Let us read the data first into a `DataArray` object:
 
 ```python
+# Open GeoTIFF file and read into `xarray.DataArray`
 pop = xarray.open_rasterio(
     '../data/ghsl/ghsl_sao_paulo.tif'
-).sel(
-    x=slice(-4436000, -4427000), y=slice(-2875000, -2886000), band=1
 )
 ```
 
-Build weights from surface:
+Next is building a weights matrix that represents the spatial configuration of pixels with values in `pop`. We will use the same approach as we saw in the chapter on weights:
 
 ```python
-w_surface = weights.Queen.from_xarray(pop, sparse=False, k=1)
+w_surface_sp = weights.Queen.from_xarray(pop)
 ```
 
-This is a bit more advanced and still experimental, so we have to take care of a few more things on our own:
-
-- Recast our `DataArray` into a `pandas.Series`
-- Remove rows for pixels with no data
-- Ensure both the data and the weights are in the same `dtype`
+So far so good. Now comes the first hairy bit. The weights builder for surfaces automatically generates a matrix with integers (`int8` in this case which, roughly speaking, are numbers without a decimal component):
 
 ```python
+w_surface_sp.sparse.dtype
+```
+
+For the LISA computation, we will need two changes in `w_surface_sp`. First, the matrix needs to be expressed as floats (roughly speaking, numbers with a decimal component) so we can multiply values and obtain the correct result. Second, we need a `W` object and, so far, we have a `WSP`:
+
+```python
+type(w_surface_sp)
+```
+
+`WSP` objects are a thin version of spatial weights matrices that are optimised for certain computations and are more lightweight in terms of memory requirements (they are great, for example, for spatial econometrics). Unfortunately, to calculate LISA statistics we require a few more bits of information, so we have to convert it into a `W` object.
+
+We take both steps in the following code snippet:
+
+```python
+w_surface = weights.WSP2W(                # 3.Convert `WSP` object to `W` 
+    weights.WSP(                          # 2.Build `WSP` from the float sparse matrix
+        w_surface_sp.sparse.astype(float) # 1.Convert sparse matrix to floats
+    )
+)
+w_surface.index = w_surface_sp.index      # 4.Assign index to new `W`
+```
+
+There is quite a bit going on in those lines of code, so let's unpack them:
+
+1. The first step (line 3) is to convert the values from integers into floats. To do this, we access the sparse matrix at the core of `w_surface_sp` (which holds all the main data) and convert it to floats using `astype`.
+1. Then we convert that sparse matrix into a `WSP` object (line 2), which is a thin wrapper, so the operation is quick.
+1. Once represented as a `WSP`, we can use PySAL again to convert it into a full-fledge `W` object using the `WSP2W` utility. This step may take a bit more of computing muscle.
+1. Finally, spatial weights from surfaces include an `index` object that will help us later return data into a surface data structure. Since this is lost with the transformations, we reattach it in the final line (line 6) from the original object.
+
+This leaves us with a weights object (`w_surface`) we can work with for the LISA. Next is to recast the values from the original data structure to one that `Moran_Local` will understand. This happens in the next code snippet:
+
+```python
+# Convert `DataArray` to a `pandas.Series`
 pop_values = pop.to_series()
+# Subset to keep only values that aren't missing
 pop_values = pop_values[
-    pop_values != pop.attrs['nodatavals'][0]
-]#.astype(w_surface.sparse.dtype)
+    pop_values != pop.rio.nodata
+]
 ```
 
-Now we have a standard weights matrix and a set of values associated with it, we can run a LISA just as we did before with a geo-table:
+Note that we do two operations: one is to convert the two-dimensional `DataArray` surface into a one-dimensional vector in the form of a `Series` object (`pop_values`); the second is to filter out values in which, in the surface, contain missing data. In surfaces, this is usually expressed with a rare value rather than with another data type. We can check that in `pop`, this is -200:
 
 ```python
-w_test = weights.WSP2W(weights.WSP(w_surface.sparse * 1.))
+pop.rio.nodata
 ```
+
+At this point, we are ready to run a LISA the same way we have done in previously in the chapter when using geo-tables:
 
 ```python tags=[]
-pop_lisa = esda.moran.Moran_Local(pop_values.astype(w_test.sparse.dtype), w_test, n_jobs=-1)
+# NOTE: this may take a bit longer to run depending on hardware
+pop_lisa = esda.moran.Moran_Local(
+    pop_values.astype(float), w_surface, n_jobs=-1
+)
 ```
 
-To visualise it, we need to express the LISA results as a surface rather than as a table. To do this, we need the bridge built in PySAL:
+Note that, before computing the LISA, we ensure the population values are _also_ expressed as floats and thus in line with those in our spatial weights.
+
+Now we have computed the LISA, on to visualisation. For this, we need to express the results as a surface rather than as a table, for which we will use the bridge built in PySAL:
 
 ```python
 from libpysal.weights import raster
 ```
 
-First, let's get the combination of quadrant and significance, as we did before in the Brexit case:
+We are aiming to create a cluster plot. This means we want to display values that are statistically significant in a color aligned with the quadrant of the Moran plot in which they lie. For this, we will create a new `Series` that intersects the quadrant information with significance. We use a 1% level for the example:
 
 ```python
 sig_pop = pandas.Series(
-    pop_lisa.q * (pop_lisa.p_sim < .01), index=pop_values.index
+    pop_lisa.q * (pop_lisa.p_sim < .01), # Quadrant of significant at 1% (0 otherwise)
+    index=pop_values.index               # Index from the Series and aligned with `w_surface`
 )
 ```
 
-The `sig_pop` object is a `pandas.Series` that we need to express as a `DataArray`. To make that connection, we can use `w_surface`, which encodes the information required to build the surface:
+The `sig_pop` object, expressed as a one-dimensional vector, contains the information we would like to recast into a `DataArray` object. For this conversion, we can use the `w2da` function, which derives the spatial configuration of each value in `sig_pop` from `w_surface`:
 
 ```python
 # Build `DataArray` from a set of values and weights
@@ -546,19 +585,21 @@ lisa_da = raster.w2da(
 ).rio.write_crs(pop.rio.crs)
 ```
 
-The resulting `DataArray` only contains missing data pixels (expressed with the same value as the original `pop`), `0` for non-significant pixels, and 1-4 depending on the quadrant for HH, LH, LL, HL significant clusters, same as with the Brexit example before:
+The resulting `DataArray` only contains missing data pixels (expressed with the same value as the original `pop`, -200), `0` for non-significant pixels, and 1-4 depending on the quadrant for HH, LH, LL, HL significant clusters, same as with the Brexit example before:
 
 ```python
 lisa_da.to_series().unique()
 ```
 
-Now let's create the colormap to encode clusters with the same colors that `splot` uses for geo-tables. For that, we need the method in `matplotlib` that builds a color map from a list of colors:
+We have all the data in the right shape to build the figure. Before we can do that, we need to hardwire the coloring scheme on our own. This is something that we do not have to pay attention to when working with geo-tables thanks to `splot`. For surfaces, we are not that lucky.
+
+First, we create the colormap to encode clusters with the same colors that `splot` uses for geo-tables. For that, we need the method in `matplotlib` that builds a color map from a list of colors:
 
 ```python
 from matplotlib.colors import ListedColormap
 ```
 
-And the colors, which we express as a dictionary:
+We express the colors we will use as a dictionary mapping the key to the color code:
 
 ```python
 # LISA colors
@@ -577,9 +618,10 @@ With these pieces, we can create the colormap object:
 lisa_cmap = ListedColormap(
     [lc['ns'], lc['HH'], lc['LH'], lc['LL'], lc['HL']]
 )
+lisa_cmap
 ```
 
-And make a figure that compares original values, with LISA clusters:
+At this point, we have all the pieces we need to build our cluster map. Let's put them together:
 
 ```python tags=[]
 # Set up figure and axis
