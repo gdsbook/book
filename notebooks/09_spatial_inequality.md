@@ -803,7 +803,7 @@ The literature on regional inequality has exploaded over the last several decade
 For recent reviews of the causes and policy responses see the following: 
 
 
-Cörvers, Frank and Ken Mayhew. 2021. "Regional inequalities: causes and cures." *Oxford Review of Economic Policy* 37(1): 1-16.{cite}`covers2021regional`
+Cörvers, Frank and Ken Mayhew. 2021. "Regional inequalities: causes and cures." *Oxford Review of Economic Policy* 37(1): 1-16.{cite}`corvers2021regional`
 
 Rodríguez-Pose, Andrés. 2018. "The revenge of the places that don't matter (and what to do about it)." *Cambridge Journal of Regions, Economy and Society*, 11(1): 189-20.{cite}`Rodriguez_Pose_2018`
 
