@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.13.6
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -81,7 +81,7 @@ A first, conceptually straightforward, approach is to augment our dataset by cou
 
 To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our `airbnbs` points. From [Chapter 8](08_point_pattern_analysis), we can recall that there are a few different hulls that can be used. We'll use the Convex Hull here, which is the smallest convex polygon that covers all of the points in the set. 
 
-```python
+```python caption="Convex Hull of the Airbnbs in San Diego." tags=[]
 airbnbs_ch = airbnbs.unary_union.convex_hull
 geopandas.GeoSeries([airbnbs_ch]).plot();
 ```

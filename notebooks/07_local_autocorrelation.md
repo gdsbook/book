@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.13.6
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -469,7 +469,7 @@ Local statistics are one of the most commonly-used tools in the geographic data 
     - The two forms of the Getis-Ord statistic differ by their inclusion of the *site* value, $y_i$, in the value for the $G_i$ statistic at that site. So, make a scatterplot of the percent leave variable and the *difference* of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using `scipy.stats.kendalltau` or `scipy.stats.pearsonr`. 
 
 
- # Next Steps
+ ## Next Steps
  
 For more thinking on the foundational methods and concepts in local testing, Fotheringham is a classic:
  
@@ -479,3 +479,7 @@ More recent discussion on local statistics (in the context of spatial statistics
 
 Nelson, Trisalyn. "Trends in Spatial Statistics." *The Professional Geographer* 64(1): 83-94. 
  
+
+```python
+
+```
