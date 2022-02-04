@@ -7,9 +7,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.13.6
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -794,4 +794,25 @@ Before leaving the topic of spatial inequality, we note that there is much more 
 
 5. What is the relationship between spatial income inequality and the spatial dependence of regional incomes?
 
+<!-- #endregion -->
+
+<!-- #region -->
+## Next Steps
+
+The literature on regional inequality has exploaded over the last several decades.
+For recent reviews of the causes and policy responses see the following: 
+
+
+Cörvers, Frank and Ken Mayhew. 2021. "Regional inequalities: causes and cures." *Oxford Review of Economic Policy* 37(1): 1-16.{cite}`covers2021regional`
+
+Rodríguez-Pose, Andrés. 2018. "The revenge of the places that don't matter (and what to do about it)." *Cambridge Journal of Regions, Economy and Society*, 11(1): 189-20.{cite}`Rodriguez_Pose_2018`
+
+
+Methodologically, spatial analysis of regional disparities is generally covered in two strands of the literature. For work on spatial econometric modeling of convergence and divergence see:
+
+Arbia, Giuseppe. 2006. *Spatial econometrics: statistical foundations and applications to regional convergence*. Springer Science \& Business Media.{cite}`arbia2006spatial`
+
+The second branch of the methodological literature focuses on exploratory spatial data analysis of inequality and is reviewed in:
+
+Rey, Sergio J. and Julie Le Gallo. 2009. "Spatial anlaysis of economic convergence." In Terry C. Mills and Kerry Patterson (eds.) *Palgrave Handbook of Econometrics*, Palgrave, pages 1251-1290.{cite}`rey2009`
 <!-- #endregion -->
