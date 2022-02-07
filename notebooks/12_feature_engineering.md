@@ -661,7 +661,7 @@ axs[0].set_ylim(minY, maxY)
 plt.show()
 ```
 
-And similarly for density density:
+And similarly for population density:
 
 ```python caption="Interpolation of population density from Census Tracts to Uber H3 Hexagons." tags=[]
 # Set up figure and axes
@@ -747,7 +747,7 @@ card = pandas.Series(d500_w.cardinalities)
 
 The `card` feature we have built will pick up areas of higher concentration of Airbnb properties with higher values, as we can see in the map below.
 
-```python
+```python caption="Number of Airbnbs within 500 meters of each listing." tags=[]
 # Set up figure and axis
 f, ax = plt.subplots(1)
 # Append cardinalities to main Airbnb geo-table
