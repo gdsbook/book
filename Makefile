@@ -10,12 +10,13 @@ lab:
                -v ${PWD}:/home/jovyan/work \
                darribas/gds_dev:6.1
 lablocal:
+
 	docker run --rm \
                -p 4000:4000 \
                -p 8888:8888 \
                --user root \
-			   -e NB_UID=1000 \
-			   -e NB_GID=1000 \
+			   -e NB_UID=1001 \
+			   -e NB_GID=1002 \
                -v ${PWD}:/home/jovyan/work \
                darribas/gds_dev:6.1
 
