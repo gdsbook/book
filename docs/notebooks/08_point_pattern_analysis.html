@@ -402,23 +402,23 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#visualization">
-   Visualization
+  <a class="reference internal nav-link" href="#visualizing-point-patterns">
+   Visualizing Point Patterns
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#dots-on-a-map">
-     Dots on a map
+    <a class="reference internal nav-link" href="#showing-patterns-as-dots-on-a-map">
+     Showing Patterns as Dots on a Map
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#hex-binning">
-     Hex-binning
+    <a class="reference internal nav-link" href="#showing-density-with-hex-binning">
+     Showing Density with Hex-binning
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#kernel-density-estimation-kde">
-     Kernel Density Estimation (KDE)
+    <a class="reference internal nav-link" href="#another-kind-of-density-kernel-density-estimation-kde">
+     Another Kind of Density: Kernel Density Estimation (KDE)
     </a>
    </li>
   </ul>
@@ -513,23 +513,23 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#visualization">
-   Visualization
+  <a class="reference internal nav-link" href="#visualizing-point-patterns">
+   Visualizing Point Patterns
   </a>
   <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#dots-on-a-map">
-     Dots on a map
+    <a class="reference internal nav-link" href="#showing-patterns-as-dots-on-a-map">
+     Showing Patterns as Dots on a Map
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#hex-binning">
-     Hex-binning
+    <a class="reference internal nav-link" href="#showing-density-with-hex-binning">
+     Showing Density with Hex-binning
     </a>
    </li>
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#kernel-density-estimation-kde">
-     Kernel Density Estimation (KDE)
+    <a class="reference internal nav-link" href="#another-kind-of-density-kernel-density-estimation-kde">
+     Another Kind of Density: Kernel Density Estimation (KDE)
     </a>
    </li>
   </ul>
@@ -604,26 +604,10 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="point-pattern-analysis">
 <h1>Point Pattern Analysis<a class="headerlink" href="#point-pattern-analysis" title="Permalink to this headline">¶</a></h1>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
-
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">pandas</span>
-<span class="kn">import</span> <span class="nn">geopandas</span>
-<span class="kn">import</span> <span class="nn">pysal</span>
-<span class="kn">import</span> <span class="nn">seaborn</span>
-<span class="kn">import</span> <span class="nn">contextily</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">DBSCAN</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Points are spatial entities that can be understood in two fundamentally different ways. On the one hand, points can be seen as fixed objects in space, which is to say their location is taken as given (<em>exogenous</em>). In this interpretation, the location of an observed point is considered as secondary to the value observed at the point. Think of this like measuring the number of cars traversing a given road intersection; the location is fixed, and the data of interest comes from the measurement taken at that location. The analysis of this kind of point data is very similar to that of other types of spatial data such as polygons and lines. On the other hand, an observation occurring at a point can also be thought of as a site of measurement from an underlying geographically-continuous process. In this case, the measurement could theoretically take place anywhere, but was only carried out or conducted in certain locations. Think of this as measuring the length of birds’ wings: the location at which birds are measured reflects the underlying geographical process of bird movement and foraging, and the length of the birds’ wings may reflect an underlying ecological process that varies by bird. This kind of approach means that both the location and the measurement matter. This is the perspective we will adopt in the rest of the chapter.</p>
 <p>When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a <em>point pattern</em>. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is geo-tagged photographs: they could technically happen in many locations but we usually find photos tend to concentrate only in a handful of them. Point patterns can be <em>marked</em>, if more attributes are provided with the location, or <em>unmarked</em>, if only the coordinates of where the event occurred are provided. Continuing the photo example, an unmarked pattern would result if only the location where are taken is used for analysis, while we would be speaking of a marked point pattern if other attributes, such as the time, camera model, or a “image quality score” was provided with the location.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Point pattern analysis is thus concerned with the visualization, description, statistical characterization, and modeling of point patterns, trying to understand the generating process that gives rise and explains the observed data. Common questions in this domain include:</p>
 <ul class="simple">
 <li><p><em>What does the pattern look like?</em></p></li>
@@ -637,7 +621,22 @@
 <div class="section" id="the-tokyo-photographs-dataset">
 <h2>The Tokyo photographs dataset<a class="headerlink" href="#the-tokyo-photographs-dataset" title="Permalink to this headline">¶</a></h2>
 <p>The rise of new forms of data such as geo-tagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why do certain places attract many more photographers than others? All these questions and more become more than just rhetorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, <span id="id1">[<a class="reference internal" href="references.html#id31">Goo07</a>]</span>). In this chapter we will explore metadata from a sample of geo-referenced images uploaded to <a class="reference external" href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a class="reference external" href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern.</p>
-<p>To get started, let’s load the Flickr data first:</p>
+<p>To get started, let’s load the packages we will need in this example.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">pysal</span>
+<span class="kn">import</span> <span class="nn">seaborn</span>
+<span class="kn">import</span> <span class="nn">contextily</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">DBSCAN</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Then, let us load some data about picture locations from Flickr:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../data/tokyo/tokyo_clean.csv&#39;</span><span class="p">)</span>
@@ -673,10 +672,11 @@ memory usage: 547.0+ KB
 </div>
 <p>Note that the data is provided as a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file, so the spatial information is encoded as separate columns, one for each coordinate. This is contrast to how we have consumed spatial data in previous chapters, where spatial information was stored in a single column and encoded in geometry objects.</p>
 </div>
-<div class="section" id="visualization">
-<h2>Visualization<a class="headerlink" href="#visualization" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="dots-on-a-map">
-<h3>Dots on a map<a class="headerlink" href="#dots-on-a-map" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="visualizing-point-patterns">
+<h2>Visualizing Point Patterns<a class="headerlink" href="#visualizing-point-patterns" title="Permalink to this headline">¶</a></h2>
+<p>There are many ways to visualize geographic point patterns, and the choice of method depends on the intended message.</p>
+<div class="section" id="showing-patterns-as-dots-on-a-map">
+<h3>Showing Patterns as Dots on a Map<a class="headerlink" href="#showing-patterns-as-dots-on-a-map" title="Permalink to this headline">¶</a></h3>
 <p>The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatter plot with <code class="docutils literal notranslate"><span class="pre">seaborn</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -686,7 +686,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_12_0.png" src="../_images/08_point_pattern_analysis_12_0.png" />
+<img alt="../_images/08_point_pattern_analysis_11_0.png" src="../_images/08_point_pattern_analysis_11_0.png" />
 </div>
 </div>
 <p>This is a good start: we can see dots tend to be concentrated in the center of the covered area in a non-random pattern. Furthermore, within the broad pattern, we can also see there seems to be more localized clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb.</p>
@@ -706,13 +706,13 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_14_0.png" src="../_images/08_point_pattern_analysis_14_0.png" />
+<img alt="../_images/08_point_pattern_analysis_13_0.png" src="../_images/08_point_pattern_analysis_13_0.png" />
 </div>
 </div>
 <p>Note how we can pull out the axis where the points are plotted and add the basemap there, specifying the CRS as WGS84, since we are plotting longitude and latitude. Compared to the previous plot, adding a basemap to our initial plot makes the pattern of Flickr data clearer.</p>
 </div>
-<div class="section" id="hex-binning">
-<h3>Hex-binning<a class="headerlink" href="#hex-binning" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="showing-density-with-hex-binning">
+<h3>Showing Density with Hex-binning<a class="headerlink" href="#showing-density-with-hex-binning" title="Permalink to this headline">¶</a></h3>
 <p>Consider our second problem: cluttering. When too many photos are concentrated in some areas of, plotting opaque dots on top of one another can make it hard to discern any pattern and explore its nature. For example, in the middle of the map, towards the right, there appears to be the highest concentration of pictures taken; the sheer amount of dots on the maps in some parts obscures whether all of that area receives as many pics or whether, within there, some places receive a particularly high degree of attention.</p>
 <p>One solution to get around cluttering relates to what we referred to earlier as moving from <span class="xref std std-ref">“tables to surfaces”</span>. We can now recast this approach as a <em>spatial</em> or <em>2-dimensional histogram</em>. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleth maps may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin 2-d histogram is straightforward in Python using the <code class="docutils literal notranslate"><span class="pre">hexbin</span></code> function:</p>
 <div class="cell docutils container">
@@ -743,13 +743,13 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_17_0.png" src="../_images/08_point_pattern_analysis_17_0.png" />
+<img alt="../_images/08_point_pattern_analysis_16_0.png" src="../_images/08_point_pattern_analysis_16_0.png" />
 </div>
 </div>
 <p>Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localized areas and that the previous map was obscuring this.</p>
 </div>
-<div class="section" id="kernel-density-estimation-kde">
-<h3>Kernel Density Estimation (KDE)<a class="headerlink" href="#kernel-density-estimation-kde" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="another-kind-of-density-kernel-density-estimation-kde">
+<h3>Another Kind of Density: Kernel Density Estimation (KDE)<a class="headerlink" href="#another-kind-of-density-kernel-density-estimation-kde" title="Permalink to this headline">¶</a></h3>
 <p>Grids are the spatial equivalent of a histogram: the user decides how many “buckets”, and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g., the modifiable areal unit problem <span id="id2">[<a class="reference internal" href="references.html#id4">Won04</a>]</span>). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g. <span id="id3">[<a class="reference internal" href="references.html#id53">Sil86</a>]</span>), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel in Python is rather straightforward:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -777,7 +777,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_19_0.png" src="../_images/08_point_pattern_analysis_19_0.png" />
+<img alt="../_images/08_point_pattern_analysis_18_0.png" src="../_images/08_point_pattern_analysis_18_0.png" />
 </div>
 </div>
 <p>The result is a smoother output that captures the same structure of the hexbin but “eases” the transitions between different areas. This provides a better generalization of the theoretical probability distribution over space.  Technically, the continuous nature of the KDE function implies that for any given point the probability of an event is 0. However, as the area around a point increases, the probability of an event within that area can be obtained.  This is useful in some cases, but is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares.</p>
@@ -838,7 +838,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_26_0.png" src="../_images/08_point_pattern_analysis_26_0.png" />
+<img alt="../_images/08_point_pattern_analysis_25_0.png" src="../_images/08_point_pattern_analysis_25_0.png" />
 </div>
 </div>
 <p>The discrepancy between the two centers is caused by the skew; there are many “clusters” of pictures far out in West and South Tokyo, whereas North and East Tokyo is densely packed, but drops off very quickly. Thus, the far out clusters of pictures pulls the mean center to the west and south, relative to the median center.</p>
@@ -900,7 +900,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_32_0.png" src="../_images/08_point_pattern_analysis_32_0.png" />
+<img alt="../_images/08_point_pattern_analysis_31_0.png" src="../_images/08_point_pattern_analysis_31_0.png" />
 </div>
 </div>
 </div>
@@ -997,7 +997,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_40_0.png" src="../_images/08_point_pattern_analysis_40_0.png" />
+<img alt="../_images/08_point_pattern_analysis_39_0.png" src="../_images/08_point_pattern_analysis_39_0.png" />
 </div>
 </div>
 <p>We will cover three more bounding shapes, all of them rectangles or circles. First, two kinds of <strong>minimum bounding rectangles</strong>. They both are constructed as the tightest <em>rectangle</em> that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the <strong>minimum rotated rectangle</strong> provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated.</p>
@@ -1117,7 +1117,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_50_0.png" src="../_images/08_point_pattern_analysis_50_0.png" />
+<img alt="../_images/08_point_pattern_analysis_49_0.png" src="../_images/08_point_pattern_analysis_49_0.png" />
 </div>
 </div>
 <p>Each gives a different impression of the area enclosing the user’s range of photographs. In this, you can see that the the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle &amp; circle are the “loosest” shapes, in that they contain the most area outside of the user’s typical area. But, they’re also the simplest shapes to draw and understand.</p>
@@ -1158,7 +1158,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_56_0.png" src="../_images/08_point_pattern_analysis_56_0.png" />
+<img alt="../_images/08_point_pattern_analysis_55_0.png" src="../_images/08_point_pattern_analysis_55_0.png" />
 </div>
 </div>
 <p>As you can see, the simulation (by default) works with the bounding box of the input point pattern. To simulate from more restricted areas formed by the point pattern, pass those hulls to the simulator! For example, to generate a random pattern within the alpha shapes:</p>
@@ -1184,7 +1184,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_59_0.png" src="../_images/08_point_pattern_analysis_59_0.png" />
+<img alt="../_images/08_point_pattern_analysis_58_0.png" src="../_images/08_point_pattern_analysis_58_0.png" />
 </div>
 </div>
 <div class="section" id="quadrat-statistics">
@@ -1199,7 +1199,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_61_0.png" src="../_images/08_point_pattern_analysis_61_0.png" />
+<img alt="../_images/08_point_pattern_analysis_60_0.png" src="../_images/08_point_pattern_analysis_60_0.png" />
 </div>
 </div>
 <p>In this case, for the default of a three by three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer Flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small p-value:</p>
@@ -1224,7 +1224,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_65_0.png" src="../_images/08_point_pattern_analysis_65_0.png" />
+<img alt="../_images/08_point_pattern_analysis_64_0.png" src="../_images/08_point_pattern_analysis_64_0.png" />
 </div>
 </div>
 <p>This means its p-value will be large, and likely not significant:</p>
@@ -1249,7 +1249,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_69_0.png" src="../_images/08_point_pattern_analysis_69_0.png" />
+<img alt="../_images/08_point_pattern_analysis_68_0.png" src="../_images/08_point_pattern_analysis_68_0.png" />
 </div>
 </div>
 <p>The quadrat test finds this to be <em>statistically nonrandom</em>, while our simulating process ensured that <em>within the given study area</em>, the pattern is a complete spatially-random process.</p>
@@ -1306,7 +1306,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_74_0.png" src="../_images/08_point_pattern_analysis_74_0.png" />
+<img alt="../_images/08_point_pattern_analysis_73_0.png" src="../_images/08_point_pattern_analysis_73_0.png" />
 </div>
 </div>
 <p>Ripley’s <span class="math notranslate nohighlight">\(G\)</span> keeps track of the proportion of points for which the nearest neighbor is within a given distance threshold, and plots that cumulative percentage against the increasing distance radii. The distribution of these cumulative percentage has a distinctive shape under completely spatially random processes. The intuition behind Ripley’s G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the cumulative distribution of nearest neighbor distances over increasing distance thresholds, and comparing it to that of a set of simulated patterns that follow a known spatially-random process. Usually, a spatial Poisson point process is used as such reference distribution.</p>
@@ -1359,7 +1359,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_78_0.png" src="../_images/08_point_pattern_analysis_78_0.png" />
+<img alt="../_images/08_point_pattern_analysis_77_0.png" src="../_images/08_point_pattern_analysis_77_0.png" />
 </div>
 </div>
 <p>The second function we introduce is Ripley’s <span class="math notranslate nohighlight">\(F\)</span>. Where the <span class="math notranslate nohighlight">\(G\)</span> function works by analyzing the distance <em>between</em> points in the pattern, the <em>F</em> function works by analyzing the distance <em>to</em> points in the pattern from locations in empty space. That is why the <span class="math notranslate nohighlight">\(F\)</span> function is called the “the empty space function”, since it characterizes the typical distance from arbitrary points in empty space to the point pattern. More explicitly, the <span class="math notranslate nohighlight">\(F\)</span> accumulates, for a growing distance range, the percentage of points that can be found within that range from a random point pattern generated within the extent of the observed pattern. If the pattern has large gaps or empty areas, the <span class="math notranslate nohighlight">\(F\)</span> function will increase slowly. But, if the pattern is highly dispersed, then the <span class="math notranslate nohighlight">\(F\)</span> function will increase rapidly. The shape of this cumulative distribution is then compared to those constructed by calculating the same cumulative distribution between the random pattern and an additional, random one generated in each simulation step.</p>
@@ -1411,7 +1411,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_81_0.png" src="../_images/08_point_pattern_analysis_81_0.png" />
+<img alt="../_images/08_point_pattern_analysis_80_0.png" src="../_images/08_point_pattern_analysis_80_0.png" />
 </div>
 </div>
 <p>Ripley’s “alphabet” extends to several other letter-named functions that can be used for conducting point pattern analysis in this vein. Good “next steps” in your point pattern analysis journey include the book by <span id="id5">[<a class="reference internal" href="references.html#id12">BRT15</a>]</span>; and the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> documentation for guidance on how to run these in Python.</p>
@@ -1508,7 +1508,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_92_0.png" src="../_images/08_point_pattern_analysis_92_0.png" />
+<img alt="../_images/08_point_pattern_analysis_91_0.png" src="../_images/08_point_pattern_analysis_91_0.png" />
 </div>
 </div>
 <p>Although informative, the result of this run is not particularly satisfactory. There are <em>way</em> too many points that are classified as “noise”.</p>
@@ -1565,7 +1565,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/08_point_pattern_analysis_96_0.png" src="../_images/08_point_pattern_analysis_96_0.png" />
+<img alt="../_images/08_point_pattern_analysis_95_0.png" src="../_images/08_point_pattern_analysis_95_0.png" />
 </div>
 </div>
 </div>

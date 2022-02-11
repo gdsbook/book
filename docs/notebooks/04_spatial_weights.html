@@ -397,11 +397,6 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id1">
-   Spatial Weights
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#contiguity-weights">
    Contiguity Weights
   </a>
@@ -524,11 +519,6 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#id1">
-   Spatial Weights
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#contiguity-weights">
    Contiguity Weights
   </a>
@@ -636,25 +626,11 @@
                 
   <div class="tex2jax_ignore mathjax_ignore section" id="spatial-weights">
 <h1>Spatial Weights<a class="headerlink" href="#spatial-weights" title="Permalink to this headline">¶</a></h1>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">contextily</span>
-<span class="kn">import</span> <span class="nn">geopandas</span>
-<span class="kn">import</span> <span class="nn">rioxarray</span>
-<span class="kn">import</span> <span class="nn">seaborn</span>
-<span class="kn">import</span> <span class="nn">pandas</span> 
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span>
-<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">cg</span> <span class="k">as</span> <span class="n">geometry</span>
-</pre></div>
-</div>
-</div>
-</div>
+<p>“Spatial weights” are one way to represent graphs in geographic data science and spatial statistics. They are widely used constructs that represent geographic relationships between the observational units in a spatially referenced dataset. Implicitly, spatial weights connect objects in a geographic table to one another using the spatial relationships between them. By expressing the notion of geographical proximity or connectedness, spatial weights are the main mechanism through which the spatial relationships in geographical data is brought to bear in the subsequent analysis.</p>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>“Spatial weights” are one way to represent graphs in geographic data science and spatial statistics. They are widely used constructs that represent geographic relationships between the observational units in a spatially referenced dataset. Implicitly, spatial weights connect objects in a geographic table to one another using the spatial relationships between them. By expressing the notion of geographical proximity or connectedness, spatial weights are the main mechanism through which the spatial relationships in geographical data is brought to bear in the subsequent analysis.</p>
-<p>For example, proximity and adjacency are common spatial questions: <em>What neighborhoods are you surrounded by? How many gas stations are within 5 miles of my stalled car?</em>
+<p>Spatial weightsoften express our knowledge about spatial relationships.
+For example, proximity and adjacency are common spatial questions: <em>What neighborhoods are you surrounded by? How many gas stations are within 5 miles of my stalled car?</em>
 These are spatial questions that target specific information about the spatial configuration of a specific target (“a neighborhood,” “my stalled car”) and geographically connected relevant sites (“adjacent neighborhoods”, “nearby gas stations”). For us to use this information in statistical analysis, it’s often necessary to compute these relationships between all pairs of observations. This means that, for many applications in geographic data science, we are building a <em>topology</em>—a mathematical structure that expresses the connectivity between observations—that we can use to examine the data. Spatial weights matrices express this topology, letting us embed all of our observations in space together, rather than asking and answering single questions about features nearby a unit.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -671,9 +647,6 @@ These are spatial questions that target specific information about the spatial c
 </div>
 </div>
 </div>
-</div>
-<div class="section" id="id1">
-<h2>Spatial Weights<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Since they provide a way to represent these spatial relationships, spatial weights are widely used throughout spatial and geographic data science.
 In this chapter, we first consider different approaches to construct spatial weights, distinguishing between those based on contiguity/adjacency relations from weights obtained from distance based relationships. We then discuss the case of hybrid weights which combine one or more spatial operations in deriving the neighbor relationships between observations. We illustrate all of these concepts through the spatial weights class in <code class="docutils literal notranslate"><span class="pre">pysal</span></code>, which provides a rich set of methods and characteristics for spatial weights and it is stored under the <code class="docutils literal notranslate"><span class="pre">weights</span></code> submodule:</p>
 <div class="cell docutils container">
@@ -736,7 +709,7 @@ more complicated. The first complication is that there are different ways that o
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_11_0.png" src="../_images/04_spatial_weights_11_0.png" />
+<img alt="../_images/04_spatial_weights_10_0.png" src="../_images/04_spatial_weights_10_0.png" />
 </div>
 </div>
 <p>A common way to express contiguity/adjacency relationships arises from an analogy to the legal moves that different chess pieces can make. <em>Rook</em> contiguity requires that the pair of polygons in
@@ -773,7 +746,7 @@ question share an <em>edge</em>. According to this definition, polygon <span cla
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_15_0.png" src="../_images/04_spatial_weights_15_0.png" />
+<img alt="../_images/04_spatial_weights_14_0.png" src="../_images/04_spatial_weights_14_0.png" />
 </div>
 </div>
 <p>The  <code class="docutils literal notranslate"><span class="pre">neighbors</span></code> attribute of our <code class="docutils literal notranslate"><span class="pre">pysal</span></code> <span class="math notranslate nohighlight">\(W\)</span> object encodes the neighbor
@@ -1032,7 +1005,7 @@ neighbor relations for this same configuration as follows:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_25_0.png" src="../_images/04_spatial_weights_25_0.png" />
+<img alt="../_images/04_spatial_weights_24_0.png" src="../_images/04_spatial_weights_24_0.png" />
 </div>
 </div>
 <p>By using <code class="docutils literal notranslate"><span class="pre">Contiguity.Queen</span></code> rather than <code class="docutils literal notranslate"><span class="pre">Contiguity.Rook</span></code>, we consider observations that share a vertex to be neighbors. The result is that the neighbors of <span class="math notranslate nohighlight">\(0\)</span> now include <span class="math notranslate nohighlight">\(4\)</span> along with <span class="math notranslate nohighlight">\(3\)</span> and <span class="math notranslate nohighlight">\(1\)</span>.</p>
@@ -1101,7 +1074,7 @@ into a <code class="docutils literal notranslate"><span class="pre">pandas.Serie
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_33_0.png" src="../_images/04_spatial_weights_33_0.png" />
+<img alt="../_images/04_spatial_weights_32_0.png" src="../_images/04_spatial_weights_32_0.png" />
 </div>
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">cardinalities</span></code> and <code class="docutils literal notranslate"><span class="pre">histogram</span></code> attributes help quickly spot asymmetries in
@@ -1185,7 +1158,7 @@ structures to extract these.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_41_0.png" src="../_images/04_spatial_weights_41_0.png" />
+<img alt="../_images/04_spatial_weights_40_0.png" src="../_images/04_spatial_weights_40_0.png" />
 </div>
 </div>
 <p>The weights object for San Diego tracts have the same attributes and methods as
@@ -1215,7 +1188,7 @@ grid. Moreover, the cardinalities have a radically different distribution:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_45_0.png" src="../_images/04_spatial_weights_45_0.png" />
+<img alt="../_images/04_spatial_weights_44_0.png" src="../_images/04_spatial_weights_44_0.png" />
 </div>
 </div>
 <p>As the minimum number of neighbors is 1, while there is one polygon with 29
@@ -1234,7 +1207,7 @@ can also plot the equivalent for rook weights of the same dataframe:</p>
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.8722463385938578
 </pre></div>
 </div>
-<img alt="../_images/04_spatial_weights_47_1.png" src="../_images/04_spatial_weights_47_1.png" />
+<img alt="../_images/04_spatial_weights_46_1.png" src="../_images/04_spatial_weights_46_1.png" />
 </div>
 </div>
 <p>The cardinality histogram shifts downward due to the increasing sparsity of the
@@ -1343,7 +1316,7 @@ In such situations, we can turn to other types of distance-based weights.</p>
 <h3>Kernel weights<a class="headerlink" href="#kernel-weights" title="Permalink to this headline">¶</a></h3>
 <p>The k-nearest neighbor rule assigns binary values to the weights for neighboring observations.
 <code class="docutils literal notranslate"><span class="pre">pysal</span></code> also supports continuously valued weights to reflect Tobler’s first law
-<span id="id2">[<a class="reference internal" href="references.html#id54">Tob70</a>]</span> in a more direct way: observations that are close to a unit have larger
+<span id="id1">[<a class="reference internal" href="references.html#id54">Tob70</a>]</span> in a more direct way: observations that are close to a unit have larger
 weights than more distant observations.</p>
 <p>Kernel weights are one of the most commonly-used kinds of distance weights. They
 reflect the case where similarity/spatial proximity is assumed or expected to
@@ -1428,7 +1401,7 @@ characteristics- can be preferred.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_69_0.png" src="../_images/04_spatial_weights_69_0.png" />
+<img alt="../_images/04_spatial_weights_68_0.png" src="../_images/04_spatial_weights_68_0.png" />
 </div>
 </div>
 <p>If we now build a weights object with adaptive bandwidth (<code class="docutils literal notranslate"><span class="pre">fixed=False</span></code>), the values for bandwith differ:</p>
@@ -1488,7 +1461,7 @@ characteristics- can be preferred.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_73_0.png" src="../_images/04_spatial_weights_73_0.png" />
+<img alt="../_images/04_spatial_weights_72_0.png" src="../_images/04_spatial_weights_72_0.png" />
 </div>
 </div>
 <p>What the kernel looks like can be strongly affected by the structure of spatial proximity, so any part of the map can look quite different from any other part of the map. By imposing a clear distance decay over several of the neighbors of each observation,
@@ -1671,7 +1644,7 @@ Earth’s surface can create erroneous neighbor pairs. For example, the four <em
 <p>A final type of spatial weight we examine here are block weights. In this case,
 it is membership in geographic
 a group that defines the neighbor relationships. Block weights connect every
-observation in a data set that belong to the same category in a provided list.<a class="footnote-reference brackets" href="#regions" id="id3">1</a>
+observation in a data set that belong to the same category in a provided list.<a class="footnote-reference brackets" href="#regions" id="id2">1</a>
 In essence, a block weight structure groups
 individual observations and considers all members of the group as “near” one another. This means that they then have a value of one for every pair of observations in the same group. Contrariwise, all members <em>not</em> in that group are considered disconnected from any observation within the group, and given a value of zero.
 This is done for every group, so the resulting matrix looks like “blocks” of 1s stacked on the diagonal (assuming that observations in the same group are near one another in the input data table), hence the “block” weights.</p>
@@ -2024,7 +1997,7 @@ criteria introduced to define neighbor relations. We first read in the data for 
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_129_0.png" src="../_images/04_spatial_weights_129_0.png" />
+<img alt="../_images/04_spatial_weights_128_0.png" src="../_images/04_spatial_weights_128_0.png" />
 </div>
 </div>
 <p>Queen and KNN graphs are relatively similar but, as one would expect, the KNN is sparser than Queen in areas with high density of irregular polygons (Queen will connect each to more than four), and denser in sparser areas with less but larger polygons (e.g. north-west). Focusing on the Queen and Block graphs, there are clear distinctions between the
@@ -2077,7 +2050,7 @@ component.</p>
 <p>Spatial weights are ubiquitous in the analysis of spatial patterns in data, since they provide a direct method to represent spatial structure.
 However, spatial weights are also useful in their own right, such as when examining latent structures directly in the graphs themselves or when using them to conduct descriptive analysis.
 One clear use case that arises in the analysis of social data is to characterize latent <em>data discontinuities</em>. By <em>data discontinuity</em>, we mean a single border (or collection of borders) where data for a variable (or many variables) of interest change abruptly.
-These can be used in models of inequality <span id="id4">[<a class="reference internal" href="references.html#id22">DDPP19</a>, <a class="reference internal" href="references.html#id24">FPP+10</a>, <a class="reference internal" href="references.html#id40">LC05</a>]</span> or used to adapt classic empirical outlier detection methods.
+These can be used in models of inequality <span id="id3">[<a class="reference internal" href="references.html#id22">DDPP19</a>, <a class="reference internal" href="references.html#id24">FPP+10</a>, <a class="reference internal" href="references.html#id40">LC05</a>]</span> or used to adapt classic empirical outlier detection methods.
 Below, we’ll show one model-free way to identify empirical boundaries in your data.</p>
 <p>First, let’s consider the median household income for our census tracts in San Diego, shown in Figure 12.</p>
 <div class="cell docutils container">
@@ -2091,7 +2064,7 @@ Below, we’ll show one model-free way to identify empirical boundaries in your 
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_137_0.png" src="../_images/04_spatial_weights_137_0.png" />
+<img alt="../_images/04_spatial_weights_136_0.png" src="../_images/04_spatial_weights_136_0.png" />
 </div>
 </div>
 <p>Now, we see some cases where there are very stark differences between neighboring areas, and some cases where there appear to be no difference between adjacent areas. Digging into this, we can examine the <em>distribution of differences</em> in neighboring areas using the adjacency list, a different representation of a spatial graph:</p>
@@ -2269,7 +2242,7 @@ memory usage: 134.5 KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_151_0.png" src="../_images/04_spatial_weights_151_0.png" />
+<img alt="../_images/04_spatial_weights_150_0.png" src="../_images/04_spatial_weights_150_0.png" />
 </div>
 </div>
 <p>From this, we can see that the two distributions are distinct, with the distribution of difference in <em>non-neighboring</em> tracts being slightly more dispersed than that for <em>neighboring</em> tracts. Thus, on the whole, this means that neighboring tracts have more <em>smaller differences in wealth</em> than non-neighboring tracts. This is consistent with the behavior we will talk about in later chapters concerning <em>spatial autocorrelation</em>, the tendency for observations to be statistically more similar to nearby observations than they are to distant observations.</p>
@@ -2440,7 +2413,7 @@ memory usage: 134.5 KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_159_0.png" src="../_images/04_spatial_weights_159_0.png" />
+<img alt="../_images/04_spatial_weights_158_0.png" src="../_images/04_spatial_weights_158_0.png" />
 </div>
 </div>
 <p>Again, our random distribution is much more dispersed than our observed distribution of the differences between nearby tracts. Empirically, we can pool our simulations and construct and use their quantiles to summarize how unlikely any of our <em>observed</em> differences are if neighbors’ household incomes were randomly assigned:</p>
@@ -2583,7 +2556,7 @@ memory usage: 134.5 KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/04_spatial_weights_166_0.png" src="../_images/04_spatial_weights_166_0.png" />
+<img alt="../_images/04_spatial_weights_165_0.png" src="../_images/04_spatial_weights_165_0.png" />
 </div>
 </div>
 <p>These are the starkest contrasts in the map, and result in the most distinctive divisions between adjacent tracts’ household incomes.</p>
@@ -2677,7 +2650,7 @@ memory usage: 134.5 KB
 <p>Uitermark, Justus and Michiel van Meeteren. 2021. “Geographcial Network Analysis.” <em>Tijdschrift voor economische en sociale geografie</em> 112: 337-350.</p>
 <hr class="footnotes docutils" />
 <dl class="footnote brackets">
-<dt class="label" id="regions"><span class="brackets"><a class="fn-backref" href="#id3">1</a></span></dt>
+<dt class="label" id="regions"><span class="brackets"><a class="fn-backref" href="#id2">1</a></span></dt>
 <dd><p>Usually, this list will have some relation to the spatial configuration of the data but, technically speaking, all one needs to create block weights is a list of memberships.</p>
 </dd>
 </dl>
