@@ -916,14 +916,7 @@ Now, the effect of changing site `2` from an apartment into a condominium is ass
 ).loc[[2] + knn.neighbors[2]]
 ```
 
-%===================================%
-
-%       Please confirm this       %
-
 We see the first row, representing the direct effect, is equal exactly to the estimate for `pg_Condominium`. For the other effects, though, we have only changed `w_pg_Condominium` by $.03$ which roughly equates the marginal effect (`w_pg_Condominium`) divided by the weight of the spatial relationship between site `2` and every neighbor (in this case, $\frac{1}{20}$ for every neighbor, but note if different neighbors had different cardinalities, this would differ).
-
-%===================================%
-
 
 Introducing a spatial lag of an explanatory variable, as we have just seen, is the most straightforward way of incorporating the notion of spatial dependence in a linear regression framework. It does not require additional changes, it can be estimated with OLS, and the interpretation is rather similar to interpreting non-spatial variables, so long as aggregate changes are required. 
 

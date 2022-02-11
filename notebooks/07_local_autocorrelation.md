@@ -611,7 +611,7 @@ lc = {
 
 With these pieces, we can create the colormap object:
 
-```python
+```python caption="Colormap for Local Moran's I Maps, starting with non-significant local scores in grey, and proceeding through high-high local statistics, low-high, low-low, then high-low."
 lisa_cmap = ListedColormap(
     [lc['ns'], lc['HH'], lc['LH'], lc['LL'], lc['HL']]
 )
