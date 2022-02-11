@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: Python 3
     language: python
     name: python3
 ---
@@ -16,8 +16,6 @@ jupyter:
 ```python tags=["remove-cell"]
 import warnings
 warnings.filterwarnings("ignore")
-# ipykernel warnings should get fixed w/ new release:
-# https://github.com/ipython/ipykernel/pull/617
 ```
 
 # Spatial Feature Engineering

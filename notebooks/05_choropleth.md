@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: Python 3
     language: python
     name: python3
 ---
@@ -22,8 +22,6 @@ warnings.filterwarnings("ignore")
 
 
 
-<!-- #region -->
-## Principles
 
 
 Choropleths are geographic maps that display statistical information encoded 
@@ -48,6 +46,8 @@ complexity by drawing upon statistical and visualization theory to provide an
 effective representation of the spatial distribution of the attribute values
 across the areal units. 
 
+## Principles
+
 The effectiveness of a choropleth map depends largely on the purpose of the map.
 Which message you want to communicate will shape what options are preferable
 over others. In this chapter we consider three dimensions over which putting
@@ -68,9 +68,6 @@ different color schemes for effective map design. We combine theory and practice
 by exploring how these concepts are implemented in different Python packages,
 including `geopandas`, and `PySAL`.
 
-
-
-<!-- #endregion -->
 
 ```python
 import seaborn

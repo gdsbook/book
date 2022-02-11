@@ -7,9 +7,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: Python 3
     language: python
     name: python3
 ---
@@ -25,8 +25,6 @@ warnings.filterwarnings("ignore")
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
 
-## Introduction
-
 This chapter uses economic inequality to illustrate how the study of the evolution of social 
 disparities can benefit from an explicitly spatial treatment.
 Social and economic inequality is often at the top of policy makers' agendas.
@@ -36,6 +34,8 @@ that the question of *inter-regional income inequality* requires further
 attention as the growing gaps between poor and rich regions have been identified
 as key drivers of civil unrest {cite}`ezcurra2019` and  political polarization in developing and developed countries
 {cite}`Rodriguez_Pose_2018`.
+
+## Introduction
 
 Much of the study of inequalities has focused at the individual level: how do outcomes
 differ across individuals? This approach does not group individuals geographically. 
