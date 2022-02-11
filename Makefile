@@ -71,6 +71,22 @@ test:
 
 	rm -rf tests
 	echo "########\n\nAll blocks passed\n\n########"
+ 
+dpi:
+	rm -rf latex300
+	mkdir latex300
+	cp infrastructure/dpi.py .
+	cp notebooks/*.ipynb latex300/.
+	python dpi.py
+	jupyter nbconvert --to notebook \
+                      --execute \
+                      --output-dir=latex300 \
+                      --ExecutePreprocessor.timeout=600 \
+                      --ExecutePreprocessor.ipython_hist_file='' \
+                      latex300/*.ipynb 
+
+	rm dpi.py
+	echo "########\n\nHigh DPI versions built\n\n########"
     
 pack_site: html
 	rm -f gdsbook_site.zip
