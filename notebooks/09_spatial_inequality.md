@@ -144,6 +144,7 @@ The kernel density estimate (or histogram) is a powerful visualization device th
 Before we can get to mapping, we change the CRS to a suitable one for mapping, the Albers Equal Area projection for North America:  
 
 ```python
+pci_df = pci_df.set_crs(epsg=4326)
 pci_df = pci_df.to_crs(
     # Albers Equal Area North America
     epsg=5070
@@ -186,7 +187,7 @@ top20/bottom20
 In 1969 the richest 20% of the counties had an income that was 1.5 times the poorest 20% of the counties. The 20:20 ratio has the advantage of being robust to outliers at the top and the bottom of the distribution. To look at the dynamics of this global inequality measure, one way is to create a function that calculates it for a given year, and apply it to all years in our time series:
 <!-- #endregion -->
 
-```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
+```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} caption="20-20 Ratio Per Capita Income by County  1969-2017." tags=[]
 def ineq_20_20(values):
     top20, bottom20 = values.quantile([.8, .2])
     return top20 / bottom20
