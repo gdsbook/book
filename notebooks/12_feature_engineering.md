@@ -81,7 +81,7 @@ To obtain information on the location of restaurants and bars, we can download i
 
 ```python caption="Convex Hull of the Airbnbs in San Diego." tags=[]
 airbnbs_ch = airbnbs.unary_union.convex_hull
-geopandas.GeoSeries([airbnbs_ch]).plot();
+geopandas.GeoSeries([airbnbs_ch]).plot()
 ```
 
 Using this polygon, we can use the `osmnx` package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we'll request POIs within San Diego that are "restaurants" or "bars," according to their metadata stored in OpenStreetMap. Once returned, we only keep a few columns to keep the table small and tidy:
