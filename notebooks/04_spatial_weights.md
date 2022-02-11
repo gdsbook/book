@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -302,19 +302,19 @@ Like before, we can visualize the adjacency relationships, but they are much mor
 
 ```python caption="The Queen contiguity graph for San Diego tracts. Tracts connected with a red line are neighbors." tags=["hide-input"]
 # Plot tract geography
-f,ax = plt.subplots(1,2,figsize=(8,4))
+f, axs = plt.subplots(1,2,figsize=(8,4))
 for i in range(2):
-    ax = san_diego_tracts.plot(edgecolor='k', facecolor='w', ax=ax[i])
+    ax = san_diego_tracts.plot(edgecolor='k', facecolor='w', ax=axs[i])
     # Plot graph connections
     w_queen.plot(
         san_diego_tracts, 
-        ax=ax[i], 
+        ax=axs[i], 
         edge_kws=dict(color='r', linestyle=':', linewidth=1),
         node_kws=dict(marker='')
     )
 # Remove the axis
-    ax[i].set_axis_off()
-ax[1].axis([-13040000,  -13020000, 3850000, 3860000])
+    axs[i].set_axis_off()
+axs[1].axis([-13040000,  -13020000, 3850000, 3860000]);
 ```
 The weights object for San Diego tracts have the same attributes and methods as
 we encountered with our artificial layout above:

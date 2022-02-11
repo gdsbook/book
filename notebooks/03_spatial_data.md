@@ -6,18 +6,19 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
 
 ```python tags=["remove-cell"]
-import warnings
+import warnings, osmnx
 warnings.filterwarnings("ignore")
 osmnx.config(
     overpass_settings='[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
+)
 ```
 
 # Spatial Data
