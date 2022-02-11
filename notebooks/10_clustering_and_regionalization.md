@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
@@ -26,8 +26,6 @@ borrowed from [GDS'17 - Lab
 -->
 
 
-## Introduction
-
 The world's hardest questions are complex and multi-faceted.
 Effective methods to learn from data recognize this. Many questions
 and challenges are inherently multidimensional; they are affected, shaped, and
@@ -37,6 +35,8 @@ terms, these processes are called *multivariate processes*, as opposed to
 Clustering is a fundamental method of geographical analysis that draws insights
 from large, complex multivariate processes. It works by finding similarities among the many dimensions in a multivariate process, condensing them down into a simpler representation.
 Thus, through clustering, a complex and difficult to understand process is recast into a simpler one that even non-technical audiences can use. 
+
+## Introduction
 
 Clustering (as we discuss it in this chapter) borrows heavily from unsupervised statistical learning {cite}`friedman2001elements`.
 Often, clustering involves sorting observations into groups without any prior idea about what the groups are (or, in machine learning jargon, without any labels, hence the _unsupervised_ name).

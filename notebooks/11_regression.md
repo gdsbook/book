@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
@@ -20,13 +20,11 @@ warnings.filterwarnings("ignore")
 
 # Spatial Regression
 
-## Introduction
+Regression (and prediction more generally) provides us a perfect case to examine how spatial structure can help us understand and analyze our data. In this chapter, we discuss how spatial structure can be used to both validate and improve prediction algorithms, focusing on linear regression specifically. 
 
+## *What* is spatial regression and *why* should I care?
 
-### *What* is spatial regression and *why* should I care?
-
-Regression (and prediction more generally) provides us a perfect case to examine how spatial structure can help us understand and analyze our data. 
-Usually, spatial structure helps models in one of two ways. 
+Usually, spatial structure helps regression models in one of two ways. 
 The first (and most clear) way space can have an impact on our data is when the process *generating* the data is itself explicitly spatial.
 Here, think of something like the prices for single family homes. 
 It's often the case that individuals pay a premium on their house price in order to live in a better school district for the same quality house. 

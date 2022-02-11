@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: Python 3
     language: python
     name: python3
 ---
@@ -21,22 +21,12 @@ warnings.filterwarnings("ignore")
 # Spatial Weights
 
 
-```python
-import contextily
-import geopandas
-import rioxarray
-import seaborn
-import pandas 
-import numpy
-import matplotlib.pyplot as plt
-from shapely.geometry import Polygon
-from pysal.lib import cg as geometry
-```
-
-## Introduction
 
 "Spatial weights" are one way to represent graphs in geographic data science and spatial statistics. They are widely used constructs that represent geographic relationships between the observational units in a spatially referenced dataset. Implicitly, spatial weights connect objects in a geographic table to one another using the spatial relationships between them. By expressing the notion of geographical proximity or connectedness, spatial weights are the main mechanism through which the spatial relationships in geographical data is brought to bear in the subsequent analysis.
 
+## Introduction
+
+Spatial weightsoften express our knowledge about spatial relationships. 
 For example, proximity and adjacency are common spatial questions: *What neighborhoods are you surrounded by? How many gas stations are within 5 miles of my stalled car?*
 These are spatial questions that target specific information about the spatial configuration of a specific target ("a neighborhood," "my stalled car") and geographically connected relevant sites ("adjacent neighborhoods", "nearby gas stations"). For us to use this information in statistical analysis, it's often necessary to compute these relationships between all pairs of observations. This means that, for many applications in geographic data science, we are building a *topology*---a mathematical structure that expresses the connectivity between observations---that we can use to examine the data. Spatial weights matrices express this topology, letting us embed all of our observations in space together, rather than asking and answering single questions about features nearby a unit. 
 
@@ -51,7 +41,6 @@ import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
 from pysal.lib import cg as geometry
 ```
-## Spatial Weights
 
 Since they provide a way to represent these spatial relationships, spatial weights are widely used throughout spatial and geographic data science.
 In this chapter, we first consider different approaches to construct spatial weights, distinguishing between those based on contiguity/adjacency relations from weights obtained from distance based relationships. We then discuss the case of hybrid weights which combine one or more spatial operations in deriving the neighbor relationships between observations. We illustrate all of these concepts through the spatial weights class in `pysal`, which provides a rich set of methods and characteristics for spatial weights and it is stored under the `weights` submodule:
