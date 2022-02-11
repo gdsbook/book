@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.13.6
+      jupytext_version: 1.11.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -141,13 +141,10 @@ A key point to keep in mind here is that the unit of measurement in this data is
 
 The kernel density estimate (or histogram) is a powerful visualization device that captures the overall morphology of the *feature* distribution for this measure of income. At the same time, the plot is silent on the underlying *geographic distribution* of county incomes. We can look at this second view of the distribution using a choropleth map. To construct this, we can use the standard `geopandas` plotting tools. 
 
-Before we can get to mapping, we note the data is expressed in longitude and latitude but this is *not* recorded on `pci_df`. We set the CRS explicitly and then change it to one more suitable for mapping, the Albers Equal Area projection for North America:  
+Before we can get to mapping, we change the CRS to a suitable one for mapping, the Albers Equal Area projection for North America:  
 
 ```python
-pci_df = pci_df.set_crs(
-    # US Census default projection
-    epsg=4326
-).to_crs(
+pci_df = pci_df.to_crs(
     # Albers Equal Area North America
     epsg=5070
 )
