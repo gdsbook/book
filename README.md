@@ -1,7 +1,6 @@
 [![Gitter](https://badges.gitter.im/pysal/gdsbook.svg)](https://gitter.im/pysal/gdsbook?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-Repository for the book "Geographic Data Science with PySAL and the pydata
-Stack"
+Repository for the book "Geographic Data Science with Python"
 
 [![Build Jupyter book](https://github.com/gdsbook/book/actions/workflows/build_website.yml/badge.svg?branch=master)](https://github.com/gdsbook/book/actions/workflows/build_website.yml)
 
