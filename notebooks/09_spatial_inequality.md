@@ -7,9 +7,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -144,7 +144,6 @@ The kernel density estimate (or histogram) is a powerful visualization device th
 Before we can get to mapping, we change the CRS to a suitable one for mapping, the Albers Equal Area projection for North America:  
 
 ```python
-pci_df = pci_df.set_crs(epsg=4326)
 pci_df = pci_df.to_crs(
     # Albers Equal Area North America
     epsg=5070
