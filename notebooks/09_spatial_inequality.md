@@ -623,7 +623,7 @@ Inference on these decompositions can be done using the `inequality.theil.TheilD
 
 Since the within and between components are interpreted as shares of the overall Theil index, we can compute the share of the Theil index due to the between-region inequality.
 
-```python caption="The share of inequality (measured by the Theil index) that is driven by between-region inequality has generally declined since 1969, although this has rebounded recently."
+```python ein.hycell=false tags=[] ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 inequalities['theil_between_share'] = (
     inequalities['theil_between'] / inequalities['theil']
 )
