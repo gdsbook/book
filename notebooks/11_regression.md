@@ -109,14 +109,14 @@ $$
 
 A regression can be seen as a multivariate extension of bivariate correlations. Indeed, one way to interpret the $\beta_k$ coefficients in the equation above is as the degree of correlation between the explanatory variable $k$ and the dependent variable, *keeping all the other explanatory variables constant*. When one calculates bivariate correlations, the coefficient of a variable is picking up the correlation between the variables, but it is also subsuming into it variation associated with other correlated variables -- also called confounding factors. Regression allows us to isolate the distinct effect that a single variable has on the dependent one, once we *control* for those other variables.
 
-Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. `statsmodels`, `scikit-learn`, `PySAL`). We will import the `spreg` module in PySAL:
+Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. `statsmodels`, `scikit-learn`, `pysal`). We will import the `spreg` module in Pysal:
 
 ```python
 from pysal.model import spreg
 ```
 
 
-In the context of this chapter, it makes sense to start with `PySAL` as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with $X$ as the list defined, we only need the following line of code:
+In the context of this chapter, it makes sense to start with `spreg` as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with $X$ as the list defined, we only need the following line of code:
 
 ```python
 # Fit OLS model
@@ -342,7 +342,7 @@ To run a linear model that includes the additional variable of distance to the p
 balboa_names = variable_names + ['d2balboa']
 ```
 
-And then fit the model using the OLS class in PySAL's `spreg`:
+And then fit the model using the OLS class in Pysal's `spreg`:
 
 ```python
 m2 = spreg.OLS(
@@ -413,7 +413,7 @@ $$
 where the main difference is that we are now allowing the constant term, $\alpha$, to vary by neighborhood $r$, $\alpha_r$.
 
 Programmatically, we will show two different ways we can estimate this: one,
-using `statsmodels`; and two, with `PySAL`. First, we will use `statsmodels`, the econometrician's toolbox in Python. 
+using `statsmodels`; and two, with `spreg`. First, we will use `statsmodels`, the econometrician's toolbox in Python. 
 
 ```python
 import statsmodels.formula.api as sm
@@ -451,10 +451,10 @@ pandas.DataFrame(
 
 The approach above shows how spatial FE are a particular case of a linear regression with a categorical  variable. Neighborhood membership is modeled using binary dummy variables. Thanks to the formula grammar used in `statsmodels`, we can express the model abstractly, and Python parses it, appropriately creating binary variables as required.
 
-The second approach leverages `PySAL` Regimes functionality. We will see regimes below but, for now, think of them as a generalisation of spatial fixed effects where not only $\alpha$ can vary. This framework allows the user to specify which variables are to be estimated separately for each group. In this case, instead of describing the model in a formula, we need to pass each element of the model as separate arguments.
+The second approach leverages `spreg` Regimes functionality. We will see regimes below but, for now, think of them as a generalisation of spatial fixed effects where not only $\alpha$ can vary. This framework allows the user to specify which variables are to be estimated separately for each group. In this case, instead of describing the model in a formula, we need to pass each element of the model as separate arguments.
 
 ```python
-# PySAL spatial fixed effect implementation
+# spreg spatial fixed effect implementation
 m4 = spreg.OLS_Regimes(
     # Dependent variable
     db[['log_price']].values, 
@@ -572,10 +572,10 @@ where we are not only allowing the constant term to vary by region ($\alpha_r$),
 
 To illustrate this approach, we will use the "spatial differentiator" of whether a house is in a coastal neighborhood or not (`coastal_neig`) to define the regimes. The rationale behind this choice is that renting a house close to the ocean might be a strong enough pull that people might be willing to pay at different *rates* for each of the house's characteristics.
 
-To implement this in Python, we use the `OLS_Regimes` class in `PySAL`, which does most of the heavy lifting for us:
+To implement this in Python, we use the `OLS_Regimes` class in `spreg`, which does most of the heavy lifting for us:
 
 ```python
-# PySAL spatial regimes implementation
+# Pysal spatial regimes implementation
 m5 = spreg.OLS_Regimes(
     # Dependent variable
     db[['log_price']].values, 
@@ -745,7 +745,7 @@ at a specific site $x_i$ you would need to compute the *change in the spatial la
 and then use that as your *change* in $X$. We will discuss this in the following section. 
 
 In Python, we can calculate the spatial lag of each variable whose name starts by `pg_`
-by first creating a list of all of those names, and then applying `PySAL`'s
+by first creating a list of all of those names, and then applying `pysal`'s
 `lag_spatial` to each of them:
 
 ```python
@@ -937,7 +937,7 @@ $$
 where $u_{lag-i} = \sum_j w_{i,j} u_j$. 
 Although it appears similar, this specification violates the assumptions about the
 error term in a classical OLS model. Hence, alternative estimation methods are
-required. `PySAL` incorporates functionality to estimate several of the most
+required. Pysal incorporates functionality to estimate several of the most
 advanced techniques developed by the literature on spatial econometrics. For
 example, we can use a general method of moments that account for 
 heteroskedasticity {cite}`arraiz2010`:
@@ -993,7 +993,7 @@ Put simply, this occurs when $P_i$ exists on both "sides" of the equals sign.
 In theory, since $P_i$ is included in computing $P_{lag-i}$, exogeneity is violated. 
 Similarly to the case of
 the spatial error, several techniques have been proposed to overcome this
-limitation, and `PySAL` implements several of them. In the example below, we
+limitation, and Pysal implements several of them. In the example below, we
 use a two-stage least squares estimation {cite}`Anselin_1988`, where the spatial
 lag of all the explanatory variables is used as instrument for the endogenous
 lag:
@@ -1177,7 +1177,7 @@ For additional reading on the topics covered in this chapter, please consult the
 
 For a more in-depth discussion of the fundamentals of spatial econometrics and applications in both GUI and command-line software, consult
 
-Anselin, Luc and Sergio Rey. 2014. *Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and PySAL.* GeoDa Press. 
+Anselin, Luc and Sergio Rey. 2014. *Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and Pysal.* GeoDa Press. 
 
 For additional mathematical detail and more extensive treatment of space-time models, consult: 
 

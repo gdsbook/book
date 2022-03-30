@@ -70,18 +70,21 @@ ref.info()
 While the shapes of the geographical units (local authority districts, in this case) are stored in a compressed GeoJSON file. We can read it directly from the `.zip` file as follows:
 
 ```python
-lads = geopandas.read_file("../data/brexit/local_authority_districts.geojson")\
-                .set_index('lad16cd')
+lads = geopandas.read_file(
+    "../data/brexit/local_authority_districts.geojson"
+).set_index('lad16cd')
 lads.info()
 ```
 
 Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes for the Leave alternative. For convenience, let us merge the vote results with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), the preferred choice of web maps, which will allow us to combine them with contextual tiles later:
 
 ```python
-db = geopandas.GeoDataFrame(lads.join(ref[['Pct_Leave']]), crs=lads.crs)\
-              .to_crs(epsg=3857)\
-              [['objectid', 'lad16nm', 'Pct_Leave', 'geometry']]\
-              .dropna()
+db = geopandas.GeoDataFrame(
+    lads.join(
+        ref[['Pct_Leave']]), crs=lads.crs
+    ).to_crs(epsg=3857)[
+        ['objectid', 'lad16nm', 'Pct_Leave', 'geometry']
+    ].dropna()
 db.info()
 ```
 
@@ -89,21 +92,23 @@ And with these elements, we can generate a choropleth map to get a quick sense o
 
 ```python caption="BREXIT Vote: Pct_Leave" tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
-db.plot(column='Pct_Leave', 
-        cmap='viridis', 
-        scheme='quantiles',
-        k=5, 
-        edgecolor='white', 
-        linewidth=0., 
-        alpha=0.75, 
-        legend=True,
-        legend_kwds={"loc": 2},
-        ax=ax
-       )
-contextily.add_basemap(ax, 
-                       crs=db.crs, 
-                       source=contextily.providers.Stamen.TerrainBackground
-                      )
+db.plot(
+    column='Pct_Leave', 
+    cmap='viridis', 
+    scheme='quantiles',
+    k=5, 
+    edgecolor='white', 
+    linewidth=0., 
+    alpha=0.75, 
+    legend=True,
+    legend_kwds={"loc": 2},
+    ax=ax
+)
+contextily.add_basemap(
+    ax, 
+    crs=db.crs, 
+    source=contextily.providers.Stamen.TerrainBackground
+)
 ax.set_axis_off()
 ```
 
@@ -143,17 +148,21 @@ $$
 
 where $w_{ij}$ is the cell in $\textbf{W}$ on the $i$-th row and $j$-th column, thus capturing the spatial relationship between observations $i$ and $j$. $y_{sl-i}$ thus captures the product of the values and weights of each observation other than $i$ in the dataset. Because non-neighbors receive a weight of zero, $y_{sl-i}$ really captures the product of values and weights for $i$'s neighbors. If $\textbf{W}$ is binary, this will amount to the sum of the values of $i$'s neighbors (useful in some contexts, such as studies of market potential); if $W$ is row standardized, a common transformation, then $w_{ij}$ is bounded between zero and one; the spatial lag thus then becomes a "local average," the average value of $Y$ in the neighborhood of each observation $i$. This latter meaning is the one that will enable our analysis of spatial autocorrelation below.
 
-As we will discover throughout this book, the spatial lag is a key element of many spatial analysis techniques and, as such, it is fully supported in PySAL. To compute the spatial lag of a given variable, `Pct_Leave` for example, we can do it as follows:
+As we will discover throughout this book, the spatial lag is a key element of many spatial analysis techniques and, as such, it is fully supported in Pysal. To compute the spatial lag of a given variable, `Pct_Leave` for example, we can do it as follows:
 
 ```python
-db['Pct_Leave_lag'] = weights.spatial_lag.lag_spatial(w, db['Pct_Leave'])
+db['Pct_Leave_lag'] = weights.spatial_lag.lag_spatial(
+    w, db['Pct_Leave']
+)
 ```
 
 Let us peek into two local authority districts to get a better intuition of what is behind the spatial lag:
 
 ```python
-db.loc[['E08000012', 'S12000019'], 
-       ['Pct_Leave', 'Pct_Leave_lag']]
+db.loc[
+    ['E08000012', 'S12000019'], 
+    ['Pct_Leave', 'Pct_Leave_lag']
+]
 ```
 
 The first row (`E08000012`) represents Liverpool, which was a notorious "Remainer" island among the mostly-Leave North of England. Outside of London and Scotland, it was one of the few locations with less than majority to Leave. The second row (`S12000019`) represents Midlothian, in Scotland, where no local authority voted to leave. Although both Liverpool and Midlothian display a similar percentage of population who voted to leave (42% and 38%, respectively), the difference in their spatial lags captures the wider geographical context, which are quite different.
@@ -165,25 +174,43 @@ To end this section visually, the smoothing nature of the lag can be appreciated
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 ax1, ax2 = axs
 
-db.plot(column='Pct_Leave', cmap='viridis', scheme='quantiles',
-        k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax1)
+db.plot(
+    column='Pct_Leave',
+    cmap='viridis',
+    scheme='quantiles',
+    k=5,
+    edgecolor='white',
+    linewidth=0.,
+    alpha=0.75,
+    legend=True,
+    ax=ax1
+)
 ax1.set_axis_off()
 ax1.set_title("% Leave")
-contextily.add_basemap(ax1, 
-                       crs=db.crs, 
-                       source=contextily.providers.Stamen.TerrainBackground,
-                       
-                      )
+contextily.add_basemap(
+    ax1, 
+    crs=db.crs, 
+    source=contextily.providers.Stamen.TerrainBackground,
+)
 
-db.plot(column='Pct_Leave_lag', cmap='viridis', scheme='quantiles',
-        k=5, edgecolor='white', linewidth=0., alpha=0.75, legend=True, ax=ax2)
+db.plot(
+    column='Pct_Leave_lag',
+    cmap='viridis',
+    scheme='quantiles',
+    k=5,
+    edgecolor='white',
+    linewidth=0.,
+    alpha=0.75,
+    legend=True,
+    ax=ax2
+)
 ax2.set_axis_off()
 ax2.set_title("% Leave - Spatial Lag")
-contextily.add_basemap(ax2, 
-                       crs=db.crs, 
-                       source=contextily.providers.Stamen.TerrainBackground,
-                       
-                      )
+contextily.add_basemap(
+    ax2, 
+    crs=db.crs, 
+    source=contextily.providers.Stamen.TerrainBackground,
+)
 
 plt.show()
 ```
@@ -206,15 +233,20 @@ Which we can visualize readily:
 
 ```python caption="BREXIT Leave vote, Leave Majority." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
-db.plot(ax=ax, column='Leave', categorical=True, legend=True, 
-        edgecolor='0.5', linewidth=0.25, cmap='Set3', 
-        figsize=(9, 9));
+db.plot(
+    ax=ax,
+    column='Leave',
+    categorical=True,
+    legend=True, 
+    edgecolor='0.5',
+    linewidth=0.25,
+    cmap='Set3', 
+    figsize=(9, 9)
+)
 ax.set_axis_off()
 ax.set_title('Leave Majority')
 plt.axis('equal')
 plt.show()
-
-
 ```
 
 Visually, it appears that the map represents a clear case of positive spatial autocorrelation: overall, there are few visible cases where a given observation is surrounded by others in the opposite category. To formally explore this initial assessment, we can use what is called a "join count" statistic (JC; {cite}`Cliff1981spatial`). Imagine a checkerboard with green (G, value 0) and yellow (Y, value 1) squares. The idea of the statistic is to count occurrences of green-green (GG), yellow-yellow (YY), or green-yellow/yellow-green (GY) joins (or neighboring pairs) on the map. In this context, both GG and YY reflect positive spatial autocorrelation, while GY captures its negative counterpart. The intuition of the statistic is to provide a baseline of how many GG, YY, and GY one would expect under the case of complete spatial randomness, and to compare this with the observed counts in the dataset. A situation where we observe more GG/YY than expected and less GY than expected would suggest positive spatial autocorrelation; while the opposite, more GY than GG/YY, would point towards negative spatial autocorrelation.
@@ -241,7 +273,7 @@ jc = esda.join_counts.Join_Counts(db['Leave'], w)
 jc
 ```
 
-As it is common throughout PySAL, we are creating an object (`jc`) that holds a lot of information beyond the value of the statistic calculated. For example, we can check how many occurrences of GG we have (note the attribute is `bb`, which originates from the original reference where the two considered classes were black and white):
+As it is common throughout Pysal, we are creating an object (`jc`) that holds a lot of information beyond the value of the statistic calculated. For example, we can check how many occurrences of GG we have (note the attribute is `bb`, which originates from the original reference where the two considered classes were black and white):
 
 ```python
 jc.bb
@@ -281,7 +313,7 @@ and for GY joins:
 jc.mean_bw
 ```
 
-Statistical inference to obtain a sense of whether these values are likely to come from random chance or not can be accessed using random spatial permutations of the observed values to create synthetic maps under the null hypothesis of complete spatial randomness. `pysal` generates 999 such synthetic patterns and then uses the distribution of join counts from these patterns to generate  pseudo-pvalues for our observed join count statistics:
+Statistical inference to obtain a sense of whether these values are likely to come from random chance or not can be accessed using random spatial permutations of the observed values to create synthetic maps under the null hypothesis of complete spatial randomness. `esda` generates 999 such synthetic patterns and then uses the distribution of join counts from these patterns to generate  pseudo-pvalues for our observed join count statistics:
 
 ```python
 jc.p_sim_bb
@@ -318,8 +350,13 @@ Technically speaking, creating a Moran Plot is very similar to creating any othe
 
 ```python caption="BREXIT Leave vote, % leave Moran Scatter Plot." tags=[]
 f, ax = plt.subplots(1, figsize=(6, 6))
-seaborn.regplot(x='Pct_Leave_std', y='Pct_Leave_lag_std', 
-                ci=None, data=db, line_kws={'color':'r'})
+seaborn.regplot(
+    x='Pct_Leave_std',
+    y='Pct_Leave_lag_std', 
+    ci=None,
+    data=db,
+    line_kws={'color':'r'}
+)
 ax.axvline(0, c='k', alpha=0.5)
 ax.axhline(0, c='k', alpha=0.5)
 ax.set_title('Moran Plot - % Leave')
@@ -335,7 +372,7 @@ The Moran Plot is an excellent tool to explore the data and get a good sense of 
 
 Very much in the same way the mean summarizes a crucial element of the distribution of values in a non-spatial setting, so does Moran's I for a spatial dataset. Continuing the comparison, we can think of the mean as a single numerical value summarizing a histogram or a kernel density plot. Similarly, Moran's I captures much of the essence of the Moran Plot. In fact, there is a close connection between the two: the value of Moran's I corresponds with the slope of the linear fit overlayed on top of the Moran Plot.
 
-In order to calculate Moran's I in our dataset, we can call a specific function in PySAL directly (before that, let us row standardized the `w` object again):
+In order to calculate Moran's I in our dataset, we can call a specific function in `esda` directly (before that, let us row standardized the `w` object again):
 
 ```python
 w.transform = 'R'
@@ -348,7 +385,7 @@ The method `Moran` creates an object that contains much more information than th
 moran.I
 ```
 
-The other bit of information we will extract from Moran's I relates to statistical inference: how likely is the pattern we observe in the map and Moran's I captures in its value to be generated by an entirely random process? If we considered the same variable but shuffled its locations randomly, would we obtain a map with similar characteristics? To obtain insight into these questions, PySAL performs a simulation and returns a measure of certainty about how likely it is to obtain a pattern like the one we observe under a spatially random process.  This is summarized in the `p_sim` attribute:
+The other bit of information we will extract from Moran's I relates to statistical inference: how likely is the pattern we observe in the map and Moran's I captures in its value to be generated by an entirely random process? If we considered the same variable but shuffled its locations randomly, would we obtain a map with similar characteristics? To obtain insight into these questions, `esda` performs a simulation and returns a measure of certainty about how likely it is to obtain a pattern like the one we observe under a spatially random process.  This is summarized in the `p_sim` attribute:
 
 ```python
 moran.p_sim
@@ -356,9 +393,9 @@ moran.p_sim
 
 The value is calculated as an empirical p-value that represents the proportion of realizations in the simulation under spatial randomness that are more extreme than the observed value. A small enough p-value associated with the Moran's I of a map allows to reject the hypothesis that the map is random. In other words, we can conclude that the map displays more spatial pattern than we would expect if the values had been randomly allocated to a locations.
 
-That is a very low value, particularly considering it is actually the minimum value we could have obtained given the simulation behind it used 999 permutations (default in `PySAL`) and, by standard terms, it would be deemed statistically significant. We can elaborate a bit further on the intuition behind the value of `p_sim`. If we generated a large number of maps with the same values but randomly allocated over space, and calculated the Moran's I statistic for each of those maps, only 0.01% of them would display a larger (absolute) value than the one we obtain from the observed data, and the other 99.99% of the random maps would receive a smaller (absolute) value of Moran's I. If we remember again that the value of Moran's I can also be interpreted as the slope of the Moran Plot, what we have is that, in this case, the particular spatial arrangement of values over space we observe for the percentage of Leave votes is more concentrated than if we were to randomly shuffle the vote proportions among the map, hence the statistical significance. As a first step, the global autocorrelation analysis can teach us that observations do seem to be positively autocorrelated over space. Indeed, the overall spatial pattern in the EU Referendum vote was highly marked: nearby areas tended to vote alike.
+That is a very low value, particularly considering it is actually the minimum value we could have obtained given the simulation behind it used 999 permutations (default in `esda`) and, by standard terms, it would be deemed statistically significant. We can elaborate a bit further on the intuition behind the value of `p_sim`. If we generated a large number of maps with the same values but randomly allocated over space, and calculated the Moran's I statistic for each of those maps, only 0.01% of them would display a larger (absolute) value than the one we obtain from the observed data, and the other 99.99% of the random maps would receive a smaller (absolute) value of Moran's I. If we remember again that the value of Moran's I can also be interpreted as the slope of the Moran Plot, what we have is that, in this case, the particular spatial arrangement of values over space we observe for the percentage of Leave votes is more concentrated than if we were to randomly shuffle the vote proportions among the map, hence the statistical significance. As a first step, the global autocorrelation analysis can teach us that observations do seem to be positively autocorrelated over space. Indeed, the overall spatial pattern in the EU Referendum vote was highly marked: nearby areas tended to vote alike.
 
-Thanks to the `splot` visualization module in PySAL, we can obtain a quick representation of the statistic that combines the Moran Plot (right) with a graphic of the empirical test that we carry out to obtain `p_sim` (left):
+Thanks to the `splot` visualization module in Pysal, we can obtain a quick representation of the statistic that combines the Moran Plot (right) with a graphic of the empirical test that we carry out to obtain `p_sim` (left):
 
 ```python caption="BREXIT Leave vote, Moran's I distribution and Scatter Plot." tags=[]
 plot_moran(moran);
@@ -385,7 +422,7 @@ $$
 
 where $n$ is the number of observations, $w_{ij}$ is the cell in a binary matrix $W$ expressing whether $i$ and $j$ are neighbors ($w_{ij}=1$) or not ($w_{ij}=1$), $y_i$ is the $i$-th observation of the variable of interest, and $\bar{y}$ is its sample mean. When compared to Moran's I, it is apparent both measures compare the relationship of $Y$ within each observation's local neighborhood to that over the entire sample. However, there are also subtle differences. While Moran's I takes cross-products on the standardized values, Geary's C uses differences on the values without any standardization. 
 
-Computationally, Geary's C is more demanding, but it can be easily computed using PySAL:
+Computationally, Geary's C is more demanding, but it can be easily computed using `esda`:
 
 ```python
 geary = esda.geary.Geary(db['Pct_Leave'], w)
