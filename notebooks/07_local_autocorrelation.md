@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -402,7 +402,7 @@ As the local statistics they are, it is best to explore them by plotting them on
 Unlike with LISAs, `splot` does not support vislualisation of G statistics at this point. To visualise their output, we will instead write a little function that generates the map from the statistic's output object and its set of associated geometries:
 
 ```python
-def g_map(g, geog, ax):
+def g_map(g, db, ax):
     '''
     Create a cluster map
     ...
@@ -411,7 +411,7 @@ def g_map(g, geog, ax):
     ---------
     g      : G_Local
              Object from the computation of the G statistic
-    geog   : GeoDataFrame
+    db     : GeoDataFrame
              Table aligned with values in `g` and containing 
              the geometries to plot
     ax     : AxesSubplot
