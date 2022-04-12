@@ -735,7 +735,7 @@ P_i = \alpha + \sum_k \mathbf{X}_{ik}\beta_k  + \epsilon_i
 P = \alpha + \mathbf{X}\beta + \epsilon
 \]</div>
 <p>A regression can be seen as a multivariate extension of bivariate correlations. Indeed, one way to interpret the <span class="math notranslate nohighlight">\(\beta_k\)</span> coefficients in the equation above is as the degree of correlation between the explanatory variable <span class="math notranslate nohighlight">\(k\)</span> and the dependent variable, <em>keeping all the other explanatory variables constant</em>. When one calculates bivariate correlations, the coefficient of a variable is picking up the correlation between the variables, but it is also subsuming into it variation associated with other correlated variables – also called confounding factors. Regression allows us to isolate the distinct effect that a single variable has on the dependent one, once we <em>control</em> for those other variables.</p>
-<p>Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>, <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>). We will import the <code class="docutils literal notranslate"><span class="pre">spreg</span></code> module in PySAL:</p>
+<p>Practically speaking, linear regressions in Python are rather streamlined and easy to work with. There are also several packages which will run them (e.g. <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>, <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, <code class="docutils literal notranslate"><span class="pre">pysal</span></code>). We will import the <code class="docutils literal notranslate"><span class="pre">spreg</span></code> module in Pysal:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pysal.model</span> <span class="kn">import</span> <span class="n">spreg</span>
@@ -743,7 +743,7 @@ P = \alpha + \mathbf{X}\beta + \epsilon
 </div>
 </div>
 </div>
-<p>In the context of this chapter, it makes sense to start with <code class="docutils literal notranslate"><span class="pre">PySAL</span></code> as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with <span class="math notranslate nohighlight">\(X\)</span> as the list defined, we only need the following line of code:</p>
+<p>In the context of this chapter, it makes sense to start with <code class="docutils literal notranslate"><span class="pre">spreg</span></code> as that is the only library that will allow us to move into explicitly spatial econometric models. To fit the model specified in the equation above with <span class="math notranslate nohighlight">\(X\)</span> as the list defined, we only need the following line of code:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fit OLS model</span>
@@ -1045,7 +1045,7 @@ Often, this reflects the fact that processes are not the same everywhere in the 
 </div>
 </div>
 </div>
-<p>And then fit the model using the OLS class in PySAL’s <code class="docutils literal notranslate"><span class="pre">spreg</span></code>:</p>
+<p>And then fit the model using the OLS class in Pysal’s <code class="docutils literal notranslate"><span class="pre">spreg</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m2</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS</span><span class="p">(</span>
@@ -1260,7 +1260,7 @@ Often, this reflects the fact that processes are not the same everywhere in the 
 \]</div>
 <p>where the main difference is that we are now allowing the constant term, <span class="math notranslate nohighlight">\(\alpha\)</span>, to vary by neighborhood <span class="math notranslate nohighlight">\(r\)</span>, <span class="math notranslate nohighlight">\(\alpha_r\)</span>.</p>
 <p>Programmatically, we will show two different ways we can estimate this: one,
-using <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>; and two, with <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>. First, we will use <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>, the econometrician’s toolbox in Python.</p>
+using <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>; and two, with <code class="docutils literal notranslate"><span class="pre">spreg</span></code>. First, we will use <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>, the econometrician’s toolbox in Python.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">sm</span>
@@ -1607,10 +1607,10 @@ using <code class="docutils literal notranslate"><span class="pre">statsmodels</
 </div></div></div>
 </div>
 <p>The approach above shows how spatial FE are a particular case of a linear regression with a categorical  variable. Neighborhood membership is modeled using binary dummy variables. Thanks to the formula grammar used in <code class="docutils literal notranslate"><span class="pre">statsmodels</span></code>, we can express the model abstractly, and Python parses it, appropriately creating binary variables as required.</p>
-<p>The second approach leverages <code class="docutils literal notranslate"><span class="pre">PySAL</span></code> Regimes functionality. We will see regimes below but, for now, think of them as a generalisation of spatial fixed effects where not only <span class="math notranslate nohighlight">\(\alpha\)</span> can vary. This framework allows the user to specify which variables are to be estimated separately for each group. In this case, instead of describing the model in a formula, we need to pass each element of the model as separate arguments.</p>
+<p>The second approach leverages <code class="docutils literal notranslate"><span class="pre">spreg</span></code> Regimes functionality. We will see regimes below but, for now, think of them as a generalisation of spatial fixed effects where not only <span class="math notranslate nohighlight">\(\alpha\)</span> can vary. This framework allows the user to specify which variables are to be estimated separately for each group. In this case, instead of describing the model in a formula, we need to pass each element of the model as separate arguments.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># PySAL spatial fixed effect implementation</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># spreg spatial fixed effect implementation</span>
 <span class="n">m4</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span>
     <span class="c1"># Dependent variable</span>
     <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
@@ -1806,10 +1806,10 @@ dtype: float64
 \]</div>
 <p>where we are not only allowing the constant term to vary by region (<span class="math notranslate nohighlight">\(\alpha_r\)</span>), but also every other parameter (<span class="math notranslate nohighlight">\(\beta_{k-r}\)</span>).</p>
 <p>To illustrate this approach, we will use the “spatial differentiator” of whether a house is in a coastal neighborhood or not (<code class="docutils literal notranslate"><span class="pre">coastal_neig</span></code>) to define the regimes. The rationale behind this choice is that renting a house close to the ocean might be a strong enough pull that people might be willing to pay at different <em>rates</em> for each of the house’s characteristics.</p>
-<p>To implement this in Python, we use the <code class="docutils literal notranslate"><span class="pre">OLS_Regimes</span></code> class in <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>, which does most of the heavy lifting for us:</p>
+<p>To implement this in Python, we use the <code class="docutils literal notranslate"><span class="pre">OLS_Regimes</span></code> class in <code class="docutils literal notranslate"><span class="pre">spreg</span></code>, which does most of the heavy lifting for us:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># PySAL spatial regimes implementation</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pysal spatial regimes implementation</span>
 <span class="n">m5</span> <span class="o">=</span> <span class="n">spreg</span><span class="o">.</span><span class="n">OLS_Regimes</span><span class="p">(</span>
     <span class="c1"># Dependent variable</span>
     <span class="n">db</span><span class="p">[[</span><span class="s1">&#39;log_price&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> 
@@ -2196,7 +2196,7 @@ Thus, to discover the exact indirect effect of a change <span class="math notran
 at a specific site <span class="math notranslate nohighlight">\(x_i\)</span> you would need to compute the <em>change in the spatial lag</em>,
 and then use that as your <em>change</em> in <span class="math notranslate nohighlight">\(X\)</span>. We will discuss this in the following section.</p>
 <p>In Python, we can calculate the spatial lag of each variable whose name starts by <code class="docutils literal notranslate"><span class="pre">pg_</span></code>
-by first creating a list of all of those names, and then applying <code class="docutils literal notranslate"><span class="pre">PySAL</span></code>’s
+by first creating a list of all of those names, and then applying <code class="docutils literal notranslate"><span class="pre">pysal</span></code>’s
 <code class="docutils literal notranslate"><span class="pre">lag_spatial</span></code> to each of them:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2621,7 +2621,7 @@ u_i = \lambda u_{lag-i} + \epsilon_i
 <p>where <span class="math notranslate nohighlight">\(u_{lag-i} = \sum_j w_{i,j} u_j\)</span>.
 Although it appears similar, this specification violates the assumptions about the
 error term in a classical OLS model. Hence, alternative estimation methods are
-required. <code class="docutils literal notranslate"><span class="pre">PySAL</span></code> incorporates functionality to estimate several of the most
+required. Pysal incorporates functionality to estimate several of the most
 advanced techniques developed by the literature on spatial econometrics. For
 example, we can use a general method of moments that account for
 heteroskedasticity <span id="id7">[<a class="reference internal" href="references.html#id7" title="Irani Arraiz, David M. Drukker, Harry H. Kelejian, and Ingmar R. Prucha. A spatial Cliff-Ord-type model with heteroskedastic innovations: Small and large sample results. Journal of Regional Science, 50(2):592–614, 2010.">ADKP10</a>]</span>:</p>
@@ -2715,7 +2715,7 @@ Put simply, this occurs when <span class="math notranslate nohighlight">\(P_i\)<
 In theory, since <span class="math notranslate nohighlight">\(P_i\)</span> is included in computing <span class="math notranslate nohighlight">\(P_{lag-i}\)</span>, exogeneity is violated.
 Similarly to the case of
 the spatial error, several techniques have been proposed to overcome this
-limitation, and <code class="docutils literal notranslate"><span class="pre">PySAL</span></code> implements several of them. In the example below, we
+limitation, and Pysal implements several of them. In the example below, we
 use a two-stage least squares estimation <span id="id8">[<a class="reference internal" href="references.html#id8" title="Luc Anselin. Spatial Econometrics: Methods and Models. Springer Netherlands, 1988. ISBN 9789401577991. URL: http://dx.doi.org/10.1007/978-94-015-7799-1, doi:10.1007/978-94-015-7799-1.">Ans88</a>]</span>, where the spatial
 lag of all the explanatory variables is used as instrument for the endogenous
 lag:</p>
@@ -3018,7 +3018,7 @@ This means that our over- and under-predictions are likely to cluster.</p>
 <h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
 <p>For additional reading on the topics covered in this chapter, please consult the following resources:</p>
 <p>For a more in-depth discussion of the fundamentals of spatial econometrics and applications in both GUI and command-line software, consult</p>
-<p>Anselin, Luc and Sergio Rey. 2014. <em>Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and PySAL.</em> GeoDa Press.</p>
+<p>Anselin, Luc and Sergio Rey. 2014. <em>Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and Pysal.</em> GeoDa Press.</p>
 <p>For additional mathematical detail and more extensive treatment of space-time models, consult:</p>
 <p>Cressie, Noel and Christopher N. Wikle. 2011. <em>Statistics for Spatio-Temporal Data</em>. Singapore: Wiley Press.</p>
 <p>For an alternative perspective on regression and critique of the spatial econometric perspective, consider:</p>
