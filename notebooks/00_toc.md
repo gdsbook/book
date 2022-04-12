@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
@@ -14,6 +14,8 @@ jupyter:
 ---
 
 # Table of Contents
+
+- [Prologue](prologue)
 
 ## Part I: Building Blocks
 
@@ -36,4 +38,7 @@ jupyter:
 - [Spatial Regression](11_regression)
 - [Spatial Feature Engineering](12_feature_engineering)
 
+## Endmatter
 
+- [Epilogue](epilogue)
+- [References](references)
