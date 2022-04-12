@@ -600,7 +600,7 @@ containerised platform for geographic data science. It relies on the official
 Jupyter Docker release and builds on top of it a large set of libraries and add-on's
 that make the life of the geographic data scientist easier. A new version of
 the container including the most recent versions of libraries is released twice a
-year. We have released the book using version `6.1`, but it is likely later versions
+year. We have released the book using version `7.0` (we wrote much of it with `6.1` and also worked), but it is likely later versions
 will work as well.
 
 Downloading the container is akin to installing the
@@ -628,7 +628,7 @@ you check those two boxes, you are ready to go. Here are the steps to take:
    following command:
 
    ```shell
-   docker pull darribas/gds_py:6.1
+   docker pull darribas/gds_py:7.0
    ```
 
 That's it! Once the command above completes, you have all the software you
@@ -642,7 +642,7 @@ docker run \
         -ti \
         -p 8888:8888 \
         -v ${PWD}:/home/jovyan/work \
-        darribas/gds_py:6.1
+        darribas/gds_py:7.0
 ```
 
 Let's unpack the command so we understand everything that is going on here to
@@ -666,8 +666,8 @@ get further insight into how the container works:
   `D`irectory) into the
   container so it is visible and editable from inside the container. Such
   folder will be available at the container's `work` folder.
-- `darribas/gds_py:6.1`: this specifies which container we want to run. In this
-  example, we run the `6.1` version of the `gds_py` container. Depending on when
+- `darribas/gds_py:7.0`: this specifies which container we want to run. In this
+  example, we run the `7.0` version of the `gds_py` container. Depending on when
   you read this, there might be a more recent version that you can try.
 
 The command above will generate output that will look, more or less, like the

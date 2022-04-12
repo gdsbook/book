@@ -8,7 +8,7 @@ lab:
 			   -e NB_UID=$UID \
 			   -e NB_GID=100 \
                -v ${PWD}:/home/jovyan/work \
-               darribas/gds_dev:6.1
+               darribas/gds_dev:7.0
 lablocal:
 	docker run --rm \
                -p 4000:4000 \
@@ -17,7 +17,7 @@ lablocal:
 			   -e NB_UID=1000 \
 			   -e NB_GID=1000 \
                -v ${PWD}:/home/jovyan/work \
-               darribas/gds_dev:6.1
+               darribas/gds_dev:7.0
 
     
     
