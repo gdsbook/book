@@ -8,7 +8,7 @@ jupyter:
       format_version: '1.3'
       jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -529,7 +529,7 @@ However, this approach quickly gets out of hand: more detailed profiles can simp
 return to an unwieldy mess of numbers. A better way of constructing
 cluster profiles is to draw the distributions of cluster members' data.
 To do this we need to "tidy up" the dataset. A tidy dataset {cite}`wickham2014tidy`
-is one where every row is an observation, and every column is a variable. This is akin to the long-format refered to in [Chapter 10](09_spatial_inequality), and contrasts with the wide-format we used when looking at inequality over time. A few steps are required  to tidy up our labeled data:
+is one where every row is an observation, and every column is a variable. This is akin to the long-format refered to in [Chapter 9](09_spatial_inequality), and contrasts with the wide-format we used when looking at inequality over time. A few steps are required  to tidy up our labeled data:
 
 ```python
 # Index db on cluster ID

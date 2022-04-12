@@ -8,7 +8,7 @@ jupyter:
       format_version: '1.3'
       jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -800,7 +800,7 @@ crosstab
 
 From the table we can see the most common case (N=3067) is properties with one bedroom surrounded mostly by other properties with also only one bedroom. Similarly we also find out, for example, that the two properties with ten bedrooms in the dataset are surrounded by properties with mostly two bedrooms. The remaining cells in the table can be interpreted in a similar fashion.
 
-If more complicated statistics are required, it can help to re-express the construction of summary statistics as a *reduction* of the *adjacency list* representation of our weights, as done in [Chapter 3](03_spatial_data). To recap, the *adjacency list* is a `pandas.DataFrame` where each row contains a single link in our graph. It contains the identifier for some `focal` observation, the identifier for some `neighbor` observation, and a value for the `weight` of the link that connects the `focal` and `neighbor`:
+If more complicated statistics are required, it can help to re-express the construction of summary statistics as a *reduction* of the *adjacency list* representation of our weights, as done in [Chapter 4](04_spatial_weights). To recap, the *adjacency list* is a `pandas.DataFrame` where each row contains a single link in our graph. It contains the identifier for some `focal` observation, the identifier for some `neighbor` observation, and a value for the `weight` of the link that connects the `focal` and `neighbor`:
 
 ```python
 adjlist = d500_w.to_adjlist()
