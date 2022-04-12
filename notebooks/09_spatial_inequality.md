@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.11.5
   kernelspec:
     display_name: Python 3
     language: python
@@ -217,7 +217,7 @@ The evolution of the ratio has a U-shaped pattern over time, bottoming out aroun
 <!-- #endregion -->
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
-In addition to the 20/20 ratio, we will explore two more traditional measures of inequality: the Gini and Theil's indices. For these, we will use the `inequality` package from `pysal`.
+In addition to the 20/20 ratio, we will explore two more traditional measures of inequality: the Gini and Theil's indices. For these, we will use the `inequality` package from Pysal.
 <!-- #endregion -->
 
 
@@ -344,7 +344,7 @@ def gini_by_col(column):
     return inequality.gini.Gini(column.values).g
 ```
 
-PySAL's Gini requires an `numpy.ndarray` rather than a `pandas.Series` object, which we can pull out through the `values` attribute. This is passed to the `Gini` class, and we only return the value of the coefficient as a `DataFrame` object.
+`inequality`'s Gini requires an `numpy.ndarray` rather than a `pandas.Series` object, which we can pull out through the `values` attribute. This is passed to the `Gini` class, and we only return the value of the coefficient as a `DataFrame` object.
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 inequalities = pci_df[years].apply(gini_by_col, axis=0).to_frame('gini')
@@ -370,7 +370,7 @@ $$T = \sum_{i=1}^m \left( \frac{y_i}{\sum_{i=1}^m y_i} \ln \left[ m \frac{y_i}{\
 
 where $y_i$ is per capita income in area $i$ among $m$ areas. Conceptually, this metric is related to the entropy of the income distribution, measuring how evenly-distributed incomes are across the population.
 
-The Theil index is also available in PySAL's `inequality`, so we can take a similar approach as above to calculate it for every year:
+The Theil index is also available in Pysal's `inequality`, so we can take a similar approach as above to calculate it for every year:
 
 ```python
 def theil(column):
@@ -600,7 +600,7 @@ explicitly considered in the second component.[^weight]
 
 
 
-Once we have covered the decomposition conceptually, the technical implementation is straightforward thanks to the `inequality` module of PySAL, and the `TheilD` class:
+Once we have covered the decomposition conceptually, the technical implementation is straightforward thanks to the `inequality` package of Pysal, and the `TheilD` class:
 
 ```python
 theil_dr = inequality.theil.TheilD(pci_df[years].values, pci_df.Region)

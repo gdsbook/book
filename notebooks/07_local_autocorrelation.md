@@ -180,7 +180,7 @@ where $m_2$ is the second moment (variance) of the distribution of values in the
 LISAs are widely used in many fields to identify geographical clusters of values or find geographical outliers. They are a useful tool that can quickly return areas in which values are concentrated and provide suggestive evidence about the processes that might be at work. For these reasons, they have a prime place in the geographic data science toolbox. Among many other applications, LISAs have been used to identify geographical clusters of poverty {cite}`Dawson2018`, map ethnic enclaves {cite}`Johnston2010EPA`, delineate areas of particularly high/low economic activity {cite}`Torres2014`, or identify clusters of contagious disease {cite}`zhang2020`. The Local Moran's $I_i$ statistic is only one of a wide variety of LISAs that can be used on many different types of spatial data.
 <!-- #endregion -->
 
-In Python, we can calculate LISAs in a very streamlined way thanks to `PySAL`. To compute local Moran statistics, we use the `Moran_Local` function:
+In Python, we can calculate LISAs in a very streamlined way thanks to `esda`. To compute local Moran statistics, we use the `Moran_Local` function:
 
 ```python
 lisa = esda.moran.Moran_Local(db['Pct_Leave'], w)
@@ -203,7 +203,7 @@ The values in the left tail of the density represent locations displaying negati
 
 Because of their very nature, looking at the numerical result of LISAs is not always the most useful way to exploit all the information they can provide. Remember we are calculating a statistic for every single observation in the data so, if we have many of them, it will be difficult to extract any meaningful pattern. In this context, a choropleth can help. At first glance, this may seem to suggest that a choropleth of the $I_i$  values would be a useful way to visualize the spatial distribution. We can see such map in the top-left panel of the figure below and, while it tells us whether the local association is positive (HH/LL) or negative (HL/LH), it cannot tell, for example, whether the yellow areas in Scotland are similar to those in the eastern cluster of yellow areas. Are the two experiencing similar patterns of spatial association, or is one of them HH and the other LL? Also, we know that values around zero will not be statistically significant. Which local statistics are thus significant and which ones non-significant from a statistical point of view? In other words, which ones can be considered statistical clusters and which ones mere noise?
 
-To answer these questions, we need to bring in additional information that we have computed when calculating the LISA statistics. We do this in four acts. The first one we have already mentioned: a straighforward choropleth of the local statistic of each area. The other three include information on the quadrant each area is assigned into, whether the statistic is considered significant or not, and a combination of those two in a single so-called _cluster_ map. A handy tool in this context is the `splot` library, part of the PySAL family, which provides a lightweight visualisation layer for spatial statistics:
+To answer these questions, we need to bring in additional information that we have computed when calculating the LISA statistics. We do this in four acts. The first one we have already mentioned: a straighforward choropleth of the local statistic of each area. The other three include information on the quadrant each area is assigned into, whether the statistic is considered significant or not, and a combination of those two in a single so-called _cluster_ map. A handy tool in this context is the `splot` library, part of the Pysal family, which provides a lightweight visualisation layer for spatial statistics:
 
 ```python
 from splot import esda as esdaplot
@@ -351,7 +351,7 @@ db[['sig','p-sim']].tail()
 
 Thus, the first five values are statistically significant, while the last five observations are not.
 
-Let us stop for a second on these two steps. First, we consider the `sig` column. Akin to global Moran's I, `PySAL` automatically computes a pseudo p-value for each LISA. Because some instances of the LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar value in random maps. A few different ways of generating random maps are considered by `PySAL`, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. In addition, we follow a similar reasoning as with global Moran's I and use 5% as the threshold for statistical significance. To identify these values, we create a variable, `sig`, that contains `True` if the p-value of the observation satisfies the condition, and `False` otherwise.
+Let us stop for a second on these two steps. First, we consider the `sig` column. Akin to global Moran's I, `esda` automatically computes a pseudo p-value for each LISA. Because some instances of the LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar value in random maps. A few different ways of generating random maps are considered by `esda`, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. In addition, we follow a similar reasoning as with global Moran's I and use 5% as the threshold for statistical significance. To identify these values, we create a variable, `sig`, that contains `True` if the p-value of the observation satisfies the condition, and `False` otherwise.
 
 Next, we construct our quadrant values using the `q` attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure `sig`, so only observations in a quadrant that are considered significant are labeled as part of that given quadrant. The remainder are labelled as non-significant.
 
@@ -388,7 +388,7 @@ This shows, for one, that most local statistics are *not* statistically signific
 
 ## Getis and Ord's local statistics
 
-Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `PySAL` includes Getis and Ord's $G_i$-type statistics. These are a different kind of local statistic which are commonly used in two forms: the $G_i$ statistic, which omits the value at a site in its local summary, and the $G_i^*$, which includes the site's own value in the local summary. The way to calculate them also follows similar patterns as with the Local Moran's $I_i$ statistics above. Let us see how that would look like for our Brexit example:
+Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `esda` includes Getis and Ord's $G_i$-type statistics. These are a different kind of local statistic which are commonly used in two forms: the $G_i$ statistic, which omits the value at a site in its local summary, and the $G_i^*$, which includes the site's own value in the local summary. The way to calculate them also follows similar patterns as with the Local Moran's $I_i$ statistics above. Let us see how that would look like for our Brexit example:
 
 ```python
 # Gi
@@ -524,7 +524,7 @@ There is quite a bit going on in those lines of code, so let's unpack them:
 
 1. The first step (line 3) is to convert the values from integers into floats. To do this, we access the sparse matrix at the core of `w_surface_sp` (which holds all the main data) and convert it to floats using `astype`.
 1. Then we convert that sparse matrix into a `WSP` object (line 2), which is a thin wrapper, so the operation is quick.
-1. Once represented as a `WSP`, we can use PySAL again to convert it into a full-fledge `W` object using the `WSP2W` utility. This step may take a bit more of computing muscle.
+1. Once represented as a `WSP`, we can use Pysal again to convert it into a full-fledge `W` object using the `WSP2W` utility. This step may take a bit more of computing muscle.
 1. Finally, spatial weights from surfaces include an `index` object that will help us later return data into a surface data structure. Since this is lost with the transformations, we reattach it in the final line (line 6) from the original object.
 
 This leaves us with a weights object (`w_surface`) we can work with for the LISA. Next is to recast the values from the original data structure to one that `Moran_Local` will understand. This happens in the next code snippet:
@@ -555,7 +555,7 @@ pop_lisa = esda.moran.Moran_Local(
 
 Note that, before computing the LISA, we ensure the population values are _also_ expressed as floats and thus in line with those in our spatial weights.
 
-Now we have computed the LISA, on to visualisation. For this, we need to express the results as a surface rather than as a table, for which we will use the bridge built in PySAL:
+Now we have computed the LISA, on to visualisation. For this, we need to express the results as a surface rather than as a table, for which we will use the bridge built in `pysal`:
 
 ```python
 from libpysal.weights import raster

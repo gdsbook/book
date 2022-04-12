@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.11.5
   kernelspec:
     display_name: Python 3
     language: python
@@ -1257,6 +1257,6 @@ Spatial weights are central to how we *represent* spatial relationships in mathe
 
 ## Next Steps
 
-For additional reading and further information on the topic of networks and spatial weights matrices, consider Chapter 3 of Anselin and Rey, *Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and PySAL*. Further, for more general thinking on networks in geography, consider: 
+For additional reading and further information on the topic of networks and spatial weights matrices, consider Chapter 3 of Anselin and Rey, *Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and Pysal*. Further, for more general thinking on networks in geography, consider: 
 
 Uitermark, Justus and Michiel van Meeteren. 2021. "Geographcial Network Analysis." *Tijdschrift voor economische en sociale geografie* 112: 337-350. 
