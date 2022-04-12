@@ -7,7 +7,7 @@ This documents the creation of the data set `uscountypcincome.gpkg` that contain
 The original files have been archived at [gdsbook/data\_archive/us\_county_income](https://github.com/gdsbook/data_archive) and include:
 
 - `CANINC1.zip`, which includes attribute data for per capita income for US counties 1969-2017
-- `tl_2019_us_county.zip`, with the geometries for each countie
+- `tl_2019_us_county.zip`, with the geometries for each county
 
 The data archive has urls back to the original sources for the downloads.
 
