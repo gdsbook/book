@@ -8,7 +8,7 @@ jupyter:
       format_version: '1.3'
       jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -97,17 +97,17 @@ Despite the fact that `centroid` is a geometry (you can tell because each cell s
 
 ```python caption="Plotting centroids and boundaries of polygon geometries." tags=[]
 # Plot centroids
-ax = gt_polygons.set_geometry('centroid')\
-                .plot('ADMIN', 
-                      markersize=5
-                     )
+ax = gt_polygons.set_geometry(
+    'centroid'
+).plot('ADMIN', markersize=5)
 # Plot polygons without color filling
-gt_polygons.plot('ADMIN', 
-                 ax=ax, 
-                 facecolor='none', 
-                 edgecolor='k', 
-                 linewidth=.2
-                );
+gt_polygons.plot(
+    'ADMIN', 
+    ax=ax, 
+    facecolor='none', 
+    edgecolor='k', 
+    linewidth=.2
+);
 ```
 
 Note again how we can create a map by calling `.plot()` on a `GeoDataFrame`. We can thematically color each feature based on a column by passing the name of that column to the plot method (as we do on with `ADMIN` in this case), and that the current geometry is used.
@@ -155,19 +155,20 @@ gt_points.head()
 Many point datasets are provided in this format. To make the most of them, it is convenient to convert them into `GeoDataFrame` tables. There are two steps involved in this process. First, we turn the raw coordinates into geometries:
 
 ```python
-pt_geoms = geopandas.points_from_xy(x=gt_points["longitude"],
-                                    y=gt_points["latitude"],
-                                    # x,y are Earth longitude & latitude
-                                    crs="EPSG:4326"
-                                   )
+pt_geoms = geopandas.points_from_xy(
+    x=gt_points["longitude"],
+    y=gt_points["latitude"],
+    # x,y are Earth longitude & latitude
+    crs="EPSG:4326"
+)
 ```
 
 Second, we create a `GeoDataFrame` object using these geometries:
 
 ```python
-gt_points = geopandas.GeoDataFrame(gt_points,
-                                   geometry=pt_geoms
-                                  )
+gt_points = geopandas.GeoDataFrame(
+    gt_points, geometry=pt_geoms
+)
 ```
 
 And now `gt_points` looks and feels exactly like the one of countries we have seen before, with the difference the `geometry` column stores `POINT` geometries:
@@ -229,9 +230,11 @@ pop.sel(band=1).plot();
 This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g., `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
 
 ```python tags=[] caption="Population surface of Sao Paulo, Brazil omitting NAN values."
-pop.where(pop!=-200)\
-   .sel(band=1)\
-   .plot(cmap="RdPu");
+pop.where(
+    pop!=-200
+).sel(
+    band=1
+).plot(cmap="RdPu");
 ```
 
 The colorbar now looks more sensible, and indicates *real* counts, rather than including the missing data placeholder values.
@@ -304,17 +307,23 @@ list(graph.adj[1520546819].keys())
 
 Thus, networks are easy to represent in Python, and are one of the three main data structures in geographic data science. 
 
+
+
+
 ## Hybrids
 
 We have just seen how geographic tables, surfaces, and networks map onto `GeoDataFrame`, `DataArray` and `Graph` objects in Python, respectively. These represent the conventional pairings that align data models to data structures with Python representations. However, while the conventional pairings are well-used, there are others in active use and many more to yet be developed. Interestingly, many new pairings are driven by new developments in technology, enabling approaches that were not possible in the past or creating situations (e.g., large datasets) that make the conventional approach limiting. Therefore, in this second section of the chapter, we step a bit "out of the box" to explore cases in which it may make sense to represent a dataset with a data structure that might not be the most obvious initial choice. 
 
+
+
 ### Surfaces as tables
 
-The first case we explore is treating surfaces as (geo-)tables. In this context, we shift from an approach where each dimension has a clear mapping to a spatial or temporal aspect of the dataset, to one where each sample, cell of the surface/cube is represented as a row in a table. This approach runs contrary to the general consensus that fields are best represented as surfaces or rasters because that allows us to index space and time "by default" based on the location of values within the data structure. Shifting to a tabular structure implies either losing that space-time reference, or having to build it manually with auxiliary objects (e.g., a spatial graph). In almost any case, operating on this format is less efficient than it *could* be if we had bespoke algorithms built around surface structures. Finally, from a more conceptual point of view, treating pixels as independent realizations of a process that we *know* is continuous is can be computationally inefficient and statistically flawed. 
+The first case we explore is treating surfaces as (geo-)tables. In this context, we shift from an approach where each dimension has a clear mapping to a spatial or temporal aspect of the dataset, to one where each sample, cell of the surface/cube is represented as a row in a table. This approach runs contrary to the general consensus that fields are best represented as surfaces or rasters because that allows us to index space and time "by default" based on the location of values within the data structure. Shifting to a tabular structure implies either losing that space-time reference, or having to build it manually with auxiliary objects (e.g., a spatial graph). In almost any case, operating on this format is less efficient than it *could* be if we had bespoke algorithms built around surface structures. Finally, from a more conceptual point of view, treating pixels as independent realizations of a process that we *know* is continuous can be computationally inefficient and statistically flawed. 
 
-This perspective however also involves important benefits. First, sometimes we *don't* need location for our particular application. Maybe we are interested in calculating overall descriptive statistics; or maybe we need to run an analysis that is entirely atomic in the sense that it operates on each sample in isolation from all the other ones.  Second, by "going tabular" we recast our specialized, spatial data into the most common data structure available, for which a large amount of commodity technology is built. This means many new tools can be used for analysis. So called "big data" technologies, such as distributed systems, are much more common, robust, and tested for tabular data than for spatial surfaces. *If* we can translate our spatial challenge into a tabular challenge, we can immediately plug into technology that is more optimized and, in some cases, reliable. Further, some analytic toolboxes common in (geographic) data science are entirely built around tabular structures. Machine learning packages such as `scikit-learn`, or some spatial analytics (such as most methods in the Pysal family of packages) are designed around this data structure. Converting our surfaces into tables thus allows us to plug into a much wider suite of (potentially) efficient tools and techniques.
+This perspective however also involves important benefits. First, sometimes we *don't* need location for our particular application. Maybe we are interested in calculating overall descriptive statistics; or maybe we need to run an analysis that is entirely atomic in the sense that it operates on each sample in isolation from all the other ones.  Second, by "going tabular" we recast our specialized, spatial data into the most common data structure available, for which a large amount of commodity technology is built. This means many new tools can be used for analysis. So called "big data" technologies, such as distributed systems, are much more common, robust, and tested for tabular data than for spatial surfaces. *If* we can translate our spatial challenge into a tabular challenge, we can immediately plug in technology that is more optimized and, in some cases, reliable. Further, some analytic toolboxes common in (geographic) data science are entirely built around tabular structures. Machine learning packages such as `scikit-learn`, or some spatial analytics (such as most methods in the Pysal family of packages) are designed around this data structure. Converting our surfaces into tables thus allows us to plug into a much wider suite of (potentially) efficient tools and techniques.
 
 We will see two ways of going from surfaces to tables: one converts every pixel into a table row, and another that aggregates pixels into predetermined polygons.
+
 
 #### One pixel at a time
 
@@ -348,16 +357,17 @@ With the power of a tabular library, some queries and filter operations become m
 t_surface.query("Value > 1000").info()
 ```
 
-The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a fully-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a simple function that takes a row from our table and the resolution of the surface, and returns its geometry:
+The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a fully-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a function that takes a row from our table and the resolution of the surface, and returns its geometry:
 
 ```python
 def row2cell(row, res_xy):
-    res_x, res_y = res_xy
-    minX = row["x"]
-    maxX = row["x"] + res_x
-    minY = row["y"] + res_y
-    maxY = row["y"]
-    poly = geometry.box(minX, minY, maxX, maxY)
+    res_x, res_y = res_xy # Extract resolution for each dimension
+    # XY Coordinates are centered on the pixel
+    minX = row["x"] - (res_x / 2)
+    maxX = row["x"] + (res_x / 2)
+    minY = row["y"] + (res_y / 2)
+    maxY = row["y"] - (res_y / 2)
+    poly = geometry.box(minX, minY, maxX, maxY) # Build squared polygon
     return poly
 ```
 
@@ -370,24 +380,30 @@ row2cell(t_surface.loc[0, :], surface.attrs["res"])
 One of the benefits of this approach is we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:
 
 ```python
-max_polys = t_surface.query("Value > 1000")\
-                     .apply(row2cell, 
-                            res_xy=surface.attrs["res"], 
-                            axis=1
-                           )
-max_polys = geopandas.GeoSeries(max_polys, crs=surface.attrs["crs"])
+max_polys = t_surface.query(
+    "Value > 1000" # Keep only cells with more than 1k people
+).apply( # Build polygons for selected cells
+    row2cell,
+    res_xy=surface.attrs["res"], 
+    axis=1
+).pipe( # Pipe result from apply to convert into a GeoSeries
+    geopandas.GeoSeries, crs=surface.attrs['crs']
+)
 ```
 
 And generate a map with the same tooling that we use for any standard geo-table:
 
 ```python caption="Combining points with Contextily." tags=[]
-ax = max_polys.plot(edgecolor="red", 
-                    figsize=(9, 9)
-                   )
-cx.add_basemap(ax, 
-               crs=surface.attrs["crs"], 
-               source=cx.providers.CartoDB.Voyager
-              )
+# Plot polygons
+ax = max_polys.plot(
+    edgecolor="red", figsize=(9, 9)
+)
+# Add basemap
+cx.add_basemap(
+    ax, 
+    crs=surface.attrs["crs"], 
+    source=cx.providers.CartoDB.Voyager
+);
 ```
 
 Finally, once we have operated on the data as a table, we may want to return to a surface-like data structure. This involves taking the same journey in the opposite direction as how we started. The sister method of `to_series` in `xarray` is `from_series`:
@@ -422,7 +438,10 @@ There are several approaches to compute the average altitude of each neighborhoo
 Since this is somewhat complicated, we will start with a single polygon. For the illustration, we will use the largest one, located on the eastern side of San Diego. We can find the ID of the polygon with:
 
 ```python
-largest_tract_id = sd_tracts.query(f"area_sqm == {sd_tracts['area_sqm'].max()}").index[0]
+largest_tract_id = sd_tracts.query(
+    f"area_sqm == {sd_tracts['area_sqm'].max()}"
+).index[0]
+
 largest_tract_id
 ```
 
@@ -435,10 +454,27 @@ largest_tract = sd_tracts.loc[largest_tract_id, "geometry"]
 Clipping the section of the surface that is within the polygon in the DEM can be achieved with the `rioxarray` extension to clip surfaces based on geometries:
 
 ```python caption="DEM clipped to San Diego" tags=[]
-dem_clip = dem.rio.clip([largest_tract.__geo_interface__], 
-                        crs=sd_tracts.crs
-                       )
-dem_clip.where(dem_clip > 0).plot();
+# Clip elevation for largest tract
+dem_clip = dem.rio.clip(
+    [largest_tract.__geo_interface__], crs=sd_tracts.crs
+)
+
+# Set up figure to display against polygon shape
+f, axs = plt.subplots(1, 2, figsize=(6, 3))
+# Display elevation of largest tract
+dem_clip.where(dem_clip > 0).plot(ax=axs[0], add_colorbar=True);
+
+# Display largest tract polygon
+sd_tracts.loc[[largest_tract_id]].plot(
+    ax=axs[1], edgecolor='red', facecolor='none'
+)
+axs[1].set_axis_off()
+# Add basemap
+cx.add_basemap(
+    axs[1], 
+    crs=sd_tracts.crs, 
+    source=cx.providers.Stamen.Terrain
+);
 ```
 
 Once we have elevation measurements for all the pixels within the tract, the average one can be calculated with `mean()`:
@@ -450,9 +486,12 @@ dem_clip.where(dem_clip > 0).mean()
 Now, to scale this to the entire geo-table, there are several approaches. Each has its benefits and disadvantages. We opt for applying the method above to each row of the table. We define an auxiliary function that takes a row containing one of our tracts and returns its elevation:
 
 ```python
-def get_mean_elevation(row):
+def get_mean_elevation(row, dem):
+    # Extract geometry object
     geom = row["geometry"].__geo_interface__
+    # Clip the surface to extract pixels within `geom`
     section = dem.rio.clip([geom], crs=sd_tracts.crs)
+    # Calculate mean elevation
     elevation = float(section.where(section > 0).mean())
     return elevation
 ```
@@ -460,13 +499,13 @@ def get_mean_elevation(row):
 Applied to the same tract, it returns the same average elevation:
 
 ```python
-get_mean_elevation(sd_tracts.loc[largest_tract_id, :])
+get_mean_elevation(sd_tracts.loc[largest_tract_id, :], dem)
 ```
 
 This method can then be run on each polygon in our series using the `apply()` method:
 
 ```python
-elevations = sd_tracts.head().apply(get_mean_elevation, axis=1)
+elevations = sd_tracts.head().apply(get_mean_elevation, dem=dem, axis=1)
 elevations
 ```
 
@@ -477,9 +516,10 @@ However, this approach can be quite slow in big data. A more efficient alternati
 ```python
 from rasterstats import zonal_stats
 
-elevations2 = zonal_stats(sd_tracts.to_crs(dem.rio.crs),
-                          "../data/nasadem/nasadem_sd.tif"
-                         )
+elevations2 = zonal_stats(
+    sd_tracts.to_crs(dem.rio.crs),   # Geotable with zones
+    "../data/nasadem/nasadem_sd.tif" # Path to surface file
+)
 elevations2 = pandas.DataFrame(elevations2)
 ```
 
@@ -490,16 +530,25 @@ elevations2.head()
 To visualize these results, we can make an elevation map:
 
 ```python caption="Digital Elevation Model Estimates by Census Tract, San Diego." tags=[]
+# Set up figure
 f, axs = plt.subplots(1, 3, figsize=(15, 5))
-dem.where(
+
+# Plot elevation surface
+dem.where( # Keep only pixels above sea level
     dem > 0
+# Reproject to CRS of tracts
 ).rio.reproject(
     sd_tracts.crs
+# Render surface
 ).plot.imshow(ax=axs[0], add_colorbar=False)
+
+# Plot tract geography
 sd_tracts.plot(ax=axs[1])
-sd_tracts.assign(
+
+# Plot elevation on tract geography
+sd_tracts.assign( # Append elevation values to tracts
     elevation=elevations2["mean"]
-).plot(
+).plot(           # Plot elevation choropleth
     "elevation", ax=axs[2]
 );
 ```
@@ -519,18 +568,17 @@ In this figure, it is hard to tell anything about the density of points in the c
 In Python, we can rely on the `datashader` library, which does all the computation in a very efficient way. This process involves two main steps. First, we set up the grid (or canvas, `cvs`) into which we want to aggregate points:
 
 ```python
-cvs = datashader.Canvas(plot_width=60,
-                        plot_height=60
-                       )
+cvs = datashader.Canvas(
+    plot_width=60, plot_height=60
+)
 ```
 
 Then we "transfer" the points into the grid:
 
 ```python
-grid = cvs.points(gt_points, 
-                  x="longitude", 
-                  y="latitude"
-                 )
+grid = cvs.points(
+    gt_points, x="longitude", y="latitude"
+)
 ```
 
 The resulting `grid` is a standard `DataArray` object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the re-sampled data allows for is much greater than when the points were visualized alone. This is shown in Figure 14. 
