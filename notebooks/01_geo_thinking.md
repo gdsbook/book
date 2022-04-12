@@ -8,7 +8,7 @@ jupyter:
       format_version: '1.3'
       jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -18,6 +18,7 @@ import warnings
 warnings.filterwarnings("ignore")
 ```
 
+<!-- #region tags=[] -->
 # Geographic thinking for data scientists
 
 Data scientists have long worked with geographical data. Maps, particularly, are a favorite kind of "infographic" now that we are in the age of responsive web cartography. While we discuss a bit about computational cartography in the chapter on choropleth mapping, it's useful to think a bit more deeply about how geography works in the context of data science. So, this chapter delves a bit into "geographic thinking," which represents the collected knowledge geographers have about why geographical information deserves special care and attention, especially when using geographic data in computations. 
@@ -47,12 +48,14 @@ This example of population density helps illustrate the classic data models in g
 - *Fields* are continuous surfaces that could, in theory, be measured at any location in space and time.
 - *Networks* reflect a set of *connections* between objects or between positions in a field. 
 
-In our population density example, an "enumeration unit" is an object, as is a person. The field representation would conceptualize density as a smooth, continuous surface containing the total number of persons at all locations. The network representation would model the inter-related system of places whose densities arise from people moving around.^[A useful reference on the topic of common models in geographic information science is {cite}`Goodchild_2007`, who focus establishing a very general framework with which geographic processes can be described, and which inspires our present framework.]
+In our population density example, an "enumeration unit" is an object, as is a person. The field representation would conceptualize density as a smooth, continuous surface containing the total number of persons at all locations. The network representation would model the inter-related system of places whose densities arise from people moving around.[^goodchildref]
+
+[^goodchildref]: A useful reference on the topic of common models in geographic information science is {cite}`Goodchild_2007`, who focus on establishing a very general framework with which geographic processes can be described, and which inspires our present framework.
 
 The differences between these three representations are important to understand because they affect what kinds of *relations* are appropriate. For instance, the relationships among geographical processes with objects can be modelled using simple distances. Near objects might then be "strongly related," and distant objects "weakly related." Alternatively, we could consider (or construct) a network that relates the objects based on their interactions. Geographical processes with networks must account for this *topology*, or structure of the connections between the "nodes" (i.e. the origins or destinations). We cannot assume that every node is connected, and these connections also cannot be directly determined from the nodes alone. For example, two subway stations may be very far apart, but could be connected by a frequent direct express train; given their connectivity, the raw distances (treating stops as geographic objects) may not be a good indication of their true geographic relationship. Finally, in a field, measurements can occur *anywhere*, so models need to account for the hypothetical realizations that could happen in the unobserved space between points of measurement. 
 
 These kinds of structures, in turn, arise directly from how processes are conceptualized and what questions the analyst seeks to answer. And, since the measurement of a process is often beyond the analyst's control, it is useful to recognize that *how a geographical process actually operates* (that is, its "causal" or "generative" structure) can be different from *how we are actually able to measure it*. In the subsequent sections, we discuss the common frames of measurement you may encounter, and the traditional linkages between data model and data structure that are found in classical geographic information systems.
-
+<!-- #endregion -->
 
 ## Computational representations: Data Structures
 

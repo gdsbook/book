@@ -8,7 +8,7 @@ jupyter:
       format_version: '1.3'
       jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -285,7 +285,7 @@ Code cells in a notebook also enable the embedding of rich (web) content. The
 `IPython` package provides methods to access as series of media and bring them
 directly to the notebook environment. Let us see how this can be done
 practically. To be able to demonstrate it, we will need to _import_ the
-`display` module^[import]:
+`display` module[^import]:
 
 [^counters]: This counter may not always be visible in all of the foramts a notbook may be viewed. In this book, cell numbers will not be visible on paper, but they will be visible in the online versions of the notebook.
 
