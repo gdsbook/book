@@ -829,7 +829,7 @@ At the same time, let us expand the maximum radius to say, 500 meters. Then we c
 
 ```python caption="Tokyo points, Clusters with DBSCAN and minp=0.01." tags=[]
 # Rerun DBSCAN
-clusterer = DBSCAN(eps=500, min_samples=minp)
+clusterer = DBSCAN(eps=500, min_samples=int(minp))
 clusterer.fit(db[['x', 'y']])
 # Turn labels into a Series
 lbls = pandas.Series(clusterer.labels_, index=db.index)
