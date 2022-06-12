@@ -321,7 +321,7 @@ Showing that the high-high (1), and low-low (3), values are predominant. Care mu
 
 Therefore, in order to focus on the areas that are most promising, we need to include significance information alongside the quadrant and local statistic. Together, this "cluster map" (as it is usually called) extracts significant observations -those that are highly unlikely to have come from pure chance- and plots them with a specific color depending on their quadrant category. All of the needed pieces are contained inside the `lisa` object we have created above and, if passed in tandem with the geo-table containing the geographies it relates to, `splot` will make a cluster map for us.
 
-Reading the clustermap reveals a few interesting aspects that would have been hard to grasp by looking at the other maps only and that are arguably more relevant for an analysis of the data. First, it is only less than half of polygons that have degrees of local spatial association strong enough to reject the idea of pure chance:
+Reading the clustermap reveals a few interesting aspects that would have been hard to grasp by looking at the other maps only and that are arguably more relevant for an analysis of the data. First, fewer than half of polygons that have degrees of local spatial association strong enough to reject the idea of pure chance:
 
 ```python
 (lisa.p_sim < 0.05).sum() * 100 / len(lisa.p_sim)
