@@ -9,16 +9,17 @@ This book introduces a new way of thinking about geographic challenges. Using ge
 ## Motivation (SR)
 
 ### Why this book?
-Writing a book like this is a major undertaking, and this suggests the authors must have some intrinsic motivations for taking on such a task. We do. Each of the authors is an active participants in both open source development of spatial analytical tools and academic geographic science. Through our research and teaching, we have come to recognize a need for book to fill a niche that sits at the intersection of GIS/Geography and the world of Data Science. We have seen the explosion of interest in all things Data Science on the one hand and, on the other, the longer standing and continued evolution of GIScience. This book represents our attempt at helping to emerge the intersection between these two fields. It is at that intersection where we believe the intellectual and methodological magic occurs.
+Writing a book like this is a major undertaking, and this suggests the authors must have some intrinsic motivations for taking on such a task. We do. Each of the authors is an active participant in both open source development of spatial analytical tools and academic geographic science. Through our research and teaching, we have come to recognize a need for a book to fill the niche that sits at the intersection of GIS/Geography and the world of Data Science. We have seen the explosion of interest in all things Data Science on the one hand and, on the other, the longer standing and continued evolution of GIScience. This book represents our attempt at helping to emerge the intersection between these two fields. It is at that common ground where we believe the intellectual and methodological magic occurs.
 
 ### Who is this for?
-In writing the book, we envisaged two community of readers who we want to bring together. The first are GIScientists and geographers who may be wondering what all the fuss is about Data Science, and  questioning whether they should engage with the methods, tools, and practices of this new field. Our response to such a reader is an emphatic "Yes!". We see so much to be gained and contributed by geographers who enter these new waters. The second community we have held in mind in writing this material are data scientists who are beginning to turn their attention to working with geographical data. Here we have encountered members of the data science community who are wondering what is so special about geographical data and problems? Data science currently has an impressive array of models and methods, surely these are all that geographers need? Our response to these questions is "No! There is a need for new forms of data science when working with geospatial data." Morever, we see the *collaboration between these two communities as critical to the development of these new advances*.
+In writing the book, we envisaged two communities of readers who we want to bring together. The first are GIScientists and geographers who may be wondering what all the fuss is about Data Science, and  questioning whether they should engage with the methods, tools, and practices of this new field. Our response to such a reader is an emphatic "Yes!". We see so much to be gained and contributed by geographers who enter these new waters. The second community we have held in mind in writing this material are data scientists who are beginning to turn their attention to working with geographical data. Here we have encountered members of the data science community who are wondering what is so special about geographical data and problems. Data science currently has an impressive array of models and methods, surely these are all that geographers need? Our response to these questions is "No! There is a need for new forms of data science when working with geospatial data." Morever, we see the *collaboration* between these two communities as *critical* to the development of these new advances.
 
 
-We also recognize that these two communities are not each a monolithic whole, but are in fact composed of individuals from different sectors, academic science, industry, public sector, and independent researchers, as well as at different career stages. We hope that we have succeeded in providing material that will be of interest to all of these readers.
+We also recognize that neither of these two communities is a monolithic whole, but are in fact composed of individuals from different sectors, academic science, industry, public sector, and independent researchers, as well as at different career stages. We hope this book provides material that will be of interest to all of these readers.
 
 ### What this book isn't
-Having described our motivation and intended audience for the book, it is important to point out what the book is not. First, we do not intend the work to be viewed as a GIS starter for data scientists. A number of excellent titles are available that serve that role GET CITES (Henrikki, others). Second, in a similar sense the book is not an introduction to Python programming for GIScientists. Again there are numerous offerings to choose from for the interested reader. GET CITES (Xiao other). Finally, we have conciously choosen breadth over depth in the selection of our topics. Each of the topics we cover are active areas of research of which our treatment should be viewed as providing an entry point to more advanced study. As the admonition goes:
+
+Having described our motivation and intended audience for the book, we find it useful to also point out what the book is not. First, we do not intend the work to be viewed as a GIS starter for data scientists. A number of excellent titles are available that serve that role GET CITES (Henrikki, others). Second, in a similar sense the book is not an introduction to Python programming for GIScientists. Again there are numerous offerings to choose from for the interested reader. GET CITES (Xiao other). Finally, we have conciously choosen breadth over depth in the selection of our topics. Each of the topics we cover are active areas of research of which our treatment should be viewed as providing an entry point to more advanced study. As the admonition goes:
 
 "A couple of months in the laboratory can frequently save a couple of hours in the library." (Frank Westheimer[^1])
 
@@ -26,27 +27,27 @@ Speaking to our intended audiences, geographers new to data science and data sci
 
 [^1]: Crampon, Jean E. 1988. Murphy, Parkinson, and Peter: Laws for librarians. Library Journal 113. no. 17 (October 15), p. 41.
 
-## Content LJW
+## Content (LJW)
 
-Every book reflects a combination of the authors' perspectives and the social and technological context in which the authors write. Thus, we see this book as a core component of the project of codifying *what a geographic data science does*, and (in turn) what kinds of knowledge are important for aspiring geographic data scientists. We also see the *medium* and *method* of writing this book as important for its purpose. So, let's discuss first the content, then the method and medium.
+Every book reflects a combination of the authors' perspectives and the social and technological context in which the authors write. Thus, we see this book as a core component of the project of codifying *what a geographic data science does* and, in turn, what kinds of knowledge are important for aspiring geographic data scientists. We also see the *medium* and *method* of writing this book as important for its purpose. Hence, let's discuss first the content, then the method and medium.
 
 ### Overview of content
 
-This book delves throughly into a few core topics of geographic data science. From our background as academic geographers, we seek to present concepts in a more *geographic* way than a standard textbook on *data science*.  This means that we cover spatial data, mapping, and spatial statistics *right* off the bat, and talk at length about some concepts (such as clusters or outliers) in a geographic, not data-scientific, manner. But, as we hope is shown throughout the book, the difference in language and framing is superficial, but the concepts are foundational to both perspectives.
+This book delves throughly into a few core topics. From our background as academic geographers, we seek to present concepts in a more *geographic* way than a standard textbook on *data science*.  This means that we cover spatial data, mapping, and spatial statistics *right* off the bat, and talk at length about some concepts (such as clusters or outliers) in a geographic, not data-scientific, manner. But, as we hope is shown throughout the book, the difference in language and framing is superficial, while the concepts are foundational to both perspectives.
 
-With that in mind, we discuss the central data structures and representations in geographic data science, and then move immediately to visualization and analysis of geographic data. We opt for descriptive *spatial statistics* that summarize the structure of maps, in order to give a sense of how to summarize geographic structure in data science problems. For the analysis sections, we opt for a presentation of a classic *subject* in spatial analysis (inequality), and then pivot to discussing important methods across geographic analysis, such as those that help understand when points are clustered in space, when geographic regions are latent within data, and when geographical spillovers complicate standard supervised learning approaches. The book closes with a discussion of how to use spatial principles to improve standard data scientific algorithms.
+With that in mind, we discuss the central data structures and representations in geographic data science, and then move immediately to visualization and analysis of geographic data. We use descriptive *spatial statistics* that summarize the structure of maps in order to build the intuition of how spatial thinking can be embedded in data science problems. For the analysis sections, we opt for a presentation of a classic subject in spatial analysis -inequality-, and then pivot to discussing important methods across geographic analysis, such as those that help understand when points are clustered in space, when geographic regions are latent within data, and when geographical spillovers are present in standard supervised learning approaches. The book closes with a discussion of how to use spatial principles to improve standard data scientific algorithms.
 
-### What is not in the book
+### What is not in the book (/"editorial discipline"?)
 
-Despite the strong data science angle we take on the discussion in this book, there are many topics that we omit in our treatment. Every book must exhibit some kind of editorial discipline, but we used three principles to inform our own.
+Despite the "breath over depth" approach we take in this book, there are many topics that we omit in our treatment. Every book must exhibit some kind of editorial discipline, and we use three principles to inform our own.
 
-First, we avoided topics that get too complicated too quickly; instead, we sought to maximize the analytical benefits by focusing on simple but meaningful methods of analysis. This precludes many of the more complex but interesting topics and methods, like Bayesian inference or generative models (like cellular automata or agent-based models). GeoAI developments at the cutting edge of quantitative geographic analysis also were excised under this editorial rule. Further, many treatments of the geographical problem of *scale* and *uncertainty* fall in this category, since these questions generally pose issues that demand theoretical, not empirical, solutions.
+First, we avoided topics that get "too complicated too quickly"; instead, we sought to maximize the analytical benefits by focusing on simple but meaningful methods of analysis. This precludes many of the interesting but more complex topics and methods, like Bayesian inference or generative models (like cellular automata or agent-based models). GeoAI developments (GET CITES, Gao et al. editorial) at the cutting edge of quantitative geographic analysis also were excised under this editorial rule. Further, many treatments of the geographical problem of *scale* and *uncertainty* fall in this category, since these questions generally pose issues that demand theoretical, not empirical, solutions.
 
-Second, we sought to discuss things that were intellectually proximate to our own experiences and trainings in quantitative geography. The world of spatial statistics is vast, and very deep, but any one person only gains so much perspetive on it. This strongly informed our decisions of what to cover in the second and third sections, where we generally avoid more complex methods like Gaussian Process (geostatistical) models or geospatial knowledge graph methods.
+Second, we sought to discuss things that were intellectually adjacent to our own experiences and training in quantitative geography. The world of spatial statistics is vast, and very deep, but any one person only gains so much perspetive on it. This strongly informed our decisions of what to cover in the second and third sections, where we generally avoid more complex methods like Gaussian Process (geostatistical) models or geospatial knowledge graph methods. We would like to emphasise these avoidances are not commentary on their merits, which we recognise, but on our own ability to present the topics with honesty, clarity, and effectiveness.
 
-Third, we sought to avoid topics that already have contemporary treatment in computational teaching. This includes spatial optimization problems (such as location allocation or coverage problems) as well as the generative and geostatistical models mentioned above.
+Third, we sought to avoid topics that already have contemporary treatment in computational teaching. This includes spatial optimization problems (such as location allocation or coverage problems) as well as the generative and geostatistical models mentioned above. With this book, we are trying to cover areas where we see a clear opportunity in (re)framing them in new ways for the benefit of the two communities we mention above. Where there is already a wheel, we have not reinvented it.
 
-Altogether, these three editorial principles help keep this book focused precisely on the set of techniques that give analysts the most benefit in the shortest space. It covers both methods to summarize and describe geographical pattern, correct analysis for the artefacts induced by geographical structure, and leverage geographical relationships to do better analyses.
+Altogether, these three editorial principles help keep this book focused precisely on the set of techniques we think give readers the most benefit in the shortest space. It covers both methods to summarize and describe geographical pattern, correct analysis for the artefacts induced by geographical structure, and leverage geographical relationships to do data analysis better.
 
 ### why a book this way
 
@@ -125,21 +126,87 @@ So, be mindful of how the medium will frame the message when you’re writing a 
 
 --->
 
-## The book with the perspective of future
+## Time in the book, and the book in time (/"the book with the perspective of the future")
 
+In this section, we consider some of the main trends that have shaped the
+conception of the book. As mentioned, every project like this is in part a
+reflection of the time in which it is conceived and created. In our case,
+this "era effect" has had both very
+tangible ramifications, as well as other ones that, though perhaps less
+visible at first, signal mayor shifts of the ground on which geographic data
+science stands. Some of them are unequivocally positive, others more of a
+price to pay to be able to develop a project like this one. 
 
-### acknowledgement/caveat emptor that the code will change in the future.
+Start with the obvious (but powerful): writing the book in the way we have done
+so _is_ possible. This is a statement we would have not been able to make
+a mere ten years ago. What you are holding in your hands (or displaying on your
+laptop) is an academic textbook released under an open license, entirely based
+on open technology, and using a platform that treats both narrative _and_ code
+as first-class citizens. It is as much a book as a software artifact, and its
+form embodies many of the principles that inspire its content.
 
-- Python for data is very fast-evolving landscape
-- point about interoperability R v Python v Julia going to R+Python+Julia (polyglot analyses, cell magics that allow for multiple languages/reticulate)
+Though possible, the process has not been straightforward. Many of the
+technologies we rely on heavily were _just_ available when we started writing
+back in 2018 (CONFIRM). Computational notebooks were stable by then, but ways
+of combining them and using them as the building block of long-form writing
+were not. In particular, this book owes much of its current form to two
+projects,
+`jupyterbook` and `jupytext`, which make it possible to build complex
+documents starting from Jupyter notebooks and to mirror their content
+to other formats such as markdown, respectively. Both projects were in their
+early days when we adopted them and, using them in production at the same time
+they were being developed into a stable shape has not been without its
+challenges. But this has also reminded us the very best of the open-source
+ethos: their teams have been a phenomenal example of how a
+an open, fast-paced project can bring together a community around it. Although
+many of the changes broke things constantly, clear documentation,
+signposting, and responsiveness to our questions made it all possible.
 
-### Concerns at the time of the book
+In effect, not only infrastruture-wise, the wider landscape of Python for
+geographic data science evolves very fast. Our scientific stack has changed
+significantly over the period of writing. New packages appear, existing ones
+change, and some also loose support and maintenance to a point that they are
+unusable. Writing a book that tries to set up the main tool set in this
+context is challenging. In some ways, by the time this book is in print, some
+of its parts will be outdated or even obsolete. We think this is a problem,
+albeit a small and good one. It is small because the core value proposition of
+the book is not as a technical guide teaching a set of specific computational
+tools. It is rather a companion to help you think geographically when you work
+with modern data, and get the most of state-of-the-art data technologies when
+you work with geographic problems. It is also a _good_ problem to have,
+because it is sign that the ecosystem is constantly getting better. New
+packages only become significant if they do more, better, or both than the
+existing ones. At any rate, this constantly and rapidly changing context made
+us think more thoroughly about the computational infrastructure and, over
+time, we learned to take it more as a feature rather than a bug (it also
+inspired us to write [Chapter 3](03_spatial_data)!). 
 
-- Writing this book as we have done it was impossible ten years ago
-- It was barely possible when we started writing it
-    - Why it was hard
-    - Which things changed
-    -
-    - How did the ecosystem improved
-- Hopefully in ten years, this will be standard, robust tooling with community consensus about how to do it properly
+Besides technical challenges, writing a texbook based on notebooks has also
+unearthed more conceptual aspects we had not ancitipated. Writing computational
+notebooks is qualitatively different from writing a traditional textbook. The
+writing process changes when you weave code and narrative, and that takes
+additional effort and explicit design choices. Furthermore, since one of our
+hard requirements for this project was the content be available online as a
+free site, we were effectively writing for both print _and_ the web in the
+same document. This
+often meant tricky tradeoff's and, sometimes, settling for the (smaller)
+common shared subset of options and functionality. All in all, this book has
+taught us in very practical ways that the medium often frames the message,
+and that we were exploring a less-known medium that had its own rules.
+
+Finally, we believe the book was written at an inflection point where the
+computational landscape for data science and GISc has left its previous
+steady state, but it is not quite clear yet what the new one fully looks like.
+Perhaps, as the famous William Gibson's quote goes, the "future is already
+here - it's just not evenly distributed". Scientific computing is open by
+default and, more and more, very interoperable. Tooling to work with such
+stack, from low-level components to the end-user, has improved enormously and
+continues to do so. At the same time, we think some of these changes bring
+about more substantial shifts that we have not fully accommodated yet. As we
+mention above, we have only scratched the surface of what new media like
+computational notebooks allow, and much of the social infrastructure around
+science (e.g., publishing) has been largely detached from these changes. With
+this book, we hope to demonstrate what is already possible in this new world,
+but also "nudge the way" for the uneven bits of the future that are still not
+here. We hope you enjoy it and inspires you to further nudge away!
 
