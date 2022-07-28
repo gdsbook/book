@@ -90,7 +90,9 @@ Using this polygon, we can use the `osmnx` package to fetch points of interest (
 %%time
 pois = osmnx.geometries_from_polygon(
     airbnbs_ch, tags={"amenity": ['restaurant', 'bar']}
-)[["unique_id", "osmid", "amenity", "cuisine", "name", "geometry"]]
+).reset_index()[
+    ["element_type", "osmid", "amenity", "cuisine", "name", "geometry"]
+]
 ```
 
 ```python tags=["remove-cell"]
