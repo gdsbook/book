@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.13.8
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -850,7 +850,7 @@ model.fit(db_scaled)
 
 And plot the final regions:
 
-```python caption="Regions from a spatially-constrained sociodemographic clutering, using a different connectivity constraint." tags=["hide-input"]
+```python caption="Regions from a spatially-constrained sociodemographic clutering, using a different connectivity constraint. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 db['ward5wknn'] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))

@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.13.8
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -78,9 +78,9 @@ gdf = geopandas.GeoDataFrame(
 )
 ```
 
-which results in the grid shown in Figure 1. 
+which results in the grid shown in the following figure. 
 
-```python caption="A three-by-three grid of squares." tags=["hide-input"]
+```python caption="A three-by-three grid of squares. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Plot grid geotable
 ax = gdf.plot(facecolor='w', edgecolor='k')
 
@@ -107,9 +107,9 @@ question share an *edge*. According to this definition, polygon $0$ would be a r
 wr = weights.contiguity.Rook.from_dataframe(gdf)
 ```
 
-Note the pattern we use to build the `w` object, which is similar across the library: we specify the criterium we want for the weights (`weights.contiguity.Rook`) and then the "constructor" we will use (`from_dataframe`). We can visualise the result plotted on top of the same grid of labeled polygons, using red dotted lines to represent the edges between a pair of nodes (polygon centroids in this case). We can see this in Figure 2. 
+Note the pattern we use to build the `w` object, which is similar across the library: we specify the criterium we want for the weights (`weights.contiguity.Rook`) and then the "constructor" we will use (`from_dataframe`). We can visualise the result plotted on top of the same grid of labeled polygons, using red dotted lines to represent the edges between a pair of nodes (polygon centroids in this case). We can see this in the following figure. 
 
-```python caption="Grid cells connected by a red line are 'neighbors' under a 'Rook' contiguity rule." tags=["hide-input"]
+```python caption="Grid cells connected by a red line are 'neighbors' under a 'Rook' contiguity rule.Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Set up figure
 f,ax = plt.subplots(1,1, subplot_kw=dict(aspect='equal'))
 # Plot grid
@@ -183,9 +183,9 @@ wq = weights.contiguity.Queen.from_dataframe(gdf)
 wq.neighbors
 ```
 
-In addition to this neighbors representation, we can also express the graph visually, as done before. This is shown in Figure 3.
+In addition to this neighbors representation, we can also express the graph visually, as done before. This is shown in the following figure.
 
-```python caption="Grid cells connected by a red line are considered 'neighbors' under 'Queen' contiguity." tags=["hide-input"]
+```python caption="Grid cells connected by a red line are considered 'neighbors' under 'Queen' contiguity. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Set up figure
 f,ax = plt.subplots(1,1, subplot_kw=dict(aspect='equal'))
 # Plot grid
@@ -289,7 +289,7 @@ w_queen = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 
 Like before, we can visualize the adjacency relationships, but they are much more difficult to see without showing a closer detail. This higher level of detail is shown in the right pane of the plot.
 
-```python caption="The Queen contiguity graph for San Diego tracts. Tracts connected with a red line are neighbors." tags=["hide-input"]
+```python caption="The Queen contiguity graph for San Diego tracts. Tracts connected with a red line are neighbors. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Plot tract geography
 f, axs = plt.subplots(1,2,figsize=(8,4))
 for i in range(2):
@@ -824,7 +824,7 @@ mx_union = weights.set_operations.w_union(mx_bw, mx_queen)
 
 With these at hand, we will build a figure that shows the connectivity graph of each weights object. For cases where we the federal regions are used to define blocks, we will color states based on the region they belong to.
 
-```python caption="The three graphs discussed above, shown side-by-side." tags=["hide-input"]
+```python caption="The three graphs discussed above, shown side-by-side. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Set up figure and axis
 f, axs = plt.subplots(2, 2, figsize=(9, 9))
 
@@ -928,7 +928,7 @@ These can be used in models of inequality {cite}`Lu2005bayesian,Fitzpatrick2010e
 Below, we'll show one model-free way to identify empirical boundaries in your data. 
 
 
-First, let's consider the median household income for our census tracts in San Diego, shown in Figure 12.
+First, let's consider the median household income for our census tracts in San Diego, shown in the following figure.
 
 ```python caption="Median household incomes in San Diego." tags=[]
 f,ax = plt.subplots(1,2, figsize=(12,4))
@@ -1081,7 +1081,7 @@ for i in range(n_simulations):
 
 After running our simulation, we get many distributions of pairwise differences in household income. Below, we plot the shroud of all of the simulated differences, shown in black, and our observed differences, shown in red:
 
-```python caption="Differences between neighboring incomes for the observed map (orange) and maps arising from randomly-reshuffled maps (black) of tract median incomes." tags=["hide-input"]
+```python caption="Differences between neighboring incomes for the observed map (orange) and maps arising from randomly-reshuffled maps (black) of tract median incomes. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Set up figure
 f = plt.figure(figsize=(12,3))
 # Build background histogram for observed differences
@@ -1147,7 +1147,7 @@ adjlist_income[outside]
 
 Note that one of these, observation $473$, appears in both boundaries. This means that the observation is likely to be *outlying*, extremely unlike *all* of its neighbors. These kinds of generalized neighborhood comparisons are discussed in the subsequent chapter on local spatial autocorrelation. For now we can visualize this on a map, focusing on the two boundaries around observation $473$, shown also in the larger context of San Diego incomes:
 
-```python caption="The two most stark differences in median household income among San Diego tracts." tags=["hide-input"]
+```python caption="The two most stark differences in median household income among San Diego tracts. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 f,ax = plt.subplots(1, 3, figsize=(18,6))
 
 # Plot tracts
