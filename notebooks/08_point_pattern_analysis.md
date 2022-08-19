@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.13.8
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -603,8 +603,8 @@ The second group of spatial statistics we consider focuses on the distributions 
 The first function, Ripley's $G$, focuses on the distribution of nearest neighbor distances. That is, the $G$ function summarizes the distances between each point in the pattern and their nearest neighbor. In the plot below, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are *mutual* nearest neighbors (and so have arrows going in both directions) but some are not. 
 
 
-```python caption="Tokyo points and nearest neighbor graph." tags=["hide-input"]
-# this code should be hidden in the book, and only the plot visible!
+```python caption="Tokyo points and nearest neighbor graph. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
+# Code generated for this figure is available on the web version of the book.
 f,ax = plt.subplots(1,2,figsize=(8,4), sharex=True, sharey=True)
 ax[0].scatter(*random_pattern.T, color='red')
 ax[1].scatter(*random_pattern.T, color='red',
@@ -654,7 +654,7 @@ We can visualize this below. On the left, we plot the $G(d)$ function, with dist
 In this plot, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user's Flickr photographs are *closer* to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is *clustered.*
 
 
-```python caption="Tokyo points, Ripley's G Function." tags=["hide-input"]
+```python caption="Tokyo points, Ripley's G Function. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 f,ax = plt.subplots(1,2,figsize=(9,3), 
                     gridspec_kw=dict(width_ratios=(6,3)))
 # plot all the simulations with very fine lines
@@ -700,7 +700,7 @@ f_test = distance_statistics.f_test(
 ```
 
 
-```python caption="Tokyo points, Cluster vs. non-cluster points." tags=["hide-input"]
+```python caption="Tokyo points, Cluster vs. non-cluster points. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 f,ax = plt.subplots(
     1,2,figsize=(9,3), gridspec_kw=dict(width_ratios=(6,3))
 )
