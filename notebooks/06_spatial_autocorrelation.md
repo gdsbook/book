@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 ```
 
@@ -45,13 +46,13 @@ import seaborn
 from pysal.viz import splot
 from splot.esda import plot_moran
 import contextily
+
 # Analysis
 import geopandas
 import pandas
 from pysal.explore import esda
 from pysal.lib import weights
 from numpy.random import seed
-
 ```
 
 In 2016, the United Kingdom ran a referendum to decide whether to remain in the European Union or to leave the club, the so called "Brexit" vote. We will use the official data from the Electoral Commission at the local authority level on percentage of votes for the Remain and Leave campaigns. There are two distinct datasets we will combine:
@@ -62,8 +63,8 @@ In 2016, the United Kingdom ran a referendum to decide whether to remain in the 
 The vote results are stored in a `csv` file which we read into a dataframe:
 
 ```python
-brexit_data_path = '../data/brexit/brexit_vote.csv'
-ref = pandas.read_csv(brexit_data_path, index_col='Area_Code')
+brexit_data_path = "../data/brexit/brexit_vote.csv"
+ref = pandas.read_csv(brexit_data_path, index_col="Area_Code")
 ref.info()
 ```
 
@@ -72,19 +73,22 @@ While the shapes of the geographical units (local authority districts, in this c
 ```python
 lads = geopandas.read_file(
     "../data/brexit/local_authority_districts.geojson"
-).set_index('lad16cd')
+).set_index("lad16cd")
 lads.info()
 ```
 
 Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes for the Leave alternative. For convenience, let us merge the vote results with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), the preferred choice of web maps, which will allow us to combine them with contextual tiles later:
 
 ```python
-db = geopandas.GeoDataFrame(
-    lads.join(
-        ref[['Pct_Leave']]), crs=lads.crs
-    ).to_crs(epsg=3857)[
-        ['objectid', 'lad16nm', 'Pct_Leave', 'geometry']
-    ].dropna()
+db = (
+    geopandas.GeoDataFrame(
+        lads.join(ref[["Pct_Leave"]]), crs=lads.crs
+    )
+    .to_crs(epsg=3857)[
+        ["objectid", "lad16nm", "Pct_Leave", "geometry"]
+    ]
+    .dropna()
+)
 db.info()
 ```
 
@@ -93,21 +97,21 @@ And with these elements, we can generate a choropleth map to get a quick sense o
 ```python caption="BREXIT Vote: Pct_Leave" tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(
-    column='Pct_Leave', 
-    cmap='viridis', 
-    scheme='quantiles',
-    k=5, 
-    edgecolor='white', 
-    linewidth=0., 
-    alpha=0.75, 
+    column="Pct_Leave",
+    cmap="viridis",
+    scheme="quantiles",
+    k=5,
+    edgecolor="white",
+    linewidth=0.0,
+    alpha=0.75,
     legend=True,
     legend_kwds={"loc": 2},
-    ax=ax
+    ax=ax,
 )
 contextily.add_basemap(
-    ax, 
-    crs=db.crs, 
-    source=contextily.providers.Stamen.TerrainBackground
+    ax,
+    crs=db.crs,
+    source=contextily.providers.Stamen.TerrainBackground,
 )
 ax.set_axis_off()
 ```
@@ -118,7 +122,7 @@ The final piece we need before we can delve into autocorrelation is the spatial 
 # Generate W from the GeoDataFrame
 w = weights.KNN.from_dataframe(db, k=8)
 # Row-standardization
-w.transform = 'R'
+w.transform = "R"
 ```
 
 ## Global spatial autocorrelation
@@ -151,18 +155,15 @@ where $w_{ij}$ is the cell in $\textbf{W}$ on the $i$-th row and $j$-th column, 
 As we will discover throughout this book, the spatial lag is a key element of many spatial analysis techniques and, as such, it is fully supported in Pysal. To compute the spatial lag of a given variable, `Pct_Leave` for example, we can do it as follows:
 
 ```python
-db['Pct_Leave_lag'] = weights.spatial_lag.lag_spatial(
-    w, db['Pct_Leave']
+db["Pct_Leave_lag"] = weights.spatial_lag.lag_spatial(
+    w, db["Pct_Leave"]
 )
 ```
 
 Let us peek into two local authority districts to get a better intuition of what is behind the spatial lag:
 
 ```python
-db.loc[
-    ['E08000012', 'S12000019'], 
-    ['Pct_Leave', 'Pct_Leave_lag']
-]
+db.loc[["E08000012", "S12000019"], ["Pct_Leave", "Pct_Leave_lag"]]
 ```
 
 The first row (`E08000012`) represents Liverpool, which was a notorious "Remainer" island among the mostly-Leave North of England. Outside of London and Scotland, it was one of the few locations with less than majority to Leave. The second row (`S12000019`) represents Midlothian, in Scotland, where no local authority voted to leave. Although both Liverpool and Midlothian display a similar percentage of population who voted to leave (42% and 38%, respectively), the difference in their spatial lags captures the wider geographical context, which are quite different.
@@ -170,45 +171,44 @@ The first row (`E08000012`) represents Liverpool, which was a notorious "Remaine
 To end this section visually, the smoothing nature of the lag can be appreciated in the following map comparison:
 
 ```python caption="BREXIT Leave vote and its spatial lag." tags=[]
-
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 ax1, ax2 = axs
 
 db.plot(
-    column='Pct_Leave',
-    cmap='viridis',
-    scheme='quantiles',
+    column="Pct_Leave",
+    cmap="viridis",
+    scheme="quantiles",
     k=5,
-    edgecolor='white',
-    linewidth=0.,
+    edgecolor="white",
+    linewidth=0.0,
     alpha=0.75,
     legend=True,
-    ax=ax1
+    ax=ax1,
 )
 ax1.set_axis_off()
 ax1.set_title("% Leave")
 contextily.add_basemap(
-    ax1, 
-    crs=db.crs, 
+    ax1,
+    crs=db.crs,
     source=contextily.providers.Stamen.TerrainBackground,
 )
 
 db.plot(
-    column='Pct_Leave_lag',
-    cmap='viridis',
-    scheme='quantiles',
+    column="Pct_Leave_lag",
+    cmap="viridis",
+    scheme="quantiles",
     k=5,
-    edgecolor='white',
-    linewidth=0.,
+    edgecolor="white",
+    linewidth=0.0,
     alpha=0.75,
     legend=True,
-    ax=ax2
+    ax=ax2,
 )
 ax2.set_axis_off()
 ax2.set_title("% Leave - Spatial Lag")
 contextily.add_basemap(
-    ax2, 
-    crs=db.crs, 
+    ax2,
+    crs=db.crs,
     source=contextily.providers.Stamen.TerrainBackground,
 )
 
@@ -225,8 +225,8 @@ The spatial lag plays an important role in quantifying spatial autocorrelation. 
 Our first dip into these measures considers a simplified case: binary values. This occurs when the variable we are interested in only takes two values. In this context, we are interested in whether a given observation is surrounded by others within the same category. For example, returning to our dataset, we want to assess the extent to which local authorities who voted to Leave tend to be surrounded by others who also voted to leave. To proceed, let us first calculate a binary variable (`Leave`) that indicates 1 if the local authority voted to leave, and zero otherwise:
 
 ```python
-db['Leave'] = (db['Pct_Leave'] > 50).astype(int)
-db[['Pct_Leave', 'Leave']].tail()
+db["Leave"] = (db["Pct_Leave"] > 50).astype(int)
+db[["Pct_Leave", "Leave"]].tail()
 ```
 
 Which we can visualize readily:
@@ -235,17 +235,17 @@ Which we can visualize readily:
 f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(
     ax=ax,
-    column='Leave',
+    column="Leave",
     categorical=True,
-    legend=True, 
-    edgecolor='0.5',
+    legend=True,
+    edgecolor="0.5",
     linewidth=0.25,
-    cmap='Set3', 
-    figsize=(9, 9)
+    cmap="Set3",
+    figsize=(9, 9),
 )
 ax.set_axis_off()
-ax.set_title('Leave Majority')
-plt.axis('equal')
+ax.set_title("Leave Majority")
+plt.axis("equal")
 plt.show()
 ```
 
@@ -258,7 +258,7 @@ w.transform
 ```
 
 ```python
-w.transform = 'O'
+w.transform = "O"
 ```
 
 ```python
@@ -269,7 +269,7 @@ We can compute the statistic as:
 
 ```python
 seed(1234)
-jc = esda.join_counts.Join_Counts(db['Leave'], w)
+jc = esda.join_counts.Join_Counts(db["Leave"], w)
 jc
 ```
 
@@ -342,8 +342,10 @@ where $n$ is the  number of observations, $z_{i}$ is the standardized value of t
 In order to understand the intuition behind its math, it is useful to begin with a graphical interpretation: the Moran Plot. The Moran Plot is a way of visualizing a spatial dataset to explore the nature and strength of spatial autocorrelation. It is essentially a traditional scatter plot in which the variable of interest is displayed against its *spatial lag*. In order to be able to interpret values as above or below the mean, the variable of interest is usually standardized by subtracting its mean:
 
 ```python
-db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )
-db['Pct_Leave_lag_std'] = ( db['Pct_Leave_lag'] - db['Pct_Leave_lag'].mean() )
+db["Pct_Leave_std"] = db["Pct_Leave"] - db["Pct_Leave"].mean()
+db["Pct_Leave_lag_std"] = (
+    db["Pct_Leave_lag"] - db["Pct_Leave_lag"].mean()
+)
 ```
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
@@ -351,15 +353,15 @@ Technically speaking, creating a Moran Plot is very similar to creating any othe
 ```python caption="BREXIT Leave vote, % leave Moran Scatter Plot." tags=[]
 f, ax = plt.subplots(1, figsize=(6, 6))
 seaborn.regplot(
-    x='Pct_Leave_std',
-    y='Pct_Leave_lag_std', 
+    x="Pct_Leave_std",
+    y="Pct_Leave_lag_std",
     ci=None,
     data=db,
-    line_kws={'color':'r'}
+    line_kws={"color": "r"},
 )
-ax.axvline(0, c='k', alpha=0.5)
-ax.axhline(0, c='k', alpha=0.5)
-ax.set_title('Moran Plot - % Leave')
+ax.axvline(0, c="k", alpha=0.5)
+ax.axhline(0, c="k", alpha=0.5)
+ax.set_title("Moran Plot - % Leave")
 plt.show()
 ```
 
@@ -375,8 +377,8 @@ Very much in the same way the mean summarizes a crucial element of the distribut
 In order to calculate Moran's I in our dataset, we can call a specific function in `esda` directly (before that, let us row standardized the `w` object again):
 
 ```python
-w.transform = 'R'
-moran = esda.moran.Moran(db['Pct_Leave'], w)
+w.transform = "R"
+moran = esda.moran.Moran(db["Pct_Leave"], w)
 ```
 
 The method `Moran` creates an object that contains much more information than the actual statistic. If we want to retrieve the value of the statistic, we can do it this way:
@@ -425,7 +427,7 @@ where $n$ is the number of observations, $w_{ij}$ is the cell in a binary matrix
 Computationally, Geary's C is more demanding, but it can be easily computed using `esda`:
 
 ```python
-geary = esda.geary.Geary(db['Pct_Leave'], w)
+geary = esda.geary.Geary(db["Pct_Leave"], w)
 ```
 
 Which has a similar way of accessing its estimate:
@@ -459,7 +461,7 @@ To illustrate its computation, let us calculate a binary distance band $W$. To m
 ```python
 db_osgb = db.to_crs(epsg=27700)
 pts = db_osgb.centroid
-xys = pandas.DataFrame({'X': pts.x, 'Y': pts.y})
+xys = pandas.DataFrame({"X": pts.x, "Y": pts.y})
 min_thr = weights.util.min_threshold_distance(xys)
 min_thr
 ```
@@ -473,13 +475,15 @@ w_db = weights.DistanceBand.from_dataframe(db_osgb, min_thr)
 At this point, we are ready to calculate the global $G$ statistic:
 
 ```python
-gao = esda.getisord.G(db['Pct_Leave'], w_db)
+gao = esda.getisord.G(db["Pct_Leave"], w_db)
 ```
 
 Access to the statistic (`gao.G`) and additional attributes can be gained in the same way as with the previous statistics:
 
 ```python
-print("Getis & Ord G: %.3f | Pseudo P-value: %.3f"%(gao.G, gao.p_sim))
+print(
+    "Getis & Ord G: %.3f | Pseudo P-value: %.3f" % (gao.G, gao.p_sim)
+)
 ```
 
 Similarly, inference can also be carried out by relying on computational simulations that replicate several instances of spatial randomness using the values in the variable of interest, but shuffling their locations. In this case, the pseudo P-value computed suggests a clear departure from the hypothesis of no concentration.

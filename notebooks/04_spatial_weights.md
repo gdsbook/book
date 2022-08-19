@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.13.8
+      jupytext_version: 1.11.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 ```
 
@@ -35,7 +36,7 @@ import contextily
 import geopandas
 import rioxarray
 import seaborn
-import pandas 
+import pandas
 import numpy
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
@@ -66,14 +67,14 @@ xs, ys = numpy.meshgrid(l, l)
 polys = []
 # Generate polygons
 for x, y in zip(xs.flatten(), ys.flatten()):
-    poly = Polygon([(x, y), (x+1, y), (x+1, y+1), (x, y+1)])
+    poly = Polygon([(x, y), (x + 1, y), (x + 1, y + 1), (x, y + 1)])
     polys.append(poly)
 # Convert to GeoSeries
 polys = geopandas.GeoSeries(polys)
 gdf = geopandas.GeoDataFrame(
     {
-        'geometry': polys, 
-        'id': ['P-%s'%str(i).zfill(2) for i in range(len(polys))]
+        "geometry": polys,
+        "id": ["P-%s" % str(i).zfill(2) for i in range(len(polys))],
     }
 )
 ```
@@ -82,18 +83,22 @@ which results in the grid shown in the following figure.
 
 ```python caption="A three-by-three grid of squares. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Plot grid geotable
-ax = gdf.plot(facecolor='w', edgecolor='k')
+ax = gdf.plot(facecolor="w", edgecolor="k")
 
 # Loop over each cell and add the text
 for x, y, t in zip(
-    [p.centroid.x-.25 for p in polys],
-    [p.centroid.y-.25 for p in polys],
-    [i for i in gdf['id']]
+    [p.centroid.x - 0.25 for p in polys],
+    [p.centroid.y - 0.25 for p in polys],
+    [i for i in gdf["id"]],
 ):
     plt.text(
-        x, y, t, verticalalignment='center', horizontalalignment='center'
+        x,
+        y,
+        t,
+        verticalalignment="center",
+        horizontalalignment="center",
     )
-    
+
 # Remove axes
 ax.set_axis_off()
 plt.show()
@@ -112,20 +117,24 @@ Note the pattern we use to build the `w` object, which is similar across the lib
 
 ```python caption="Grid cells connected by a red line are 'neighbors' under a 'Rook' contiguity rule.Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Set up figure
-f,ax = plt.subplots(1,1, subplot_kw=dict(aspect='equal'))
+f, ax = plt.subplots(1, 1, subplot_kw=dict(aspect="equal"))
 # Plot grid
-gdf.plot(facecolor='w', edgecolor='k', ax=ax)
+gdf.plot(facecolor="w", edgecolor="k", ax=ax)
 # Loop over each cell and add the text
 for x, y, t in zip(
-    [p.centroid.x-.25 for p in polys],
-    [p.centroid.y-.25 for p in polys],
-    [i for i in gdf['id']]
+    [p.centroid.x - 0.25 for p in polys],
+    [p.centroid.y - 0.25 for p in polys],
+    [i for i in gdf["id"]],
 ):
     plt.text(
-        x, y, t, verticalalignment='center', horizontalalignment='center'
+        x,
+        y,
+        t,
+        verticalalignment="center",
+        horizontalalignment="center",
     )
 # Plot weights connectivity
-wr.plot(gdf, edge_kws=dict(color='r', linestyle=':'), ax =ax)
+wr.plot(gdf, edge_kws=dict(color="r", linestyle=":"), ax=ax)
 # Remove axes
 ax.set_axis_off()
 ```
@@ -189,20 +198,24 @@ In addition to this neighbors representation, we can also express the graph visu
 
 ```python caption="Grid cells connected by a red line are considered 'neighbors' under 'Queen' contiguity. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Set up figure
-f,ax = plt.subplots(1,1, subplot_kw=dict(aspect='equal'))
+f, ax = plt.subplots(1, 1, subplot_kw=dict(aspect="equal"))
 # Plot grid
-gdf.plot(facecolor='w', edgecolor='k', ax=ax)
+gdf.plot(facecolor="w", edgecolor="k", ax=ax)
 # Loop over each cell and add the text
 for x, y, t in zip(
-    [p.centroid.x-.25 for p in polys],
-    [p.centroid.y-.25 for p in polys],
-    [i for i in gdf['id']]
+    [p.centroid.x - 0.25 for p in polys],
+    [p.centroid.y - 0.25 for p in polys],
+    [i for i in gdf["id"]],
 ):
     plt.text(
-        x, y, t, verticalalignment='center', horizontalalignment='center'
+        x,
+        y,
+        t,
+        verticalalignment="center",
+        horizontalalignment="center",
     )
 # Plot weights connectivity
-wq.plot(gdf, edge_kws=dict(color='r', linestyle=':'), ax =ax)
+wq.plot(gdf, edge_kws=dict(color="r", linestyle=":"), ax=ax)
 # Remove axes
 ax.set_axis_off()
 ```
@@ -241,7 +254,7 @@ We can obtain a quick visual representation by converting the cardinalities
 into a `pandas.Series` and creating a histogram:
 
 ```python caption="Histogram of  cardinalities (i.e. the number of neighbors each cell has) in the Queen grid."
-pandas.Series(wq.cardinalities).plot.hist(color='k');
+pandas.Series(wq.cardinalities).plot.hist(color="k");
 ```
 
 The `cardinalities` and `histogram` attributes help quickly spot asymmetries in
@@ -285,7 +298,9 @@ must construct it ourselves. Under the hood, `pysal` uses efficient spatial inde
 structures to extract these.
 
 ```python
-san_diego_tracts = geopandas.read_file('../data/sandiego/sandiego_tracts.gpkg')
+san_diego_tracts = geopandas.read_file(
+    "../data/sandiego/sandiego_tracts.gpkg"
+)
 w_queen = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 ```
 
@@ -293,19 +308,21 @@ Like before, we can visualize the adjacency relationships, but they are much mor
 
 ```python caption="The Queen contiguity graph for San Diego tracts. Tracts connected with a red line are neighbors. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Plot tract geography
-f, axs = plt.subplots(1,2,figsize=(8,4))
+f, axs = plt.subplots(1, 2, figsize=(8, 4))
 for i in range(2):
-    ax = san_diego_tracts.plot(edgecolor='k', facecolor='w', ax=axs[i])
+    ax = san_diego_tracts.plot(
+        edgecolor="k", facecolor="w", ax=axs[i]
+    )
     # Plot graph connections
     w_queen.plot(
-        san_diego_tracts, 
-        ax=axs[i], 
-        edge_kws=dict(color='r', linestyle=':', linewidth=1),
-        node_kws=dict(marker='')
+        san_diego_tracts,
+        ax=axs[i],
+        edge_kws=dict(color="r", linestyle=":", linewidth=1),
+        node_kws=dict(marker=""),
     )
-# Remove the axis
+    # Remove the axis
     axs[i].set_axis_off()
-axs[1].axis([-13040000,  -13020000, 3850000, 3860000]);
+axs[1].axis([-13040000, -13020000, 3850000, 3860000]);
 ```
 The weights object for San Diego tracts have the same attributes and methods as
 we encountered with our artificial layout above:
@@ -480,9 +497,9 @@ Adaptive bandwidths are picked again using a K-nearest neighbor rule. A bandwidt
 # Create subset of tracts
 sub_30 = san_diego_tracts.query("sub_30 == True")
 # Plot polygons
-ax = sub_30.plot(facecolor='w', edgecolor='k')
+ax = sub_30.plot(facecolor="w", edgecolor="k")
 # Create and plot centroids
-sub_30.head(30).centroid.plot(color='r', ax=ax)
+sub_30.head(30).centroid.plot(color="r", ax=ax)
 # Remove axis
 ax.set_axis_off();
 ```
@@ -492,7 +509,7 @@ If we now build a weights object with adaptive bandwidth (`fixed=False`), the va
 ```python
 # Build weights with adaptive bandwidth
 w_adaptive = weights.distance.Kernel.from_dataframe(
-    sub_30,fixed=False, k=15
+    sub_30, fixed=False, k=15
 )
 # Print first five bandwidth values
 w_adaptive.bandwidth[:5]
@@ -504,23 +521,23 @@ And, we can visualize what these kernels look like on the map, too, by focusing 
 # Create full matrix version of weights
 full_matrix, ids = w_adaptive.full()
 # Set up figure with two subplots in a row
-f,ax = plt.subplots(
-    1, 2, figsize=(12,6), subplot_kw=dict(aspect='equal')
+f, ax = plt.subplots(
+    1, 2, figsize=(12, 6), subplot_kw=dict(aspect="equal")
 )
 # Append weights for first polygon and plot on first subplot
-sub_30.assign(
-    weight_0 = full_matrix[0]
-).plot("weight_0", cmap='plasma', ax=ax[0])
+sub_30.assign(weight_0=full_matrix[0]).plot(
+    "weight_0", cmap="plasma", ax=ax[0]
+)
 # Append weights for 18th polygon and plot on first subplot
-sub_30.assign(
-    weight_18 = full_matrix[17]
-).plot("weight_18", cmap='plasma', ax=ax[1])
+sub_30.assign(weight_18=full_matrix[17]).plot(
+    "weight_18", cmap="plasma", ax=ax[1]
+)
 # Add centroid of focal tracts
 sub_30.iloc[[0], :].centroid.plot(
-    ax=ax[0], marker="*", color="k", label='Focal Tract'
+    ax=ax[0], marker="*", color="k", label="Focal Tract"
 )
 sub_30.iloc[[17], :].centroid.plot(
-    ax=ax[1], marker="*", color="k", label='Focal Tract'
+    ax=ax[1], marker="*", color="k", label="Focal Tract"
 )
 # Add titles
 ax[0].set_title("Kernel centered on first tract")
@@ -528,7 +545,7 @@ ax[1].set_title("Kernel centered on 18th tract")
 # Remove axis
 [ax_.set_axis_off() for ax_ in ax]
 # Add legend
-[ax_.legend(loc='upper left') for ax_ in ax];
+[ax_.legend(loc="upper left") for ax_ in ax];
 ```
 
 What the kernel looks like can be strongly affected by the structure of spatial proximity, so any part of the map can look quite different from any other part of the map. By imposing a clear distance decay over several of the neighbors of each observation,
@@ -613,7 +630,7 @@ shapefile full of polygons):
 ```python
 # ignore curvature of the earth
 knn4_bad = weights.distance.KNN.from_shapefile(
-    '../data/texas/texas.shp', k=4
+    "../data/texas/texas.shp", k=4
 )
 ```
 
@@ -633,7 +650,7 @@ case:
 
 ```python
 knn4 = weights.distance.KNN.from_shapefile(
-    '../data/texas/texas.shp', k=4, radius=radius
+    "../data/texas/texas.shp", k=4, radius=radius
 )
 ```
 
@@ -662,9 +679,7 @@ To demonstrate this class of spatial weights, we will use the tract dataset for
 San Diego and focus on their county membership:
 
 ```python
-san_diego_tracts[
-    ['GEOID', 'state', 'county', 'tract']
-].head()
+san_diego_tracts[["GEOID", "state", "county", "tract"]].head()
 ```
 
 Every tract has a unique ID (`GEOID`) and a county ID, shared by all tracts in
@@ -677,8 +692,8 @@ list of memberships. In this case, we will use the county membership:
 ```python
 # NOTE: since this is a large dataset, it might take a while to process
 w_bl = weights.util.block_weights(
-    san_diego_tracts['county'].values, 
-    ids=san_diego_tracts['GEOID'].values
+    san_diego_tracts["county"].values,
+    ids=san_diego_tracts["GEOID"].values,
 )
 ```
 
@@ -686,7 +701,7 @@ As a check, let's consider the first two rows in the table above. If the block
 weights command has worked out correctly, both should be neighbors:
 
 ```python
-'06073000201' in w_bl['06073000100']
+"06073000201" in w_bl["06073000100"]
 ```
 
 We can use block weights as an intermediate step in more involved analyses
@@ -795,7 +810,7 @@ We compare the neighbor graphs that results from some of the
 criteria introduced to define neighbor relations. We first read in the data for Mexico:
 
 ```python
-mx = geopandas.read_file('../data/mexico/mexicojoin.shp')
+mx = geopandas.read_file("../data/mexico/mexicojoin.shp")
 ```
 
 We will contrast the look of the connectivity graphs built following several criteria so, to streamline things, let's build the weights objects first:
@@ -815,7 +830,7 @@ mx_knn4 = weights.KNN.from_dataframe(mx, k=4)
 - Block weights at the federal region level
 
 ```python
-mx_bw = weights.util.block_weights(mx['INEGI2'].values)
+mx_bw = weights.util.block_weights(mx["INEGI2"].values)
 ```
 
 - A combination of block and queen that connects contiguous neighbors _across_ regions
@@ -834,53 +849,49 @@ f, axs = plt.subplots(2, 2, figsize=(9, 9))
 ax = axs[0, 0]
 mx.plot(ax=ax)
 mx_queen.plot(
-    mx, 
-    edge_kws=dict(linewidth=1, color='orangered'), 
-    node_kws=dict(marker='*'), 
-    ax=ax
+    mx,
+    edge_kws=dict(linewidth=1, color="orangered"),
+    node_kws=dict(marker="*"),
+    ax=ax,
 )
 ax.set_axis_off()
-ax.set_title('Queen')
+ax.set_title("Queen")
 
 # KNN
 ax = axs[0, 1]
 mx.plot(ax=ax)
 mx_knn4.plot(
-    mx, 
-    edge_kws=dict(linewidth=1, color='orangered'), 
-    node_kws=dict(marker='*'), 
-    ax=ax
+    mx,
+    edge_kws=dict(linewidth=1, color="orangered"),
+    node_kws=dict(marker="*"),
+    ax=ax,
 )
 ax.set_axis_off()
-ax.set_title('$K$-NN 4')
+ax.set_title("$K$-NN 4")
 
 # Block
 ax = axs[1, 0]
-mx.plot(
-    column='INEGI2', categorical=True, cmap='Pastel2', ax=ax
-)
+mx.plot(column="INEGI2", categorical=True, cmap="Pastel2", ax=ax)
 mx_bw.plot(
-    mx, 
-    edge_kws=dict(linewidth=1, color='orangered'), 
-    node_kws=dict(marker='*'), 
-    ax=ax
+    mx,
+    edge_kws=dict(linewidth=1, color="orangered"),
+    node_kws=dict(marker="*"),
+    ax=ax,
 )
 ax.set_axis_off()
-ax.set_title('Block weights')
+ax.set_title("Block weights")
 
 # Union
 ax = axs[1, 1]
-mx.plot(
-    column='INEGI2', categorical=True, cmap='Pastel2', ax=ax
-)
+mx.plot(column="INEGI2", categorical=True, cmap="Pastel2", ax=ax)
 mx_union.plot(
-    mx, 
-    edge_kws=dict(linewidth=1, color='orangered'), 
-    node_kws=dict(marker='*'), 
-    ax=ax
+    mx,
+    edge_kws=dict(linewidth=1, color="orangered"),
+    node_kws=dict(marker="*"),
+    ax=ax,
 )
 ax.set_axis_off()
-ax.set_title('Queen + Block')
+ax.set_title("Queen + Block")
 f.tight_layout()
 plt.show()
 ```
@@ -933,17 +944,17 @@ Below, we'll show one model-free way to identify empirical boundaries in your da
 First, let's consider the median household income for our census tracts in San Diego, shown in the following figure.
 
 ```python caption="Median household incomes in San Diego." tags=[]
-f,ax = plt.subplots(1,2, figsize=(12,4))
-san_diego_tracts.plot('median_hh_income', ax=ax[0])
+f, ax = plt.subplots(1, 2, figsize=(12, 4))
+san_diego_tracts.plot("median_hh_income", ax=ax[0])
 ax[0].set_axis_off()
-san_diego_tracts['median_hh_income'].plot.hist(ax=ax[1])
+san_diego_tracts["median_hh_income"].plot.hist(ax=ax[1])
 plt.show()
 ```
 
 Now, we see some cases where there are very stark differences between neighboring areas, and some cases where there appear to be no difference between adjacent areas. Digging into this, we can examine the *distribution of differences* in neighboring areas using the adjacency list, a different representation of a spatial graph:
 
 ```python
-adjlist = w_rook.to_adjlist() 
+adjlist = w_rook.to_adjlist()
 adjlist.head()
 ```
 
@@ -953,16 +964,16 @@ Now we want to connect this table representing spatial structure with informatio
 
 ```python
 adjlist_income = adjlist.merge(
-    san_diego_tracts[['median_hh_income']], 
-    how='left', 
-    left_on='focal', 
-    right_index=True
+    san_diego_tracts[["median_hh_income"]],
+    how="left",
+    left_on="focal",
+    right_index=True,
 ).merge(
-    san_diego_tracts[['median_hh_income']], 
-    how='left',
-    left_on='neighbor', 
-    right_index=True, 
-    suffixes=('_focal', '_neighbor')
+    san_diego_tracts[["median_hh_income"]],
+    how="left",
+    left_on="neighbor",
+    right_index=True,
+    suffixes=("_focal", "_neighbor"),
 )
 adjlist_income.info()
 ```
@@ -970,11 +981,10 @@ adjlist_income.info()
 This operation brings together the income at both the focal observation and the neighbor observation. The difference between these two yields income differences between *adjacent* tracts:
 
 ```python
-adjlist_income['diff'] = adjlist_income[
-    'median_hh_income_focal'
-] - adjlist_income[
-    'median_hh_income_neighbor'
-]
+adjlist_income["diff"] = (
+    adjlist_income["median_hh_income_focal"]
+    - adjlist_income["median_hh_income_neighbor"]
+)
 ```
 
 With this information on difference we can now do a few things. First, we can compare whether or not this *distribution* is distinct from the distribution of non-neighboring tracts' differences in wealth. This will give us a hint at the extent to which income follows a spatial pattern. This is also discussed more in depth in the spatial inequality chapter, specifically in reference to the Spatial Gini. 
@@ -983,8 +993,8 @@ To do this, we can first compute the all-pairs differences in income using the `
 
 ```python
 all_pairs = numpy.subtract.outer(
-    san_diego_tracts['median_hh_income'].values, 
-    san_diego_tracts['median_hh_income'].values
+    san_diego_tracts["median_hh_income"].values,
+    san_diego_tracts["median_hh_income"].values,
 )
 ```
 
@@ -1005,24 +1015,24 @@ non_neighboring_diffs = (complement_wr * all_pairs).flatten()
 Now, we can compare the two distributions of the difference in wealth:
 
 ```python caption="Diferences between median incomes among neighboring (and non-neighboring) tracts in San Diego."
-f = plt.figure(figsize=(12,3))
+f = plt.figure(figsize=(12, 3))
 plt.hist(
-    non_neighboring_diffs, 
-    color='lightgrey', 
-    edgecolor='k', 
-    density=True, 
-    bins=50, 
-    label='Nonneighbors'
+    non_neighboring_diffs,
+    color="lightgrey",
+    edgecolor="k",
+    density=True,
+    bins=50,
+    label="Nonneighbors",
 )
 plt.hist(
-    adjlist_income['diff'], 
-    color='salmon', 
-    edgecolor='orangered', 
-    linewidth=3, 
-    density=True, 
-    histtype='step', 
-    bins=50, 
-    label='Neighbors'
+    adjlist_income["diff"],
+    color="salmon",
+    edgecolor="orangered",
+    linewidth=3,
+    density=True,
+    histtype="step",
+    bins=50,
+    label="Neighbors",
 )
 seaborn.despine()
 plt.ylabel("Density")
@@ -1036,7 +1046,7 @@ From this, we can see that the two distributions are distinct, with the distribu
 The adjacency table we have build can also help us find our *most extreme* observed differences in income, hinting at possible hard boundaries between the areas. Since our links are symmetric, we can then focus only on focal observations with *the most extreme* difference in wealth from their immediate neighbors, considering only on those where the *focal* is higher, since they each have an equivalent *negative* back-link.
 
 ```python
-extremes = adjlist_income.sort_values('diff', ascending=False).head()
+extremes = adjlist_income.sort_values("diff", ascending=False).head()
 extremes
 ```
 
@@ -1059,60 +1069,64 @@ simulated_diffs = numpy.empty((len(adjlist), n_simulations))
 # Loop over each random draw
 for i in range(n_simulations):
     # Extract income values
-    median_hh_focal = adjlist_income['median_hh_income_focal'].values
+    median_hh_focal = adjlist_income["median_hh_income_focal"].values
     # Shuffle income values across locations
-    random_income = san_diego_tracts[
-        ['median_hh_income']
-    ].sample(frac=1, replace=False).reset_index()
+    random_income = (
+        san_diego_tracts[["median_hh_income"]]
+        .sample(frac=1, replace=False)
+        .reset_index()
+    )
     # Join income to adjacency
     adjlist_random_income = adjlist.merge(
-        random_income, left_on='focal', right_index=True
+        random_income, left_on="focal", right_index=True
     ).merge(
-        random_income, 
-        left_on='neighbor', 
-        right_index=True, 
-        suffixes=('_focal','_neighbor')
+        random_income,
+        left_on="neighbor",
+        right_index=True,
+        suffixes=("_focal", "_neighbor"),
     )
     # Store reslults from random draw
-    simulated_diffs[:,i] = adjlist_random_income[
-        'median_hh_income_focal'
-    ] - adjlist_random_income[
-        'median_hh_income_neighbor'
-    ]
+    simulated_diffs[:, i] = (
+        adjlist_random_income["median_hh_income_focal"]
+        - adjlist_random_income["median_hh_income_neighbor"]
+    )
 ```
 
 After running our simulation, we get many distributions of pairwise differences in household income. Below, we plot the shroud of all of the simulated differences, shown in black, and our observed differences, shown in red:
 
 ```python caption="Differences between neighboring incomes for the observed map (orange) and maps arising from randomly-reshuffled maps (black) of tract median incomes. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Set up figure
-f = plt.figure(figsize=(12,3))
+f = plt.figure(figsize=(12, 3))
 # Build background histogram for observed differences
 plt.hist(
-    adjlist_income['diff'], 
-    color='salmon', 
-    bins=50, 
+    adjlist_income["diff"],
+    color="salmon",
+    bins=50,
     density=True,
-    alpha=1, 
-    linewidth=4
+    alpha=1,
+    linewidth=4,
 )
 # Plot simulated, random differences
-[plt.hist(
-    simulation, 
-    histtype='step', 
-    color='k', 
-    alpha=.01, 
-    linewidth=1, 
-    bins=50, 
-    density=True
-) for simulation in simulated_diffs.T]
+[
+    plt.hist(
+        simulation,
+        histtype="step",
+        color="k",
+        alpha=0.01,
+        linewidth=1,
+        bins=50,
+        density=True,
+    )
+    for simulation in simulated_diffs.T
+]
 # Build histogram borderline for observed differences
 plt.hist(
-    adjlist_income['diff'], 
-    histtype='step', 
-    edgecolor='orangered', 
-    bins=50, 
+    adjlist_income["diff"],
+    histtype="step",
+    edgecolor="orangered",
+    bins=50,
     density=True,
-    linewidth=2
+    linewidth=2,
 )
 # Style figure
 seaborn.despine()
@@ -1130,14 +1144,14 @@ simulated_diffs.flatten().shape
 ```python
 # Convert all simulated differences into a single vector
 pooled_diffs = simulated_diffs.flatten()
-# Calculate the 0.5th, 50th and 99.5th percentiles 
-lower, median, upper = numpy.percentile(pooled_diffs, q=(.5,50,99.5))
-# Create a swith that is True if the value is "extreme" 
+# Calculate the 0.5th, 50th and 99.5th percentiles
+lower, median, upper = numpy.percentile(
+    pooled_diffs, q=(0.5, 50, 99.5)
+)
+# Create a swith that is True if the value is "extreme"
 # (in the 0.5th percentile or/`|` in the 00.5th), False otherwise
-outside = (
-    adjlist_income['diff'] < lower
-) | (
-    adjlist_income['diff'] > upper
+outside = (adjlist_income["diff"] < lower) | (
+    adjlist_income["diff"] > upper
 )
 ```
 
@@ -1150,35 +1164,48 @@ adjlist_income[outside]
 Note that one of these, observation $473$, appears in both boundaries. This means that the observation is likely to be *outlying*, extremely unlike *all* of its neighbors. These kinds of generalized neighborhood comparisons are discussed in the subsequent chapter on local spatial autocorrelation. For now we can visualize this on a map, focusing on the two boundaries around observation $473$, shown also in the larger context of San Diego incomes:
 
 ```python caption="The two most stark differences in median household income among San Diego tracts. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
-f,ax = plt.subplots(1, 3, figsize=(18,6))
+f, ax = plt.subplots(1, 3, figsize=(18, 6))
 
 # Plot tracts
 for i in range(2):
-    san_diego_tracts.plot('median_hh_income', ax=ax[i])
+    san_diego_tracts.plot("median_hh_income", ax=ax[i])
 
 # Zoom 1
-first_focus = san_diego_tracts.iloc[[473,157]]
-ax[0].plot(first_focus.centroid.x, first_focus.centroid.y, color='red')
-west,east,south,north = first_focus.buffer(1000).total_bounds
+first_focus = san_diego_tracts.iloc[[473, 157]]
+ax[0].plot(
+    first_focus.centroid.x, first_focus.centroid.y, color="red"
+)
+west, east, south, north = first_focus.buffer(1000).total_bounds
 ax[0].axis([west, south, east, north])
 ax[0].set_axis_off()
 
 # Zoom 2
-second_focus = san_diego_tracts.iloc[[473,163]]
-ax[1].plot(second_focus.centroid.x, second_focus.centroid.y, color='red')
+second_focus = san_diego_tracts.iloc[[473, 163]]
+ax[1].plot(
+    second_focus.centroid.x, second_focus.centroid.y, color="red"
+)
 ax[1].axis([west, south, east, north])
 ax[1].set_axis_off()
 
 # Context
-san_diego_tracts.plot(facecolor="k", edgecolor="w", linewidth=0.5, alpha=0.5, ax=ax[2])
+san_diego_tracts.plot(
+    facecolor="k", edgecolor="w", linewidth=0.5, alpha=0.5, ax=ax[2]
+)
 contextily.add_basemap(ax[2], crs=san_diego_tracts.crs)
-area_of_focus = pandas.concat((first_focus, second_focus)).buffer(12000).total_bounds
-ax[2].plot(first_focus.centroid.x, first_focus.centroid.y, color='red')
-ax[2].plot(second_focus.centroid.x, second_focus.centroid.y, color='red')
+area_of_focus = (
+    pandas.concat((first_focus, second_focus))
+    .buffer(12000)
+    .total_bounds
+)
+ax[2].plot(
+    first_focus.centroid.x, first_focus.centroid.y, color="red"
+)
+ax[2].plot(
+    second_focus.centroid.x, second_focus.centroid.y, color="red"
+)
 west, east, south, north = area_of_focus
 ax[2].axis([west, south, east, north])
 ax[2].set_axis_off()
-
 ```
 
 These are the starkest contrasts in the map, and result in the most distinctive divisions between adjacent tracts' household incomes. 

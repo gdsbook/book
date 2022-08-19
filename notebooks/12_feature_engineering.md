@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 ```
 
@@ -49,7 +50,7 @@ osmnx.config(
 Throughout this chapter, we will use the same dataset to which we want to append more information or augment, and we will do so through leveraging geography. For the illustration, we will use the set of [AirBnB properties](../data/airbnb/regression_cleaning) we have used in the [previous chapter](11_regression). Let's read it:
 
 ```python
-airbnbs = geopandas.read_file('../data/airbnb/regression_db.geojson')
+airbnbs = geopandas.read_file("../data/airbnb/regression_db.geojson")
 ```
 
 ## What is spatial feature engineering? 
@@ -89,9 +90,16 @@ Using this polygon, we can use the `osmnx` package to fetch points of interest (
 ```python
 %%time
 pois = osmnx.geometries_from_polygon(
-    airbnbs_ch, tags={"amenity": ['restaurant', 'bar']}
+    airbnbs_ch, tags={"amenity": ["restaurant", "bar"]}
 ).reset_index()[
-    ["element_type", "osmid", "amenity", "cuisine", "name", "geometry"]
+    [
+        "element_type",
+        "osmid",
+        "amenity",
+        "cuisine",
+        "name",
+        "geometry",
+    ]
 ]
 ```
 
@@ -111,23 +119,23 @@ pois = geopandas.read_file("../data/cache/sd_pois.gpkg")
 This provides us with every location within our convex hull that is tagged in the metadata stored in OpenStreetMap as a "restaurant" or "bar". Overall, this provides us with about 1300 points of interest: 
 
 ```python
-pois.groupby('amenity').amenity.count()
+pois.groupby("amenity").amenity.count()
 ```
 
 Once loaded into `pois` as a `GeoDataFrame`, let's take a peek at their location, as compared with AirBnB spots:
 
 ```python caption="Points of interest (POIs) and Airbnbs in San Diego." tags=[]
 # Set up figure and axis
-f,ax = plt.subplots(1,figsize=(12, 12))
+f, ax = plt.subplots(1, figsize=(12, 12))
 # Plot AirBnb properties
-airbnbs.plot(ax=ax, marker='.')
+airbnbs.plot(ax=ax, marker=".")
 # Plot POIs in red
-pois.plot(ax=ax, color='r')
+pois.plot(ax=ax, color="r")
 # Add Stamen's Toner basemap
 contextily.add_basemap(
-    ax, 
-    crs=airbnbs.crs.to_string(), 
-    source=contextily.providers.Stamen.Toner
+    ax,
+    crs=airbnbs.crs.to_string(),
+    source=contextily.providers.Stamen.Toner,
 )
 # Remove axes
 ax.set_axis_off()
@@ -173,7 +181,7 @@ pois_albers.crs
 With this, we can create the radius of 500m around each AirBnB. This is often called *buffering*, where a shape is dilated by a given radius.
 
 ```python
-airbnbs_albers['buffer_500m'] = airbnbs_albers.buffer(500)
+airbnbs_albers["buffer_500m"] = airbnbs_albers.buffer(500)
 ```
 
 Now, `abb_buffer` contains a 500-meter circle around each AirBnB.
@@ -188,9 +196,9 @@ joined = geopandas.sjoin(
     # Left table - Airbnb with the geometry reset from the original
     # points to the 500m buffer and selecting only `id` and
     # `buffer_500m` column
-    airbnbs_albers.set_geometry('buffer_500m')[['id', 'buffer_500m']],
+    airbnbs_albers.set_geometry("buffer_500m")[["id", "buffer_500m"]],
     # Operation (spatial predicate) to use for the spatial join (`within`)
-    op="within"
+    op="within",
 )
 ```
 
@@ -198,14 +206,16 @@ The resulting `joined` object contains a row for every pair of POI and AirBnB th
 
 ```python
 # Group POIs by Airbnb ID (`id`)
-poi_count = joined.groupby(
-    "id"
-# Keep only POI id column (`osmid`)
-)[
-    "osmid"
-# Count POIs by Airbnb + convert Series into DataFrame
-].count().to_frame(
-    'poi_count'
+poi_count = (
+    joined.groupby(
+        "id"
+        # Keep only POI id column (`osmid`)
+    )[
+        "osmid"
+        # Count POIs by Airbnb + convert Series into DataFrame
+    ]
+    .count()
+    .to_frame("poi_count")
 )
 # Print top of the table
 poi_count.head()
@@ -215,7 +225,7 @@ The resulting `Series` is indexed on the AirBnB IDs, so we can assign it to the 
 
 ```python
 airbnbs_w_counts = airbnbs_albers.merge(
-    poi_count, left_on='id', right_index=True
+    poi_count, left_on="id", right_index=True
 ).fillna({"poi_count": 0})
 ```
 
@@ -230,13 +240,13 @@ airbnbs_w_counts.plot(
     scheme="quantiles",
     alpha=0.5,
     legend=True,
-    ax=ax
+    ax=ax,
 )
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    crs=airbnbs_albers.crs.to_string(), 
-    source=contextily.providers.Stamen.Toner
+    ax,
+    crs=airbnbs_albers.crs.to_string(),
+    source=contextily.providers.Stamen.Toner,
 )
 # Remove axes
 ax.set_axis_off();
@@ -283,7 +293,7 @@ Now, we can  apply this logic to a sequence of coordinates. For that, we need to
 # Create table with XY coordinates of Airbnb locations
 abb_xys = pandas.DataFrame(
     {"X": airbnbs.geometry.x, "Y": airbnbs.geometry.y}
-# Convert from DataFrame to array of XY pairs
+    # Convert from DataFrame to array of XY pairs
 ).to_records(index=False)
 ```
 
@@ -297,7 +307,7 @@ elevation = pandas.DataFrame(
     # Name of the column to be created to store elevation
     columns=["Elevation"],
     # Row index, mirroring that of Airbnb locations
-    index=airbnbs.index
+    index=airbnbs.index,
 )
 # Print top of the table
 elevation.head()
@@ -311,20 +321,20 @@ f, ax = plt.subplots(1, figsize=(9, 9))
 # Join elevation data to original Airbnb table
 airbnbs.join(
     elevation
-# Plot elevation at each Airbnb location as a quantile choropleth
+    # Plot elevation at each Airbnb location as a quantile choropleth
 ).plot(
     column="Elevation",
     scheme="quantiles",
     legend=True,
     alpha=0.5,
-    ax=ax
+    ax=ax,
 )
 # Add Stamen's terrain basemap
 contextily.add_basemap(
-    ax, 
-    crs=airbnbs.crs.to_string(), 
+    ax,
+    crs=airbnbs.crs.to_string(),
     source=contextily.providers.Stamen.TerrainBackground,
-    alpha=0.5
+    alpha=0.5,
 )
 # Remove axes
 ax.set_axis_off();
@@ -344,7 +354,7 @@ This algorithm will select the nearest ten listings, then compute the prediction
 
 ```python
 two_bed_homes = airbnbs[
-    airbnbs['bedrooms']==2 & airbnbs['rt_Entire_home/apt']
+    airbnbs["bedrooms"] == 2 & airbnbs["rt_Entire_home/apt"]
 ]
 ```
 
@@ -363,7 +373,7 @@ To plot the interpolated surface, we must also construct a grid of locations for
 xmin, ymin, xmax, ymax = airbnbs.total_bounds
 # Generate X and Y meshes for the space within the bounding box
 x, y = numpy.meshgrid(
-    numpy.linspace(xmin, xmax), numpy.linspace(ymin,ymax)
+    numpy.linspace(xmin, xmax), numpy.linspace(ymin, ymax)
 )
 ```
 
@@ -371,15 +381,15 @@ To build an intuition on what they are, we can visualise both meshes side by sid
 
 ```python caption="Example grid showing the coordiantes used for interpolation." tags=[]
 # Set up figure
-f,ax = plt.subplots(1,2)
+f, ax = plt.subplots(1, 2)
 # Plot X mesh
 ax[0].imshow(x)
 # Plot Y mesh
 ax[1].imshow(y)
 # Label X mesh
-ax[0].set_title('X values')
+ax[0].set_title("X values")
 # Label Y mesh
-ax[1].set_title('Y values')
+ax[1].set_title("Y values")
 # Display
 plt.show()
 ```
@@ -391,8 +401,7 @@ With these coordinates, we can make a GeoDataFrame containing the grid cells at 
 grid = numpy.column_stack((x.flatten(), y.flatten()))
 # Convert a 1D (flattened) version of X and Y meshes into a geo-table
 grid_df = geopandas.GeoDataFrame(
-    geometry=geopandas.points_from_xy(
-        x=x.flatten(), y=y.flatten())
+    geometry=geopandas.points_from_xy(x=x.flatten(), y=y.flatten())
 )
 ```
 
@@ -402,12 +411,12 @@ We can visualise this grid together with the original Airbnb locations to get a 
 # Plot guid points with size 1
 ax = grid_df.plot(markersize=1)
 # Plot on top Airbnb locations in red
-two_bed_homes.plot(ax=ax, color='red')
+two_bed_homes.plot(ax=ax, color="red")
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    crs=two_bed_homes.crs.to_string(), 
-    source=contextily.providers.Stamen.TonerBackground
+    ax,
+    crs=two_bed_homes.crs.to_string(),
+    source=contextily.providers.Stamen.TonerBackground,
 )
 # Remove axes
 ax.set_axis_off();
@@ -416,9 +425,9 @@ ax.set_axis_off();
 With this done, we can now construct the predictions. First we train the model:
 
 ```python
-model = KNeighborsRegressor(
-    n_neighbors=10, weights='distance'
-).fit(two_bed_home_locations, two_bed_homes.price)
+model = KNeighborsRegressor(n_neighbors=10, weights="distance").fit(
+    two_bed_home_locations, two_bed_homes.price
+)
 ```
 
 And then we predict at the grid cell locations:
@@ -438,23 +447,31 @@ The map is a result not only of the underlying data but also the algorithm we ha
 
 ```python caption="Predicted nightly price using a varying number of nearest neighbors. Note the plot smooths considerably as more neighbors are added." tags=[]
 # Set up figure and 8 axes
-f,ax = plt.subplots(1,8, figsize=(16,4))
+f, ax = plt.subplots(1, 8, figsize=(16, 4))
 # Loop over eight values equally spaced between 2 and 100
-for i,k_neighbors in enumerate(numpy.geomspace(2, 100, 8).astype(int)):
+for i, k_neighbors in enumerate(
+    numpy.geomspace(2, 100, 8).astype(int)
+):
     # Select axis to plot estimates for that value of k
     facet = ax[i]
     # Set up a KNN regressor instance with k_neighbors neighbors
-    predictions = KNeighborsRegressor(
-        n_neighbors=k_neighbors, weights='distance'
-    # Fit instance to the 2-bed subset
-    ).fit(
-        two_bed_home_locations, two_bed_homes.price
-    # Get predictions for locations on the grid
-    ).predict(grid)
+    predictions = (
+        KNeighborsRegressor(
+            n_neighbors=k_neighbors,
+            weights="distance"
+            # Fit instance to the 2-bed subset
+        )
+        .fit(
+            two_bed_home_locations,
+            two_bed_homes.price
+            # Get predictions for locations on the grid
+        )
+        .predict(grid)
+    )
     # Plot predictions
     grid_df.plot(predictions, ax=facet)
     # Remove axis
-    facet.axis('off')
+    facet.axis("off")
     # Set axis title
     facet.set_title(f"{k_neighbors} neighbors")
 ```
@@ -464,7 +481,10 @@ Focusing in on central San Diego tells the story a bit more clearly, since there
 ```python
 central_sd_bounds = [-117.179832, 32.655563, -117.020874, 32.769909]
 (
-    central_xmin, central_ymin, central_xmax, central_ymax
+    central_xmin,
+    central_ymin,
+    central_xmax,
+    central_ymax,
 ) = central_sd_bounds
 ```
 
@@ -473,8 +493,8 @@ And repeating the process above for this area, including building the meshes of 
 ```python
 # Build X and Y meshes
 central_x, central_y = numpy.meshgrid(
-    numpy.linspace(central_xmin, central_xmax), 
-    numpy.linspace(central_ymin, central_ymax)
+    numpy.linspace(central_xmin, central_xmax),
+    numpy.linspace(central_ymin, central_ymax),
 )
 # Bind X and Y meshes in a 2D array
 central_grid = numpy.column_stack(
@@ -492,23 +512,31 @@ Finally we can reproduce the sequence of figures with different values of K only
 
 ```python caption="Focus on downtown San Diego predictions for nearest neighbor interpolation." tags=[]
 # Set up figure and subplot
-f, ax = plt.subplots(1,5, figsize=(16,4), sharex=True, sharey=True)
+f, ax = plt.subplots(1, 5, figsize=(16, 4), sharex=True, sharey=True)
 # Loop over five values equally spaced between 2 and 100
-for i,k_neighbors in enumerate(numpy.geomspace(2, 100, 5).astype(int)):
+for i, k_neighbors in enumerate(
+    numpy.geomspace(2, 100, 5).astype(int)
+):
     # Select axis to plot estimates for that value of k
     facet = ax[i]
     # Set up a KNN regressor instance with k_neighbors neighbors
-    predictions = KNeighborsRegressor(
-        n_neighbors=k_neighbors, weights='distance'
-    # Fit instance to the 2-bed subset
-    ).fit(
-        two_bed_home_locations, two_bed_homes.price
-    # Get predictions for locations on the grid
-    ).predict(central_grid)
+    predictions = (
+        KNeighborsRegressor(
+            n_neighbors=k_neighbors,
+            weights="distance"
+            # Fit instance to the 2-bed subset
+        )
+        .fit(
+            two_bed_home_locations,
+            two_bed_homes.price
+            # Get predictions for locations on the grid
+        )
+        .predict(central_grid)
+    )
     # Plot predictions
     central_grid_df.plot(predictions, ax=facet)
     # Remove axis
-    facet.axis('off')
+    facet.axis("off")
     # Set axis title
     facet.set_title(f"{k_neighbors} neighbors")
 ```
@@ -526,9 +554,7 @@ Let us pull down the number of inhabitants from the American Community Survey fo
 %%time
 acs = cenpy.products.ACS()
 sd_pop = acs.from_msa(
-    "San Diego, CA",
-    level = "tract",
-    variables=['B02001_001E']
+    "San Diego, CA", level="tract", variables=["B02001_001E"]
 )
 ```
 
@@ -548,7 +574,9 @@ sd_pop = geopandas.read_file("../data/cache/sd_census.gpkg")
 And calculate population density:
 
 ```python
-sd_pop["density"] = sd_pop["B02001_001E"] / sd_pop.to_crs(epsg=3311).area
+sd_pop["density"] = (
+    sd_pop["B02001_001E"] / sd_pop.to_crs(epsg=3311).area
+)
 ```
 
 Now, to "transfer" density estimates to each AirBnB, we can rely on the spatial join in `geopandas`:
@@ -597,7 +625,7 @@ interpolated = area_interpolate(
     # Extensive variables in `source_df` to be interpolated (e.g. population)
     extensive_variables=["B02001_001E"],
     # Intensive variables in `source_df` to be interpolated (e.g. density)
-    intensive_variables=["density"]
+    intensive_variables=["density"],
 )
 ```
 
@@ -620,15 +648,13 @@ minX, minY, maxX, maxY = interpolated.total_bounds
 # Reproject tracts to EPSG:331
 sd_pop.to_crs(
     epsg=3311
-# Clip to the bounding box
+    # Clip to the bounding box
 ).cx[
-    minX:maxX, minY:maxY
-# Quantile choropleth for tract population
+    minX:maxX,
+    minY:maxY
+    # Quantile choropleth for tract population
 ].plot(
-    column="B02001_001E", 
-    scheme="quantiles", 
-    k=10,
-    ax=axs[0]
+    column="B02001_001E", scheme="quantiles", k=10, ax=axs[0]
 )
 # Remove axes
 axs[0].set_axis_off()
@@ -636,19 +662,14 @@ axs[0].set_axis_off()
 # Reproject H3 hexagons to ESPG:3311
 h3.to_crs(
     epsg=3311
-# Plot hexagons
-).plot(
-    ax=axs[1], markersize=0.5
-)
+    # Plot hexagons
+).plot(ax=axs[1], markersize=0.5)
 # Remove axes
 axs[1].set_axis_off()
 
 # Plot hexagons with interpolated population
 interpolated.plot(
-    column="B02001_001E",
-    scheme="quantiles",
-    k=10,
-    ax=axs[2]
+    column="B02001_001E", scheme="quantiles", k=10, ax=axs[2]
 )
 # Remove axes
 axs[2].set_axis_off()
@@ -672,15 +693,13 @@ minX, minY, maxX, maxY = interpolated.total_bounds
 # Reproject tracts to EPSG:331
 sd_pop.to_crs(
     epsg=3311
-# Clip to the bounding box
+    # Clip to the bounding box
 ).cx[
-    minX:maxX, minY:maxY
-# Quantile choropleth for tract population density
+    minX:maxX,
+    minY:maxY
+    # Quantile choropleth for tract population density
 ].plot(
-    column="density", 
-    scheme="quantiles", 
-    k=10,
-    ax=axs[0]
+    column="density", scheme="quantiles", k=10, ax=axs[0]
 )
 # Remove axes
 axs[0].set_axis_off()
@@ -688,19 +707,14 @@ axs[0].set_axis_off()
 # Reproject H3 hexagons to ESPG:3311
 h3.to_crs(
     epsg=3311
-# Plot hexagons
-).plot(
-    ax=axs[1], markersize=0.5
-)
+    # Plot hexagons
+).plot(ax=axs[1], markersize=0.5)
 # Remove axes
 axs[1].set_axis_off()
 
 # Plot hexagons with interpolated population density
 interpolated.plot(
-    column="density",
-    scheme="quantiles",
-    k=10,
-    ax=axs[2]
+    column="density", scheme="quantiles", k=10, ax=axs[2]
 )
 # Remove axes
 axs[2].set_axis_off()
@@ -753,8 +767,8 @@ f, ax = plt.subplots(1)
 # Append cardinalities to main Airbnb geo-table
 airbnbs.assign(
     card=card
-# Plot cardinality quantile choropleth
-).plot('card', scheme='quantiles', k=7, markersize=1, ax=ax)
+    # Plot cardinality quantile choropleth
+).plot("card", scheme="quantiles", k=7, markersize=1, ax=ax)
 # Add basemap
 contextily.add_basemap(ax, crs=airbnbs.crs)
 # Remove axes
@@ -767,17 +781,19 @@ If what we are interested in is finding the average number of bedrooms around ea
 
 ```python
 # Row standardise
-d500_w.transform = 'r'
+d500_w.transform = "r"
 # Compute spatial lag of No. of bedrooms
 local_average_bedrooms = weights.lag_spatial(
-    d500_w, airbnbs_albers[['bedrooms']].values
+    d500_w, airbnbs_albers[["bedrooms"]].values
 )
 ```
 
 While related, these features contain quite distinct pieces of information, and both may prove useful in modeling: 
 
 ```python caption="Relationship between the number of bedrooms at an Airbnb and the typical number of bedrooms among nearby Airbnbs." tags=[]
-plt.scatter(airbnbs_albers[['bedrooms']].values, local_average_bedrooms)
+plt.scatter(
+    airbnbs_albers[["bedrooms"]].values, local_average_bedrooms
+)
 plt.xlabel("Number of bedrooms")
 plt.ylabel("Average of nearby\n listings' bedrooms");
 ```
@@ -786,7 +802,7 @@ If we were instead interested in the most common number of bedrooms, rather than
 
 ```python
 local_mode = weights.lag_categorical(
-    d500_w, airbnbs_albers[['bedrooms']].values
+    d500_w, airbnbs_albers[["bedrooms"]].values
 )
 ```
 
@@ -816,10 +832,10 @@ If we had the values for each for the neighbors in this adjacency list table, th
 
 ```python
 adjlist = adjlist.merge(
-    airbnbs_albers[['bedrooms']], 
-    left_on='neighbor', 
-    right_index=True, 
-    how='left'
+    airbnbs_albers[["bedrooms"]],
+    left_on="neighbor",
+    right_index=True,
+    how="left",
 )
 adjlist.head()
 ```
@@ -840,7 +856,7 @@ We can use our 500m weights from before to build the average again:
 
 ```python
 average_within_500 = weights.lag_spatial(
-    d500_w, airbnbs_albers[['bedrooms']].values
+    d500_w, airbnbs_albers[["bedrooms"]].values
 )
 ```
 
@@ -863,9 +879,9 @@ d1k_exclusive = weights.set_operations.w_difference(
 Then, we can compute the average size of listings between 500m and one kilometer in the same manner as before using our `d1k_exclusive` graph, which now omits all edges shorter than 500m. 
 
 ```python
-d1k_exclusive.transform = 'r'
+d1k_exclusive.transform = "r"
 average_500m_to_1k = weights.lag_spatial(
-    d1k_exclusive, airbnbs_albers[['bedrooms']].values
+    d1k_exclusive, airbnbs_albers[["bedrooms"]].values
 )
 ```
 
@@ -874,9 +890,7 @@ Thus, we can see that the two features definitely contain distinct, but related,
 ```python caption="Relationship between the size of Airbnbs between successive distance buffers around an Airbnb." tags=[]
 # Plot scatter
 plt.scatter(
-    average_within_500,
-    average_500m_to_1k,
-    color='k', marker='.'
+    average_within_500, average_500m_to_1k, color="k", marker="."
 )
 # Rename horizontal axis
 plt.xlabel("Average size within 500 meters")
@@ -884,12 +898,12 @@ plt.xlabel("Average size within 500 meters")
 plt.ylabel("Average size\n beyond 500m but within 1km")
 # Plot line of 45 degrees
 plt.plot(
-    [0,5],
-    [0,5], 
-    color='orangered', 
-    linestyle=':', 
-    linewidth=2, 
-    label='1 to 1'
+    [0, 5],
+    [0, 5],
+    color="orangered",
+    linestyle=":",
+    linewidth=2,
+    label="1 to 1",
 )
 # Add legend
 plt.legend();
@@ -926,7 +940,7 @@ labels = HDBSCAN(min_cluster_size=25).fit(coordinates).labels_
 The spatial distribution of these clusters will give us a sense of areas of San Diego with relatively high density of the observations. But the `labels` object does not contains clusters, only observation memberships. To derive those clusters geographically, we construct the convex hull of the observations in each detected cluster, creating thus a polygon that delimits every observation that is part of the cluster:
 
 ```python
-hulls = airbnbs_albers[['geometry']].dissolve(by=labels).convex_hull
+hulls = airbnbs_albers[["geometry"]].dissolve(by=labels).convex_hull
 ```
 
 The polygons in `hulls` provide an intermediate layer between the granularity of each individual location and the global scale of San Diego as a geographical unit. Since people tend to make locational decisions hierarchically (e.g. first select *San Diego* as a destination, then they pick a particular *part* of San Diego, then choose a house within the area), this approach might give us reasonable insight into enclaves of Airbnb properties:
@@ -945,20 +959,20 @@ airbnbs_albers.plot(
     # Include legend
     legend=True,
     # Draw on axis `ax`
-    ax=ax, 
+    ax=ax,
     # Use circle as marker
-    marker='.',
+    marker=".",
     # Position legend outside the map
-    legend_kwds={'bbox_to_anchor': (1,1)}
+    legend_kwds={"bbox_to_anchor": (1, 1)},
 )
 # Plot convex hull polygons for each cluster label
 # except that for -1 (observations classified as noise)
-hulls[hulls.index != -1].boundary.plot(color='k', ax=ax)
+hulls[hulls.index != -1].boundary.plot(color="k", ax=ax)
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    crs=airbnbs_albers.crs.to_string(), 
-    source=contextily.providers.CartoDB.VoyagerNoLabels
+    ax,
+    crs=airbnbs_albers.crs.to_string(),
+    source=contextily.providers.CartoDB.VoyagerNoLabels,
 )
 # Remove axes
 ax.set_axis_off();
@@ -968,17 +982,17 @@ Note how the hierarchical nature of HDBSCAN, which picks density thresholds _loc
 
 ```python caption="Boxplot of price by detected 'competition cluter.' The clusters do vary significantly in prices, and could be used to train a model." tags=[]
 # Set up figure
-f = plt.figure(figsize=(8,3))
+f = plt.figure(figsize=(8, 3))
 # Add box plots of price by HDBSCAN cluster
 ax = airbnbs_albers.boxplot(
     # Plot distribution of 'price'
-    "price", 
+    "price",
     # Group by cluster label, generating one box plot/cluster
-    by=labels, 
+    by=labels,
     # Do not display individual outlier observations
-    flierprops=dict(marker=None), 
+    flierprops=dict(marker=None),
     # Draw visualisation on the current axis (inside `f`)
-    ax=plt.gca()
+    ax=plt.gca(),
 )
 # Set label for horizontal axis
 ax.set_xlabel("HDBSCAN cluster")
@@ -990,7 +1004,7 @@ plt.gcf().suptitle(None)
 # Remove default axis title
 ax.set_title(None)
 # Re-adjust vertical value range for easier legibility
-ax.set_ylim(0,1250);
+ax.set_ylim(0, 1250);
 ```
 
 If we want to capture the variation picked up by membership to these clusters in a regression model, we could use these labels as the basis for spatial fixed effects, for example, as we saw in [Chapter 11](11_regression).

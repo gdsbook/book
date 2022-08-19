@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings, osmnx
+
 warnings.filterwarnings("ignore")
 osmnx.config(
     overpass_settings='[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
@@ -84,7 +85,7 @@ Changing the geometric representation of a sample must be done carefully: since 
 Let us make a map of both the boundary and the centroid of a country. First, to compute the centroid, we can use the `gt_polygons.geometry.centroid` property. This gives us the point that minimizes the average distance from all other points on the boundary of the shape. Storing that back to a column, called `centroid`:
 
 ```python
-gt_polygons['centroid'] = gt_polygons.geometry.centroid
+gt_polygons["centroid"] = gt_polygons.geometry.centroid
 ```
 
 We now have an additional feature:
@@ -97,16 +98,10 @@ Despite the fact that `centroid` is a geometry (you can tell because each cell s
 
 ```python caption="Plotting centroids and boundaries of polygon geometries." tags=[]
 # Plot centroids
-ax = gt_polygons.set_geometry(
-    'centroid'
-).plot('ADMIN', markersize=5)
+ax = gt_polygons.set_geometry("centroid").plot("ADMIN", markersize=5)
 # Plot polygons without color filling
 gt_polygons.plot(
-    'ADMIN', 
-    ax=ax, 
-    facecolor='none', 
-    edgecolor='k', 
-    linewidth=.2
+    "ADMIN", ax=ax, facecolor="none", edgecolor="k", linewidth=0.2
 );
 ```
 
@@ -159,16 +154,14 @@ pt_geoms = geopandas.points_from_xy(
     x=gt_points["longitude"],
     y=gt_points["latitude"],
     # x,y are Earth longitude & latitude
-    crs="EPSG:4326"
+    crs="EPSG:4326",
 )
 ```
 
 Second, we create a `GeoDataFrame` object using these geometries:
 
 ```python
-gt_points = geopandas.GeoDataFrame(
-    gt_points, geometry=pt_geoms
-)
+gt_points = geopandas.GeoDataFrame(gt_points, geometry=pt_geoms)
 ```
 
 And now `gt_points` looks and feels exactly like the one of countries we have seen before, with the difference the `geometry` column stores `POINT` geometries:
@@ -229,12 +222,8 @@ pop.sel(band=1).plot();
 
 This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g., `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
 
-```python tags=[] caption="Population surface of Sao Paulo, Brazil omitting NAN values."
-pop.where(
-    pop!=-200
-).sel(
-    band=1
-).plot(cmap="RdPu");
+```python caption="Population surface of Sao Paulo, Brazil omitting NAN values." tags=[]
+pop.where(pop != -200).sel(band=1).plot(cmap="RdPu");
 ```
 
 The colorbar now looks more sensible, and indicates *real* counts, rather than including the missing data placeholder values.
@@ -361,13 +350,15 @@ The table we have built has no geometries associated with it, only rows represen
 
 ```python
 def row2cell(row, res_xy):
-    res_x, res_y = res_xy # Extract resolution for each dimension
+    res_x, res_y = res_xy  # Extract resolution for each dimension
     # XY Coordinates are centered on the pixel
     minX = row["x"] - (res_x / 2)
     maxX = row["x"] + (res_x / 2)
     minY = row["y"] + (res_y / 2)
     maxY = row["y"] - (res_y / 2)
-    poly = geometry.box(minX, minY, maxX, maxY) # Build squared polygon
+    poly = geometry.box(
+        minX, minY, maxX, maxY
+    )  # Build squared polygon
     return poly
 ```
 
@@ -380,14 +371,16 @@ row2cell(t_surface.loc[0, :], surface.attrs["res"])
 One of the benefits of this approach is we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:
 
 ```python
-max_polys = t_surface.query(
-    "Value > 1000" # Keep only cells with more than 1k people
-).apply( # Build polygons for selected cells
-    row2cell,
-    res_xy=surface.attrs["res"], 
-    axis=1
-).pipe( # Pipe result from apply to convert into a GeoSeries
-    geopandas.GeoSeries, crs=surface.attrs['crs']
+max_polys = (
+    t_surface.query(
+        "Value > 1000"
+    )  # Keep only cells with more than 1k people
+    .apply(  # Build polygons for selected cells
+        row2cell, res_xy=surface.attrs["res"], axis=1
+    )
+    .pipe(  # Pipe result from apply to convert into a GeoSeries
+        geopandas.GeoSeries, crs=surface.attrs["crs"]
+    )
 )
 ```
 
@@ -395,14 +388,10 @@ And generate a map with the same tooling that we use for any standard geo-table:
 
 ```python caption="Combining points with Contextily." tags=[]
 # Plot polygons
-ax = max_polys.plot(
-    edgecolor="red", figsize=(9, 9)
-)
+ax = max_polys.plot(edgecolor="red", figsize=(9, 9))
 # Add basemap
 cx.add_basemap(
-    ax, 
-    crs=surface.attrs["crs"], 
-    source=cx.providers.CartoDB.Voyager
+    ax, crs=surface.attrs["crs"], source=cx.providers.CartoDB.Voyager
 );
 ```
 
@@ -422,14 +411,18 @@ A second use case involves moving surfaces directly into geographic tables by ag
 Let's start by reading the data. First, the elevation model:
 
 ```python caption="Digital Elevation Model as a raster." tags=[]
-dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(band=1)
+dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(
+    band=1
+)
 dem.where(dem > 0).plot.imshow();
 ```
 
 And the neighborhood areas (tracts) from the Census:
 
 ```python caption="San Diego California Census Tracts." tags=[]
-sd_tracts = geopandas.read_file("../data/sandiego/sandiego_tracts.gpkg")
+sd_tracts = geopandas.read_file(
+    "../data/sandiego/sandiego_tracts.gpkg"
+)
 sd_tracts.plot();
 ```
 
@@ -462,18 +455,16 @@ dem_clip = dem.rio.clip(
 # Set up figure to display against polygon shape
 f, axs = plt.subplots(1, 2, figsize=(6, 3))
 # Display elevation of largest tract
-dem_clip.where(dem_clip > 0).plot(ax=axs[0], add_colorbar=True);
+dem_clip.where(dem_clip > 0).plot(ax=axs[0], add_colorbar=True)
 
 # Display largest tract polygon
 sd_tracts.loc[[largest_tract_id]].plot(
-    ax=axs[1], edgecolor='red', facecolor='none'
+    ax=axs[1], edgecolor="red", facecolor="none"
 )
 axs[1].set_axis_off()
 # Add basemap
 cx.add_basemap(
-    axs[1], 
-    crs=sd_tracts.crs, 
-    source=cx.providers.Stamen.Terrain
+    axs[1], crs=sd_tracts.crs, source=cx.providers.Stamen.Terrain
 );
 ```
 
@@ -505,7 +496,9 @@ get_mean_elevation(sd_tracts.loc[largest_tract_id, :], dem)
 This method can then be run on each polygon in our series using the `apply()` method:
 
 ```python
-elevations = sd_tracts.head().apply(get_mean_elevation, dem=dem, axis=1)
+elevations = sd_tracts.head().apply(
+    get_mean_elevation, dem=dem, axis=1
+)
 elevations
 ```
 
@@ -517,8 +510,8 @@ However, this approach can be quite slow in big data. A more efficient alternati
 from rasterstats import zonal_stats
 
 elevations2 = zonal_stats(
-    sd_tracts.to_crs(dem.rio.crs),   # Geotable with zones
-    "../data/nasadem/nasadem_sd.tif" # Path to surface file
+    sd_tracts.to_crs(dem.rio.crs),  # Geotable with zones
+    "../data/nasadem/nasadem_sd.tif",  # Path to surface file
 )
 elevations2 = pandas.DataFrame(elevations2)
 ```
@@ -534,21 +527,24 @@ To visualize these results, we can make an elevation map:
 f, axs = plt.subplots(1, 3, figsize=(15, 5))
 
 # Plot elevation surface
-dem.where( # Keep only pixels above sea level
-    dem > 0
-# Reproject to CRS of tracts
+dem.where(  # Keep only pixels above sea level
+    dem
+    > 0
+    # Reproject to CRS of tracts
 ).rio.reproject(
     sd_tracts.crs
-# Render surface
-).plot.imshow(ax=axs[0], add_colorbar=False)
+    # Render surface
+).plot.imshow(
+    ax=axs[0], add_colorbar=False
+)
 
 # Plot tract geography
 sd_tracts.plot(ax=axs[1])
 
 # Plot elevation on tract geography
-sd_tracts.assign( # Append elevation values to tracts
+sd_tracts.assign(  # Append elevation values to tracts
     elevation=elevations2["mean"]
-).plot(           # Plot elevation choropleth
+).plot(  # Plot elevation choropleth
     "elevation", ax=axs[2]
 );
 ```
@@ -568,17 +564,13 @@ In this figure, it is hard to tell anything about the density of points in the c
 In Python, we can rely on the `datashader` library, which does all the computation in a very efficient way. This process involves two main steps. First, we set up the grid (or canvas, `cvs`) into which we want to aggregate points:
 
 ```python
-cvs = datashader.Canvas(
-    plot_width=60, plot_height=60
-)
+cvs = datashader.Canvas(plot_width=60, plot_height=60)
 ```
 
 Then we "transfer" the points into the grid:
 
 ```python
-grid = cvs.points(
-    gt_points, x="longitude", y="latitude"
-)
+grid = cvs.points(gt_points, x="longitude", y="latitude")
 ```
 
 The resulting `grid` is a standard `DataArray` object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the re-sampled data allows for is much greater than when the points were visualized alone. This is shown in Figure 14. 

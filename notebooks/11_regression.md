@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 ```
 
@@ -70,24 +71,24 @@ To learn a little more about how regression works, we'll examine information abo
 This dataset contains house intrinsic characteristics, both continuous (number of beds as in `beds`) and categorical (type of renting or, in AirBnB jargon, property group as in the series of `pg_X` binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g. distance to Balboa Park, `d2balboa` or neighborhood id, `neighbourhood_cleansed`).
 
 ```python
-db = geopandas.read_file('../data/airbnb/regression_db.geojson')
+db = geopandas.read_file("../data/airbnb/regression_db.geojson")
 ```
 
 These are the explanatory variables we will use throughout the chapter.
 
 ```python
 variable_names = [
-    'accommodates',    # Number of people it accommodates
-    'bathrooms',       # Number of bathrooms
-    'bedrooms',        # Number of bedrooms
-    'beds',            # Number of beds
+    "accommodates",  # Number of people it accommodates
+    "bathrooms",  # Number of bathrooms
+    "bedrooms",  # Number of bedrooms
+    "beds",  # Number of beds
     # Below are binary variables, 1 True, 0 False
-    'rt_Private_room', # Room type: private room
-    'rt_Shared_room',  # Room type: shared room
-    'pg_Condominium',  # Property group: condo
-    'pg_House',        # Property group: house
-    'pg_Other',        # Property group: other
-    'pg_Townhouse'     # Property group: townhouse
+    "rt_Private_room",  # Room type: private room
+    "rt_Shared_room",  # Room type: shared room
+    "pg_Condominium",  # Property group: condo
+    "pg_House",  # Property group: house
+    "pg_Other",  # Property group: other
+    "pg_Townhouse",  # Property group: townhouse
 ]
 ```
 
@@ -122,13 +123,13 @@ In the context of this chapter, it makes sense to start with `spreg` as that is 
 # Fit OLS model
 m1 = spreg.OLS(
     # Dependent variable
-    db[['log_price']].values, 
+    db[["log_price"]].values,
     # Independent variables
     db[variable_names].values,
     # Dependent variable name
-    name_y='log_price', 
+    name_y="log_price",
     # Independent variable name
-    name_x=variable_names
+    name_x=variable_names,
 )
 ```
 
@@ -162,17 +163,17 @@ is_coastal = db.coastal.astype(bool)
 coastal = m1.u[is_coastal]
 not_coastal = m1.u[~is_coastal]
 # Create histogram of the distribution of coastal residuals
-plt.hist(coastal, density=True, label='Coastal')
+plt.hist(coastal, density=True, label="Coastal")
 # Create histogram of the distribution of non-coastal residuals
 plt.hist(
-    not_coastal, 
-    histtype='step',
-    density=True, 
-    linewidth=4, 
-    label='Not Coastal'
+    not_coastal,
+    histtype="step",
+    density=True,
+    linewidth=4,
+    label="Not Coastal",
 )
 # Add Line on 0
-plt.vlines(0,0,1, linestyle=":", color='k', linewidth=4)
+plt.vlines(0, 0, 1, linestyle=":", color="k", linewidth=4)
 # Add legend
 plt.legend()
 # Display
@@ -198,33 +199,30 @@ To make this more clear, we'll first sort the data by the median residual in tha
 
 ```python caption="Boxplot of prediction errors by neighborhood in San Diego, showing that the basic model systematically over- (or under-) predicts the nightly price of some neighborhoods' Airbnbs." tags=[]
 # Create column with residual values from m1
-db['residual'] = m1.u
+db["residual"] = m1.u
 # Obtain the median value of residuals in each neighbourhood
-medians = db.groupby(
-    "neighborhood"
-).residual.median().to_frame(
-    'hood_residual'
+medians = (
+    db.groupby("neighborhood")
+    .residual.median()
+    .to_frame("hood_residual")
 )
 
 # Increase fontsize
-seaborn.set(font_scale = 1.25)
+seaborn.set(font_scale=1.25)
 # Set up figure
-f = plt.figure(figsize=(15,3))
+f = plt.figure(figsize=(15, 3))
 # Grab figure's axis
 ax = plt.gca()
 # Generate bloxplot of values by neighbourhood
 # Note the data includes the median values merged on-the-fly
 seaborn.boxplot(
-    'neighborhood', 
-    'residual', 
-    ax = ax,
+    "neighborhood",
+    "residual",
+    ax=ax,
     data=db.merge(
-        medians, 
-        how='left',
-        left_on='neighborhood',
-        right_index=True
-    ).sort_values(
-        'hood_residual'), palette='bwr'
+        medians, how="left", left_on="neighborhood", right_index=True
+    ).sort_values("hood_residual"),
+    palette="bwr",
 )
 # Auto-format of the X labels
 f.autofmt_xdate()
@@ -253,13 +251,13 @@ This means that, when we compute the *spatial lag* of that $KNN$ weight and the 
 ```python caption="The relationship between prediction error for an Airbnb and the nearest Airbnb's prediction error. This suggests that if an Airbnb's nightly price is over-predicted, its nearby Airbnbs will also be over-predicted." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
 ax = seaborn.regplot(
-    m1.u.flatten(), 
-    lag_residual.flatten(), 
-    line_kws=dict(color='orangered'),
-    ci=None
+    m1.u.flatten(),
+    lag_residual.flatten(),
+    line_kws=dict(color="orangered"),
+    ci=None,
 )
-ax.set_xlabel('Model Residuals - $u$')
-ax.set_ylabel('Spatial Lag of Model Residuals - $W u$');
+ax.set_xlabel("Model Residuals - $u$")
+ax.set_ylabel("Spatial Lag of Model Residuals - $W u$");
 ```
 
 In this plot, we see that our prediction errors tend to cluster!
@@ -276,26 +274,29 @@ Recalling the *local Moran* statistics in [Chapter 7](07_local_autocorrelation),
 # Re-weight W to 20 nearest neighbors
 knn.reweight(k=20, inplace=True)
 # Row standardise weights
-knn.transform = 'R'
+knn.transform = "R"
 # Run LISA on residuals
 outliers = esda.moran.Moran_Local(m1.u, knn, permutations=9999)
 # Select only LISA cluster cores
-error_clusters = (outliers.q % 2 == 1)
+error_clusters = outliers.q % 2 == 1
 # Filter out non-significant clusters
-error_clusters &= (outliers.p_sim <= .001)
+error_clusters &= outliers.p_sim <= 0.001
 # Add `error_clusters` and `local_I` columns
-ax = db.assign(
-    error_clusters = error_clusters,
-    local_I = outliers.Is
-# Retain error clusters only
-).query(
-    "error_clusters"
-# Sort by I value to largest plot on top
-).sort_values(
-    'local_I'
-# Plot I values
-).plot(
-    'local_I', cmap='bwr', marker='.'
+ax = (
+    db.assign(
+        error_clusters=error_clusters,
+        local_I=outliers.Is
+        # Retain error clusters only
+    )
+    .query(
+        "error_clusters"
+        # Sort by I value to largest plot on top
+    )
+    .sort_values(
+        "local_I"
+        # Plot I values
+    )
+    .plot("local_I", cmap="bwr", marker=".")
 )
 # Add basemap
 contextily.add_basemap(ax, crs=db.crs)
@@ -331,7 +332,7 @@ One relevant proximity-driven variable that could influence our San Diego model 
 Therefore, this is sometimes called a *spatially-patterned omitted covariate*: geographic information our model needs to make good predictions which we have left out of our model. Therefore, let's build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize the structure of this distance covariate itself:
 
 ```python caption="A map showing the 'Distance to Balboa Park' variable." tags=[]
-ax = db.plot('d2balboa', marker='.', s=5)
+ax = db.plot("d2balboa", marker=".", s=5)
 contextily.add_basemap(ax, crs=db.crs)
 ax.set_axis_off();
 ```
@@ -339,17 +340,17 @@ ax.set_axis_off();
 To run a linear model that includes the additional variable of distance to the park, we add the name to the list of variables we included originally:
 
 ```python
-balboa_names = variable_names + ['d2balboa']
+balboa_names = variable_names + ["d2balboa"]
 ```
 
 And then fit the model using the OLS class in Pysal's `spreg`:
 
 ```python
 m2 = spreg.OLS(
-    db[['log_price']].values, 
-    db[balboa_names].values, 
-    name_y = 'log_price', 
-    name_x = balboa_names
+    db[["log_price"]].values,
+    db[balboa_names].values,
+    name_y="log_price",
+    name_x=balboa_names,
 )
 ```
 
@@ -358,8 +359,8 @@ When you inspect the regression diagnostics and output, you see that this covari
 ```python
 pandas.DataFrame(
     [[m1.r2, m1.ar2], [m2.r2, m2.ar2]],
-    index=['M1', 'M2'],
-    columns=['R2', 'Adj. R2']
+    index=["M1", "M2"],
+    columns=["R2", "Adj. R2"],
 )
 ```
 
@@ -371,13 +372,13 @@ pandas.DataFrame(
     {
         # Pull out regression coefficients and
         # flatten as they are returned as Nx1 array
-        'Coeff.': m2.betas.flatten(),
+        "Coeff.": m2.betas.flatten(),
         # Pull out and flatten standard errors
-        'Std. Error': m2.std_err.flatten(),
+        "Std. Error": m2.std_err.flatten(),
         # Pull out P-values from t-stat object
-        'P-Value': [i[1] for i in m2.t_stat]
+        "P-Value": [i[1] for i in m2.t_stat],
     },
-    index=m2.name_x
+    index=m2.name_x,
 )
 ```
 
@@ -386,13 +387,13 @@ And, there still appears to be spatial structure in our model's errors:
 ```python caption="The relationship between prediction error and the nearest Airbnb's prediction error for the model including the 'Distance to Balboa Park' variable. Note the much stronger relationship here than before." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m2.u)
 ax = seaborn.regplot(
-    m2.u.flatten(), 
-    lag_residual.flatten(), 
-    line_kws=dict(color='orangered'),
-    ci=None
+    m2.u.flatten(),
+    lag_residual.flatten(),
+    line_kws=dict(color="orangered"),
+    ci=None,
 )
-ax.set_xlabel('Residuals ($u$)')
-ax.set_ylabel('Spatial lag of residuals ($Wu$)');
+ax.set_xlabel("Residuals ($u$)")
+ax.set_ylabel("Spatial lag of residuals ($Wu$)");
 ```
 
 Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an AirBnB; the coefficient estimate is *positive*, meaning that people are paying a premium to be *further* from the Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this. Further, the next chapter is an extensive treatment of spatial fixed effects, presenting many more spatial feature engineering methods. Here, we have only showed how to include these engineered features in a standard linear modeling framework. 
@@ -422,7 +423,11 @@ import statsmodels.formula.api as sm
 This package provides a formula-like API, which allows us to express the *equation* we wish to estimate directly:
 
 ```python
-f = 'log_price ~ ' + ' + '.join(variable_names) + ' + neighborhood - 1'
+f = (
+    "log_price ~ "
+    + " + ".join(variable_names)
+    + " + neighborhood - 1"
+)
 print(f)
 ```
 
@@ -438,13 +443,13 @@ We could rely on the `summary2()` method to print a similar summary report from 
 
 ```python
 # Store variable names for all the spatial fixed effects
-sfe_names = [i for i in m3.params.index if 'neighborhood[' in i]
+sfe_names = [i for i in m3.params.index if "neighborhood[" in i]
 # Create table
 pandas.DataFrame(
     {
-        'Coef.': m3.params[sfe_names],
-        'Std. Error': m3.bse[sfe_names],
-        'P-Value': m3.pvalues[sfe_names]
+        "Coef.": m3.params[sfe_names],
+        "Std. Error": m3.bse[sfe_names],
+        "P-Value": m3.pvalues[sfe_names],
     }
 )
 ```
@@ -457,23 +462,23 @@ The second approach leverages `spreg` Regimes functionality. We will see regimes
 # spreg spatial fixed effect implementation
 m4 = spreg.OLS_Regimes(
     # Dependent variable
-    db[['log_price']].values, 
+    db[["log_price"]].values,
     # Independent variables
     db[variable_names].values,
     # Variable specifying neighborhood membership
-    db['neighborhood'].tolist(),
+    db["neighborhood"].tolist(),
     # Allow the constant term to vary by group/regime
-    constant_regi='many',
+    constant_regi="many",
     # Variables to be allowed to vary (True) or kept
     # constant (False). Here we set all to False
-    cols2regi=[False]*len(variable_names),
+    cols2regi=[False] * len(variable_names),
     # Allow separate sigma coefficients to be estimated
     # by regime (False so a single sigma)
     regime_err_sep=False,
     # Dependent variable name
-    name_y='log_price', 
+    name_y="log_price",
     # Independent variables names
-    name_x=variable_names
+    name_x=variable_names,
 )
 ```
 
@@ -481,9 +486,8 @@ Similarly as above, we could rely on the `summary` attribute to print a report w
 
 ```python
 import numpy
-numpy.round(
-    m4.betas.flatten() - m3.params.values, decimals=12
-)
+
+numpy.round(m4.betas.flatten() - m3.params.values, decimals=12)
 ```
 
 Econometrically speaking, what the neighborhood FEs we have introduced imply is that, instead of comparing all house prices across San Diego as equal, we only derive variation from within each postcode. Remember that the interpretation of $\beta_k$ is the effect of variable $k$, *given all the other explanatory variables included remain constant*. By including a single variable for each area, we are effectively forcing the model to compare as equal only house prices that share the same value for each variable; or, in other words, only houses located within the same area. Introducing FE affords a higher degree of isolation of the effects of the variables we introduce in the model because we can control for unobserved effects that align spatially with the distribution of the FE introduced (by neighborhood, in our case). To make a map of neighborhood fixed effects, we need to process the results from our model slightly.
@@ -491,7 +495,7 @@ Econometrically speaking, what the neighborhood FEs we have introduced imply is 
 First, we extract only the effects pertaining to the neighborhoods:
 
 ```python
-neighborhood_effects = m3.params.filter(like='neighborhood')
+neighborhood_effects = m3.params.filter(like="neighborhood")
 neighborhood_effects.head()
 ```
 
@@ -501,12 +505,12 @@ Then, we need to extract just the neighborhood name from the index of this Serie
 # Create a sequence with the variable names without
 # `neighborhood[` and `]`
 stripped = neighborhood_effects.index.str.strip(
-    'neighborhood['
-).str.strip(']')
+    "neighborhood["
+).str.strip("]")
 # Reindex the neighborhood_effects Series on clean names
 neighborhood_effects.index = stripped
 # Convert Series to DataFrame
-neighborhood_effects = neighborhood_effects.to_frame('fixed_effect')
+neighborhood_effects = neighborhood_effects.to_frame("fixed_effect")
 # Print top of table
 neighborhood_effects.head()
 ```
@@ -514,7 +518,7 @@ neighborhood_effects.head()
 Good, we're back to our raw neighborhood names. These allow us to join it to an auxillary file with neighborhood boundaries that is indexed on the same names. Let's read the boundaries first:
 
 ```python
-sd_path = '../data/airbnb/neighbourhoods.geojson'
+sd_path = "../data/airbnb/neighbourhoods.geojson"
 neighborhoods = geopandas.read_file(sd_path)
 ```
 
@@ -523,33 +527,33 @@ And we can then merge the spatial fixed effects and plot them on a map:
 ```python caption="Neighborhood effects on Airbnb nightly prices. Neighborhoods shown in grey are 'not statistically significant' in their effect on Airbnb prices." tags=[]
 # Plot base layer with all neighborhoods in grey
 ax = neighborhoods.plot(
-    color='k', linewidth=0, alpha=0.5, figsize=(12,6)
+    color="k", linewidth=0, alpha=0.5, figsize=(12, 6)
 )
 # Merge SFE estimates (note not every polygon
 # receives an estimate since not every polygon
 # contains AirBnb properties)
 neighborhoods.merge(
-    neighborhood_effects, 
-    how='left',
-    left_on='neighbourhood', 
+    neighborhood_effects,
+    how="left",
+    left_on="neighbourhood",
     right_index=True
-# Drop polygons without a SFE estimate
+    # Drop polygons without a SFE estimate
 ).dropna(
-    subset=['fixed_effect']
-# Plot quantile choropleth
+    subset=["fixed_effect"]
+    # Plot quantile choropleth
 ).plot(
-    'fixed_effect',     # Variable to display
-    scheme='quantiles', # Choropleth scheme
-    k=7,                # No. of classes in the choropleth
-    linewidth=0.1,      # Polygon border width
-    cmap='viridis',     # Color scheme
-    ax=ax               # Axis to draw on
+    "fixed_effect",  # Variable to display
+    scheme="quantiles",  # Choropleth scheme
+    k=7,  # No. of classes in the choropleth
+    linewidth=0.1,  # Polygon border width
+    cmap="viridis",  # Color scheme
+    ax=ax,  # Axis to draw on
 )
 # Add basemap
 contextily.add_basemap(
-    ax, 
+    ax,
     crs=neighborhoods.crs,
-    source=contextily.providers.CartoDB.PositronNoLabels
+    source=contextily.providers.CartoDB.PositronNoLabels,
 )
 # Remove axis
 ax.set_axis_off()
@@ -578,20 +582,20 @@ To implement this in Python, we use the `OLS_Regimes` class in `spreg`, which do
 # Pysal spatial regimes implementation
 m5 = spreg.OLS_Regimes(
     # Dependent variable
-    db[['log_price']].values, 
+    db[["log_price"]].values,
     # Independent variables
     db[variable_names].values,
     # Variable specifying neighborhood membership
-    db['coastal'].tolist(),
+    db["coastal"].tolist(),
     # Allow the constant term to vary by group/regime
-    constant_regi='many',
+    constant_regi="many",
     # Allow separate sigma coefficients to be estimated
     # by regime (False so a single sigma)
     regime_err_sep=False,
     # Dependent variable name
-    name_y='log_price', 
+    name_y="log_price",
     # Independent variables names
-    name_x=variable_names
+    name_x=variable_names,
 )
 ```
 
@@ -603,35 +607,31 @@ res = pandas.DataFrame(
     {
         # Pull out regression coefficients and
         # flatten as they are returned as Nx1 array
-        'Coeff.': m5.betas.flatten(),
+        "Coeff.": m5.betas.flatten(),
         # Pull out and flatten standard errors
-        'Std. Error': m5.std_err.flatten(),
+        "Std. Error": m5.std_err.flatten(),
         # Pull out P-values from t-stat object
-        'P-Value': [i[1] for i in m5.t_stat]
+        "P-Value": [i[1] for i in m5.t_stat],
     },
-    index=m5.name_x
+    index=m5.name_x,
 )
 # Coastal regime
 ## Extract variables for the coastal regime
-coastal = [i for i in res.index if '1_' in i]
+coastal = [i for i in res.index if "1_" in i]
 ## Subset results to coastal and remove the 1_ underscore
-coastal = res.loc[coastal, :].rename(
-    lambda i: i.replace('1_', '')
-)
+coastal = res.loc[coastal, :].rename(lambda i: i.replace("1_", ""))
 ## Build multi-index column names
 coastal.columns = pandas.MultiIndex.from_product(
-    [['Coastal'], coastal.columns]
+    [["Coastal"], coastal.columns]
 )
 # Non-coastal model
 ## Extract variables for the non-coastal regime
-ncoastal = [i for i in res.index if '0_' in i]
+ncoastal = [i for i in res.index if "0_" in i]
 ## Subset results to non-coastal and remove the 0_ underscore
-ncoastal = res.loc[ncoastal, :].rename(
-    lambda i: i.replace('0_', '')
-)
+ncoastal = res.loc[ncoastal, :].rename(lambda i: i.replace("0_", ""))
 ## Build multi-index column names
 ncoastal.columns = pandas.MultiIndex.from_product(
-    [['Non-coastal'], ncoastal.columns]
+    [["Non-coastal"], ncoastal.columns]
 )
 # Concat both models
 pandas.concat([coastal, ncoastal], axis=1)
@@ -654,7 +654,7 @@ pandas.DataFrame(
     # Name of variables
     index=m5.name_x_r,
     # Column names
-    columns=['Statistic', 'P-value']
+    columns=["Statistic", "P-value"],
 )
 ```
 
@@ -750,17 +750,21 @@ by first creating a list of all of those names, and then applying `pysal`'s
 
 ```python
 # Select only columns in `db` containing the keyword `pg_`
-wx = db.filter(
-    like='pg_'
-# Compute the spatial lag of each of those variables
-).apply(
-    lambda y: weights.spatial_lag.lag_spatial(knn, y)
-# Rename the spatial lag, adding w_ to the original name
-).rename(
-    columns=lambda c: 'w_'+c
-# Remove the lag of the binary variable for apartments
-).drop(
-    'w_pg_Apartment', axis=1
+wx = (
+    db.filter(
+        like="pg_"
+        # Compute the spatial lag of each of those variables
+    )
+    .apply(
+        lambda y: weights.spatial_lag.lag_spatial(knn, y)
+        # Rename the spatial lag, adding w_ to the original name
+    )
+    .rename(
+        columns=lambda c: "w_"
+        + c
+        # Remove the lag of the binary variable for apartments
+    )
+    .drop("w_pg_Apartment", axis=1)
 )
 ```
 
@@ -774,13 +778,13 @@ slx_exog = db[variable_names].join(wx)
 # Fit linear model with `spreg`
 m6 = spreg.OLS(
     # Dependent variable
-    db[['log_price']].values, 
+    db[["log_price"]].values,
     # Independent variables
     slx_exog.values,
     # Dependent variable name
-    name_y='l_price', 
+    name_y="l_price",
     # Independent variables names
-    name_x=slx_exog.columns.tolist()
+    name_x=slx_exog.columns.tolist(),
 )
 ```
 
@@ -790,27 +794,23 @@ interpreted also in a similar way. To focus on the aspects that differ from the 
 
 ```python
 # Collect names of variables of interest
-vars_of_interest = db[
-    variable_names
-].filter(
-    like='pg_'
-).join(
-    wx
-).columns
+vars_of_interest = (
+    db[variable_names].filter(like="pg_").join(wx).columns
+)
 # Build full table of regression coefficients
 pandas.DataFrame(
     {
         # Pull out regression coefficients and
         # flatten as they are returned as Nx1 array
-        'Coeff.': m6.betas.flatten(),
+        "Coeff.": m6.betas.flatten(),
         # Pull out and flatten standard errors
-        'Std. Error': m6.std_err.flatten(),
+        "Std. Error": m6.std_err.flatten(),
         # Pull out P-values from t-stat object
-        'P-Value': [i[1] for i in m6.t_stat]
+        "P-Value": [i[1] for i in m6.t_stat],
     },
     index=m6.name_x
-# Subset for variables of itnerest only and round to
-# four decimals
+    # Subset for variables of itnerest only and round to
+    # four decimals
 ).reindex(vars_of_interest).round(4)
 ```
 
@@ -851,7 +851,7 @@ To illustrate the effect of a change in one of the values in a given location in
 ```python
 # Print values for third observation for columns spanning
 # from `pg_Apartment` to `pg_Townhouse`
-db.loc[2, 'pg_Apartment': 'pg_Townhouse']
+db.loc[2, "pg_Apartment":"pg_Townhouse"]
 ```
 
 Let's now make a copy of our data and change the value to magically turn the apartment into a condominium:
@@ -860,30 +860,34 @@ Let's now make a copy of our data and change the value to magically turn the apa
 # Make copy of the dataset
 db_scenario = db.copy()
 # Make Apartment 0 and condo 1 for third observation
-db_scenario.loc[2, ['pg_Apartment', 'pg_Condominium']] = [0,1]
+db_scenario.loc[2, ["pg_Apartment", "pg_Condominium"]] = [0, 1]
 ```
 
 We've successfully made the change:
 
 ```python
-db_scenario.loc[2, 'pg_Apartment': 'pg_Townhouse']
+db_scenario.loc[2, "pg_Apartment":"pg_Townhouse"]
 ```
 
 Now, we need to *also* update the spatial lag variates:
 
 ```python
 # Select only columns in `db_scenario` containing the keyword `pg_`
-wx_scenario = db_scenario.filter(
-    like='pg'
-# Compute the spatial lag of each of those variables
-).apply(
-    lambda y: weights.spatial_lag.lag_spatial(knn, y)
-# Rename the spatial lag, adding w_ to the original name
-).rename(
-    columns=lambda c: 'w_'+c
-# Remove the lag of the binary variable for apartments
-).drop(
-    'w_pg_Apartment', axis=1
+wx_scenario = (
+    db_scenario.filter(
+        like="pg"
+        # Compute the spatial lag of each of those variables
+    )
+    .apply(
+        lambda y: weights.spatial_lag.lag_spatial(knn, y)
+        # Rename the spatial lag, adding w_ to the original name
+    )
+    .rename(
+        columns=lambda c: "w_"
+        + c
+        # Remove the lag of the binary variable for apartments
+    )
+    .drop("w_pg_Apartment", axis=1)
 )
 ```
 
@@ -911,8 +915,9 @@ Now, the effect of changing site `2` from an apartment into a condominium is ass
 ```python
 # Difference between original and new predicted values
 (
-    y_pred_scenario - m6.predy
-# Subset to site `2` and its neighbors
+    y_pred_scenario
+    - m6.predy
+    # Subset to site `2` and its neighbors
 ).loc[[2] + knn.neighbors[2]]
 ```
 
@@ -943,19 +948,19 @@ example, we can use a general method of moments that account for
 heteroskedasticity {cite}`arraiz2010`:
 
 ```python
-# Fit spatial error model with `spreg` 
+# Fit spatial error model with `spreg`
 # (GMM estimation allowing for heteroskedasticity)
 m7 = spreg.GM_Error_Het(
     # Dependent variable
-    db[['log_price']].values, 
+    db[["log_price"]].values,
     # Independent variables
     db[variable_names].values,
     # Spatial weights matrix
-    w=knn, 
+    w=knn,
     # Dependent variable name
-    name_y='log_price', 
+    name_y="log_price",
     # Independent variables names
-    name_x=variable_names
+    name_x=variable_names,
 )
 ```
 
@@ -967,16 +972,16 @@ pandas.DataFrame(
     {
         # Pull out regression coefficients and
         # flatten as they are returned as Nx1 array
-        'Coeff.': m7.betas.flatten(),
+        "Coeff.": m7.betas.flatten(),
         # Pull out and flatten standard errors
-        'Std. Error': m7.std_err.flatten(),
+        "Std. Error": m7.std_err.flatten(),
         # Pull out P-values from t-stat object
-        'P-Value': [i[1] for i in m7.z_stat]
+        "P-Value": [i[1] for i in m7.z_stat],
     },
     index=m7.name_x
-# Subset for lambda parameter and round to
-# four decimals
-).reindex(['lambda']).round(4)
+    # Subset for lambda parameter and round to
+    # four decimals
+).reindex(["lambda"]).round(4)
 ```
 
 #### Spatial Lag
@@ -999,19 +1004,19 @@ lag of all the explanatory variables is used as instrument for the endogenous
 lag:
 
 ```python
-# Fit spatial lag model with `spreg` 
+# Fit spatial lag model with `spreg`
 # (GMM estimation)
 m8 = spreg.GM_Lag(
     # Dependent variable
-    db[['log_price']].values, 
+    db[["log_price"]].values,
     # Independent variables
     db[variable_names].values,
     # Spatial weights matrix
-    w=knn, 
+    w=knn,
     # Dependent variable name
-    name_y='log_price', 
+    name_y="log_price",
     # Independent variables names
-    name_x=variable_names
+    name_x=variable_names,
 )
 ```
 
@@ -1023,14 +1028,14 @@ pandas.DataFrame(
     {
         # Pull out regression coefficients and
         # flatten as they are returned as Nx1 array
-        'Coeff.': m8.betas.flatten(),
+        "Coeff.": m8.betas.flatten(),
         # Pull out and flatten standard errors
-        'Std. Error': m8.std_err.flatten(),
+        "Std. Error": m8.std_err.flatten(),
         # Pull out P-values from t-stat object
-        'P-Value': [i[1] for i in m8.z_stat]
+        "P-Value": [i[1] for i in m8.z_stat],
     },
     index=m8.name_z
-# Round to four decimals
+    # Round to four decimals
 ).round(4)
 ```
 
@@ -1069,50 +1074,54 @@ Below, the black lines represent our simulations, and the colored patches below 
 
 ```python caption="Distributions showing the differences between coastal and non-coastal prediction errors. Some 'random' simulations are shown in black in each plot, where observations are randomly assigned to either 'Coastal' or 'Not Coastal' groups." tags=[]
 n_simulations = 100
-f, ax = plt.subplots(1,2,figsize=(12,3), sharex=True, sharey=True)
+f, ax = plt.subplots(1, 2, figsize=(12, 3), sharex=True, sharey=True)
 ax[0].hist(
-    coastal, 
-    color=['r']*3, 
-    alpha=.5, 
-    density=True, 
-    bins=30, 
-    label='Coastal', 
-    cumulative=True
+    coastal,
+    color=["r"] * 3,
+    alpha=0.5,
+    density=True,
+    bins=30,
+    label="Coastal",
+    cumulative=True,
 )
 ax[1].hist(
-    not_coastal, 
-    color='b', 
-    alpha=.5,
-    density=True, 
-    bins=30, 
-    label='Not Coastal', 
-    cumulative=True
+    not_coastal,
+    color="b",
+    alpha=0.5,
+    density=True,
+    bins=30,
+    label="Not Coastal",
+    cumulative=True,
 )
 for simulation in range(n_simulations):
     shuffled_residuals = m1.u[numpy.random.permutation(m1.n)]
     random_coast, random_notcoast = (
-        shuffled_residuals[is_coastal], 
-        shuffled_residuals[~is_coastal]
+        shuffled_residuals[is_coastal],
+        shuffled_residuals[~is_coastal],
     )
     if simulation == 0:
-        label = 'Simulations'
+        label = "Simulations"
     else:
         label = None
     ax[0].hist(
-        random_coast, 
-        density=True, 
-        histtype='step',
-        color='k', alpha=.05, bins=30, 
-        label=label, 
-        cumulative=True
+        random_coast,
+        density=True,
+        histtype="step",
+        color="k",
+        alpha=0.05,
+        bins=30,
+        label=label,
+        cumulative=True,
     )
     ax[1].hist(
-        random_coast, 
-        density=True, 
-        histtype='step',
-        color='k', alpha=.05, bins=30, 
-        label=label, 
-        cumulative=True
+        random_coast,
+        density=True,
+        histtype="step",
+        color="k",
+        alpha=0.05,
+        bins=30,
+        label=label,
+        cumulative=True,
     )
 ax[0].legend()
 ax[1].legend()
@@ -1134,30 +1143,53 @@ We won't spend too much time on this theory specifically, but we can quickly and
 correlations = []
 nulls = []
 for order in range(1, 51, 5):
-    knn.reweight(k=order, inplace=True) #operates in place, quickly and efficiently avoiding copies
-    knn.transform = 'r'
+    knn.reweight(
+        k=order, inplace=True
+    )  # operates in place, quickly and efficiently avoiding copies
+    knn.transform = "r"
     lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
-    random_residual = m1.u[numpy.random.permutation(len(m1.u))] 
+    random_residual = m1.u[numpy.random.permutation(len(m1.u))]
     random_lag_residual = weights.spatial_lag.lag_spatial(
         knn, random_residual
-    ) # identical to random neighbors in KNN 
+    )  # identical to random neighbors in KNN
     correlations.append(
-        numpy.corrcoef(m1.u.flatten(), lag_residual.flatten())[0,1]
+        numpy.corrcoef(m1.u.flatten(), lag_residual.flatten())[0, 1]
     )
     nulls.append(
-        numpy.corrcoef(m1.u.flatten(), random_lag_residual.flatten())[0,1]
+        numpy.corrcoef(m1.u.flatten(), random_lag_residual.flatten())[
+            0, 1
+        ]
     )
 ```
 
 ```python caption="Correlogram showing the change in correlation between prediction error at an Airbnb and its surroundings as the number of nearest neighbors increase. The null hypothesis, where residuals are shuffled around the map, shows no significant correlation at any distance. " tags=[]
-plt.plot(range(1,51,5), correlations)
-plt.plot(range(1,51,5), nulls, color='orangered')
-plt.hlines(numpy.mean(correlations[-3:]),*plt.xlim(),linestyle=':', color='k')
-plt.hlines(numpy.mean(nulls[-3:]),*plt.xlim(),linestyle=':', color='k')
-plt.text(s='Long-Run Correlation: ${:.2f}$'.format(numpy.mean(correlations[-3:])), x=25,y=.3)
-plt.text(s='Long-Run Null: ${:.2f}$'.format(numpy.mean(nulls[-3:])), x=25, y=.05)
-plt.xlabel('$K$: number of nearest neighbors')
-plt.ylabel("Correlation between site \n and neighborhood average of size $K$")
+plt.plot(range(1, 51, 5), correlations)
+plt.plot(range(1, 51, 5), nulls, color="orangered")
+plt.hlines(
+    numpy.mean(correlations[-3:]),
+    *plt.xlim(),
+    linestyle=":",
+    color="k"
+)
+plt.hlines(
+    numpy.mean(nulls[-3:]), *plt.xlim(), linestyle=":", color="k"
+)
+plt.text(
+    s="Long-Run Correlation: ${:.2f}$".format(
+        numpy.mean(correlations[-3:])
+    ),
+    x=25,
+    y=0.3,
+)
+plt.text(
+    s="Long-Run Null: ${:.2f}$".format(numpy.mean(nulls[-3:])),
+    x=25,
+    y=0.05,
+)
+plt.xlabel("$K$: number of nearest neighbors")
+plt.ylabel(
+    "Correlation between site \n and neighborhood average of size $K$"
+)
 plt.show()
 ```
 

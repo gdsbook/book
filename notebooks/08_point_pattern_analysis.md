@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.13.8
+      jupytext_version: 1.11.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 ```
 
@@ -60,7 +61,7 @@ Then, let us load some data about picture locations from Flickr:
 
 
 ```python
-db = pandas.read_csv('../data/tokyo/tokyo_clean.csv')
+db = pandas.read_csv("../data/tokyo/tokyo_clean.csv")
 ```
 
 The table contains the following information about the sample of 10,000 photographs: the ID of the user who took the photo; the location expressed as latitude and longitude columns; a transformed version of those coordinates expressed in Pseudo Mercator; the timestamp when the photo was taken; and the URL where the picture they refer to is stored online:
@@ -82,7 +83,7 @@ The first step to get a sense of what the spatial dimension of this dataset look
 
 ```python caption="Tokyo points jointplot, longitude and latitude." tags=[]
 # Generate scatter plot
-seaborn.jointplot(x='longitude', y='latitude', data=db, s=0.5);
+seaborn.jointplot(x="longitude", y="latitude", data=db, s=0.5);
 ```
 
 
@@ -93,12 +94,12 @@ Start with the context. The easiest way to provide additional context is by over
 ```python caption="Tokyo points jointplot, longitude and latitude, with basemap via contextily." tags=[]
 # Generate scatter plot
 joint_axes = seaborn.jointplot(
-    x='longitude', y='latitude', data=db, s=0.5
+    x="longitude", y="latitude", data=db, s=0.5
 )
 contextily.add_basemap(
     joint_axes.ax_joint,
     crs="EPSG:4326",
-    source=contextily.providers.CartoDB.PositronNoLabels
+    source=contextily.providers.CartoDB.PositronNoLabels,
 );
 ```
 
@@ -116,21 +117,20 @@ One solution to get around cluttering relates to what we referred to earlier as 
 ```python caption="Tokyo points Hex Binning" tags=[]
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(12, 9))
-# Generate and add hexbin with 50 hexagons in each 
+# Generate and add hexbin with 50 hexagons in each
 # dimension, no borderlines, half transparency,
 # and the reverse viridis colormap
 hb = ax.hexbin(
-    db['x'], 
-    db['y'],
-    gridsize=50, 
+    db["x"],
+    db["y"],
+    gridsize=50,
     linewidths=0,
-    alpha=0.5, 
-    cmap='viridis_r'
+    alpha=0.5,
+    cmap="viridis_r",
 )
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+    ax, source=contextily.providers.CartoDB.Positron
 )
 # Add colorbar
 plt.colorbar(hb)
@@ -149,21 +149,20 @@ Grids are the spatial equivalent of a histogram: the user decides how many "buck
 ```python caption="Tokyo points Kernel Density." tags=[]
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
-# Generate and add KDE with a shading of 50 gradients 
+# Generate and add KDE with a shading of 50 gradients
 # coloured contours, 75% of transparency,
 # and the reverse viridis colormap
 seaborn.kdeplot(
-    db['x'], 
-    db['y'],
-    n_levels=50, 
+    db["x"],
+    db["y"],
+    n_levels=50,
     shade=True,
-    alpha=0.55, 
-    cmap='viridis_r'
+    alpha=0.55,
+    cmap="viridis_r",
 )
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+    ax, source=contextily.providers.CartoDB.Positron
 )
 # Remove axes
 ax.set_axis_off()
@@ -190,8 +189,8 @@ from pointpats import centrography
 
 
 ```python
-mean_center = centrography.mean_center(db[['x', 'y']])
-med_center = centrography.euclidean_median(db[['x', 'y']])
+mean_center = centrography.mean_center(db[["x", "y"]])
+med_center = centrography.euclidean_median(db[["x", "y"]])
 ```
 
 It is easiest to visualize this by plotting the point pattern and its mean center alongside one another:
@@ -200,26 +199,29 @@ It is easiest to visualize this by plotting the point pattern and its mean cente
 ```python caption="Tokyo points Mean and Median Centers." tags=[]
 # Generate scatter plot
 joint_axes = seaborn.jointplot(
-    x='x', y='y', data=db, s=0.75, height=9
+    x="x", y="y", data=db, s=0.75, height=9
 )
 # Add mean point and marginal lines
 joint_axes.ax_joint.scatter(
-    *mean_center, color='red', marker='x', s=50, label='Mean Center'
+    *mean_center, color="red", marker="x", s=50, label="Mean Center"
 )
-joint_axes.ax_marg_x.axvline(mean_center[0], color='red')
-joint_axes.ax_marg_y.axhline(mean_center[1], color='red')
+joint_axes.ax_marg_x.axvline(mean_center[0], color="red")
+joint_axes.ax_marg_y.axhline(mean_center[1], color="red")
 # Add median point and marginal lines
 joint_axes.ax_joint.scatter(
-    *med_center, color='limegreen', marker='o', s=50, label='Median Center'
+    *med_center,
+    color="limegreen",
+    marker="o",
+    s=50,
+    label="Median Center"
 )
-joint_axes.ax_marg_x.axvline(med_center[0], color='limegreen')
-joint_axes.ax_marg_y.axhline(med_center[1], color='limegreen')
+joint_axes.ax_marg_x.axvline(med_center[0], color="limegreen")
+joint_axes.ax_marg_y.axhline(med_center[1], color="limegreen")
 # Legend
 joint_axes.ax_joint.legend()
 # Add basemap
 contextily.add_basemap(
-    joint_axes.ax_joint, 
-    source=contextily.providers.CartoDB.Positron
+    joint_axes.ax_joint, source=contextily.providers.CartoDB.Positron
 )
 # Clean axes
 joint_axes.ax_joint.set_axis_off()
@@ -238,7 +240,7 @@ A measure of dispersion that is common in centrography is the *standard distance
 
 
 ```python
-centrography.std_distance(db[['x','y']])
+centrography.std_distance(db[["x", "y"]])
 ```
 This means that, on average, pictures are taken around 8800 meters away from the mean center. 
 
@@ -246,7 +248,7 @@ Another helpful visualization is the *standard deviational ellipse*, or *standar
 
 
 ```python
-major, minor, rotation = centrography.ellipse(db[['x','y']])
+major, minor, rotation = centrography.ellipse(db[["x", "y"]])
 ```
 
 
@@ -256,26 +258,32 @@ from matplotlib.patches import Ellipse
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot photograph points
-ax.scatter(db['x'], db['y'], s=0.75)
-ax.scatter(*mean_center, color='red', marker='x', label='Mean Center')
-ax.scatter(*med_center, color='limegreen', marker='o', label='Median Center')
+ax.scatter(db["x"], db["y"], s=0.75)
+ax.scatter(*mean_center, color="red", marker="x", label="Mean Center")
+ax.scatter(
+    *med_center, color="limegreen", marker="o", label="Median Center"
+)
 
 # Construct the standard ellipse using matplotlib
-ellipse = Ellipse(xy=mean_center, # center the ellipse on our mean center
-                  width=major*2, # centrography.ellipse only gives half the axis
-                  height=minor*2, 
-                  angle = numpy.rad2deg(rotation), # Angles for this are in degrees, not radians
-                  facecolor='none', 
-                  edgecolor='red', linestyle='--',
-                  label='Std. Ellipse')
+ellipse = Ellipse(
+    xy=mean_center,  # center the ellipse on our mean center
+    width=major * 2,  # centrography.ellipse only gives half the axis
+    height=minor * 2,
+    angle=numpy.rad2deg(
+        rotation
+    ),  # Angles for this are in degrees, not radians
+    facecolor="none",
+    edgecolor="red",
+    linestyle="--",
+    label="Std. Ellipse",
+)
 ax.add_patch(ellipse)
 
 ax.legend()
 # Display
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+    ax, source=contextily.providers.CartoDB.Positron
 )
 plt.show()
 ```
@@ -290,7 +298,7 @@ Below, we'll walk through how to construct each example and visualize them at th
 
 ```python
 user = db.query('user_id == "95795770@N00"')
-coordinates = user[['x','y']].values
+coordinates = user[["x", "y"]].values
 ```
 
 First, we'll compute the **convex hull**, which is the tightest *convex* shape that encloses the user's photos. By *convex*, we mean that the shape never "doubles back" on itself; it has no divets, valleys, crenelations, or holes. All of its interior angles are smaller than 180 degrees.  This is computed using the `centrography.hull` method.
@@ -307,66 +315,69 @@ In contrast, you can think of an alpha shape as the space made from rolling a *s
 
 ```python
 import libpysal
-alpha_shape, alpha, circs = libpysal.cg.alpha_shape_auto(coordinates, return_circles=True)
+
+alpha_shape, alpha, circs = libpysal.cg.alpha_shape_auto(
+    coordinates, return_circles=True
+)
 ```
 
 To illustrate, the figure below has the tightest single alpha shape shown in green and the original source points shown in black. The "bounding" circles shown in the figure all have a radius of $8652$ meters. The circles are plotted where our "bounding" disk touches two or three of the points in the point cloud. You can see that the circles "cut into" the convex hull, shown in blue dashed lines, up until they touch two (or three) points. Any tighter, and the circle would disconnect one of the points on the boundary of the alpha shape. 
 
 
 ```python caption="Tokyo points Tightest Alpha Shape, Minimum Bounding Circles, Convex Hull." tags=[]
-from descartes import PolygonPatch #to plot the alpha shape easily
-f,ax = plt.subplots(1,1, figsize=(9,9))
+from descartes import PolygonPatch  # to plot the alpha shape easily
+
+f, ax = plt.subplots(1, 1, figsize=(9, 9))
 
 # Plot a green alpha shape
 ax.add_patch(
     PolygonPatch(
-        alpha_shape, 
-        edgecolor='green', 
-        facecolor='green', 
-        alpha=.2, 
-        label = 'Tighest single alpha shape'
+        alpha_shape,
+        edgecolor="green",
+        facecolor="green",
+        alpha=0.2,
+        label="Tighest single alpha shape",
     )
 )
 
 # Include the points for our prolific user in black
 ax.scatter(
-    *coordinates.T, color='k', marker='.', label='Source Points'
+    *coordinates.T, color="k", marker=".", label="Source Points"
 )
 
 # plot the circles forming the boundary of the alpha shape
 for i, circle in enumerate(circs):
     # only label the first circle of its kind
     if i == 0:
-        label = 'Bounding Circles'
+        label = "Bounding Circles"
     else:
         label = None
     ax.add_patch(
         plt.Circle(
-            circle, 
-            radius=alpha, 
-            facecolor='none', 
-            edgecolor='r', 
-            label=label
+            circle,
+            radius=alpha,
+            facecolor="none",
+            edgecolor="r",
+            label=label,
         )
     )
 
 # add a blue convex hull
 ax.add_patch(
     plt.Polygon(
-        convex_hull_vertices, 
-        closed=True, 
-        edgecolor='blue', 
-        facecolor='none', 
-        linestyle=':', 
+        convex_hull_vertices,
+        closed=True,
+        edgecolor="blue",
+        facecolor="none",
+        linestyle=":",
         linewidth=2,
-        label='Convex Hull'
+        label="Convex Hull",
     )
 )
 
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+    ax, source=contextily.providers.CartoDB.Positron
 )
 
 plt.legend();
@@ -379,24 +390,31 @@ For the minimum rotated rectangle, we will use the `minimum_rotated_rectangle` f
 
 ```python
 import pygeos
+
 point_array = geopandas.points_from_xy(x=user.x, y=user.y)
 multipoint = pygeos.from_shapely(point_array.unary_union())
 
-min_rot_rect = pygeos.to_shapely(pygeos.minimum_rotated_rectangle(multipoint))
+min_rot_rect = pygeos.to_shapely(
+    pygeos.minimum_rotated_rectangle(multipoint)
+)
 ```
 
 And, for the minimum bounding rectangle without rotation, we will use the `minimum_bounding_rectangle` function from the `pointpats` package.
 
 
 ```python
-min_rect_vertices = centrography.minimum_bounding_rectangle(coordinates)
+min_rect_vertices = centrography.minimum_bounding_rectangle(
+    coordinates
+)
 ```
 
 Finally, the **minimum bounding circle** is the smallest circle that can be drawn to enclose the entire dataset. Often, this circle is bigger than the minimum bounding rectangle. It is implemented in the `minimum_bounding_circle` function in `pointpats`. 
 
 
 ```python
-(center_x, center_y), radius = centrography.minimum_bounding_circle(coordinates)
+(center_x, center_y), radius = centrography.minimum_bounding_circle(
+    coordinates
+)
 ```
 
 Now, to visualize these, we'll convert the raw vertices into `matplotlib` patches: 
@@ -408,56 +426,60 @@ from descartes import PolygonPatch
 
 # Make a purple alpha shape
 alpha_shape_patch = PolygonPatch(
-    alpha_shape, 
-    edgecolor='purple', 
-    facecolor='none', 
+    alpha_shape,
+    edgecolor="purple",
+    facecolor="none",
     linewidth=2,
-    label='Alpha Shape'
+    label="Alpha Shape",
 )
 
 # a blue convex hull
 convex_hull_patch = Polygon(
-    convex_hull_vertices, 
-    closed=True, 
-    edgecolor='blue', facecolor='none', 
-    linestyle=':', linewidth=2,
-    label='Convex Hull'
+    convex_hull_vertices,
+    closed=True,
+    edgecolor="blue",
+    facecolor="none",
+    linestyle=":",
+    linewidth=2,
+    label="Convex Hull",
 )
 
 # a green minimum rotated rectangle
 
 min_rot_rect_patch = PolygonPatch(
-    min_rot_rect, 
-    edgecolor='green', 
-    facecolor='none', 
-    linestyle='--', 
-    label='Min Rotated Rectangle', 
-    linewidth=2
+    min_rot_rect,
+    edgecolor="green",
+    facecolor="none",
+    linestyle="--",
+    label="Min Rotated Rectangle",
+    linewidth=2,
 )
 
 
-# compute the width and height of the 
+# compute the width and height of the
 min_rect_width = min_rect_vertices[2] - min_rect_vertices[0]
 min_rect_height = min_rect_vertices[2] - min_rect_vertices[0]
 
 # a goldenrod minimum bounding rectangle
 min_rect_patch = Rectangle(
-    min_rect_vertices[0:2], 
-    width = min_rect_width,
-    height = min_rect_height,
-    edgecolor='goldenrod', facecolor='none', 
-    linestyle='dashed', linewidth=2, 
-    label='Min Bounding Rectangle', 
+    min_rect_vertices[0:2],
+    width=min_rect_width,
+    height=min_rect_height,
+    edgecolor="goldenrod",
+    facecolor="none",
+    linestyle="dashed",
+    linewidth=2,
+    label="Min Bounding Rectangle",
 )
 
 # and a red minimum bounding circle
 circ_patch = Circle(
-    (center_x, center_y), 
+    (center_x, center_y),
     radius=radius,
-    edgecolor='red', 
-    facecolor='none', 
+    edgecolor="red",
+    facecolor="none",
     linewidth=2,
-    label='Min Bounding Circle'
+    label="Min Bounding Circle",
 )
 ```
 
@@ -465,7 +487,7 @@ Finally, we'll plot the patches together with the photograph locations below:
 
 
 ```python caption="Tokyo points Tightest Alpha Shape, Minimum Bounding Circle, Convex Hull, Bounding Rectangle.." tags=[]
-f,ax = plt.subplots(1, figsize=(10,10))
+f, ax = plt.subplots(1, figsize=(10, 10))
 
 ax.add_patch(alpha_shape_patch)
 ax.add_patch(convex_hull_patch)
@@ -473,14 +495,13 @@ ax.add_patch(min_rot_rect_patch)
 ax.add_patch(min_rect_patch)
 ax.add_patch(circ_patch)
 
-ax.scatter(db.x, db.y, s=.75, color='grey')
-ax.scatter(user.x, user.y, s=100, color='r', marker='x')
-ax.legend(ncol=1, loc='center left')
+ax.scatter(db.x, db.y, s=0.75, color="grey")
+ax.scatter(user.x, user.y, s=100, color="r", marker="x")
+ax.legend(ncol=1, loc="center left")
 
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+    ax, source=contextily.providers.CartoDB.Positron
 )
 plt.show()
 ```
@@ -499,7 +520,12 @@ The first set of techniques, **quadrat** statistics, receive their name after th
 
 
 ```python
-from pointpats import distance_statistics, QStatistic, random, PointPattern
+from pointpats import (
+    distance_statistics,
+    QStatistic,
+    random,
+    PointPattern,
+)
 ```
 
 For the purposes of illustration, it also helps to provide a pattern derived from a known *completely spatially random* process. That is, the location and number of points is totally random; there is neither clustering nor dispersion. In point pattern analysis, this is known as a *Poisson point process*. 
@@ -513,14 +539,18 @@ random_pattern = random.poisson(coordinates, size=len(coordinates))
 
 
 ```python caption="Tokyo points Observed and Random Patterns." tags=[]
-f,ax = plt.subplots(1, figsize=(9, 9))
-plt.scatter(*coordinates.T, color='k', marker='.', label='Observed photographs')
-plt.scatter(*random_pattern.T, color='r', marker='x', label='Random')
-contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+f, ax = plt.subplots(1, figsize=(9, 9))
+plt.scatter(
+    *coordinates.T,
+    color="k",
+    marker=".",
+    label="Observed photographs"
 )
-ax.legend(ncol=1, loc='center left')
+plt.scatter(*random_pattern.T, color="r", marker="x", label="Random")
+contextily.add_basemap(
+    ax, source=contextily.providers.CartoDB.Positron
+)
+ax.legend(ncol=1, loc="center left")
 plt.show()
 ```
 
@@ -529,19 +559,22 @@ As you can see, the simulation (by default) works with the bounding box of the i
 
 
 ```python
-random_pattern_ashape = random.poisson(alpha_shape, size=len(coordinates))
+random_pattern_ashape = random.poisson(
+    alpha_shape, size=len(coordinates)
+)
 ```
 
 
 ```python caption="Tokyo points, random and observed patterns within Alpha shape." tags=[]
-f,ax = plt.subplots(1, figsize=(9, 9))
-plt.scatter(*coordinates.T, color='k', marker='.', label='Observed')
-plt.scatter(*random_pattern_ashape.T, color='r', marker='x', label='Random')
-contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+f, ax = plt.subplots(1, figsize=(9, 9))
+plt.scatter(*coordinates.T, color="k", marker=".", label="Observed")
+plt.scatter(
+    *random_pattern_ashape.T, color="r", marker="x", label="Random"
 )
-ax.legend(ncol=1, loc='center left')
+contextily.add_basemap(
+    ax, source=contextily.providers.CartoDB.Positron
+)
+ax.legend(ncol=1, loc="center left")
 plt.show()
 ```
 
@@ -605,24 +638,41 @@ The first function, Ripley's $G$, focuses on the distribution of nearest neighbo
 
 ```python caption="Tokyo points and nearest neighbor graph. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
 # Code generated for this figure is available on the web version of the book.
-f,ax = plt.subplots(1,2,figsize=(8,4), sharex=True, sharey=True)
-ax[0].scatter(*random_pattern.T, color='red')
-ax[1].scatter(*random_pattern.T, color='red',
-              zorder=100, marker='.', label='Points')
+f, ax = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
+ax[0].scatter(*random_pattern.T, color="red")
+ax[1].scatter(
+    *random_pattern.T,
+    color="red",
+    zorder=100,
+    marker=".",
+    label="Points"
+)
 nn_ixs, nn_ds = PointPattern(random_pattern).knn(1)
 first = True
 for coord, nn_ix, nn_d in zip(random_pattern, nn_ixs, nn_ds):
     dx, dy = random_pattern[nn_ix].squeeze() - coord
-    arrow = ax[1].arrow(*coord, dx,dy, 
-                length_includes_head=True, 
-                overhang=0, head_length=300*3,
-                head_width=300*3, width=50*3,
-                linewidth=0, facecolor='k',
-                head_starts_at_zero=False)
+    arrow = ax[1].arrow(
+        *coord,
+        dx,
+        dy,
+        length_includes_head=True,
+        overhang=0,
+        head_length=300 * 3,
+        head_width=300 * 3,
+        width=50 * 3,
+        linewidth=0,
+        facecolor="k",
+        head_starts_at_zero=False
+    )
     if first:
-        plt.plot((1e100, 1e101), (0,1), color='k', 
-                 marker='<', markersize=10,
-                 label='Nearest Neighbor to Point')
+        plt.plot(
+            (1e100, 1e101),
+            (0, 1),
+            color="k",
+            marker="<",
+            markersize=10,
+            label="Nearest Neighbor to Point",
+        )
     first = False
 
 ax[0].axis([1.554e7, 1.556e7, 4240000, 4260000])
@@ -631,7 +681,7 @@ ax[0].set_yticklabels([])
 ax[0].set_xticks([])
 ax[0].set_yticks([])
 f.tight_layout()
-ax[1].legend(bbox_to_anchor = (.5,-.06), fontsize=16)
+ax[1].legend(bbox_to_anchor=(0.5, -0.06), fontsize=16)
 plt.show()
 ```
 
@@ -655,23 +705,32 @@ In this plot, we see that the red empirical function rises much faster than simu
 
 
 ```python caption="Tokyo points, Ripley's G Function. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
-f,ax = plt.subplots(1,2,figsize=(9,3), 
-                    gridspec_kw=dict(width_ratios=(6,3)))
+f, ax = plt.subplots(
+    1, 2, figsize=(9, 3), gridspec_kw=dict(width_ratios=(6, 3))
+)
 # plot all the simulations with very fine lines
-ax[0].plot(g_test.support, g_test.simulations.T, color='k', alpha=.01)
+ax[0].plot(
+    g_test.support, g_test.simulations.T, color="k", alpha=0.01
+)
 # and show the average of simulations
-ax[0].plot(g_test.support, numpy.median(g_test.simulations, axis=0), color='cyan', 
-         label='median simulation')
+ax[0].plot(
+    g_test.support,
+    numpy.median(g_test.simulations, axis=0),
+    color="cyan",
+    label="median simulation",
+)
 
 
 # and the observed pattern's G function
-ax[0].plot(g_test.support, g_test.statistic, label = 'observed', color='red')
+ax[0].plot(
+    g_test.support, g_test.statistic, label="observed", color="red"
+)
 
 # clean up labels and axes
-ax[0].set_xlabel('distance')
-ax[0].set_ylabel('% of nearest neighbor\ndistances shorter')
+ax[0].set_xlabel("distance")
+ax[0].set_ylabel("% of nearest neighbor\ndistances shorter")
 ax[0].legend()
-ax[0].set_xlim(0,2000)
+ax[0].set_xlim(0, 2000)
 ax[0].set_title(r"Ripley's $G(d)$ function")
 
 # plot the pattern itself on the next frame
@@ -682,7 +741,7 @@ ax[1].set_xticks([])
 ax[1].set_yticks([])
 ax[1].set_xticklabels([])
 ax[1].set_yticklabels([])
-ax[1].set_title('Pattern')
+ax[1].set_title("Pattern")
 f.tight_layout()
 plt.show()
 ```
@@ -701,25 +760,33 @@ f_test = distance_statistics.f_test(
 
 
 ```python caption="Tokyo points, Cluster vs. non-cluster points. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
-f,ax = plt.subplots(
-    1,2,figsize=(9,3), gridspec_kw=dict(width_ratios=(6,3))
+f, ax = plt.subplots(
+    1, 2, figsize=(9, 3), gridspec_kw=dict(width_ratios=(6, 3))
 )
 
 # plot all the simulations with very fine lines
-ax[0].plot(f_test.support, f_test.simulations.T, color='k', alpha=.01)
+ax[0].plot(
+    f_test.support, f_test.simulations.T, color="k", alpha=0.01
+)
 # and show the average of simulations
-ax[0].plot(f_test.support, numpy.median(f_test.simulations, axis=0), color='cyan', 
-         label='median simulation')
+ax[0].plot(
+    f_test.support,
+    numpy.median(f_test.simulations, axis=0),
+    color="cyan",
+    label="median simulation",
+)
 
 
 # and the observed pattern's F function
-ax[0].plot(f_test.support, f_test.statistic, label = 'observed', color='red')
+ax[0].plot(
+    f_test.support, f_test.statistic, label="observed", color="red"
+)
 
 # clean up labels and axes
-ax[0].set_xlabel('distance')
-ax[0].set_ylabel('% of nearest point in pattern\ndistances shorter')
+ax[0].set_xlabel("distance")
+ax[0].set_ylabel("% of nearest point in pattern\ndistances shorter")
 ax[0].legend()
-ax[0].set_xlim(0,2000)
+ax[0].set_xlim(0, 2000)
 ax[0].set_title(r"Ripley's $F(d)$ function")
 
 # plot the pattern itself on the next frame
@@ -730,7 +797,7 @@ ax[1].set_xticks([])
 ax[1].set_yticks([])
 ax[1].set_xticklabels([])
 ax[1].set_yticklabels([])
-ax[1].set_title('Pattern')
+ax[1].set_title("Pattern")
 f.tight_layout()
 plt.show()
 ```
@@ -789,20 +856,22 @@ Now we already have the clusters, we can proceed to visualize them. There are ma
 # Setup figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Subset points that are not part of any cluster (noise)
-noise = db.loc[lbls==-1, ['x', 'y']]
+noise = db.loc[lbls == -1, ["x", "y"]]
 # Plot noise in grey
-ax.scatter(noise['x'], noise['y'], c='grey', s=5, linewidth=0)
+ax.scatter(noise["x"], noise["y"], c="grey", s=5, linewidth=0)
 # Plot all points that are not noise in red
 # NOTE how this is done through some fancy indexing, where
 #      we take the index of all points (tw) and substract from
 #      it the index of those that are noise
-ax.scatter(db.loc[db.index.difference(noise.index), 'x'], \
-           db.loc[db.index.difference(noise.index), 'y'], \
-          c='red', linewidth=0)
+ax.scatter(
+    db.loc[db.index.difference(noise.index), "x"],
+    db.loc[db.index.difference(noise.index), "y"],
+    c="red",
+    linewidth=0,
+)
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+    ax, source=contextily.providers.CartoDB.Positron
 )
 # Remove axes
 ax.set_axis_off()
@@ -829,29 +898,28 @@ At the same time, let us expand the maximum radius to say, 500 meters. Then we c
 ```python caption="Tokyo points, Clusters with DBSCAN and minp=0.01." tags=[]
 # Rerun DBSCAN
 clusterer = DBSCAN(eps=500, min_samples=int(minp))
-clusterer.fit(db[['x', 'y']])
+clusterer.fit(db[["x", "y"]])
 # Turn labels into a Series
 lbls = pandas.Series(clusterer.labels_, index=db.index)
 # Setup figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Subset points that are not part of any cluster (noise)
-noise = db.loc[lbls==-1, ['x', 'y']]
+noise = db.loc[lbls == -1, ["x", "y"]]
 # Plot noise in grey
-ax.scatter(noise['x'], noise['y'], c='grey', s=5, linewidth=0)
+ax.scatter(noise["x"], noise["y"], c="grey", s=5, linewidth=0)
 # Plot all points that are not noise in red
 # NOTE how this is done through some fancy indexing, where
 #      we take the index of all points (db) and substract from
 #      it the index of those that are noise
 ax.scatter(
-    db.loc[db.index.difference(noise.index), 'x'],
-    db.loc[db.index.difference(noise.index), 'y'],
-    c='red', 
-    linewidth=0
+    db.loc[db.index.difference(noise.index), "x"],
+    db.loc[db.index.difference(noise.index), "y"],
+    c="red",
+    linewidth=0,
 )
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    source=contextily.providers.CartoDB.Positron
+    ax, source=contextily.providers.CartoDB.Positron
 )
 # Remove axes
 ax.set_axis_off()
