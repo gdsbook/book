@@ -628,14 +628,14 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># Graphics</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span>
-<span class="kn">import</span> <span class="nn">seaborn</span>                   <span class="c1"># Graphics</span>
-<span class="kn">import</span> <span class="nn">geopandas</span>                 <span class="c1"># Spatial data manipulation</span>
-<span class="kn">import</span> <span class="nn">pandas</span>                    <span class="c1"># Tabular data manipulation</span>
-<span class="kn">import</span> <span class="nn">rioxarray</span>                 <span class="c1"># Surface data manipulation</span>
-<span class="kn">import</span> <span class="nn">xarray</span>                    <span class="c1"># Surface data manipulation</span>
-<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>   <span class="c1"># Exploratory Spatial analytics</span>
-<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>    <span class="c1"># Spatial weights</span>
-<span class="kn">import</span> <span class="nn">contextily</span>                <span class="c1"># Background tiles</span>
+<span class="kn">import</span> <span class="nn">seaborn</span>  <span class="c1"># Graphics</span>
+<span class="kn">import</span> <span class="nn">geopandas</span>  <span class="c1"># Spatial data manipulation</span>
+<span class="kn">import</span> <span class="nn">pandas</span>  <span class="c1"># Tabular data manipulation</span>
+<span class="kn">import</span> <span class="nn">rioxarray</span>  <span class="c1"># Surface data manipulation</span>
+<span class="kn">import</span> <span class="nn">xarray</span>  <span class="c1"># Surface data manipulation</span>
+<span class="kn">from</span> <span class="nn">pysal.explore</span> <span class="kn">import</span> <span class="n">esda</span>  <span class="c1"># Exploratory Spatial analytics</span>
+<span class="kn">from</span> <span class="nn">pysal.lib</span> <span class="kn">import</span> <span class="n">weights</span>  <span class="c1"># Spatial weights</span>
+<span class="kn">import</span> <span class="nn">contextily</span>  <span class="c1"># Background tiles</span>
 </pre></div>
 </div>
 </div>
@@ -644,8 +644,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-    <span class="s1">&#39;../data/brexit/brexit_vote.csv&#39;</span><span class="p">,</span> 
-    <span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;Area_Code&#39;</span>
+    <span class="s2">&quot;../data/brexit/brexit_vote.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;Area_Code&quot;</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -656,7 +655,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
     <span class="s2">&quot;../data/brexit/local_authority_districts.geojson&quot;</span>
-<span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;lad16cd&#39;</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;lad16cd&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -664,13 +663,15 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <p>Then, we “trim” the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> so it retains only what we know we will need, reproject it to spherical mercator, and drop rows with missing data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-    <span class="n">lads</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ref</span><span class="p">[[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]]),</span> <span class="n">crs</span><span class="o">=</span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
-    <span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span>
-<span class="p">)[</span>
-    <span class="p">[</span><span class="s1">&#39;objectid&#39;</span><span class="p">,</span> <span class="s1">&#39;lad16nm&#39;</span><span class="p">,</span> <span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
-<span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+        <span class="n">lads</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ref</span><span class="p">[[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]]),</span> <span class="n">crs</span><span class="o">=</span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)[</span>
+        <span class="p">[</span><span class="s2">&quot;objectid&quot;</span><span class="p">,</span> <span class="s2">&quot;lad16nm&quot;</span><span class="p">,</span> <span class="s2">&quot;Pct_Leave&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+    <span class="p">]</span>
+    <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="p">)</span>
 
 <span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
@@ -699,22 +700,22 @@ memory usage: 14.8+ KB
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Build choropleth</span>
 <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> 
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> 
-    <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
-    <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> 
-    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> 
-    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> 
-    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> 
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">legend_kwds</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Add basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> 
-    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">VoyagerNoLabels</span>
+    <span class="n">ax</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">VoyagerNoLabels</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
@@ -731,7 +732,7 @@ memory usage: 14.8+ KB
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate W from the GeoDataFrame</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="c1"># Row-standardization</span>
-<span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span>
+<span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;R&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -742,7 +743,9 @@ memory usage: 14.8+ KB
 <p>To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardised form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;w_Pct_Leave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -750,8 +753,8 @@ memory usage: 14.8+ KB
 <p>And their respective standardized versions, where we subtract the average and divide by the standard deviation:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>
-<span class="n">db</span><span class="p">[</span><span class="s1">&#39;w_Pct_Leave_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;w_Pct_Leave&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -763,7 +766,7 @@ memory usage: 14.8+ KB
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Plot values</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
-    <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Pct_Leave_std&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;w_Pct_Leave_std&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">None</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;w_Pct_Leave_std&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">);</span>
 </pre></div>
 </div>
@@ -779,16 +782,16 @@ memory usage: 14.8+ KB
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Plot values</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
-    <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Pct_Leave_std&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;w_Pct_Leave_std&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">None</span>
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;w_Pct_Leave_std&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">)</span>
 <span class="c1"># Add vertical and horizontal lines</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="c1"># Add text labels for each quadrant</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;HH&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;HL&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="s2">&quot;LH&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mi">25</span><span class="p">,</span> <span class="o">-</span><span class="mf">11.0</span><span class="p">,</span> <span class="s2">&quot;LL&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;HH&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">,</span> <span class="s2">&quot;HL&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="s2">&quot;LH&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">-</span><span class="mi">25</span><span class="p">,</span> <span class="o">-</span><span class="mf">11.0</span><span class="p">,</span> <span class="s2">&quot;LL&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
 <span class="c1"># Display</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -812,7 +815,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>In Python, we can calculate LISAs in a very streamlined way thanks to <code class="docutils literal notranslate"><span class="pre">esda</span></code>. To compute local Moran statistics, we use the <code class="docutils literal notranslate"><span class="pre">Moran_Local</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -851,83 +854,84 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <span class="c1"># Make the axes accessible with single indexing</span>
 <span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-                    <span class="c1"># Subplot 1 #</span>
-            <span class="c1"># Choropleth of local statistics</span>
+<span class="c1"># Subplot 1 #</span>
+<span class="c1"># Choropleth of local statistics</span>
 <span class="c1"># Grab first axis in the figure</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="c1"># Assign new column with local statistics on-the-fly</span>
 <span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
     <span class="n">Is</span><span class="o">=</span><span class="n">lisa</span><span class="o">.</span><span class="n">Is</span>
-<span class="c1"># Plot choropleth of local statistics</span>
+    <span class="c1"># Plot choropleth of local statistics</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;Is&#39;</span><span class="p">,</span> 
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;plasma&#39;</span><span class="p">,</span> 
-    <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
-    <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> 
-    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> 
-    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> 
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Is&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;plasma&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
 <span class="p">)</span>
 
-                    <span class="c1"># Subplot 2 #</span>
-                <span class="c1"># Quadrant categories</span>
+<span class="c1"># Subplot 2 #</span>
+<span class="c1"># Quadrant categories</span>
 <span class="c1"># Grab second axis of local statistics</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="c1"># Plot Quandrant colors (note to ensure all polygons are assigned a</span>
 <span class="c1"># quadrant, we &quot;trick&quot; the function by setting significance level to</span>
 <span class="c1"># 1 so all observations are treated as &quot;significant&quot; and thus assigned</span>
 <span class="c1"># a quadrant color</span>
-<span class="n">esdaplot</span><span class="o">.</span><span class="n">lisa_cluster</span><span class="p">(</span><span class="n">lisa</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+<span class="n">esdaplot</span><span class="o">.</span><span class="n">lisa_cluster</span><span class="p">(</span><span class="n">lisa</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 
-                    <span class="c1"># Subplot 3 #</span>
-                <span class="c1"># Significance map</span>
+<span class="c1"># Subplot 3 #</span>
+<span class="c1"># Significance map</span>
 <span class="c1"># Grab third axis of local statistics</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-<span class="c1"># </span>
+<span class="c1">#</span>
 <span class="c1"># Find out significant observations</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-    <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">),</span> <span class="c1"># Assign 1 if significant, 0 otherwise</span>
-    <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span>           <span class="c1"># Use the index in the original data</span>
-<span class="c1"># Recode 1 to &quot;Significant and 0 to &quot;Non-significant&quot;</span>
-<span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="s1">&#39;Significant&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;Non-Significant&#39;</span><span class="p">})</span>
+    <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">),</span>  <span class="c1"># Assign 1 if significant, 0 otherwise</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span>  <span class="c1"># Use the index in the original data</span>
+    <span class="c1"># Recode 1 to &quot;Significant and 0 to &quot;Non-significant&quot;</span>
+<span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Significant&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Non-Significant&quot;</span><span class="p">})</span>
 <span class="c1"># Assign labels to `db` on the fly</span>
 <span class="n">db</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
     <span class="n">cl</span><span class="o">=</span><span class="n">labels</span>
-<span class="c1"># Plot choropleth of (non-)significant areas</span>
+    <span class="c1"># Plot choropleth of (non-)significant areas</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;cl&#39;</span><span class="p">,</span> 
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;cl&quot;</span><span class="p">,</span>
     <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Paired&#39;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Paired&quot;</span><span class="p">,</span>
     <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
 <span class="p">)</span>
 
-                       
-                    <span class="c1"># Subplot 4 #</span>
-                    <span class="c1"># Cluster map</span>
+
+<span class="c1"># Subplot 4 #</span>
+<span class="c1"># Cluster map</span>
 <span class="c1"># Grab second axis of local statistics</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
 <span class="c1"># Plot Quandrant colors In this case, we use a 5% significance</span>
 <span class="c1"># level to select polygons as part of statistically significant</span>
 <span class="c1"># clusters</span>
-<span class="n">esdaplot</span><span class="o">.</span><span class="n">lisa_cluster</span><span class="p">(</span><span class="n">lisa</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
+<span class="n">esdaplot</span><span class="o">.</span><span class="n">lisa_cluster</span><span class="p">(</span><span class="n">lisa</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 
-                    <span class="c1"># Figure styling #</span>
+<span class="c1"># Figure styling #</span>
 <span class="c1"># Set title to each subplot</span>
 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span>
         <span class="p">[</span>
-            <span class="s1">&#39;Local Statistics&#39;</span><span class="p">,</span> 
-            <span class="s1">&#39;Scatterplot Quadrant&#39;</span><span class="p">,</span> 
-            <span class="s1">&#39;Statistical Significance&#39;</span><span class="p">,</span> 
-            <span class="s1">&#39;Moran Cluster Map&#39;</span>
-        <span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="mi">0</span>
+            <span class="s2">&quot;Local Statistics&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Scatterplot Quadrant&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Statistical Significance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Moran Cluster Map&quot;</span><span class="p">,</span>
+        <span class="p">][</span><span class="n">i</span><span class="p">],</span>
+        <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span>
 <span class="c1"># Tight layout to minimise in-betwee white space</span>
 <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
@@ -994,13 +998,13 @@ dtype: int64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assign pseudo P-values to `db`</span>
-<span class="n">db</span><span class="p">[</span><span class="s1">&#39;p-sim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span>
+<span class="n">db</span><span class="p">[</span><span class="s2">&quot;p-sim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span>
 <span class="c1"># `1` if significant (at 5% confidence level), `0` otherwise</span>
 <span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span>
 <span class="c1"># Assign significance flag to `db`</span>
-<span class="n">db</span><span class="p">[</span><span class="s1">&#39;sig&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span>
+<span class="n">db</span><span class="p">[</span><span class="s2">&quot;sig&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sig</span>
 <span class="c1"># Print top of the table to inspect</span>
-<span class="n">db</span><span class="p">[[</span><span class="s1">&#39;sig&#39;</span><span class="p">,</span><span class="s1">&#39;p-sim&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">db</span><span class="p">[[</span><span class="s2">&quot;sig&quot;</span><span class="p">,</span> <span class="s2">&quot;p-sim&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1065,7 +1069,7 @@ dtype: int64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print bottom of the table to inspect</span>
-<span class="n">db</span><span class="p">[[</span><span class="s1">&#39;sig&#39;</span><span class="p">,</span><span class="s1">&#39;p-sim&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+<span class="n">db</span><span class="p">[[</span><span class="s2">&quot;sig&quot;</span><span class="p">,</span> <span class="s2">&quot;p-sim&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1132,22 +1136,27 @@ dtype: int64
 <p>Next, we construct our quadrant values using the <code class="docutils literal notranslate"><span class="pre">q</span></code> attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure <code class="docutils literal notranslate"><span class="pre">sig</span></code>, so only observations in a quadrant that are considered significant are labeled as part of that given quadrant. The remainder are labelled as non-significant.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pick as part of a quadrant only significant polygons, </span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pick as part of a quadrant only significant polygons,</span>
 <span class="c1"># assign `0` otherwise (Non-significant polygons)</span>
 <span class="n">spots</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span> <span class="o">*</span> <span class="n">sig</span>
 <span class="c1"># Mapping from value to name (as a dict)</span>
 <span class="n">spots_labels</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="mi">0</span><span class="p">:</span> <span class="s1">&#39;Non-Significant&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="s1">&#39;HH&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s1">&#39;LH&#39;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span><span class="s1">&#39;LL&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s1">&#39;HL&#39;</span>
+    <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Non-Significant&quot;</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;HH&quot;</span><span class="p">,</span>
+    <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;LH&quot;</span><span class="p">,</span>
+    <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;LL&quot;</span><span class="p">,</span>
+    <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;HL&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 <span class="c1"># Create column in `db` with labels for each polygon</span>
-<span class="n">db</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+<span class="n">db</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
     <span class="c1"># First initialise a Series using values and `db` index</span>
-    <span class="n">spots</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span>
-<span class="c1"># Then map each value to corresponding label based </span>
-<span class="c1"># on the `spots_labels` mapping</span>
+    <span class="n">spots</span><span class="p">,</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">index</span>
+    <span class="c1"># Then map each value to corresponding label based</span>
+    <span class="c1"># on the `spots_labels` mapping</span>
 <span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">spots_labels</span><span class="p">)</span>
 <span class="c1"># Print top for inspection</span>
-<span class="n">db</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">db</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1167,7 +1176,7 @@ Name: labels, dtype: object
 <p>After building these new columns, analysis on the overall trends of LISA statistics is more straightforward than from the <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object. For example, an overview of the distribution of labels is one line away:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1190,9 +1199,9 @@ Name: labels, dtype: int64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gi</span>
-<span class="n">go_i</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+<span class="n">go_i</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
 <span class="c1"># Gi*</span>
-<span class="n">go_i_star</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">],</span> <span class="n">w</span><span class="p">,</span> <span class="n">star</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">go_i_star</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">,</span> <span class="n">star</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1202,16 +1211,16 @@ Name: labels, dtype: int64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
-    <span class="sd">&#39;&#39;&#39;</span>
+    <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a cluster map</span>
 <span class="sd">    ...</span>
-<span class="sd">    </span>
+
 <span class="sd">    Arguments</span>
 <span class="sd">    ---------</span>
 <span class="sd">    g      : G_Local</span>
 <span class="sd">             Object from the computation of the G statistic</span>
 <span class="sd">    db     : GeoDataFrame</span>
-<span class="sd">             Table aligned with values in `g` and containing </span>
+<span class="sd">             Table aligned with values in `g` and containing</span>
 <span class="sd">             the geometries to plot</span>
 <span class="sd">    ax     : AxesSubplot</span>
 <span class="sd">             `matplotlib` axis to draw the map on</span>
@@ -1220,33 +1229,33 @@ Name: labels, dtype: int64
 <span class="sd">    -------</span>
 <span class="sd">    ax     : AxesSubplot</span>
 <span class="sd">             Axis with the map drawn</span>
-<span class="sd">    &#39;&#39;&#39;</span>
-    <span class="n">ec</span> <span class="o">=</span> <span class="s1">&#39;0.8&#39;</span>
-    
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ec</span> <span class="o">=</span> <span class="s2">&quot;0.8&quot;</span>
+
     <span class="c1"># Break observations into significant or not</span>
     <span class="n">sig</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span>
 
     <span class="c1"># Plot non-significant clusters</span>
-    <span class="n">ns</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sig</span><span class="o">==</span><span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
-    <span class="n">ns</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;lightgrey&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">ns</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">sig</span> <span class="o">==</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+    <span class="n">ns</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightgrey&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
     <span class="c1"># Plot HH clusters</span>
-    <span class="n">hh</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">g</span><span class="o">.</span><span class="n">Zs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sig</span><span class="o">==</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
-    <span class="n">hh</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">hh</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">g</span><span class="o">.</span><span class="n">Zs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sig</span> <span class="o">==</span> <span class="kc">True</span><span class="p">),</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+    <span class="n">hh</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
     <span class="c1"># Plot LL clusters</span>
-    <span class="n">ll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">g</span><span class="o">.</span><span class="n">Zs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sig</span><span class="o">==</span><span class="kc">True</span><span class="p">),</span> <span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
-    <span class="n">ll</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="n">ll</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[(</span><span class="n">g</span><span class="o">.</span><span class="n">Zs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sig</span> <span class="o">==</span> <span class="kc">True</span><span class="p">),</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+    <span class="n">ll</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">ec</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
     <span class="c1"># Style and draw</span>
     <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-        <span class="n">ax</span><span class="p">,</span> 
-        <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> 
+        <span class="n">ax</span><span class="p">,</span>
+        <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
         <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># Flag to add a star to the title if it&#39;s G_i*</span>
-    <span class="n">st</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">st</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">star</span><span class="p">:</span>
-        <span class="n">st</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span>
+        <span class="n">st</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span>
     <span class="c1"># Add title</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;G</span><span class="si">{</span><span class="n">st</span><span class="si">}</span><span class="s1"> statistic for Pct of Leave votes&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;G</span><span class="si">{</span><span class="n">st</span><span class="si">}</span><span class="s2"> statistic for Pct of Leave votes&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
     <span class="c1"># Remove axis for aesthetics</span>
     <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">ax</span>
@@ -1284,9 +1293,7 @@ Name: labels, dtype: int64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Open GeoTIFF file and read into `xarray.DataArray`</span>
-<span class="n">pop</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span>
-    <span class="s1">&#39;../data/ghsl/ghsl_sao_paulo.tif&#39;</span>
-<span class="p">)</span>
+<span class="n">pop</span> <span class="o">=</span> <span class="n">xarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/ghsl/ghsl_sao_paulo.tif&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1329,12 +1336,14 @@ Name: labels, dtype: int64
 <p>We take both steps in the following code snippet:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">WSP2W</span><span class="p">(</span>                <span class="c1"># 3.Convert `WSP` object to `W` </span>
-    <span class="n">weights</span><span class="o">.</span><span class="n">WSP</span><span class="p">(</span>                          <span class="c1"># 2.Build `WSP` from the float sparse matrix</span>
-        <span class="n">w_surface_sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="c1"># 1.Convert sparse matrix to floats</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">WSP2W</span><span class="p">(</span>  <span class="c1"># 3.Convert `WSP` object to `W`</span>
+    <span class="n">weights</span><span class="o">.</span><span class="n">WSP</span><span class="p">(</span>  <span class="c1"># 2.Build `WSP` from the float sparse matrix</span>
+        <span class="n">w_surface_sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+            <span class="nb">float</span>
+        <span class="p">)</span>  <span class="c1"># 1.Convert sparse matrix to floats</span>
     <span class="p">)</span>
 <span class="p">)</span>
-<span class="n">w_surface</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">w_surface_sp</span><span class="o">.</span><span class="n">index</span>      <span class="c1"># 4.Assign index to new `W`</span>
+<span class="n">w_surface</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">w_surface_sp</span><span class="o">.</span><span class="n">index</span>  <span class="c1"># 4.Assign index to new `W`</span>
 </pre></div>
 </div>
 </div>
@@ -1352,9 +1361,7 @@ Name: labels, dtype: int64
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert `DataArray` to a `pandas.Series`</span>
 <span class="n">pop_values</span> <span class="o">=</span> <span class="n">pop</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
 <span class="c1"># Subset to keep only values that aren&#39;t missing</span>
-<span class="n">pop_values</span> <span class="o">=</span> <span class="n">pop_values</span><span class="p">[</span>
-    <span class="n">pop_values</span> <span class="o">!=</span> <span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span>
-<span class="p">]</span>
+<span class="n">pop_values</span> <span class="o">=</span> <span class="n">pop_values</span><span class="p">[</span><span class="n">pop_values</span> <span class="o">!=</span> <span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span><span class="p">]</span>
 </pre></div>
 </div>
 </div>
@@ -1396,8 +1403,11 @@ Name: labels, dtype: int64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sig_pop</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
-    <span class="n">pop_lisa</span><span class="o">.</span><span class="n">q</span> <span class="o">*</span> <span class="p">(</span><span class="n">pop_lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">.01</span><span class="p">),</span> <span class="c1"># Quadrant of significant at 1% (0 otherwise)</span>
-    <span class="n">index</span><span class="o">=</span><span class="n">pop_values</span><span class="o">.</span><span class="n">index</span>               <span class="c1"># Index from the Series and aligned with `w_surface`</span>
+    <span class="n">pop_lisa</span><span class="o">.</span><span class="n">q</span>
+    <span class="o">*</span> <span class="p">(</span>
+        <span class="n">pop_lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
+    <span class="p">),</span>  <span class="c1"># Quadrant of significant at 1% (0 otherwise)</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">pop_values</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>  <span class="c1"># Index from the Series and aligned with `w_surface`</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1408,10 +1418,12 @@ Name: labels, dtype: int64
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build `DataArray` from a set of values and weights</span>
 <span class="n">lisa_da</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">w2da</span><span class="p">(</span>
-    <span class="n">sig_pop</span><span class="p">,</span>                                      <span class="c1"># Values</span>
-    <span class="n">w_surface</span><span class="p">,</span>                                    <span class="c1"># Spatial weights</span>
-    <span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;nodatavals&#39;</span><span class="p">:</span> <span class="n">pop</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;nodatavals&#39;</span><span class="p">]}</span> <span class="c1"># Value for missing data</span>
-<span class="c1"># Add CRS information in a compliant manner</span>
+    <span class="n">sig_pop</span><span class="p">,</span>  <span class="c1"># Values</span>
+    <span class="n">w_surface</span><span class="p">,</span>  <span class="c1"># Spatial weights</span>
+    <span class="n">attrs</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;nodatavals&quot;</span><span class="p">:</span> <span class="n">pop</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;nodatavals&quot;</span><span class="p">]</span>
+    <span class="p">}</span>  <span class="c1"># Value for missing data</span>
+    <span class="c1"># Add CRS information in a compliant manner</span>
 <span class="p">)</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_crs</span><span class="p">(</span><span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1444,11 +1456,11 @@ Name: labels, dtype: int64
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># LISA colors</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;ns&#39;</span><span class="p">:</span> <span class="s1">&#39;lightgrey&#39;</span><span class="p">,</span> <span class="c1"># Values of 0</span>
-    <span class="s1">&#39;HH&#39;</span><span class="p">:</span> <span class="s1">&#39;#d7191c&#39;</span><span class="p">,</span>   <span class="c1"># Values of 1</span>
-    <span class="s1">&#39;LH&#39;</span><span class="p">:</span> <span class="s1">&#39;#abd9e9&#39;</span><span class="p">,</span>   <span class="c1"># Values of 2</span>
-    <span class="s1">&#39;LL&#39;</span><span class="p">:</span> <span class="s1">&#39;#2c7bb6&#39;</span><span class="p">,</span>   <span class="c1"># Values of 3</span>
-    <span class="s1">&#39;HL&#39;</span><span class="p">:</span> <span class="s1">&#39;#fdae61&#39;</span><span class="p">,</span>   <span class="c1"># Values of 4</span>
+    <span class="s2">&quot;ns&quot;</span><span class="p">:</span> <span class="s2">&quot;lightgrey&quot;</span><span class="p">,</span>  <span class="c1"># Values of 0</span>
+    <span class="s2">&quot;HH&quot;</span><span class="p">:</span> <span class="s2">&quot;#d7191c&quot;</span><span class="p">,</span>  <span class="c1"># Values of 1</span>
+    <span class="s2">&quot;LH&quot;</span><span class="p">:</span> <span class="s2">&quot;#abd9e9&quot;</span><span class="p">,</span>  <span class="c1"># Values of 2</span>
+    <span class="s2">&quot;LL&quot;</span><span class="p">:</span> <span class="s2">&quot;#2c7bb6&quot;</span><span class="p">,</span>  <span class="c1"># Values of 3</span>
+    <span class="s2">&quot;HL&quot;</span><span class="p">:</span> <span class="s2">&quot;#fdae61&quot;</span><span class="p">,</span>  <span class="c1"># Values of 4</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -1458,7 +1470,7 @@ Name: labels, dtype: int64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa_cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">lc</span><span class="p">[</span><span class="s1">&#39;ns&#39;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s1">&#39;HH&#39;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s1">&#39;LH&#39;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s1">&#39;LL&#39;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s1">&#39;HL&#39;</span><span class="p">]]</span>
+    <span class="p">[</span><span class="n">lc</span><span class="p">[</span><span class="s2">&quot;ns&quot;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;HH&quot;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;LH&quot;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;LL&quot;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;HL&quot;</span><span class="p">]]</span>
 <span class="p">)</span>
 <span class="n">lisa_cmap</span>
 </pre></div>
@@ -1472,29 +1484,32 @@ Name: labels, dtype: int64
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-                    <span class="c1"># Subplot 1 #       </span>
+<span class="c1"># Subplot 1 #</span>
 <span class="c1"># Select pixels that do not have the `nodata` value</span>
 <span class="c1"># (ie. they are not missing data)</span>
 <span class="n">pop</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
-    <span class="n">pop</span><span class="o">!=</span><span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span>
-<span class="c1"># Plot surface with a horizontal colorbar</span>
+    <span class="n">pop</span>
+    <span class="o">!=</span> <span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span>
+    <span class="c1"># Plot surface with a horizontal colorbar</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="c1">#, cbar_kwargs={&quot;orientation&quot;: &quot;horizontal&quot;}</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># , cbar_kwargs={&quot;orientation&quot;: &quot;horizontal&quot;}</span>
 <span class="p">)</span>
-                    <span class="c1"># Subplot 2 #</span>
+<span class="c1"># Subplot 2 #</span>
 <span class="c1"># Select pixels with no missing data and rescale to [0, 1] by</span>
-<span class="c1"># dividing by 4 (maximum value in `lisa_da`) </span>
+<span class="c1"># dividing by 4 (maximum value in `lisa_da`)</span>
 <span class="p">(</span>
-    <span class="n">lisa_da</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lisa_da</span><span class="o">!=-</span><span class="mi">200</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span>
-<span class="c1"># Plot surface without a colorbar</span>
+    <span class="n">lisa_da</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">lisa_da</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">200</span><span class="p">)</span>
+    <span class="o">/</span> <span class="mi">4</span>
+    <span class="c1"># Plot surface without a colorbar</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">lisa_cmap</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">add_colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                    <span class="c1"># Aesthetics #</span>
+<span class="c1"># Aesthetics #</span>
 <span class="c1"># Subplot titles</span>
-<span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Population by pixel&#39;</span><span class="p">,</span> <span class="s1">&#39;Population clusters&#39;</span><span class="p">]</span>
+<span class="n">titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Population by pixel&quot;</span><span class="p">,</span> <span class="s2">&quot;Population clusters&quot;</span><span class="p">]</span>
 <span class="c1"># Apply the following to each of the two subplots</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
     <span class="c1"># Keep proportion of axes</span>
-    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
     <span class="c1"># Remove axis</span>
     <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
     <span class="c1"># Add title</span>

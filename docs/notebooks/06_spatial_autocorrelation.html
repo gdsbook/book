@@ -666,6 +666,7 @@ title="Print to PDF"
 <span class="kn">from</span> <span class="nn">pysal.viz</span> <span class="kn">import</span> <span class="n">splot</span>
 <span class="kn">from</span> <span class="nn">splot.esda</span> <span class="kn">import</span> <span class="n">plot_moran</span>
 <span class="kn">import</span> <span class="nn">contextily</span>
+
 <span class="c1"># Analysis</span>
 <span class="kn">import</span> <span class="nn">geopandas</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
@@ -684,8 +685,8 @@ title="Print to PDF"
 <p>The vote results are stored in a <code class="docutils literal notranslate"><span class="pre">csv</span></code> file which we read into a dataframe:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">brexit_data_path</span> <span class="o">=</span> <span class="s1">&#39;../data/brexit/brexit_vote.csv&#39;</span>
-<span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">brexit_data_path</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">&#39;Area_Code&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">brexit_data_path</span> <span class="o">=</span> <span class="s2">&quot;../data/brexit/brexit_vote.csv&quot;</span>
+<span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">brexit_data_path</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;Area_Code&quot;</span><span class="p">)</span>
 <span class="n">ref</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -727,7 +728,7 @@ memory usage: 62.7+ KB
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
     <span class="s2">&quot;../data/brexit/local_authority_districts.geojson&quot;</span>
-<span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;lad16cd&#39;</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;lad16cd&quot;</span><span class="p">)</span>
 <span class="n">lads</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -757,12 +758,15 @@ memory usage: 33.6+ KB
 <p>Although there are several variables that could be considered, we will focus on <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, which measures the proportion of votes for the Leave alternative. For convenience, let us merge the vote results with the spatial data and project the output into the Spherical Mercator coordinate reference system (CRS), the preferred choice of web maps, which will allow us to combine them with contextual tiles later:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-    <span class="n">lads</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-        <span class="n">ref</span><span class="p">[[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]]),</span> <span class="n">crs</span><span class="o">=</span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)[</span>
-        <span class="p">[</span><span class="s1">&#39;objectid&#39;</span><span class="p">,</span> <span class="s1">&#39;lad16nm&#39;</span><span class="p">,</span> <span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
-    <span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+        <span class="n">lads</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ref</span><span class="p">[[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]]),</span> <span class="n">crs</span><span class="o">=</span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
+    <span class="p">)</span>
+    <span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)[</span>
+        <span class="p">[</span><span class="s2">&quot;objectid&quot;</span><span class="p">,</span> <span class="s2">&quot;lad16nm&quot;</span><span class="p">,</span> <span class="s2">&quot;Pct_Leave&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+    <span class="p">]</span>
+    <span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="p">)</span>
 <span class="n">db</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -788,21 +792,21 @@ memory usage: 14.8+ KB
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> 
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span> 
-    <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
-    <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> 
-    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span> 
-    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> 
-    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> 
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
+    <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> 
-    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span>
+    <span class="n">ax</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 </pre></div>
@@ -818,7 +822,7 @@ memory usage: 14.8+ KB
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate W from the GeoDataFrame</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="c1"># Row-standardization</span>
-<span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span>
+<span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;R&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -845,8 +849,8 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <p>As we will discover throughout this book, the spatial lag is a key element of many spatial analysis techniques and, as such, it is fully supported in Pysal. To compute the spatial lag of a given variable, <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code> for example, we can do it as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave_lag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
-    <span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_lag&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
+    <span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -855,10 +859,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <p>Let us peek into two local authority districts to get a better intuition of what is behind the spatial lag:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-    <span class="p">[</span><span class="s1">&#39;E08000012&#39;</span><span class="p">,</span> <span class="s1">&#39;S12000019&#39;</span><span class="p">],</span> 
-    <span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> <span class="s1">&#39;Pct_Leave_lag&#39;</span><span class="p">]</span>
-<span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="o">.</span><span class="n">loc</span><span class="p">[[</span><span class="s2">&quot;E08000012&quot;</span><span class="p">,</span> <span class="s2">&quot;S12000019&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">,</span> <span class="s2">&quot;Pct_Leave_lag&quot;</span><span class="p">]]</span>
 </pre></div>
 </div>
 </div>
@@ -913,40 +914,40 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span> <span class="o">=</span> <span class="n">axs</span>
 
 <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span>
-    <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span>
-    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">% Le</span><span class="s2">ave&quot;</span><span class="p">)</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax1</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> 
+    <span class="n">ax1</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
     <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;Pct_Leave_lag&#39;</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;viridis&#39;</span><span class="p">,</span>
-    <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Pct_Leave_lag&quot;</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
     <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;white&#39;</span><span class="p">,</span>
-    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">% Le</span><span class="s2">ave - Spatial Lag&quot;</span><span class="p">)</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax2</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> 
+    <span class="n">ax2</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
     <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -966,8 +967,8 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <p>Our first dip into these measures considers a simplified case: binary values. This occurs when the variable we are interested in only takes two values. In this context, we are interested in whether a given observation is surrounded by others within the same category. For example, returning to our dataset, we want to assess the extent to which local authorities who voted to Leave tend to be surrounded by others who also voted to leave. To proceed, let us first calculate a binary variable (<code class="docutils literal notranslate"><span class="pre">Leave</span></code>) that indicates 1 if the local authority voted to leave, and zero otherwise:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Leave&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-<span class="n">db</span><span class="p">[[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">,</span> <span class="s1">&#39;Leave&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Leave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="n">db</span><span class="p">[[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">,</span> <span class="s2">&quot;Leave&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1035,17 +1036,17 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
-    <span class="n">column</span><span class="o">=</span><span class="s1">&#39;Leave&#39;</span><span class="p">,</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Leave&quot;</span><span class="p">,</span>
     <span class="n">categorical</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-    <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;0.5&#39;</span><span class="p">,</span>
+    <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;0.5&quot;</span><span class="p">,</span>
     <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
-    <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Set3&#39;</span><span class="p">,</span> 
-    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;Set3&quot;</span><span class="p">,</span>
+    <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Leave Majority&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Leave Majority&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1070,7 +1071,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;O&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;O&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -1091,7 +1092,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">seed</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span>
-<span class="n">jc</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">join_counts</span><span class="o">.</span><span class="n">Join_Counts</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Leave&#39;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+<span class="n">jc</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">join_counts</span><span class="o">.</span><span class="n">Join_Counts</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
 <span class="n">jc</span>
 </pre></div>
 </div>
@@ -1233,8 +1234,10 @@ I = \dfrac{n}{\sum_i\sum_j w_{ij}} \dfrac{\sum_i\sum_j w_{ij} \, z_i \, z_j}{\su
 <p>In order to understand the intuition behind its math, it is useful to begin with a graphical interpretation: the Moran Plot. The Moran Plot is a way of visualizing a spatial dataset to explore the nature and strength of spatial autocorrelation. It is essentially a traditional scatter plot in which the variable of interest is displayed against its <em>spatial lag</em>. In order to be able to interpret values as above or below the mean, the variable of interest is usually standardized by subtracting its mean:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>
-<span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave_lag_std&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave_lag&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave_lag&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_lag_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_lag&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_lag&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1244,15 +1247,15 @@ I = \dfrac{n}{\sum_i\sum_j w_{ij}} \dfrac{\sum_i\sum_j w_{ij} \, z_i \, z_j}{\su
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
-    <span class="n">x</span><span class="o">=</span><span class="s1">&#39;Pct_Leave_std&#39;</span><span class="p">,</span>
-    <span class="n">y</span><span class="o">=</span><span class="s1">&#39;Pct_Leave_lag_std&#39;</span><span class="p">,</span> 
+    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">,</span>
+    <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Pct_Leave_lag_std&quot;</span><span class="p">,</span>
     <span class="n">ci</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span>
-    <span class="n">line_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span><span class="s1">&#39;r&#39;</span><span class="p">}</span>
+    <span class="n">line_kws</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;r&quot;</span><span class="p">},</span>
 <span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Moran Plot - </span><span class="si">% Le</span><span class="s1">ave&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Moran Plot - </span><span class="si">% Le</span><span class="s2">ave&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -1268,8 +1271,8 @@ I = \dfrac{n}{\sum_i\sum_j w_{ij}} \dfrac{\sum_i\sum_j w_{ij} \, z_i \, z_j}{\su
 <p>In order to calculate Moran’s I in our dataset, we can call a specific function in <code class="docutils literal notranslate"><span class="pre">esda</span></code> directly (before that, let us row standardized the <code class="docutils literal notranslate"><span class="pre">w</span></code> object again):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;R&#39;</span>
-<span class="n">moran</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;R&quot;</span>
+<span class="n">moran</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1332,7 +1335,7 @@ C = \dfrac{(n-1)}
 <p>Computationally, Geary’s C is more demanding, but it can be easily computed using <code class="docutils literal notranslate"><span class="pre">esda</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geary</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">geary</span><span class="o">.</span><span class="n">Geary</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geary</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">geary</span><span class="o">.</span><span class="n">Geary</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1379,7 +1382,7 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db_osgb</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">27700</span><span class="p">)</span>
 <span class="n">pts</span> <span class="o">=</span> <span class="n">db_osgb</span><span class="o">.</span><span class="n">centroid</span>
-<span class="n">xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <span class="n">pts</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">:</span> <span class="n">pts</span><span class="o">.</span><span class="n">y</span><span class="p">})</span>
+<span class="n">xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">pts</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">pts</span><span class="o">.</span><span class="n">y</span><span class="p">})</span>
 <span class="n">min_thr</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">min_threshold_distance</span><span class="p">(</span><span class="n">xys</span><span class="p">)</span>
 <span class="n">min_thr</span>
 </pre></div>
@@ -1402,7 +1405,7 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 <p>At this point, we are ready to calculate the global <span class="math notranslate nohighlight">\(G\)</span> statistic:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gao</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">],</span> <span class="n">w_db</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gao</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w_db</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1410,7 +1413,9 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 <p>Access to the statistic (<code class="docutils literal notranslate"><span class="pre">gao.G</span></code>) and additional attributes can be gained in the same way as with the previous statistics:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Getis &amp; Ord G: </span><span class="si">%.3f</span><span class="s2"> | Pseudo P-value: </span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">gao</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">gao</span><span class="o">.</span><span class="n">p_sim</span><span class="p">))</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span>
+    <span class="s2">&quot;Getis &amp; Ord G: </span><span class="si">%.3f</span><span class="s2"> | Pseudo P-value: </span><span class="si">%.3f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">gao</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">gao</span><span class="o">.</span><span class="n">p_sim</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>

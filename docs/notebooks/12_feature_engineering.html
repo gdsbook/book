@@ -730,7 +730,7 @@ title="Print to PDF"
 <p>Throughout this chapter, we will use the same dataset to which we want to append more information or augment, and we will do so through leveraging geography. For the illustration, we will use the set of <a class="reference internal" href="../data/airbnb/regression_cleaning.html"><span class="doc std std-doc">AirBnB properties</span></a> we have used in the <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">previous chapter</span></a>. Let’s read it:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s1">&#39;../data/airbnb/regression_db.geojson&#39;</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/airbnb/regression_db.geojson&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -776,9 +776,16 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
 <span class="n">pois</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">geometries_from_polygon</span><span class="p">(</span>
-    <span class="n">airbnbs_ch</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;amenity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;restaurant&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">]}</span>
+    <span class="n">airbnbs_ch</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;amenity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;restaurant&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">]}</span>
 <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span>
-    <span class="p">[</span><span class="s2">&quot;element_type&quot;</span><span class="p">,</span> <span class="s2">&quot;osmid&quot;</span><span class="p">,</span> <span class="s2">&quot;amenity&quot;</span><span class="p">,</span> <span class="s2">&quot;cuisine&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+    <span class="p">[</span>
+        <span class="s2">&quot;element_type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;osmid&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;amenity&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cuisine&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -801,7 +808,7 @@ Wall time: 313 ms
 <p>This provides us with every location within our convex hull that is tagged in the metadata stored in OpenStreetMap as a “restaurant” or “bar”. Overall, this provides us with about 1300 points of interest:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;amenity&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">amenity</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pois</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;amenity&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">amenity</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -818,16 +825,16 @@ Name: amenity, dtype: int64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
-<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
 <span class="c1"># Plot AirBnb properties</span>
-<span class="n">airbnbs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="n">airbnbs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
 <span class="c1"># Plot POIs in red</span>
-<span class="n">pois</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">pois</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
 <span class="c1"># Add Stamen&#39;s Toner basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
-    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
+    <span class="n">ax</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
@@ -936,7 +943,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>With this, we can create the radius of 500m around each AirBnB. This is often called <em>buffering</em>, where a shape is dilated by a given radius.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_albers</span><span class="p">[</span><span class="s1">&#39;buffer_500m&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_albers</span><span class="p">[</span><span class="s2">&quot;buffer_500m&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -952,9 +959,9 @@ Datum: NAD83 (High Accuracy Reference Network)
     <span class="c1"># Left table - Airbnb with the geometry reset from the original</span>
     <span class="c1"># points to the 500m buffer and selecting only `id` and</span>
     <span class="c1"># `buffer_500m` column</span>
-    <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s1">&#39;buffer_500m&#39;</span><span class="p">)[[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;buffer_500m&#39;</span><span class="p">]],</span>
+    <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s2">&quot;buffer_500m&quot;</span><span class="p">)[[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;buffer_500m&quot;</span><span class="p">]],</span>
     <span class="c1"># Operation (spatial predicate) to use for the spatial join (`within`)</span>
-    <span class="n">op</span><span class="o">=</span><span class="s2">&quot;within&quot;</span>
+    <span class="n">op</span><span class="o">=</span><span class="s2">&quot;within&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -964,14 +971,16 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Group POIs by Airbnb ID (`id`)</span>
-<span class="n">poi_count</span> <span class="o">=</span> <span class="n">joined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
-    <span class="s2">&quot;id&quot;</span>
-<span class="c1"># Keep only POI id column (`osmid`)</span>
-<span class="p">)[</span>
-    <span class="s2">&quot;osmid&quot;</span>
-<span class="c1"># Count POIs by Airbnb + convert Series into DataFrame</span>
-<span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span>
-    <span class="s1">&#39;poi_count&#39;</span>
+<span class="n">poi_count</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">joined</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+        <span class="s2">&quot;id&quot;</span>
+        <span class="c1"># Keep only POI id column (`osmid`)</span>
+    <span class="p">)[</span>
+        <span class="s2">&quot;osmid&quot;</span>
+        <span class="c1"># Count POIs by Airbnb + convert Series into DataFrame</span>
+    <span class="p">]</span>
+    <span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s2">&quot;poi_count&quot;</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="c1"># Print top of the table</span>
 <span class="n">poi_count</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -1037,7 +1046,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_w_counts</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-    <span class="n">poi_count</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">poi_count</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="s2">&quot;poi_count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
 </pre></div>
 </div>
@@ -1060,13 +1069,13 @@ Datum: NAD83 (High Accuracy Reference Network)
     <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Add basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
-    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span>
+    <span class="n">ax</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">Toner</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
@@ -1140,7 +1149,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create table with XY coordinates of Airbnb locations</span>
 <span class="n">abb_xys</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
     <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">}</span>
-<span class="c1"># Convert from DataFrame to array of XY pairs</span>
+    <span class="c1"># Convert from DataFrame to array of XY pairs</span>
 <span class="p">)</span><span class="o">.</span><span class="n">to_records</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -1156,7 +1165,7 @@ Datum: NAD83 (High Accuracy Reference Network)
     <span class="c1"># Name of the column to be created to store elevation</span>
     <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Elevation&quot;</span><span class="p">],</span>
     <span class="c1"># Row index, mirroring that of Airbnb locations</span>
-    <span class="n">index</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">index</span>
+    <span class="n">index</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Print top of the table</span>
 <span class="n">elevation</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
@@ -1218,20 +1227,20 @@ Datum: NAD83 (High Accuracy Reference Network)
 <span class="c1"># Join elevation data to original Airbnb table</span>
 <span class="n">airbnbs</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
     <span class="n">elevation</span>
-<span class="c1"># Plot elevation at each Airbnb location as a quantile choropleth</span>
+    <span class="c1"># Plot elevation at each Airbnb location as a quantile choropleth</span>
 <span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Elevation&quot;</span><span class="p">,</span>
     <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Add Stamen&#39;s terrain basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
+    <span class="n">ax</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span>
     <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
-    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span>
+    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
@@ -1268,7 +1277,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_bed_homes</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="p">[</span>
-    <span class="n">airbnbs</span><span class="p">[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]</span><span class="o">==</span><span class="mi">2</span> <span class="o">&amp;</span> <span class="n">airbnbs</span><span class="p">[</span><span class="s1">&#39;rt_Entire_home/apt&#39;</span><span class="p">]</span>
+    <span class="n">airbnbs</span><span class="p">[</span><span class="s2">&quot;bedrooms&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">&amp;</span> <span class="n">airbnbs</span><span class="p">[</span><span class="s2">&quot;rt_Entire_home/apt&quot;</span><span class="p">]</span>
 <span class="p">]</span>
 </pre></div>
 </div>
@@ -1297,7 +1306,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">total_bounds</span>
 <span class="c1"># Generate X and Y meshes for the space within the bounding box</span>
 <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
-    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">)</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1307,15 +1316,15 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure</span>
-<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="c1"># Plot X mesh</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 <span class="c1"># Plot Y mesh</span>
 <span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
 <span class="c1"># Label X mesh</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;X values&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;X values&quot;</span><span class="p">)</span>
 <span class="c1"># Label Y mesh</span>
-<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Y values&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Y values&quot;</span><span class="p">)</span>
 <span class="c1"># Display</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
@@ -1332,8 +1341,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <span class="n">grid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
 <span class="c1"># Convert a 1D (flattened) version of X and Y meshes into a geo-table</span>
 <span class="n">grid_df</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
-    <span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span>
-        <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+    <span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="o">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1345,12 +1353,12 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot guid points with size 1</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 <span class="c1"># Plot on top Airbnb locations in red</span>
-<span class="n">two_bed_homes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+<span class="n">two_bed_homes</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">)</span>
 <span class="c1"># Add basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">two_bed_homes</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
-    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerBackground</span>
+    <span class="n">ax</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">two_bed_homes</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TonerBackground</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
@@ -1364,9 +1372,9 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>With this done, we can now construct the predictions. First we train the model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span>
-    <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span>
-<span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+    <span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1411,23 +1419,31 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and 8 axes</span>
-<span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
 <span class="c1"># Loop over eight values equally spaced between 2 and 100</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k_neighbors</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)):</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k_neighbors</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="p">):</span>
     <span class="c1"># Select axis to plot estimates for that value of k</span>
     <span class="n">facet</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="c1"># Set up a KNN regressor instance with k_neighbors neighbors</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span>
-        <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span>
-    <span class="c1"># Fit instance to the 2-bed subset</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-        <span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
-    <span class="c1"># Get predictions for locations on the grid</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">KNeighborsRegressor</span><span class="p">(</span>
+            <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span>
+            <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span>
+            <span class="c1"># Fit instance to the 2-bed subset</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+            <span class="n">two_bed_home_locations</span><span class="p">,</span>
+            <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
+            <span class="c1"># Get predictions for locations on the grid</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="c1"># Plot predictions</span>
     <span class="n">grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">facet</span><span class="p">)</span>
     <span class="c1"># Remove axis</span>
-    <span class="n">facet</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="n">facet</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
     <span class="c1"># Set axis title</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k_neighbors</span><span class="si">}</span><span class="s2"> neighbors&quot;</span><span class="p">)</span>
 </pre></div>
@@ -1446,7 +1462,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">central_sd_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mf">117.179832</span><span class="p">,</span> <span class="mf">32.655563</span><span class="p">,</span> <span class="o">-</span><span class="mf">117.020874</span><span class="p">,</span> <span class="mf">32.769909</span><span class="p">]</span>
 <span class="p">(</span>
-    <span class="n">central_xmin</span><span class="p">,</span> <span class="n">central_ymin</span><span class="p">,</span> <span class="n">central_xmax</span><span class="p">,</span> <span class="n">central_ymax</span>
+    <span class="n">central_xmin</span><span class="p">,</span>
+    <span class="n">central_ymin</span><span class="p">,</span>
+    <span class="n">central_xmax</span><span class="p">,</span>
+    <span class="n">central_ymax</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">=</span> <span class="n">central_sd_bounds</span>
 </pre></div>
 </div>
@@ -1463,8 +1482,8 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build X and Y meshes</span>
 <span class="n">central_x</span><span class="p">,</span> <span class="n">central_y</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span>
-    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_xmin</span><span class="p">,</span> <span class="n">central_xmax</span><span class="p">),</span> 
-    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_ymin</span><span class="p">,</span> <span class="n">central_ymax</span><span class="p">)</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_xmin</span><span class="p">,</span> <span class="n">central_xmax</span><span class="p">),</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">central_ymin</span><span class="p">,</span> <span class="n">central_ymax</span><span class="p">),</span>
 <span class="p">)</span>
 <span class="c1"># Bind X and Y meshes in a 2D array</span>
 <span class="n">central_grid</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
@@ -1484,23 +1503,31 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and subplot</span>
-<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">4</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sharey</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1"># Loop over five values equally spaced between 2 and 100</span>
-<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">k_neighbors</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)):</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">k_neighbors</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+    <span class="n">numpy</span><span class="o">.</span><span class="n">geomspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="p">):</span>
     <span class="c1"># Select axis to plot estimates for that value of k</span>
     <span class="n">facet</span> <span class="o">=</span> <span class="n">ax</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="c1"># Set up a KNN regressor instance with k_neighbors neighbors</span>
-    <span class="n">predictions</span> <span class="o">=</span> <span class="n">KNeighborsRegressor</span><span class="p">(</span>
-        <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s1">&#39;distance&#39;</span>
-    <span class="c1"># Fit instance to the 2-bed subset</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
-        <span class="n">two_bed_home_locations</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
-    <span class="c1"># Get predictions for locations on the grid</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">central_grid</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">KNeighborsRegressor</span><span class="p">(</span>
+            <span class="n">n_neighbors</span><span class="o">=</span><span class="n">k_neighbors</span><span class="p">,</span>
+            <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;distance&quot;</span>
+            <span class="c1"># Fit instance to the 2-bed subset</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+            <span class="n">two_bed_home_locations</span><span class="p">,</span>
+            <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">price</span>
+            <span class="c1"># Get predictions for locations on the grid</span>
+        <span class="p">)</span>
+        <span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">central_grid</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="c1"># Plot predictions</span>
     <span class="n">central_grid_df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">facet</span><span class="p">)</span>
     <span class="c1"># Remove axis</span>
-    <span class="n">facet</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+    <span class="n">facet</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s2">&quot;off&quot;</span><span class="p">)</span>
     <span class="c1"># Set axis title</span>
     <span class="n">facet</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k_neighbors</span><span class="si">}</span><span class="s2"> neighbors&quot;</span><span class="p">)</span>
 </pre></div>
@@ -1521,9 +1548,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
 <span class="n">acs</span> <span class="o">=</span> <span class="n">cenpy</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ACS</span><span class="p">()</span>
 <span class="n">sd_pop</span> <span class="o">=</span> <span class="n">acs</span><span class="o">.</span><span class="n">from_msa</span><span class="p">(</span>
-    <span class="s2">&quot;San Diego, CA&quot;</span><span class="p">,</span>
-    <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;tract&quot;</span><span class="p">,</span>
-    <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;B02001_001E&#39;</span><span class="p">]</span>
+    <span class="s2">&quot;San Diego, CA&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;tract&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1552,7 +1577,9 @@ Wall time: 42.2 s
 <p>And calculate population density:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span><span class="o">.</span><span class="n">area</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">sd_pop</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span><span class="p">)</span><span class="o">.</span><span class="n">area</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -1665,7 +1692,7 @@ memory usage: 1.4+ MB
     <span class="c1"># Extensive variables in `source_df` to be interpolated (e.g. population)</span>
     <span class="n">extensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">],</span>
     <span class="c1"># Intensive variables in `source_df` to be interpolated (e.g. density)</span>
-    <span class="n">intensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">]</span>
+    <span class="n">intensive_variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1693,15 +1720,13 @@ memory usage: 1.4+ MB
 <span class="c1"># Reproject tracts to EPSG:331</span>
 <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
     <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
-<span class="c1"># Clip to the bounding box</span>
+    <span class="c1"># Clip to the bounding box</span>
 <span class="p">)</span><span class="o">.</span><span class="n">cx</span><span class="p">[</span>
-    <span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span> <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span>
-<span class="c1"># Quantile choropleth for tract population</span>
+    <span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span>
+    <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span>
+    <span class="c1"># Quantile choropleth for tract population</span>
 <span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span> 
-    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> 
-    <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
@@ -1709,19 +1734,14 @@ memory usage: 1.4+ MB
 <span class="c1"># Reproject H3 hexagons to ESPG:3311</span>
 <span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
     <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
-<span class="c1"># Plot hexagons</span>
-<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span>
-<span class="p">)</span>
+    <span class="c1"># Plot hexagons</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
 <span class="c1"># Plot hexagons with interpolated population</span>
 <span class="n">interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span>
-    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
-    <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
@@ -1754,15 +1774,13 @@ memory usage: 1.4+ MB
 <span class="c1"># Reproject tracts to EPSG:331</span>
 <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
     <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
-<span class="c1"># Clip to the bounding box</span>
+    <span class="c1"># Clip to the bounding box</span>
 <span class="p">)</span><span class="o">.</span><span class="n">cx</span><span class="p">[</span>
-    <span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span> <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span>
-<span class="c1"># Quantile choropleth for tract population density</span>
+    <span class="n">minX</span><span class="p">:</span><span class="n">maxX</span><span class="p">,</span>
+    <span class="n">minY</span><span class="p">:</span><span class="n">maxY</span>
+    <span class="c1"># Quantile choropleth for tract population density</span>
 <span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> 
-    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> 
-    <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
@@ -1770,19 +1788,14 @@ memory usage: 1.4+ MB
 <span class="c1"># Reproject H3 hexagons to ESPG:3311</span>
 <span class="n">h3</span><span class="o">.</span><span class="n">to_crs</span><span class="p">(</span>
     <span class="n">epsg</span><span class="o">=</span><span class="mi">3311</span>
-<span class="c1"># Plot hexagons</span>
-<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span>
-<span class="p">)</span>
+    <span class="c1"># Plot hexagons</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">markersize</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
 
 <span class="c1"># Plot hexagons with interpolated population density</span>
 <span class="n">interpolated</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span>
-    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span>
-    <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">column</span><span class="o">=</span><span class="s2">&quot;density&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">axs</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
@@ -1850,8 +1863,8 @@ memory usage: 1.4+ MB
 <span class="c1"># Append cardinalities to main Airbnb geo-table</span>
 <span class="n">airbnbs</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span>
     <span class="n">card</span><span class="o">=</span><span class="n">card</span>
-<span class="c1"># Plot cardinality quantile choropleth</span>
-<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s1">&#39;card&#39;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;quantiles&#39;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+    <span class="c1"># Plot cardinality quantile choropleth</span>
+<span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="s2">&quot;card&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;quantiles&quot;</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="c1"># Add basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 <span class="c1"># Remove axes</span>
@@ -1870,10 +1883,10 @@ memory usage: 1.4+ MB
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Row standardise</span>
-<span class="n">d500_w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+<span class="n">d500_w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;r&quot;</span>
 <span class="c1"># Compute spatial lag of No. of bedrooms</span>
 <span class="n">local_average_bedrooms</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
-    <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;bedrooms&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -1888,7 +1901,9 @@ memory usage: 1.4+ MB
 <p>While related, these features contain quite distinct pieces of information, and both may prove useful in modeling:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">local_average_bedrooms</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+    <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;bedrooms&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">local_average_bedrooms</span>
+<span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Number of bedrooms&quot;</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Average of nearby</span><span class="se">\n</span><span class="s2"> listings&#39; bedrooms&quot;</span><span class="p">);</span>
 </pre></div>
@@ -1902,7 +1917,7 @@ memory usage: 1.4+ MB
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_mode</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_categorical</span><span class="p">(</span>
-    <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;bedrooms&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -2167,10 +2182,10 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">adjlist</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-    <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]],</span> 
-    <span class="n">left_on</span><span class="o">=</span><span class="s1">&#39;neighbor&#39;</span><span class="p">,</span> 
-    <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
-    <span class="n">how</span><span class="o">=</span><span class="s1">&#39;left&#39;</span>
+    <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;bedrooms&quot;</span><span class="p">]],</span>
+    <span class="n">left_on</span><span class="o">=</span><span class="s2">&quot;neighbor&quot;</span><span class="p">,</span>
+    <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">adjlist</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </pre></div>
@@ -2283,7 +2298,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">average_within_500</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
-    <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;bedrooms&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -2320,9 +2335,9 @@ Name: bedrooms, Length: 6035, dtype: float64
 <p>Then, we can compute the average size of listings between 500m and one kilometer in the same manner as before using our <code class="docutils literal notranslate"><span class="pre">d1k_exclusive</span></code> graph, which now omits all edges shorter than 500m.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s1">&#39;r&#39;</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;r&quot;</span>
 <span class="n">average_500m_to_1k</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
-    <span class="n">d1k_exclusive</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;bedrooms&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">d1k_exclusive</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;bedrooms&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -2369,9 +2384,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot scatter</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
-    <span class="n">average_within_500</span><span class="p">,</span>
-    <span class="n">average_500m_to_1k</span><span class="p">,</span>
-    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span>
+    <span class="n">average_within_500</span><span class="p">,</span> <span class="n">average_500m_to_1k</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span>
 <span class="p">)</span>
 <span class="c1"># Rename horizontal axis</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Average size within 500 meters&quot;</span><span class="p">)</span>
@@ -2379,12 +2392,12 @@ Name: bedrooms, Length: 6035, dtype: float64
 <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Average size</span><span class="se">\n</span><span class="s2"> beyond 500m but within 1km&quot;</span><span class="p">)</span>
 <span class="c1"># Plot line of 45 degrees</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span> 
-    <span class="n">color</span><span class="o">=</span><span class="s1">&#39;orangered&#39;</span><span class="p">,</span> 
-    <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> 
-    <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
-    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;1 to 1&#39;</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="n">color</span><span class="o">=</span><span class="s2">&quot;orangered&quot;</span><span class="p">,</span>
+    <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;1 to 1&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Add legend</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">();</span>
@@ -2443,7 +2456,7 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 <p>The spatial distribution of these clusters will give us a sense of areas of San Diego with relatively high density of the observations. But the <code class="docutils literal notranslate"><span class="pre">labels</span></code> object does not contains clusters, only observation memberships. To derive those clusters geographically, we construct the convex hull of the observations in each detected cluster, creating thus a polygon that delimits every observation that is part of the cluster:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hulls</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">convex_hull</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hulls</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">convex_hull</span>
 </pre></div>
 </div>
 </div>
@@ -2470,20 +2483,20 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
     <span class="c1"># Include legend</span>
     <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="c1"># Draw on axis `ax`</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> 
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
     <span class="c1"># Use circle as marker</span>
-    <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+    <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">,</span>
     <span class="c1"># Position legend outside the map</span>
-    <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;bbox_to_anchor&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)}</span>
+    <span class="n">legend_kwds</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;bbox_to_anchor&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
 <span class="p">)</span>
 <span class="c1"># Plot convex hull polygons for each cluster label</span>
 <span class="c1"># except that for -1 (observations classified as noise)</span>
-<span class="n">hulls</span><span class="p">[</span><span class="n">hulls</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">hulls</span><span class="p">[</span><span class="n">hulls</span><span class="o">.</span><span class="n">index</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">boundary</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;k&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
 <span class="c1"># Add basemap</span>
 <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
-    <span class="n">ax</span><span class="p">,</span> 
-    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> 
-    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">VoyagerNoLabels</span>
+    <span class="n">ax</span><span class="p">,</span>
+    <span class="n">crs</span><span class="o">=</span><span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span>
+    <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">CartoDB</span><span class="o">.</span><span class="n">VoyagerNoLabels</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="c1"># Remove axes</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">();</span>
@@ -2502,17 +2515,17 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure</span>
-<span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 <span class="c1"># Add box plots of price by HDBSCAN cluster</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span>
     <span class="c1"># Plot distribution of &#39;price&#39;</span>
-    <span class="s2">&quot;price&quot;</span><span class="p">,</span> 
+    <span class="s2">&quot;price&quot;</span><span class="p">,</span>
     <span class="c1"># Group by cluster label, generating one box plot/cluster</span>
-    <span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> 
+    <span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
     <span class="c1"># Do not display individual outlier observations</span>
-    <span class="n">flierprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span> 
+    <span class="n">flierprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">marker</span><span class="o">=</span><span class="kc">None</span><span class="p">),</span>
     <span class="c1"># Draw visualisation on the current axis (inside `f`)</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">(),</span>
 <span class="p">)</span>
 <span class="c1"># Set label for horizontal axis</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;HDBSCAN cluster&quot;</span><span class="p">)</span>
@@ -2524,7 +2537,7 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 <span class="c1"># Remove default axis title</span>
 <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
 <span class="c1"># Re-adjust vertical value range for easier legibility</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1250</span><span class="p">);</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1250</span><span class="p">);</span>
 </pre></div>
 </div>
 </div>
