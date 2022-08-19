@@ -8,7 +8,7 @@ jupyter:
       format_version: '1.3'
       jupytext_version: 1.11.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -375,12 +375,14 @@ plt.legend();
 
 We will cover three more bounding shapes, all of them rectangles or circles. First, two kinds of **minimum bounding rectangles**. They both are constructed as the tightest *rectangle* that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the **minimum rotated rectangle** provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated. 
 
-For the minimum rotated rectangle, we will use the `minimum_rotated_rectangle` function from the `pointpats.centrography` module. 
-
+For the minimum rotated rectangle, we will use the `minimum_rotated_rectangle` function from the `pygeos` module, which constructs the minimum rotated rectangle for an input *multi-point* object. This means that we will need to collect our points together into a single multi-point object and then compute the rotated rectangle for that object. 
 
 ```python
-# Commented out until functionality is added to pointpats
-#min_rot_rect = centrography.minimum_rotated_rectangle(coordinates)
+import pygeos
+point_array = geopandas.points_from_xy(x=user.x, y=user.y)
+multipoint = pygeos.from_shapely(point_array.unary_union())
+
+min_rot_rect = pygeos.to_shapely(pygeos.minimum_rotated_rectangle(multipoint))
 ```
 
 And, for the minimum bounding rectangle without rotation, we will use the `minimum_bounding_rectangle` function from the `pointpats` package.
@@ -423,18 +425,16 @@ convex_hull_patch = Polygon(
 )
 
 # a green minimum rotated rectangle
-"""
-# Commented out until functionality is added to pointpats
-min_rot_rect_patch = Polygon(
+
+min_rot_rect_patch = PolygonPatch(
     min_rot_rect, 
-    closed=True, 
     edgecolor='green', 
     facecolor='none', 
     linestyle='--', 
     label='Min Rotated Rectangle', 
     linewidth=2
 )
-"""
+
 
 # compute the width and height of the 
 min_rect_width = min_rect_vertices[2] - min_rect_vertices[0]
@@ -469,8 +469,7 @@ f,ax = plt.subplots(1, figsize=(10,10))
 
 ax.add_patch(alpha_shape_patch)
 ax.add_patch(convex_hull_patch)
-# Commented out until functionality is added to pointpats
-#ax.add_patch(min_rot_rect_patch)
+ax.add_patch(min_rot_rect_patch)
 ax.add_patch(min_rect_patch)
 ax.add_patch(circ_patch)
 
