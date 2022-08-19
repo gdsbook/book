@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.13.8
+      jupytext_version: 1.11.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 ```
 
@@ -110,9 +111,9 @@ that traditional clustering is unable to articulate.
 ```python
 from esda.moran import Moran
 from libpysal.weights import Queen, KNN
-import seaborn 
+import seaborn
 import pandas
-import geopandas 
+import geopandas
 import numpy
 import matplotlib.pyplot as plt
 ```
@@ -124,7 +125,7 @@ We return to the San Diego tracts dataset we have used earlier in the book. In t
 
 ```python
 # Read file
-db = geopandas.read_file('../data/sandiego/sandiego_tracts.gpkg')
+db = geopandas.read_file("../data/sandiego/sandiego_tracts.gpkg")
 ```
 
 To make things easier later on, let us collect the variables we will use to
@@ -133,16 +134,16 @@ socioeconomic reality of each area and, taken together, provide a comprehensive
 characterization of San Diego as a whole. We thus create a list with the names of the columns we will use later on:
 
 ```python
-cluster_variables =  [
-    'median_house_value', # Median house value
-    'pct_white',          # % tract population that is white
-    'pct_rented',         # % households that are rented
-    'pct_hh_female',      # % female-led households 
-    'pct_bachelor',       # % tract population with a Bachelors degree
-    'median_no_rooms',    # Median n. of rooms in the tract's households
-    'income_gini',        # Gini index measuring tract wealth inequality
-    'median_age',         # Median age of tract population
-    'tt_work'             # Travel time to work 
+cluster_variables = [
+    "median_house_value",  # Median house value
+    "pct_white",  # % tract population that is white
+    "pct_rented",  # % households that are rented
+    "pct_hh_female",  # % female-led households
+    "pct_bachelor",  # % tract population with a Bachelors degree
+    "median_no_rooms",  # Median n. of rooms in the tract's households
+    "income_gini",  # Gini index measuring tract wealth inequality
+    "median_age",  # Median age of tract population
+    "tt_work",  # Travel time to work
 ]
 ```
 
@@ -162,13 +163,7 @@ for i, col in enumerate(cluster_variables):
     # select the axis where the map will go
     ax = axs[i]
     # Plot the map
-    db.plot(
-        column=col, 
-        ax=ax,
-        scheme='Quantiles', 
-        linewidth=0,
-        cmap='RdPu'
-    )
+    db.plot(column=col, ax=ax, scheme="Quantiles", linewidth=0, cmap="RdPu")
     # Remove axis clutter
     ax.set_axis_off()
     # Set the axis title to the name of variable being plotted
@@ -212,13 +207,12 @@ numpy.random.seed(123456)
 mi_results = [Moran(db[variable], w) for variable in cluster_variables]
 # Structure results as a list of tuples
 mi_results = [
-    (variable, res.I, res.p_sim) for variable,res in zip(cluster_variables, mi_results)
+    (variable, res.I, res.p_sim) for variable, res in zip(cluster_variables, mi_results)
 ]
 # Display on table
 table = pandas.DataFrame(
-    mi_results,
-    columns=['Variable', "Moran's I", 'P-value']
-).set_index('Variable')
+    mi_results, columns=["Variable", "Moran's I", "P-value"]
+).set_index("Variable")
 table
 ```
 
@@ -241,7 +235,7 @@ This would be too many maps to process visually. Instead, we focus directly
 on the bivariate relationships between each pair of attributes, devoid for now of geography, and use a scatterplot matrix.
 
 ```python caption="A scatter matrix demonstrating the various pair-wise dependencies between each of the variables considered in this section. Each 'facet', or little scatterplot, shows the relationship between the vairable in that column (as its horizontal axis) and that row (as its vertical axis). Since the diagonal represents the situation where the row and column have the same variable, it instead shows the univariate distribution of that variable."
-_ = seaborn.pairplot(db[cluster_variables], kind='reg', diag_kind='kde')
+_ = seaborn.pairplot(db[cluster_variables], kind="reg", diag_kind="kde")
 ```
 
 Two different types of plots are contained in the scatterplot matrix. On the
@@ -266,7 +260,7 @@ Indeed, this kind of concentration in values is something you need to be very aw
 For example, say we locate an observation based on only two variables: house price and gini coefficient. In this case:
 
 ```python
-db[['income_gini', 'median_house_value']].head()
+db[["income_gini", "median_house_value"]].head()
 ```
 
 The distance between observations in terms of these variates can be computed easily using `scikit-learn`:
@@ -276,9 +270,7 @@ from sklearn import metrics
 ```
 
 ```python
-metrics.pairwise_distances(
-    db[['income_gini', 'median_house_value']].head()
-).round(4)
+metrics.pairwise_distances(db[["income_gini", "median_house_value"]].head()).round(4)
 ```
 
 In this case, we know that the housing values are in the hundreds of thousands, but the Gini coefficient (which we discussed in the previous chapter) is constrained to fall between zero and one. So, for example, the distance between the first two observations is nearly totally driven by the difference in median house value (which is 259100 dollars) and ignores the difference in the Gini coefficient (which is about .11). Indeed, a change of a single dollar in median house value will correspond to *the maximum possible* difference in Gini coefficients. So, a clustering algorithm that uses this distance to determine classifications will pay a lot of attention to median house value, but very little to the Gini coefficient! 
@@ -402,14 +394,12 @@ Thus, this gives us one map that incorporates the information from all nine cova
 
 ```python caption="Clusters in the sociodemographic data, found using K-means with k=5. Note that the large eastern part of San Diego actually contains few observations, since those tracts are larger." tags=[]
 # Assign labels into a column
-db['k5cls'] = k5cls.labels_
+db["k5cls"] = k5cls.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
-# Plot unique values choropleth including 
+# Plot unique values choropleth including
 # a legend and with no boundary lines
-db.plot(
-    column='k5cls', categorical=True, legend=True, linewidth=0, ax=ax
-)
+db.plot(column="k5cls", categorical=True, legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
 # Display the map
@@ -442,7 +432,7 @@ considering cardinality, or the count of observations in each cluster:
 
 ```python
 # Group data table by cluster label and count observations
-k5sizes = db.groupby('k5cls').size()
+k5sizes = db.groupby("k5cls").size()
 k5sizes
 ```
 
@@ -458,7 +448,7 @@ we report the total land area of the cluster:
 ```python
 # Dissolve areas by Cluster, aggregate by summing,
 # and keep column for area
-areas = db.dissolve(by='k5cls', aggfunc='sum')['area_sqm']
+areas = db.dissolve(by="k5cls", aggfunc="sum")["area_sqm"]
 areas
 ```
 
@@ -466,9 +456,7 @@ We can then use cluster shares to show visually a comparison of the two membersh
 
 ```python caption="Measuring cluster size by the number of tracts per cluster and land area per cluster." tags=[]
 # Bind cluster figures in a single table
-area_tracts = pandas.DataFrame(
-    {'No. Tracts': k5sizes, 'Area': areas}
-)
+area_tracts = pandas.DataFrame({"No. Tracts": k5sizes, "Area": areas})
 # Convert raw values into percentages
 area_tracts = area_tracts * 100 / area_tracts.sum()
 # Bar plot
@@ -491,9 +479,9 @@ provides the conceptual shorthand, moving from the arbitrary label to a meaningf
 collection of observations with similar attributes. To build a basic profile, we can compute the (unscaled) means of each of the attributes in every cluster:
 
 ```python
-# Group table by cluster label, keep the variables used 
+# Group table by cluster label, keep the variables used
 # for clustering, and obtain their mean
-k5means = db.groupby('k5cls')[cluster_variables].mean()
+k5means = db.groupby("k5cls")[cluster_variables].mean()
 # Transpose the table and print it rounding each value
 # to three decimals
 k5means.T.round(3)
@@ -533,18 +521,16 @@ is one where every row is an observation, and every column is a variable. This i
 
 ```python
 # Index db on cluster ID
-tidy_db = db.set_index('k5cls')
+tidy_db = db.set_index("k5cls")
 # Keep only variables used for clustering
 tidy_db = tidy_db[cluster_variables]
-# Stack column names into a column, obtaining 
+# Stack column names into a column, obtaining
 # a "long" version of the dataset
 tidy_db = tidy_db.stack()
 # Take indices into proper columns
 tidy_db = tidy_db.reset_index()
 # Rename column names
-tidy_db = tidy_db.rename(
-    columns={'level_1': 'Attribute', 0: 'Values'}
-)
+tidy_db = tidy_db.rename(columns={"level_1": "Attribute", 0: "Values"})
 # Check out result
 tidy_db.head()
 ```
@@ -554,19 +540,19 @@ for each variable. This gives us the full distributional profile of each cluster
 
 ```python caption="Distributions of each variable for the different cluters."
 # Scale fonts to make them more readable
-seaborn.set(font_scale = 1.5)
+seaborn.set(font_scale=1.5)
 # Setup the facets
 facets = seaborn.FacetGrid(
     data=tidy_db,
-    col='Attribute',
-    hue='k5cls',
+    col="Attribute",
+    hue="k5cls",
     sharey=False,
     sharex=False,
     aspect=2,
-    col_wrap=3
+    col_wrap=3,
 )
 # Build the plot from `sns.kdeplot`
-_ = facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend()
+_ = facets.map(seaborn.kdeplot, "Values", shade=True).add_legend()
 ```
 
 Note that we create the figure using the facetting functionality in `seaborn`, which
@@ -622,24 +608,24 @@ use the `fit` method to actually apply the clustering algorithm to our data:
 # Set seed for reproducibility
 numpy.random.seed(0)
 # Iniciate the algorithm
-model = AgglomerativeClustering(linkage='ward', n_clusters=5)
+model = AgglomerativeClustering(linkage="ward", n_clusters=5)
 # Run clustering
 model.fit(db_scaled)
 # Assign labels to main data table
-db['ward5'] = model.labels_
+db["ward5"] = model.labels_
 ```
 
 As above, we can check the number of observations that fall within each cluster:
 
 ```python
-ward5sizes = db.groupby('ward5').size()
+ward5sizes = db.groupby("ward5").size()
 ward5sizes
 ```
 
 Further, we can check the simple average profiles of our clusters:
 
 ```python
-ward5means = db.groupby('ward5')[cluster_variables].mean()
+ward5means = db.groupby("ward5")[cluster_variables].mean()
 ward5means.T.round(3)
 ```
 
@@ -647,18 +633,16 @@ And again, we can tidy our dataset:
 
 ```python
 # Index db on cluster ID
-tidy_db = db.set_index('ward5')
+tidy_db = db.set_index("ward5")
 # Keep only variables used for clustering
 tidy_db = tidy_db[cluster_variables]
-# Stack column names into a column, obtaining 
+# Stack column names into a column, obtaining
 # a "long" version of the dataset
 tidy_db = tidy_db.stack()
 # Take indices into proper columns
 tidy_db = tidy_db.reset_index()
 # Rename column names
-tidy_db = tidy_db.rename(
-    columns={'level_1': 'Attribute', 0: 'Values'}
-)
+tidy_db = tidy_db.rename(columns={"level_1": "Attribute", 0: "Values"})
 # Check out result
 tidy_db.head()
 ```
@@ -669,15 +653,15 @@ And create a plot of the profiles' distributions:
 # Setup the facets
 facets = seaborn.FacetGrid(
     data=tidy_db,
-    col='Attribute',
-    hue='ward5', 
+    col="Attribute",
+    hue="ward5",
     sharey=False,
     sharex=False,
     aspect=2,
-    col_wrap=3
+    col_wrap=3,
 )
 # Build the plot as a `sns.kdeplot`
-facets.map(seaborn.kdeplot, 'Values', shade=True).add_legend();
+facets.map(seaborn.kdeplot, "Values", shade=True).add_legend();
 ```
 
 For the sake of brevity, we will not spend much time on the plots above.
@@ -688,43 +672,29 @@ clustering solution by making a map of the clusters. To make the comparison
 with k-means simpler, we will display both side by side:
 
 ```python caption="Two clutering solutions, one for the K-means solution, and the other for Ward's hierarchical clutering. Note that colorings cannot be directly compared between the two maps." tags=[]
-db['ward5'] =model.labels_
+db["ward5"] = model.labels_
 # Setup figure and ax
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 
-            ### K-Means ###
+### K-Means ###
 ax = axs[0]
-# Plot unique values choropleth including 
+# Plot unique values choropleth including
 # a legend and with no boundary lines
-db.plot(
-    column='ward5', 
-    categorical=True, 
-    cmap='Set2', 
-    legend=True, 
-    linewidth=0, 
-    ax=ax
-)
+db.plot(column="ward5", categorical=True, cmap="Set2", legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
 # Add title
-ax.set_title('K-Means solution ($k=5$)')
+ax.set_title("K-Means solution ($k=5$)")
 
-            ### AHC ###
+### AHC ###
 ax = axs[1]
-# Plot unique values choropleth including 
+# Plot unique values choropleth including
 # a legend and with no boundary lines
-db.plot(
-    column='k5cls', 
-    categorical=True, 
-    cmap='Set3', 
-    legend=True, 
-    linewidth=0, 
-    ax=ax
-)
+db.plot(column="k5cls", categorical=True, cmap="Set3", legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
 # Add title
-ax.set_title('AHC solution ($k=5$)')
+ax.set_title("AHC solution ($k=5$)")
 
 # Display the map
 plt.show()
@@ -791,9 +761,7 @@ in a cluster if they are also spatially connected:
 # Set the seed for reproducibility
 numpy.random.seed(123456)
 # Specify cluster model with spatial constraint
-model = AgglomerativeClustering(
-    linkage='ward', connectivity=w.sparse, n_clusters=5
-)
+model = AgglomerativeClustering(linkage="ward", connectivity=w.sparse, n_clusters=5)
 # Fit algorithm to the data
 model.fit(db_scaled)
 ```
@@ -801,11 +769,11 @@ model.fit(db_scaled)
 Let's inspect the output:
 
 ```python caption="Spatially-constrained clusters, or 'regions', of San Diego using Ward's hierarchical clustering." tags=[]
-db['ward5wq'] = model.labels_
+db["ward5wq"] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot unique values choropleth including a legend and with no boundary lines
-db.plot(column='ward5wq', categorical=True, legend=True, linewidth=0, ax=ax)
+db.plot(column="ward5wq", categorical=True, legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
 # Display the map
@@ -841,9 +809,7 @@ another AHC regionalization:
 # Set the seed for reproducibility
 numpy.random.seed(123456)
 # Specify cluster model with spatial constraint
-model = AgglomerativeClustering(
-    linkage='ward', connectivity=w.sparse, n_clusters=5
-)
+model = AgglomerativeClustering(linkage="ward", connectivity=w.sparse, n_clusters=5)
 # Fit algorithm to the data
 model.fit(db_scaled)
 ```
@@ -851,18 +817,12 @@ model.fit(db_scaled)
 And plot the final regions:
 
 ```python caption="Regions from a spatially-constrained sociodemographic clutering, using a different connectivity constraint. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
-db['ward5wknn'] = model.labels_
+db["ward5wknn"] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
-# Plot unique values choropleth 
+# Plot unique values choropleth
 # including a legend and with no boundary lines
-db.plot(
-    column='ward5wknn', 
-    categorical=True, 
-    legend=True, 
-    linewidth=0, 
-    ax=ax
-)
+db.plot(column="ward5wknn", categorical=True, legend=True, linewidth=0, ax=ax)
 # Remove axis
 ax.set_axis_off()
 # Display the map
@@ -893,11 +853,11 @@ Computing this, then, can be done directly from the area and perimeter of a regi
 
 ```python
 results = []
-for cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+for cluster_type in ("k5cls", "ward5", "ward5wq", "ward5wknn"):
     # compute the region polygons using a dissolve
-    regions = db[[cluster_type, 'geometry']].dissolve(by=cluster_type)
+    regions = db[[cluster_type, "geometry"]].dissolve(by=cluster_type)
     # compute the actual isoperimetric quotient for these regions
-    ipqs = regions.area * 4 * numpy.pi / (regions.boundary.length**2)
+    ipqs = regions.area * 4 * numpy.pi / (regions.boundary.length ** 2)
     # cast to a dataframe
     result = ipqs.to_frame(cluster_type)
     results.append(result)
@@ -922,22 +882,21 @@ To compute these, each scoring function requires both the original data and the 
 
 ```python
 ch_scores = []
-for cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+for cluster_type in ("k5cls", "ward5", "ward5wq", "ward5wknn"):
     # compute the CH score
     ch_score = metrics.calinski_harabasz_score(
-    # using scaled variables
-        robust_scale(db[cluster_variables]), 
-    # using these labels
-        db[cluster_type]
+        # using scaled variables
+        robust_scale(db[cluster_variables]),
+        # using these labels
+        db[cluster_type],
     )
     # and append the cluster type with the CH score
     ch_scores.append((cluster_type, ch_score))
 
-# re-arrange the scores into a dataframe for display 
-pandas.DataFrame(
-    ch_scores, 
-    columns=['cluster type', 'CH score']
-).set_index('cluster type')
+# re-arrange the scores into a dataframe for display
+pandas.DataFrame(ch_scores, columns=["cluster type", "CH score"]).set_index(
+    "cluster type"
+)
 ```
 
 For all functions in `metrics` that end in "score", higher numbers indicate greater fit, whereas functions that end in `loss` work in the other direction. Thus, the K-means solution has the highest Calinski-Harabasz score, while the ward clustering comes second. The regionalizations both come *well* below the clusterings, too. As we said before, the improved geographical coherence comes at a pretty hefty cost in terms of feature goodness of fit. This is because regionalization is *constrained*, and mathematically *can not* achieve the same score as the unconstrained K-means solution, unless we get lucky and the k-means solution *is* a valid regionalization. 
@@ -950,21 +909,17 @@ The `metrics` module also contains useful tools to compare whether the labelling
 ```python
 ami_scores = []
 # for each cluster solution
-for i_cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+for i_cluster_type in ("k5cls", "ward5", "ward5wq", "ward5wknn"):
     # for every other clustering
-    for j_cluster_type in ('k5cls', 'ward5', 'ward5wq', 'ward5wknn'):
+    for j_cluster_type in ("k5cls", "ward5", "ward5wq", "ward5wknn"):
         # compute the adjusted mutual info between the two
         ami_score = metrics.adjusted_mutual_info_score(
-            db[i_cluster_type], 
-            db[j_cluster_type]
+            db[i_cluster_type], db[j_cluster_type]
         )
         # and save the pair of cluster types with the score
         ami_scores.append((i_cluster_type, j_cluster_type, ami_score))
 # arrange the results into a dataframe
-results = pandas.DataFrame(
-    ami_scores, 
-    columns=['source', 'target', 'similarity']
-)
+results = pandas.DataFrame(ami_scores, columns=["source", "target", "similarity"])
 # and spread the dataframe out into a square
 results.pivot("source", "target", "similarity")
 ```

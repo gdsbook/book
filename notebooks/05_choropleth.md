@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 ```
 
@@ -107,18 +108,16 @@ for 1940 (`PCGDP1940`):
 
 ```python tags=[]
 mx = geopandas.read_file("../data/mexico/mexicojoin.shp")
-mx[['NAME', 'PCGDP1940']].head()
+mx[["NAME", "PCGDP1940"]].head()
 ```
 
 Which displays the following statistical distribution:
 
 ```python caption="Distribution of per capita GDP across 1940s Mexican States" tags=[]
 # Plot histogram
-ax = seaborn.histplot(mx['PCGDP1940'], bins=5)
+ax = seaborn.histplot(mx["PCGDP1940"], bins=5)
 # Add rug on horizontal axis
-seaborn.rugplot(
-    mx['PCGDP1940'], height=0.05, color='red', ax=ax
-);
+seaborn.rugplot(mx["PCGDP1940"], height=0.05, color="red", ax=ax);
 ```
 
 As we can see, the distribution is positively skewed as in common in regional income studies. In other words,
@@ -127,7 +126,7 @@ we shall see, this skewness will have implications for the choice of choropleth
 classification scheme.
 
 ```python
-mx['PCGDP1940'].describe()
+mx["PCGDP1940"].describe()
 ```
 
 
@@ -145,7 +144,7 @@ observations in each class. In the figure, we have five classes which can be
 extracted with an explicit call to the `hist` function:
 
 ```python
-counts, bins, patches = ax.hist(mx['PCGDP1940'], bins=5)
+counts, bins, patches = ax.hist(mx["PCGDP1940"], bins=5)
 ```
 
 The `counts` object captures how many observations each category in the classification has:
@@ -198,7 +197,7 @@ values are placed into the first two classes leaving the last three classes
 rather sparse:
 
 ```python
-ei5 = mapclassify.EqualInterval(mx['PCGDP1940'], k=5)
+ei5 = mapclassify.EqualInterval(mx["PCGDP1940"], k=5)
 ei5
 ```
 
@@ -239,7 +238,7 @@ Let us generate a synthetic variable with these characteristics:
 numpy.random.seed(12345)
 # Generate a variable of 20 values randomly
 # selected from 0 to 10
-x = numpy.random.randint(0,10,20)
+x = numpy.random.randint(0, 10, 20)
 # Manually ensure the first ten values are 0 (the
 # minimum value)
 x[0:10] = x.min()
@@ -277,7 +276,7 @@ classes to have upper limits within one standard deviation ($c_{1}^u = \bar{x}-s
 are placed into the top (bottom) class.
 
 ```python
-msd = mapclassify.StdMean(mx['PCGDP1940'])
+msd = mapclassify.StdMean(mx["PCGDP1940"])
 msd
 ```
 
@@ -298,7 +297,7 @@ each other in the entire sequence, proceeding in descending order relative to
 the size of the breaks:
 
 ```python
-mb5 = mapclassify.MaximumBreaks(mx['PCGDP1940'], k=5)
+mb5 = mapclassify.MaximumBreaks(mx["PCGDP1940"], k=5)
 mb5
 ```
 
@@ -324,7 +323,7 @@ IQR$. Intermediate classes have their upper limits set to the 0.25, 0.50 and
 0.75 percentiles of the attribute values.
 
 ```python
-bp = mapclassify.BoxPlot(mx['PCGDP1940'])
+bp = mapclassify.BoxPlot(mx["PCGDP1940"])
 bp
 ```
 
@@ -337,7 +336,7 @@ The default value for the hinge is $h=1.5$ in
 `mapclassify`. However, this can be specified by the user for an alternative classification:
 
 ```python
-bp1 = mapclassify.BoxPlot(mx['PCGDP1940'], hinge=1)
+bp1 = mapclassify.BoxPlot(mx["PCGDP1940"], hinge=1)
 bp1
 ```
 
@@ -353,7 +352,7 @@ there is a balance between the number of smaller and larger values assigned to
 each class.
 
 ```python
-ht = mapclassify.HeadTailBreaks(mx['PCGDP1940'])
+ht = mapclassify.HeadTailBreaks(mx["PCGDP1940"])
 ht
 ```
 
@@ -381,7 +380,7 @@ when we consider [Clustering & Regionalization](10_clustering_and_regionalizatio
 
 ```python
 numpy.random.seed(12345)
-jc5 = mapclassify.JenksCaspall(mx['PCGDP1940'], k=5)
+jc5 = mapclassify.JenksCaspall(mx["PCGDP1940"], k=5)
 jc5
 ```
 
@@ -394,7 +393,7 @@ classification for a prespecified number of classes:
 
 ```python
 numpy.random.seed(12345)
-fj5 = mapclassify.FisherJenks(mx['PCGDP1940'], k=5)
+fj5 = mapclassify.FisherJenks(mx["PCGDP1940"], k=5)
 fj5
 ```
 
@@ -407,7 +406,7 @@ improve the objective function. It is a heuristic, however, so unlike
 Fisher-Jenks, there is no optimal solution guaranteed:
 
 ```python
-mp5 = mapclassify.MaxP(mx['PCGDP1940'], k=5)
+mp5 = mapclassify.MaxP(mx["PCGDP1940"], k=5)
 mp5
 ```
 
@@ -442,16 +441,14 @@ compare different classifiers for $k=5$ on the Mexico data:
 # Bunch classifier objects
 class5 = q5, ei5, ht, mb5, msd, fj5, jc5, mp5
 # Collect ADCM for each classifier
-fits = numpy.array([ c.adcm for c in class5])
+fits = numpy.array([c.adcm for c in class5])
 # Convert ADCM scores to a DataFrame
 adcms = pandas.DataFrame(fits)
 # Add classifier names
-adcms['classifier'] = [c.name for c in class5]
+adcms["classifier"] = [c.name for c in class5]
 # Add column names to the ADCM
-adcms.columns = ['ADCM', 'Classifier']
-ax = seaborn.barplot(
-    y='Classifier', x='ADCM', data=adcms, palette='Pastel1'
-)
+adcms.columns = ["ADCM", "Classifier"]
+ax = seaborn.barplot(y="Classifier", x="ADCM", data=adcms, palette="Pastel1")
 ```
 
 As is to be expected, the Fisher-Jenks classifier dominates all other k=5
@@ -470,40 +467,40 @@ visualise how they map to observations:
 
 ```python
 # Append class values as a separate column
-mx['Quantiles'] = q5.yb
-mx['Equal Interval'] = ei5.yb
-mx['Head-Tail Breaks'] = ht.yb
-mx['Maximum Breaks'] = mb5.yb
-mx['Mean-Standard Deviation'] = msd.yb
-mx['Fisher-Jenks'] = fj5.yb
-mx['Jenks Caspall'] = jc5.yb
-mx['MaxP'] = mp5.yb
+mx["Quantiles"] = q5.yb
+mx["Equal Interval"] = ei5.yb
+mx["Head-Tail Breaks"] = ht.yb
+mx["Maximum Breaks"] = mb5.yb
+mx["Mean-Standard Deviation"] = msd.yb
+mx["Fisher-Jenks"] = fj5.yb
+mx["Jenks Caspall"] = jc5.yb
+mx["MaxP"] = mp5.yb
 ```
 
 With those in one place, we can display their labels in a heatmap. Note that, since our variable of interest is continuous, we can sort the rows of the table by their value (`.sort_values('PCGDP1940')`) and color each cell according to the label assigned to it by each classifier. To make the heatmap easier to read, we transpose it (`.T`) so Mexican states are displayed along the horizontal axis and classification schemes are along the vertical one.
 
 ```python caption="Assignment differences between alternative classification schemes, Mexican State PCGDP1940." tags=[]
-f, ax = plt.subplots(1, figsize=(9,3))
+f, ax = plt.subplots(1, figsize=(9, 3))
 seaborn.heatmap(
-    mx.set_index('NAME').sort_values(
-        'PCGDP1940'
-    )[
+    mx.set_index("NAME")
+    .sort_values("PCGDP1940")[
         [
-            'Head-Tail Breaks', 
-            'Fisher-Jenks',
-            'Maximum Breaks', 
-            'Equal Interval',
-            'MaxP',
-            'Quantiles', 
-            'Jenks Caspall',
-            'Mean-Standard Deviation',
+            "Head-Tail Breaks",
+            "Fisher-Jenks",
+            "Maximum Breaks",
+            "Equal Interval",
+            "MaxP",
+            "Quantiles",
+            "Jenks Caspall",
+            "Mean-Standard Deviation",
         ]
-    ].T,
-    cmap='YlGn',
+    ]
+    .T,
+    cmap="YlGn",
     cbar=False,
-    ax=ax
+    ax=ax,
 )
-ax.set_xlabel('State ID');
+ax.set_xlabel("State ID");
 ```
 
 The figure can be challenging to read at first but, once you "decode" it, it packs
@@ -525,8 +522,7 @@ different classifiers:
 
 ```python
 pandas.DataFrame(
-    {c.name: c.counts for c in class5},
-    index=['Class-{}'.format(i) for i in range(5)]
+    {c.name: c.counts for c in class5}, index=["Class-{}".format(i) for i in range(5)]
 )
 ```
 
@@ -568,11 +564,11 @@ We will illustrate it with a quantile map:
 
 ```python caption="Quantile choropleth, Mexican State PCGDP1940." tags=[]
 ax = mx.plot(
-    column='PCGDP1940',          # Data to plot
-    scheme='Quantiles',          # Classification scheme
-    cmap='YlGn',                 # Color palette
-    legend=True,                 # Add legend
-    legend_kwds={'fmt':'{:.0f}'} # Remove decimals in legend
+    column="PCGDP1940",  # Data to plot
+    scheme="Quantiles",  # Classification scheme
+    cmap="YlGn",  # Color palette
+    legend=True,  # Add legend
+    legend_kwds={"fmt": "{:.0f}"},  # Remove decimals in legend
 )
 ax.set_axis_off();
 ```
@@ -587,13 +583,13 @@ Sequential color schemes are appropriate for continuous data where the origin is
 
 ```python caption="Quantile choropleth with black borderlines, Mexican State PCGDP1940." tags=[]
 ax = mx.plot(
-    column='PCGDP1940',          # Data to plot
-    scheme='Quantiles',          # Classification scheme
-    cmap='Blues',                # Color palette
-    edgecolor='k',               # Borderline color
-    linewidth=0.1,               # Borderline width
-    legend=True,                 # Add legend
-    legend_kwds={'fmt':'{:.0f}'} # Remove decimals in legend (for legibility)
+    column="PCGDP1940",  # Data to plot
+    scheme="Quantiles",  # Classification scheme
+    cmap="Blues",  # Color palette
+    edgecolor="k",  # Borderline color
+    linewidth=0.1,  # Borderline width
+    legend=True,  # Add legend
+    legend_kwds={"fmt": "{:.0f}"},  # Remove decimals in legend (for legibility)
 )
 ax.set_axis_off();
 ```
@@ -615,21 +611,17 @@ rank in the income distribution between 1940 to 2000:
 
 ```python
 # Create income-based rank table (Rank 1 is highest)
-rnk = mx[
-    ['NAME', 'PCGDP1940', 'PCGDP2000']
-].rank(ascending=False)
+rnk = mx[["NAME", "PCGDP1940", "PCGDP2000"]].rank(ascending=False)
 # Compute change from 1940 to 2000
-rnk['change'] = rnk['PCGDP1940'] - rnk['PCGDP2000']
+rnk["change"] = rnk["PCGDP1940"] - rnk["PCGDP2000"]
 # Add column with bin class
-rnk['class'] = pandas.cut(rnk['change'], [-numpy.inf, -5, 0, 5, 20])
+rnk["class"] = pandas.cut(rnk["change"], [-numpy.inf, -5, 0, 5, 20])
 ```
 
 The `rnk` table now contains the change in rank positions of each state between 1940 and 2000, as well as a `class` column that binds together states in the  [-inf, -5), [-5, 0), [0, 5), [5, 20] groups. Note that these are descending ranks, so the wealthiest state in any period has a rank of 1 and therefore when considering the change in ranks, a negative change reflects moving down the income distribution. We can use a divergent palette to signify both intensity of the change in ranks, as well as direction:
 
 ```python caption="Divergent palette, Mexican State per capita income rank change." tags=[]
-ax = mx[['geometry']].join(rnk).plot(
-    'class', legend=True, cmap='RdYlGn'
-)
+ax = mx[["geometry"]].join(rnk).plot("class", legend=True, cmap="RdYlGn")
 ax.set_axis_off();
 ```
 
@@ -649,7 +641,7 @@ are on a nominal measurement scale. One of these is a region definition variable
 that groups individual states in contiguous clusters of similar characteristics:
 
 ```python
-mx['HANSON98'].head()
+mx["HANSON98"].head()
 ```
 
 This aggregation scheme partitions Mexico into five regions, recorded with
@@ -658,7 +650,7 @@ incorrect) way to display this would be to treat the region variable as
 sequential:
 
 ```python caption="(Incorrect) sequential palette, Mexican regions." tags=[]
-ax = mx.plot('HANSON98')
+ax = mx.plot("HANSON98")
 ax.set_axis_off();
 ```
 
@@ -673,7 +665,7 @@ is to use a "qualitative" color palette, which is used if you specify that
 the variable is categorical:
 
 ```python caption="Qualitative palette, Mexican regions." tags=[]
-ax = mx.plot('HANSON98', categorical=True, legend=True)
+ax = mx.plot("HANSON98", categorical=True, legend=True)
 ax.set_axis_off();
 ```
 
@@ -688,9 +680,7 @@ In this last section of the chapter, we consider bespoke partitions of the data 
 To create a choropleth that reflects this partitioning of the data, we can use the `UserDefined` classifier in `mapclassify`:
 
 ```python
-classi = mapclassify.UserDefined(
-    mx['PCGDP2000'], [10000, 12500, 15000]
-)
+classi = mapclassify.UserDefined(mx["PCGDP2000"], [10000, 12500, 15000])
 classi
 ```
 
@@ -698,13 +688,11 @@ If we now want to display these classes on a map, we can use a similar approach 
 
 ```python caption="Choropleth map colored to focus on areas of southern Mexico eligible for a target policy, showcasting User-Defined map classifications." tags=[]
 classi.plot(
-    mx,                      # Use geometries in the geo-table
-    legend=True,             # Add a legend
-    legend_kwds={
-        'loc': 'upper right' # Place legend on top right corner
-    },
-    axis_on=False,           # Remove axis
-    cmap='viridis_r'         # Use reverse Viridis
+    mx,  # Use geometries in the geo-table
+    legend=True,  # Add a legend
+    legend_kwds={"loc": "upper right"},  # Place legend on top right corner
+    axis_on=False,  # Remove axis
+    cmap="viridis_r",  # Use reverse Viridis
 );
 ```
 
@@ -714,12 +702,9 @@ The approach above is useful in that it is based on `mapclassify` and thus provi
 
 ```python caption="User-defined palette, `pandas` approach." tags=[]
 # Classify values specifying bins
-lbls = pandas.cut(
-    mx['PCGDP2000'], [-numpy.inf, 10000, 12500, 15000, numpy.inf]
-)
+lbls = pandas.cut(mx["PCGDP2000"], [-numpy.inf, 10000, 12500, 15000, numpy.inf])
 # Dynamically assign to geo-table and plot with a legend
-ax = mx.plot(lbls, cmap='viridis_r', legend=True
-)
+ax = mx.plot(lbls, cmap="viridis_r", legend=True)
 # Remove axis
 ax.set_axis_off();
 ```
@@ -732,11 +717,9 @@ To illustrate this approach, we will create a figure with choropleths of GDP per
 
 ```python
 # List the years we want of pc GDP
-years = ['PCGDP1940', 'PCGDP1960', 'PCGDP1980', 'PCGDP2000']
+years = ["PCGDP1940", "PCGDP1960", "PCGDP1980", "PCGDP2000"]
 # Create pooled classification
-pooled = mapclassify.Pooled(
-    mx[years], classifier='Quantiles', k=5
-)
+pooled = mapclassify.Pooled(mx[years], classifier="Quantiles", k=5)
 ```
 
 <!-- #region -->
@@ -755,13 +738,11 @@ axs = axs.flatten()
 # Loop over each year
 for i, y in enumerate(years):
     mx.plot(
-        y,                    # Year to plot
-        scheme='UserDefined', # Use our own bins
-        classification_kwds={ # Use global bins
-            'bins': pooled.global_classifier.bins
-        }, 
-        legend=True,          # Add a legend
-        ax=axs[i]             # Plot on the corresponding axis
+        y,  # Year to plot
+        scheme="UserDefined",  # Use our own bins
+        classification_kwds={"bins": pooled.global_classifier.bins},  # Use global bins
+        legend=True,  # Add a legend
+        ax=axs[i],  # Plot on the corresponding axis
     )
     # Remove axis
     axs[i].set_axis_off()

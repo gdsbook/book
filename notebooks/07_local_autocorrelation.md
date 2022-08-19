@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 ```
 
@@ -37,23 +38,20 @@ We continue with the same dataset about Brexit voting that we examined in the pr
 ```python
 import matplotlib.pyplot as plt  # Graphics
 from matplotlib import colors
-import seaborn                   # Graphics
-import geopandas                 # Spatial data manipulation
-import pandas                    # Tabular data manipulation
-import rioxarray                 # Surface data manipulation
-import xarray                    # Surface data manipulation
-from pysal.explore import esda   # Exploratory Spatial analytics
-from pysal.lib import weights    # Spatial weights
-import contextily                # Background tiles
+import seaborn  # Graphics
+import geopandas  # Spatial data manipulation
+import pandas  # Tabular data manipulation
+import rioxarray  # Surface data manipulation
+import xarray  # Surface data manipulation
+from pysal.explore import esda  # Exploratory Spatial analytics
+from pysal.lib import weights  # Spatial weights
+import contextily  # Background tiles
 ```
 
 We read the vote data as a non-spatial table:
 
 ```python
-ref = pandas.read_csv(
-    '../data/brexit/brexit_vote.csv', 
-    index_col='Area_Code'
-)
+ref = pandas.read_csv("../data/brexit/brexit_vote.csv", index_col="Area_Code")
 ```
 
 And the spatial geometries for the local authority districts in Great Britain:
@@ -61,19 +59,17 @@ And the spatial geometries for the local authority districts in Great Britain:
 ```python
 lads = geopandas.read_file(
     "../data/brexit/local_authority_districts.geojson"
-).set_index('lad16cd')
+).set_index("lad16cd")
 ```
 
 Then, we "trim" the `DataFrame` so it retains only what we know we will need, reproject it to spherical mercator, and drop rows with missing data:
 
 ```python
-db = geopandas.GeoDataFrame(
-    lads.join(ref[['Pct_Leave']]), crs=lads.crs
-).to_crs(
-    epsg=3857
-)[
-    ['objectid', 'lad16nm', 'Pct_Leave', 'geometry']
-].dropna()
+db = (
+    geopandas.GeoDataFrame(lads.join(ref[["Pct_Leave"]]), crs=lads.crs)
+    .to_crs(epsg=3857)[["objectid", "lad16nm", "Pct_Leave", "geometry"]]
+    .dropna()
+)
 
 db.info()
 ```
@@ -85,22 +81,20 @@ Although there are several variables that could be considered, we will focus on 
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Build choropleth
 db.plot(
-    column='Pct_Leave', 
-    cmap='viridis', 
-    scheme='quantiles',
-    k=5, 
-    edgecolor='white', 
-    linewidth=0., 
-    alpha=0.75, 
+    column="Pct_Leave",
+    cmap="viridis",
+    scheme="quantiles",
+    k=5,
+    edgecolor="white",
+    linewidth=0.0,
+    alpha=0.75,
     legend=True,
     legend_kwds=dict(loc=2),
-    ax=ax
+    ax=ax,
 )
 # Add basemap
 contextily.add_basemap(
-    ax, 
-    crs=db.crs, 
-    source=contextily.providers.CartoDB.VoyagerNoLabels
+    ax, crs=db.crs, source=contextily.providers.CartoDB.VoyagerNoLabels
 )
 # Remove axes
 ax.set_axis_off();
@@ -112,7 +106,7 @@ As in the previous chapter, we require a spatial weights matrix to implement our
 # Generate W from the GeoDataFrame
 w = weights.distance.KNN.from_dataframe(db, k=8)
 # Row-standardization
-w.transform = 'R'
+w.transform = "R"
 ```
 
 <!-- #region tags=[] -->
@@ -122,14 +116,14 @@ To better understand the underpinnings of local spatial autocorrelation, we retu
 <!-- #endregion -->
 
 ```python
-db['w_Pct_Leave'] = weights.spatial_lag.lag_spatial(w, db['Pct_Leave'])
+db["w_Pct_Leave"] = weights.spatial_lag.lag_spatial(w, db["Pct_Leave"])
 ```
 
 And their respective standardized versions, where we subtract the average and divide by the standard deviation:
 
 ```python
-db['Pct_Leave_std'] = ( db['Pct_Leave'] - db['Pct_Leave'].mean() )
-db['w_Pct_Leave_std'] = ( db['w_Pct_Leave'] - db['Pct_Leave'].mean() )
+db["Pct_Leave_std"] = db["Pct_Leave"] - db["Pct_Leave"].mean()
+db["w_Pct_Leave_std"] = db["w_Pct_Leave"] - db["Pct_Leave"].mean()
 ```
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot:
@@ -138,9 +132,7 @@ Technically speaking, creating a Moran Plot is very similar to creating any othe
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
-seaborn.regplot(
-    x='Pct_Leave_std', y='w_Pct_Leave_std', data=db, ci=None
-);
+seaborn.regplot(x="Pct_Leave_std", y="w_Pct_Leave_std", data=db, ci=None);
 ```
 
 Using standardized values, we can immediately divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: those with above-average leave voting, which have positive standardized values; and those with below-average leave voting, which feature negative standardized values. Applying this thinking to both the percentage to leave and its spatial lag, divides a Moran Plot in four quadrants. Each of them captures a situation based on whether a given area displays a value above the mean (high) or below (low) in either the original variable (`Pct_Leave`) or its spatial lag (`w_Pct_Leave_std`). Using this terminology, we name the four quadrants as follows: high-high (HH) for the top-right, low-high (LH) for the top-left, low-low (LL) for the bottom-left, and high-low (HL) for the bottom right. Graphically, we can capture this as follows:
@@ -149,17 +141,15 @@ Using standardized values, we can immediately divide each variable (the percenta
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
-seaborn.regplot(
-    x='Pct_Leave_std', y='w_Pct_Leave_std', data=db, ci=None
-)
+seaborn.regplot(x="Pct_Leave_std", y="w_Pct_Leave_std", data=db, ci=None)
 # Add vertical and horizontal lines
-plt.axvline(0, c='k', alpha=0.5)
-plt.axhline(0, c='k', alpha=0.5)
+plt.axvline(0, c="k", alpha=0.5)
+plt.axhline(0, c="k", alpha=0.5)
 # Add text labels for each quadrant
-plt.text(20, 5, "HH", fontsize=25, c='r')
-plt.text(12, -11, "HL", fontsize=25, c='r')
-plt.text(-20, 8.0, "LH", fontsize=25, c='r')
-plt.text(-25, -11.0, "LL", fontsize=25, c='r')
+plt.text(20, 5, "HH", fontsize=25, c="r")
+plt.text(12, -11, "HL", fontsize=25, c="r")
+plt.text(-20, 8.0, "LH", fontsize=25, c="r")
+plt.text(-25, -11.0, "LL", fontsize=25, c="r")
 # Display
 plt.show()
 ```
@@ -183,7 +173,7 @@ LISAs are widely used in many fields to identify geographical clusters of values
 In Python, we can calculate LISAs in a very streamlined way thanks to `esda`. To compute local Moran statistics, we use the `Moran_Local` function:
 
 ```python
-lisa = esda.moran.Moran_Local(db['Pct_Leave'], w)
+lisa = esda.moran.Moran_Local(db["Pct_Leave"], w)
 ```
 
 We need to pass the variable of interest—proportion of Leave votes in this context—and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object (`lisa`) that has a number of attributes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using `seaborn`:
@@ -217,83 +207,84 @@ f, axs = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
 # Make the axes accessible with single indexing
 axs = axs.flatten()
 
-                    # Subplot 1 #
-            # Choropleth of local statistics
+# Subplot 1 #
+# Choropleth of local statistics
 # Grab first axis in the figure
 ax = axs[0]
 # Assign new column with local statistics on-the-fly
 db.assign(
     Is=lisa.Is
-# Plot choropleth of local statistics
+    # Plot choropleth of local statistics
 ).plot(
-    column='Is', 
-    cmap='plasma', 
-    scheme='quantiles',
-    k=5, 
-    edgecolor='white', 
-    linewidth=0.1, 
+    column="Is",
+    cmap="plasma",
+    scheme="quantiles",
+    k=5,
+    edgecolor="white",
+    linewidth=0.1,
     alpha=0.75,
     legend=True,
-    ax=ax
+    ax=ax,
 )
 
-                    # Subplot 2 #
-                # Quadrant categories
+# Subplot 2 #
+# Quadrant categories
 # Grab second axis of local statistics
 ax = axs[1]
 # Plot Quandrant colors (note to ensure all polygons are assigned a
 # quadrant, we "trick" the function by setting significance level to
 # 1 so all observations are treated as "significant" and thus assigned
 # a quadrant color
-esdaplot.lisa_cluster(lisa, db, p=1, ax=ax);
+esdaplot.lisa_cluster(lisa, db, p=1, ax=ax)
 
-                    # Subplot 3 #
-                # Significance map
+# Subplot 3 #
+# Significance map
 # Grab third axis of local statistics
 ax = axs[2]
-# 
+#
 # Find out significant observations
 labels = pandas.Series(
-    1 * (lisa.p_sim < 0.05), # Assign 1 if significant, 0 otherwise
-    index=db.index           # Use the index in the original data
-# Recode 1 to "Significant and 0 to "Non-significant"
-).map({1: 'Significant', 0: 'Non-Significant'})
+    1 * (lisa.p_sim < 0.05),  # Assign 1 if significant, 0 otherwise
+    index=db.index  # Use the index in the original data
+    # Recode 1 to "Significant and 0 to "Non-significant"
+).map({1: "Significant", 0: "Non-Significant"})
 # Assign labels to `db` on the fly
 db.assign(
     cl=labels
-# Plot choropleth of (non-)significant areas
+    # Plot choropleth of (non-)significant areas
 ).plot(
-    column='cl', 
+    column="cl",
     categorical=True,
     k=2,
-    cmap='Paired',
+    cmap="Paired",
     linewidth=0.1,
-    edgecolor='white',
+    edgecolor="white",
     legend=True,
-    ax=ax
+    ax=ax,
 )
 
-                       
-                    # Subplot 4 #
-                    # Cluster map
+
+# Subplot 4 #
+# Cluster map
 # Grab second axis of local statistics
 ax = axs[3]
 # Plot Quandrant colors In this case, we use a 5% significance
 # level to select polygons as part of statistically significant
 # clusters
-esdaplot.lisa_cluster(lisa, db, p=0.05, ax=ax);
+esdaplot.lisa_cluster(lisa, db, p=0.05, ax=ax)
 
-                    # Figure styling #
+# Figure styling #
 # Set title to each subplot
 for i, ax in enumerate(axs.flatten()):
     ax.set_axis_off()
     ax.set_title(
         [
-            'Local Statistics', 
-            'Scatterplot Quadrant', 
-            'Statistical Significance', 
-            'Moran Cluster Map'
-        ][i], y=0
+            "Local Statistics",
+            "Scatterplot Quadrant",
+            "Statistical Significance",
+            "Moran Cluster Map",
+        ][i],
+        y=0,
     )
 # Tight layout to minimise in-betwee white space
 f.tight_layout()
@@ -335,18 +326,18 @@ First, we pull the information computed in `lisa` and insert it in the main data
 
 ```python
 # Assign pseudo P-values to `db`
-db['p-sim'] = lisa.p_sim
+db["p-sim"] = lisa.p_sim
 # `1` if significant (at 5% confidence level), `0` otherwise
 sig = 1 * (lisa.p_sim < 0.05)
 # Assign significance flag to `db`
-db['sig'] = sig
+db["sig"] = sig
 # Print top of the table to inspect
-db[['sig','p-sim']].head()
+db[["sig", "p-sim"]].head()
 ```
 
 ```python
 # Print bottom of the table to inspect
-db[['sig','p-sim']].tail()
+db[["sig", "p-sim"]].tail()
 ```
 
 Thus, the first five values are statistically significant, while the last five observations are not.
@@ -356,22 +347,21 @@ Let us stop for a second on these two steps. First, we consider the `sig` column
 Next, we construct our quadrant values using the `q` attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure `sig`, so only observations in a quadrant that are considered significant are labeled as part of that given quadrant. The remainder are labelled as non-significant.
 
 ```python
-# Pick as part of a quadrant only significant polygons, 
+# Pick as part of a quadrant only significant polygons,
 # assign `0` otherwise (Non-significant polygons)
 spots = lisa.q * sig
 # Mapping from value to name (as a dict)
-spots_labels = {
-    0: 'Non-Significant', 1:'HH', 2: 'LH', 3:'LL', 4: 'HL'
-}
+spots_labels = {0: "Non-Significant", 1: "HH", 2: "LH", 3: "LL", 4: "HL"}
 # Create column in `db` with labels for each polygon
-db['labels'] = pandas.Series(
+db["labels"] = pandas.Series(
     # First initialise a Series using values and `db` index
-    spots, index=db.index
-# Then map each value to corresponding label based 
-# on the `spots_labels` mapping
+    spots,
+    index=db.index
+    # Then map each value to corresponding label based
+    # on the `spots_labels` mapping
 ).map(spots_labels)
 # Print top for inspection
-db['labels'].head()
+db["labels"].head()
 ```
 
 These cluster labels are meaningful if you know of the Moran Plot. To help making them a bit more intuitive, a terminology that is sometimes used goes as follows. Positive forms of local spatial autocorrelation are of two types. First, HH observations, which we can term "hot spots", represent areas where values at the site and its surroundings are larger than average. Second, LL observations, significant clusters of low values surrounded by low values, are sometimes referred to as "cold spots". Negative forms of local spatial autocorrelation also include two cases. When the focal observation displays low values but its surroundings have high values (LH), we call them "doughnuts". Conversely, areas with high values but neighboured by others with low values (HL) can be referred to as "diamonds in the rough". We note this terminology is purely mnemonic, but recognise in some cases it can help remembering the interpretation of local statistics. 
@@ -380,7 +370,7 @@ These cluster labels are meaningful if you know of the Moran Plot. To help makin
 After building these new columns, analysis on the overall trends of LISA statistics is more straightforward than from the `lisa` object. For example, an overview of the distribution of labels is one line away:
 
 ```python
-db['labels'].value_counts()
+db["labels"].value_counts()
 ```
 
 This shows, for one, that most local statistics are *not* statistically significant. Among those that are, we see many more hotspots/coldspots than doughnuts/diamonds-in-the-rough. This is consistent with the skew we saw in the distribution of local statistics earlier. 
@@ -392,9 +382,9 @@ Similar to the global case, there are more local indicators of spatial correlati
 
 ```python
 # Gi
-go_i = esda.getisord.G_Local(db['Pct_Leave'], w)
+go_i = esda.getisord.G_Local(db["Pct_Leave"], w)
 # Gi*
-go_i_star = esda.getisord.G_Local(db['Pct_Leave'], w, star=True)
+go_i_star = esda.getisord.G_Local(db["Pct_Leave"], w, star=True)
 ```
 
 As the local statistics they are, it is best to explore them by plotting them on a map. Unlike with LISA though, the $G$ statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.
@@ -403,16 +393,16 @@ Unlike with LISAs, `splot` does not support vislualisation of G statistics at th
 
 ```python
 def g_map(g, db, ax):
-    '''
+    """
     Create a cluster map
     ...
-    
+
     Arguments
     ---------
     g      : G_Local
              Object from the computation of the G statistic
     db     : GeoDataFrame
-             Table aligned with values in `g` and containing 
+             Table aligned with values in `g` and containing
              the geometries to plot
     ax     : AxesSubplot
              `matplotlib` axis to draw the map on
@@ -421,33 +411,33 @@ def g_map(g, db, ax):
     -------
     ax     : AxesSubplot
              Axis with the map drawn
-    '''
-    ec = '0.8'
-    
+    """
+    ec = "0.8"
+
     # Break observations into significant or not
     sig = g.p_sim < 0.05
 
     # Plot non-significant clusters
-    ns = db.loc[sig==False, 'geometry']
-    ns.plot(ax=ax, color='lightgrey', edgecolor=ec, linewidth=0.1)
+    ns = db.loc[sig == False, "geometry"]
+    ns.plot(ax=ax, color="lightgrey", edgecolor=ec, linewidth=0.1)
     # Plot HH clusters
-    hh = db.loc[(g.Zs > 0) & (sig==True), 'geometry']
-    hh.plot(ax=ax, color='red', edgecolor=ec, linewidth=0.1)
+    hh = db.loc[(g.Zs > 0) & (sig == True), "geometry"]
+    hh.plot(ax=ax, color="red", edgecolor=ec, linewidth=0.1)
     # Plot LL clusters
-    ll = db.loc[(g.Zs < 0) & (sig==True), 'geometry']
-    ll.plot(ax=ax, color='blue', edgecolor=ec, linewidth=0.1)
+    ll = db.loc[(g.Zs < 0) & (sig == True), "geometry"]
+    ll.plot(ax=ax, color="blue", edgecolor=ec, linewidth=0.1)
     # Style and draw
     contextily.add_basemap(
-        ax, 
-        crs=db.crs, 
+        ax,
+        crs=db.crs,
         source=contextily.providers.Stamen.TerrainBackground,
     )
     # Flag to add a star to the title if it's G_i*
-    st = ''
+    st = ""
     if g.star:
-        st = '*'
+        st = "*"
     # Add title
-    ax.set_title(f'G{st} statistic for Pct of Leave votes', size=15)
+    ax.set_title(f"G{st} statistic for Pct of Leave votes", size=15)
     # Remove axis for aesthetics
     ax.set_axis_off()
     return ax
@@ -484,9 +474,7 @@ For this case, we will use the GHSL dataset that contains an extract of gridded 
 
 ```python
 # Open GeoTIFF file and read into `xarray.DataArray`
-pop = xarray.open_rasterio(
-    '../data/ghsl/ghsl_sao_paulo.tif'
-)
+pop = xarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
 ```
 
 Next is building a weights matrix that represents the spatial configuration of pixels with values in `pop`. We will use the same approach as we saw in the chapter on weights:
@@ -512,12 +500,12 @@ type(w_surface_sp)
 We take both steps in the following code snippet:
 
 ```python
-w_surface = weights.WSP2W(                # 3.Convert `WSP` object to `W` 
-    weights.WSP(                          # 2.Build `WSP` from the float sparse matrix
-        w_surface_sp.sparse.astype(float) # 1.Convert sparse matrix to floats
+w_surface = weights.WSP2W(  # 3.Convert `WSP` object to `W`
+    weights.WSP(  # 2.Build `WSP` from the float sparse matrix
+        w_surface_sp.sparse.astype(float)  # 1.Convert sparse matrix to floats
     )
 )
-w_surface.index = w_surface_sp.index      # 4.Assign index to new `W`
+w_surface.index = w_surface_sp.index  # 4.Assign index to new `W`
 ```
 
 There is quite a bit going on in those lines of code, so let's unpack them:
@@ -533,9 +521,7 @@ This leaves us with a weights object (`w_surface`) we can work with for the LISA
 # Convert `DataArray` to a `pandas.Series`
 pop_values = pop.to_series()
 # Subset to keep only values that aren't missing
-pop_values = pop_values[
-    pop_values != pop.rio.nodata
-]
+pop_values = pop_values[pop_values != pop.rio.nodata]
 ```
 
 Note that we do two operations: one is to convert the two-dimensional `DataArray` surface into a one-dimensional vector in the form of a `Series` object (`pop_values`); the second is to filter out values in which, in the surface, contain missing data. In surfaces, this is usually expressed with a rare value rather than with another data type. We can check that in `pop`, this is -200:
@@ -548,9 +534,7 @@ At this point, we are ready to run a LISA the same way we have done in previousl
 
 ```python tags=[]
 # NOTE: this may take a bit longer to run depending on hardware
-pop_lisa = esda.moran.Moran_Local(
-    pop_values.astype(float), w_surface, n_jobs=-1
-)
+pop_lisa = esda.moran.Moran_Local(pop_values.astype(float), w_surface, n_jobs=-1)
 ```
 
 Note that, before computing the LISA, we ensure the population values are _also_ expressed as floats and thus in line with those in our spatial weights.
@@ -565,8 +549,8 @@ We are aiming to create a cluster plot. This means we want to display values tha
 
 ```python
 sig_pop = pandas.Series(
-    pop_lisa.q * (pop_lisa.p_sim < .01), # Quadrant of significant at 1% (0 otherwise)
-    index=pop_values.index               # Index from the Series and aligned with `w_surface`
+    pop_lisa.q * (pop_lisa.p_sim < 0.01),  # Quadrant of significant at 1% (0 otherwise)
+    index=pop_values.index,  # Index from the Series and aligned with `w_surface`
 )
 ```
 
@@ -575,10 +559,10 @@ The `sig_pop` object, expressed as a one-dimensional vector, contains the inform
 ```python
 # Build `DataArray` from a set of values and weights
 lisa_da = raster.w2da(
-    sig_pop,                                      # Values
-    w_surface,                                    # Spatial weights
-    attrs={'nodatavals': pop.attrs['nodatavals']} # Value for missing data
-# Add CRS information in a compliant manner
+    sig_pop,  # Values
+    w_surface,  # Spatial weights
+    attrs={"nodatavals": pop.attrs["nodatavals"]}  # Value for missing data
+    # Add CRS information in a compliant manner
 ).rio.write_crs(pop.rio.crs)
 ```
 
@@ -601,51 +585,51 @@ We express the colors we will use as a dictionary mapping the key to the color c
 ```python
 # LISA colors
 lc = {
-    'ns': 'lightgrey', # Values of 0
-    'HH': '#d7191c',   # Values of 1
-    'LH': '#abd9e9',   # Values of 2
-    'LL': '#2c7bb6',   # Values of 3
-    'HL': '#fdae61',   # Values of 4
+    "ns": "lightgrey",  # Values of 0
+    "HH": "#d7191c",  # Values of 1
+    "LH": "#abd9e9",  # Values of 2
+    "LL": "#2c7bb6",  # Values of 3
+    "HL": "#fdae61",  # Values of 4
 }
 ```
 
 With these pieces, we can create the colormap object:
 
 ```python caption="Colormap for Local Moran's I Maps, starting with non-significant local scores in grey, and proceeding through high-high local statistics, low-high, low-low, then high-low."
-lisa_cmap = ListedColormap(
-    [lc['ns'], lc['HH'], lc['LH'], lc['LL'], lc['HL']]
-)
+lisa_cmap = ListedColormap([lc["ns"], lc["HH"], lc["LH"], lc["LL"], lc["HL"]])
 lisa_cmap
 ```
 
 At this point, we have all the pieces we need to build our cluster map. Let's put them together:
 
-```python tags=[] caption="LISA map for Sao Paulo population surface."
+```python caption="LISA map for Sao Paulo population surface." tags=[]
 # Set up figure and axis
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
-                    # Subplot 1 #       
+# Subplot 1 #
 # Select pixels that do not have the `nodata` value
 # (ie. they are not missing data)
 pop.where(
-    pop!=pop.rio.nodata
-# Plot surface with a horizontal colorbar
+    pop
+    != pop.rio.nodata
+    # Plot surface with a horizontal colorbar
 ).plot(
-    ax=axs[0], add_colorbar=False#, cbar_kwargs={"orientation": "horizontal"}
+    ax=axs[0], add_colorbar=False  # , cbar_kwargs={"orientation": "horizontal"}
 )
-                    # Subplot 2 #
+# Subplot 2 #
 # Select pixels with no missing data and rescale to [0, 1] by
-# dividing by 4 (maximum value in `lisa_da`) 
+# dividing by 4 (maximum value in `lisa_da`)
 (
-    lisa_da.where(lisa_da!=-200) / 4
-# Plot surface without a colorbar
+    lisa_da.where(lisa_da != -200)
+    / 4
+    # Plot surface without a colorbar
 ).plot(cmap=lisa_cmap, ax=axs[1], add_colorbar=False)
-                    # Aesthetics #
+# Aesthetics #
 # Subplot titles
-titles = ['Population by pixel', 'Population clusters']
+titles = ["Population by pixel", "Population clusters"]
 # Apply the following to each of the two subplots
 for i in range(2):
     # Keep proportion of axes
-    axs[i].axis('equal')
+    axs[i].axis("equal")
     # Remove axis
     axs[i].set_axis_off()
     # Add title

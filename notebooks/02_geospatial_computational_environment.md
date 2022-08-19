@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+
 warnings.filterwarnings("ignore")
 from IPython.display import Image
 ```
@@ -61,8 +62,7 @@ scientific community could study, understand, and replicate their findings.
 One of the most famous of these annotations are Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars, shown in Figure 1. 
 
 ```python caption="Galileo's drawings of Jupyter and the Medician stars, showing the power of diagrams inside of scientific texts." tags=["remove-input"]
-url = ("https://upload.wikimedia.org/wikipedia/"\
-       "commons/c/ca/Medicean_Stars.png")
+url = "https://upload.wikimedia.org/wikipedia/" "commons/c/ca/Medicean_Stars.png"
 Image(url, width=250)
 ```
 
@@ -302,7 +302,7 @@ content. For example, we can include a YouTube clip by passing the video ID[^you
 [^youtube]: We regret to inform the reader that the printed page is not the best for displaying YouTube videos, or indeed any web content. So if you are reading this book on paper, the video will not render. We recommend viewing the notebooks online at [`geographicdata.science/book`](https://geographicdata.science/book) to see the full power of the notebook.
 
 ```python caption="Embedding rich media in a notebook." tags=[]
-display.YouTubeVideo('iinQDhsdE9s')
+display.YouTubeVideo("iinQDhsdE9s")
 ```
 
 Or we can pass standard HTML code:
@@ -510,7 +510,7 @@ the help. Take the `read_file` function we have imported above. One way to check
 dialog from within the notebook is to add a question mark after it:
 
 ```python attributes={"classes": [], "id": "", "n": "20"}
-read_file?
+?read_file
 ```
 
 <!-- #region -->
@@ -700,7 +700,7 @@ Firefox or Google Chrome) and enter `http://localhost:8888` as if it were a webs
 This should then load a landing page that looks approximately like this one:
 
 ```python caption="The authentification screen for Jupyter notebooks" tags=["remove-input"]
-path = ("../figures/jupyter_landing_page.png")
+path = "../figures/jupyter_landing_page.png"
 display.Image(path, width=500)
 ```
 
