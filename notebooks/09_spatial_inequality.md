@@ -86,7 +86,9 @@ For this chapter, we use data on average income per capita over time. Specifical
 
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-pci_df = geopandas.read_file("../data/us_county_income/uscountypcincome.gpkg")
+pci_df = geopandas.read_file(
+    "../data/us_county_income/uscountypcincome.gpkg"
+)
 pci_df.columns
 ```
 
@@ -115,7 +117,9 @@ pci_df.shape
 As an example, we can see the first ten years for Jackson County, Mississippi (state code `28`) below:
 
 ```python
-pci_df.query('NAME == "Jackson" & STATEFP == "28"').loc[:, "1969":"1979"]
+pci_df.query('NAME == "Jackson" & STATEFP == "28"').loc[
+    :, "1969":"1979"
+]
 ```
 
 <!-- #region {"ein.tags": "worksheet-0", "slideshow": {"slide_type": "-"}} -->
@@ -345,7 +349,9 @@ def gini_by_col(column):
 `inequality`'s Gini requires an `numpy.ndarray` rather than a `pandas.Series` object, which we can pull out through the `values` attribute. This is passed to the `Gini` class, and we only return the value of the coefficient as a `DataFrame` object.
 
 ```python ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-inequalities = pci_df[years].apply(gini_by_col, axis=0).to_frame("gini")
+inequalities = (
+    pci_df[years].apply(gini_by_col, axis=0).to_frame("gini")
+)
 ```
 
 This results in a series of Gini values, one for each year:
@@ -605,7 +611,9 @@ explicitly considered in the second component.[^weight]
 Once we have covered the decomposition conceptually, the technical implementation is straightforward thanks to the `inequality` package of Pysal, and the `TheilD` class:
 
 ```python
-theil_dr = inequality.theil.TheilD(pci_df[years].values, pci_df.Region)
+theil_dr = inequality.theil.TheilD(
+    pci_df[years].values, pci_df.Region
+)
 ```
 
 The `theil_dr` object has the between and within group components stored in the `bg` and `wg` attributes, respectively. For example the "between" component for each year is computed is:
@@ -634,9 +642,9 @@ inequalities["theil_between_share"] = (
 We can visualize the three time series:
 
 ```python caption="Inequality indices (Gini, Theil), shown alongside Moran's I, with the Theil Decomposition into between-region and within-region components at bottom." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
-inequalities[["theil_between", "theil_within", "theil_between_share"]].plot(
-    subplots=True, figsize=(10, 8)
-);
+inequalities[
+    ["theil_between", "theil_within", "theil_between_share"]
+].plot(subplots=True, figsize=(10, 8));
 ```
 
  The between-region share of inequality is at its lowest in the mid-2000s, not in the mid-1990s. This suggests that regional differences were very important in the 1970s and 1980s, but this importance has been waning, relative to the inequality *within* US Census Regions. The ratio also generally shares the same pattern, but does not see minima in the same places.
@@ -734,7 +742,9 @@ Inference on this estimator is computationally demanding, since the pairwise dif
 
 ```python
 %%time
-spatial_gini_results = pci_df[years].apply(gini_spatial_by_col, weights=wq).T
+spatial_gini_results = (
+    pci_df[years].apply(gini_spatial_by_col, weights=wq).T
+)
 ```
 
 ```python
@@ -760,7 +770,9 @@ Second, when spatial dependence is high, nearby observations will be similar. So
 ```python caption="Relationship between the 'near differences' term of the Spatial Gini coefficient and Moran's I. The top, as a measure of spatial dissimilarity, should move in an opposite direction to the bottom, which measures spatial similarity (albeit in a different fashion)."
 inequalities["near_diffs"] = spatial_gini_results.near_diffs
 
-inequalities[["near_diffs", "I"]].plot.line(subplots=True, figsize=(15, 6));
+inequalities[["near_diffs", "I"]].plot.line(
+    subplots=True, figsize=(15, 6)
+);
 ```
 
 ## Conclusion

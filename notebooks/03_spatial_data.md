@@ -17,7 +17,9 @@ jupyter:
 import warnings, osmnx
 
 warnings.filterwarnings("ignore")
-osmnx.config(overpass_settings='[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]')
+osmnx.config(
+    overpass_settings='[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
+)
 ```
 
 # Spatial Data
@@ -53,7 +55,9 @@ Before proceeding, though, it helps to mention a quick clarification on terminol
 To understand the structure of geographic tables, it will help to read in the `countries_clean.gpkg` dataset included in this book that describes countries in the world. To read in this data, we can use the `read_file()` method in `geopandas`:[^package-v-function]
 
 ```python
-gt_polygons = geopandas.read_file("../data/countries/countries_clean.gpkg")
+gt_polygons = geopandas.read_file(
+    "../data/countries/countries_clean.gpkg"
+)
 ```
 
 And we can examine the top of the table with the `.head()` method:
@@ -96,7 +100,9 @@ Despite the fact that `centroid` is a geometry (you can tell because each cell s
 # Plot centroids
 ax = gt_polygons.set_geometry("centroid").plot("ADMIN", markersize=5)
 # Plot polygons without color filling
-gt_polygons.plot("ADMIN", ax=ax, facecolor="none", edgecolor="k", linewidth=0.2);
+gt_polygons.plot(
+    "ADMIN", ax=ax, facecolor="none", edgecolor="k", linewidth=0.2
+);
 ```
 
 Note again how we can create a map by calling `.plot()` on a `GeoDataFrame`. We can thematically color each feature based on a column by passing the name of that column to the plot method (as we do on with `ADMIN` in this case), and that the current geometry is used.
@@ -350,7 +356,9 @@ def row2cell(row, res_xy):
     maxX = row["x"] + (res_x / 2)
     minY = row["y"] + (res_y / 2)
     maxY = row["y"] - (res_y / 2)
-    poly = geometry.box(minX, minY, maxX, maxY)  # Build squared polygon
+    poly = geometry.box(
+        minX, minY, maxX, maxY
+    )  # Build squared polygon
     return poly
 ```
 
@@ -364,7 +372,9 @@ One of the benefits of this approach is we do not require entirely filled surfac
 
 ```python
 max_polys = (
-    t_surface.query("Value > 1000")  # Keep only cells with more than 1k people
+    t_surface.query(
+        "Value > 1000"
+    )  # Keep only cells with more than 1k people
     .apply(  # Build polygons for selected cells
         row2cell, res_xy=surface.attrs["res"], axis=1
     )
@@ -380,13 +390,17 @@ And generate a map with the same tooling that we use for any standard geo-table:
 # Plot polygons
 ax = max_polys.plot(edgecolor="red", figsize=(9, 9))
 # Add basemap
-cx.add_basemap(ax, crs=surface.attrs["crs"], source=cx.providers.CartoDB.Voyager);
+cx.add_basemap(
+    ax, crs=surface.attrs["crs"], source=cx.providers.CartoDB.Voyager
+);
 ```
 
 Finally, once we have operated on the data as a table, we may want to return to a surface-like data structure. This involves taking the same journey in the opposite direction as how we started. The sister method of `to_series` in `xarray` is `from_series`:
 
 ```python
-new_da = xarray.DataArray.from_series(t_surface.set_index(["band", "y", "x"])["Value"])
+new_da = xarray.DataArray.from_series(
+    t_surface.set_index(["band", "y", "x"])["Value"]
+)
 new_da
 ```
 
@@ -397,14 +411,18 @@ A second use case involves moving surfaces directly into geographic tables by ag
 Let's start by reading the data. First, the elevation model:
 
 ```python caption="Digital Elevation Model as a raster." tags=[]
-dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(band=1)
+dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(
+    band=1
+)
 dem.where(dem > 0).plot.imshow();
 ```
 
 And the neighborhood areas (tracts) from the Census:
 
 ```python caption="San Diego California Census Tracts." tags=[]
-sd_tracts = geopandas.read_file("../data/sandiego/sandiego_tracts.gpkg")
+sd_tracts = geopandas.read_file(
+    "../data/sandiego/sandiego_tracts.gpkg"
+)
 sd_tracts.plot();
 ```
 
@@ -413,9 +431,9 @@ There are several approaches to compute the average altitude of each neighborhoo
 Since this is somewhat complicated, we will start with a single polygon. For the illustration, we will use the largest one, located on the eastern side of San Diego. We can find the ID of the polygon with:
 
 ```python
-largest_tract_id = sd_tracts.query(f"area_sqm == {sd_tracts['area_sqm'].max()}").index[
-    0
-]
+largest_tract_id = sd_tracts.query(
+    f"area_sqm == {sd_tracts['area_sqm'].max()}"
+).index[0]
 
 largest_tract_id
 ```
@@ -430,7 +448,9 @@ Clipping the section of the surface that is within the polygon in the DEM can be
 
 ```python caption="DEM clipped to San Diego" tags=[]
 # Clip elevation for largest tract
-dem_clip = dem.rio.clip([largest_tract.__geo_interface__], crs=sd_tracts.crs)
+dem_clip = dem.rio.clip(
+    [largest_tract.__geo_interface__], crs=sd_tracts.crs
+)
 
 # Set up figure to display against polygon shape
 f, axs = plt.subplots(1, 2, figsize=(6, 3))
@@ -438,10 +458,14 @@ f, axs = plt.subplots(1, 2, figsize=(6, 3))
 dem_clip.where(dem_clip > 0).plot(ax=axs[0], add_colorbar=True)
 
 # Display largest tract polygon
-sd_tracts.loc[[largest_tract_id]].plot(ax=axs[1], edgecolor="red", facecolor="none")
+sd_tracts.loc[[largest_tract_id]].plot(
+    ax=axs[1], edgecolor="red", facecolor="none"
+)
 axs[1].set_axis_off()
 # Add basemap
-cx.add_basemap(axs[1], crs=sd_tracts.crs, source=cx.providers.Stamen.Terrain);
+cx.add_basemap(
+    axs[1], crs=sd_tracts.crs, source=cx.providers.Stamen.Terrain
+);
 ```
 
 Once we have elevation measurements for all the pixels within the tract, the average one can be calculated with `mean()`:
@@ -472,7 +496,9 @@ get_mean_elevation(sd_tracts.loc[largest_tract_id, :], dem)
 This method can then be run on each polygon in our series using the `apply()` method:
 
 ```python
-elevations = sd_tracts.head().apply(get_mean_elevation, dem=dem, axis=1)
+elevations = sd_tracts.head().apply(
+    get_mean_elevation, dem=dem, axis=1
+)
 elevations
 ```
 

@@ -51,7 +51,9 @@ import contextily  # Background tiles
 We read the vote data as a non-spatial table:
 
 ```python
-ref = pandas.read_csv("../data/brexit/brexit_vote.csv", index_col="Area_Code")
+ref = pandas.read_csv(
+    "../data/brexit/brexit_vote.csv", index_col="Area_Code"
+)
 ```
 
 And the spatial geometries for the local authority districts in Great Britain:
@@ -66,8 +68,12 @@ Then, we "trim" the `DataFrame` so it retains only what we know we will need, re
 
 ```python
 db = (
-    geopandas.GeoDataFrame(lads.join(ref[["Pct_Leave"]]), crs=lads.crs)
-    .to_crs(epsg=3857)[["objectid", "lad16nm", "Pct_Leave", "geometry"]]
+    geopandas.GeoDataFrame(
+        lads.join(ref[["Pct_Leave"]]), crs=lads.crs
+    )
+    .to_crs(epsg=3857)[
+        ["objectid", "lad16nm", "Pct_Leave", "geometry"]
+    ]
     .dropna()
 )
 
@@ -94,7 +100,9 @@ db.plot(
 )
 # Add basemap
 contextily.add_basemap(
-    ax, crs=db.crs, source=contextily.providers.CartoDB.VoyagerNoLabels
+    ax,
+    crs=db.crs,
+    source=contextily.providers.CartoDB.VoyagerNoLabels,
 )
 # Remove axes
 ax.set_axis_off();
@@ -116,7 +124,9 @@ To better understand the underpinnings of local spatial autocorrelation, we retu
 <!-- #endregion -->
 
 ```python
-db["w_Pct_Leave"] = weights.spatial_lag.lag_spatial(w, db["Pct_Leave"])
+db["w_Pct_Leave"] = weights.spatial_lag.lag_spatial(
+    w, db["Pct_Leave"]
+)
 ```
 
 And their respective standardized versions, where we subtract the average and divide by the standard deviation:
@@ -132,7 +142,9 @@ Technically speaking, creating a Moran Plot is very similar to creating any othe
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
-seaborn.regplot(x="Pct_Leave_std", y="w_Pct_Leave_std", data=db, ci=None);
+seaborn.regplot(
+    x="Pct_Leave_std", y="w_Pct_Leave_std", data=db, ci=None
+);
 ```
 
 Using standardized values, we can immediately divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: those with above-average leave voting, which have positive standardized values; and those with below-average leave voting, which feature negative standardized values. Applying this thinking to both the percentage to leave and its spatial lag, divides a Moran Plot in four quadrants. Each of them captures a situation based on whether a given area displays a value above the mean (high) or below (low) in either the original variable (`Pct_Leave`) or its spatial lag (`w_Pct_Leave_std`). Using this terminology, we name the four quadrants as follows: high-high (HH) for the top-right, low-high (LH) for the top-left, low-low (LL) for the bottom-left, and high-low (HL) for the bottom right. Graphically, we can capture this as follows:
@@ -141,7 +153,9 @@ Using standardized values, we can immediately divide each variable (the percenta
 # Setup the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
-seaborn.regplot(x="Pct_Leave_std", y="w_Pct_Leave_std", data=db, ci=None)
+seaborn.regplot(
+    x="Pct_Leave_std", y="w_Pct_Leave_std", data=db, ci=None
+)
 # Add vertical and horizontal lines
 plt.axvline(0, c="k", alpha=0.5)
 plt.axhline(0, c="k", alpha=0.5)
@@ -351,7 +365,13 @@ Next, we construct our quadrant values using the `q` attribute which records the
 # assign `0` otherwise (Non-significant polygons)
 spots = lisa.q * sig
 # Mapping from value to name (as a dict)
-spots_labels = {0: "Non-Significant", 1: "HH", 2: "LH", 3: "LL", 4: "HL"}
+spots_labels = {
+    0: "Non-Significant",
+    1: "HH",
+    2: "LH",
+    3: "LL",
+    4: "HL",
+}
 # Create column in `db` with labels for each polygon
 db["labels"] = pandas.Series(
     # First initialise a Series using values and `db` index
@@ -502,7 +522,9 @@ We take both steps in the following code snippet:
 ```python
 w_surface = weights.WSP2W(  # 3.Convert `WSP` object to `W`
     weights.WSP(  # 2.Build `WSP` from the float sparse matrix
-        w_surface_sp.sparse.astype(float)  # 1.Convert sparse matrix to floats
+        w_surface_sp.sparse.astype(
+            float
+        )  # 1.Convert sparse matrix to floats
     )
 )
 w_surface.index = w_surface_sp.index  # 4.Assign index to new `W`
@@ -534,7 +556,9 @@ At this point, we are ready to run a LISA the same way we have done in previousl
 
 ```python tags=[]
 # NOTE: this may take a bit longer to run depending on hardware
-pop_lisa = esda.moran.Moran_Local(pop_values.astype(float), w_surface, n_jobs=-1)
+pop_lisa = esda.moran.Moran_Local(
+    pop_values.astype(float), w_surface, n_jobs=-1
+)
 ```
 
 Note that, before computing the LISA, we ensure the population values are _also_ expressed as floats and thus in line with those in our spatial weights.
@@ -549,7 +573,10 @@ We are aiming to create a cluster plot. This means we want to display values tha
 
 ```python
 sig_pop = pandas.Series(
-    pop_lisa.q * (pop_lisa.p_sim < 0.01),  # Quadrant of significant at 1% (0 otherwise)
+    pop_lisa.q
+    * (
+        pop_lisa.p_sim < 0.01
+    ),  # Quadrant of significant at 1% (0 otherwise)
     index=pop_values.index,  # Index from the Series and aligned with `w_surface`
 )
 ```
@@ -561,7 +588,9 @@ The `sig_pop` object, expressed as a one-dimensional vector, contains the inform
 lisa_da = raster.w2da(
     sig_pop,  # Values
     w_surface,  # Spatial weights
-    attrs={"nodatavals": pop.attrs["nodatavals"]}  # Value for missing data
+    attrs={
+        "nodatavals": pop.attrs["nodatavals"]
+    }  # Value for missing data
     # Add CRS information in a compliant manner
 ).rio.write_crs(pop.rio.crs)
 ```
@@ -596,7 +625,9 @@ lc = {
 With these pieces, we can create the colormap object:
 
 ```python caption="Colormap for Local Moran's I Maps, starting with non-significant local scores in grey, and proceeding through high-high local statistics, low-high, low-low, then high-low."
-lisa_cmap = ListedColormap([lc["ns"], lc["HH"], lc["LH"], lc["LL"], lc["HL"]])
+lisa_cmap = ListedColormap(
+    [lc["ns"], lc["HH"], lc["LH"], lc["LL"], lc["HL"]]
+)
 lisa_cmap
 ```
 
@@ -613,7 +644,8 @@ pop.where(
     != pop.rio.nodata
     # Plot surface with a horizontal colorbar
 ).plot(
-    ax=axs[0], add_colorbar=False  # , cbar_kwargs={"orientation": "horizontal"}
+    ax=axs[0],
+    add_colorbar=False,  # , cbar_kwargs={"orientation": "horizontal"}
 )
 # Subplot 2 #
 # Select pixels with no missing data and rescale to [0, 1] by

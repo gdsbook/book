@@ -165,7 +165,13 @@ not_coastal = m1.u[~is_coastal]
 # Create histogram of the distribution of coastal residuals
 plt.hist(coastal, density=True, label="Coastal")
 # Create histogram of the distribution of non-coastal residuals
-plt.hist(not_coastal, histtype="step", density=True, linewidth=4, label="Not Coastal")
+plt.hist(
+    not_coastal,
+    histtype="step",
+    density=True,
+    linewidth=4,
+    label="Not Coastal",
+)
 # Add Line on 0
 plt.vlines(0, 0, 1, linestyle=":", color="k", linewidth=4)
 # Add legend
@@ -195,7 +201,11 @@ To make this more clear, we'll first sort the data by the median residual in tha
 # Create column with residual values from m1
 db["residual"] = m1.u
 # Obtain the median value of residuals in each neighbourhood
-medians = db.groupby("neighborhood").residual.median().to_frame("hood_residual")
+medians = (
+    db.groupby("neighborhood")
+    .residual.median()
+    .to_frame("hood_residual")
+)
 
 # Increase fontsize
 seaborn.set(font_scale=1.25)
@@ -241,7 +251,10 @@ This means that, when we compute the *spatial lag* of that $KNN$ weight and the 
 ```python caption="The relationship between prediction error for an Airbnb and the nearest Airbnb's prediction error. This suggests that if an Airbnb's nightly price is over-predicted, its nearby Airbnbs will also be over-predicted." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
 ax = seaborn.regplot(
-    m1.u.flatten(), lag_residual.flatten(), line_kws=dict(color="orangered"), ci=None
+    m1.u.flatten(),
+    lag_residual.flatten(),
+    line_kws=dict(color="orangered"),
+    ci=None,
 )
 ax.set_xlabel("Model Residuals - $u$")
 ax.set_ylabel("Spatial Lag of Model Residuals - $W u$");
@@ -345,7 +358,9 @@ When you inspect the regression diagnostics and output, you see that this covari
 
 ```python
 pandas.DataFrame(
-    [[m1.r2, m1.ar2], [m2.r2, m2.ar2]], index=["M1", "M2"], columns=["R2", "Adj. R2"]
+    [[m1.r2, m1.ar2], [m2.r2, m2.ar2]],
+    index=["M1", "M2"],
+    columns=["R2", "Adj. R2"],
 )
 ```
 
@@ -372,7 +387,10 @@ And, there still appears to be spatial structure in our model's errors:
 ```python caption="The relationship between prediction error and the nearest Airbnb's prediction error for the model including the 'Distance to Balboa Park' variable. Note the much stronger relationship here than before." tags=[]
 lag_residual = weights.spatial_lag.lag_spatial(knn, m2.u)
 ax = seaborn.regplot(
-    m2.u.flatten(), lag_residual.flatten(), line_kws=dict(color="orangered"), ci=None
+    m2.u.flatten(),
+    lag_residual.flatten(),
+    line_kws=dict(color="orangered"),
+    ci=None,
 )
 ax.set_xlabel("Residuals ($u$)")
 ax.set_ylabel("Spatial lag of residuals ($Wu$)");
@@ -405,7 +423,11 @@ import statsmodels.formula.api as sm
 This package provides a formula-like API, which allows us to express the *equation* we wish to estimate directly:
 
 ```python
-f = "log_price ~ " + " + ".join(variable_names) + " + neighborhood - 1"
+f = (
+    "log_price ~ "
+    + " + ".join(variable_names)
+    + " + neighborhood - 1"
+)
 print(f)
 ```
 
@@ -482,7 +504,9 @@ Then, we need to extract just the neighborhood name from the index of this Serie
 ```python
 # Create a sequence with the variable names without
 # `neighborhood[` and `]`
-stripped = neighborhood_effects.index.str.strip("neighborhood[").str.strip("]")
+stripped = neighborhood_effects.index.str.strip(
+    "neighborhood["
+).str.strip("]")
 # Reindex the neighborhood_effects Series on clean names
 neighborhood_effects.index = stripped
 # Convert Series to DataFrame
@@ -502,7 +526,9 @@ And we can then merge the spatial fixed effects and plot them on a map:
 
 ```python caption="Neighborhood effects on Airbnb nightly prices. Neighborhoods shown in grey are 'not statistically significant' in their effect on Airbnb prices." tags=[]
 # Plot base layer with all neighborhoods in grey
-ax = neighborhoods.plot(color="k", linewidth=0, alpha=0.5, figsize=(12, 6))
+ax = neighborhoods.plot(
+    color="k", linewidth=0, alpha=0.5, figsize=(12, 6)
+)
 # Merge SFE estimates (note not every polygon
 # receives an estimate since not every polygon
 # contains AirBnb properties)
@@ -525,7 +551,9 @@ neighborhoods.merge(
 )
 # Add basemap
 contextily.add_basemap(
-    ax, crs=neighborhoods.crs, source=contextily.providers.CartoDB.PositronNoLabels
+    ax,
+    crs=neighborhoods.crs,
+    source=contextily.providers.CartoDB.PositronNoLabels,
 )
 # Remove axis
 ax.set_axis_off()
@@ -593,14 +621,18 @@ coastal = [i for i in res.index if "1_" in i]
 ## Subset results to coastal and remove the 1_ underscore
 coastal = res.loc[coastal, :].rename(lambda i: i.replace("1_", ""))
 ## Build multi-index column names
-coastal.columns = pandas.MultiIndex.from_product([["Coastal"], coastal.columns])
+coastal.columns = pandas.MultiIndex.from_product(
+    [["Coastal"], coastal.columns]
+)
 # Non-coastal model
 ## Extract variables for the non-coastal regime
 ncoastal = [i for i in res.index if "0_" in i]
 ## Subset results to non-coastal and remove the 0_ underscore
 ncoastal = res.loc[ncoastal, :].rename(lambda i: i.replace("0_", ""))
 ## Build multi-index column names
-ncoastal.columns = pandas.MultiIndex.from_product([["Non-coastal"], ncoastal.columns])
+ncoastal.columns = pandas.MultiIndex.from_product(
+    [["Non-coastal"], ncoastal.columns]
+)
 # Concat both models
 pandas.concat([coastal, ncoastal], axis=1)
 ```
@@ -762,7 +794,9 @@ interpreted also in a similar way. To focus on the aspects that differ from the 
 
 ```python
 # Collect names of variables of interest
-vars_of_interest = db[variable_names].filter(like="pg_").join(wx).columns
+vars_of_interest = (
+    db[variable_names].filter(like="pg_").join(wx).columns
+)
 # Build full table of regression coefficients
 pandas.DataFrame(
     {
@@ -1118,23 +1152,44 @@ for order in range(1, 51, 5):
     random_lag_residual = weights.spatial_lag.lag_spatial(
         knn, random_residual
     )  # identical to random neighbors in KNN
-    correlations.append(numpy.corrcoef(m1.u.flatten(), lag_residual.flatten())[0, 1])
-    nulls.append(numpy.corrcoef(m1.u.flatten(), random_lag_residual.flatten())[0, 1])
+    correlations.append(
+        numpy.corrcoef(m1.u.flatten(), lag_residual.flatten())[0, 1]
+    )
+    nulls.append(
+        numpy.corrcoef(m1.u.flatten(), random_lag_residual.flatten())[
+            0, 1
+        ]
+    )
 ```
 
 ```python caption="Correlogram showing the change in correlation between prediction error at an Airbnb and its surroundings as the number of nearest neighbors increase. The null hypothesis, where residuals are shuffled around the map, shows no significant correlation at any distance. " tags=[]
 plt.plot(range(1, 51, 5), correlations)
 plt.plot(range(1, 51, 5), nulls, color="orangered")
-plt.hlines(numpy.mean(correlations[-3:]), *plt.xlim(), linestyle=":", color="k")
-plt.hlines(numpy.mean(nulls[-3:]), *plt.xlim(), linestyle=":", color="k")
+plt.hlines(
+    numpy.mean(correlations[-3:]),
+    *plt.xlim(),
+    linestyle=":",
+    color="k"
+)
+plt.hlines(
+    numpy.mean(nulls[-3:]), *plt.xlim(), linestyle=":", color="k"
+)
 plt.text(
-    s="Long-Run Correlation: ${:.2f}$".format(numpy.mean(correlations[-3:])),
+    s="Long-Run Correlation: ${:.2f}$".format(
+        numpy.mean(correlations[-3:])
+    ),
     x=25,
     y=0.3,
 )
-plt.text(s="Long-Run Null: ${:.2f}$".format(numpy.mean(nulls[-3:])), x=25, y=0.05)
+plt.text(
+    s="Long-Run Null: ${:.2f}$".format(numpy.mean(nulls[-3:])),
+    x=25,
+    y=0.05,
+)
 plt.xlabel("$K$: number of nearest neighbors")
-plt.ylabel("Correlation between site \n and neighborhood average of size $K$")
+plt.ylabel(
+    "Correlation between site \n and neighborhood average of size $K$"
+)
 plt.show()
 ```
 

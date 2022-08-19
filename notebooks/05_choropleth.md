@@ -448,7 +448,9 @@ adcms = pandas.DataFrame(fits)
 adcms["classifier"] = [c.name for c in class5]
 # Add column names to the ADCM
 adcms.columns = ["ADCM", "Classifier"]
-ax = seaborn.barplot(y="Classifier", x="ADCM", data=adcms, palette="Pastel1")
+ax = seaborn.barplot(
+    y="Classifier", x="ADCM", data=adcms, palette="Pastel1"
+)
 ```
 
 As is to be expected, the Fisher-Jenks classifier dominates all other k=5
@@ -522,7 +524,8 @@ different classifiers:
 
 ```python
 pandas.DataFrame(
-    {c.name: c.counts for c in class5}, index=["Class-{}".format(i) for i in range(5)]
+    {c.name: c.counts for c in class5},
+    index=["Class-{}".format(i) for i in range(5)],
 )
 ```
 
@@ -589,7 +592,9 @@ ax = mx.plot(
     edgecolor="k",  # Borderline color
     linewidth=0.1,  # Borderline width
     legend=True,  # Add legend
-    legend_kwds={"fmt": "{:.0f}"},  # Remove decimals in legend (for legibility)
+    legend_kwds={
+        "fmt": "{:.0f}"
+    },  # Remove decimals in legend (for legibility)
 )
 ax.set_axis_off();
 ```
@@ -621,7 +626,11 @@ rnk["class"] = pandas.cut(rnk["change"], [-numpy.inf, -5, 0, 5, 20])
 The `rnk` table now contains the change in rank positions of each state between 1940 and 2000, as well as a `class` column that binds together states in the  [-inf, -5), [-5, 0), [0, 5), [5, 20] groups. Note that these are descending ranks, so the wealthiest state in any period has a rank of 1 and therefore when considering the change in ranks, a negative change reflects moving down the income distribution. We can use a divergent palette to signify both intensity of the change in ranks, as well as direction:
 
 ```python caption="Divergent palette, Mexican State per capita income rank change." tags=[]
-ax = mx[["geometry"]].join(rnk).plot("class", legend=True, cmap="RdYlGn")
+ax = (
+    mx[["geometry"]]
+    .join(rnk)
+    .plot("class", legend=True, cmap="RdYlGn")
+)
 ax.set_axis_off();
 ```
 
@@ -680,7 +689,9 @@ In this last section of the chapter, we consider bespoke partitions of the data 
 To create a choropleth that reflects this partitioning of the data, we can use the `UserDefined` classifier in `mapclassify`:
 
 ```python
-classi = mapclassify.UserDefined(mx["PCGDP2000"], [10000, 12500, 15000])
+classi = mapclassify.UserDefined(
+    mx["PCGDP2000"], [10000, 12500, 15000]
+)
 classi
 ```
 
@@ -690,7 +701,9 @@ If we now want to display these classes on a map, we can use a similar approach 
 classi.plot(
     mx,  # Use geometries in the geo-table
     legend=True,  # Add a legend
-    legend_kwds={"loc": "upper right"},  # Place legend on top right corner
+    legend_kwds={
+        "loc": "upper right"
+    },  # Place legend on top right corner
     axis_on=False,  # Remove axis
     cmap="viridis_r",  # Use reverse Viridis
 );
@@ -702,7 +715,9 @@ The approach above is useful in that it is based on `mapclassify` and thus provi
 
 ```python caption="User-defined palette, `pandas` approach." tags=[]
 # Classify values specifying bins
-lbls = pandas.cut(mx["PCGDP2000"], [-numpy.inf, 10000, 12500, 15000, numpy.inf])
+lbls = pandas.cut(
+    mx["PCGDP2000"], [-numpy.inf, 10000, 12500, 15000, numpy.inf]
+)
 # Dynamically assign to geo-table and plot with a legend
 ax = mx.plot(lbls, cmap="viridis_r", legend=True)
 # Remove axis
@@ -740,7 +755,9 @@ for i, y in enumerate(years):
     mx.plot(
         y,  # Year to plot
         scheme="UserDefined",  # Use our own bins
-        classification_kwds={"bins": pooled.global_classifier.bins},  # Use global bins
+        classification_kwds={
+            "bins": pooled.global_classifier.bins
+        },  # Use global bins
         legend=True,  # Add a legend
         ax=axs[i],  # Plot on the corresponding axis
     )

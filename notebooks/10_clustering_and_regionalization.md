@@ -163,7 +163,13 @@ for i, col in enumerate(cluster_variables):
     # select the axis where the map will go
     ax = axs[i]
     # Plot the map
-    db.plot(column=col, ax=ax, scheme="Quantiles", linewidth=0, cmap="RdPu")
+    db.plot(
+        column=col,
+        ax=ax,
+        scheme="Quantiles",
+        linewidth=0,
+        cmap="RdPu",
+    )
     # Remove axis clutter
     ax.set_axis_off()
     # Set the axis title to the name of variable being plotted
@@ -204,10 +210,13 @@ the extent to which each variable contains spatial structure:
 # Set seed for reproducibility
 numpy.random.seed(123456)
 # Calculate Moran's I for each variable
-mi_results = [Moran(db[variable], w) for variable in cluster_variables]
+mi_results = [
+    Moran(db[variable], w) for variable in cluster_variables
+]
 # Structure results as a list of tuples
 mi_results = [
-    (variable, res.I, res.p_sim) for variable, res in zip(cluster_variables, mi_results)
+    (variable, res.I, res.p_sim)
+    for variable, res in zip(cluster_variables, mi_results)
 ]
 # Display on table
 table = pandas.DataFrame(
@@ -235,7 +244,9 @@ This would be too many maps to process visually. Instead, we focus directly
 on the bivariate relationships between each pair of attributes, devoid for now of geography, and use a scatterplot matrix.
 
 ```python caption="A scatter matrix demonstrating the various pair-wise dependencies between each of the variables considered in this section. Each 'facet', or little scatterplot, shows the relationship between the vairable in that column (as its horizontal axis) and that row (as its vertical axis). Since the diagonal represents the situation where the row and column have the same variable, it instead shows the univariate distribution of that variable."
-_ = seaborn.pairplot(db[cluster_variables], kind="reg", diag_kind="kde")
+_ = seaborn.pairplot(
+    db[cluster_variables], kind="reg", diag_kind="kde"
+)
 ```
 
 Two different types of plots are contained in the scatterplot matrix. On the
@@ -270,7 +281,9 @@ from sklearn import metrics
 ```
 
 ```python
-metrics.pairwise_distances(db[["income_gini", "median_house_value"]].head()).round(4)
+metrics.pairwise_distances(
+    db[["income_gini", "median_house_value"]].head()
+).round(4)
 ```
 
 In this case, we know that the housing values are in the hundreds of thousands, but the Gini coefficient (which we discussed in the previous chapter) is constrained to fall between zero and one. So, for example, the distance between the first two observations is nearly totally driven by the difference in median house value (which is 259100 dollars) and ignores the difference in the Gini coefficient (which is about .11). Indeed, a change of a single dollar in median house value will correspond to *the maximum possible* difference in Gini coefficients. So, a clustering algorithm that uses this distance to determine classifications will pay a lot of attention to median house value, but very little to the Gini coefficient! 
@@ -399,7 +412,9 @@ db["k5cls"] = k5cls.labels_
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot unique values choropleth including
 # a legend and with no boundary lines
-db.plot(column="k5cls", categorical=True, legend=True, linewidth=0, ax=ax)
+db.plot(
+    column="k5cls", categorical=True, legend=True, linewidth=0, ax=ax
+)
 # Remove axis
 ax.set_axis_off()
 # Display the map
@@ -530,7 +545,9 @@ tidy_db = tidy_db.stack()
 # Take indices into proper columns
 tidy_db = tidy_db.reset_index()
 # Rename column names
-tidy_db = tidy_db.rename(columns={"level_1": "Attribute", 0: "Values"})
+tidy_db = tidy_db.rename(
+    columns={"level_1": "Attribute", 0: "Values"}
+)
 # Check out result
 tidy_db.head()
 ```
@@ -642,7 +659,9 @@ tidy_db = tidy_db.stack()
 # Take indices into proper columns
 tidy_db = tidy_db.reset_index()
 # Rename column names
-tidy_db = tidy_db.rename(columns={"level_1": "Attribute", 0: "Values"})
+tidy_db = tidy_db.rename(
+    columns={"level_1": "Attribute", 0: "Values"}
+)
 # Check out result
 tidy_db.head()
 ```
@@ -680,7 +699,14 @@ f, axs = plt.subplots(1, 2, figsize=(12, 6))
 ax = axs[0]
 # Plot unique values choropleth including
 # a legend and with no boundary lines
-db.plot(column="ward5", categorical=True, cmap="Set2", legend=True, linewidth=0, ax=ax)
+db.plot(
+    column="ward5",
+    categorical=True,
+    cmap="Set2",
+    legend=True,
+    linewidth=0,
+    ax=ax,
+)
 # Remove axis
 ax.set_axis_off()
 # Add title
@@ -690,7 +716,14 @@ ax.set_title("K-Means solution ($k=5$)")
 ax = axs[1]
 # Plot unique values choropleth including
 # a legend and with no boundary lines
-db.plot(column="k5cls", categorical=True, cmap="Set3", legend=True, linewidth=0, ax=ax)
+db.plot(
+    column="k5cls",
+    categorical=True,
+    cmap="Set3",
+    legend=True,
+    linewidth=0,
+    ax=ax,
+)
 # Remove axis
 ax.set_axis_off()
 # Add title
@@ -761,7 +794,9 @@ in a cluster if they are also spatially connected:
 # Set the seed for reproducibility
 numpy.random.seed(123456)
 # Specify cluster model with spatial constraint
-model = AgglomerativeClustering(linkage="ward", connectivity=w.sparse, n_clusters=5)
+model = AgglomerativeClustering(
+    linkage="ward", connectivity=w.sparse, n_clusters=5
+)
 # Fit algorithm to the data
 model.fit(db_scaled)
 ```
@@ -773,7 +808,13 @@ db["ward5wq"] = model.labels_
 # Setup figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot unique values choropleth including a legend and with no boundary lines
-db.plot(column="ward5wq", categorical=True, legend=True, linewidth=0, ax=ax)
+db.plot(
+    column="ward5wq",
+    categorical=True,
+    legend=True,
+    linewidth=0,
+    ax=ax,
+)
 # Remove axis
 ax.set_axis_off()
 # Display the map
@@ -809,7 +850,9 @@ another AHC regionalization:
 # Set the seed for reproducibility
 numpy.random.seed(123456)
 # Specify cluster model with spatial constraint
-model = AgglomerativeClustering(linkage="ward", connectivity=w.sparse, n_clusters=5)
+model = AgglomerativeClustering(
+    linkage="ward", connectivity=w.sparse, n_clusters=5
+)
 # Fit algorithm to the data
 model.fit(db_scaled)
 ```
@@ -822,7 +865,13 @@ db["ward5wknn"] = model.labels_
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot unique values choropleth
 # including a legend and with no boundary lines
-db.plot(column="ward5wknn", categorical=True, legend=True, linewidth=0, ax=ax)
+db.plot(
+    column="ward5wknn",
+    categorical=True,
+    legend=True,
+    linewidth=0,
+    ax=ax,
+)
 # Remove axis
 ax.set_axis_off()
 # Display the map
@@ -857,7 +906,9 @@ for cluster_type in ("k5cls", "ward5", "ward5wq", "ward5wknn"):
     # compute the region polygons using a dissolve
     regions = db[[cluster_type, "geometry"]].dissolve(by=cluster_type)
     # compute the actual isoperimetric quotient for these regions
-    ipqs = regions.area * 4 * numpy.pi / (regions.boundary.length ** 2)
+    ipqs = (
+        regions.area * 4 * numpy.pi / (regions.boundary.length ** 2)
+    )
     # cast to a dataframe
     result = ipqs.to_frame(cluster_type)
     results.append(result)
@@ -894,9 +945,9 @@ for cluster_type in ("k5cls", "ward5", "ward5wq", "ward5wknn"):
     ch_scores.append((cluster_type, ch_score))
 
 # re-arrange the scores into a dataframe for display
-pandas.DataFrame(ch_scores, columns=["cluster type", "CH score"]).set_index(
-    "cluster type"
-)
+pandas.DataFrame(
+    ch_scores, columns=["cluster type", "CH score"]
+).set_index("cluster type")
 ```
 
 For all functions in `metrics` that end in "score", higher numbers indicate greater fit, whereas functions that end in `loss` work in the other direction. Thus, the K-means solution has the highest Calinski-Harabasz score, while the ward clustering comes second. The regionalizations both come *well* below the clusterings, too. As we said before, the improved geographical coherence comes at a pretty hefty cost in terms of feature goodness of fit. This is because regionalization is *constrained*, and mathematically *can not* achieve the same score as the unconstrained K-means solution, unless we get lucky and the k-means solution *is* a valid regionalization. 
@@ -919,7 +970,9 @@ for i_cluster_type in ("k5cls", "ward5", "ward5wq", "ward5wknn"):
         # and save the pair of cluster types with the score
         ami_scores.append((i_cluster_type, j_cluster_type, ami_score))
 # arrange the results into a dataframe
-results = pandas.DataFrame(ami_scores, columns=["source", "target", "similarity"])
+results = pandas.DataFrame(
+    ami_scores, columns=["source", "target", "similarity"]
+)
 # and spread the dataframe out into a square
 results.pivot("source", "target", "similarity")
 ```

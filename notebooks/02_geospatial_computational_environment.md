@@ -62,7 +62,10 @@ scientific community could study, understand, and replicate their findings.
 One of the most famous of these annotations are Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars, shown in Figure 1. 
 
 ```python caption="Galileo's drawings of Jupyter and the Medician stars, showing the power of diagrams inside of scientific texts." tags=["remove-input"]
-url = "https://upload.wikimedia.org/wikipedia/" "commons/c/ca/Medicean_Stars.png"
+url = (
+    "https://upload.wikimedia.org/wikipedia/"
+    "commons/c/ca/Medicean_Stars.png"
+)
 Image(url, width=250)
 ```
 

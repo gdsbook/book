@@ -72,7 +72,10 @@ for x, y in zip(xs.flatten(), ys.flatten()):
 # Convert to GeoSeries
 polys = geopandas.GeoSeries(polys)
 gdf = geopandas.GeoDataFrame(
-    {"geometry": polys, "id": ["P-%s" % str(i).zfill(2) for i in range(len(polys))]}
+    {
+        "geometry": polys,
+        "id": ["P-%s" % str(i).zfill(2) for i in range(len(polys))],
+    }
 )
 ```
 
@@ -88,7 +91,13 @@ for x, y, t in zip(
     [p.centroid.y - 0.25 for p in polys],
     [i for i in gdf["id"]],
 ):
-    plt.text(x, y, t, verticalalignment="center", horizontalalignment="center")
+    plt.text(
+        x,
+        y,
+        t,
+        verticalalignment="center",
+        horizontalalignment="center",
+    )
 
 # Remove axes
 ax.set_axis_off()
@@ -117,7 +126,13 @@ for x, y, t in zip(
     [p.centroid.y - 0.25 for p in polys],
     [i for i in gdf["id"]],
 ):
-    plt.text(x, y, t, verticalalignment="center", horizontalalignment="center")
+    plt.text(
+        x,
+        y,
+        t,
+        verticalalignment="center",
+        horizontalalignment="center",
+    )
 # Plot weights connectivity
 wr.plot(gdf, edge_kws=dict(color="r", linestyle=":"), ax=ax)
 # Remove axes
@@ -192,7 +207,13 @@ for x, y, t in zip(
     [p.centroid.y - 0.25 for p in polys],
     [i for i in gdf["id"]],
 ):
-    plt.text(x, y, t, verticalalignment="center", horizontalalignment="center")
+    plt.text(
+        x,
+        y,
+        t,
+        verticalalignment="center",
+        horizontalalignment="center",
+    )
 # Plot weights connectivity
 wq.plot(gdf, edge_kws=dict(color="r", linestyle=":"), ax=ax)
 # Remove axes
@@ -277,7 +298,9 @@ must construct it ourselves. Under the hood, `pysal` uses efficient spatial inde
 structures to extract these.
 
 ```python
-san_diego_tracts = geopandas.read_file("../data/sandiego/sandiego_tracts.gpkg")
+san_diego_tracts = geopandas.read_file(
+    "../data/sandiego/sandiego_tracts.gpkg"
+)
 w_queen = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
 ```
 
@@ -287,7 +310,9 @@ Like before, we can visualize the adjacency relationships, but they are much mor
 # Plot tract geography
 f, axs = plt.subplots(1, 2, figsize=(8, 4))
 for i in range(2):
-    ax = san_diego_tracts.plot(edgecolor="k", facecolor="w", ax=axs[i])
+    ax = san_diego_tracts.plot(
+        edgecolor="k", facecolor="w", ax=axs[i]
+    )
     # Plot graph connections
     w_queen.plot(
         san_diego_tracts,
@@ -483,7 +508,9 @@ If we now build a weights object with adaptive bandwidth (`fixed=False`), the va
 
 ```python
 # Build weights with adaptive bandwidth
-w_adaptive = weights.distance.Kernel.from_dataframe(sub_30, fixed=False, k=15)
+w_adaptive = weights.distance.Kernel.from_dataframe(
+    sub_30, fixed=False, k=15
+)
 # Print first five bandwidth values
 w_adaptive.bandwidth[:5]
 ```
@@ -494,14 +521,24 @@ And, we can visualize what these kernels look like on the map, too, by focusing 
 # Create full matrix version of weights
 full_matrix, ids = w_adaptive.full()
 # Set up figure with two subplots in a row
-f, ax = plt.subplots(1, 2, figsize=(12, 6), subplot_kw=dict(aspect="equal"))
+f, ax = plt.subplots(
+    1, 2, figsize=(12, 6), subplot_kw=dict(aspect="equal")
+)
 # Append weights for first polygon and plot on first subplot
-sub_30.assign(weight_0=full_matrix[0]).plot("weight_0", cmap="plasma", ax=ax[0])
+sub_30.assign(weight_0=full_matrix[0]).plot(
+    "weight_0", cmap="plasma", ax=ax[0]
+)
 # Append weights for 18th polygon and plot on first subplot
-sub_30.assign(weight_18=full_matrix[17]).plot("weight_18", cmap="plasma", ax=ax[1])
+sub_30.assign(weight_18=full_matrix[17]).plot(
+    "weight_18", cmap="plasma", ax=ax[1]
+)
 # Add centroid of focal tracts
-sub_30.iloc[[0], :].centroid.plot(ax=ax[0], marker="*", color="k", label="Focal Tract")
-sub_30.iloc[[17], :].centroid.plot(ax=ax[1], marker="*", color="k", label="Focal Tract")
+sub_30.iloc[[0], :].centroid.plot(
+    ax=ax[0], marker="*", color="k", label="Focal Tract"
+)
+sub_30.iloc[[17], :].centroid.plot(
+    ax=ax[1], marker="*", color="k", label="Focal Tract"
+)
 # Add titles
 ax[0].set_title("Kernel centered on first tract")
 ax[1].set_title("Kernel centered on 18th tract")
@@ -537,7 +574,9 @@ other observations are within the buffer. If they are, they are assigned a
 weight of one in the spatial weights matrix, if not they receive a zero.
 
 ```python
-w_bdb = weights.distance.DistanceBand.from_dataframe(gdf, 1.5, binary=True)
+w_bdb = weights.distance.DistanceBand.from_dataframe(
+    gdf, 1.5, binary=True
+)
 ```
 
 This creates a binary distance weights where every other observation within
@@ -549,7 +588,9 @@ everyone else. For this example we will return to the small lattice example
 covered in the beginning:
 
 ```python
-w_hy = weights.distance.DistanceBand.from_dataframe(gdf, 1.5, binary=False)
+w_hy = weights.distance.DistanceBand.from_dataframe(
+    gdf, 1.5, binary=False
+)
 ```
 
 We apply a threshold of 1.5 for this illustration. `pysal` truncates continuous
@@ -588,7 +629,9 @@ shapefile full of polygons):
 
 ```python
 # ignore curvature of the earth
-knn4_bad = weights.distance.KNN.from_shapefile("../data/texas/texas.shp", k=4)
+knn4_bad = weights.distance.KNN.from_shapefile(
+    "../data/texas/texas.shp", k=4
+)
 ```
 
 Next, let us take curvature into account. To do this, we require the
@@ -649,7 +692,8 @@ list of memberships. In this case, we will use the county membership:
 ```python
 # NOTE: since this is a large dataset, it might take a while to process
 w_bl = weights.util.block_weights(
-    san_diego_tracts["county"].values, ids=san_diego_tracts["GEOID"].values
+    san_diego_tracts["county"].values,
+    ids=san_diego_tracts["GEOID"].values,
 )
 ```
 
@@ -805,7 +849,10 @@ f, axs = plt.subplots(2, 2, figsize=(9, 9))
 ax = axs[0, 0]
 mx.plot(ax=ax)
 mx_queen.plot(
-    mx, edge_kws=dict(linewidth=1, color="orangered"), node_kws=dict(marker="*"), ax=ax
+    mx,
+    edge_kws=dict(linewidth=1, color="orangered"),
+    node_kws=dict(marker="*"),
+    ax=ax,
 )
 ax.set_axis_off()
 ax.set_title("Queen")
@@ -814,7 +861,10 @@ ax.set_title("Queen")
 ax = axs[0, 1]
 mx.plot(ax=ax)
 mx_knn4.plot(
-    mx, edge_kws=dict(linewidth=1, color="orangered"), node_kws=dict(marker="*"), ax=ax
+    mx,
+    edge_kws=dict(linewidth=1, color="orangered"),
+    node_kws=dict(marker="*"),
+    ax=ax,
 )
 ax.set_axis_off()
 ax.set_title("$K$-NN 4")
@@ -823,7 +873,10 @@ ax.set_title("$K$-NN 4")
 ax = axs[1, 0]
 mx.plot(column="INEGI2", categorical=True, cmap="Pastel2", ax=ax)
 mx_bw.plot(
-    mx, edge_kws=dict(linewidth=1, color="orangered"), node_kws=dict(marker="*"), ax=ax
+    mx,
+    edge_kws=dict(linewidth=1, color="orangered"),
+    node_kws=dict(marker="*"),
+    ax=ax,
 )
 ax.set_axis_off()
 ax.set_title("Block weights")
@@ -832,7 +885,10 @@ ax.set_title("Block weights")
 ax = axs[1, 1]
 mx.plot(column="INEGI2", categorical=True, cmap="Pastel2", ax=ax)
 mx_union.plot(
-    mx, edge_kws=dict(linewidth=1, color="orangered"), node_kws=dict(marker="*"), ax=ax
+    mx,
+    edge_kws=dict(linewidth=1, color="orangered"),
+    node_kws=dict(marker="*"),
+    ax=ax,
 )
 ax.set_axis_off()
 ax.set_title("Queen + Block")
@@ -1043,7 +1099,12 @@ After running our simulation, we get many distributions of pairwise differences 
 f = plt.figure(figsize=(12, 3))
 # Build background histogram for observed differences
 plt.hist(
-    adjlist_income["diff"], color="salmon", bins=50, density=True, alpha=1, linewidth=4
+    adjlist_income["diff"],
+    color="salmon",
+    bins=50,
+    density=True,
+    alpha=1,
+    linewidth=4,
 )
 # Plot simulated, random differences
 [
@@ -1084,10 +1145,14 @@ simulated_diffs.flatten().shape
 # Convert all simulated differences into a single vector
 pooled_diffs = simulated_diffs.flatten()
 # Calculate the 0.5th, 50th and 99.5th percentiles
-lower, median, upper = numpy.percentile(pooled_diffs, q=(0.5, 50, 99.5))
+lower, median, upper = numpy.percentile(
+    pooled_diffs, q=(0.5, 50, 99.5)
+)
 # Create a swith that is True if the value is "extreme"
 # (in the 0.5th percentile or/`|` in the 00.5th), False otherwise
-outside = (adjlist_income["diff"] < lower) | (adjlist_income["diff"] > upper)
+outside = (adjlist_income["diff"] < lower) | (
+    adjlist_income["diff"] > upper
+)
 ```
 
 Despite the fact that that our observed differences are less dispersed on average, we can identify two boundaries in the data that are in the top 1% most extreme differences in neighboring household incomes across the map. These boundaries are shown in the table below:
@@ -1107,23 +1172,37 @@ for i in range(2):
 
 # Zoom 1
 first_focus = san_diego_tracts.iloc[[473, 157]]
-ax[0].plot(first_focus.centroid.x, first_focus.centroid.y, color="red")
+ax[0].plot(
+    first_focus.centroid.x, first_focus.centroid.y, color="red"
+)
 west, east, south, north = first_focus.buffer(1000).total_bounds
 ax[0].axis([west, south, east, north])
 ax[0].set_axis_off()
 
 # Zoom 2
 second_focus = san_diego_tracts.iloc[[473, 163]]
-ax[1].plot(second_focus.centroid.x, second_focus.centroid.y, color="red")
+ax[1].plot(
+    second_focus.centroid.x, second_focus.centroid.y, color="red"
+)
 ax[1].axis([west, south, east, north])
 ax[1].set_axis_off()
 
 # Context
-san_diego_tracts.plot(facecolor="k", edgecolor="w", linewidth=0.5, alpha=0.5, ax=ax[2])
+san_diego_tracts.plot(
+    facecolor="k", edgecolor="w", linewidth=0.5, alpha=0.5, ax=ax[2]
+)
 contextily.add_basemap(ax[2], crs=san_diego_tracts.crs)
-area_of_focus = pandas.concat((first_focus, second_focus)).buffer(12000).total_bounds
-ax[2].plot(first_focus.centroid.x, first_focus.centroid.y, color="red")
-ax[2].plot(second_focus.centroid.x, second_focus.centroid.y, color="red")
+area_of_focus = (
+    pandas.concat((first_focus, second_focus))
+    .buffer(12000)
+    .total_bounds
+)
+ax[2].plot(
+    first_focus.centroid.x, first_focus.centroid.y, color="red"
+)
+ax[2].plot(
+    second_focus.centroid.x, second_focus.centroid.y, color="red"
+)
 west, east, south, north = area_of_focus
 ax[2].axis([west, south, east, north])
 ax[2].set_axis_off()

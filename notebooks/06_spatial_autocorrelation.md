@@ -81,8 +81,12 @@ Although there are several variables that could be considered, we will focus on 
 
 ```python
 db = (
-    geopandas.GeoDataFrame(lads.join(ref[["Pct_Leave"]]), crs=lads.crs)
-    .to_crs(epsg=3857)[["objectid", "lad16nm", "Pct_Leave", "geometry"]]
+    geopandas.GeoDataFrame(
+        lads.join(ref[["Pct_Leave"]]), crs=lads.crs
+    )
+    .to_crs(epsg=3857)[
+        ["objectid", "lad16nm", "Pct_Leave", "geometry"]
+    ]
     .dropna()
 )
 db.info()
@@ -105,7 +109,9 @@ db.plot(
     ax=ax,
 )
 contextily.add_basemap(
-    ax, crs=db.crs, source=contextily.providers.Stamen.TerrainBackground
+    ax,
+    crs=db.crs,
+    source=contextily.providers.Stamen.TerrainBackground,
 )
 ax.set_axis_off()
 ```
@@ -149,7 +155,9 @@ where $w_{ij}$ is the cell in $\textbf{W}$ on the $i$-th row and $j$-th column, 
 As we will discover throughout this book, the spatial lag is a key element of many spatial analysis techniques and, as such, it is fully supported in Pysal. To compute the spatial lag of a given variable, `Pct_Leave` for example, we can do it as follows:
 
 ```python
-db["Pct_Leave_lag"] = weights.spatial_lag.lag_spatial(w, db["Pct_Leave"])
+db["Pct_Leave_lag"] = weights.spatial_lag.lag_spatial(
+    w, db["Pct_Leave"]
+)
 ```
 
 Let us peek into two local authority districts to get a better intuition of what is behind the spatial lag:
@@ -335,7 +343,9 @@ In order to understand the intuition behind its math, it is useful to begin with
 
 ```python
 db["Pct_Leave_std"] = db["Pct_Leave"] - db["Pct_Leave"].mean()
-db["Pct_Leave_lag_std"] = db["Pct_Leave_lag"] - db["Pct_Leave_lag"].mean()
+db["Pct_Leave_lag_std"] = (
+    db["Pct_Leave_lag"] - db["Pct_Leave_lag"].mean()
+)
 ```
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot in Python:
@@ -343,7 +353,11 @@ Technically speaking, creating a Moran Plot is very similar to creating any othe
 ```python caption="BREXIT Leave vote, % leave Moran Scatter Plot." tags=[]
 f, ax = plt.subplots(1, figsize=(6, 6))
 seaborn.regplot(
-    x="Pct_Leave_std", y="Pct_Leave_lag_std", ci=None, data=db, line_kws={"color": "r"}
+    x="Pct_Leave_std",
+    y="Pct_Leave_lag_std",
+    ci=None,
+    data=db,
+    line_kws={"color": "r"},
 )
 ax.axvline(0, c="k", alpha=0.5)
 ax.axhline(0, c="k", alpha=0.5)
@@ -467,7 +481,9 @@ gao = esda.getisord.G(db["Pct_Leave"], w_db)
 Access to the statistic (`gao.G`) and additional attributes can be gained in the same way as with the previous statistics:
 
 ```python
-print("Getis & Ord G: %.3f | Pseudo P-value: %.3f" % (gao.G, gao.p_sim))
+print(
+    "Getis & Ord G: %.3f | Pseudo P-value: %.3f" % (gao.G, gao.p_sim)
+)
 ```
 
 Similarly, inference can also be carried out by relying on computational simulations that replicate several instances of spatial randomness using the values in the variable of interest, but shuffling their locations. In this case, the pseudo P-value computed suggests a clear departure from the hypothesis of no concentration.
