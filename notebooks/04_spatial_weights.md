@@ -26,7 +26,7 @@ warnings.filterwarnings("ignore")
 
 ## Introduction
 
-Spatial weightsoften express our knowledge about spatial relationships. 
+Spatial weights often express our knowledge about spatial relationships. 
 For example, proximity and adjacency are common spatial questions: *What neighborhoods are you surrounded by? How many gas stations are within 5 miles of my stalled car?*
 These are spatial questions that target specific information about the spatial configuration of a specific target ("a neighborhood," "my stalled car") and geographically connected relevant sites ("adjacent neighborhoods", "nearby gas stations"). For us to use this information in statistical analysis, it's often necessary to compute these relationships between all pairs of observations. This means that, for many applications in geographic data science, we are building a *topology*---a mathematical structure that expresses the connectivity between observations---that we can use to examine the data. Spatial weights matrices express this topology, letting us embed all of our observations in space together, rather than asking and answering single questions about features nearby a unit. 
 
@@ -103,7 +103,8 @@ A common way to express contiguity/adjacency relationships arises from an analog
 question share an *edge*. According to this definition, polygon $0$ would be a rook neighbor of $1$ and $3$, while $1$ would be a rook neighbor with $0$, $2$, and $4$. Applying this rule to all nine polygons we can model our neighbor relations as:
 
 ```python
-# Build a regular 3x3 lattice and draw it here
+# Build a rook contiguity matrix from a regular 3x3
+# lattice stored in a geo-table
 wr = weights.contiguity.Rook.from_dataframe(gdf)
 ```
 
@@ -178,7 +179,8 @@ requires the pair of polygons to only share one or more *vertices*. We can creat
 neighbor relations for this same configuration as follows:
 
 ```python
-# Build a regular 3x3 lattice and draw it here
+# Build a queen contiguity matrix from a regular 3x3
+# lattice stored in a geo-table
 wq = weights.contiguity.Queen.from_dataframe(gdf)
 wq.neighbors
 ```
@@ -1209,7 +1211,7 @@ Spatial weights are central to how we *represent* spatial relationships in mathe
 
 5. In this chapter, we worked with regular *square* lattices using the `lat2W` function. In the same manner, the `hexLat2W` function can generate *hexagonal regular lattices*. For lattices of size (3,3), (6,6), and (9,9) for Rook & Queen `lat2W`, as well as for `hexLat2W`:
 
-    1. examine the average cardinality. Does `lat2W` or `hexLat2W` have higher average cardinality? 
+    1. Examine the average cardinality. Does `lat2W` or `hexLat2W` have higher average cardinality? 
     2. Further, make a histogram of the cardinalities. Which type of lattice has higher variation in its number of neighbors? 
     3. Why is there no `rook=True` option in `hexLat2W`, as there is in `lat2W`?
 
