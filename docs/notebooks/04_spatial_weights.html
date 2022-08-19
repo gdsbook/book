@@ -736,7 +736,7 @@ title="Print to PDF"
 <p>“Spatial weights” are one way to represent graphs in geographic data science and spatial statistics. They are widely used constructs that represent geographic relationships between the observational units in a spatially referenced dataset. Implicitly, spatial weights connect objects in a geographic table to one another using the spatial relationships between them. By expressing the notion of geographical proximity or connectedness, spatial weights are the main mechanism through which the spatial relationships in geographical data is brought to bear in the subsequent analysis.</p>
 <section id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h2>
-<p>Spatial weightsoften express our knowledge about spatial relationships.
+<p>Spatial weights often express our knowledge about spatial relationships.
 For example, proximity and adjacency are common spatial questions: <em>What neighborhoods are you surrounded by? How many gas stations are within 5 miles of my stalled car?</em>
 These are spatial questions that target specific information about the spatial configuration of a specific target (“a neighborhood,” “my stalled car”) and geographically connected relevant sites (“adjacent neighborhoods”, “nearby gas stations”). For us to use this information in statistical analysis, it’s often necessary to compute these relationships between all pairs of observations. This means that, for many applications in geographic data science, we are building a <em>topology</em>—a mathematical structure that expresses the connectivity between observations—that we can use to examine the data. Spatial weights matrices express this topology, letting us embed all of our observations in space together, rather than asking and answering single questions about features nearby a unit.</p>
 <div class="cell docutils container">
@@ -793,7 +793,7 @@ more complicated. The first complication is that there are different ways that o
 </div>
 </div>
 </div>
-<p>which results in the grid shown in Figure 1.</p>
+<p>which results in the grid shown in the following figure.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plot grid geotable</span>
@@ -823,13 +823,14 @@ more complicated. The first complication is that there are different ways that o
 question share an <em>edge</em>. According to this definition, polygon <span class="math notranslate nohighlight">\(0\)</span> would be a rook neighbor of <span class="math notranslate nohighlight">\(1\)</span> and <span class="math notranslate nohighlight">\(3\)</span>, while <span class="math notranslate nohighlight">\(1\)</span> would be a rook neighbor with <span class="math notranslate nohighlight">\(0\)</span>, <span class="math notranslate nohighlight">\(2\)</span>, and <span class="math notranslate nohighlight">\(4\)</span>. Applying this rule to all nine polygons we can model our neighbor relations as:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build a regular 3x3 lattice and draw it here</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build a rook contiguity matrix from a regular 3x3</span>
+<span class="c1"># lattice stored in a geo-table</span>
 <span class="n">wr</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Rook</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Note the pattern we use to build the <code class="docutils literal notranslate"><span class="pre">w</span></code> object, which is similar across the library: we specify the criterium we want for the weights (<code class="docutils literal notranslate"><span class="pre">weights.contiguity.Rook</span></code>) and then the “constructor” we will use (<code class="docutils literal notranslate"><span class="pre">from_dataframe</span></code>). We can visualise the result plotted on top of the same grid of labeled polygons, using red dotted lines to represent the edges between a pair of nodes (polygon centroids in this case). We can see this in Figure 2.</p>
+<p>Note the pattern we use to build the <code class="docutils literal notranslate"><span class="pre">w</span></code> object, which is similar across the library: we specify the criterium we want for the weights (<code class="docutils literal notranslate"><span class="pre">weights.contiguity.Rook</span></code>) and then the “constructor” we will use (<code class="docutils literal notranslate"><span class="pre">from_dataframe</span></code>). We can visualise the result plotted on top of the same grid of labeled polygons, using red dotted lines to represent the edges between a pair of nodes (polygon centroids in this case). We can see this in the following figure.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure</span>
@@ -1068,7 +1069,8 @@ requires the pair of polygons to only share one or more <em>vertices</em>. We ca
 neighbor relations for this same configuration as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build a regular 3x3 lattice and draw it here</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build a queen contiguity matrix from a regular 3x3</span>
+<span class="c1"># lattice stored in a geo-table</span>
 <span class="n">wq</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">contiguity</span><span class="o">.</span><span class="n">Queen</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">gdf</span><span class="p">)</span>
 <span class="n">wq</span><span class="o">.</span><span class="n">neighbors</span>
 </pre></div>
@@ -1088,7 +1090,7 @@ neighbor relations for this same configuration as follows:</p>
 </div>
 </div>
 </div>
-<p>In addition to this neighbors representation, we can also express the graph visually, as done before. This is shown in Figure 3.</p>
+<p>In addition to this neighbors representation, we can also express the graph visually, as done before. This is shown in the following figure.</p>
 <div class="cell tag_hide-input docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure</span>
@@ -2159,7 +2161,7 @@ However, spatial weights are also useful in their own right, such as when examin
 One clear use case that arises in the analysis of social data is to characterize latent <em>data discontinuities</em>. By <em>data discontinuity</em>, we mean a single border (or collection of borders) where data for a variable (or many variables) of interest change abruptly.
 These can be used in models of inequality <span id="id3">[<a class="reference internal" href="references.html#id22" title="Nema Dean, Guanpeng Dong, Aneta Piekut, and Gwilym Pryce. Frontiers in residential segregation: understanding neighbourhood boundaries and their impacts. Tijdschrift voor economische en sociale geografie, 110(3):271–288, 2019.">DDPP19</a>, <a class="reference internal" href="references.html#id24" title="Matthew C Fitzpatrick, Evan L Preisser, Adam Porter, Joseph Elkinton, Lance A Waller, Bradley P Carlin, and Aaron M Ellison. Ecological boundary detection using bayesian areal wombling. Ecology, 91(12):3448–3455, 2010.">FPP+10</a>, <a class="reference internal" href="references.html#id40" title="Haolan Lu and Bradley P Carlin. Bayesian areal wombling for geographical boundary analysis. Geographical Analysis, 37(3):265–285, 2005.">LC05</a>]</span> or used to adapt classic empirical outlier detection methods.
 Below, we’ll show one model-free way to identify empirical boundaries in your data.</p>
-<p>First, let’s consider the median household income for our census tracts in San Diego, shown in Figure 12.</p>
+<p>First, let’s consider the median household income for our census tracts in San Diego, shown in the following figure.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
@@ -2695,7 +2697,7 @@ memory usage: 134.5 KB
 <li><p>Comparing their average cardinality and percentage of nonzero links, which graph in this chapter has the <em>most sparse</em> structure? That is, which graph is the most sparsely connected?</p></li>
 <li><p>In this chapter, we worked with regular <em>square</em> lattices using the <code class="docutils literal notranslate"><span class="pre">lat2W</span></code> function. In the same manner, the <code class="docutils literal notranslate"><span class="pre">hexLat2W</span></code> function can generate <em>hexagonal regular lattices</em>. For lattices of size (3,3), (6,6), and (9,9) for Rook &amp; Queen <code class="docutils literal notranslate"><span class="pre">lat2W</span></code>, as well as for <code class="docutils literal notranslate"><span class="pre">hexLat2W</span></code>:</p>
 <ol class="simple">
-<li><p>examine the average cardinality. Does <code class="docutils literal notranslate"><span class="pre">lat2W</span></code> or <code class="docutils literal notranslate"><span class="pre">hexLat2W</span></code> have higher average cardinality?</p></li>
+<li><p>Examine the average cardinality. Does <code class="docutils literal notranslate"><span class="pre">lat2W</span></code> or <code class="docutils literal notranslate"><span class="pre">hexLat2W</span></code> have higher average cardinality?</p></li>
 <li><p>Further, make a histogram of the cardinalities. Which type of lattice has higher variation in its number of neighbors?</p></li>
 <li><p>Why is there no <code class="docutils literal notranslate"><span class="pre">rook=True</span></code> option in <code class="docutils literal notranslate"><span class="pre">hexLat2W</span></code>, as there is in <code class="docutils literal notranslate"><span class="pre">lat2W</span></code>?</p></li>
 </ol>
