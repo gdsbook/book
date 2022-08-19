@@ -47,7 +47,7 @@ makes our scientific practices *Science*. Indeed the scientific process, underst
 we "stand on the shoulders of giants" and progress through dialectic, can only
 work properly if the
 community can access and study both results _and_ the process that created
-them. Thus, transparency, accessibility, and inclusivemenss are critical for good science.
+them. Thus, transparency, accessibility, and inclusiveness are critical for good science.
 
 To better understand the argument behind contemporary Open Science, it is useful
 to understand its history. The idea of openness was a core committment of early scientists. 
@@ -200,7 +200,7 @@ software stack, such as the operating system, and even some hardware
 requirements, such as the use of specific chips such as graphics processing
 units (GPU). Additionally, a reproducible platform will also specify the
 versions of packages that are required to recreate the results presented in a
-notebook, since changes to packages can change the results of computations o rbreak analytical workflows entirely.
+notebook, since changes to packages can change the results of computations or break analytical workflows entirely.
 
 Unlike open source packages, the notion of reproducible platforms is not as
 widespread and generally agreed upon. Its necessity has only become apparent more
@@ -265,7 +265,7 @@ official GitHub specification of the so-called GitHub-Flavored markdown
 Code cells are boxes that contain snippets of computer code. In this
 book, all code will be Python, but Jupyter notebooks are flexible enough to
 work with other languages.[^kernel_list] 
-In Jupyter, c}ode cells look like this:
+In Jupyter, code cells look like this:
 
 [^kernel_list]: A full list of supported kernels for Jupyter is available at [`https://github.com/jupyter/jupyter/wiki/Jupyter-kernels`](https://github.com/jupyter/jupyter/wiki/Jupyter-kernels)
 
@@ -287,7 +287,7 @@ directly to the notebook environment. Let us see how this can be done
 practically. To be able to demonstrate it, we will need to _import_ the
 `display` module[^import]:
 
-[^counters]: This counter may not always be visible in all of the foramts a notbook may be viewed. In this book, cell numbers will not be visible on paper, but they will be visible in the online versions of the notebook.
+[^counters]: This counter may not always be visible in all of the formats a notebook may be viewed. In this book, cell numbers will not be visible on paper, but they will be visible in the online versions of the notebook.
 
 [^import]: Skip to the next section if you want to learn more about
 importing packages)
