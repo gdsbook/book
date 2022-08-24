@@ -1,9 +1,9 @@
 # Home
 ## Geographic Data Science with Python
 
-* Sergio J. Rey
-* Dani Arribas-Bel
-* Levi J. Wolf
+* [Sergio J. Rey](https://sergerey.org/)
+* [Dani Arribas-Bel](https://darribas.org)
+* [Levi J. Wolf](http://www.ljwolf.org/)
 
 ## Introduction
 
@@ -173,14 +173,14 @@ packages only become significant if they do more, better, or both than the
 existing ones. At any rate, this constantly and rapidly changing context made
 us think more thoroughly about the computational infrastructure and, over
 time, we learned to take it more as a feature rather than a bug (it also
-inspired us to write Chapter 3!). 
+inspired us to write [Chapter 2](notebooks/02_geospatial_computational_environment)!). 
 
-Besides technical challenges, writing a textbook based on notebooks has also
+Besides technical challenges, creating a textbook based on notebooks has also
 unearthed more conceptual aspects we had not anticipated. Writing computational
-notebooks is qualitatively different from writing a traditional textbook. As. discussed before, the
+notebooks is qualitatively different from writing a traditional textbook. As discussed before, the
 writing process changes when you weave code and narrative, and that takes
 additional effort and explicit design choices. Furthermore, we wanted this book's content  be available online as a
-free website, so we were effectively writing for both print _and_ the web in the
+free website, so we were effectively catering to both print _and_ the web in the
 same document. This
 often meant tricky tradeoff's and, sometimes, settling for a (smaller)
 common shared subset of options and functionality. All in all, this book has
