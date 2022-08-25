@@ -23,6 +23,20 @@ lablocal:
     
 sync: 
 	jupytext --sync ./notebooks/*.ipynb
+
+rerun:
+	echo "import matplotlib.pyplot as plt\nplt.rcParams['figure.dpi']=300" \
+			> ~/.ipython/profile_default/startup/00.py
+	jupyter nbconvert --to notebook\
+			--execute \
+			--output-dir=build \
+			--ExecutePreprocessor.timeout=600 \
+			--ExecutePreprocessor.ipython_hist_file='' \
+			notebooks/*ipynb
+	mv build/*ipynb ./notebooks/
+	make sync
+	rm ~/.ipython/profile_default/startup/00.py
+
     
 html: sync
 	echo "Cleaning up existing tmp_book folder..."
@@ -70,7 +84,7 @@ test:
 
 	rm -rf tests
 	echo "########\n\nAll blocks passed\n\n########"
-    
+
 pack_site: html
 	rm -f gdsbook_site.zip
 	cd docs && zip -r ../gdsbook_site.zip ./
