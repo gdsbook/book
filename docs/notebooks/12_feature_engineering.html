@@ -717,8 +717,8 @@ title="Print to PDF"
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">geopandas</span><span class="o">,</span> <span class="nn">pandas</span><span class="o">,</span> <span class="nn">libpysal.weights</span> <span class="k">as</span> <span class="nn">weights</span><span class="o">,</span> <span class="nn">contextily</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">cenpy</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">cenpy</span>
 <span class="kn">import</span> <span class="nn">osmnx</span>
 <span class="kn">import</span> <span class="nn">seaborn</span>
 <span class="kn">import</span> <span class="nn">rasterio</span>
@@ -768,7 +768,10 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_9_0.png" src="../_images/12_feature_engineering_9_0.png" />
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;AxesSubplot:&gt;
+</pre></div>
+</div>
+<img alt="../_images/12_feature_engineering_9_1.png" src="../_images/12_feature_engineering_9_1.png" />
 </div>
 </div>
 <p>Using this polygon, we can use the <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we’ll request POIs within San Diego that are “restaurants” or “bars,” according to their metadata stored in OpenStreetMap. Once returned, we only keep a few columns to keep the table small and tidy:</p>
@@ -791,8 +794,8 @@ title="Print to PDF"
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 333 ms, sys: 214 ms, total: 548 ms
-Wall time: 313 ms
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 1.75 s, sys: 47.5 ms, total: 1.8 s
+Wall time: 1.81 s
 </pre></div>
 </div>
 </div>
@@ -815,7 +818,7 @@ Wall time: 313 ms
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>amenity
 bar            308
-restaurant    1050
+restaurant    1060
 Name: amenity, dtype: int64
 </pre></div>
 </div>
@@ -864,10 +867,6 @@ Name: amenity, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
 Name: WGS 84
 Axis Info [ellipsoidal]:
@@ -876,7 +875,7 @@ Axis Info [ellipsoidal]:
 Area of Use:
 - name: World.
 - bounds: (-180.0, -90.0, 180.0, 90.0)
-Datum: World Geodetic System 1984
+Datum: World Geodetic System 1984 ensemble
 - Ellipsoid: WGS 84
 - Prime Meridian: Greenwich
 </pre></div>
@@ -899,7 +898,7 @@ Axis Info [ellipsoidal]:
 Area of Use:
 - name: World.
 - bounds: (-180.0, -90.0, 180.0, 90.0)
-Datum: World Geodetic System 1984
+Datum: World Geodetic System 1984 ensemble
 - Ellipsoid: WGS 84
 - Prime Meridian: Greenwich
 </pre></div>
@@ -966,6 +965,12 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.9/site-packages/IPython/core/interactiveshell.py:3364: FutureWarning: The `op` parameter is deprecated and will be removed in a future release. Please use the `predicate` parameter instead.
+  if (await self.run_code(code, result,  async_=asy)):
+</pre></div>
+</div>
+</div>
 </div>
 <p>The resulting <code class="docutils literal notranslate"><span class="pre">joined</span></code> object contains a row for every pair of POI and AirBnB that are linked. From there, we can apply a group-by operation, using the AirBnB ID, and count how many POIs each AirBnB has within 500m of distance:</p>
 <div class="cell docutils container">
@@ -988,10 +993,6 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_html"><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -1051,12 +1052,6 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <p>We can visualize now the distribution of counts to get a sense of how “well-served” AirBnB properties are arranged over space:</p>
 <div class="cell docutils container">
@@ -1110,11 +1105,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_38_1.png" src="../_images/12_feature_engineering_38_1.png" />
+<img alt="../_images/12_feature_engineering_38_0.png" src="../_images/12_feature_engineering_38_0.png" />
 </div>
 </div>
 <p>Let’s first check the CRS is aligned with our sample of point locations:</p>
@@ -1248,11 +1239,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_48_1.png" src="../_images/12_feature_engineering_48_1.png" />
+<img alt="../_images/12_feature_engineering_48_0.png" src="../_images/12_feature_engineering_48_0.png" />
 </div>
 </div>
 </section>
@@ -1263,12 +1250,6 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsRegressor</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1289,12 +1270,6 @@ Datum: NAD83 (High Accuracy Reference Network)
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">two_bed_home_locations</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
     <span class="p">(</span><span class="n">two_bed_homes</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">two_bed_homes</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1378,23 +1353,11 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <p>And then we predict at the grid cell locations:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1408,11 +1371,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_68_1.png" src="../_images/12_feature_engineering_68_1.png" />
+<img alt="../_images/12_feature_engineering_68_0.png" src="../_images/12_feature_engineering_68_0.png" />
 </div>
 </div>
 <p>The map is a result not only of the underlying data but also the algorithm we have used. For example, you can see that the surface gets smoother as you increase the number of nearest neighbors to consider:</p>
@@ -1450,11 +1409,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_70_1.png" src="../_images/12_feature_engineering_70_1.png" />
+<img alt="../_images/12_feature_engineering_70_0.png" src="../_images/12_feature_engineering_70_0.png" />
 </div>
 </div>
 <p>Focusing in on central San Diego tells the story a bit more clearly, since there are interesting points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface. To visualise a zoom into the region, we begin by extracting its bounding box:</p>
@@ -1467,12 +1422,6 @@ Datum: NAD83 (High Accuracy Reference Network)
     <span class="n">central_xmax</span><span class="p">,</span>
     <span class="n">central_ymax</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">=</span> <span class="n">central_sd_bounds</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1545,23 +1494,19 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
-<span class="n">acs</span> <span class="o">=</span> <span class="n">cenpy</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ACS</span><span class="p">()</span>
-<span class="n">sd_pop</span> <span class="o">=</span> <span class="n">acs</span><span class="o">.</span><span class="n">from_msa</span><span class="p">(</span>
-    <span class="s2">&quot;San Diego, CA&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;tract&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">]</span>
-<span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">acs</span> <span class="o">=</span> <span class="n">cenpy</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">ACS</span><span class="p">()</span>
+    <span class="n">sd_pop</span> <span class="o">=</span> <span class="n">acs</span><span class="o">.</span><span class="n">from_msa</span><span class="p">(</span>
+        <span class="s2">&quot;San Diego, CA&quot;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;tract&quot;</span><span class="p">,</span> <span class="n">variables</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;B02001_001E&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">sd_pop</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;../data/cache/sd_census.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GPKG&#39;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Remote loading failed...&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-/opt/conda/lib/python3.8/site-packages/pyproj/crs/crs.py:53: FutureWarning: &#39;+init=&lt;authority&gt;:&lt;code&gt;&#39; syntax is deprecated. &#39;&lt;authority&gt;:&lt;code&gt;&#39; is the preferred initialization method. When making the change, be mindful of axis order changes: https://pyproj4.github.io/pyproj/stable/gotchas.html#axis-order-changes-in-proj-6
-  return _prepare_from_string(&quot; &quot;.join(pjargs))
-</pre></div>
-</div>
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2.77 s, sys: 236 ms, total: 3.01 s
-Wall time: 42.2 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Remote loading failed...
 </pre></div>
 </div>
 </div>
@@ -1637,10 +1582,6 @@ dtypes: float64(8), geometry(1), int64(13), object(6)
 memory usage: 1.4+ MB
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 </div>
 </div>
 </section>
@@ -1657,7 +1598,7 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/rasterstats/io.py:24: DeprecationWarning: Using or importing the ABCs from &#39;collections&#39; instead of from &#39;collections.abc&#39; is deprecated since Python 3.3, and in 3.9 it will stop working
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.9/site-packages/rasterstats/io.py:24: DeprecationWarning: Using or importing the ABCs from &#39;collections&#39; instead of from &#39;collections.abc&#39; is deprecated since Python 3.3, and in 3.10 it will stop working
   from collections import Iterable, Mapping
 </pre></div>
 </div>
@@ -1668,14 +1609,6 @@ memory usage: 1.4+ MB
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">h3</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/h3_grid/sd_h3_grid.gpkg&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-/opt/conda/lib/python3.8/site-packages/geopandas/geodataframe.py:577: RuntimeWarning: Sequential read of iterator was interrupted. Resetting iterator. This can negatively impact the performance.
-  for feature in features_lst:
 </pre></div>
 </div>
 </div>
@@ -1756,11 +1689,7 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_96_1.png" src="../_images/12_feature_engineering_96_1.png" />
+<img alt="../_images/12_feature_engineering_95_0.png" src="../_images/12_feature_engineering_95_0.png" />
 </div>
 </div>
 <p>And similarly for population density:</p>
@@ -1810,11 +1739,7 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_98_1.png" src="../_images/12_feature_engineering_98_1.png" />
+<img alt="../_images/12_feature_engineering_97_0.png" src="../_images/12_feature_engineering_97_0.png" />
 </div>
 </div>
 </section>
@@ -1837,12 +1762,6 @@ memory usage: 1.4+ MB
 <span class="n">d500_w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">DistanceBand</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span>
     <span class="n">airbnbs_albers</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">silence_warnings</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -1873,7 +1792,7 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_105_0.png" src="../_images/12_feature_engineering_105_0.png" />
+<img alt="../_images/12_feature_engineering_104_0.png" src="../_images/12_feature_engineering_104_0.png" />
 </div>
 </div>
 </section>
@@ -1891,12 +1810,6 @@ memory usage: 1.4+ MB
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-</div>
 </div>
 <p>While related, these features contain quite distinct pieces of information, and both may prove useful in modeling:</p>
 <div class="cell docutils container">
@@ -1910,7 +1823,7 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_109_0.png" src="../_images/12_feature_engineering_109_0.png" />
+<img alt="../_images/12_feature_engineering_108_0.png" src="../_images/12_feature_engineering_108_0.png" />
 </div>
 </div>
 <p>If we were instead interested in the most common number of bedrooms, rather than the average, we could use the <code class="docutils literal notranslate"><span class="pre">lag_categorical</span></code> function, which will consider each value as a category and return the most common value in each neighbor set:</p>
@@ -1923,12 +1836,12 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/spatial_lag.py:167: DeprecationWarning: `np.int` is a deprecated alias for the builtin `int`. To silence this warning, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.9/site-packages/libpysal/weights/spatial_lag.py:167: DeprecationWarning: `np.int` is a deprecated alias for the builtin `int`. To silence this warning, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
 Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
   normalized_labels = np.zeros(y.shape, dtype=np.int)
-/opt/conda/lib/python3.8/site-packages/numpy/core/fromnumeric.py:3419: RuntimeWarning: Mean of empty slice.
+/opt/conda/lib/python3.9/site-packages/numpy/core/fromnumeric.py:3440: RuntimeWarning: Mean of empty slice.
   return _methods._mean(a, axis=axis, dtype=dtype,
-/opt/conda/lib/python3.8/site-packages/numpy/core/_methods.py:188: RuntimeWarning: invalid value encountered in double_scalars
+/opt/conda/lib/python3.9/site-packages/numpy/core/_methods.py:189: RuntimeWarning: invalid value encountered in double_scalars
   ret = ret.dtype.type(ret / rcount)
 </pre></div>
 </div>
@@ -1971,9 +1884,11 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
       <th>4.0</th>
       <th>5.0</th>
       <th>6.0</th>
+      <th>7.0</th>
     </tr>
     <tr>
       <th>bedrooms</th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -1986,82 +1901,90 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
   <tbody>
     <tr>
       <th>0.0</th>
-      <td>5</td>
+      <td>4</td>
       <td>391</td>
-      <td>39</td>
-      <td>8</td>
-      <td>1</td>
+      <td>40</td>
+      <td>7</td>
+      <td>3</td>
       <td>0</td>
-      <td>1</td>
+      <td>0</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>1.0</th>
-      <td>2</td>
-      <td>3068</td>
+      <td>3</td>
+      <td>3064</td>
       <td>215</td>
-      <td>32</td>
+      <td>33</td>
       <td>17</td>
-      <td>4</td>
+      <td>5</td>
       <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>2.0</th>
       <td>1</td>
-      <td>977</td>
-      <td>268</td>
-      <td>13</td>
+      <td>978</td>
+      <td>269</td>
+      <td>11</td>
       <td>3</td>
       <td>1</td>
+      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>3.0</th>
-      <td>3</td>
-      <td>427</td>
-      <td>164</td>
-      <td>37</td>
-      <td>11</td>
       <td>2</td>
+      <td>429</td>
+      <td>164</td>
+      <td>34</td>
+      <td>12</td>
+      <td>3</td>
+      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>4.0</th>
       <td>0</td>
-      <td>168</td>
-      <td>55</td>
+      <td>164</td>
+      <td>60</td>
       <td>11</td>
-      <td>31</td>
+      <td>30</td>
       <td>5</td>
       <td>3</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>5.0</th>
       <td>0</td>
-      <td>53</td>
-      <td>16</td>
+      <td>51</td>
+      <td>17</td>
       <td>3</td>
       <td>8</td>
       <td>18</td>
       <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>6.0</th>
       <td>0</td>
-      <td>13</td>
-      <td>9</td>
+      <td>12</td>
+      <td>10</td>
+      <td>1</td>
+      <td>4</td>
       <td>2</td>
-      <td>3</td>
-      <td>2</td>
+      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>7.0</th>
       <td>0</td>
-      <td>5</td>
+      <td>6</td>
       <td>1</td>
       <td>2</td>
       <td>1</td>
-      <td>1</td>
+      <td>0</td>
+      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
@@ -2069,6 +1992,7 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
       <td>0</td>
       <td>3</td>
       <td>1</td>
+      <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
@@ -2083,11 +2007,13 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
       <td>0</td>
       <td>0</td>
       <td>0</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>10.0</th>
       <td>0</td>
       <td>2</td>
+      <td>0</td>
       <td>0</td>
       <td>0</td>
       <td>0</td>
@@ -2103,12 +2029,6 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adjlist</span> <span class="o">=</span> <span class="n">d500_w</span><span class="o">.</span><span class="n">to_adjlist</span><span class="p">()</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -2192,10 +2112,6 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_html"><div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -2268,10 +2184,6 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>focal
 0       1.0
 1       2.0
@@ -2324,7 +2236,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.9/site-packages/libpysal/weights/weights.py:172: UserWarning: The weights matrix is not fully connected: 
  There are 60 disconnected components.
  There are 32 islands with ids: 762, 907, 976, 1003, 1776, 1867, 2789, 2841, 3130, 3138, 3184, 3604, 3748, 3962, 3989, 4366, 4443, 4627, 4764, 4885, 4989, 5014, 5536, 5733, 5756, 5790, 5796, 5808, 6005, 6026, 6049, 6068.
   warnings.warn(message)
@@ -2405,7 +2317,7 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/12_feature_engineering_130_0.png" src="../_images/12_feature_engineering_130_0.png" />
+<img alt="../_images/12_feature_engineering_129_0.png" src="../_images/12_feature_engineering_129_0.png" />
 </div>
 </div>
 <p>As the plot shows, although the relationship between both is positive, there is quite a bit of variation and departure from the (red) line of equality. These represent cases with either larger (above the line) or smaller (below) average size in the 500m to 1km ring than in the 500m buffer.</p>
@@ -2440,13 +2352,13 @@ Name: bedrooms, Length: 6035, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:275: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.9/site-packages/hdbscan/hdbscan_.py:275: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
 Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
   alg = KDTreeBoruvkaAlgorithm(tree, min_samples, metric=metric,
-/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:56: DeprecationWarning: `np.int` is a deprecated alias for the builtin `int`. To silence this warning, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
+/opt/conda/lib/python3.9/site-packages/hdbscan/hdbscan_.py:56: DeprecationWarning: `np.int` is a deprecated alias for the builtin `int`. To silence this warning, use `int` by itself. Doing this will not modify any behavior and is safe. When replacing `np.int`, you may wish to use e.g. `np.int64` or `np.int32` to specify the precision. If you wish to review your current use, check the release note link for additional information.
 Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
   condensed_tree = condense_tree(single_linkage_tree,
-/opt/conda/lib/python3.8/site-packages/hdbscan/hdbscan_.py:59: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
+/opt/conda/lib/python3.9/site-packages/hdbscan/hdbscan_.py:59: DeprecationWarning: `np.bool` is a deprecated alias for the builtin `bool`. To silence this warning, use `bool` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.bool_` here.
 Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations
   labels, probabilities, stabilities = get_clusters(condensed_tree,
 </pre></div>
@@ -2457,12 +2369,6 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">hulls</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">dissolve</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">convex_hull</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
 </pre></div>
 </div>
 </div>
@@ -2504,11 +2410,7 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_142_1.png" src="../_images/12_feature_engineering_142_1.png" />
+<img alt="../_images/12_feature_engineering_141_0.png" src="../_images/12_feature_engineering_141_0.png" />
 </div>
 </div>
 <p>Note how the hierarchical nature of HDBSCAN, which picks density thresholds <em>locally</em> is at work in the map, where some of the clusters (e.g. orange ones in the north) display lower density than parts of the center which are <em>not</em> part of any cluster. These results also capture some information about the price of a listing. We can see this if we plot the distribution of prices across the detected clusters:</p>
@@ -2542,11 +2444,7 @@ Deprecated in NumPy 1.20; for more details and guidance: https://numpy.org/devdo
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/lib/python3.8/site-packages/ipykernel/ipkernel.py:283: DeprecationWarning: `should_run_async` will not call `transform_cell` automatically in the future. Please pass the result to `transformed_cell` argument and any exception that happen during thetransform in `preprocessing_exc_tuple` in IPython 7.17 and above.
-  and should_run_async(code)
-</pre></div>
-</div>
-<img alt="../_images/12_feature_engineering_144_1.png" src="../_images/12_feature_engineering_144_1.png" />
+<img alt="../_images/12_feature_engineering_143_0.png" src="../_images/12_feature_engineering_143_0.png" />
 </div>
 </div>
 <p>If we want to capture the variation picked up by membership to these clusters in a regression model, we could use these labels as the basis for spatial fixed effects, for example, as we saw in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>.</p>
