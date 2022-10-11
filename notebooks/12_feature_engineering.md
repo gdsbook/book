@@ -33,8 +33,8 @@ At its core, *spatial feature engineering* is the process of developing addition
 ```python
 import geopandas, pandas, libpysal.weights as weights, contextily
 import matplotlib.pyplot as plt
-import cenpy
 import numpy
+import cenpy
 import osmnx
 import seaborn
 import rasterio
@@ -551,18 +551,14 @@ We now move on to a case where the information we are interested in matching to 
 Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:
 
 ```python
-%%time
-acs = cenpy.products.ACS()
-sd_pop = acs.from_msa(
-    "San Diego, CA", level="tract", variables=["B02001_001E"]
-)
-```
-
-```python tags=["remove-cell"]
 try:
-    _ = geopandas.read_file("../data/cache/sd_census.gpkg")
+    acs = cenpy.products.ACS()
+    sd_pop = acs.from_msa(
+        "San Diego, CA", level="tract", variables=["B02001_001E"]
+    )
+    sd_pop.to_file("../data/cache/sd_census.gpkg", driver='GPKG')
 except:
-    sd_pop.to_file("../data/cache/sd_census.gpkg", driver="GPKG")
+    print("Remote loading failed...")
 ```
 
 The code snippet above sends a query to the Census Bureau server to fetch the data for San Diego. Note that it _requires_ internet connectivity to work. If you are working on the book _without_ connectivity, a cached version of the dataset is available on the data folder and can be read as:
