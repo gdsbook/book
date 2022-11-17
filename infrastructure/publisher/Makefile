@@ -1,0 +1,2 @@
+abstracts:
+	python abstracts.py
