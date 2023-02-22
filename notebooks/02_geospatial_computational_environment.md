@@ -37,7 +37,7 @@ this book relies on: Jupyter Notebooks and JupyterLab, Python packages,
 and a containerized platform to run the Python code in this book.
 
 
-## Open Science
+## Open science
 
 The term Open Science has grown in popularity in recent years. Although it is
 used in a variety of contexts with slightly different meanings {cite}`cruwell2019seven`, one statement of the intution behind Open Science is that the
@@ -45,7 +45,7 @@ scientific process, at its core, is meant to be transparent and accessible to an
 In this context, openness is not to be seen as an "add-on" that only makes
 cosmetic changes to the general scientific approach, but as a key component of what
 makes our scientific practices *Science*. Indeed the scientific process, understood as one where
-we "stand on the shoulders of giants" and progress through dialectic, can only
+we "stand on the shoulders of giants" and progress through dialectics, can only
 work properly if the
 community can access and study both results _and_ the process that created
 them. Thus, transparency, accessibility, and inclusiveness are critical for good science.
@@ -59,7 +59,7 @@ would record the field or lab experiments on paper notebooks or diaries,
 providing enough detail to, first, remember what they had done and how they
 had arrived at their results; but also to ensure other members of the
 scientific community could study, understand, and replicate their findings.
-One of the most famous of these annotations are Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars, shown in Figure 1. 
+One of the most famous of these annotations is Galileo's drawings of Jupiter ([source](https://commons.wikimedia.org/wiki/File:Medicean_Stars.png)) and the Medicean stars, shown in Figure 1. 
 
 ```python caption="Galileo's drawings of Jupyter and the Medician stars, showing the power of diagrams inside of scientific texts." tags=["remove-input"]
 url = (
@@ -94,7 +94,7 @@ notebook separates from the medium in which these steps actually take place.
 The current state of science, in terms of transparency and openness, is prompting
 for action {cite}`Rey_2009`. On the back of these debates, the term
 "reproducibility" is also gaining traction. Again, this is a rather general
-term but in one popular defition {cite}`bollen2015social`, it suggests that
+term but in one popular definition {cite}`bollen2015social`, it suggests that
 scientific results need to be accompanied by enough information and detail so they
 could be repeated by a third party. Since much of modern science is mediated
 through computers, reproducibility thus poses important challenges for the
@@ -152,7 +152,7 @@ Notebooks represent the top layer on the reproducibility stack. They can capture
 the detail of reproducible work specific to a given project: 
 what data is used, how it is read, cleaned, and transformed; what algorithms are used, how they
 are combined; how each figure in the project is generated, etc. Stronger guidance on how
-to write notebooks in efficient ways is also emerging (e.g. {cite}`Rule_2019`), so this too represents an evolving set of practices which we document incompletely in the following sections.
+to write notebooks in efficient ways is also emerging (e.g., {cite}`Rule_2019`), so this too represents an evolving set of practices which we document incompletely in the following sections.
 
 ### Open source packages
 
@@ -171,7 +171,7 @@ functionality that can be used in a variety of contexts. Their function is to
 avoid duplication "downstream" by encapsulating functionality in a way that
 can be accessed and used in a variety of contexts without having to re-write
 code every time it is needed. In doing so, packages (or libraries, an
-interchangeable term in this context) embody the famous hacker motto of DRY.:
+interchangeable term in this context) embody the famous hacker motto of DRY:
 "don't repeat yourself".
 
 Open source packages is software that provides its own code for the user to inspect. 
@@ -222,16 +222,16 @@ data science are starting to be explored {cite}`Cook_2017`.
 
 ## The (computational) building blocks of this book
 
-The main format of this book is the "notebook," and is as the first medium in which our content is created and intended to be presented. 
+The main format of this book is the "notebook" and is  the first medium in which our content is created and is intended to be presented. 
 Each chapter is written as a separate notebook and can
 be run interactively. At the same time, we collect all chapters and convert
-them into different formats for "static consumption" (i.e.. read only), either
+them into different formats for "static consumption" (i.e., read only), either
 in HTML format for the web, or PDF to be printed in a physical copy.
 This section will present the specific format of notebooks we use, and
 illustrate its building blocks in a way that allows you to then follow the
 rest of the book interactively.
 
-### Jupyter Notebooks and JupyterLab
+### Jupyter notebooks and JupyterLab
 
 Our choice of notebook system is Jupyter {cite}`Kluyver2016jupyter`. A Jupyter notebook is a plain
 text file with the `.ipynb` extension, which means that it is an easy file to
@@ -252,17 +252,17 @@ of content that usually contain either text or code. In fact, a
 notebook overall can be thought of as a collection of code and text cells that, when executed in the correct order, describe and conduct an analysis.
 
 Text cells contain text written in the Markdown text formatting language. Markdown is a
-popular set of rules to create rich content (e.g. headers, lists, links) from plain text. 
+popular set of rules to create rich content (e.g., headers, lists, links) from plain text. 
 It is designed so that the plain text version looks similar to the outputted document. 
 This makes it less complex than other
-typesetting approaches, but means it also supports fewer features.
+typesetting approaches, but this means it also supports fewer features.
 After writing a text cell, the notebook engine will process the markdown into HTML, which you then see as rich text with images, styling, headers, and so forth. 
 For more demanding or specific tasks, text cells can also 
-integrate $\LaTeX$ notation. This means we can write most forms of narrative
-relying on markdown, which is more straightforward, and use $\LaTeX$ for
-more sophisticated parts, such as equations. Covering all of the markdown syntax and structure in detail
+integrate $\LaTeX $ notation. This means we can write most forms of narrative
+relying on Markdown, which is more straightforward, and use $\LaTeX $ for
+more sophisticated parts, such as equations. Covering all of the Markdown syntax and structure in detail
 is beyond the scope of this chapter, but the interested reader can inspect the
-official GitHub specification of the so-called GitHub-Flavored markdown
+official GitHub specification of the so-called GitHub-Flavored Markdown
 {cite}`ghfmd` that is adopted by Jupyter notebook.
 
 Code cells are boxes that contain snippets of computer code. In this
@@ -277,12 +277,12 @@ In Jupyter, code cells look like this:
 ```
 
 A code cell can be "run" to execute the code it contains. If the code produces
-an output (e.g. a table or a figure), this will be produced below the code cell as output.
+an output (e.g., table or figure), this will be produced below the code cell as output.
 Every time a cell is run, its counter on the notebook interface will go up by one[^counters].
 This counter indicates the order in which a cell is run, in that lower-number cells have been run before higher-number cells.
 As mentioned before, however, notebooks generally allow the user to "go back" and execute cells again, so there may be lower-number cells that come *after* higher-number cells. 
 
-#### Rich Content
+#### Rich content
 
 Code cells in a notebook also enable the embedding of rich (web) content. The
 `IPython` package provides methods to access as series of media and bring them
@@ -293,7 +293,7 @@ practically. To be able to demonstrate it, we will need to _import_ the
 [^counters]: This counter may not always be visible in all of the formats a notebook may be viewed. In this book, cell numbers will not be visible on paper, but they will be visible in the online versions of the notebook.
 
 [^import]: Skip to the next section if you want to learn more about
-importing packages)
+importing packages.
 
 ```python attributes={"classes": [], "id": "", "n": "3"}
 import IPython.display as display
@@ -353,7 +353,7 @@ display.HTML(osm)
 ```
 
 Finally, using a similar approach, we can also load and display local 
-images, which we will so throughout the book. For that, we use the `Image`
+images, which we will do throughout the book. For that, we use the `Image`
 method:
 
 ```python caption="This book's logo, built from Stamen Toner map tiles and from code."
@@ -361,10 +361,10 @@ path = "../infrastructure/logo/logo_transparent-bg.png"
 display.Image(path, width=250)
 ```
 
-#### Jupyter Lab
+#### JupyterLab
 
-Our recommended way to interact with Jupyter notebooks is through Jupyter Lab.
-Jupyter Lab is an interface to the Jupyter ecosystem that brings together
+Our recommended way to interact with Jupyter notebooks is through JupyterLab.
+JupyterLab is an interface to the Jupyter ecosystem that brings together
 several tools for data science into a consistent interface that enables the user
 to accomplish most of her workflows. It is built as a web app following a
 client-server architecture. This means the computation is decoupled from the
@@ -374,25 +374,24 @@ interactively on your laptop. In this case, it is likely both the server that
 runs all the Python computations you specify in code cells (what we call the
 _kernel_) is running on your laptop, and you are interacting with it through your
 browser of preference. But the same technology could power a situation where
-your kernel is running in a cloud data center, and you interact with Jupyter
-Lab from a tablet.
+your kernel is running in a cloud data center, and you interact with JupyterLab from a tablet.
 
-Jupyter Lab' interface has three main areas. These are shown in Figure 4. [^jlab]
+JupyterLab's interface has three main areas. These are shown in Figure 4. [^jlab]
 
 [^jlab]: Depending on the version of JupyterLab you are using, the layout and appearance
 may slightly change.
 
-```python caption="An annotated view of the Jupyterlab interface " tags=["remove-input"]
+```python caption="An annotated view of the JupyterLab interface " tags=["remove-input"]
 path = "../figures/jupyter_lab.png"
 display.Image(path, width=500)
 ```
 
 At the top, we find a menu bar (red box in the figure) that allows us to open,
 create and interact with files, as well as to modify the appearance and 
-behavior of Jupyter Lab. The largest real estate is occupied by the main
+behavior of JupyterLab. The largest real estate is occupied by the main
 pane (blue box). By default, there is an option to create a new notebook, open
-a console, a terminal session, a (markdown) text file, and a window for
-contextual help. Jupyter Lab provides a flexible workspace in that the user
+a console, a terminal session, a (Markdown) text file, and a window for
+contextual help. JupyterLab provides a flexible workspace in that the user
 can open as many windows as needed and rearrange them as desired by dragging
 and dropping. Finally, on the left of the main pane we find the side pane
 (green box),
@@ -403,10 +402,9 @@ currently open kernels and terminal sessions, a list of all the commands in the
 menu (the command _palette_), and a list of all the open windows inside the
 lab.
 
-### Python and Open Source Packages
+### Python and open source packages
 
-The main component of this book relies on the Python programming language. Python is a high-
-level programming language used widely in (data) science. From satellites controlled by NASA[^nasa]
+The main component of this book relies on the Python programming language. Python is a high-level programming language used widely in (data) science. From satellites controlled by NASA[^nasa]
 to courses in economics by Nobel Prize-winning professors[^quantecon], Python is a fundamental component of "consensus" data science {cite}`donoho201750`.
 This book uses Python because it is a good language for beginners and 
 high-performance science alike. For this reason, it has emerged as one of the main
@@ -414,13 +412,13 @@ options for Data Science {cite}`te_python`. Python is widely used for data
 processing and analysis both in academia and in industry. There is a vibrant and 
 growing scientific community (through the Scientific Python 
 library `scipy` and the PyData organization), working in
-both universities and companies, to support and enhance the Python's capabilities.
+both universities and companies, to support and enhance  Python's capabilities.
 New methods and usability improvements of existing packages (also known as libraries)
 are continuously being released. Within the geographic domain, Python is also very widely
 adopted: it is the language used for scripting in both the main proprietary enterprise
 geographic information system, ArcGIS, 
 and the leading open geographic information system, QGIS. All
-of this means that, whether you are thinking of Higher Education
+of this means that, whether you are thinking of higher education
 or industry, Python will be an important asset, valuable to
 employers and scientists alike. 
 
@@ -432,15 +430,15 @@ needing to be compiled. This is in contrast to other kinds of programming
 languages, which require an additional non-interactive step where a program is 
 converted into a binary file, which can then be run. With Python, one does
 not need to worry about this non-interactive compilation step. Instead, we can 
-simply write code, run it, fix any issues directly, and re-run the code in a
+simply write code, run it, fix any issues directly, and rerun the code in a
 rapid iteration cycle. This makes Python a very productive tool for science, since you can
 prototype code quickly. 
 
 
-#### Open Source Packages
+#### Open source packages
 
 The standard Python language includes some data structures (such as lists and
-dictionaries) and allows many basic mathematical operations (e.g. sums, differences,
+dictionaries) and allows many basic mathematical operations (e.g., sums, differences,
 products). For example, right out of the box, and without any further
 action needed, you can use Python as a calculator. For instance, three plus five is eight:
 
@@ -464,10 +462,10 @@ However, the strength of Python as a data analysis tool comes from additional
 packages, software that adds functionality to the language itself.
 In this book, we will introduce and use many of the core libraries of the 
 Python ecosystem for (geographic) data science,
-a set of widely-used libraries that make Python fully-featured.
+a set of widely-used libraries that make Python fully featured.
 We will discuss each package as we use them throughout the chapters. 
 Here, we will show how an installed package can be
-loaded into a session so its functionality can be accessed. Package loading
+loaded into a session so that its functionality can be accessed. Package loading
 in Python is called _importing_. We will use the library `geopandas` as
 an example. The simplest way to import a library is by typing the following:
 
@@ -485,8 +483,8 @@ import geopandas as gpd
 ```
 
 Now, every time we want to access a function from `geopandas`, we need to
-type "`gpd.`" before the function's name. However sometimes we rather import
-only parts of a library. For example, we might only want to use one function.
+type "`gpd.`" before the function's name. However, sometimes we want to only import
+ parts of a library. For example, we might only want to use one function.
 In this case, it might be cleaner and more efficient to bring the function
 itself only:
 
@@ -518,7 +516,7 @@ dialog from within the notebook is to add a question mark after it:
 
 <!-- #region -->
 In the notebook, this brings up a sub-window in the browser with all the
-information you need.[^bookhelp] Additionally, Jupyter Lab offers the "Contextual Help"
+information you need.[^bookhelp] Additionally, JupyterLab offers the "Contextual Help"
 box in the initial launcher. If you open it, the help of every function where
 your cursor lands will be dynamically displayed in the contextual help.
 
@@ -542,7 +540,7 @@ this concept in a practical setting. For this book, we use a piece of software c
 Docker. Docker is based on the idea of a "container,"
 which allows users to create computational environments and run processes within them in a way that is
 isolated from the host operating system. We decided to use Docker for
-three main reasons: first, it is widely adopted as an industry standard (e.g.
+three main reasons: first, it is widely adopted as an industry standard (e.g.,
 many websites run on Docker containers), which means it is well
 supported and is likely to be maintained for a while; second, it has also
 become a standard in the world of data science, which means foundational
@@ -565,7 +563,7 @@ executes will remain exactly the same. In fact, the content inside the box
 remains exactly the same, bit by bit. When we download a container into a
 computer, be it a laptop or a data center, we are not performing an install of
 the software it contains from the usual channels, for the platform on which we
-are going to run it on. Instead, we are downloading the software in the form
+are going to run it. Instead, we are downloading the software in the form
 that was installed when the container was originally built and packaged,
 and for the operating system that was also packaged originally. This is the real
 advantage: build once, run everywhere. For the experienced reader,
@@ -582,7 +580,7 @@ stored outside in the host machine.
 
 "*Containers sound great but, how can I install and run one?*", you might be
 asking yourself at this point. First, you will need to install Docker on your
-computer. This assumes you have administrative rights (i.e. you can install
+computer. This assumes you have administrative rights (i.e., you can install
 software). If that is the case, you can go to the Docker website[^docker] 
 and install the version that suits your operating system. Note that, although container
 technology is Linux-based, Docker provides tools to run it smoothly in macOS
@@ -608,7 +606,7 @@ will work as well.
 
 Downloading the container is akin to installing the
 software you need to interact with the book, so you will only need to run it once.
-However, keep in mind that the docker "image," the file that stores the container,
+However, keep in mind that the Docker "image," the file that stores the container,
 is relatively large (around 4GB), so you
 will need the space on your machine as well as a good internet connection. If
 you check those two boxes, you are ready to go. Here are the steps to take:
@@ -621,7 +619,7 @@ you check those two boxes, you are ready to go. Here are the steps to take:
    - `Windows`: we recommend PowerShell or the Terminal app. Type "PowerShell"
      or "Terminal" on the startup menu
      and, when it comes up, hit enter. This will open a terminal for you.
-   - `macOS`: use the `Teminal.app`. You can find it on the Applications
+   - `macOS`: use the `Terminal.app`. You can find it on the Applications
      folder, within the Utilities subfolder.
    - `Linux`: if you are running Linux, you probably already have a terminal
      application of preference. Almost any Linux distribution comes with a
@@ -648,10 +646,10 @@ docker run \
         darribas/gds_py:7.0
 ```
 
-Let's unpack the command so we understand everything that is going on here to
+Let's unpack the command so that we understand everything that is going on here to
 get further insight into how the container works:
 
-- `docker run`: Docker does a lot of things, to communicate that we want to
+- `docker run`: Docker does a lot of things; to communicate that we want to
   _run_ a new container, we need specify it.
 - `--rm`: this flag will ensure the container is removed when you close
   it. This in turn makes sure every time you run it again, you start
@@ -659,7 +657,7 @@ get further insight into how the container works:
 - `-ti`: this flag further ensures that the container is not run in the
   background but in an interactive mode.
 - `-p 8888:8888`: with this, we ensure we forward the _port_ from inside
-  the container out to the host machine (e.g. your laptop). This flag is
+  the container out to the host machine (e.g., your laptop). This flag is
   important because it allows the Jupyter server running inside the container
   to communicate with the browser so we can render the app and send commands.
   It is one of the two doors we discuss above connecting the container with 
@@ -709,21 +707,21 @@ display.Image(path, width=500)
 
 To access the lab, copy the token from the terminal (in the example above,
 that would be `ae7e8017f3e97658a218ec2c2d1fbcc894f09d80f6b5f79c`), enter it on
-the box and click on "Log in". Now you are in, and can view and execute the chapters in this book. 
+the box and click on "Log in". Now you are in, and you can view and execute the chapters in this book. 
 
 ## Conclusion
 
 Reproducibility requires us to take our tools seriously. Since the onset of computational science, we have sought methods to keep the "code" that implements science linked tightly to the writing that explains it. Notebooks offer us a way to do this. Further, keeping in the spirit of open science from long ago, we will do better science if we keep our software public and open to the world. To guarantee that our code can, in fact, be executed, we must also document the environment in which the code is executed using tools like Docker. In the following chapter, we use these tools in concert with geographical thinking to learn about *geographic data science.*
 
 
-## Next Steps
+## Next steps
 
 
 For those interested in further reading on the topic, we suggest the following articles.  
 
 For more information on how to write "good" computational notebooks, consider: 
 
-Rule, Adam, Amanda Birmingham, Cristal Zuniga, Ilka Altintas, Shih-Cheng Huang, Rob Knight, Niema Moshiri, Mai H. Nguyen, Sara Brin Rosenthal, Fernando Pérez and others. 2019. "Ten Simple Rules for writing and sharing computational analyses in Jupyter Notebooks." *PLOS Computational Biology* 15(7).
+Rule, Adam, Amanda Birmingham, Cristal Zuniga, Ilka Altintas, Shih-Cheng Huang, Rob Knight, Niema Moshiri, Mai H. Nguyen, Sara Brin Rosenthal, Fernando Pérez et al. 2019. "Ten Simple Rules for writing and sharing computational analyses in Jupyter Notebooks." *PLOS Computational Biology* 15(7).
 
 For additional perspective on how open code and reproducibility matters in geographic applications, consult the following publications:
 
