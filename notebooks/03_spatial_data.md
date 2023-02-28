@@ -26,9 +26,19 @@ osmnx.config(
 
 This chapter grounds the ideas discussed in the previous two chapters into a practical context. We consider how data structures, and the data models they represent, are implemented in Python. We also cover how to interact with these data structures. This will happen alongside the code used to manipulate the data in a single computational laboratory notebook. This, then, unites the two concepts of open science and geographical thinking. 
 
-Further, we will spend most of the chapter discussing how Python represents data *once read* from a file or database, rather than focusing on specific *file* formats used to store data. This is because the libraries we use will read any format into one of a few canonical data structures that we discuss in Chapter 1.  We take this approach because these data structures are what we interact with during our data analysis: they our interface with the data. File formats, while useful, are secondary to this purpose. Indeed, part of the benefit of Python (and other computing languages) is *abstraction*: the complexities, particularities and quirks associated with each file format are removed as Python represents all data in a few standard ways, regardless of provenance. We take full advantage of this feature here. 
+Further, we will spend most of the chapter discussing how Python represents data
+*once read* from a file or database, rather than focusing on specific *file*
+formats used to store data. This is because the libraries we use will read any
+format into one of a few canonical data structures that we discuss in Chapter 1.
+We take this approach because these data structures are what we interact with
+during our data analysis: they are our interface with the data. File formats, while useful, are secondary to this purpose. Indeed, part of the benefit of Python (and other computing languages) is *abstraction*: the complexities, particularities and quirks associated with each file format are removed as Python represents all data in a few standard ways, regardless of provenance. We take full advantage of this feature here. 
 
-We divide the chapter in two main parts. The first part looks at each of the three main data structures reviewed in Chapter 1 (*Geographic Thinking*): geographic tables, surfaces and spatial graphs. Second, we explore combinations of different data structures that depart from the traditional data model/structure matchings discussed in Chapter 2. We cover how one data in one structure can be effectively transferred to another, but also discuss why that might (or might not) be a good idea in some cases. A final note before we delve into the content of this book is in order: this is not a comprehensive account of *everything* that is possible with each of the data structures we present. Rather, you can think of it as a preview that we will build on throughout the book to showcase much of what is possible with Python.
+We divide the chapter in two main parts. The first part looks at each of the
+three main data structures reviewed in Chapter 1 (*Geographic Thinking*):
+geographic tables, surfaces and spatial graphs. Second, we explore combinations
+of different data structures that depart from the traditional data
+model/structure matchings discussed in Chapter 2. We cover how one data in one
+structure can be effectively transferred to another, but also we discuss why that might (or might not) be a good idea in some cases. A final note before we delve into the content of this book is in order: this is not a comprehensive account of *everything* that is possible with each of the data structures we present. Rather, you can think of it as a preview that we will build on throughout the book to showcase much of what is possible with Python.
 
 ```python
 import pandas
@@ -46,11 +56,20 @@ import matplotlib.pyplot as plt
 
 As outlined in Chapter 1, there are a few main data structures that are used in geographic data science: geographic tables (which are generally matched to an object data model), rasters or surfaces (which are generally matched to a field data model), and spatial networks (which are generally matched to a graph data model). We discuss these in turn throughout this section. 
 
-### Geographic Tables
+### Geographic tables
 
 Geographic objects are usually matched to what we called the *geographic table*. Geographic tables can be thought of as a tab in a spreadsheet where one of the columns records geometric information. This data structure represents a single geographic object as a row of a table; each column in the table records information about the object, its attributes or features, as we will see below. Typically, there is a special column in this table that records the *geometry* of the object. Computer systems that use this data structure are intended to add geography into a *relational database*, such as PostgreSQL (through its PostGIS extension) or sqlite (through its spatialite extension). Beyond this, however, many data science languages (such as R, Julia, and Python), have packages that adopt this data structure as well (such as `sf`, `GeoTables.jl`, and `geopandas`), and it is rapidly becoming the main data structure for object-based geographic data. 
 
-Before proceeding, though, it helps to mention a quick clarification on terminology. Throughout this book, regardless of the data structure used, we will refer to a measurement about an observation as a *feature*. This is consistent with other work in data science and machine learning. Then, one set of measurements is a *sample*. For tables, this means a feature is a column and a sample is a row. Historically, though, geographic information scientists have used the word "feature" to mean an individual observation, since a "feature" in cartography is an entity on a map, and "attribute" to describe characteristics of that observation. Elsewhere, a feature may be called a "variable," and a sample referred to as a "record." So, consistent terminology is important: for this book, a *feature* is one measured trait pertaining to an observation (a column), and a *sample* is one set of measurements (a row). 
+Before proceeding, though, it helps to mention a quick clarification on
+terminology. Throughout this book, regardless of the data structure used, we
+will refer to a measurement about an observation as a *feature*. This is
+consistent with other work in data science and machine learning. Then, one set
+of measurements is a *sample*. For tables, this means a feature is a column, and
+a sample is a row. Historically, though, geographic information scientists have
+used the word "feature" to mean an individual observation, since a "feature" in
+cartography is an entity on a map, and "attribute" to describe characteristics
+of that observation. Elsewhere, a feature may be called a "variable," and a
+sample is referred to as a "record." So, consistent terminology is important: for this book, a *feature* is one measured trait pertaining to an observation (column), and a *sample* is one set of measurements (row). 
 
 To understand the structure of geographic tables, it will help to read in the `countries_clean.gpkg` dataset included in this book that describes countries in the world. To read in this data, we can use the `read_file()` method in `geopandas`:[^package-v-function]
 
@@ -66,7 +85,11 @@ And we can examine the top of the table with the `.head()` method:
 gt_polygons.head()
 ```
 
-Each row of this table is a single country. Each country only has two features: the administrative name of the country and the geometry of the country's boundary. The name of the country is encoded in the `ADMIN` column using the Python `str` type, which is used to store text-based data. The geometry of the country's boundary is stored in the `geometry` column, and is encoded using a special class in Python that is used to represent geometric objects. As with other table-based data structures in Python, every row and column have an index that identifies them uniquely and is rendered in bold on the left-hand side of the table. This geographic table is an instance of the `geopandas.GeoDataFrame` object, used throughout Python's ecosystem to represent geographic data.
+Each row of this table is a single country. Each country only has two features:
+the administrative name of the country and the geometry of the country's
+boundary. The name of the country is encoded in the `ADMIN` column using the
+Python `str` type, which is used to store text-based data. The geometry of the
+country's boundary is stored in the `geometry` column, and it is encoded using a special class in Python that is used to represent geometric objects. As with other table-based data structures in Python, every row and column have an index that identifies them uniquely and is rendered in bold on the left-hand side of the table. This geographic table is an instance of the `geopandas.GeoDataFrame` object, used throughout Python's ecosystem to represent geographic data.
 
 Geographic tables store geographic information as an additional column. But, how is this information encoded? To see, we can check the type of the object in the first row:
 
@@ -107,7 +130,7 @@ gt_polygons.plot(
 
 Note again how we can create a map by calling `.plot()` on a `GeoDataFrame`. We can thematically color each feature based on a column by passing the name of that column to the plot method (as we do on with `ADMIN` in this case), and that the current geometry is used.
 
-Thus, as should now be clear, nearly any kind of geographic object can be represented in one (or more) geometry column(s). Thinking about the number of different kinds of shapes or geometries one could use quickly boggles the mind. Fortunately the Open Geospatial Consortium (OGC) has defined a set of "abstract" types that can be used to define any kind of geometry. This specification, codified in ISO 19125-1---the "simple features" specification---defines the formal relationships between these types: a `Point` is a zero-dimensional location with an x and y coordinate; a `LineString` is a path composed of a set of more than one `Point`, and a `Polygon` is a surface that has at least one `LineString` that starts and stops with the same coordinate. All of these types *also* have `Multi` variants that indicate a collection of multiple geometries of the same type. So, for instance, Bolivia is represented as a single polygon:
+Thus, as should now be clear, nearly any kind of geographic object can be represented in one (or more) geometry column(s). Thinking about the number of different kinds of shapes or geometries one could use quickly boggles the mind. Fortunately the Open Geospatial Consortium (OGC) has defined a set of "abstract" types that can be used to define any kind of geometry. This specification, codified in ISO 19125-1---the "simple features" specification---defines the formal relationships between these types: a `Point` is a zero-dimensional location with an x and y coordinate, a `LineString` is a path composed of a set of more than one `Point`, and a `Polygon` is a surface that has at least one `LineString` that starts and stops with the same coordinate. All of these types *also* have `Multi` variants that indicate a collection of multiple geometries of the same type. So, for instance, Bolivia is represented as a single polygon:
 
 ```python
 gt_polygons.query('ADMIN == "Bolivia"')
@@ -172,7 +195,14 @@ gt_points.head()
 
 ### Surfaces
 
-Surfaces are used to record data from a field data model. In theory, a field is a continuous surface and thus has an infinite number of locations at which it could be measured. In reality however, fields are measured at a finite sample of locations that, to provide a sense of continuity and better conform with the field model, are uniformly structured across space. Surfaces thus are represented as grids where each cell contains a sample. A grid can also be thought of as a table with rows and columns but, as we discussed in the previous chapter, both of them are directly tied to geographic location. This is in sharp contrast with geographic tables, where geography is confined to a single column.
+Surfaces are used to record data from a field data model. In theory, a field is
+a continuous surface and thus has an infinite number of locations at which it
+could be measured. In reality, however, fields are measured at a finite sample
+of locations that, to provide a sense of continuity and better conform with the
+field model, are uniformly structured across space. Surfaces thus are
+represented as grids where each cell contains a sample. A grid can also be
+thought of as a table with rows and columns but, as we discussed in the previous
+chapter, both of them are directly tied to a geographic location. This is in sharp contrast with geographic tables, where geography is confined to a single column.
 
 To explore how Python represents surfaces, we will use an extract for the Brazilian city of Sao Paulo of a [global population dataset](../data/ghsl/build_ghsl_extract). This dataset records population counts in cells of the same dimensions uniformly covering the surface of the Earth. Our extract is available as a GeoTIF file, a variation of the TIF image format that includes geographic information. We can use the `open_rasterio()` method from the `xarray` package to read in the GeoTIF:
 
@@ -186,7 +216,9 @@ This reads the data into a `DataArray` object:
 type(pop)
 ```
 
-`xarray` is a package to work with multi-dimensional labeled arrays. Let's unpack this: we can use arrays of not only two dimensions as in a table with rows and columns, but with an arbitrary number of them; each of these dimensions are "tracked" by an index that makes it easy and efficient to manipulate. In `xarray`, these indices are called coordinates, and they can be retrieved from our `DataArray` through the `coords` attribute:
+`xarray` is a package to work with multi-dimensional labeled arrays. Let's
+unpack this: we can use arrays of not only two dimensions as in a table with
+rows and columns, but also with an arbitrary number of them; each of these dimensions is "tracked" by an index that makes it easy and efficient to manipulate. In `xarray`, these indices are called coordinates, and they can be retrieved from our `DataArray` through the `coords` attribute:
 
 ```python
 pop.coords
@@ -220,7 +252,7 @@ The resulting object is thus a two-dimensional array. Similar to geographic tabl
 pop.sel(band=1).plot();
 ```
 
-This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g., `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
+This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data is traditionally stored in surfaces not as a class of its own (e.g., `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
 
 ```python caption="Population surface of Sao Paulo, Brazil omitting NAN values." tags=[]
 pop.where(pop != -200).sel(band=1).plot(cmap="RdPu");
@@ -230,7 +262,16 @@ The colorbar now looks more sensible, and indicates *real* counts, rather than i
 
 ### Spatial graphs
 
-Spatial graphs store connections between objects through space. These connections may derive from geographical topology (e.g., contiguity), distance, or more sophisticated dimensions such as interaction flows (e.g., commuting, trade, communication). Compared to geographic tables and surfaces, spatial graphs are rather different. First, in most cases they do not record measurements about a given phenomena, but instead focus on *connections*, on storing relationships between objects as they are facilitated (or impeded in their absence) by space. Second, because of this relational nature, the data are organized in a more unstructured fashion: while one sample may be connected to only one other sample, another one can display several links. This in stark contrast to geographic tables and surfaces, both of which have a clearly defined structure, shape and dimensionality in which data are organized. 
+Spatial graphs store connections between objects through space. These
+connections may derive from geographical topology (e.g., contiguity), distance,
+or more sophisticated dimensions such as interaction flows (e.g., commuting,
+trade, communication). Compared to geographic tables and surfaces, spatial
+graphs are rather different. First, in most cases they do not record
+measurements about given phenomena, but instead focus on *connections*, on
+storing relationships between objects as they are facilitated (or impeded in
+their absence) by space. Second, because of this relational nature, the data are
+organized in a more unstructured fashion: while one sample may be connected to
+only one other sample, another one can display several links. This is in stark contrast to geographic tables and surfaces, both of which have a clearly defined structure, shape and dimensionality in which data are organized. 
 
 These particularities translate into a different set of Python data structures. Unlike the previous data structures we have seen, there are quite a few data structures to represent spatial graphs, each optimized for different contexts. One such case is the use of spatial connections in statistical methods such as exploratory data analysis or regression. For this, the most common data structure are spatial weights matrices, to which we devote the next chapter. 
 
@@ -309,9 +350,9 @@ We have just seen how geographic tables, surfaces, and networks map onto `GeoDat
 
 The first case we explore is treating surfaces as (geo-)tables. In this context, we shift from an approach where each dimension has a clear mapping to a spatial or temporal aspect of the dataset, to one where each sample, cell of the surface/cube is represented as a row in a table. This approach runs contrary to the general consensus that fields are best represented as surfaces or rasters because that allows us to index space and time "by default" based on the location of values within the data structure. Shifting to a tabular structure implies either losing that space-time reference, or having to build it manually with auxiliary objects (e.g., a spatial graph). In almost any case, operating on this format is less efficient than it *could* be if we had bespoke algorithms built around surface structures. Finally, from a more conceptual point of view, treating pixels as independent realizations of a process that we *know* is continuous can be computationally inefficient and statistically flawed. 
 
-This perspective however also involves important benefits. First, sometimes we *don't* need location for our particular application. Maybe we are interested in calculating overall descriptive statistics; or maybe we need to run an analysis that is entirely atomic in the sense that it operates on each sample in isolation from all the other ones.  Second, by "going tabular" we recast our specialized, spatial data into the most common data structure available, for which a large amount of commodity technology is built. This means many new tools can be used for analysis. So called "big data" technologies, such as distributed systems, are much more common, robust, and tested for tabular data than for spatial surfaces. *If* we can translate our spatial challenge into a tabular challenge, we can immediately plug in technology that is more optimized and, in some cases, reliable. Further, some analytic toolboxes common in (geographic) data science are entirely built around tabular structures. Machine learning packages such as `scikit-learn`, or some spatial analytics (such as most methods in the Pysal family of packages) are designed around this data structure. Converting our surfaces into tables thus allows us to plug into a much wider suite of (potentially) efficient tools and techniques.
+This perspective, however, also involves important benefits. First, sometimes we *don't* need location for our particular application. Maybe we are interested in calculating overall descriptive statistics; or maybe we need to run an analysis that is entirely atomic in the sense that it operates on each sample in isolation from all the other ones.  Second, by "going tabular" we recast our specialized, spatial data into the most common data structure available, for which a large amount of commodity technology is built. This means many new tools can be used for analysis. So-called "big data" technologies, such as distributed systems, are much more common, robust, and tested for tabular data than for spatial surfaces. *If* we can translate our spatial challenge into a tabular challenge, we can immediately plug in technology that is more optimized and, in some cases, reliable. Further, some analytic toolboxes common in (geographic) data science are entirely built around tabular structures. Machine learning packages such as `scikit-learn`, or some spatial analytics (such as most methods in the Pysal family of packages) are designed around this data structure. Converting our surfaces into tables thus allows us to plug into a much wider suite of (potentially) efficient tools and techniques.
 
-We will see two ways of going from surfaces to tables: one converts every pixel into a table row, and another that aggregates pixels into predetermined polygons.
+We will see two ways of going from surfaces to tables: one converts every pixel into a table row, and another aggregates pixels into pre-determined polygons.
 
 
 #### One pixel at a time
@@ -346,7 +387,7 @@ With the power of a tabular library, some queries and filter operations become m
 t_surface.query("Value > 1000").info()
 ```
 
-The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a fully-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a function that takes a row from our table and the resolution of the surface, and returns its geometry:
+The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a full-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a function that takes a row from our table and the resolution of the surface, and returns its geometry:
 
 ```python
 def row2cell(row, res_xy):
@@ -368,7 +409,7 @@ For example:
 row2cell(t_surface.loc[0, :], surface.attrs["res"])
 ```
 
-One of the benefits of this approach is we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:
+One of the benefits of this approach is that we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:
 
 ```python
 max_polys = (
@@ -406,7 +447,9 @@ new_da
 
 #### Pixels to polygons
 
-A second use case involves moving surfaces directly into geographic tables by aggregating pixels into pre-specified geometries. For this illustration, we will use the [DEM](../data/nasadem/build_nasadem_sd) surface containing elevation for the San Diego (US) region, and the set of [Census tracts](../data/sandiego/sandiego_tracts_cleaning). For an example, we will investigate the average altitude of each neighborhood.
+A second use case involves moving surfaces directly into geographic tables by
+aggregating pixels into pre-specified geometries. For this illustration, we will
+use the digital elevation model [(DEM)](../data/nasadem/build_nasadem_sd) surface containing elevation for the San Diego (US) region, and the set of [census tracts](../data/sandiego/sandiego_tracts_cleaning). For an example, we will investigate the average altitude of each neighborhood.
 
 Let's start by reading the data. First, the elevation model:
 
@@ -417,7 +460,7 @@ dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(
 dem.where(dem > 0).plot.imshow();
 ```
 
-And the neighborhood areas (tracts) from the Census:
+And the neighborhood areas (tracts) from the census:
 
 ```python caption="San Diego California Census Tracts." tags=[]
 sd_tracts = geopandas.read_file(
@@ -504,7 +547,12 @@ elevations
 
 This simple approach illustrates the main idea well: find the cells that pertain to a given geometry and summarize their values in some manner. This can be done with any kind of geometry. Further, this simple method plays well with `xarray` surface structures and is scalable in that it is not too involved to run in parallel and distributed form using libraries like `dask`. Further, it can be extended using arbitrary Python functions, so it is simple to extend.
 
-However, this approach can be quite slow in big data. A more efficient alternative for our example uses the `rasterstats` library. This is a purpose-built library to construct so-called "zonal statistics" from surfaces. Here, the "zones" are the polygons and the "surface" is our `DataArray`. Generally, this library will be faster than the simpler approach used above, but may be more difficult to extend or adapt:
+However, this approach can be quite slow in big data. A more efficient
+alternative for our example uses the `rasterstats` library. This is a
+purpose-built library to construct so-called "zonal statistics" from
+surfaces. Here, the "zones" are the polygons and the "surface" is our
+`DataArray`. Generally, this library will be faster than the simpler approach
+used above, but it may be more difficult to extend or adapt:
 
 ```python
 from rasterstats import zonal_stats
@@ -573,7 +621,7 @@ Then we "transfer" the points into the grid:
 grid = cvs.points(gt_points, x="longitude", y="latitude")
 ```
 
-The resulting `grid` is a standard `DataArray` object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the re-sampled data allows for is much greater than when the points were visualized alone. This is shown in Figure 14. 
+The resulting `grid` is a standard `DataArray` object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the resampled data allows for is much greater than when the points were visualized alone. This is shown in Figure 14. 
 
 ```python caption="Point locations of Tokyo Photographs, and Point Density as a Surface." tags=[]
 f, axs = plt.subplots(1, 2, figsize=(14, 6))
@@ -583,11 +631,11 @@ grid.plot(ax=axs[1]);
 
 ### Networks as graphs *and* tables
 
-In the previous chapter, we saw networks as data structures that store *connections* between objects. We also discussed how this broad definition includes many interpretations that focus on different aspects of the networks. While spatial analytics may use graphs to record the topology of a table of objects such as polygons; transport applications may treat the network representation of the street layout as a set of objects itself, in this case lines. In this final section we show how one can flip back and forth between one representation and another, to take advantage of different aspects.
+In the previous chapter, we saw networks as data structures that store *connections* between objects. We also discussed how this broad definition includes many interpretations that focus on different aspects of the networks. While spatial analytics may use graphs to record the topology of a table of objects such as polygons, transport applications may treat the network representation of the street layout as a set of objects itself, in this case lines. In this final section we show how one can flip back and forth between one representation and another, to take advantage of different aspects.
 
 We start with the `graph` object from the [previous section](#Spatial-graphs). Remember this captures the street layout around Yoyogi park in Tokyo. We have seen how, stored under this data structure, it is easy to query which node is connected to which, and which ones are at the end of a given edge. 
 
-However, in some cases, we may want to convert the graph into a structure that allows us to operate on each component of the network independently. For example, we may want to map streets, calculate segment lengths, or draw buffers around each intersection. These are all operations that do not require topological information, that are standard for geo-tables and that are irrelevant to the graph structure. In this context, it makes sense to convert our `graph` to two geo-tables, one for intersections (the graph nodes) and one for street segments (the graph edges). In `osmnx`, we can do that with the built-in converter:
+However, in some cases, we may want to convert the graph into a structure that allows us to operate on each component of the network independently. For example, we may want to map streets, calculate segment lengths, or draw buffers around each intersection. These are all operations that do not require topological information, that are standard for geo-tables, and that are irrelevant to the graph structure. In this context, it makes sense to convert our `graph` to two geo-tables, one for intersections (graph nodes) and one for street segments (graph edges). In `osmnx`, we can do that with the built-in converter:
 
 ```python
 gt_intersections, gt_lines = osmnx.graph_to_gdfs(graph)
