@@ -343,8 +343,8 @@ In order to understand the intuition behind its math, it is useful to begin with
 
 ```python
 db["Pct_Leave_std"] = db["Pct_Leave"] - db["Pct_Leave"].mean()
-db["Pct_Leave_lag_std"] = (
-    db["Pct_Leave_lag"] - db["Pct_Leave_lag"].mean()
+db["Pct_Leave_lag_std"] = weights.lag_spatial(
+    w, db["Pct_Leave_std"]
 )
 ```
 
