@@ -92,7 +92,7 @@ db = (
 db.info()
 ```
 
-And with these elements, we can generate a choropleth map to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the `alpha` attribute) to make the final plot easier to read.
+And with these elements, we can generate a choropleth map to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the `alpha` attribute) to make the final plot in Figure 1 easier to read: 
 
 ```python caption="Percentage of voters wanting to leave the EU in the 2016 UK Referendum known as the 'Brexit' vote." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -168,7 +168,7 @@ db.loc[["E08000012", "S12000019"], ["Pct_Leave", "Pct_Leave_lag"]]
 
 The first row (`E08000012`) represents Liverpool, which was a notorious "Remainer" island among the mostly-Leave North of England. Outside of London and Scotland, it was one of the few locations with less than majority to Leave. The second row (`S12000019`) represents Midlothian, in Scotland, where no local authority voted to leave. Although both Liverpool and Midlothian display a similar percentage of population who voted to leave (42% and 38%, respectively), the difference in their spatial lags captures the wider geographical context, which are quite different.
 
-To end this section visually, the smoothing nature of the lag can be appreciated in the following map comparison:
+To end this section visually, the smoothing nature of the lag can be appreciated in the following map comparison in Figure 2.
 
 ```python caption="Vote to leave the EU and its spatial lag." tags=[]
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
@@ -229,7 +229,7 @@ db["Leave"] = (db["Pct_Leave"] > 50).astype(int)
 db[["Pct_Leave", "Leave"]].tail()
 ```
 
-Which we can visualize readily:
+Which we can visualize readily in Figure 3: 
 
 ```python caption="Places with a majority voting leave in the Brexit vote" tags=[]
 f, ax = plt.subplots(1, figsize=(9, 9))
@@ -348,7 +348,7 @@ db["Pct_Leave_lag_std"] = weights.lag_spatial(
 )
 ```
 
-Technically speaking, creating a Moran Plot is very similar to creating any other scatterplot in Python:
+Technically speaking, creating a Moran Plot is very similar to creating any other scatterplot in Python. We will make one for Figure 4.
 
 ```python caption="Brexit vote, % leave Moran Scatterplot." tags=[]
 f, ax = plt.subplots(1, figsize=(6, 6))
@@ -397,7 +397,7 @@ The value is calculated as an empirical p-value that represents the proportion o
 
 That is a very low value, particularly considering it is actually the minimum value we could have obtained given the simulation behind it used 999 permutations (default in `esda`) and, by standard terms, it would be deemed statistically significant. We can elaborate a bit further on the intuition behind the value of `p_sim`. If we generated a large number of maps with the same values but randomly allocated over space, and calculated the Moran's I statistic for each of those maps, only 0.01% of them would display a larger (absolute) value than the one we obtain from the observed data, and the other 99.99% of the random maps would receive a smaller (absolute) value of Moran's I. If we remember again that the value of Moran's I can also be interpreted as the slope of the Moran Plot, what we have is that, in this case, the particular spatial arrangement of values over space we observe for the percentage of Leave votes is more concentrated than if we were to randomly shuffle the vote proportions among the map, hence the statistical significance. As a first step, the global autocorrelation analysis can teach us that observations do seem to be positively autocorrelated over space. Indeed, the overall spatial pattern in the EU Referendum vote was highly marked: nearby areas tended to vote alike.
 
-Thanks to the `splot` visualization module in Pysal, we can obtain a quick representation of the statistic that combines the Moran scatterplot we saw before with a graphic of the empirical test that we carry out to obtain `p_sim`:
+Thanks to the `splot` visualization module in Pysal, we can obtain a quick representation of the statistic that combines the Moran scatterplot we saw before with a graphic of the empirical test that we carry out to obtain `p_sim`. This is shown in Figure 5.
 
 ```python caption="Brexit vote, Moran's I replicate distribution and Scatterplot." tags=[]
 plot_moran(moran);

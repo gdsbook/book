@@ -110,7 +110,7 @@ mx = geopandas.read_file("../data/mexico/mexicojoin.shp")
 mx[["NAME", "PCGDP1940"]].head()
 ```
 
-Which displays the following statistical distribution:
+Which displays the following statistical distribution (in Figure 1). 
 
 ```python caption="Distribution of per capita GDP across 1940s Mexican states" tags=[]
 # Plot histogram
@@ -435,7 +435,7 @@ is a measure of fit. In `mapclassify`, the absolute deviation around class
 medians (ADCM) is calculated and provides a measure of fit that allows for
 comparison of alternative classifiers for the same value of $k$. The ADCM
 will give us a sense of how "compact" each group is. To see this, we can
-compare different classifiers for $k=5$ on the Mexico data:
+compare different classifiers for $k=5$ on the Mexico data in Figure 2: 
 
 ```python caption="Absolute Deviation around Class Medians. Alternative classification schemes, Mexican state per capita GDP in 1940." tags=[]
 # Bunch classifier objects
@@ -563,7 +563,7 @@ dig into each below, but we will explore how we can make choropleths in
 Python first. The mechanics are the same across different types of data, so it is worth
 spending a bit of time first to get the general idea.
 
-We will illustrate it with a quantile map:
+We will illustrate it with a quantile map in Figure 4:
 
 ```python caption="Quantile choropleth, Mexican state per capita GDP in 1940." tags=[]
 ax = mx.plot(
@@ -582,7 +582,7 @@ Making choropleths on geo-tables is an extension of plotting their geometries. W
 ### Sequential palettes
 
 
-Sequential color schemes are appropriate for continuous data where the origin is in one end of the series. The `PCGDP1940` column we have been using so far is a good example. In these cases, we want a palette that encodes this feature in its choice of colors. Sequential palettes use a gradient of colors from an origin color to a destination color. The example above, where lowest values are encoded in the lightest yellow and the highest in dark green is a good one. Sequential palettes can also have a shades of a single color. For example, the popular "blues" palette in Color Brewer is a great choice too:
+Sequential color schemes are appropriate for continuous data where the origin is in one end of the series. The `PCGDP1940` column we have been using so far is a good example. In these cases, we want a palette that encodes this feature in its choice of colors. Sequential palettes use a gradient of colors from an origin color to a destination color. The example above, where lowest values are encoded in the lightest yellow and the highest in dark green is a good one. Sequential palettes can also have a shades of a single color. For example, the popular "blues" palette in Color Brewer is a great choice too, shown in Figure 5:
 
 ```python caption="Quantile choropleth with black borderlines, Mexican state per capita GDP in 1940." tags=[]
 ax = mx.plot(
@@ -623,7 +623,7 @@ rnk["change"] = rnk["PCGDP1940"] - rnk["PCGDP2000"]
 rnk["class"] = pandas.cut(rnk["change"], [-numpy.inf, -5, 0, 5, 20])
 ```
 
-The `rnk` table now contains the change in rank positions of each state between 1940 and 2000, as well as a `class` column that binds together states in the  [-inf, -5), [-5, 0), [0, 5), [5, 20] groups. Note that these are descending ranks, so the wealthiest state in any period has a rank of 1, and therefore when considering the change in ranks, a negative change reflects moving down the income distribution. We can use a divergent palette to signify both intensity of the change in ranks, as well as direction:
+The `rnk` table now contains the change in rank positions of each state between 1940 and 2000, as well as a `class` column that binds together states in the  [-inf, -5), [-5, 0), [0, 5), [5, 20] groups. Note that these are descending ranks, so the wealthiest state in any period has a rank of 1, and therefore when considering the change in ranks, a negative change reflects moving down the income distribution. We can use a divergent palette to signify both intensity of the change in ranks, as well as direction in Figure 6: 
 
 ```python caption="Divergent palette, Mexican state per capita income rank change." tags=[]
 ax = (
@@ -656,7 +656,7 @@ mx["HANSON98"].head()
 This aggregation scheme partitions Mexico into five regions, recorded with
 the numbers 1 to 5 in the table. A naive (and
 incorrect) way to display this would be to treat the region variable as
-sequential:
+sequential, visualized in Figure 7: 
 
 ```python caption="(Incorrect) sequential palette, Mexican regions." tags=[]
 ax = mx.plot("HANSON98")
@@ -671,7 +671,7 @@ than those in the north, as the color map implies an intensity gradient.
 
 A more appropriate visualization
 is to use a "qualitative" color palette, which is used if you specify that
-the variable is categorical:
+the variable is categorical (Figure 8).
 
 ```python caption="Qualitative palette, Mexican regions." tags=[]
 ax = mx.plot("HANSON98", categorical=True, legend=True)
@@ -695,7 +695,7 @@ classi = mapclassify.UserDefined(
 classi
 ```
 
-If we now want to display these classes on a map, we can use a similar approach to how we have seen above, or use the built-in plotting method in `mapclassify`:
+If we now want to display these classes on a map, we can use a similar approach to how we have seen above, or use the built-in plotting method in `mapclassify` to generate Figure 9:
 
 ```python caption="Choropleth map colored to focus on areas of southern Mexico eligible for a target policy, showcasing user-defined map classifications." tags=[]
 classi.plot(
@@ -711,7 +711,7 @@ classi.plot(
 
 Since we want to draw attention to the classes at the bottom of the scale, we use the reverse viridis (`viridis_r`) palette. Thus, Figure 9 shows in purple the areas not targeted by our hypothetical policy.
 
-The approach above is useful in that it is based on `mapclassify` and thus provides a unified interface shared with all the algorithms seen above. An alternative one involves using the `pandas.cut` method, which allows us to easily include a legend too:
+The approach above is useful in that it is based on `mapclassify` and thus provides a unified interface shared with all the algorithms seen above. An alternative one involves using the `pandas.cut` method, which allows us to easily include a legend too in Figure 10: 
 
 ```python caption="User-defined palette, `pandas` approach." tags=[]
 # Classify values specifying bins
@@ -737,7 +737,7 @@ years = ["PCGDP1940", "PCGDP1960", "PCGDP1980", "PCGDP2000"]
 pooled = mapclassify.Pooled(mx[years], classifier="Quantiles", k=5)
 ```
 
-The `pooled` object contains a lot of information on the classification and we can use it to generate a figure with the maps. To do that, we rely also on the `UserDefined` classifier we have just seen in the previous section:
+The `pooled` object contains a lot of information on the classification and we can use it to generate a figure with the maps. To do that, we rely also on the `UserDefined` classifier we have just seen in the previous section to create a multi-pane figure showing the per capita income as it changes over time (Figure 11). 
 
 ```python caption="Pooled quantile classification of per capita GDP for 1940, 1960, 1980, and 2000, Mexican states." tags=[]
 # Set up figure with four axis
