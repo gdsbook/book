@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
     display_name: Python 3
     language: python
@@ -28,8 +28,8 @@ warnings.filterwarnings("ignore")
 Choropleths are geographic maps that display statistical information encoded 
 in a color palette. Choropleth maps play a prominent role in geographic data science as they allow
 us to display non-geographic attributes or variables on a geographic map. The
-word choropleth stems from the root "choro", meaning "region". As such
-choropleth maps represent data at the region level, and are appropriate for
+word choropleth stems from the root "choro", meaning "region". 
+Choropleth maps represent data at the region level, and are appropriate for
 areal unit data where each observation combines a value of an attribute and a
 geometric figure, usually a polygon. Choropleth maps derive from an earlier era
 where cartographers faced technological constraints that precluded the use of
@@ -87,7 +87,7 @@ Data classification considers the problem of
 partitioning the attribute values into mutually exclusive and exhaustive
 groups. The precise manner in which this is done will be a function of the
 measurement scale of the attribute in question. For quantitative attributes
-(ordinal, interval, ratio scales) the classes will have an explicit ordering.
+(ordinal, interval, ratio scales), the classes will have an explicit ordering.
 More formally, the classification problem is to define class boundaries such
 that
 
@@ -100,10 +100,9 @@ value of the attribute for spatial location $i$, $j$ is a class index, and $c_j$
 represents the lower bound of interval $j$. Different classification schemes obtain from their definition of the class
 boundaries. The choice of the classification scheme should take into
 consideration the statistical distribution of the attribute values as well
-as the goal of our map (e.g., highlight outliers Vs accurately depict the distribution of values).
+as the goal of our map (e.g., highlight outliers vs. accurately depict the distribution of values).
 
-To illustrate these considerations, we will examine regional income data for the
-32 Mexican states used in the paper by {cite}`Rey_2010`. The variable we focus on is per capita gross domestic product
+To illustrate these considerations, we will examine regional income data for 32 Mexican states {cite}`Rey_2010` in this chapter. The variable we focus on is per capita gross domestic product
 for 1940 (`PCGDP1940`):
 
 ```python tags=[]
@@ -113,15 +112,15 @@ mx[["NAME", "PCGDP1940"]].head()
 
 Which displays the following statistical distribution:
 
-```python caption="Distribution of per capita GDP across 1940s Mexican States" tags=[]
+```python caption="Distribution of per capita GDP across 1940s Mexican states" tags=[]
 # Plot histogram
 ax = seaborn.histplot(mx["PCGDP1940"], bins=5)
 # Add rug on horizontal axis
 seaborn.rugplot(mx["PCGDP1940"], height=0.05, color="red", ax=ax);
 ```
 
-As we can see, the distribution is positively skewed as in common in regional income studies. In other words,
-the mean exceeds the median (`50%`, in the table below), leading the to fat right tail in the figure. As
+As we can see, the distribution is positively skewed as is common in regional income studies. In other words,
+the mean exceeds the median (`50%`, in the table below), leading to the long right tail in the figure. As
 we shall see, this skewness will have implications for the choice of choropleth
 classification scheme.
 
@@ -178,7 +177,7 @@ The choropleth literature has many alternative classification algorithms that fo
 import mapclassify
 ```
 
-### Equal Intervals
+### Equal intervals
 
 The Freedman-Diaconis approach provides a rule to determine the width and, in
 turn, the number of bins for the classification. This is a special case of a
@@ -225,8 +224,8 @@ widths of the first four intervals are rather different:
 q5.bins[1:] - q5.bins[:-1]
 ```
 
-While quantiles does avoid the pitfall of sparse classes, this classification is
-not problem free. The varying widths of the intervals can be markedly different
+While quantile classification avoids the pitfall of sparse classes, this classification is
+not problem-free. The varying widths of the intervals can be markedly different
 which can lead to problems of interpretation. A second challenge facing quantiles
 arises when there are a large number of duplicate values in the distribution
 such that the limits for one or more classes become ambiguous. For example, if one had a variable with $n=20$ but 10 of the observations took on the same value which was the minimum observed, then for values of $k>2$, the class boundaries become ill-defined since a simple rule of splitting at the $n/k$ ranked observed value would depend upon how ties are treated when ranking.
@@ -260,7 +259,7 @@ ux
 ```
 
 In this case, `mapclassify` will issue a warning alerting the user to the issue that this sample does not contain enough unique values to form 
-the number of well-defined classes requested.  It then forms a lower number of classes using pseudo quantiles, or quantiles defined on the unique values in the sample, and then uses the pseudo quantiles to classify all the values.
+the number of well-defined classes requested.  It then forms a lower number of classes using pseudo-quantiles, or quantiles defined on the unique values in the sample, and then uses the pseudo-quantiles to classify all the values.
 
 
 ### Mean-standard deviation
@@ -286,13 +285,13 @@ information when we use the standard deviation. The lack of symmetry leads to
 an inadmissible upper bound for the first  class as well as a concentration of the
 vast majority of values in the middle class.
 
-### Maximum Breaks
+### Maximum breaks
 
 The maximum breaks classifier decides where to set the break points between
 classes by considering the difference between sorted values. That is, rather
 than considering a value of the dataset in itself, it looks at how apart each
 value is from the next one in the sorted sequence. The classifier then places
-the the $k-1$ break points in between the pairs of values most stretched apart from
+the $k-1$ break points in between the pairs of values most stretched apart from
 each other in the entire sequence, proceeding in descending order relative to
 the size of the breaks:
 
@@ -305,14 +304,14 @@ Maximum breaks is an appropriate approach when we are interested in making sure
 observations in each class are separated from those in neighboring classes. As
 such, it works well in cases where the distribution of values is not unimodal.
 In addition, the algorithm is relatively fast to compute. However, its
-simplicity can sometimes cause unexpected results. To the extent in only
+simplicity can sometimes cause unexpected results. To the extent that maximum breaks classification only
 considers the top $k-1$ differences between consecutive values, other more nuanced
 within-group differences and dissimilarities can be ignored.
 
-### Box-Plot
+### Boxplot
 
-The box-plot classification is a blend of the quantile and
-standard deviation classifiers. Here $k$ is predefined to six, with the upper limit of the first class is set
+The boxplot classification is a blend of the quantile and
+standard deviation classifiers. Here $k$ is predefined to six, with the upper limit of the first class set
 to:
 
 $$q_{0.25}-h \, IQR$$
@@ -343,7 +342,7 @@ bp1
 Doing so will affect the definition of the outlier classes, as well as the
 neighboring internal classes.
 
-### Head-Tail Breaks
+### Head-tail breaks
 
 The head tail algorithm {cite}`Jiang_2013` is based on a recursive partitioning of the data using splits around
 iterative means. The splitting process continues until the distributions within each of
@@ -360,11 +359,12 @@ For data with a heavy-tailed distribution, such as power law and log normal
 distributions, the head tail breaks classifier  can be particularly
 effective.
 
-### Jenks Caspall
+### Jenks-Caspall breaks
 
 This approach, as well as the following two, tackles the classification
-challenge from a heuristic perspective, rather than from deterministic one.
-Originally proposed by {cite}`Jenks_1971`, this algorithm aims to minimize
+challenge from a heuristic perspective, rather than from a deterministic one.
+Originally proposed by {cite}`Jenks_1971`, the Jenks-Caspall classification algorithm
+aims to minimize
 the sum of absolute deviations around class means. The approach begins with a
 prespecified number of classes and an arbitrary initial set of class breaks -
 for example using quintiles. The algorithm attempts to improve the objective
@@ -374,9 +374,9 @@ movement into the second quintile, while the lowest value in the second
 quintile would be considered for a possible move into the first quintile. The
 candidate move resulting in the largest reduction in the objective function
 would be made, and the process continues until no other improving moves are
-possible. The Jenks Caspall algorithm is the one-dimension case of the widely
+possible. The Jenks-Caspall algorithm is the one-dimension case of the widely
 used K-Means algorithm for clustering, which we will see later in this book
-when we consider [Clustering & Regionalization](10_clustering_and_regionalization).
+when we consider [Clustering and Regionalization](10_clustering_and_regionalization).
 
 ```python
 numpy.random.seed(12345)
@@ -384,11 +384,11 @@ jc5 = mapclassify.JenksCaspall(mx["PCGDP1940"], k=5)
 jc5
 ```
 
-### Fisher Jenks
+### Fisher-Jenks breaks
 
 The second optimal algorithm adopts a dynamic programming approach to minimize
 the sum of the absolute deviations around class medians. In contrast to the
-Jenks-Caspall approach, Fisher-Jenks is guaranteed to produce an optimal
+Jenks-Caspall algorithm, the Fisher-Jenks alorithm is guaranteed to produce an optimal
 classification for a prespecified number of classes:
 
 ```python
@@ -399,9 +399,9 @@ fj5
 
 ### Max-p
 
-Finally, the max-p classifiers adopts the algorithm underlying the max-p region
+Finally, the max-p classifier adopts the algorithm underlying the max-p region
 building method {cite}`Duque_2011` to the case of map classification. It is similar in spirit to
-Jenks Caspall in that it considers greedy swapping between adjacent classes to
+Jenks-Caspall in that it considers greedy swapping between adjacent classes to
 improve the objective function. It is a heuristic, however, so unlike
 Fisher-Jenks, there is no optimal solution guaranteed:
 
@@ -410,12 +410,12 @@ mp5 = mapclassify.MaxP(mx["PCGDP1940"], k=5)
 mp5
 ```
 
-### Comparing Classification schemes
+### Comparing classification schemes
 
 As a special case of clustering, the definition of
 the number of classes and the class boundaries pose a problem to the map
 designer. Recall that the Freedman-Diaconis rule was said to be optimal,
-however, the optimality necessitates the specification of an objective function.
+however; optimality can only be measured relative to a specified objective function.
 In the case of Freedman-Diaconis, the objective function is to minimize the
 difference between the area under estimated kernel density based on the sample
 and the area under the theoretical population distribution that generated the
@@ -427,17 +427,17 @@ mapping. Also relevant is the spatial distribution of the attribute values and
 the ability of the classifier to convey a sense of that spatial distribution. As
 we shall see, this is not necessarily directly related to the statistical
 distribution of the attribute values. We will return to a joint consideration of both
-the statistical and spatial distribution of the attribute values in comparison
-of classifiers below.
+the statistical and spatial distribution of the attribute values when comparing classifiers
+later in this chapter. 
 
 For map classification, a common optimality criterion
-is a measure of fit. In `mapclassify`, the "absolute deviation around class
-medians" (ADCM) is calculated and provides a measure of fit that allows for
+is a measure of fit. In `mapclassify`, the absolute deviation around class
+medians (ADCM) is calculated and provides a measure of fit that allows for
 comparison of alternative classifiers for the same value of $k$. The ADCM
 will give us a sense of how "compact" each group is. To see this, we can
 compare different classifiers for $k=5$ on the Mexico data:
 
-```python caption="Absolute Deviation around Class Medians. Alternative classification schemes, Mexican State PCGDP1940." tags=[]
+```python caption="Absolute Deviation around Class Medians. Alternative classification schemes, Mexican state per capita GDP in 1940." tags=[]
 # Bunch classifier objects
 class5 = q5, ei5, ht, mb5, msd, fj5, jc5, mp5
 # Collect ADCM for each classifier
@@ -463,9 +463,9 @@ assignment of the majority of the observations to the central class.
 The ADCM provides a global measure of fit which can be used to compare the
 alternative classifiers. As a complement to this global perspective, it can be
 revealing to consider how each of the observations in our data was classified across
-the alternative approaches. To do this we can add the class bin attribute (`yb`)
+the alternative approaches. To do this, we can add the class bin attribute (`yb`)
 generated by the `mapclassify` classifiers as additional columns in the dataframe to
-visualise how they map to observations:
+visualize how they map to observations:
 
 ```python
 # Append class values as a separate column
@@ -479,9 +479,9 @@ mx["Jenks Caspall"] = jc5.yb
 mx["MaxP"] = mp5.yb
 ```
 
-With those in one place, we can display their labels in a heatmap. Note that, since our variable of interest is continuous, we can sort the rows of the table by their value (`.sort_values('PCGDP1940')`) and color each cell according to the label assigned to it by each classifier. To make the heatmap easier to read, we transpose it (`.T`) so Mexican states are displayed along the horizontal axis and classification schemes are along the vertical one.
+With those in one place, we can display their labels in a heatmap. Note that, since our variable of interest is continuous, we can sort the rows of the table by their value (`.sort_values('PCGDP1940')`) and color each cell according to the label assigned to it by each classifier. To make the heatmap easier to read, we transpose it (`.T`) so that Mexican states are displayed along the horizontal axis and classification schemes are along the vertical one. (see Figure 3)
 
-```python caption="Assignment differences between alternative classification schemes, Mexican State PCGDP1940." tags=[]
+```python caption="Assignment differences between alternative classification schemes, Mexican state per capita GDP in 1940." tags=[]
 f, ax = plt.subplots(1, figsize=(9, 3))
 seaborn.heatmap(
     mx.set_index("NAME")
@@ -505,7 +505,7 @@ seaborn.heatmap(
 ax.set_xlabel("State ID");
 ```
 
-The figure can be challenging to read at first but, once you "decode" it, it packs
+Figure 3 can be challenging to read at first but, once you "decode" it, it packs
 a lot of information. Each row includes a full 
 series of all of our data, classified by an algorithm, with the group to which it 
 has been assigned encoded on a color scale from light yellow (lowest value group) 
@@ -529,11 +529,11 @@ pandas.DataFrame(
 )
 ```
 
-Doing so highlights the similarities between Fisher Jenks and equal intervals as
+Doing so highlights the similarities between Fisher-Jenks and equal intervals as
 the distribution counts are very similar, with the two approaches agreeing on all 17
 states assigned to the first class. Indeed, the only observation that
 distinguishes the two classifiers is the treatment of Baja California Sur which
-is kept in class 1 in equal intervals, but assigned to class 2 by Fisher Jenks.
+is kept in class 1 in equal intervals, but assigned to class 2 by Fisher-Jenks.
 
 ## Color
 
@@ -548,9 +548,9 @@ distribution of the attribute values.
 Prior to examining the attribute values it is important to note that, as we will
 see in the figures below, the
 spatial units for these states are far from homogeneous in their shapes and
-sizes. This can have major impacts on our brain's pattern recognition capabilities
+sizes. This can have major impacts on our brain's pattern recognition capabilities,
 as we tend to be drawn to the larger polygons, even though they might not be
-the most relevant one for our analysis. Yet, when we considered the
+the most relevant ones for our analysis. Yet, when we considered the
 statistical distribution above, each observation was given equal weight. Thus,
 the spatial distribution becomes more complicated to evaluate from a visual and
 statistical perspective.
@@ -559,13 +559,13 @@ The choice of a color scheme for a
 choropleth map should be based on the type of variable under consideration
 {cite}`Brewer1997mapping`. Generally, a distinction is drawn between three
 types of numerical attributes: sequential, diverging, and qualitative. We will
-dig into each below but, before, let us explore how we can make choropleths in
-Python. The mechanics are the same across different type of data, so it is worth
+dig into each below, but we will explore how we can make choropleths in
+Python first. The mechanics are the same across different types of data, so it is worth
 spending a bit of time first to get the general idea.
 
 We will illustrate it with a quantile map:
 
-```python caption="Quantile choropleth, Mexican State PCGDP1940." tags=[]
+```python caption="Quantile choropleth, Mexican state per capita GDP in 1940." tags=[]
 ax = mx.plot(
     column="PCGDP1940",  # Data to plot
     scheme="Quantiles",  # Classification scheme
@@ -576,15 +576,15 @@ ax = mx.plot(
 ax.set_axis_off();
 ```
 
-Making choropleths on geo-tables is an extension of plotting their geometries. We use the same `.plot` function but now we also select the column of data we want to encode with color (in our case, `PCGDP1940`). We can also specify the classification scheme using the same names as we saw above with `mapclassify`. In fact, the underlying computation is always performed with `mapclassify`. This approach simply dispatches it so it is more convenient and we can make maps in one line of code. Next, we pick the color scheme. The default color map used by `geopandas` is viridis, which is a multi-hue sequential scheme but, for this example, we pick the yellow to green scale from Color Brewer. Finally, we specify we would like to add a legend, and format it for legibility so that there are no decimals and it reads cleaner.
+Making choropleths on geo-tables is an extension of plotting their geometries. We use the same `.plot()` function, but now we also select the column of data we want to encode with color (in our case, `PCGDP1940`). We can also specify the classification scheme using the same names as we saw above with `mapclassify`. In fact, the underlying computation is always performed with `mapclassify`. This approach simply dispatches it so it is more convenient and we can make maps in one line of code. Next, we pick the color scheme. The default color map used by `geopandas` is viridis, which is a multi-hue sequential scheme but, for this example, we pick the yellow-to-green scale from Color Brewer. Finally, we specify that we would like to add a legend, and format it for legibility so that there are no decimals and it reads cleaner.
 
 
-### Sequential Palettes
+### Sequential palettes
 
 
 Sequential color schemes are appropriate for continuous data where the origin is in one end of the series. The `PCGDP1940` column we have been using so far is a good example. In these cases, we want a palette that encodes this feature in its choice of colors. Sequential palettes use a gradient of colors from an origin color to a destination color. The example above, where lowest values are encoded in the lightest yellow and the highest in dark green is a good one. Sequential palettes can also have a shades of a single color. For example, the popular "blues" palette in Color Brewer is a great choice too:
 
-```python caption="Quantile choropleth with black borderlines, Mexican State PCGDP1940." tags=[]
+```python caption="Quantile choropleth with black borderlines, Mexican state per capita GDP in 1940." tags=[]
 ax = mx.plot(
     column="PCGDP1940",  # Data to plot
     scheme="Quantiles",  # Classification scheme
@@ -602,17 +602,17 @@ ax.set_axis_off();
 Note how, in this case, we switch borderlines to black so that we can distinguish states in the lowest category from the white background.
 
 
-### Diverging Palettes
+### Diverging palettes
 
 A slightly different pallete from the sequential one is the so-called "diverging" values palette. This is
 useful with continuous data when one wishes to place equal emphasis on mid-range critical values as
 well as extremes at both ends of the distribution. Light colors are used to
-emphasize the mid-range class while dark colors with contrasting hues are used
+emphasize the mid-range class, while dark colors with contrasting hues are used
 to distinguish the low and high extremes.
 
 To illustrate this with the Mexican
 income data, we can derive a new variable which measures the change in a state's
-rank in the income distribution between 1940 to 2000:
+rank in the income distribution from 1940 to 2000:
 
 ```python
 # Create income-based rank table (Rank 1 is highest)
@@ -623,9 +623,9 @@ rnk["change"] = rnk["PCGDP1940"] - rnk["PCGDP2000"]
 rnk["class"] = pandas.cut(rnk["change"], [-numpy.inf, -5, 0, 5, 20])
 ```
 
-The `rnk` table now contains the change in rank positions of each state between 1940 and 2000, as well as a `class` column that binds together states in the  [-inf, -5), [-5, 0), [0, 5), [5, 20] groups. Note that these are descending ranks, so the wealthiest state in any period has a rank of 1 and therefore when considering the change in ranks, a negative change reflects moving down the income distribution. We can use a divergent palette to signify both intensity of the change in ranks, as well as direction:
+The `rnk` table now contains the change in rank positions of each state between 1940 and 2000, as well as a `class` column that binds together states in the  [-inf, -5), [-5, 0), [0, 5), [5, 20] groups. Note that these are descending ranks, so the wealthiest state in any period has a rank of 1, and therefore when considering the change in ranks, a negative change reflects moving down the income distribution. We can use a divergent palette to signify both intensity of the change in ranks, as well as direction:
 
-```python caption="Divergent palette, Mexican State per capita income rank change." tags=[]
+```python caption="Divergent palette, Mexican state per capita income rank change." tags=[]
 ax = (
     mx[["geometry"]]
     .join(rnk)
@@ -634,11 +634,11 @@ ax = (
 ax.set_axis_off();
 ```
 
-In the map, the red (green) hues are states that have moved downwards (upwards) in the
+In the map, the red (green) hues are states that have moved downward (upward) in the
 income distribution, with the darker hue representing a larger movement.
 
 
-### Qualitative Palettes
+### Qualitative palettes
 
 Qualitative palettes encode categorical data. In this case, colors do _not_ follow
 a gradient but rather imply qualitative differences between classes. That is, observations
@@ -654,7 +654,7 @@ mx["HANSON98"].head()
 ```
 
 This aggregation scheme partitions Mexico into five regions, recorded with
-the numbers one to five in the table. A naive (and
+the numbers 1 to 5 in the table. A naive (and
 incorrect) way to display this would be to treat the region variable as
 sequential:
 
@@ -664,8 +664,8 @@ ax.set_axis_off();
 ```
 
 This is not correct because the region variable is not on an interval scale, so
-the differences between the values have no quantitative significance but rather
-the values simply indicate region membership. However, the choropleth above gives
+the differences between the values have no quantitative significance, but rather
+the values simply indicate region membership. However, the choropleth in Figure 7 gives
 a clear visual cue that regions in the south have larger values
 than those in the north, as the color map implies an intensity gradient.
 
@@ -697,7 +697,7 @@ classi
 
 If we now want to display these classes on a map, we can use a similar approach to how we have seen above, or use the built-in plotting method in `mapclassify`:
 
-```python caption="Choropleth map colored to focus on areas of southern Mexico eligible for a target policy, showcasting User-Defined map classifications." tags=[]
+```python caption="Choropleth map colored to focus on areas of southern Mexico eligible for a target policy, showcasing user-defined map classifications." tags=[]
 classi.plot(
     mx,  # Use geometries in the geo-table
     legend=True,  # Add a legend
@@ -709,7 +709,7 @@ classi.plot(
 );
 ```
 
-Since we want to draw attention to the classes at the bottom of the scale, we use the reverse viridis (`viridis_r`) palette, showing in purple those areas not targetted by our hypothetical policy.
+Since we want to draw attention to the classes at the bottom of the scale, we use the reverse viridis (`viridis_r`) palette. Thus, Figure 9 shows in purple the areas not targeted by our hypothetical policy.
 
 The approach above is useful in that it is based on `mapclassify` and thus provides a unified interface shared with all the algorithms seen above. An alternative one involves using the `pandas.cut` method, which allows us to easily include a legend too:
 
@@ -724,7 +724,7 @@ ax = mx.plot(lbls, cmap="viridis_r", legend=True)
 ax.set_axis_off();
 ```
 
-### Pooled Classifications
+### Pooled classifications
 
 Sometimes choropleths exist as part of larger figures that may include more choropleths. In some cases, each of them can be best considered as an independent map, and then everything we have seen so far applies directly. In other instances, we may want to create a single classification of values _across_ the maps and use it consistently. For those situations, we can create _pooled_ classifications that consider all the values across the series.
 
@@ -737,14 +737,9 @@ years = ["PCGDP1940", "PCGDP1960", "PCGDP1980", "PCGDP2000"]
 pooled = mapclassify.Pooled(mx[years], classifier="Quantiles", k=5)
 ```
 
-<!-- #region -->
-The `pooled` object contains a lot of information on the classification and we can use it to generate a figure with the maps. To do that, we rely also on the `UserDefined` classifier we have just seen in the previous section: [^gpnote]
+The `pooled` object contains a lot of information on the classification and we can use it to generate a figure with the maps. To do that, we rely also on the `UserDefined` classifier we have just seen in the previous section:
 
-
-[^gpnote]:  At the time of writing, there is a bug in `geopandas` plotting that scrambles the legend and classification in cases when there are empty classes (ie. no observation is within the bin bounds). An issue has been filed [here](https://github.com/geopandas/geopandas/issues/2018) and, as soon as it is resolved, the code in the chapter will be updated.
-<!-- #endregion -->
-
-```python caption="Pooled quantile classification of per capita GDP for 1940, 1969, 1980, and 2000, Mexican states." tags=[]
+```python caption="Pooled quantile classification of per capita GDP for 1940, 1960, 1980, and 2000, Mexican states." tags=[]
 # Set up figure with four axis
 f, axs = plt.subplots(2, 2, figsize=(12, 12))
 # Flatten the array of axis so you can loop over
@@ -779,14 +774,14 @@ scheme, variable measurement scale, spatial configuration and color palettes
 were illustrated using Pysal's map classification module together with other
 related packages in the Python data stack.
 
-Choropleth maps are a central tool in the geographic data science toolkit as
+Choropleth maps are a central tool in the geographic data science toolkit, as
 they provide powerful visualizations of the spatial distribution of attribute
 values. We have only touched on the basic concepts in this chapter, as there is
 much more that can be said about cartographic theory and the design of effective
 choropleth maps. Readers interested in pursuing this literature are encouraged
 to see the references cited.
 
-At the same time, given the philosophy underlying Pysal the methods we cover
+At the same time, given the philosophy underlying Pysal, the methods we cover
 here are sufficient for exploratory data analysis where the rapid and flexible
 generation of views is critical to the work flow. Once the analysis is complete,
 and the final presentation quality maps are to be generated, there are excellent
@@ -794,24 +789,24 @@ packages in the data stack that the user can turn to.
 
 ## Questions
 
-1. A variable (such as population density measured for census tracts in a metropolitan area) can display a high degree of skewness. That is, the distribution may be very asymmetric, either with a few very values and a bulk of low ones; or a few very low values with a bulk of high values. What is an appropriate choice for a choropleth classification for a skewed variable?
+1. A variable (such as population density measured for census tracts in a metropolitan area) can display a high degree of skewness. That is, the distribution may be very asymmetric, either with a few very high values and a bulk of low ones; or a few very low values with a bulk of high values. What is an appropriate choice for a choropleth classification for a skewed variable?
 2. Provide two solutions to the problem of ties when applying quantile classification to the following series: $y=[2,2,2,2,2,2,4,7,8,9,20,21]$ and $k=4$. Discuss the merits of each approach.
 3. Which classifiers are appropriate for data that displays a high degree of multi-modality in its statistical distribution? 
 4. Are there any colormaps that work well for multi-modal data?
-5. Contrast and compare classed choropleth maps with class-less (i.e. continuous-scale) choropleth maps? What are the strengths and limitations of each type of visualization for spatial data?
+5. Contrast and compare classed choropleth maps with class-less (i.e., continuous-scale) choropleth maps? What are the strengths and limitations of each type of visualization for spatial data?
 6. In what ways do choropleth classifiers treat intra-class and inter-class heterogeneity differently? What are the implications of these choices?
 7. To what extent do most commonly employed choropleth classification methods take the geographical distribution of the variable into consideration? Can you think of ways to incorporate the spatial features of a variable into a classification for a choropleth map?
 8. Discuss the similarities between the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?
 9. The Fisher-Jenks classifier will always have more internally homogeneous classes than other k-classifiers. Given this, why might one decide on choosing a different k-classifier for a particular data set?
 
-## Next Steps
+## Next steps
 
 We have but touched the surface of the large literature on choropleth mapping in particular, and geovisualization more generally. Readers interested in delving deeper into these topices are directed to the following:
 
 - {cite}`slocum2014thematic`. Thematic Cartography and Geovisualization. Pearson.
-- {cite} `cromely2009choropleth`. "Choropleth map legend design for visualizing community health disparities." *International Journal of Health Geographics*, 8: 1-11.
-- {cite} `cromely1996comparison`. "A comparison of optimal classification strategies for choroplethic displays of spatiall aggregated data." *International Journal of Geographc Information Systems*, 10: 405-424.
-- {cite} `brewer2005designming`. Designing better maps: A guide for GIS Users. ESRI press.
+- {cite}`cromely2009choropleth`. "Choropleth map legend design for visualizing community health disparities." *International Journal of Health Geographics*, 8: 1-11.
+- {cite}`cromely1996comparison`. "A comparison of optimal classification strategies for choroplethic displays of spatiall aggregated data." *International Journal of Geographc Information Systems*, 10: 405-424.
+- {cite}`brewer2005designming`. Designing better maps: A guide for GIS Users. ESRI press.
 
 
 ```python
