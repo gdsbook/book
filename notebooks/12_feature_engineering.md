@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.13.8
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -15,6 +15,7 @@ jupyter:
 
 ```python tags=["remove-cell"]
 import warnings
+from myst_nb import glue
 
 warnings.filterwarnings("ignore")
 ```
@@ -22,13 +23,13 @@ warnings.filterwarnings("ignore")
 # Spatial Feature Engineering
 
 
-In machine learning and data science, we are often equipped with *tons* of data. Indeed, given the constellation of packages to query data services, free and open source data sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful *features* from this rich and deep sea of data. 
+In machine learning and data science, we are often equipped with *tons* of data. Indeed, given the constellation of packages to query data services, free and open source data-sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful *features* from this rich and deep sea of data. 
 
 Where data is available, but not yet directly *usable*, *feature engineering* helps to construct representations or transformations of the original data that are more useful for modeling a given phenomenon of interest. In traditional machine learning, feature engineering involves applying additional *domain knowledge* to raw information in order to structure it in a manner that is meaningful for a model. Often, this involves some sort of *transformation* of the original dataset, which is a well-studied concept in both classical statistics and remains so in machine learning methods. While *feature engineering* always relies on this implicit domain knowledge, it is an extremely important part of adapting general-purpose algorithms to unique or distinctive problems facing the every-day data scientist. 
 
-Geography is one of the most high-quality, ubiquitous ways to introduce *domain knowledge* into a problem: everything has a position in both *space* and *time*. And, while things that happen near to one another *in time* do not necessarily have a fundamental relationship, things that are *near* one another are often related. Thus, space is the ultimate *linkage key*, allowing us to connect different datasets together in order to improve our models and our predictions. This means that, even for *aspatial*, "non-geographic" data, you can use *spatial feature engineering* to create useful, highly-relevant features for your analysis. 
+Geography is one of the most high-quality, ubiquitous ways to introduce *domain knowledge* into a problem: everything has a position in both *space* and *time*. And, while things that happen near one another *in time* do not necessarily have a fundamental relationship, things that are *near* one another are often related. Thus, space is the ultimate *linkage key*, allowing us to connect different datasets together in order to improve our models and our predictions. This means that, even for *aspatial*, "non-geographic" data, you can use *spatial feature engineering* to create useful, highly relevant features for your analysis. 
 
-At its core, *spatial feature engineering* is the process of developing additional information from raw data using *geographic knowledge*. This distilling of information can occur *between* datasets, where geography is used to link information in separate datasets together; or *within* datasets, where geography can be used to augment the information available for one sample by borrowing from nearby ones. This chapter is structured following that distinction: for cases where geography connects *different* datasets, we adopt the term "Map Matching", often used in industry; while we use the mirroring concept of "Map Synthesis" describing the use of geographical structure to derive new features from a given dataset. Technically speaking, some of the methods we review are similar across these two cases, or even the same; however they can be applied in the context of "matching" or "synthesis", and we consider those conceptually different, hence their inclusion in both sections. Throughout the chapter, we use the AirBnB nightly rental prices in San Diego, as well as auxiliary datasets such as elevation or Census demographics.
+At its core, *spatial feature engineering* is the process of developing additional information from raw data using *geographic knowledge*. This distilling of information can occur *between* datasets, where geography is used to link information in separate datasets together; or *within* datasets, where geography can be used to augment the information available for one sample by borrowing from nearby ones. This chapter is structured following that distinction: for cases where geography connects *different* datasets, we adopt the term "Map Matching", often used in industry; while we use the mirroring concept of "Map Synthesis" describing the use of geographical structure to derive new features from a given dataset. Technically speaking, some of the methods we review are similar across these two cases, or even the same; however, they can be applied in the context of "matching" or "synthesis", and we consider those conceptually different, hence their inclusion in both sections. Throughout the chapter, we use the Airbnb nightly rental prices in San Diego, as well as auxiliary datasets such as elevation or census demographics.
 
 ```python
 import geopandas, pandas, libpysal.weights as weights, contextily
@@ -47,7 +48,7 @@ osmnx.config(
 )
 ```
 
-Throughout this chapter, we will use the same dataset to which we want to append more information or augment, and we will do so through leveraging geography. For the illustration, we will use the set of [AirBnB properties](../data/airbnb/regression_cleaning) we have used in the [previous chapter](11_regression). Let's read it:
+Throughout this chapter, we will use the same dataset to which we want to append more information or augment, and we will do so through leveraging geography. For the illustration, we will use the set of [Airbnb properties](../data/airbnb/regression_cleaning) we have used in [Chapter 11](11_regression). Let's read it:
 
 ```python
 airbnbs = geopandas.read_file("../data/airbnb/regression_db.geojson")
@@ -57,35 +58,35 @@ airbnbs = geopandas.read_file("../data/airbnb/regression_db.geojson")
 
 At its core, *spatial feature engineering* is the process of developing additional information from raw data using *geographic knowledge*. This synthesis could occur *between* datasets, where geography is used to link samples in separate datasets together; or *within* datasets, where geography can be used to borrow information from nearby samples. Building linkages *between* datasets is often called "Map Matching", while we use the term "Map Synthesis" to describe the use of geographical structure to derive new features from existing data. We will cover both kinds of feature engineering.
 
-To help us discuss this, a vocabulary is helpful. We will cover a few different kinds of features in this chapter, both of which can be constructed in either Map Synthesis or Map Matching operations: 
-- A *spatial summary feature* measures the attributes of observations that have some pre-specified spatial relationship with our target observations. This includes 
-    - taking the average or median value of features within a neighborhood of each target observation. 
-    - the *spatial lag*, used in previous chapters of this book (e.g., Chapters [3](03_spatial_data), [6](06_spatial_autocorrelation), and [11](11_regression), is a kind of spatial summary feature, since it reflects the average value of the data in the neighborhood around each point. 
+To help us discuss this, a vocabulary is helpful. We will cover a few different kinds of features in this chapter. All of them can be constructed using either Map Synthesis or Map Matching operations: 
+- A *spatial summary feature* measures the attributes of observations that have some pre-specified spatial relationship with our target observations. This includes:
+    - Taking the average or median value of features within a neighborhood of each target observation. 
+    - The *spatial lag*, used in previous chapters of this book, e.g., Chapters [3](03_spatial_data), [6](06_spatial_autocorrelation), and [11](11_regression), is a kind of spatial summary feature, since it reflects the average value of the data in the neighborhood around each point. 
     - Other kinds of spatial summary features might include the count of observations within a given distance or the standard deviation of ten nearest observations. 
     - Summary features generally include *interpolated features* which involve a transfer of information from one spatial support to another, such as when the target locations are not the same as the locations in our ancillary data. Interpolated features become significantly more complex as well when the data is *areal*, as will be discussed later in this chapter.
 - A *proximity feature* measures the distance from a target observation to some other observation or position in the map. This might be done in a map matching context, as we did before with the distance to Balboa Park in [Chapter 11](11_regression), or it might be done in a map synthesis context by measuring the distance to the nearest other observation. 
 
-## Feature Engineering Using Map Matching
+## Feature engineering using map matching
 
 Space is the ultimate linkage key; map matching is all about exploiting this asset. Geographic information is collected at different scales, aggregated using bespoke geographic delineations, and ultimately stored in different datasets. Modeling and machine learning usually require the use of data aligned and coherently structured; to bring disparate geo-datasets together, the data scientist needs to be able to transfer information expressed for one geography into another. This is where map matching comes to the rescue. By using geographical location, we can connect datasets that have no common key or that are otherwise completely unrelated. This is a "magic trick" that we can pull off because of location that would be much harder, or impossible, with data lacking spatial information.
 
 The details, and difficulty, of this transfer of information from one geography to another one depend on the nature of the "source" and "target", and on the precision with which we want to perform such transfer. In this context, there is always an inevitable trade-off between precision and sophistication: more precise transfer is usually possible at the expense of more advanced and involved techniques. Their additional cost in applying them, both in terms of cognitive load on the data scientist's part or in terms of computation, must be weighted in on an individual basis: sometimes we need the best possible estimates, at all costs; sometimes "good enough" is, well, good enough. 
 
-In this section, we cover a few cases that we consider represent the most common and widely used approaches. We begin with situations where we have two point datasets and all we need to calculate are descriptive statistics of one dataset to the observations in the other. We switch the type of data and consider how to attach information from a continuous grid, stored in a raster file, to a set of points. Then we show the equivalent case for "moving" information for a polygon geography to a point dataset. These are all cases that, in their simplest form, involve mostly traditional GIS operations (e.g., buffer construction, spatial joins) and little in the way of statistical modeling. As an example of a case that is more involved, we cover the transfer of information from a set of points to another set of points in different locations, and of a polygon geography to another different polygon geography. For these final cases, but also as more generally, we try to include examples that capture the essence of the method, but keep the technique as simple as possible. For almost any of these cases we cover, the reader can find more sophisticated techniques that usually yield more accurate estimates. Where possible, we try to signpost these.
+In this section, we cover a few cases that we consider represent the most common and widely used approaches. We begin with situations where we have two point datasets and all we need to calculate are descriptive statistics of one dataset to the observations in the other. We switch the type of data and consider how to attach information from a continuous grid, stored in a raster file, to a set of points. Then we show the equivalent case for "moving" information for a polygon geography to a point dataset. These are all cases that, in their simplest form, involve mostly traditional GIS operations (e.g., buffer construction, spatial joins) and little in the way of statistical modeling. As an example of a case that is more involved, we cover the transfer of information from a set of points to another set of points in different locations, and of a polygon geography to another different polygon geography. For these final cases, but also more generally, we try to include examples that capture the essence of the method but keep the technique as simple as possible. For almost any of these cases we cover, the reader can find more sophisticated techniques that usually yield more accurate estimates. Where possible, we try to signpost these.
 
 ### Counting *nearby* features
 
 
-A first, conceptually straightforward, approach is to augment our dataset by counting how many points of a different dataset are in the vicinity of each observation. For example, we might want to know how many bars and restaurants each AirBnB has within a given radius. This count can then become an additional  feature of our dataset, stored in a new column of `airbnbs`.
+A first, conceptually straightforward, approach is to augment our dataset by counting how many points of a different dataset are in the vicinity of each observation. For example, we might want to know how many bars and restaurants each Airbnb has within a given radius. This count can then become an additional  feature of our dataset, stored in a new column of `airbnbs`.
 
-To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our `airbnbs` points. From [Chapter 8](08_point_pattern_analysis), we can recall that there are a few different hulls that can be used. We'll use the Convex Hull here, which is the smallest convex polygon that covers all of the points in the set. 
+To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our `airbnbs` points. From [Chapter 8](08_point_pattern_analysis), we can recall that there are a few different hulls that can be used. We'll use the Convex Hull here (Fig. XXX1XXX), which is the smallest convex polygon that covers all the points in the set. 
 
-```python caption="Convex Hull of the Airbnbs in San Diego." tags=[]
+```python caption="Convex hull of the Airbnbs in San Diego." tags=[]
 airbnbs_ch = airbnbs.unary_union.convex_hull
 geopandas.GeoSeries([airbnbs_ch]).plot()
 ```
 
-Using this polygon, we can use the `osmnx` package to fetch points of interest (POIs) from OpenStreetMap. We can make our request more manageable by only requesting points of interest that fall within specific categories. Below, we'll request POIs within San Diego that are "restaurants" or "bars," according to their metadata stored in OpenStreetMap. Once returned, we only keep a few columns to keep the table small and tidy:
+Using this polygon, we can use the `osmnx` package to fetch POIs from OpenStreetMap. We can make our request more manageable by only requesting POIs that fall within specific categories. Below, we'll request POIs within San Diego that are "restaurants" or "bars," according to their metadata stored in OpenStreetMap. Once returned, we only use a few columns to keep the table small and tidy:
 
 ```python
 %%time
@@ -116,18 +117,18 @@ The code snippet above sends a query to the OpenStreetMap server to fetch the da
 pois = geopandas.read_file("../data/cache/sd_pois.gpkg")
 ```
 
-This provides us with every location within our convex hull that is tagged in the metadata stored in OpenStreetMap as a "restaurant" or "bar". Overall, this provides us with about 1300 points of interest: 
+This provides us with every location within our convex hull that is tagged in the metadata stored in OpenStreetMap as a "restaurant" or "bar". Overall, this provides us with about 1300 POIs: 
 
 ```python
 pois.groupby("amenity").amenity.count()
 ```
 
-Once loaded into `pois` as a `GeoDataFrame`, let's take a peek at their location, as compared with AirBnB spots:
+Once loaded into `pois` as a `GeoDataFrame`, we use the code below to generate Figure XXX2XXX, which takes a peek at their location, as compared with Airbnb spots:
 
 ```python caption="Points of interest (POIs) and Airbnbs in San Diego." tags=[]
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(12, 12))
-# Plot AirBnb properties
+# Plot Airbnb properties
 airbnbs.plot(ax=ax, marker=".")
 # Plot POIs in red
 pois.plot(ax=ax, color="r")
@@ -143,17 +144,17 @@ ax.set_axis_off()
 plt.show()
 ```
 
-Now, for some feature engineering. It may be extremely useful to know whether an AirBnB is located in a "hot" location, with a lot of restaurants and bars to choose from. Alternatively, if AirBnBs are very remote, they might not be as lucrative for short, expensive "city-break" reservations. That is, AirBnB users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be *willing to pay more* for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the AirBnB. 
+Now for some feature engineering. It may be extremely useful to know whether an Airbnb is located in a "hot" location, with a lot of restaurants and bars to choose from. Alternatively, if Airbnbs are very remote, they might not be as lucrative for short, expensive "city-break" reservations. That is, Airbnb users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be *willing to pay more* for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the Airbnb. 
 
-Thus, we can *engineer features* in the AirBnB data using the nearby POIs. To do this, we can create a new feature for the AirBnB dataset --that is, a new column in `airbnbs`-- which incorporates information about how many POIs are *nearby* each property. This kind of "feature counting" is useful in applications where the mere presence of nearby features can affect the quantity we are modeling. 
+Thus, we can *engineer features* in the Airbnb data using the nearby POIs. To do this, we can create a new feature for the Airbnb dataset --that is, a new column in `airbnbs`-- which incorporates information about how many POIs are *nearby* each property. This kind of "feature counting" is useful in applications where the mere presence of nearby features can affect the quantity we are modeling. 
 
 To do this kind of feature engineering, let us first walk through what we need to do at a conceptual level: 
 
-1. Decide what is *nearby*. This will dictate how far we go from each AirBnB when counting the number of "nearby" bars & restaurants. For this example, we will use 500 meter buffer, which is approximately the distance of a leisurely ten-minute walk.
-2. For each AirBnB, determine whether POIs are *within* a leisurely ten-minute walk. 
-3. Count how many POIs are within the specified radius of each AirBnB.
+1. Decide what is *nearby*. This will dictate how far we go from each Airbnb when counting the number of "nearby" bars and restaurants. For this example, we will use a 500-meter buffer, which is approximately the distance of a leisurely ten-minute walk.
+2. For each Airbnb, determine whether POIs are *within* a leisurely ten-minute walk. 
+3. Count how many POIs are within the specified radius of each Airbnb.
 
-At the end of this procedure, we have the number of bars & restaurants that are within a leisurely walk of the AirBnB, which might be useful in predicting the price of each AirBnB. 
+At the end of this procedure, we have the number of bars and restaurants that are within a leisurely walk of the Airbnb, which might be useful in predicting the price of each Airbnb. 
 
 Let us now translate the list above into code. For part 1., we need to be able to measure distances in meters. However, `airbnbs` is originally expressed in degrees, since it is provided in terms of locations in latitude and longitude:
 
@@ -161,7 +162,7 @@ Let us now translate the list above into code. For part 1., we need to be able t
 airbnbs.crs
 ```
 
-In addition, the `pois` are also provided in terms of their latitude & longitude:
+In addition, the `pois` are also provided in terms of their latitude and longitude:
 
 ```python
 pois.crs
@@ -178,13 +179,13 @@ pois_albers = pois.to_crs(epsg=3311)
 pois_albers.crs
 ```
 
-With this, we can create the radius of 500m around each AirBnB. This is often called *buffering*, where a shape is dilated by a given radius.
+With this, we can create the radius of 500 meters around each Airbnb. This is often called *buffering*, where a shape is dilated by a given radius.
 
 ```python
 airbnbs_albers["buffer_500m"] = airbnbs_albers.buffer(500)
 ```
 
-Now, `abb_buffer` contains a 500-meter circle around each AirBnB.
+Now, `abb_buffer` contains a 500-meter circle around each Airbnb.
 
 Using these, we can count the number of POIs that are within these areas using a *spatial join*. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: `pois within airbnb_buffers`, where `within` is the predicate relating `pois` to `airbnb_buffers`. Predicates are not always *reversible*: no `airbnb_buffer` can be `within` a `poi`. In `geopandas`, we can compute all pairs of relations between the `pois` and `airbnb_buffers` efficiently using the `sjoin` function, which takes a `predicate` argument defining the requested relationship between the first and second argument. 
 
@@ -194,7 +195,7 @@ joined = geopandas.sjoin(
     # Right table - POIs
     pois_albers,
     # Left table - Airbnb with the geometry reset from the original
-    # points to the 500m buffer and selecting only `id` and
+    # points to the 500-meter buffer and selecting only `id` and
     # `buffer_500m` column
     airbnbs_albers.set_geometry("buffer_500m")[["id", "buffer_500m"]],
     # Operation (spatial predicate) to use for the spatial join (`within`)
@@ -202,7 +203,7 @@ joined = geopandas.sjoin(
 )
 ```
 
-The resulting `joined` object contains a row for every pair of POI and AirBnB that are linked. From there, we can apply a group-by operation, using the AirBnB ID, and count how many POIs each AirBnB has within 500m of distance:
+The resulting `joined` object contains a row for every pair of POI and Airbnb that are linked. From there, we can apply a group-by operation, using the Airbnb ID, and count how many POIs each Airbnb has within 500 meters of distance:
 
 ```python
 # Group POIs by Airbnb ID (`id`)
@@ -221,7 +222,7 @@ poi_count = (
 poi_count.head()
 ```
 
-The resulting `Series` is indexed on the AirBnB IDs, so we can assign it to the original `airbnbs` table. In this case, we know by construction that missing AirBnBs in `poi_count` do not have any POI within 500m, so we can fill missing values in the column with zeros.
+The resulting `Series` is indexed on the Airbnb IDs, so we can assign it to the original `airbnbs` table. In this case, we know by construction that missing Airbnbs in `poi_count` do not have any POI within 500m, so we can fill missing values in the column with zeros.
 
 ```python
 airbnbs_w_counts = airbnbs_albers.merge(
@@ -229,9 +230,9 @@ airbnbs_w_counts = airbnbs_albers.merge(
 ).fillna({"poi_count": 0})
 ```
 
-We can visualize now the distribution of counts to get a sense of how "well-served" AirBnB properties are arranged over space:
+We can visualize now (Fig. XXX3XXX) the distribution of counts to get a sense of how "well-served" Airbnb properties are arranged over space:
 
-```python caption="Number of POIs within 500m from each Airbnb." tags=[]
+```python caption="Number of POIs within 500 meters of each Airbnb." tags=[]
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot quantile map of No. of POIs for every Airbnb
@@ -252,17 +253,17 @@ contextily.add_basemap(
 ax.set_axis_off();
 ```
 
-### Assigning point values from surfaces: elevation of AirBnBs
+### Assigning point values from surfaces: elevation of Airbnbs
 
 
 We have just seen how to count points around each observation in a point dataset. In other cases, we might be confronted with a related but different challenge: transferring the value of a particular point in a surface to a point in a different dataset. 
 
-To make this more accessible, let us illustrate the context with an example question: *what is the elevation of each AirBnB property?* To answer this question, we require, at least, the following:
+To make this more accessible, let us illustrate the context with an example question: *what is the elevation of each Airbnb property?* To answer this question, we require, at least, the following:
 
-1. A sample of AirBnB property locations.
+1. A sample of Airbnb property locations.
 1. A dataset of elevation. We will use here the [NASA DEM](../data/nasadem/README.md) surface for the San Diego area.
 
-Let  us open and plot the file with elevation data:
+We use the code below, which opens and plot the file with elevation data, to generate Figure XXX4XXX:
 
 ```python caption="Digital elevation model of the San Diego area." tags=[]
 # Open file
@@ -313,7 +314,7 @@ elevation = pandas.DataFrame(
 elevation.head()
 ```
 
-Now we have a table with the elevation of each  AirBnB property, we can plot the site elevations on a map for visual inspection:
+Now that we have a table with the elevation of each Airbnb property, we can plot the site elevations on a map (Fig. XXX5XXX) for visual inspection:
 
 ```python caption="Elevation above sea level at each Airbnb." tags=[]
 # Set up figure and axis
@@ -340,11 +341,11 @@ contextily.add_basemap(
 ax.set_axis_off();
 ```
 
-### Point Interpolation using scikit-learn 
+### Point interpolation using scikit-learn 
 
 In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is *spatial interpolation*. For a continuous geographical field measured at a set of points, *spatial interpolation* methods provide us a way to guess at the value a field would take at sites we do not measure. 
 
-There are many sophisticated methods with which this can be done. *Kriging*, common in the sub-field of spatial statistics called "geostatistics," is one such practice based on the theory of *Gaussian Process Regression.* Another common approach, *geographically-weighted regression*, provides unique model estimates at every control point, as well as predictions for places where there is no data. Here, though, we'll use a fairly basic $k$-nearest neighbor prediction algorithm from `scikit-learn` to demonstrate the process. 
+There are many sophisticated methods with which this can be done. *Kriging*, common in the sub-field of spatial statistics called "geostatistics", is one such practice based on the theory of *Gaussian Process Regression.* Another common approach, *geographically weighted regression*, provides unique model estimates at every control point, as well as predictions for places where there is no data. Here, though, we'll use a fairly basic $k$-nearest neighbor prediction algorithm from `scikit-learn` to demonstrate the process. 
 
 ```python
 from sklearn.neighbors import KNeighborsRegressor
@@ -358,7 +359,7 @@ two_bed_homes = airbnbs[
 ]
 ```
 
-Once subset, we can extract the XY coordinates for each of them into a 2D array:
+Once subset, we can extract the XY coordinates for each of them into a two-dimensional array:
 
 ```python
 two_bed_home_locations = numpy.column_stack(
@@ -377,7 +378,7 @@ x, y = numpy.meshgrid(
 )
 ```
 
-To build an intuition on what they are, we can visualise both meshes side by side:
+To build an intuition on what they are we create Figure XXX6XXX, which visualizes both meshes side-by-side:
 
 ```python caption="Example grid showing the coordiantes used for interpolation." tags=[]
 # Set up figure
@@ -405,10 +406,10 @@ grid_df = geopandas.GeoDataFrame(
 )
 ```
 
-We can visualise this grid together with the original Airbnb locations to get a better sense of what we have just built:
+We can visualize this grid together with the original Airbnb locations (Fig. XXX7XXX) to get a better sense of what we have just built:
 
 ```python caption="Grid underlaid Airbnb locations used for interpolation." tags=[]
-# Plot guid points with size 1
+# Plot grid points with size 1
 ax = grid_df.plot(markersize=1)
 # Plot on top Airbnb locations in red
 two_bed_homes.plot(ax=ax, color="red")
@@ -436,14 +437,14 @@ And then we predict at the grid cell locations:
 predictions = model.predict(grid)
 ```
 
-The result can be displayed as a continuous choropleth, for example:
+The result can be displayed as a continuous choropleth (Fig. XXX8XXX), for example:
 
-```python caption="Predicted Airbnb price using 10 nearest neighbor interpolation." tags=[]
+```python caption="Predicted Airbnb price using ten nearest neighbor interpolation." tags=[]
 ax = grid_df.plot(predictions)
 ax.set_axis_off();
 ```
 
-The map is a result not only of the underlying data but also the algorithm we have used. For example, you can see that the surface gets smoother as you increase the number of nearest neighbors to consider:
+The map is a result not only of the underlying data but also the algorithm we have used. For example, you can see in Figure XXX9XXX (generated with the code below) that the surface gets smoother as you increase the number of nearest neighbors to consider.
 
 ```python caption="Predicted nightly price using a varying number of nearest neighbors. Note the plot smooths considerably as more neighbors are added." tags=[]
 # Set up figure and 8 axes
@@ -476,7 +477,7 @@ for i, k_neighbors in enumerate(
     facet.set_title(f"{k_neighbors} neighbors")
 ```
 
-Focusing in on central San Diego tells the story a bit more clearly, since there are interesting points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface. To visualise a zoom into the region, we begin by extracting its bounding box:
+Focusing in on central San Diego tells the story a bit more clearly, since there are interesting points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface. To visualize a zoom into the region, we begin by extracting its bounding box:
 
 ```python
 central_sd_bounds = [-117.179832, 32.655563, -117.020874, 32.769909]
@@ -508,7 +509,7 @@ central_grid_df = geopandas.GeoDataFrame(
 )
 ```
 
-Finally we can reproduce the sequence of figures with different values of K only for the central part of the San Diego area:
+Finally, we can reproduce the sequence of figures with different values of K only for the central part of the San Diego area (Fig. XXX10XXX):
 
 ```python caption="Focus on downtown San Diego predictions for nearest neighbor interpolation." tags=[]
 # Set up figure and subplot
@@ -541,12 +542,12 @@ for i, k_neighbors in enumerate(
     facet.set_title(f"{k_neighbors} neighbors")
 ```
 
-Plenty more of these methods are implemented in `scikit-learn.neighbors`, as well as kriging methods in `GSTools` {cite}`sebastian_muller_2021_5169658` and geographically-weighted regression in `mgwr` {cite}`oshan2019mgwr}. 
+Plenty more of these methods are implemented in `scikit-learn.neighbors`, as well as kriging methods in `GSTools` {cite}`sebastian_muller_2021_5169658` and geographically weighted regression in `mgwr` {cite}`oshan2019mgwr`.
 
 
 ### Polygon to point
 
-We now move on to a case where the information we are interested in matching to our set of points is stored in a polygon geography. For example, we would like to know the population density of the neighborhood in which each AirBnB is located. This is conceptually similar to the sampling example above, but in the case the information we want to sample is not a surface but a geo-table of polygons. To determine density, we will download population estimates at the Census tract level, and "transfer" those estimates over to each AirBnB point. Geographically, the only challenge here is finding the containing polygon for each point, and then performing what is in spatial databases parlance known as a "spatial join", by which we link the two layers through their spatial connection.
+We now move on to a case where the information we are interested in matching to our set of points is stored in a polygon geography. For example, we would like to know the population density of the neighborhood in which each Airbnb is located. This is conceptually similar to the sampling example above, but in the case the information we want to sample is not a surface but a geo-table of polygons. To determine density, we will download population estimates at the census tract level, and "transfer" those estimates over to each Airbnb point. Geographically, the only challenge here is finding the containing polygon for each point, and then performing what is in spatial databases parlance known as a "spatial join", by which we link the two layers through their spatial connection.
 
 Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:
 
@@ -575,13 +576,13 @@ sd_pop["density"] = (
 )
 ```
 
-Now, to "transfer" density estimates to each AirBnB, we can rely on the spatial join in `geopandas`:
+Now, to "transfer" density estimates to each Airbnb, we can rely on the spatial join in `geopandas`:
 
 ```python
 j = geopandas.sjoin(airbnbs, sd_pop.to_crs(airbnbs.crs))
 ```
 
-The result is a table with one row per AirBnB and one column for each attribute we originally had for properties, *as well as* those of the tract where the area is located:
+The result is a table with one row per Airbnb and one column for each attribute we originally had for properties, *as well as* those of the tract where the area is located:
 
 ```python
 j.info()
@@ -591,7 +592,7 @@ j.info()
 
 The final case of map matching we consider is transfer of information from one polygon/areal geography to a different one. This is a common use-case when an analysis requires data that is provided at different levels of aggregation and different boundary delineations.
 
-There is a large literature around this problem under the umbrella of dasymetric mapping {cite}`eicher2001dasymetric`. The conceptual idea is relatively straight-forward: we want to apportion values from one set of polygons to another based on how much "geography" is shared. In its simplest case, we can do this based on area. We will assign values from the former geography to the latter one based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the "source", and that to which we want to transfer data the "target". Let's say we have a population count  measure for each of three source polygons, 1, 2, 3, and we have a target polygon A for which we require an estimated population. If the intersection of polygon A with each of the source polygons amounts to  50%, 30%, and 20% of the total area of polygon A respectively, then the population estimate for A will be a weighted average between the rates in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively. 
+There is a large literature around this problem under the umbrella of dasymetric mapping {cite}`eicher2001dasymetric`. The conceptual idea is relatively straightforward: we want to apportion values from one set of polygons to another based on how much "geography" is shared. In its simplest case, we can do this based on area. We will assign values from the former geography to the latter one based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the "source", and that to which we want to transfer data the "target". Let's say we have a population count  measure for each of three source polygons, 1, 2, 3, and we have a target polygon A for which we require an estimated population. If the intersection of polygon A with each of the source polygons amounts to  50%, 30%, and 20% of the total area of polygon A, respectively, then the population estimate for A will be a weighted average between the rates in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively. 
 
 We could also go in the other direction. If we had total population for polygon A, but population was not reported for polygons 1, 2, 3, we could use areal interpolation to allocate the population from A (now the source polygon) to each of the three target polygons. Polygon 1 would get 0.5 of the population of A, polygon 2 would get 0.3 of A's population, and C the remainder. Here we are assuming the area of A is completely exhausted by the areas of 1, 2, and 3, and that the latter polygons do not overlap with each other. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.
 
@@ -631,9 +632,9 @@ There is quite a bit going on in the cell above, let us unpack it:
 - The method `area_interpolate` then takes the source and the target `GeoDataFrame` objects using the same naming convention we have in our explanation. 
 - In addition, we need to specify which variables we would like to interpolate. here, Tobler makes a distinction:
     - *Extensive* variables, or absolute values such as counts, aggregates, etc. (which we use for population, `B02001_001E`)
-    - *Intensive* variables, such as rates, ratios, etc. (which we select for density as it is the ratio of population over area)
+    - *Intensive* variables, such as rates, ratios, etc. (which we select for density, as it is the ratio of population over area)
 
-The `interpolated` output object is a geo-table that contains the target polygons and estimates of the variable(s) we originally had for the source geography (population and density in this case). We can illustrate the transfer of information from one geography to the other with the following figure for total population estimates:
+The `interpolated` output object is a geo-table that contains the target polygons and estimates of the variable(s) we originally had for the source geography (population and density in this case). Figure XXX11XXX (generated with the code below) illustrates the transfer of information from one geography to the other with for the case of total population estimates.
 
 ```python caption="Interpolation of areal information to a different geometry. The Uber H3 hexagon grid is shown in the middle, and the interpolated values for population are shown on the right." tags=[]
 # Set up figure and axes
@@ -678,7 +679,7 @@ axs[0].set_ylim(minY, maxY)
 plt.show()
 ```
 
-And similarly for population density:
+And Figure XXX12XXX, generated with the code below, shows the equivalent for population density.
 
 ```python caption="Interpolation of population density from Census Tracts to Uber H3 Hexagons." tags=[]
 # Set up figure and axes
@@ -723,24 +724,24 @@ axs[0].set_ylim(minY, maxY)
 plt.show()
 ```
 
-## Feature Engineering using Map Synthesis
+## Feature engineering using map synthesis
 
-Feature engineering with map matching is most helpful when you have additional information to use in the analysis. And, with the wealth of freely available data from censuses, satellites, and open volunteered geographic information vendors such as OpenStreetMap, map matching can be a very powerful tool for enriching and improving your analyses. However, it is sometimes *also* useful to only examine the data you've got, and use the spatial structure within to build better features or better models. While this might be done using spatially-explicit models (like those covered in [Chapter 11](11_regression), it is also possible to use map synthesis to build spatial features and improve model performance.
+Feature engineering with map matching is most helpful when you have additional information to use in the analysis. And, with the wealth of freely available data from censuses, satellites, and open volunteered geographic information vendors such as OpenStreetMap, map matching can be a very powerful tool for enriching and improving your analyses. However, it is sometimes *also* useful to only examine the data you've got, and use the spatial structure within to build better features or better models. While this might be done using spatially explicit models (like those covered in [Chapter 11](11_regression)), it is also possible to use map synthesis to build spatial features and improve model performance.
 
-There is an extensive amount of map synthesis features. In fact, many of them are usually derived for specific use cases and following the intuition of domain experts that can take technical guidance along the lines presented here. We discuss two main ones as an illustration, but reiterate the sky really is the limit in this category. First, we will return to spatial *summary* features. Second, we will examine *regionalization features*, which detect and leverage geographical clusters in the data to improve prediction. 
+There is an extensive amount of map synthesis features. In fact, many of them are usually derived for specific use cases and following the intuition of domain experts that can take technical guidance along the lines presented here. We discuss two main ones as an illustration, but reiterate that the sky really is the limit in this category. First, we will return to spatial *summary* features. Second, we will examine *regionalization features*, which detect and leverage geographical clusters in the data to improve prediction. 
 
-### Spatial Summary Features in Map Synthesis
+### Spatial summary features in map synthesis
 
 
-Just like in map matching, you can use spatial summary features in map synthesis to make create better models. One approach involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we now refer only to the data on hand. Thus, we may want to determine whether nearby AirBnBs are "competing" with each AirBnB. We might do this by finding the distance to the nearest AirBnB with the same number of bedrooms, since two nearby listings that *also* sleep the same number of people likely will compete with one another for tenants. 
+Just like in map matching, you can use spatial summary features in map synthesis to build better models. One approach involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we now refer only to the data on hand. Thus, we may want to determine whether nearby Airbnbs are "competing" with each Airbnb. We might do this by finding the distance to the nearest Airbnb with the same number of bedrooms, since two nearby listings that *also* sleep the same number of people likely will compete with one another for tenants. 
 
 #### Counting neighbors
 
-A useful metric to characterise an observation in your data through geography is whether it is surrounded by other observations or not. This question (and the following one we cover) is another area of geographic data science where spatial weights matrices are useful.
+A useful metric to characterize an observation in your data through geography is whether it is surrounded by other observations or not. This question (and the following one we cover) is another area of geographic data science where spatial weights matrices are useful.
 
-If we define to be "surrounded by other observations" as in "having many neighbors", this translates into the cardinalities of a spatial weights matrix (ie. the number of neighbors recorded in the matrix for each observation).
+If we define to be "surrounded by other observations" as in "having many neighbors", this translates into the cardinalities of a spatial weights matrix (i.e., the number of neighbors recorded in the matrix for each observation).
 
-For example, we can "engineer a feature" that contains the number of Airbnb properties each property has within 500 metres by constructing a distance band object:
+For example, we can "engineer a feature" that contains the number of Airbnb properties each property has within 500 meters by constructing a distance band object:
 
 ```python
 # Build distance band spatial weights matrix
@@ -755,7 +756,7 @@ And extracting its cardinalities:
 card = pandas.Series(d500_w.cardinalities)
 ```
 
-The `card` feature we have built will pick up areas of higher concentration of Airbnb properties with higher values, as we can see in the map below.
+The `card` feature we have built will pick up areas of higher concentration of Airbnb properties with higher values, as we can see in Figure XXX13XXX.
 
 ```python caption="Number of Airbnbs within 500 meters of each listing." tags=[]
 # Set up figure and axis
@@ -773,10 +774,10 @@ ax.set_axis_off();
 
 #### Distance buffers within a single table
 
-If what we are interested in is finding the average number of bedrooms around each house, we might do this with using a row-standardised version of the `DistanceBand` weight object we have just built, which considers AirBnB as "neighbors" if they are within the distance threshold, and computing the spatial lag of the number of bedrooms.
+If what we are interested in is finding the average number of bedrooms around each house, we might do this using a row-standardized version of the `DistanceBand` weight object we have just built, which considers Airbnb as "neighbors" if they are within the distance threshold, and computing the spatial lag of the number of bedrooms.
 
 ```python
-# Row standardise
+# Row standardize
 d500_w.transform = "r"
 # Compute spatial lag of No. of bedrooms
 local_average_bedrooms = weights.lag_spatial(
@@ -784,7 +785,7 @@ local_average_bedrooms = weights.lag_spatial(
 )
 ```
 
-While related, these features contain quite distinct pieces of information, and both may prove useful in modeling: 
+While related, these features contain quite distinct pieces of information, and both may prove useful in modeling. This is shown in Figure XXX14XXX, which compares them directly in a scatterplot. 
 
 ```python caption="Relationship between the number of bedrooms at an Airbnb and the typical number of bedrooms among nearby Airbnbs." tags=[]
 plt.scatter(
@@ -811,10 +812,13 @@ crosstab = pandas.crosstab(
 crosstab.columns.name = "nearby"
 crosstab
 ```
+```python tags=["remove-cell"]
+glue('most_common', crosstab.values.max())
+```
 
-From the table we can see the most common case (N=3067) is properties with one bedroom surrounded mostly by other properties with also only one bedroom. Similarly we also find out, for example, that the two properties with ten bedrooms in the dataset are surrounded by properties with mostly two bedrooms. The remaining cells in the table can be interpreted in a similar fashion.
+From the table we can see the most common case (N={glue:}`most_common`) is properties with one bedroom surrounded mostly by other properties with also only one bedroom. Similarly we also find out, for example, that the two properties with ten bedrooms in the dataset are surrounded by properties with mostly two bedrooms. The remaining cells in the table can be interpreted in a similar fashion.
 
-If more complicated statistics are required, it can help to re-express the construction of summary statistics as a *reduction* of the *adjacency list* representation of our weights, as done in [Chapter 4](04_spatial_weights). To recap, the *adjacency list* is a `pandas.DataFrame` where each row contains a single link in our graph. It contains the identifier for some `focal` observation, the identifier for some `neighbor` observation, and a value for the `weight` of the link that connects the `focal` and `neighbor`:
+If more complicated statistics are required, it can help to reexpress the construction of summary statistics as a *reduction* of the *adjacency list* representation of our weights, as done in [Chapter 4](04_spatial_weights). To recap, the *adjacency list* is a `pandas.DataFrame` where each row contains a single link in our graph. It contains the identifier for some `focal` observation, the identifier for some `neighbor` observation, and a value for the `weight` of the link that connects the `focal` and `neighbor`:
 
 ```python
 adjlist = d500_w.to_adjlist()
@@ -842,13 +846,13 @@ Now, we need only to group the adjacency list by the focal observation and summa
 adjlist.groupby("focal").bedrooms.median()
 ```
 
-Since the mean and/or mode are the most commonly-used measures of central tendency, the `lag_spatial` and `lag_categorical` functions cover many of the required uses in practice. 
+Since the mean and/or mode are the most commonly used measures of central tendency, the `lag_spatial` and `lag_categorical` functions cover many of the required uses in practice. 
 
 #### "Ring" buffer features
 
-Sometimes, analysts might want to use multiple "bands" of buffer features. This requires that we build summaries of the observations that fall *only within* a given range of distances, such as the typical size of houses that are further than 500m, but still within one kilometer. This kind of "ring buffer", or annulus, is a common request in spatial analysis, and can be done in substantially the same way as before by increasing the `threshold` in a `DistanceBand` weight.  
+Sometimes, analysts might want to use multiple "bands" of buffer features. This requires that we build summaries of the observations that fall *only within* a given range of distances, such as the typical size of houses that are further than 500 meters, but still within one kilometer. This kind of "ring buffer", or annulus, is a common request in spatial analysis, and can be done in substantially the same way as before by increasing the `threshold` in a `DistanceBand` weight.  
 
-We can use our 500m weights from before to build the average again:
+We can use our 500 meters weights from before to build the average again:
 
 ```python
 average_within_500 = weights.lag_spatial(
@@ -856,7 +860,7 @@ average_within_500 = weights.lag_spatial(
 )
 ```
 
-Then, we need to build the graph of AirBnBs that fall *between* 500m and one kilometer from one another. To start, we build the `DistanceBand` graph of all listings closer than one kilometer:
+Then, we need to build the graph of Airbnbs that fall *between* 500 meters and 1 kilometer from one another. To start, we build the `DistanceBand` graph of all listings closer than 1 kilometer:
 
 ```python
 d1k_w = weights.DistanceBand.from_dataframe(
@@ -864,7 +868,7 @@ d1k_w = weights.DistanceBand.from_dataframe(
 )
 ```
 
-Then, using the `weights.set_operations` module, we can express set-theoretic relationships between graphs. Here, we need to *remove* the links in our one kilometer graph that are *also* links in the 500m graph. To do this, we need `w_difference(d1k_w, d500_w)`, the difference between the one kilometer graph and the 500m graph: 
+Then, using the `weights.set_operations` module, we can express set-theoretic relationships between graphs. Here, we need to *remove* the links in our 1 kilometer graph that are *also* links in the 500 meters graph. To do this, we need `w_difference(d1k_w, d500_w)`, the difference between the one kilometer graph and the 500 meters graph: 
 
 ```python
 d1k_exclusive = weights.set_operations.w_difference(
@@ -872,7 +876,7 @@ d1k_exclusive = weights.set_operations.w_difference(
 )
 ```
 
-Then, we can compute the average size of listings between 500m and one kilometer in the same manner as before using our `d1k_exclusive` graph, which now omits all edges shorter than 500m. 
+Then, we can compute the average size of listings between 500 meters and 1 kilometer in the same manner as before using our `d1k_exclusive` graph, which now omits all edges shorter than 500 meters. 
 
 ```python
 d1k_exclusive.transform = "r"
@@ -881,7 +885,7 @@ average_500m_to_1k = weights.lag_spatial(
 )
 ```
 
-Thus, we can see that the two features definitely contain distinct, but related, information, and both may be valuable as features when attempting to predict features of interest. 
+Thus, as we can see in Figure XXX15XXX (generated by the code below), the two features contain distinct, but related, information, and both may be valuable in their own right when attempting to predict outcomes of interest. 
 
 ```python caption="Relationship between the size of Airbnbs between successive distance buffers around an Airbnb." tags=[]
 # Plot scatter
@@ -905,13 +909,13 @@ plt.plot(
 plt.legend();
 ```
 
-As the plot shows, although the relationship between both is positive, there is quite a bit of variation and departure from the (red) line of equality. These represent cases with either larger (above the line) or smaller (below) average size in the 500m to 1km ring than in the 500m buffer.
+As the plot shows, although the relationship between both is positive, there is quite a bit of variation and departure from the (red) line of equality. These represent cases with either larger (above the line) or smaller (below) average size in the 500 meters to 1 kilometer ring than in the 500 meters buffer.
 
 
 ### Clustering as feature engineering
 
 
-One unique way to use spatial or features information *within* your data as a feature in your existing models is to use *clustering*, as we saw in Chapters [8](08_point_pattern_analysis) & [10](10_clustering_and_regionalization), respectively. This can provide an indication of whether an observation exists in a given "place" geographically, or if an observation is a specific "kind" of observation. Data reduction of many variates into a derived categorical feature can be useful in training models. This is even more useful when the *spatial location* of a given observation indicates a useful characteristic about the kind of observation that may be found at that location. 
+One unique way to use spatial or features information *within* your data as a feature in your existing models is to use *clustering*, as we saw in Chapters [8](08_point_pattern_analysis) and [10](10_clustering_and_regionalization), respectively. This can provide an indication of whether an observation exists in a given "place" geographically, or if an observation is a specific "kind" of observation. Data reduction of many variates into a derived categorical feature can be useful in training models. This is even more useful when the *spatial location* of a given observation indicates a useful characteristic about the kind of observation that may be found at that location. 
 
 While sometimes we might prefer to introduce space and (co-)location through our model (as we did in [Chapter 11](11_regression)), others we can instead use (spatial) cluster labels themselves as features. For example, to cluster the listings based on their location, we can use hierarchical DBSCAN {cite}`campello2013density`, an improved variant of the traditional DBSCAN algorithm used in [Chapter 8](08_point_pattern_analysis). We import it through its own package {cite}`mcinnes2017hdbscan`:
 
@@ -919,7 +923,7 @@ While sometimes we might prefer to introduce space and (co-)location through our
 from hdbscan import HDBSCAN
 ```
 
-To apply to our Airbnb data, we need the coordinates as a 2D array of XY pairs:
+To apply to our Airbnb data, we need the coordinates as a two-dimensional array of XY pairs:
 
 ```python
 coordinates = numpy.column_stack(
@@ -927,26 +931,26 @@ coordinates = numpy.column_stack(
 )
 ```
 
-With a little tuning, we can decide on an effective parameterization. The main advantage of HDBSCAN over the traditional approach is that it reduces the number of tuning parameters from two to one: we only need to set the minimum number of observations we want to define a cluster. Here, we look for relatively large clusters of AirBnBs, those with about 25 listings or more, fit it to our array of coordinates and store the cluster labels identified:
+With a little tuning, we can decide on an effective parameterization. The main advantage of HDBSCAN over the traditional approach is that it reduces the number of tuning parameters from two to one: we only need to set the minimum number of observations we want to define a cluster. Here, we look for relatively large clusters of Airbnbs, those with about 25 listings or more, fit them to our array of coordinates, and store the cluster labels identified:
 
 ```python
 labels = HDBSCAN(min_cluster_size=25).fit(coordinates).labels_
 ```
 
-The spatial distribution of these clusters will give us a sense of areas of San Diego with relatively high density of the observations. But the `labels` object does not contains clusters, only observation memberships. To derive those clusters geographically, we construct the convex hull of the observations in each detected cluster, creating thus a polygon that delimits every observation that is part of the cluster:
+The spatial distribution of these clusters will give us a sense of areas of San Diego with relatively high density of the observations. But the `labels` object does not contain clusters, only observation memberships. To derive those clusters geographically, we construct the convex hull of the observations in each detected cluster, creating thus a polygon that delimits every observation that is part of the cluster:
 
 ```python
 hulls = airbnbs_albers[["geometry"]].dissolve(by=labels).convex_hull
 ```
 
-The polygons in `hulls` provide an intermediate layer between the granularity of each individual location and the global scale of San Diego as a geographical unit. Since people tend to make locational decisions hierarchically (e.g. first select *San Diego* as a destination, then they pick a particular *part* of San Diego, then choose a house within the area), this approach might give us reasonable insight into enclaves of Airbnb properties:
+The polygons in `hulls` (and displayed in Figure XXX16XXX) provide an intermediate layer between the granularity of each individual location and the global scale of San Diego as a geographical unit. Since people tend to make locational decisions hierarchically (e.g., first they select *San Diego* as a destination, then they pick a particular *part* of San Diego, then choose a house within the area), this approach might give us reasonable insight into enclaves of Airbnb properties:
 
 ```python caption="Clusters in the locations of Airbnbs within San Diego." tags=[]
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot individual Airbnb locations
 airbnbs_albers.plot(
-    # Colour by cluster label
+    # Color by cluster label
     column=labels,
     # Consider label as categorical
     categorical=True,
@@ -974,9 +978,9 @@ contextily.add_basemap(
 ax.set_axis_off();
 ```
 
-Note how the hierarchical nature of HDBSCAN, which picks density thresholds _locally_ is at work in the map, where some of the clusters (e.g. orange ones in the north) display lower density than parts of the center which are _not_ part of any cluster. These results also capture some information about the price of a listing. We can see this if we plot the distribution of prices across the detected clusters:
+Note how the hierarchical nature of HDBSCAN, which picks density thresholds _locally_ is at work in the map, where some of the clusters (e.g., orange ones in the north) display lower density than parts of the center which are _not_ part of any cluster. These results also capture some information about the price of a listing. Figure XXX17XXX (generated with the code below) shows this by plotting the distribution of prices across the detected clusters.
 
-```python caption="Boxplot of price by detected 'competition cluter.' The clusters do vary significantly in prices, and could be used to train a model." tags=[]
+```python caption="Boxplot of price by detected 'competition cluster.' The clusters vary significantly in prices and could be used to train a model." tags=[]
 # Set up figure
 f = plt.figure(figsize=(8, 3))
 # Add box plots of price by HDBSCAN cluster
@@ -987,7 +991,7 @@ ax = airbnbs_albers.boxplot(
     by=labels,
     # Do not display individual outlier observations
     flierprops=dict(marker=None),
-    # Draw visualisation on the current axis (inside `f`)
+    # Draw visualization on the current axis (inside `f`)
     ax=plt.gca(),
 )
 # Set label for horizontal axis
@@ -1009,11 +1013,11 @@ If we want to capture the variation picked up by membership to these clusters in
 ## Conclusion
 
 
-Feature engineering is a powerful way to enrich your data and make the most out of them. It is often within reach whether you are able to mix in auxilliary data or not. At a minimum, it only requires that new variables are constructed from your existing data; however if you have access to more data, spatial feature engineering provides the *ultimate linkage key*, a flexible and powerful tool with which you can unlock the value held in many *other* datasets that you may have access to even if they are not obviously connected to your own. 
+Feature engineering is a powerful way to enrich your data and make the most out of them. It is often within reach whether you are able to mix in auxilliary data or not. At a minimum, it only requires that new variables are constructed from your existing data; however, if you have access to more data, spatial feature engineering provides the *ultimate linkage key*, a flexible and powerful tool with which you can unlock the value held in many *other* datasets that you may have access to even if they are not obviously connected to your own. 
 
 We have structured all the approaches presented in this chapter along two main groups: those which allow you to augment a given dataset, which we have termed _map synthesis_; and those that enable connecting disparate datasets through space. In both cases, each operation involved in feature engineering, such as determining what the average value is in the area near each observation or identifying whether observations exist as part of a "cluster", are relatively simple operations. As building blocks that may be combined with each other, they build large, rich, and useful datasets that can be used directly in your existing methods of analysis. 
 
-Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters [10](10_clustering_and_regionalization) and [11](11_regression)) can leverage spatial structure *directly* during learning/inference. These techniques allow you to embed space in non-spatial models to make them "geography aware". Furthermore, the techniques in this chapter (and the methods that extend upon them) are immediately useful for most practicing data scientists, and can be integrated into nearly any analytical method or approach. 
+Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters [10](10_clustering_and_regionalization) and [11](11_regression)) can leverage spatial structure *directly* during learning/inference. These techniques allow you to embed space in non-spatial models to make them "geography aware". Furthermore, the techniques in this chapter (and the methods that extend upon them) are immediately useful for most practicing data scientists, and they can be integrated into nearly any analytical method or approach. 
 
 
 ## Questions
@@ -1021,28 +1025,28 @@ Beyond feature engineering, statistical techniques we discuss in this book (part
 1. Thinking of your own research, provide an example where map matching would
    be a useful spatial feature engineering approach? How about an example where
    map synthesis would be useful for your research?
-2. In the  **Counting *nearby* features** example early in the chapter, there
+2. In the [Counting *nearby* features](#counting-nearby-features) example early in the chapter, there
    is a potential issue with under-counting the number of nearby bars and
-   restaurants for certain AirBnBs in the dataset. Which AirBnBs are subject to
+   restaurants for certain Airbnbs in the dataset. Which Airbnbs are subject to
    neighbor under-counts and why?
 3. How would you correct the under-count in the previous question?
 4. Dasymetric mapping may introduce spurious spatial autocorrelation (see
-   Chapters 6 and 7) through
+   Chapters [6](06_spatial_autocorrelation) and [7](07_local_autocorrelation)) through
    the interpolation process. How does this occur and why is it important to acknowledge?
 5. From the previous spatial regression chapter, is the SLX model a map matching or a map synthesis technique?
-6. Feature engineering is can be used in many different applied contexts. When might feature engineering actually *not* improve a model? 
+6. Feature engineering can be used in many different applied contexts. When might feature engineering actually *not* improve a model? 
 
 
-## Next Steps
+## Next steps
 
-For more information on machine learning methods, it is difficult to beat *Introduction to Statistical Learning* by James, Witten, Hastie, and Tibshirani: 
+For more information on machine learning methods, it is difficult to beat *Introduction to Statistical Learning* by: 
 
 James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. *Introduction to Statistical Learning* (2nd Edition). Wiley: New York. 
 
-In addition, there are many geospatial relationships that can be leveraged to merge datasets together. These *spatial join* techniques often require quite a bit of background understanding in *geocomputation*, computation that focuses on the basic/fundamental geometric operations and relationships between geographic objects. However, simple introductions are offered by our partner book, 
+In addition, there are many geospatial relationships that can be leveraged to merge datasets together. These *spatial join* techniques often require quite a bit of background understanding in *geocomputation*, computation that focuses on the basic/fundamental geometric operations and relationships between geographic objects. However, simple introductions are offered by our partner book: 
 
 Tenkanen, Henrikki, Vuokko Heikinheimo, and David Whipp. 2023. *Python for Geographic Data Analysis*. CRC Press: Boca Raton, FL. https://pythongis.org
 
-Finally, references on geographic interpolation methods are sometimes hard to come by, but a good and readable introduction to the domain is offered by Comber and Zeng:
+Finally, references on geographic interpolation methods are sometimes hard to come by, but a good and readable introduction to the domain is offered by:
 
 Comber, Alexis and Wen Zeng. 2019. "Spatial Interpolation using areal features: A review of methods and opportunities using new forms of data with coded illustrations." *Geography Compass* 13.  https://doi.org/10.1111/gec3.12465
