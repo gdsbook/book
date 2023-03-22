@@ -411,7 +411,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-empirical-illustration-the-eu-referendum">An empirical illustration: the EU Referendum</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivating-local-spatial-autocorrelation">Motivating Local Spatial Autocorrelation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivating-local-spatial-autocorrelation">Motivating local spatial autocorrelation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#local-moran-s-i-i">Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getis-and-ord-s-local-statistics">Getis and Ord’s local statistics</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bonus-local-statistics-on-surfaces">Bonus: local statistics on surfaces</a></li>
@@ -431,12 +431,12 @@ document.write(`
                   
   <section class="tex2jax_ignore mathjax_ignore" id="local-spatial-autocorrelation">
 <h1>Local Spatial Autocorrelation<a class="headerlink" href="#local-spatial-autocorrelation" title="Permalink to this heading">#</a></h1>
-<p>In the previous chapter, we explored how global measures of spatial autocorrelation can help us determine whether the overall spatial distribution of our phenomenon of interest is compatible with a geographically random process. These statistics are useful: the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. This could represent <em>spillovers</em>, where outcomes at one site influence other sites; or could indicate <em>contagion</em>, where outcomes at one site <em>causally influence</em> other sites. As we will see later in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>, it could simply be the result of systematic spatial variation (or, as we will call it then, <em>heterogeneity</em>). Spatial autocorrelation also sometimes arises from data measurement and processing. In this case, the dependence is a form of non-random noise rather than due to substantive processes. For example, when “down-sampling” geographic data, sometimes large patches of identical values can be created. These may only be artifacts of the interpolation, rather than substantive autocorrelation. Regardless of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis. For these reasons, the ability to determine whether spatial autocorrelation is present in a geographically referenced data set is a critical component of the geographic data science toolbox.</p>
+<p>In the previous chapter, we explored how global measures of spatial autocorrelation can help us determine whether the overall spatial distribution of our phenomenon of interest is compatible with a geographically random process. These statistics are useful: the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. This could represent <em>spillovers</em>, where outcomes at one site influence other sites; or it could indicate <em>contagion</em>, where outcomes at one site <em>causally influence</em> other sites. As we will see later in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>, it could simply be the result of systematic spatial variation (or, as we will call it then, <em>heterogeneity</em>). Spatial autocorrelation also sometimes arises from data measurement and processing. In this case, the dependence is a form of non-random noise rather than due to substantive processes. For example, when “down-sampling” geographic data, sometimes large patches of identical values can be created. These may only be artifacts of the interpolation, rather than substantive autocorrelation. Regardless of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis. For these reasons, the ability to determine whether spatial autocorrelation is present in a geographically referenced data set is a critical component of the geographic data science toolbox.</p>
 <p>Despite their importance, global measures of spatial autocorrelation are “whole map” statistics. They provide a single summary for an entire data set. For example,
-Moran’s <span class="math notranslate nohighlight">\(I\)</span> is a good tool to summarize a dataset into a single value that captures the degree of geographical clustering (or dispersion, if negative). However, Moran’s <span class="math notranslate nohighlight">\(I\)</span> does not indicate areas within the map where specific types of values (e.g. high, low) are clustered, or instances of explicit dispersion.
+Moran’s <span class="math notranslate nohighlight">\(I\)</span> is a good tool to summarize a dataset into a single value that captures the degree of geographical clustering (or dispersion, if negative). However, Moran’s <span class="math notranslate nohighlight">\(I\)</span> does not indicate areas within the map where specific types of values (e.g., high, low) are clustered, or instances of explicit dispersion.
 In other words, Moran’s I can tell us whether values in our map <em>cluster</em> together (or disperse) overall, but it will not inform us about where specific <em>clusters</em> (or outliers) are.</p>
 <p>In this chapter, we introduce local measures of spatial autocorrelation.
-Local measures of spatial autocorrelation focus on the relationships between <em>each</em> observation and its surroundings, rather than providing a single summary of these relationships across the map. In this sense, they are not summary statistics but scores that allow us to learn more about the spatial structure in our data. The general intuition behind the metrics however is similar to that of global ones. Some of them are even mathematically connected, where the global version can be decomposed into a collection of local ones. One such example are Local Indicators of Spatial Association (LISAs) <span id="id1">[<a class="reference internal" href="references.html#id2" title="Luc Anselin. Local indicators of spatial association-LISA. Geographical Analysis, 27:93–115, 1995.">Ans95</a>]</span>, which we use to build the understanding of local spatial autocorrelation, and on which we spend a good part of the chapter. Once such concepts are firmed, we introduce a couple alternative statistics that present complementary information or allow us to obtain similar insights for categorical data. Although very often these statistics are used with data expressed in geo-tables, there is nothing fundamentally connecting the two. In fact, the application of these methods to large surfaces is a promising area of work. For that reason, we close the chapter with an illustration of how one can run these statistics on data stored as surfaces.</p>
+Local measures of spatial autocorrelation focus on the relationships between <em>each</em> observation and its surroundings, rather than providing a single summary of these relationships across the map. In this sense, they are not summary statistics but scores that allow us to learn more about the spatial structure in our data. The general intuition behind the metrics however is similar to that of global ones. Some of them are even mathematically connected, where the global version can be decomposed into a collection of local ones. One such example are Local Indicators of Spatial Association (LISAs) <span id="id1">[<a class="reference internal" href="references.html#id2" title="Luc Anselin. Local indicators of spatial association-LISA. Geographical Analysis, 27:93–115, 1995.">Ans95</a>]</span>, which we use to build the understanding of local spatial autocorrelation, and on which we spend a good part of the chapter. Once such concepts are clarified, we introduce a couple of alternative statistics that present complementary information or allow us to obtain similar insights for categorical data. Although very often these statistics are used with data expressed in geo-tables, there is nothing fundamentally connecting the two. In fact, the application of these methods to large surfaces is a promising area of work. For that reason, we close the chapter with an illustration of how one can run these statistics on data stored as surfaces.</p>
 <section id="an-empirical-illustration-the-eu-referendum">
 <h2>An empirical illustration: the EU Referendum<a class="headerlink" href="#an-empirical-illustration-the-eu-referendum" title="Permalink to this heading">#</a></h2>
 <p>We continue with the same dataset about Brexit voting that we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:</p>
@@ -509,7 +509,7 @@ memory usage: 14.8+ KB
 </div>
 </div>
 </div>
-<p>Although there are several variables that could be considered, we will focus on <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union. With these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the <code class="docutils literal notranslate"><span class="pre">alpha</span></code> attribute) to make the final plot easier to read.</p>
+<p>Although there are several variables that could be considered, we will focus on <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union. With these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the <code class="docutils literal notranslate"><span class="pre">alpha</span></code> attribute) to make the final plot easier to read in Figure 1:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and a single axis</span>
@@ -539,7 +539,7 @@ memory usage: 14.8+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/095300e35f6069c2493422a9983efaaeb8a15f2c418904b431a6745df065ae55.png" src="../_images/095300e35f6069c2493422a9983efaaeb8a15f2c418904b431a6745df065ae55.png" />
+<img alt="../_images/7dc7edecc59880b9bc75ed6acbbad427162a397cf45e244379de8c0c48f837c6.png" src="../_images/7dc7edecc59880b9bc75ed6acbbad427162a397cf45e244379de8c0c48f837c6.png" />
 </div>
 </div>
 <p>As in the previous chapter, we require a spatial weights matrix to implement our statistic. Here, we will use eight nearest neighbors for the sake of the example, but the discussion in the earlier chapter on weights applies in this context, and other criteria would be valid too. We also row-standardize them:</p>
@@ -555,46 +555,45 @@ memory usage: 14.8+ KB
 </div>
 </section>
 <section id="motivating-local-spatial-autocorrelation">
-<h2>Motivating Local Spatial Autocorrelation<a class="headerlink" href="#motivating-local-spatial-autocorrelation" title="Permalink to this heading">#</a></h2>
-<p>To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardised form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:</p>
+<h2>Motivating local spatial autocorrelation<a class="headerlink" href="#motivating-local-spatial-autocorrelation" title="Permalink to this heading">#</a></h2>
+<p>To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardized form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">spatial_lag</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span>
-    <span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span>
-<span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>And their respective standardized versions, where we subtract the average and divide by the standard deviation:</p>
+<p>And their respective centered versions, where we subtract the average off of every value:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave_std&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
 </div>
-<p>Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot:</p>
+<p>Technically speaking, creating a Moran scatterplot is very similar to creating any other scatterplot. We have also done this before in Chapter 6. To see this again, we can make Figure 2:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup the figure and axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up the figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Plot values</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
     <span class="n">x</span><span class="o">=</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;w_Pct_Leave_std&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">db</span><span class="p">,</span> <span class="n">ci</span><span class="o">=</span><span class="kc">None</span>
-<span class="p">);</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/ee5fe7fe861b25d413885917ccb7aa3d9e2e88e6ad41b755bd936772db69b362.png" src="../_images/ee5fe7fe861b25d413885917ccb7aa3d9e2e88e6ad41b755bd936772db69b362.png" />
+<img alt="../_images/5714c8ba6d56fbd0835628bf278d16f5f2de215dbdc1c8ec325ed81fbc2a9435.png" src="../_images/5714c8ba6d56fbd0835628bf278d16f5f2de215dbdc1c8ec325ed81fbc2a9435.png" />
 </div>
 </div>
-<p>Using standardized values, we can immediately divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: those with above-average leave voting, which have positive standardized values; and those with below-average leave voting, which feature negative standardized values. Applying this thinking to both the percentage to leave and its spatial lag, divides a Moran Plot in four quadrants. Each of them captures a situation based on whether a given area displays a value above the mean (high) or below (low) in either the original variable (<code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>) or its spatial lag (<code class="docutils literal notranslate"><span class="pre">w_Pct_Leave_std</span></code>). Using this terminology, we name the four quadrants as follows: high-high (HH) for the top-right, low-high (LH) for the top-left, low-low (LL) for the bottom-left, and high-low (HL) for the bottom right. Graphically, we can capture this as follows:</p>
+<p>Using standardized values, we can immediately divide each variable (percentage that voted to leave, and its spatial lag) in two groups: those with above-average leave voting, which have positive standardized values; and those with below-average leave voting, which feature negative standardized values. Applying this thinking to both the percentage to leave and its spatial lag, divides a Moran scatterplot into four quadrants. Each of them captures a situation based on whether a given area displays a value above the mean (high) or below (low) in either the original variable (<code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>) or its spatial lag (<code class="docutils literal notranslate"><span class="pre">w_Pct_Leave_std</span></code>). Using this terminology, we name the four quadrants as follows: high-high (HH) for the top-right, low-high (LH) for the top-left, low-low (LL) for the bottom-left, and high-low (HL) for the bottom right. Graphically, we can express this in Figure 3:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup the figure and axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up the figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Plot values</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
@@ -614,14 +613,14 @@ memory usage: 14.8+ KB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/a2448f61535242bd539cf142cf8f7960df0f2d167360baf563f0533e394ef11a.png" src="../_images/a2448f61535242bd539cf142cf8f7960df0f2d167360baf563f0533e394ef11a.png" />
+<img alt="../_images/df54f69f26d57bafbde7e283ead12ab94ef61af04e110665ce2b305ed6957a40.png" src="../_images/df54f69f26d57bafbde7e283ead12ab94ef61af04e110665ce2b305ed6957a40.png" />
 </div>
 </div>
 </section>
 <section id="local-moran-s-i-i">
 <h2>Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span><a class="headerlink" href="#local-moran-s-i-i" title="Permalink to this heading">#</a></h2>
-<p>One way to look at the figure above is as a classification of each observation in the dataset depending on its value and that of its neighbors. Furthermore, this classification is exhaustive: every point is assigned a label. But remember local measures help us to identify areas of <em>unusual</em> concentration of values. Clusters will represent values of one type that are <em>unlikely</em> to appear under the assumption of spatial randomness. To know whether each location belongs to a <em>statistically significant</em> cluster of a given kind, we thus need to compare it with what we would expect if the data were allocated over space in a completely random way. However, what we are interested in is whether the strength with which the values are concentrated is unusually high. This is exactly what LISAs are designed to do. A detailed description the statistical underpinnings of LISAs is beyond the scope of this chapter. If you would like to delve deeper into the math and probability challenges arising, a good recent reference is <span id="id2">[<a class="reference internal" href="references.html#id3" title="Jeffery Sauer, Taylor Oshan, Sergio Rey, and Levi John Wolf. The importance of null hypotheses: understanding differences in local moranâ€™s under heteroskedasticity. Geographical Analysis, n/a(n/a):, 2021. URL: https://onlinelibrary.wiley.com/doi/abs/10.1111/gean.12304, arXiv:https://onlinelibrary.wiley.com/doi/pdf/10.1111/gean.12304, doi:https://doi.org/10.1111/gean.12304.">SORW21</a>]</span>. In this context, we will provide some intuition about how they work in one LISA statistic, the Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span>.</p>
-<p>The core idea of a local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> is to identify cases in which the value of an observation and the average of its surroundings is either more similar (HH or LL in the scatterplot above) or dissimilar (HL, LH) than we would expect from pure chance. The mechanism to do this is similar to the one in the global Moran’s I, but applied in this case to each observation. This results in as many statistics as original observations. The formal representation of the statistic can be written as:</p>
+<p>One way to look at the figure above is as a classification of each observation in the dataset depending on its value and that of its neighbors. Furthermore, this classification is exhaustive: every point is assigned a label. But remember local measures help us to identify areas of <em>unusual</em> concentration of values. Clusters will represent values of one type that are <em>unlikely</em> to appear under the assumption of spatial randomness. To know whether each location belongs to a <em>statistically significant</em> cluster of a given kind, we thus need to compare it with what we would expect if the data were allocated over space in a completely random way. However, what we are interested in is whether the strength with which the values are concentrated is unusually high. This is exactly what LISAs are designed to do. A detailed description of the statistical underpinnings of LISAs is beyond the scope of this chapter. If you would like to delve deeper into the math and probability challenges arising, a good recent reference is <span id="id2">[<a class="reference internal" href="references.html#id3" title="Jeffery Sauer, Taylor Oshan, Sergio Rey, and Levi John Wolf. The importance of null hypotheses: understanding differences in local moranâ€™s under heteroskedasticity. Geographical Analysis, n/a(n/a):, 2021. URL: https://onlinelibrary.wiley.com/doi/abs/10.1111/gean.12304, arXiv:https://onlinelibrary.wiley.com/doi/pdf/10.1111/gean.12304, doi:https://doi.org/10.1111/gean.12304.">SORW21</a>]</span>. In this context, we will provide some intuition about how they work in one LISA statistic, the local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span>.</p>
+<p>The core idea of a local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> is to identify cases in which the value of an observation and the average of its surroundings is either more similar (HH or LL in the scatterplot from Figure 3) or dissimilar (HL, LH) than we would expect from pure chance. The mechanism to do this is similar to the one in the global Moran’s I, but it is applied in this case to each observation. This results in as many statistics as original observations. The formal representation of the statistic can be written as:</p>
 <div class="math notranslate nohighlight">
 \[
 I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_i z_i^2}{n}
@@ -636,7 +635,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 </div>
 </div>
 </div>
-<p>We need to pass the variable of interest—proportion of Leave votes in this context—and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object (<code class="docutils literal notranslate"><span class="pre">lisa</span></code>) that has a number of attributes of interest. The local indicators themselves are in the <code class="docutils literal notranslate"><span class="pre">Is</span></code> attribute and we can get a sense of their distribution using <code class="docutils literal notranslate"><span class="pre">seaborn</span></code>:</p>
+<p>We need to pass the variable of interest—proportion of Leave votes in this context—and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object (<code class="docutils literal notranslate"><span class="pre">lisa</span></code>) that has a number of attributes of interest. The local indicators themselves are in the <code class="docutils literal notranslate"><span class="pre">Is</span></code> attribute and we can get a sense of their distribution using <code class="docutils literal notranslate"><span class="pre">seaborn</span></code>’s kernel density estimate plotting, as in Figure 4:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Draw KDE line</span>
@@ -648,13 +647,13 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/981c75f47d0bff8ce5c00a0f7e3c0ccbc9ec6e4a663ada4a29767e4c081cc967.png" src="../_images/981c75f47d0bff8ce5c00a0f7e3c0ccbc9ec6e4a663ada4a29767e4c081cc967.png" />
+<img alt="../_images/923e17e5a9e806fa6024f9a7cc468bf67307e991b9b5b58c12e03c95c9c77e58.png" src="../_images/923e17e5a9e806fa6024f9a7cc468bf67307e991b9b5b58c12e03c95c9c77e58.png" />
 </div>
 </div>
 <p>The figure reveals a rather skewed distribution of local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistics. This outcome is due to the dominance of positive forms of spatial association, implying most of the local statistic values will be positive. Here it is important to keep in mind that the high positive values arise from value similarity in space, and this can be due to either high values being next to high values <em>or</em> low values next to low values. The local <span class="math notranslate nohighlight">\(I_i\)</span> values alone cannot distinguish these two cases.</p>
-<p>The values in the left tail of the density represent locations displaying negative spatial association. There are also two forms, a high value surrounded by low values, or a low value surrounded by high valued neighboring observations. And, again, the  <span class="math notranslate nohighlight">\(I_i\)</span> statistic cannot distinguish between the two cases.</p>
+<p>The values in the left tail of the density represent locations displaying negative spatial association. There are also two forms, a high value surrounded by low values, or a low value surrounded by high-valued neighboring observations. And, again, the  <span class="math notranslate nohighlight">\(I_i\)</span> statistic cannot distinguish between the two cases.</p>
 <p>Because of their very nature, looking at the numerical result of LISAs is not always the most useful way to exploit all the information they can provide. Remember we are calculating a statistic for every single observation in the data so, if we have many of them, it will be difficult to extract any meaningful pattern. In this context, a choropleth can help. At first glance, this may seem to suggest that a choropleth of the <span class="math notranslate nohighlight">\(I_i\)</span>  values would be a useful way to visualize the spatial distribution. We can see such map in the top-left panel of the figure below and, while it tells us whether the local association is positive (HH/LL) or negative (HL/LH), it cannot tell, for example, whether the yellow areas in Scotland are similar to those in the eastern cluster of yellow areas. Are the two experiencing similar patterns of spatial association, or is one of them HH and the other LL? Also, we know that values around zero will not be statistically significant. Which local statistics are thus significant and which ones non-significant from a statistical point of view? In other words, which ones can be considered statistical clusters and which ones mere noise?</p>
-<p>To answer these questions, we need to bring in additional information that we have computed when calculating the LISA statistics. We do this in four acts. The first one we have already mentioned: a straighforward choropleth of the local statistic of each area. The other three include information on the quadrant each area is assigned into, whether the statistic is considered significant or not, and a combination of those two in a single so-called <em>cluster</em> map. A handy tool in this context is the <code class="docutils literal notranslate"><span class="pre">splot</span></code> library, part of the Pysal family, which provides a lightweight visualisation layer for spatial statistics:</p>
+<p>To answer these questions, we need to bring in additional information that we have computed when calculating the LISA statistics. We do this in four acts. The first one we have already mentioned: a straighforward choropleth of the local statistic of each area. The other three include information on the quadrant each area is assigned into, whether the statistic is considered significant or not, and a combination of those two in a single so-called <em>cluster</em> map. A handy tool in this context is the <code class="docutils literal notranslate"><span class="pre">splot</span></code> library, part of the Pysal family, which provides a lightweight visualization layer for spatial statistics:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">splot</span> <span class="kn">import</span> <span class="n">esda</span> <span class="k">as</span> <span class="n">esdaplot</span>
@@ -694,7 +693,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <span class="c1"># Quadrant categories</span>
 <span class="c1"># Grab second axis of local statistics</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="c1"># Plot Quandrant colors (note to ensure all polygons are assigned a</span>
+<span class="c1"># Plot Quadrant colors (note to ensure all polygons are assigned a</span>
 <span class="c1"># quadrant, we &quot;trick&quot; the function by setting significance level to</span>
 <span class="c1"># 1 so all observations are treated as &quot;significant&quot; and thus assigned</span>
 <span class="c1"># a quadrant color</span>
@@ -731,7 +730,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <span class="c1"># Cluster map</span>
 <span class="c1"># Grab second axis of local statistics</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-<span class="c1"># Plot Quandrant colors In this case, we use a 5% significance</span>
+<span class="c1"># Plot Quadrant colors In this case, we use a 5% significance</span>
 <span class="c1"># level to select polygons as part of statistically significant</span>
 <span class="c1"># clusters</span>
 <span class="n">esdaplot</span><span class="o">.</span><span class="n">lisa_cluster</span><span class="p">(</span><span class="n">lisa</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">)</span>
@@ -749,7 +748,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
         <span class="p">][</span><span class="n">i</span><span class="p">],</span>
         <span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span>
-<span class="c1"># Tight layout to minimise in-betwee white space</span>
+<span class="c1"># Tight layout to minimize in-between white space</span>
 <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
 
 <span class="c1"># Display the figure</span>
@@ -758,11 +757,11 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/9019e539a998e3c806b9608cb29a12c012ebfb944cfb2bbceed8d2b96e22934f.png" src="../_images/9019e539a998e3c806b9608cb29a12c012ebfb944cfb2bbceed8d2b96e22934f.png" />
+<img alt="../_images/8113a3207e47465307c3125672ba1517773604bc38cd4a2297dce26f678fabb1.png" src="../_images/8113a3207e47465307c3125672ba1517773604bc38cd4a2297dce26f678fabb1.png" />
 </div>
 </div>
-<p>The purple and yellow locations in the top-right map display the largest magnitude (positive and negative values) for the local statistics <span class="math notranslate nohighlight">\(I_i\)</span>. Yet, remember this signifies positive spatial autocorrelation, which can be of high <em>or</em> low values. This map thus cannot distinguish between areas with low support for the Brexit vote and those highly in favour.</p>
-<p>To distinguish between these two cases, the map in the upper-right shows the location of the LISA statistic in the quadrant of the Moran Scatter plot. This indicates whether the positive (or negative) local association exists within a specific <em>quadrant</em>, such as the High-High quadrant. This information is recorded in the <code class="docutils literal notranslate"><span class="pre">q</span></code> attribute of the <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object:</p>
+<p>The purple and yellow locations in the top-right map in Figure 5 display the largest magnitude (positive and negative values) for the local statistics <span class="math notranslate nohighlight">\(I_i\)</span>. Yet, remember this signifies positive spatial autocorrelation, which can be of high <em>or</em> low values. This map thus cannot distinguish between areas with low support for the Brexit vote and those highly in favour.</p>
+<p>To distinguish between these two cases, the map in the top-right of Figure 5 shows the location of the LISA statistic in the quadrant of the Moran scatterplot. This indicates whether the positive (or negative) local association exists within a specific <em>quadrant</em>, such as the HH quadrant. This information is recorded in the <code class="docutils literal notranslate"><span class="pre">q</span></code> attribute of the <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
@@ -793,9 +792,9 @@ dtype: int64
 </div>
 </div>
 </div>
-<p>Showing that the high-high (1), and low-low (3), values are predominant. Care must be taken, however, in the interpretation of these first two maps, as the underlying statistical significance of the local values has not been considered. We have simply mapped the raw LISA value alongside the quadrant in which the local statistic resides. To statistical significance, the bottom left map distinguishes those polygons whose pseudo p-value is above (<em>“Non-Significant”</em>) or below (<em>“Significant”</em>) the threshold value of 5% we use in this context. An examination of the map suggests that quite a few local authorities have local statistics that are small enough so as to be compatible with pure chance.</p>
+<p>Showing that the high-high (1), and low-low (3), values are predominant. Care must be taken, however, in the interpretation of these first two maps, as the underlying statistical significance of the local values has not been considered. We have simply mapped the raw LISA value alongside the quadrant in which the local statistic resides. To statistical significance, the bottom-left map distinguishes those polygons whose pseudo-<span class="math notranslate nohighlight">\(p\)</span>-value is above (<em>“Non-Significant”</em>) or below (<em>“Significant”</em>) the threshold value of 5% we use in this context. An examination of the map suggests that quite a few local authorities have local statistics that are small enough so as to be compatible with pure chance.</p>
 <p>Therefore, in order to focus on the areas that are most promising, we need to include significance information alongside the quadrant and local statistic. Together, this “cluster map” (as it is usually called) extracts significant observations -those that are highly unlikely to have come from pure chance- and plots them with a specific color depending on their quadrant category. All of the needed pieces are contained inside the <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object we have created above and, if passed in tandem with the geo-table containing the geographies it relates to, <code class="docutils literal notranslate"><span class="pre">splot</span></code> will make a cluster map for us.</p>
-<p>Reading the clustermap reveals a few interesting aspects that would have been hard to grasp by looking at the other maps only and that are arguably more relevant for an analysis of the data. First, fewer than half of polygons that have degrees of local spatial association strong enough to reject the idea of pure chance:</p>
+<p>Reading the clustermap reveals a few interesting aspects that would have been hard to grasp by looking at the other maps only and that are arguably more relevant for an analysis of the data. First, fewer than half of polygons have degrees of local spatial association strong enough to reject the idea of pure chance:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span><span class="p">)</span>
@@ -803,13 +802,13 @@ dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>41.578947368421055
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>40.26315789473684
 </pre></div>
 </div>
 </div>
 </div>
 <p>A little over 41% of the local authorities are considered, by this analysis, to be part of a spatial cluster. Second, we identify three clear areas of low support for leaving the EU: Scotland, London, and the area around Oxford (North-West of London). And third, although there appeared to be many areas with concentrated values indicating high support, it is only the region in the North-East and West of England whose spatial concentration shows enough strength to reasonably rule out pure chance.</p>
-<p>Before we move on from the LISA statistics, let’s dive into a bit of the data engineering required to “export” significance levels and other information, as well as dig a bit further into what these numbers represent. The latter is useful if we need to work with them as part of a broader data pipeline. So far, cluster maps have been handled by <code class="docutils literal notranslate"><span class="pre">splot</span></code>, but there is quite a bit that happens under the hood. If we needed to recreate one of its maps, or to use this information in a different context, we would need to extract them out of our <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object, and link them up to the original <code class="docutils literal notranslate"><span class="pre">db</span></code> table. Here is one way you can do this.</p>
+<p>Before we move on from the LISA statistics, let’s dive into a bit of the data engineering required to “export” significance levels and other information, as well as dig a bit further into what these numbers represent. The latter are useful if we need to work with them as part of a broader data pipeline. So far, cluster maps have been handled by <code class="docutils literal notranslate"><span class="pre">splot</span></code>, but there is quite a bit that happens under the hood. If we needed to recreate one of its maps, or to use this information in a different context, we would need to extract them out of our <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object, and link them up to the original <code class="docutils literal notranslate"><span class="pre">db</span></code> table. Here is one way you can do this.</p>
 <p>First, we pull the information computed in <code class="docutils literal notranslate"><span class="pre">lisa</span></code> and insert it in the main data table:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -856,27 +855,27 @@ dtype: int64
     <tr>
       <th>E06000001</th>
       <td>1</td>
-      <td>0.008</td>
+      <td>0.016</td>
     </tr>
     <tr>
       <th>E06000002</th>
       <td>1</td>
-      <td>0.008</td>
+      <td>0.014</td>
     </tr>
     <tr>
       <th>E06000003</th>
       <td>1</td>
-      <td>0.011</td>
+      <td>0.019</td>
     </tr>
     <tr>
       <th>E06000004</th>
       <td>1</td>
-      <td>0.011</td>
+      <td>0.016</td>
     </tr>
     <tr>
       <th>E06000010</th>
       <td>1</td>
-      <td>0.012</td>
+      <td>0.022</td>
     </tr>
   </tbody>
 </table>
@@ -921,35 +920,35 @@ dtype: int64
     <tr>
       <th>W06000018</th>
       <td>0</td>
-      <td>0.498</td>
+      <td>0.448</td>
     </tr>
     <tr>
       <th>W06000019</th>
       <td>0</td>
-      <td>0.487</td>
+      <td>0.435</td>
     </tr>
     <tr>
       <th>W06000021</th>
       <td>0</td>
-      <td>0.475</td>
+      <td>0.427</td>
     </tr>
     <tr>
       <th>W06000022</th>
       <td>0</td>
-      <td>0.353</td>
+      <td>0.392</td>
     </tr>
     <tr>
       <th>W06000023</th>
       <td>0</td>
-      <td>0.278</td>
+      <td>0.257</td>
     </tr>
   </tbody>
 </table>
 </div></div></div>
 </div>
 <p>Thus, the first five values are statistically significant, while the last five observations are not.</p>
-<p>Let us stop for a second on these two steps. First, we consider the <code class="docutils literal notranslate"><span class="pre">sig</span></code> column. Akin to global Moran’s I, <code class="docutils literal notranslate"><span class="pre">esda</span></code> automatically computes a pseudo p-value for each LISA. Because some instances of the LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar value in random maps. A few different ways of generating random maps are considered by <code class="docutils literal notranslate"><span class="pre">esda</span></code>, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. In addition, we follow a similar reasoning as with global Moran’s I and use 5% as the threshold for statistical significance. To identify these values, we create a variable, <code class="docutils literal notranslate"><span class="pre">sig</span></code>, that contains <code class="docutils literal notranslate"><span class="pre">True</span></code> if the p-value of the observation satisfies the condition, and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
-<p>Next, we construct our quadrant values using the <code class="docutils literal notranslate"><span class="pre">q</span></code> attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure <code class="docutils literal notranslate"><span class="pre">sig</span></code>, so only observations in a quadrant that are considered significant are labeled as part of that given quadrant. The remainder are labelled as non-significant.</p>
+<p>Let us stop for a second on these two steps. First, we consider the <code class="docutils literal notranslate"><span class="pre">sig</span></code> column. Akin to global Moran’s I, <code class="docutils literal notranslate"><span class="pre">esda</span></code> automatically computes a pseudo-<span class="math notranslate nohighlight">\(p\)</span>-value for each LISA. Because some instances of the LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar value in random maps. A few different ways of generating random maps are considered by <code class="docutils literal notranslate"><span class="pre">esda</span></code>, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. In addition, we follow a similar reasoning as with global Moran’s I and use 5% as the threshold for statistical significance. To identify these values, we create a variable, <code class="docutils literal notranslate"><span class="pre">sig</span></code>, that contains <code class="docutils literal notranslate"><span class="pre">True</span></code> if the p-value of the observation satisfies the condition, and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
+<p>Next, we construct our quadrant values using the <code class="docutils literal notranslate"><span class="pre">q</span></code> attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure <code class="docutils literal notranslate"><span class="pre">sig</span></code>, so only observations in a quadrant that are considered significant are labeled as part of that given quadrant. The remainder are labeled as non-significant.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pick as part of a quadrant only significant polygons,</span>
@@ -988,7 +987,7 @@ Name: labels, dtype: object
 </div>
 </div>
 </div>
-<p>These cluster labels are meaningful if you know of the Moran Plot. To help making them a bit more intuitive, a terminology that is sometimes used goes as follows. Positive forms of local spatial autocorrelation are of two types. First, HH observations, which we can term “hot spots”, represent areas where values at the site and its surroundings are larger than average. Second, LL observations, significant clusters of low values surrounded by low values, are sometimes referred to as “cold spots”. Negative forms of local spatial autocorrelation also include two cases. When the focal observation displays low values but its surroundings have high values (LH), we call them “doughnuts”. Conversely, areas with high values but neighboured by others with low values (HL) can be referred to as “diamonds in the rough”. We note this terminology is purely mnemonic, but recognise in some cases it can help remembering the interpretation of local statistics.</p>
+<p>These cluster labels are meaningful if you know of the Moran Plot. To help making them a bit more intuitive, a terminology that is sometimes used goes as follows. Positive forms of local spatial autocorrelation are of two types. First, HH observations, which we can term as “hot spots”, represent areas where values at the site and its surroundings are larger than average. Second, LL observations, significant clusters of low values surrounded by low values, are sometimes referred to as “cold spots”. Negative forms of local spatial autocorrelation also include two cases. When the focal observation displays low values but its surroundings have high values (LH), we call them “doughnuts”. Conversely, areas with high values but neighbored by others with low values (HL) can be referred to as “diamonds in the rough”. We note this terminology is purely mnemonic, but recognize in some cases it can help in remembering the interpretation of local statistics.</p>
 <p>After building these new columns, analysis on the overall trends of LISA statistics is more straightforward than from the <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object. For example, an overview of the distribution of labels is one line away:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -997,9 +996,9 @@ Name: labels, dtype: object
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Non-Significant    222
-HH                  75
-LL                  73
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Non-Significant    227
+HH                  74
+LL                  69
 LH                   6
 HL                   4
 Name: labels, dtype: int64
@@ -1011,7 +1010,7 @@ Name: labels, dtype: int64
 </section>
 <section id="getis-and-ord-s-local-statistics">
 <h2>Getis and Ord’s local statistics<a class="headerlink" href="#getis-and-ord-s-local-statistics" title="Permalink to this heading">#</a></h2>
-<p>Similar to the global case, there are more local indicators of spatial correlation than the local Moran’s I. <code class="docutils literal notranslate"><span class="pre">esda</span></code> includes Getis and Ord’s <span class="math notranslate nohighlight">\(G_i\)</span>-type statistics. These are a different kind of local statistic which are commonly used in two forms: the <span class="math notranslate nohighlight">\(G_i\)</span> statistic, which omits the value at a site in its local summary, and the <span class="math notranslate nohighlight">\(G_i^*\)</span>, which includes the site’s own value in the local summary. The way to calculate them also follows similar patterns as with the Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistics above. Let us see how that would look like for our Brexit example:</p>
+<p>Similar to the global case, there are more local indicators of spatial correlation than the local Moran’s I. <code class="docutils literal notranslate"><span class="pre">esda</span></code> includes Getis and Ord’s <span class="math notranslate nohighlight">\(G_i\)</span>-type statistics. These are a different kind of local statistic that are commonly used in two forms: the <span class="math notranslate nohighlight">\(G_i\)</span> statistic, which omits the value at a site in its local summary, and the <span class="math notranslate nohighlight">\(G_i^*\)</span>, which includes the site’s own value in the local summary. The way to calculate them also follows similar patterns as with the Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistics above. Let us see how that would look like for our Brexit example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gi</span>
@@ -1022,8 +1021,8 @@ Name: labels, dtype: int64
 </div>
 </div>
 </div>
-<p>As the local statistics they are, it is best to explore them by plotting them on a map. Unlike with LISA though, the <span class="math notranslate nohighlight">\(G\)</span> statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.</p>
-<p>Unlike with LISAs, <code class="docutils literal notranslate"><span class="pre">splot</span></code> does not support vislualisation of G statistics at this point. To visualise their output, we will instead write a little function that generates the map from the statistic’s output object and its set of associated geometries:</p>
+<p>Like all local statistics, it is best to explore Getis and Ord statistics by plotting them on a map. Unlike with LISA though, the <span class="math notranslate nohighlight">\(G\)</span> statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.</p>
+<p>Unlike with LISAs, <code class="docutils literal notranslate"><span class="pre">splot</span></code> does not support visualization of G statistics at this point. To visualize their output, we will instead write a little function that generates the map from the statistic’s output object and its set of associated geometries.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
@@ -1079,10 +1078,10 @@ Name: labels, dtype: int64
 </div>
 </div>
 </div>
-<p>With this function at hand, generating <span class="math notranslate nohighlight">\(G_i^{(*)}\)</span> cluster maps is as straightforward as it is for LISA outputs through <code class="docutils literal notranslate"><span class="pre">splot</span></code>:</p>
+<p>With this function at hand, generating <span class="math notranslate nohighlight">\(G_i^{(*)}\)</span> cluster maps is as straightforward as it is for LISA outputs through <code class="docutils literal notranslate"><span class="pre">splot</span></code> in Figure 6:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Setup figure and axes</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axes</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Loop over the two statistics</span>
 <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">go_i</span><span class="p">,</span> <span class="n">go_i_star</span><span class="p">],</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
@@ -1096,15 +1095,15 @@ Name: labels, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/f1cf02deec733783644b9ba9b0c05b678d4b592b4383df8abf79fa99a8a856d7.png" src="../_images/f1cf02deec733783644b9ba9b0c05b678d4b592b4383df8abf79fa99a8a856d7.png" />
+<img alt="../_images/be7c8f3e0b6eedcd21473eba98bec7791a4051c1d77dca8e0f9fd724996116c4.png" src="../_images/be7c8f3e0b6eedcd21473eba98bec7791a4051c1d77dca8e0f9fd724996116c4.png" />
 </div>
 </div>
-<p>In this case, the results are virtually the same for <span class="math notranslate nohighlight">\(G_i\)</span> and <span class="math notranslate nohighlight">\(G_i^*\)</span>. Also, at first glance, these maps appear to be visually similar to the final LISA map from above. Naturally, this leads to the question: <em>why use the <span class="math notranslate nohighlight">\(G\)</span> statistics at all?</em> The answer to this question is that the two sets of local statistics, local <span class="math notranslate nohighlight">\(I\)</span> and the local <span class="math notranslate nohighlight">\(G\)</span>, are complementary statistics. The local <span class="math notranslate nohighlight">\(I\)</span> statistic (on its own) gives an indication of cluster/outlier status, and the local <span class="math notranslate nohighlight">\(G\)</span> shows which side of the hotspot/coldspot divide the observation is on. Alternatively, the local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> cluster map provides both pieces of information, but can be more challenging to visualize all at once. Thus, it depends on your analytical preferences and the point of the analysis at hand.</p>
+<p>In this case, the results are virtually the same for <span class="math notranslate nohighlight">\(G_i\)</span> and <span class="math notranslate nohighlight">\(G_i^*\)</span>. Also, at first glance, these maps appear to be visually similar to the final LISA map from above. Naturally, this leads to the question: <em>why use the <span class="math notranslate nohighlight">\(G_i\)</span> statistics at all?</em> The answer to this question is that the two sets of local statistics, local <span class="math notranslate nohighlight">\(I\)</span> and local <span class="math notranslate nohighlight">\(G_i\)</span>, are complementary statistics. The local <span class="math notranslate nohighlight">\(I_i\)</span> statistic (on its own) gives an indication of cluster/outlier status, and the local <span class="math notranslate nohighlight">\(G_i\)</span> shows which side of the hotspot/coldspot divide the observation is on. Alternatively, the local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> cluster map provides both pieces of information, but it can be more challenging to visualize all at once. Thus, it depends on your analytical preferences and the point of the analysis at hand.</p>
 </section>
 <section id="bonus-local-statistics-on-surfaces">
 <h2>Bonus: local statistics on surfaces<a class="headerlink" href="#bonus-local-statistics-on-surfaces" title="Permalink to this heading">#</a></h2>
-<p>Before we wrap up the chapter, we are going to cover an illustration that, conceptually, is very similar to the topics we have seen above but, from a technical standpoint, has a bit of a different spin. We will learn how to compute local Moran’s I on data that are stored as a surface, rather than as a geo-table (as we have seen above). As we have seen earlier in the book, more and more data for which we might want to explore local spatial autocorrelation are being provided as surfaces rather than geo-tables. The trick to follow this illustration is to realise that, despite the data structure, surfaces also provide data spatially arranged and that, as such, we can apply the battery of tools we have learned in this chapter to better understand their spatial structure.</p>
-<p>Before we start, a note of caution. The functionality required to handle LISA on surfaces is still experimental and a bit rough around the edges. This is because, unlike the case of geo-tables, it has not been a common use-case for geographic data scientists and the tooling eco-system is not as evolved. Nevertheless, it is an exciting time to get started on this, because a lot is happening in this space, and the basic building blocks to develop a full-fledge eco-system are already in place. For this reason, we think it is important to cover in this chapter, even though some of the code we will use below is a bit more sophisticated than what we have seen above. Be patient and do not worry if you have to read things twice (or thrice!) before they start making sense. This is getting into geographic data scientist pro territory!</p>
+<p>Before we wrap up the chapter, we are going to cover an illustration that, conceptually, is very similar to the topics we have seen above but, from a technical standpoint, has a bit of a different spin. We will learn how to compute local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> on data that are stored as a surface, rather than as a geo-table (as we have seen above). As we have seen earlier in the book, more and more data for which we might want to explore local spatial autocorrelation are being provided as surfaces rather than geo-tables. The trick to follow this illustration is to realize that, despite the data structure, surfaces also provide data spatially arranged and that, as such, we can apply the battery of tools we have learned in this chapter to better understand their spatial structure.</p>
+<p>Before we start, a note of caution. The functionality required to handle LISA on surfaces is still experimental and a bit rough around the edges. This is because, unlike the case of geo-tables, it has not been a common use-case for geographic data scientists and the tooling ecosystem is not as evolved. Nevertheless, it is an exciting time to get started on this, because a lot is happening in this space, and the basic building blocks to develop a full-fledged ecosystem are already in place. For this reason, we think it is important to cover in this chapter, even though some of the code we will use below is a bit more sophisticated than what we have seen above. Be patient and do not worry if you have to read things twice (or thrice!) before they start making sense. This is getting into <em>geographic data scientist pro</em> territory!</p>
 <p>For this case, we will use the GHSL dataset that contains an extract of gridded population for the metropolitan region of Sao Paulo (Brazil). Let us read the data first into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1122,7 +1121,7 @@ Name: labels, dtype: int64
 </div>
 </div>
 </div>
-<p>So far so good. Now comes the first hairy bit. The weights builder for surfaces automatically generates a matrix with integers (<code class="docutils literal notranslate"><span class="pre">int8</span></code> in this case which, roughly speaking, are numbers without a decimal component):</p>
+<p>So far, so good. Now comes the first hairy bit. The weights builder for surfaces automatically generates a matrix with integers (<code class="docutils literal notranslate"><span class="pre">int8</span></code> in this case which, roughly speaking, are numbers without a decimal component):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface_sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">dtype</span>
@@ -1168,7 +1167,7 @@ Name: labels, dtype: int64
 <ol class="arabic simple">
 <li><p>The first step (line 3) is to convert the values from integers into floats. To do this, we access the sparse matrix at the core of <code class="docutils literal notranslate"><span class="pre">w_surface_sp</span></code> (which holds all the main data) and convert it to floats using <code class="docutils literal notranslate"><span class="pre">astype</span></code>.</p></li>
 <li><p>Then we convert that sparse matrix into a <code class="docutils literal notranslate"><span class="pre">WSP</span></code> object (line 2), which is a thin wrapper, so the operation is quick.</p></li>
-<li><p>Once represented as a <code class="docutils literal notranslate"><span class="pre">WSP</span></code>, we can use Pysal again to convert it into a full-fledge <code class="docutils literal notranslate"><span class="pre">W</span></code> object using the <code class="docutils literal notranslate"><span class="pre">WSP2W</span></code> utility. This step may take a bit more of computing muscle.</p></li>
+<li><p>Once represented as a <code class="docutils literal notranslate"><span class="pre">WSP</span></code>, we can use Pysal again to convert it into a full-fledged <code class="docutils literal notranslate"><span class="pre">W</span></code> object using the <code class="docutils literal notranslate"><span class="pre">WSP2W</span></code> utility. This step may take a bit more of computing muscle.</p></li>
 <li><p>Finally, spatial weights from surfaces include an <code class="docutils literal notranslate"><span class="pre">index</span></code> object that will help us later return data into a surface data structure. Since this is lost with the transformations, we reattach it in the final line (line 6) from the original object.</p></li>
 </ol>
 <p>This leaves us with a weights object (<code class="docutils literal notranslate"><span class="pre">w_surface</span></code>) we can work with for the LISA. Next is to recast the values from the original data structure to one that <code class="docutils literal notranslate"><span class="pre">Moran_Local</span></code> will understand. This happens in the next code snippet:</p>
@@ -1182,7 +1181,7 @@ Name: labels, dtype: int64
 </div>
 </div>
 </div>
-<p>Note that we do two operations: one is to convert the two-dimensional <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> surface into a one-dimensional vector in the form of a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object (<code class="docutils literal notranslate"><span class="pre">pop_values</span></code>); the second is to filter out values in which, in the surface, contain missing data. In surfaces, this is usually expressed with a rare value rather than with another data type. We can check that in <code class="docutils literal notranslate"><span class="pre">pop</span></code>, this is -200:</p>
+<p>Note that we do two operations: one is to convert the two-dimensional <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> surface into a one-dimensional vector in the form of a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object (<code class="docutils literal notranslate"><span class="pre">pop_values</span></code>); the second is to filter out values in which, in the surface, contain missing data. In surfaces, this is usually expressed with a rare value rather than with another data type. We can check that in <code class="docutils literal notranslate"><span class="pre">pop</span></code>, this is negative:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span>
@@ -1195,7 +1194,7 @@ Name: labels, dtype: int64
 </div>
 </div>
 </div>
-<p>At this point, we are ready to run a LISA the same way we have done in previously in the chapter when using geo-tables:</p>
+<p>At this point, we are ready to run a LISA the same way we have done in the previous chapter when using geo-tables:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: this may take a bit longer to run depending on hardware</span>
@@ -1207,7 +1206,7 @@ Name: labels, dtype: int64
 </div>
 </div>
 <p>Note that, before computing the LISA, we ensure the population values are <em>also</em> expressed as floats and thus in line with those in our spatial weights.</p>
-<p>Now we have computed the LISA, on to visualisation. For this, we need to express the results as a surface rather than as a table, for which we will use the bridge built in <code class="docutils literal notranslate"><span class="pre">pysal</span></code>:</p>
+<p>Now that we have computed the LISA, on to visualization. For this, we need to express the results as a surface rather than as a table, for which we will use the bridge built in <code class="docutils literal notranslate"><span class="pre">pysal</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="kn">import</span> <span class="n">raster</span>
@@ -1245,7 +1244,7 @@ Name: labels, dtype: int64
 </div>
 </div>
 </div>
-<p>The resulting <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> only contains missing data pixels (expressed with the same value as the original <code class="docutils literal notranslate"><span class="pre">pop</span></code>, -200), <code class="docutils literal notranslate"><span class="pre">0</span></code> for non-significant pixels, and 1-4 depending on the quadrant for HH, LH, LL, HL significant clusters, same as with the Brexit example before:</p>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> only contains missing data pixels (expressed with the same value as the original <code class="docutils literal notranslate"><span class="pre">pop</span></code> feature), <code class="docutils literal notranslate"><span class="pre">0</span></code> for non-significant pixels, and 1-4 depending on the quadrant for HH, LH, LL, HL significant clusters, same as with the Brexit example before:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa_da</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
@@ -1253,7 +1252,7 @@ Name: labels, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([-200,    0,    3,    1,    2,    4])
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([-200,    0,    3,    1,    4,    2])
 </pre></div>
 </div>
 </div>
@@ -1282,7 +1281,7 @@ Name: labels, dtype: int64
 </div>
 </div>
 </div>
-<p>With these pieces, we can create the colormap object:</p>
+<p>With these pieces, we can create the colormap object (shown in Figure 7) that replicates our original local Moran cluster map colors.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa_cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span>
@@ -1293,9 +1292,12 @@ Name: labels, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_html"><div style="vertical-align: middle;"><strong>from_list</strong> </div><div class="cmap"><img alt="from_list colormap" title="from_list" style="border: 1px solid #555;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAABACAYAAABsv8+/AAAAGHRFWHRUaXRsZQBmcm9tX2xpc3QgY29sb3JtYXBDL89FAAAAHnRFWHREZXNjcmlwdGlvbgBmcm9tX2xpc3QgY29sb3JtYXABtCnOAAAAMHRFWHRBdXRob3IATWF0cGxvdGxpYiB2My40LjMsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcJXfPTAAAAMnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHYzLjQuMywgaHR0cHM6Ly9tYXRwbG90bGliLm9yZyf7bPQAAAFOSURBVHic7dZBDQJBAARBIDjCAwmysML3TGCAB1n8gIG7L3tJVymYZD59HGN8D+zS+XqbPYEVn+dr9gRW3B9+2aP3ZZk9gQ2n2QMAgP8TAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCfhcVCotxILZcAAAAAElFTkSuQmCC"></div><div style="vertical-align: middle; max-width: 514px; display: flex; justify-content: space-between;"><div style="float: left;"><div title="#d3d3d3ff" style="display: inline-block; width: 1em; height: 1em; margin: 0; vertical-align: middle; border: 1px solid #555; background-color: #d3d3d3ff;"></div> under</div><div style="margin: 0 auto; display: inline-block;">bad <div title="#00000000" style="display: inline-block; width: 1em; height: 1em; margin: 0; vertical-align: middle; border: 1px solid #555; background-color: #00000000;"></div></div><div style="float: right;">over <div title="#fdae61ff" style="display: inline-block; width: 1em; height: 1em; margin: 0; vertical-align: middle; border: 1px solid #555; background-color: #fdae61ff;"></div></div></div></div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;matplotlib.colors.ListedColormap at 0x7fae61f510d0&gt;
+</pre></div>
 </div>
-<p>At this point, we have all the pieces we need to build our cluster map. Let’s put them together:</p>
+</div>
+</div>
+<p>At this point, we have all the pieces we need to build our cluster map. Let’s put them together to build Figure 8:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
@@ -1336,7 +1338,7 @@ Name: labels, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/3c00c09c63e4d3b2386fc124762441d19c599694ca386c460e4cc058185a3106.png" src="../_images/3c00c09c63e4d3b2386fc124762441d19c599694ca386c460e4cc058185a3106.png" />
+<img alt="../_images/4243c9b9c1a99cc11585f0025274489d7eeb0aa0c4aee3cbf883881c46950adb.png" src="../_images/4243c9b9c1a99cc11585f0025274489d7eeb0aa0c4aee3cbf883881c46950adb.png" />
 </div>
 </div>
 </section>
@@ -1366,7 +1368,7 @@ Name: labels, dtype: int64
 <li><p>does any site’s local I change their outlier/statistical significance classifications? Use <code class="docutils literal notranslate"><span class="pre">pandas.crosstab</span></code> to examine how many classifications change between the two kinds of statistic. Make sure to consider observations’ statistical significances in addition to their quadrant classification.</p></li>
 </ul>
 </li>
-<li><p>Make two maps, side by side, of the local statistics without rate correction and with rate correction. Does your interpretation of the maps change depending on the correction?</p></li>
+<li><p>Make two maps, side-by-side, of the local statistics without rate correction and with rate correction. Does your interpretation of the maps change depending on the correction?</p></li>
 </ul>
 </li>
 <li><p>Local statistics use <em>permutation-based</em> inference for their significance testing. This means that, to test the statistical significance of a local relationship, values of the observed variable are <em>shuffled</em> around the map. These large numbers of <em>random</em> maps are then used to compare against the observed map. Local inference requires some restrictions on how each shuffle occurs, since each observation must be “fixed” and compared to randomly-shuffle neighboring observations. The distribution of local statistics for each “shuffle” is contained in the <code class="docutils literal notranslate"><span class="pre">.rlisas</span></code> attribute of a Local Moran object.</p>
@@ -1384,8 +1386,8 @@ Name: labels, dtype: int64
 </li>
 <li><p>Local Getis-Ord statistics come in two forms. As discussed above, Getis-Ord <span class="math notranslate nohighlight">\(G_i\)</span> statistics <em>omit</em> each site from their own local statistic. In contrast, <span class="math notranslate nohighlight">\(G_i^*\)</span> statistics <em>include</em> the site in its own local statistic.</p>
 <ul class="simple">
-<li><p>Make a scatterplot of the two types of statistic, contained in <code class="docutils literal notranslate"><span class="pre">gostats.Zs</span></code> and <code class="docutils literal notranslate"><span class="pre">gostars.Zs</span></code> to examine how similar the two forms of the Getis-Ord statistic are.</p></li>
-<li><p>The two forms of the Getis-Ord statistic differ by their inclusion of the <em>site</em> value, <span class="math notranslate nohighlight">\(y_i\)</span>, in the value for the <span class="math notranslate nohighlight">\(G_i\)</span> statistic at that site. So, make a scatterplot of the percent leave variable and the <em>difference</em> of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using <code class="docutils literal notranslate"><span class="pre">scipy.stats.kendalltau</span></code> or <code class="docutils literal notranslate"><span class="pre">scipy.stats.pearsonr</span></code>.</p></li>
+<li><p>make a scatterplot of the two types of statistic, contained in <code class="docutils literal notranslate"><span class="pre">gostats.Zs</span></code> and <code class="docutils literal notranslate"><span class="pre">gostars.Zs</span></code> to examine how similar the two forms of the Getis-Ord statistic are.</p></li>
+<li><p>the two forms of the Getis-Ord statistic differ by their inclusion of the <em>site</em> value, <span class="math notranslate nohighlight">\(y_i\)</span>, in the value for the <span class="math notranslate nohighlight">\(G_i\)</span> statistic at that site. So, make a scatterplot of the percent leave variable and the <em>difference</em> of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using <code class="docutils literal notranslate"><span class="pre">scipy.stats.kendalltau</span></code> or <code class="docutils literal notranslate"><span class="pre">scipy.stats.pearsonr</span></code>.</p></li>
 </ul>
 </li>
 </ol>
@@ -1461,7 +1463,7 @@ Name: labels, dtype: int64
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#an-empirical-illustration-the-eu-referendum">An empirical illustration: the EU Referendum</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivating-local-spatial-autocorrelation">Motivating Local Spatial Autocorrelation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#motivating-local-spatial-autocorrelation">Motivating local spatial autocorrelation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#local-moran-s-i-i">Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getis-and-ord-s-local-statistics">Getis and Ord’s local statistics</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bonus-local-statistics-on-surfaces">Bonus: local statistics on surfaces</a></li>
