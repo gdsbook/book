@@ -173,7 +173,7 @@ const thebe_selector_output = ".output, .cell_output"
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Part I - Building Blocks</span></p>
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../intro_part_i.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="01_geo_thinking.html">Geographic thinking for data scientists</a></li>
+<li class="toctree-l1"><a class="reference internal" href="01_geo_thinking.html">Geographic Thinking for Data Scientists</a></li>
 <li class="toctree-l1"><a class="reference internal" href="02_geospatial_computational_environment.html">Computational Tools for Geographic Data Science</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Spatial Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="04_spatial_weights.html">Spatial Weights</a></li>
@@ -409,7 +409,7 @@ document.write(`
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fundamentals-of-geographic-data-structures">Fundamentals of geographic data structures</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geographic-tables">Geographic Tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geographic-tables">Geographic tables</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#surfaces">Surfaces</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spatial-graphs">Spatial graphs</a></li>
 </ul>
@@ -440,8 +440,18 @@ document.write(`
   <section class="tex2jax_ignore mathjax_ignore" id="spatial-data">
 <h1>Spatial Data<a class="headerlink" href="#spatial-data" title="Permalink to this heading">#</a></h1>
 <p>This chapter grounds the ideas discussed in the previous two chapters into a practical context. We consider how data structures, and the data models they represent, are implemented in Python. We also cover how to interact with these data structures. This will happen alongside the code used to manipulate the data in a single computational laboratory notebook. This, then, unites the two concepts of open science and geographical thinking.</p>
-<p>Further, we will spend most of the chapter discussing how Python represents data <em>once read</em> from a file or database, rather than focusing on specific <em>file</em> formats used to store data. This is because the libraries we use will read any format into one of a few canonical data structures that we discuss in Chapter 1.  We take this approach because these data structures are what we interact with during our data analysis: they our interface with the data. File formats, while useful, are secondary to this purpose. Indeed, part of the benefit of Python (and other computing languages) is <em>abstraction</em>: the complexities, particularities and quirks associated with each file format are removed as Python represents all data in a few standard ways, regardless of provenance. We take full advantage of this feature here.</p>
-<p>We divide the chapter in two main parts. The first part looks at each of the three main data structures reviewed in Chapter 1 (<em>Geographic Thinking</em>): geographic tables, surfaces and spatial graphs. Second, we explore combinations of different data structures that depart from the traditional data model/structure matchings discussed in Chapter 2. We cover how one data in one structure can be effectively transferred to another, but also discuss why that might (or might not) be a good idea in some cases. A final note before we delve into the content of this book is in order: this is not a comprehensive account of <em>everything</em> that is possible with each of the data structures we present. Rather, you can think of it as a preview that we will build on throughout the book to showcase much of what is possible with Python.</p>
+<p>Further, we will spend most of the chapter discussing how Python represents data
+<em>once read</em> from a file or database, rather than focusing on specific <em>file</em>
+formats used to store data. This is because the libraries we use will read any
+format into one of a few canonical data structures that we discuss in Chapter 1.
+We take this approach because these data structures are what we interact with
+during our data analysis: they are our interface with the data. File formats, while useful, are secondary to this purpose. Indeed, part of the benefit of Python (and other computing languages) is <em>abstraction</em>: the complexities, particularities and quirks associated with each file format are removed as Python represents all data in a few standard ways, regardless of provenance. We take full advantage of this feature here.</p>
+<p>We divide the chapter in two main parts. The first part looks at each of the
+three main data structures reviewed in Chapter 1 (<em>Geographic Thinking</em>):
+geographic tables, surfaces and spatial graphs. Second, we explore combinations
+of different data structures that depart from the traditional data
+model/structure matchings discussed in Chapter 2. We cover how one data in one
+structure can be effectively transferred to another, but also we discuss why that might (or might not) be a good idea in some cases. A final note before we delve into the content of this book is in order: this is not a comprehensive account of <em>everything</em> that is possible with each of the data structures we present. Rather, you can think of it as a preview that we will build on throughout the book to showcase much of what is possible with Python.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span>
@@ -461,9 +471,18 @@ document.write(`
 <h2>Fundamentals of geographic data structures<a class="headerlink" href="#fundamentals-of-geographic-data-structures" title="Permalink to this heading">#</a></h2>
 <p>As outlined in Chapter 1, there are a few main data structures that are used in geographic data science: geographic tables (which are generally matched to an object data model), rasters or surfaces (which are generally matched to a field data model), and spatial networks (which are generally matched to a graph data model). We discuss these in turn throughout this section.</p>
 <section id="geographic-tables">
-<h3>Geographic Tables<a class="headerlink" href="#geographic-tables" title="Permalink to this heading">#</a></h3>
+<h3>Geographic tables<a class="headerlink" href="#geographic-tables" title="Permalink to this heading">#</a></h3>
 <p>Geographic objects are usually matched to what we called the <em>geographic table</em>. Geographic tables can be thought of as a tab in a spreadsheet where one of the columns records geometric information. This data structure represents a single geographic object as a row of a table; each column in the table records information about the object, its attributes or features, as we will see below. Typically, there is a special column in this table that records the <em>geometry</em> of the object. Computer systems that use this data structure are intended to add geography into a <em>relational database</em>, such as PostgreSQL (through its PostGIS extension) or sqlite (through its spatialite extension). Beyond this, however, many data science languages (such as R, Julia, and Python), have packages that adopt this data structure as well (such as <code class="docutils literal notranslate"><span class="pre">sf</span></code>, <code class="docutils literal notranslate"><span class="pre">GeoTables.jl</span></code>, and <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>), and it is rapidly becoming the main data structure for object-based geographic data.</p>
-<p>Before proceeding, though, it helps to mention a quick clarification on terminology. Throughout this book, regardless of the data structure used, we will refer to a measurement about an observation as a <em>feature</em>. This is consistent with other work in data science and machine learning. Then, one set of measurements is a <em>sample</em>. For tables, this means a feature is a column and a sample is a row. Historically, though, geographic information scientists have used the word “feature” to mean an individual observation, since a “feature” in cartography is an entity on a map, and “attribute” to describe characteristics of that observation. Elsewhere, a feature may be called a “variable,” and a sample referred to as a “record.” So, consistent terminology is important: for this book, a <em>feature</em> is one measured trait pertaining to an observation (a column), and a <em>sample</em> is one set of measurements (a row).</p>
+<p>Before proceeding, though, it helps to mention a quick clarification on
+terminology. Throughout this book, regardless of the data structure used, we
+will refer to a measurement about an observation as a <em>feature</em>. This is
+consistent with other work in data science and machine learning. Then, one set
+of measurements is a <em>sample</em>. For tables, this means a feature is a column, and
+a sample is a row. Historically, though, geographic information scientists have
+used the word “feature” to mean an individual observation, since a “feature” in
+cartography is an entity on a map, and “attribute” to describe characteristics
+of that observation. Elsewhere, a feature may be called a “variable,” and a
+sample is referred to as a “record.” So, consistent terminology is important: for this book, a <em>feature</em> is one measured trait pertaining to an observation (column), and a <em>sample</em> is one set of measurements (row).</p>
 <p>To understand the structure of geographic tables, it will help to read in the <code class="docutils literal notranslate"><span class="pre">countries_clean.gpkg</span></code> dataset included in this book that describes countries in the world. To read in this data, we can use the <code class="docutils literal notranslate"><span class="pre">read_file()</span></code> method in <code class="docutils literal notranslate"><span class="pre">geopandas</span></code>:<a class="footnote-reference brackets" href="#package-v-function" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -534,7 +553,11 @@ document.write(`
 </table>
 </div></div></div>
 </div>
-<p>Each row of this table is a single country. Each country only has two features: the administrative name of the country and the geometry of the country’s boundary. The name of the country is encoded in the <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code> column using the Python <code class="docutils literal notranslate"><span class="pre">str</span></code> type, which is used to store text-based data. The geometry of the country’s boundary is stored in the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column, and is encoded using a special class in Python that is used to represent geometric objects. As with other table-based data structures in Python, every row and column have an index that identifies them uniquely and is rendered in bold on the left-hand side of the table. This geographic table is an instance of the <code class="docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code> object, used throughout Python’s ecosystem to represent geographic data.</p>
+<p>Each row of this table is a single country. Each country only has two features:
+the administrative name of the country and the geometry of the country’s
+boundary. The name of the country is encoded in the <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code> column using the
+Python <code class="docutils literal notranslate"><span class="pre">str</span></code> type, which is used to store text-based data. The geometry of the
+country’s boundary is stored in the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> column, and it is encoded using a special class in Python that is used to represent geometric objects. As with other table-based data structures in Python, every row and column have an index that identifies them uniquely and is rendered in bold on the left-hand side of the table. This geographic table is an instance of the <code class="docutils literal notranslate"><span class="pre">geopandas.GeoDataFrame</span></code> object, used throughout Python’s ecosystem to represent geographic data.</p>
 <p>Geographic tables store geographic information as an additional column. But, how is this information encoded? To see, we can check the type of the object in the first row:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -651,7 +674,7 @@ document.write(`
 </div>
 </div>
 <p>Note again how we can create a map by calling <code class="docutils literal notranslate"><span class="pre">.plot()</span></code> on a <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>. We can thematically color each feature based on a column by passing the name of that column to the plot method (as we do on with <code class="docutils literal notranslate"><span class="pre">ADMIN</span></code> in this case), and that the current geometry is used.</p>
-<p>Thus, as should now be clear, nearly any kind of geographic object can be represented in one (or more) geometry column(s). Thinking about the number of different kinds of shapes or geometries one could use quickly boggles the mind. Fortunately the Open Geospatial Consortium (OGC) has defined a set of “abstract” types that can be used to define any kind of geometry. This specification, codified in ISO 19125-1—the “simple features” specification—defines the formal relationships between these types: a <code class="docutils literal notranslate"><span class="pre">Point</span></code> is a zero-dimensional location with an x and y coordinate; a <code class="docutils literal notranslate"><span class="pre">LineString</span></code> is a path composed of a set of more than one <code class="docutils literal notranslate"><span class="pre">Point</span></code>, and a <code class="docutils literal notranslate"><span class="pre">Polygon</span></code> is a surface that has at least one <code class="docutils literal notranslate"><span class="pre">LineString</span></code> that starts and stops with the same coordinate. All of these types <em>also</em> have <code class="docutils literal notranslate"><span class="pre">Multi</span></code> variants that indicate a collection of multiple geometries of the same type. So, for instance, Bolivia is represented as a single polygon:</p>
+<p>Thus, as should now be clear, nearly any kind of geographic object can be represented in one (or more) geometry column(s). Thinking about the number of different kinds of shapes or geometries one could use quickly boggles the mind. Fortunately the Open Geospatial Consortium (OGC) has defined a set of “abstract” types that can be used to define any kind of geometry. This specification, codified in ISO 19125-1—the “simple features” specification—defines the formal relationships between these types: a <code class="docutils literal notranslate"><span class="pre">Point</span></code> is a zero-dimensional location with an x and y coordinate, a <code class="docutils literal notranslate"><span class="pre">LineString</span></code> is a path composed of a set of more than one <code class="docutils literal notranslate"><span class="pre">Point</span></code>, and a <code class="docutils literal notranslate"><span class="pre">Polygon</span></code> is a surface that has at least one <code class="docutils literal notranslate"><span class="pre">LineString</span></code> that starts and stops with the same coordinate. All of these types <em>also</em> have <code class="docutils literal notranslate"><span class="pre">Multi</span></code> variants that indicate a collection of multiple geometries of the same type. So, for instance, Bolivia is represented as a single polygon:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_polygons</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ADMIN == &quot;Bolivia&quot;&#39;</span><span class="p">)</span>
@@ -987,7 +1010,14 @@ document.write(`
 </section>
 <section id="surfaces">
 <h3>Surfaces<a class="headerlink" href="#surfaces" title="Permalink to this heading">#</a></h3>
-<p>Surfaces are used to record data from a field data model. In theory, a field is a continuous surface and thus has an infinite number of locations at which it could be measured. In reality however, fields are measured at a finite sample of locations that, to provide a sense of continuity and better conform with the field model, are uniformly structured across space. Surfaces thus are represented as grids where each cell contains a sample. A grid can also be thought of as a table with rows and columns but, as we discussed in the previous chapter, both of them are directly tied to geographic location. This is in sharp contrast with geographic tables, where geography is confined to a single column.</p>
+<p>Surfaces are used to record data from a field data model. In theory, a field is
+a continuous surface and thus has an infinite number of locations at which it
+could be measured. In reality, however, fields are measured at a finite sample
+of locations that, to provide a sense of continuity and better conform with the
+field model, are uniformly structured across space. Surfaces thus are
+represented as grids where each cell contains a sample. A grid can also be
+thought of as a table with rows and columns but, as we discussed in the previous
+chapter, both of them are directly tied to a geographic location. This is in sharp contrast with geographic tables, where geography is confined to a single column.</p>
 <p>To explore how Python represents surfaces, we will use an extract for the Brazilian city of Sao Paulo of a <a class="reference internal" href="../data/ghsl/build_ghsl_extract.html"><span class="doc std std-doc">global population dataset</span></a>. This dataset records population counts in cells of the same dimensions uniformly covering the surface of the Earth. Our extract is available as a GeoTIF file, a variation of the TIF image format that includes geographic information. We can use the <code class="docutils literal notranslate"><span class="pre">open_rasterio()</span></code> method from the <code class="docutils literal notranslate"><span class="pre">xarray</span></code> package to read in the GeoTIF:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1009,7 +1039,9 @@ document.write(`
 </div>
 </div>
 </div>
-<p><code class="docutils literal notranslate"><span class="pre">xarray</span></code> is a package to work with multi-dimensional labeled arrays. Let’s unpack this: we can use arrays of not only two dimensions as in a table with rows and columns, but with an arbitrary number of them; each of these dimensions are “tracked” by an index that makes it easy and efficient to manipulate. In <code class="docutils literal notranslate"><span class="pre">xarray</span></code>, these indices are called coordinates, and they can be retrieved from our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> through the <code class="docutils literal notranslate"><span class="pre">coords</span></code> attribute:</p>
+<p><code class="docutils literal notranslate"><span class="pre">xarray</span></code> is a package to work with multi-dimensional labeled arrays. Let’s
+unpack this: we can use arrays of not only two dimensions as in a table with
+rows and columns, but also with an arbitrary number of them; each of these dimensions is “tracked” by an index that makes it easy and efficient to manipulate. In <code class="docutils literal notranslate"><span class="pre">xarray</span></code>, these indices are called coordinates, and they can be retrieved from our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> through the <code class="docutils literal notranslate"><span class="pre">coords</span></code> attribute:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">coords</span>
@@ -1448,7 +1480,7 @@ Attributes:
 <img alt="../_images/40bdd30786610e6f7c631fd778be3286784ac5a9ed86edba635771d62e34dc36.png" src="../_images/40bdd30786610e6f7c631fd778be3286784ac5a9ed86edba635771d62e34dc36.png" />
 </div>
 </div>
-<p>This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data are traditionally stored in surfaces not as a class of its own (e.g., <code class="docutils literal notranslate"><span class="pre">NaN</span></code>) but with an impossible value. If we return to the <code class="docutils literal notranslate"><span class="pre">attrs</span></code> printout above, we can see how the <code class="docutils literal notranslate"><span class="pre">nodatavals</span></code> attribute specifies missing data recorded with -200. With that in mind, we can use the <code class="docutils literal notranslate"><span class="pre">where()</span></code> method to select only values that are <em>not</em> -200:</p>
+<p>This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data is traditionally stored in surfaces not as a class of its own (e.g., <code class="docutils literal notranslate"><span class="pre">NaN</span></code>) but with an impossible value. If we return to the <code class="docutils literal notranslate"><span class="pre">attrs</span></code> printout above, we can see how the <code class="docutils literal notranslate"><span class="pre">nodatavals</span></code> attribute specifies missing data recorded with -200. With that in mind, we can use the <code class="docutils literal notranslate"><span class="pre">where()</span></code> method to select only values that are <em>not</em> -200:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">pop</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">200</span><span class="p">)</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">band</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;RdPu&quot;</span><span class="p">);</span>
@@ -1463,7 +1495,16 @@ Attributes:
 </section>
 <section id="spatial-graphs">
 <h3>Spatial graphs<a class="headerlink" href="#spatial-graphs" title="Permalink to this heading">#</a></h3>
-<p>Spatial graphs store connections between objects through space. These connections may derive from geographical topology (e.g., contiguity), distance, or more sophisticated dimensions such as interaction flows (e.g., commuting, trade, communication). Compared to geographic tables and surfaces, spatial graphs are rather different. First, in most cases they do not record measurements about a given phenomena, but instead focus on <em>connections</em>, on storing relationships between objects as they are facilitated (or impeded in their absence) by space. Second, because of this relational nature, the data are organized in a more unstructured fashion: while one sample may be connected to only one other sample, another one can display several links. This in stark contrast to geographic tables and surfaces, both of which have a clearly defined structure, shape and dimensionality in which data are organized.</p>
+<p>Spatial graphs store connections between objects through space. These
+connections may derive from geographical topology (e.g., contiguity), distance,
+or more sophisticated dimensions such as interaction flows (e.g., commuting,
+trade, communication). Compared to geographic tables and surfaces, spatial
+graphs are rather different. First, in most cases they do not record
+measurements about given phenomena, but instead focus on <em>connections</em>, on
+storing relationships between objects as they are facilitated (or impeded in
+their absence) by space. Second, because of this relational nature, the data are
+organized in a more unstructured fashion: while one sample may be connected to
+only one other sample, another one can display several links. This is in stark contrast to geographic tables and surfaces, both of which have a clearly defined structure, shape and dimensionality in which data are organized.</p>
 <p>These particularities translate into a different set of Python data structures. Unlike the previous data structures we have seen, there are quite a few data structures to represent spatial graphs, each optimized for different contexts. One such case is the use of spatial connections in statistical methods such as exploratory data analysis or regression. For this, the most common data structure are spatial weights matrices, to which we devote the next chapter.</p>
 <p>In this chapter, we briefly review a different way of representing spatial graphs that is much closer to the mathematical concept of a graph. A graph is composed of <em>nodes</em> that are linked together by <em>edges</em>. In a spatial network, <em>nodes</em> may represent geographical places, and thus have a specific location; likewise, <em>edges</em> may represent geographical paths between these places. Networks require both <em>nodes</em> and <em>edges</em> to analyze their structure.</p>
 <p>For illustration, we will rely on the <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> library, which can query data from OpenStreetMap. For example, we extract the street-based graph of Yoyogi Park, near our earlier data from Tokyo:</p>
@@ -1584,8 +1625,8 @@ Attributes:
 <section id="surfaces-as-tables">
 <h3>Surfaces as tables<a class="headerlink" href="#surfaces-as-tables" title="Permalink to this heading">#</a></h3>
 <p>The first case we explore is treating surfaces as (geo-)tables. In this context, we shift from an approach where each dimension has a clear mapping to a spatial or temporal aspect of the dataset, to one where each sample, cell of the surface/cube is represented as a row in a table. This approach runs contrary to the general consensus that fields are best represented as surfaces or rasters because that allows us to index space and time “by default” based on the location of values within the data structure. Shifting to a tabular structure implies either losing that space-time reference, or having to build it manually with auxiliary objects (e.g., a spatial graph). In almost any case, operating on this format is less efficient than it <em>could</em> be if we had bespoke algorithms built around surface structures. Finally, from a more conceptual point of view, treating pixels as independent realizations of a process that we <em>know</em> is continuous can be computationally inefficient and statistically flawed.</p>
-<p>This perspective however also involves important benefits. First, sometimes we <em>don’t</em> need location for our particular application. Maybe we are interested in calculating overall descriptive statistics; or maybe we need to run an analysis that is entirely atomic in the sense that it operates on each sample in isolation from all the other ones.  Second, by “going tabular” we recast our specialized, spatial data into the most common data structure available, for which a large amount of commodity technology is built. This means many new tools can be used for analysis. So called “big data” technologies, such as distributed systems, are much more common, robust, and tested for tabular data than for spatial surfaces. <em>If</em> we can translate our spatial challenge into a tabular challenge, we can immediately plug in technology that is more optimized and, in some cases, reliable. Further, some analytic toolboxes common in (geographic) data science are entirely built around tabular structures. Machine learning packages such as <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, or some spatial analytics (such as most methods in the Pysal family of packages) are designed around this data structure. Converting our surfaces into tables thus allows us to plug into a much wider suite of (potentially) efficient tools and techniques.</p>
-<p>We will see two ways of going from surfaces to tables: one converts every pixel into a table row, and another that aggregates pixels into predetermined polygons.</p>
+<p>This perspective, however, also involves important benefits. First, sometimes we <em>don’t</em> need location for our particular application. Maybe we are interested in calculating overall descriptive statistics; or maybe we need to run an analysis that is entirely atomic in the sense that it operates on each sample in isolation from all the other ones.  Second, by “going tabular” we recast our specialized, spatial data into the most common data structure available, for which a large amount of commodity technology is built. This means many new tools can be used for analysis. So-called “big data” technologies, such as distributed systems, are much more common, robust, and tested for tabular data than for spatial surfaces. <em>If</em> we can translate our spatial challenge into a tabular challenge, we can immediately plug in technology that is more optimized and, in some cases, reliable. Further, some analytic toolboxes common in (geographic) data science are entirely built around tabular structures. Machine learning packages such as <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code>, or some spatial analytics (such as most methods in the Pysal family of packages) are designed around this data structure. Converting our surfaces into tables thus allows us to plug into a much wider suite of (potentially) efficient tools and techniques.</p>
+<p>We will see two ways of going from surfaces to tables: one converts every pixel into a table row, and another aggregates pixels into pre-determined polygons.</p>
 <section id="one-pixel-at-a-time">
 <h4>One pixel at a time<a class="headerlink" href="#one-pixel-at-a-time" title="Permalink to this heading">#</a></h4>
 <p>Technically, going from surface to table involves traversing from <code class="docutils literal notranslate"><span class="pre">xarray</span></code> to <code class="docutils literal notranslate"><span class="pre">pandas</span></code> objects. This is actually a well established bridge. To illustrate it with an example, let’s revisit the population counts in <a class="reference internal" href="../data/ghsl/build_ghsl_extract.html"><span class="doc std std-doc">Sao Paulo</span></a> used earlier. We can read the surface into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object with the <code class="docutils literal notranslate"><span class="pre">open_rasterio()</span></code> method:</p>
@@ -1654,7 +1695,7 @@ memory usage: 271.9 KB
 </div>
 </div>
 </div>
-<p>The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a fully-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a function that takes a row from our table and the resolution of the surface, and returns its geometry:</p>
+<p>The table we have built has no geometries associated with it, only rows representing pixels. It takes a bit more effort, but it is possible to convert it, or a subset of it, into a full-fledged geographic table, where each pixel includes the grid geometry it represents. For this task, we develop a function that takes a row from our table and the resolution of the surface, and returns its geometry:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">row2cell</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">res_xy</span><span class="p">):</span>
@@ -1682,7 +1723,7 @@ memory usage: 271.9 KB
 <div class="cell_output docutils container">
 <img alt="../_images/2eb0eab0cffc716e1bcbc18084f68f4131362b4a1986bcdd5c614e88cc31bb22.svg" src="../_images/2eb0eab0cffc716e1bcbc18084f68f4131362b4a1986bcdd5c614e88cc31bb22.svg" /></div>
 </div>
-<p>One of the benefits of this approach is we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:</p>
+<p>One of the benefits of this approach is that we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">max_polys</span> <span class="o">=</span> <span class="p">(</span>
@@ -2100,7 +2141,9 @@ Coordinates:
 </section>
 <section id="pixels-to-polygons">
 <h4>Pixels to polygons<a class="headerlink" href="#pixels-to-polygons" title="Permalink to this heading">#</a></h4>
-<p>A second use case involves moving surfaces directly into geographic tables by aggregating pixels into pre-specified geometries. For this illustration, we will use the <a class="reference internal" href="../data/nasadem/build_nasadem_sd.html"><span class="doc std std-doc">DEM</span></a> surface containing elevation for the San Diego (US) region, and the set of <a class="reference internal" href="../data/sandiego/sandiego_tracts_cleaning.html"><span class="doc std std-doc">Census tracts</span></a>. For an example, we will investigate the average altitude of each neighborhood.</p>
+<p>A second use case involves moving surfaces directly into geographic tables by
+aggregating pixels into pre-specified geometries. For this illustration, we will
+use the digital elevation model <a class="reference internal" href="../data/nasadem/build_nasadem_sd.html"><span class="doc std std-doc">(DEM)</span></a> surface containing elevation for the San Diego (US) region, and the set of <a class="reference internal" href="../data/sandiego/sandiego_tracts_cleaning.html"><span class="doc std std-doc">census tracts</span></a>. For an example, we will investigate the average altitude of each neighborhood.</p>
 <p>Let’s start by reading the data. First, the elevation model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2115,7 +2158,7 @@ Coordinates:
 <img alt="../_images/1cb4847c2c77315476fde558e39e11a2746644faf83460aff9544f2f7c5c3eeb.png" src="../_images/1cb4847c2c77315476fde558e39e11a2746644faf83460aff9544f2f7c5c3eeb.png" />
 </div>
 </div>
-<p>And the neighborhood areas (tracts) from the Census:</p>
+<p>And the neighborhood areas (tracts) from the census:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sd_tracts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
@@ -2599,7 +2642,12 @@ dtype: float64
 </div>
 </div>
 <p>This simple approach illustrates the main idea well: find the cells that pertain to a given geometry and summarize their values in some manner. This can be done with any kind of geometry. Further, this simple method plays well with <code class="docutils literal notranslate"><span class="pre">xarray</span></code> surface structures and is scalable in that it is not too involved to run in parallel and distributed form using libraries like <code class="docutils literal notranslate"><span class="pre">dask</span></code>. Further, it can be extended using arbitrary Python functions, so it is simple to extend.</p>
-<p>However, this approach can be quite slow in big data. A more efficient alternative for our example uses the <code class="docutils literal notranslate"><span class="pre">rasterstats</span></code> library. This is a purpose-built library to construct so-called “zonal statistics” from surfaces. Here, the “zones” are the polygons and the “surface” is our <code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. Generally, this library will be faster than the simpler approach used above, but may be more difficult to extend or adapt:</p>
+<p>However, this approach can be quite slow in big data. A more efficient
+alternative for our example uses the <code class="docutils literal notranslate"><span class="pre">rasterstats</span></code> library. This is a
+purpose-built library to construct so-called “zonal statistics” from
+surfaces. Here, the “zones” are the polygons and the “surface” is our
+<code class="docutils literal notranslate"><span class="pre">DataArray</span></code>. Generally, this library will be faster than the simpler approach
+used above, but it may be more difficult to extend or adapt:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">rasterstats</span> <span class="kn">import</span> <span class="n">zonal_stats</span>
@@ -2751,7 +2799,7 @@ dtype: float64
 </div>
 </div>
 </div>
-<p>The resulting <code class="docutils literal notranslate"><span class="pre">grid</span></code> is a standard <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the re-sampled data allows for is much greater than when the points were visualized alone. This is shown in Figure 14.</p>
+<p>The resulting <code class="docutils literal notranslate"><span class="pre">grid</span></code> is a standard <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the resampled data allows for is much greater than when the points were visualized alone. This is shown in Figure 14.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
@@ -2767,9 +2815,9 @@ dtype: float64
 </section>
 <section id="networks-as-graphs-and-tables">
 <h3>Networks as graphs <em>and</em> tables<a class="headerlink" href="#networks-as-graphs-and-tables" title="Permalink to this heading">#</a></h3>
-<p>In the previous chapter, we saw networks as data structures that store <em>connections</em> between objects. We also discussed how this broad definition includes many interpretations that focus on different aspects of the networks. While spatial analytics may use graphs to record the topology of a table of objects such as polygons; transport applications may treat the network representation of the street layout as a set of objects itself, in this case lines. In this final section we show how one can flip back and forth between one representation and another, to take advantage of different aspects.</p>
+<p>In the previous chapter, we saw networks as data structures that store <em>connections</em> between objects. We also discussed how this broad definition includes many interpretations that focus on different aspects of the networks. While spatial analytics may use graphs to record the topology of a table of objects such as polygons, transport applications may treat the network representation of the street layout as a set of objects itself, in this case lines. In this final section we show how one can flip back and forth between one representation and another, to take advantage of different aspects.</p>
 <p>We start with the <code class="docutils literal notranslate"><span class="pre">graph</span></code> object from the <span class="xref myst">previous section</span>. Remember this captures the street layout around Yoyogi park in Tokyo. We have seen how, stored under this data structure, it is easy to query which node is connected to which, and which ones are at the end of a given edge.</p>
-<p>However, in some cases, we may want to convert the graph into a structure that allows us to operate on each component of the network independently. For example, we may want to map streets, calculate segment lengths, or draw buffers around each intersection. These are all operations that do not require topological information, that are standard for geo-tables and that are irrelevant to the graph structure. In this context, it makes sense to convert our <code class="docutils literal notranslate"><span class="pre">graph</span></code> to two geo-tables, one for intersections (the graph nodes) and one for street segments (the graph edges). In <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>, we can do that with the built-in converter:</p>
+<p>However, in some cases, we may want to convert the graph into a structure that allows us to operate on each component of the network independently. For example, we may want to map streets, calculate segment lengths, or draw buffers around each intersection. These are all operations that do not require topological information, that are standard for geo-tables, and that are irrelevant to the graph structure. In this context, it makes sense to convert our <code class="docutils literal notranslate"><span class="pre">graph</span></code> to two geo-tables, one for intersections (graph nodes) and one for street segments (graph edges). In <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>, we can do that with the built-in converter:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gt_intersections</span><span class="p">,</span> <span class="n">gt_lines</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_to_gdfs</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
@@ -2992,7 +3040,7 @@ memory usage: 26.9+ KB
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fundamentals-of-geographic-data-structures">Fundamentals of geographic data structures</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geographic-tables">Geographic Tables</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#geographic-tables">Geographic tables</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#surfaces">Surfaces</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#spatial-graphs">Spatial graphs</a></li>
 </ul>
