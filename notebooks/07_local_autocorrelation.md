@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.10.3
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: Python 3
     language: python
     name: python3
 ---
@@ -21,14 +21,14 @@ warnings.filterwarnings("ignore")
 
 # Local Spatial Autocorrelation
 
-In the previous chapter, we explored how global measures of spatial autocorrelation can help us determine whether the overall spatial distribution of our phenomenon of interest is compatible with a geographically random process. These statistics are useful: the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. This could represent *spillovers*, where outcomes at one site influence other sites; or could indicate *contagion*, where outcomes at one site *causally influence* other sites. As we will see later in [Chapter 11](11_regression), it could simply be the result of systematic spatial variation (or, as we will call it then, _heterogeneity_). Spatial autocorrelation also sometimes arises from data measurement and processing. In this case, the dependence is a form of non-random noise rather than due to substantive processes. For example, when "down-sampling" geographic data, sometimes large patches of identical values can be created. These may only be artifacts of the interpolation, rather than substantive autocorrelation. Regardless of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis. For these reasons, the ability to determine whether spatial autocorrelation is present in a geographically referenced data set is a critical component of the geographic data science toolbox. 
+In the previous chapter, we explored how global measures of spatial autocorrelation can help us determine whether the overall spatial distribution of our phenomenon of interest is compatible with a geographically random process. These statistics are useful: the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. This could represent *spillovers*, where outcomes at one site influence other sites; or it could indicate *contagion*, where outcomes at one site *causally influence* other sites. As we will see later in [Chapter 11](11_regression), it could simply be the result of systematic spatial variation (or, as we will call it then, _heterogeneity_). Spatial autocorrelation also sometimes arises from data measurement and processing. In this case, the dependence is a form of non-random noise rather than due to substantive processes. For example, when "down-sampling" geographic data, sometimes large patches of identical values can be created. These may only be artifacts of the interpolation, rather than substantive autocorrelation. Regardless of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis. For these reasons, the ability to determine whether spatial autocorrelation is present in a geographically referenced data set is a critical component of the geographic data science toolbox. 
 
 Despite their importance, global measures of spatial autocorrelation are "whole map" statistics. They provide a single summary for an entire data set. For example,
-Moran's $I$ is a good tool to summarize a dataset into a single value that captures the degree of geographical clustering (or dispersion, if negative). However, Moran's $I$ does not indicate areas within the map where specific types of values (e.g. high, low) are clustered, or instances of explicit dispersion. 
+Moran's $I$ is a good tool to summarize a dataset into a single value that captures the degree of geographical clustering (or dispersion, if negative). However, Moran's $I$ does not indicate areas within the map where specific types of values (e.g., high, low) are clustered, or instances of explicit dispersion. 
 In other words, Moran's I can tell us whether values in our map *cluster* together (or disperse) overall, but it will not inform us about where specific *clusters* (or outliers) are.
 
 In this chapter, we introduce local measures of spatial autocorrelation.
-Local measures of spatial autocorrelation focus on the relationships between _each_ observation and its surroundings, rather than providing a single summary of these relationships across the map. In this sense, they are not summary statistics but scores that allow us to learn more about the spatial structure in our data. The general intuition behind the metrics however is similar to that of global ones. Some of them are even mathematically connected, where the global version can be decomposed into a collection of local ones. One such example are Local Indicators of Spatial Association (LISAs) {cite}`Anselin1995local`, which we use to build the understanding of local spatial autocorrelation, and on which we spend a good part of the chapter. Once such concepts are firmed, we introduce a couple alternative statistics that present complementary information or allow us to obtain similar insights for categorical data. Although very often these statistics are used with data expressed in geo-tables, there is nothing fundamentally connecting the two. In fact, the application of these methods to large surfaces is a promising area of work. For that reason, we close the chapter with an illustration of how one can run these statistics on data stored as surfaces.
+Local measures of spatial autocorrelation focus on the relationships between _each_ observation and its surroundings, rather than providing a single summary of these relationships across the map. In this sense, they are not summary statistics but scores that allow us to learn more about the spatial structure in our data. The general intuition behind the metrics however is similar to that of global ones. Some of them are even mathematically connected, where the global version can be decomposed into a collection of local ones. One such example are Local Indicators of Spatial Association (LISAs) {cite}`Anselin1995local`, which we use to build the understanding of local spatial autocorrelation, and on which we spend a good part of the chapter. Once such concepts are clarified, we introduce a couple of alternative statistics that present complementary information or allow us to obtain similar insights for categorical data. Although very often these statistics are used with data expressed in geo-tables, there is nothing fundamentally connecting the two. In fact, the application of these methods to large surfaces is a promising area of work. For that reason, we close the chapter with an illustration of how one can run these statistics on data stored as surfaces.
 
 
 ## An empirical illustration: the EU Referendum
@@ -80,9 +80,9 @@ db = (
 db.info()
 ```
 
-Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union. With these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the `alpha` attribute) to make the final plot easier to read.
+Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union. With these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the `alpha` attribute) to make the final plot easier to read in Figure 1: 
 
-```python caption="BREXIT Leave vote, % leave." tags=[]
+```python caption="Percentage of voters wanting to leave the EU in the 2016 UK Referendum known as the 'Brexit' vote." tags=[]
 # Set up figure and a single axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Build choropleth
@@ -118,39 +118,38 @@ w.transform = "R"
 ```
 
 <!-- #region tags=[] -->
-## Motivating Local Spatial Autocorrelation
+## Motivating local spatial autocorrelation
 
-To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardised form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:
+To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardized form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:
 <!-- #endregion -->
 
 ```python
-db["w_Pct_Leave"] = weights.spatial_lag.lag_spatial(
-    w, db["Pct_Leave"]
-)
+db["w_Pct_Leave"] = weights.lag_spatial(w, db['Pct_Leave'])
 ```
 
-And their respective standardized versions, where we subtract the average and divide by the standard deviation:
+And their respective centered versions, where we subtract the average off of every value: 
 
 ```python
 db["Pct_Leave_std"] = db["Pct_Leave"] - db["Pct_Leave"].mean()
-db["w_Pct_Leave_std"] = db["w_Pct_Leave"] - db["Pct_Leave"].mean()
+db["w_Pct_Leave_std"] = weights.lag_spatial(w, db['Pct_Leave_std'])
 ```
 
-Technically speaking, creating a Moran Plot is very similar to creating any other scatter plot:
+Technically speaking, creating a Moran scatterplot is very similar to creating any other scatterplot. We have also done this before in Chapter 6. To see this again, we can make Figure 2:
 
-```python caption="BREXIT Leave vote, % leave Moran Scatter Plot." tags=[]
-# Setup the figure and axis
+```python caption="Brexit % leave Moran scatterplot." tags=[]
+# Set up the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
 seaborn.regplot(
     x="Pct_Leave_std", y="w_Pct_Leave_std", data=db, ci=None
-);
+)
+plt.show()
 ```
 
-Using standardized values, we can immediately divide each variable (the percentage that voted to leave, and its spatial lag) in two groups: those with above-average leave voting, which have positive standardized values; and those with below-average leave voting, which feature negative standardized values. Applying this thinking to both the percentage to leave and its spatial lag, divides a Moran Plot in four quadrants. Each of them captures a situation based on whether a given area displays a value above the mean (high) or below (low) in either the original variable (`Pct_Leave`) or its spatial lag (`w_Pct_Leave_std`). Using this terminology, we name the four quadrants as follows: high-high (HH) for the top-right, low-high (LH) for the top-left, low-low (LL) for the bottom-left, and high-low (HL) for the bottom right. Graphically, we can capture this as follows:
+Using standardized values, we can immediately divide each variable (percentage that voted to leave, and its spatial lag) in two groups: those with above-average leave voting, which have positive standardized values; and those with below-average leave voting, which feature negative standardized values. Applying this thinking to both the percentage to leave and its spatial lag, divides a Moran scatterplot into four quadrants. Each of them captures a situation based on whether a given area displays a value above the mean (high) or below (low) in either the original variable (`Pct_Leave`) or its spatial lag (`w_Pct_Leave_std`). Using this terminology, we name the four quadrants as follows: high-high (HH) for the top-right, low-high (LH) for the top-left, low-low (LL) for the bottom-left, and high-low (HL) for the bottom right. Graphically, we can express this in Figure 3:
 
-```python caption="BREXIT Leave vote, % leave Moran Scatter Plot Quadrants." tags=[]
-# Setup the figure and axis
+```python caption="Brexit % leave Moran scatterplot with labelled quadrants." tags=[]
+# Set up the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
 seaborn.regplot(
@@ -171,9 +170,9 @@ plt.show()
 <!-- #region jp-MarkdownHeadingCollapsed=true tags=[] jp-MarkdownHeadingCollapsed=true -->
 ## Local Moran's $I_i$
 
-One way to look at the figure above is as a classification of each observation in the dataset depending on its value and that of its neighbors. Furthermore, this classification is exhaustive: every point is assigned a label. But remember local measures help us to identify areas of _unusual_ concentration of values. Clusters will represent values of one type that are _unlikely_ to appear under the assumption of spatial randomness. To know whether each location belongs to a *statistically significant* cluster of a given kind, we thus need to compare it with what we would expect if the data were allocated over space in a completely random way. However, what we are interested in is whether the strength with which the values are concentrated is unusually high. This is exactly what LISAs are designed to do. A detailed description the statistical underpinnings of LISAs is beyond the scope of this chapter. If you would like to delve deeper into the math and probability challenges arising, a good recent reference is {cite}`sauer2021ga`. In this context, we will provide some intuition about how they work in one LISA statistic, the Local Moran's $I_i$. 
+One way to look at the figure above is as a classification of each observation in the dataset depending on its value and that of its neighbors. Furthermore, this classification is exhaustive: every point is assigned a label. But remember local measures help us to identify areas of _unusual_ concentration of values. Clusters will represent values of one type that are _unlikely_ to appear under the assumption of spatial randomness. To know whether each location belongs to a *statistically significant* cluster of a given kind, we thus need to compare it with what we would expect if the data were allocated over space in a completely random way. However, what we are interested in is whether the strength with which the values are concentrated is unusually high. This is exactly what LISAs are designed to do. A detailed description of the statistical underpinnings of LISAs is beyond the scope of this chapter. If you would like to delve deeper into the math and probability challenges arising, a good recent reference is {cite}`sauer2021ga`. In this context, we will provide some intuition about how they work in one LISA statistic, the local Moran's $I_i$. 
 
-The core idea of a local Moran's $I_i$ is to identify cases in which the value of an observation and the average of its surroundings is either more similar (HH or LL in the scatterplot above) or dissimilar (HL, LH) than we would expect from pure chance. The mechanism to do this is similar to the one in the global Moran's I, but applied in this case to each observation. This results in as many statistics as original observations. The formal representation of the statistic can be written as:
+The core idea of a local Moran's $I_i$ is to identify cases in which the value of an observation and the average of its surroundings is either more similar (HH or LL in the scatterplot from Figure 3) or dissimilar (HL, LH) than we would expect from pure chance. The mechanism to do this is similar to the one in the global Moran's I, but it is applied in this case to each observation. This results in as many statistics as original observations. The formal representation of the statistic can be written as:
 
 $$
 I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_i z_i^2}{n}
@@ -190,9 +189,9 @@ In Python, we can calculate LISAs in a very streamlined way thanks to `esda`. To
 lisa = esda.moran.Moran_Local(db["Pct_Leave"], w)
 ```
 
-We need to pass the variable of interest—proportion of Leave votes in this context—and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object (`lisa`) that has a number of attributes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using `seaborn`:
+We need to pass the variable of interest—proportion of Leave votes in this context—and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object (`lisa`) that has a number of attributes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using `seaborn`'s kernel density estimate plotting, as in Figure 4: 
 
-```python caption="BREXIT Leave vote, reference distribution LISA statistics Pct_Leave." tags=[]
+```python caption="Brexit % Leave vote, observed distribution LISA statistics for all sites." tags=[]
 # Draw KDE line
 ax = seaborn.kdeplot(lisa.Is)
 # Add one small bar (rug) for each observation
@@ -202,12 +201,12 @@ seaborn.rugplot(lisa.Is, ax=ax);
 
 The figure reveals a rather skewed distribution of local Moran's $I_i$ statistics. This outcome is due to the dominance of positive forms of spatial association, implying most of the local statistic values will be positive. Here it is important to keep in mind that the high positive values arise from value similarity in space, and this can be due to either high values being next to high values *or* low values next to low values. The local $I_i$ values alone cannot distinguish these two cases.
 
-The values in the left tail of the density represent locations displaying negative spatial association. There are also two forms, a high value surrounded by low values, or a low value surrounded by high valued neighboring observations. And, again, the  $I_i$ statistic cannot distinguish between the two cases.
+The values in the left tail of the density represent locations displaying negative spatial association. There are also two forms, a high value surrounded by low values, or a low value surrounded by high-valued neighboring observations. And, again, the  $I_i$ statistic cannot distinguish between the two cases.
 
 
 Because of their very nature, looking at the numerical result of LISAs is not always the most useful way to exploit all the information they can provide. Remember we are calculating a statistic for every single observation in the data so, if we have many of them, it will be difficult to extract any meaningful pattern. In this context, a choropleth can help. At first glance, this may seem to suggest that a choropleth of the $I_i$  values would be a useful way to visualize the spatial distribution. We can see such map in the top-left panel of the figure below and, while it tells us whether the local association is positive (HH/LL) or negative (HL/LH), it cannot tell, for example, whether the yellow areas in Scotland are similar to those in the eastern cluster of yellow areas. Are the two experiencing similar patterns of spatial association, or is one of them HH and the other LL? Also, we know that values around zero will not be statistically significant. Which local statistics are thus significant and which ones non-significant from a statistical point of view? In other words, which ones can be considered statistical clusters and which ones mere noise?
 
-To answer these questions, we need to bring in additional information that we have computed when calculating the LISA statistics. We do this in four acts. The first one we have already mentioned: a straighforward choropleth of the local statistic of each area. The other three include information on the quadrant each area is assigned into, whether the statistic is considered significant or not, and a combination of those two in a single so-called _cluster_ map. A handy tool in this context is the `splot` library, part of the Pysal family, which provides a lightweight visualisation layer for spatial statistics:
+To answer these questions, we need to bring in additional information that we have computed when calculating the LISA statistics. We do this in four acts. The first one we have already mentioned: a straighforward choropleth of the local statistic of each area. The other three include information on the quadrant each area is assigned into, whether the statistic is considered significant or not, and a combination of those two in a single so-called _cluster_ map. A handy tool in this context is the `splot` library, part of the Pysal family, which provides a lightweight visualization layer for spatial statistics:
 
 ```python
 from splot import esda as esdaplot
@@ -215,7 +214,7 @@ from splot import esda as esdaplot
 
 With all pieces in place, let's first get busy building the figure:
 
-```python caption="BREXIT Leave vote, Pct_Leave. LISA (TL), Quadrant (TR), Signficance (BL), Cluster Map (BR)." tags=[]
+```python caption="Brexit % Leave vote, Pct_Leave. LISA (top-left), Quadrant (top-right), Signficance (bottom-left), Cluster Map (bottom-right)." tags=[]
 # Set up figure and axes
 f, axs = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
 # Make the axes accessible with single indexing
@@ -245,7 +244,7 @@ db.assign(
 # Quadrant categories
 # Grab second axis of local statistics
 ax = axs[1]
-# Plot Quandrant colors (note to ensure all polygons are assigned a
+# Plot Quadrant colors (note to ensure all polygons are assigned a
 # quadrant, we "trick" the function by setting significance level to
 # 1 so all observations are treated as "significant" and thus assigned
 # a quadrant color
@@ -282,7 +281,7 @@ db.assign(
 # Cluster map
 # Grab second axis of local statistics
 ax = axs[3]
-# Plot Quandrant colors In this case, we use a 5% significance
+# Plot Quadrant colors In this case, we use a 5% significance
 # level to select polygons as part of statistically significant
 # clusters
 esdaplot.lisa_cluster(lisa, db, p=0.05, ax=ax)
@@ -300,16 +299,16 @@ for i, ax in enumerate(axs.flatten()):
         ][i],
         y=0,
     )
-# Tight layout to minimise in-betwee white space
+# Tight layout to minimize in-between white space
 f.tight_layout()
 
 # Display the figure
 plt.show()
 ```
 
-The purple and yellow locations in the top-right map display the largest magnitude (positive and negative values) for the local statistics $I_i$. Yet, remember this signifies positive spatial autocorrelation, which can be of high _or_ low values. This map thus cannot distinguish between areas with low support for the Brexit vote and those highly in favour.
+The purple and yellow locations in the top-right map in Figure 5 display the largest magnitude (positive and negative values) for the local statistics $I_i$. Yet, remember this signifies positive spatial autocorrelation, which can be of high _or_ low values. This map thus cannot distinguish between areas with low support for the Brexit vote and those highly in favour.
 
-To distinguish between these two cases, the map in the upper-right shows the location of the LISA statistic in the quadrant of the Moran Scatter plot. This indicates whether the positive (or negative) local association exists within a specific *quadrant*, such as the High-High quadrant. This information is recorded in the `q` attribute of the `lisa` object:
+To distinguish between these two cases, the map in the top-right of Figure 5 shows the location of the LISA statistic in the quadrant of the Moran scatterplot. This indicates whether the positive (or negative) local association exists within a specific *quadrant*, such as the HH quadrant. This information is recorded in the `q` attribute of the `lisa` object:
 
 ```python
 lisa.q[:10]
@@ -322,11 +321,11 @@ counts = pandas.value_counts(lisa.q)
 counts
 ```
 
-Showing that the high-high (1), and low-low (3), values are predominant. Care must be taken, however, in the interpretation of these first two maps, as the underlying statistical significance of the local values has not been considered. We have simply mapped the raw LISA value alongside the quadrant in which the local statistic resides. To statistical significance, the bottom left map distinguishes those polygons whose pseudo p-value is above (_"Non-Significant"_) or below (_"Significant"_) the threshold value of 5% we use in this context. An examination of the map suggests that quite a few local authorities have local statistics that are small enough so as to be compatible with pure chance. 
+Showing that the high-high (1), and low-low (3), values are predominant. Care must be taken, however, in the interpretation of these first two maps, as the underlying statistical significance of the local values has not been considered. We have simply mapped the raw LISA value alongside the quadrant in which the local statistic resides. To statistical significance, the bottom-left map distinguishes those polygons whose pseudo-$p$-value is above (_"Non-Significant"_) or below (_"Significant"_) the threshold value of 5% we use in this context. An examination of the map suggests that quite a few local authorities have local statistics that are small enough so as to be compatible with pure chance. 
 
 Therefore, in order to focus on the areas that are most promising, we need to include significance information alongside the quadrant and local statistic. Together, this "cluster map" (as it is usually called) extracts significant observations -those that are highly unlikely to have come from pure chance- and plots them with a specific color depending on their quadrant category. All of the needed pieces are contained inside the `lisa` object we have created above and, if passed in tandem with the geo-table containing the geographies it relates to, `splot` will make a cluster map for us.
 
-Reading the clustermap reveals a few interesting aspects that would have been hard to grasp by looking at the other maps only and that are arguably more relevant for an analysis of the data. First, fewer than half of polygons that have degrees of local spatial association strong enough to reject the idea of pure chance:
+Reading the clustermap reveals a few interesting aspects that would have been hard to grasp by looking at the other maps only and that are arguably more relevant for an analysis of the data. First, fewer than half of polygons have degrees of local spatial association strong enough to reject the idea of pure chance:
 
 ```python
 (lisa.p_sim < 0.05).sum() * 100 / len(lisa.p_sim)
@@ -334,7 +333,7 @@ Reading the clustermap reveals a few interesting aspects that would have been ha
 
 A little over 41% of the local authorities are considered, by this analysis, to be part of a spatial cluster. Second, we identify three clear areas of low support for leaving the EU: Scotland, London, and the area around Oxford (North-West of London). And third, although there appeared to be many areas with concentrated values indicating high support, it is only the region in the North-East and West of England whose spatial concentration shows enough strength to reasonably rule out pure chance.
 
-Before we move on from the LISA statistics, let's dive into a bit of the data engineering required to "export" significance levels and other information, as well as dig a bit further into what these numbers represent. The latter is useful if we need to work with them as part of a broader data pipeline. So far, cluster maps have been handled by `splot`, but there is quite a bit that happens under the hood. If we needed to recreate one of its maps, or to use this information in a different context, we would need to extract them out of our `lisa` object, and link them up to the original `db` table. Here is one way you can do this.
+Before we move on from the LISA statistics, let's dive into a bit of the data engineering required to "export" significance levels and other information, as well as dig a bit further into what these numbers represent. The latter are useful if we need to work with them as part of a broader data pipeline. So far, cluster maps have been handled by `splot`, but there is quite a bit that happens under the hood. If we needed to recreate one of its maps, or to use this information in a different context, we would need to extract them out of our `lisa` object, and link them up to the original `db` table. Here is one way you can do this.
 
 First, we pull the information computed in `lisa` and insert it in the main data table:
 
@@ -356,9 +355,9 @@ db[["sig", "p-sim"]].tail()
 
 Thus, the first five values are statistically significant, while the last five observations are not.
 
-Let us stop for a second on these two steps. First, we consider the `sig` column. Akin to global Moran's I, `esda` automatically computes a pseudo p-value for each LISA. Because some instances of the LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar value in random maps. A few different ways of generating random maps are considered by `esda`, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. In addition, we follow a similar reasoning as with global Moran's I and use 5% as the threshold for statistical significance. To identify these values, we create a variable, `sig`, that contains `True` if the p-value of the observation satisfies the condition, and `False` otherwise.
+Let us stop for a second on these two steps. First, we consider the `sig` column. Akin to global Moran's I, `esda` automatically computes a pseudo-$p$-value for each LISA. Because some instances of the LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar value in random maps. A few different ways of generating random maps are considered by `esda`, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. In addition, we follow a similar reasoning as with global Moran's I and use 5% as the threshold for statistical significance. To identify these values, we create a variable, `sig`, that contains `True` if the p-value of the observation satisfies the condition, and `False` otherwise.
 
-Next, we construct our quadrant values using the `q` attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure `sig`, so only observations in a quadrant that are considered significant are labeled as part of that given quadrant. The remainder are labelled as non-significant.
+Next, we construct our quadrant values using the `q` attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure `sig`, so only observations in a quadrant that are considered significant are labeled as part of that given quadrant. The remainder are labeled as non-significant.
 
 ```python
 # Pick as part of a quadrant only significant polygons,
@@ -384,7 +383,7 @@ db["labels"] = pandas.Series(
 db["labels"].head()
 ```
 
-These cluster labels are meaningful if you know of the Moran Plot. To help making them a bit more intuitive, a terminology that is sometimes used goes as follows. Positive forms of local spatial autocorrelation are of two types. First, HH observations, which we can term "hot spots", represent areas where values at the site and its surroundings are larger than average. Second, LL observations, significant clusters of low values surrounded by low values, are sometimes referred to as "cold spots". Negative forms of local spatial autocorrelation also include two cases. When the focal observation displays low values but its surroundings have high values (LH), we call them "doughnuts". Conversely, areas with high values but neighboured by others with low values (HL) can be referred to as "diamonds in the rough". We note this terminology is purely mnemonic, but recognise in some cases it can help remembering the interpretation of local statistics. 
+These cluster labels are meaningful if you know of the Moran Plot. To help making them a bit more intuitive, a terminology that is sometimes used goes as follows. Positive forms of local spatial autocorrelation are of two types. First, HH observations, which we can term as "hot spots", represent areas where values at the site and its surroundings are larger than average. Second, LL observations, significant clusters of low values surrounded by low values, are sometimes referred to as "cold spots". Negative forms of local spatial autocorrelation also include two cases. When the focal observation displays low values but its surroundings have high values (LH), we call them "doughnuts". Conversely, areas with high values but neighbored by others with low values (HL) can be referred to as "diamonds in the rough". We note this terminology is purely mnemonic, but recognize in some cases it can help in remembering the interpretation of local statistics. 
 
 
 After building these new columns, analysis on the overall trends of LISA statistics is more straightforward than from the `lisa` object. For example, an overview of the distribution of labels is one line away:
@@ -398,7 +397,7 @@ This shows, for one, that most local statistics are *not* statistically signific
 
 ## Getis and Ord's local statistics
 
-Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `esda` includes Getis and Ord's $G_i$-type statistics. These are a different kind of local statistic which are commonly used in two forms: the $G_i$ statistic, which omits the value at a site in its local summary, and the $G_i^*$, which includes the site's own value in the local summary. The way to calculate them also follows similar patterns as with the Local Moran's $I_i$ statistics above. Let us see how that would look like for our Brexit example:
+Similar to the global case, there are more local indicators of spatial correlation than the local Moran's I. `esda` includes Getis and Ord's $G_i$-type statistics. These are a different kind of local statistic that are commonly used in two forms: the $G_i$ statistic, which omits the value at a site in its local summary, and the $G_i^*$, which includes the site's own value in the local summary. The way to calculate them also follows similar patterns as with the Local Moran's $I_i$ statistics above. Let us see how that would look like for our Brexit example:
 
 ```python
 # Gi
@@ -407,9 +406,9 @@ go_i = esda.getisord.G_Local(db["Pct_Leave"], w)
 go_i_star = esda.getisord.G_Local(db["Pct_Leave"], w, star=True)
 ```
 
-As the local statistics they are, it is best to explore them by plotting them on a map. Unlike with LISA though, the $G$ statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.
+Like all local statistics, it is best to explore Getis and Ord statistics by plotting them on a map. Unlike with LISA though, the $G$ statistics only allow to identify positive spatial autocorrelation. When standardized, positive values imply clustering of high values, while negative implies grouping of low values. Unfortunately, it is not possible to discern spatial outliers.
 
-Unlike with LISAs, `splot` does not support vislualisation of G statistics at this point. To visualise their output, we will instead write a little function that generates the map from the statistic's output object and its set of associated geometries:
+Unlike with LISAs, `splot` does not support visualization of G statistics at this point. To visualize their output, we will instead write a little function that generates the map from the statistic's output object and its set of associated geometries.
 
 ```python
 def g_map(g, db, ax):
@@ -463,10 +462,10 @@ def g_map(g, db, ax):
     return ax
 ```
 
-With this function at hand, generating $G_i^{(*)}$ cluster maps is as straightforward as it is for LISA outputs through `splot`:
+With this function at hand, generating $G_i^{(*)}$ cluster maps is as straightforward as it is for LISA outputs through `splot` in Figure 6: 
 
-```python caption="BREXIT Leave vote, Pct_Leave, Getis-Ord G (L) and G* (R) statistics." tags=[]
-# Setup figure and axes
+```python caption="BREXIT Leave vote, Pct_Leave, Getis-Ord G (left) and G* (right) statistics." tags=[]
+# Set up figure and axes
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 # Loop over the two statistics
 for g, ax in zip([go_i, go_i_star], axs.flatten()):
@@ -478,7 +477,7 @@ f.tight_layout()
 plt.show()
 ```
 
-In this case, the results are virtually the same for $G_i$ and $G_i^*$. Also, at first glance, these maps appear to be visually similar to the final LISA map from above. Naturally, this leads to the question: *why use the $G$ statistics at all?* The answer to this question is that the two sets of local statistics, local $I$ and the local $G$, are complementary statistics. The local $I$ statistic (on its own) gives an indication of cluster/outlier status, and the local $G$ shows which side of the hotspot/coldspot divide the observation is on. Alternatively, the local Moran's $I_i$ cluster map provides both pieces of information, but can be more challenging to visualize all at once. Thus, it depends on your analytical preferences and the point of the analysis at hand. 
+In this case, the results are virtually the same for $G_i$ and $G_i^*$. Also, at first glance, these maps appear to be visually similar to the final LISA map from above. Naturally, this leads to the question: *why use the $G_i$ statistics at all?* The answer to this question is that the two sets of local statistics, local $I$ and local $G_i$, are complementary statistics. The local $I_i$ statistic (on its own) gives an indication of cluster/outlier status, and the local $G_i$ shows which side of the hotspot/coldspot divide the observation is on. Alternatively, the local Moran's $I_i$ cluster map provides both pieces of information, but it can be more challenging to visualize all at once. Thus, it depends on your analytical preferences and the point of the analysis at hand. 
 
 
 
@@ -486,9 +485,9 @@ In this case, the results are virtually the same for $G_i$ and $G_i^*$. Also, at
 ## Bonus: local statistics on surfaces
 
 
-Before we wrap up the chapter, we are going to cover an illustration that, conceptually, is very similar to the topics we have seen above but, from a technical standpoint, has a bit of a different spin. We will learn how to compute local Moran's I on data that are stored as a surface, rather than as a geo-table (as we have seen above). As we have seen earlier in the book, more and more data for which we might want to explore local spatial autocorrelation are being provided as surfaces rather than geo-tables. The trick to follow this illustration is to realise that, despite the data structure, surfaces also provide data spatially arranged and that, as such, we can apply the battery of tools we have learned in this chapter to better understand their spatial structure. 
+Before we wrap up the chapter, we are going to cover an illustration that, conceptually, is very similar to the topics we have seen above but, from a technical standpoint, has a bit of a different spin. We will learn how to compute local Moran's $I_i$ on data that are stored as a surface, rather than as a geo-table (as we have seen above). As we have seen earlier in the book, more and more data for which we might want to explore local spatial autocorrelation are being provided as surfaces rather than geo-tables. The trick to follow this illustration is to realize that, despite the data structure, surfaces also provide data spatially arranged and that, as such, we can apply the battery of tools we have learned in this chapter to better understand their spatial structure. 
 
-Before we start, a note of caution. The functionality required to handle LISA on surfaces is still experimental and a bit rough around the edges. This is because, unlike the case of geo-tables, it has not been a common use-case for geographic data scientists and the tooling eco-system is not as evolved. Nevertheless, it is an exciting time to get started on this, because a lot is happening in this space, and the basic building blocks to develop a full-fledge eco-system are already in place. For this reason, we think it is important to cover in this chapter, even though some of the code we will use below is a bit more sophisticated than what we have seen above. Be patient and do not worry if you have to read things twice (or thrice!) before they start making sense. This is getting into geographic data scientist pro territory!
+Before we start, a note of caution. The functionality required to handle LISA on surfaces is still experimental and a bit rough around the edges. This is because, unlike the case of geo-tables, it has not been a common use-case for geographic data scientists and the tooling ecosystem is not as evolved. Nevertheless, it is an exciting time to get started on this, because a lot is happening in this space, and the basic building blocks to develop a full-fledged ecosystem are already in place. For this reason, we think it is important to cover in this chapter, even though some of the code we will use below is a bit more sophisticated than what we have seen above. Be patient and do not worry if you have to read things twice (or thrice!) before they start making sense. This is getting into *geographic data scientist pro* territory!
 
 For this case, we will use the GHSL dataset that contains an extract of gridded population for the metropolitan region of Sao Paulo (Brazil). Let us read the data first into a `DataArray` object:
 
@@ -503,7 +502,7 @@ Next is building a weights matrix that represents the spatial configuration of p
 w_surface_sp = weights.Queen.from_xarray(pop)
 ```
 
-So far so good. Now comes the first hairy bit. The weights builder for surfaces automatically generates a matrix with integers (`int8` in this case which, roughly speaking, are numbers without a decimal component):
+So far, so good. Now comes the first hairy bit. The weights builder for surfaces automatically generates a matrix with integers (`int8` in this case which, roughly speaking, are numbers without a decimal component):
 
 ```python
 w_surface_sp.sparse.dtype
@@ -534,7 +533,7 @@ There is quite a bit going on in those lines of code, so let's unpack them:
 
 1. The first step (line 3) is to convert the values from integers into floats. To do this, we access the sparse matrix at the core of `w_surface_sp` (which holds all the main data) and convert it to floats using `astype`.
 1. Then we convert that sparse matrix into a `WSP` object (line 2), which is a thin wrapper, so the operation is quick.
-1. Once represented as a `WSP`, we can use Pysal again to convert it into a full-fledge `W` object using the `WSP2W` utility. This step may take a bit more of computing muscle.
+1. Once represented as a `WSP`, we can use Pysal again to convert it into a full-fledged `W` object using the `WSP2W` utility. This step may take a bit more of computing muscle.
 1. Finally, spatial weights from surfaces include an `index` object that will help us later return data into a surface data structure. Since this is lost with the transformations, we reattach it in the final line (line 6) from the original object.
 
 This leaves us with a weights object (`w_surface`) we can work with for the LISA. Next is to recast the values from the original data structure to one that `Moran_Local` will understand. This happens in the next code snippet:
@@ -546,13 +545,13 @@ pop_values = pop.to_series()
 pop_values = pop_values[pop_values != pop.rio.nodata]
 ```
 
-Note that we do two operations: one is to convert the two-dimensional `DataArray` surface into a one-dimensional vector in the form of a `Series` object (`pop_values`); the second is to filter out values in which, in the surface, contain missing data. In surfaces, this is usually expressed with a rare value rather than with another data type. We can check that in `pop`, this is -200:
+Note that we do two operations: one is to convert the two-dimensional `DataArray` surface into a one-dimensional vector in the form of a `Series` object (`pop_values`); the second is to filter out values in which, in the surface, contain missing data. In surfaces, this is usually expressed with a rare value rather than with another data type. We can check that in `pop`, this is negative:
 
 ```python
 pop.rio.nodata
 ```
 
-At this point, we are ready to run a LISA the same way we have done in previously in the chapter when using geo-tables:
+At this point, we are ready to run a LISA the same way we have done in the previous chapter when using geo-tables:
 
 ```python tags=[]
 # NOTE: this may take a bit longer to run depending on hardware
@@ -563,7 +562,7 @@ pop_lisa = esda.moran.Moran_Local(
 
 Note that, before computing the LISA, we ensure the population values are _also_ expressed as floats and thus in line with those in our spatial weights.
 
-Now we have computed the LISA, on to visualisation. For this, we need to express the results as a surface rather than as a table, for which we will use the bridge built in `pysal`:
+Now that we have computed the LISA, on to visualization. For this, we need to express the results as a surface rather than as a table, for which we will use the bridge built in `pysal`:
 
 ```python
 from libpysal.weights import raster
@@ -595,7 +594,7 @@ lisa_da = raster.w2da(
 ).rio.write_crs(pop.rio.crs)
 ```
 
-The resulting `DataArray` only contains missing data pixels (expressed with the same value as the original `pop`, -200), `0` for non-significant pixels, and 1-4 depending on the quadrant for HH, LH, LL, HL significant clusters, same as with the Brexit example before:
+The resulting `DataArray` only contains missing data pixels (expressed with the same value as the original `pop` feature), `0` for non-significant pixels, and 1-4 depending on the quadrant for HH, LH, LL, HL significant clusters, same as with the Brexit example before:
 
 ```python
 lisa_da.to_series().unique()
@@ -622,7 +621,7 @@ lc = {
 }
 ```
 
-With these pieces, we can create the colormap object:
+With these pieces, we can create the colormap object (shown in Figure 7) that replicates our original local Moran cluster map colors. 
 
 ```python caption="Colormap for Local Moran's I Maps, starting with non-significant local scores in grey, and proceeding through high-high local statistics, low-high, low-low, then high-low."
 lisa_cmap = ListedColormap(
@@ -631,7 +630,7 @@ lisa_cmap = ListedColormap(
 lisa_cmap
 ```
 
-At this point, we have all the pieces we need to build our cluster map. Let's put them together:
+At this point, we have all the pieces we need to build our cluster map. Let's put them together to build Figure 8: 
 
 ```python caption="LISA map for Sao Paulo population surface." tags=[]
 # Set up figure and axis
@@ -689,7 +688,7 @@ Local statistics are one of the most commonly-used tools in the geographic data 
     - Using `esda.moran.Moran_Local_Rate`, estimate *local* Moran's I treating Leave data as a rate.
         - does any site's local I change? Make a scatterplot of the `lisa.Is` you estimated before and this new rate-based local Moran. 
         - does any site's local I change their outlier/statistical significance classifications? Use `pandas.crosstab` to examine how many classifications change between the two kinds of statistic. Make sure to consider observations' statistical significances in addition to their quadrant classification.
-    - Make two maps, side by side, of the local statistics without rate correction and with rate correction. Does your interpretation of the maps change depending on the correction?
+    - Make two maps, side-by-side, of the local statistics without rate correction and with rate correction. Does your interpretation of the maps change depending on the correction?
 4. Local statistics use *permutation-based* inference for their significance testing. This means that, to test the statistical significance of a local relationship, values of the observed variable are *shuffled* around the map. These large numbers of *random* maps are then used to compare against the observed map. Local inference requires some restrictions on how each shuffle occurs, since each observation must be "fixed" and compared to randomly-shuffle neighboring observations. The distribution of local statistics for each "shuffle" is contained in the `.rlisas` attribute of a Local Moran object. 
     - For the first observation, make a `seaborn.distplot` of its shuffled local statistics. Add a vertical line to the histogram using `plt.axvline()`. 
     - Do the same for the last observation as well. 
@@ -698,8 +697,8 @@ Local statistics are one of the most commonly-used tools in the geographic data 
     - The standard errors are contained in the `.seI_sim` attribute. Make a map of the standard errors. Are there any areas of the map that appear to be more uncertain about their local statistics? 
     - compute the standard deviation of each observation's "shuffle" distribution, contained in the `.rlisas` attribute. Verify that the standard deviation of this shuffle distribution is the same as the standard errors in `seI_sim`. 
 6. Local Getis-Ord statistics come in two forms. As discussed above, Getis-Ord $G_i$ statistics *omit* each site from their own local statistic. In contrast, $G_i^*$ statistics *include* the site in its own local statistic.
-    - Make a scatterplot of the two types of statistic, contained in `gostats.Zs` and `gostars.Zs` to examine how similar the two forms of the Getis-Ord statistic are. 
-    - The two forms of the Getis-Ord statistic differ by their inclusion of the *site* value, $y_i$, in the value for the $G_i$ statistic at that site. So, make a scatterplot of the percent leave variable and the *difference* of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using `scipy.stats.kendalltau` or `scipy.stats.pearsonr`. 
+    - make a scatterplot of the two types of statistic, contained in `gostats.Zs` and `gostars.Zs` to examine how similar the two forms of the Getis-Ord statistic are. 
+    - the two forms of the Getis-Ord statistic differ by their inclusion of the *site* value, $y_i$, in the value for the $G_i$ statistic at that site. So, make a scatterplot of the percent leave variable and the *difference* of the two statistics. Is there a relationship between the percent leave vote and the difference in the two forms of the Getis-Ord statistic? Confirm this for yourself using `scipy.stats.kendalltau` or `scipy.stats.pearsonr`. 
 
 ## Next Steps
  
