@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.13.8
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -155,7 +155,7 @@ To examine this, we first might want to split our data up by regions and see if 
 One reasonable theory might be that our model does not include any information about *beaches*, a critical aspect of why people live and vacation in San Diego. 
 Therefore, we might want to see whether or not our errors are higher or lower depending on whether or not an Airbnb is in a "beach" neighborhood, a neighborhood near the ocean. We use the code below to generate Figure XXX1XXX, which looks at prices between the two groups of houses, "beach" and "no beach".
 
-```python caption="Distributions of prediction errors (residuals) for the basic linear model. Residuals for coastal Airbnbs are generally positive, meaning that the model under-predicts their prices." tags=[]
+```python caption="Distributions of prediction errors (residuals) for the basic linear model. Residuals for coastal Airbnbs are generally positive, meaning that the model under-predicts their prices."
 # Create a Boolean (True/False) with whether a
 # property is coastal or not
 is_coastal = db.coastal.astype(bool)
@@ -197,7 +197,7 @@ For us to determine whether this is the case, we might be interested in the full
 
 To make this more clear, we'll first sort the data by the median residual in that neighborhood, and then make a boxplot (Fig. XXX2XXX), which shows the distribution of residuals in each neighborhood:
 
-```python caption="Boxplot of prediction errors by neighborhood in San Diego, showing that the basic model systematically over- (or under-) predicts the nightly price of some neighborhoods' Airbnbs." tags=[]
+```python caption="Boxplot of prediction errors by neighborhood in San Diego, showing that the basic model systematically over- (or under-) predicts the nightly price of some neighborhoods' Airbnbs."
 # Create column with residual values from m1
 db["residual"] = m1.u
 # Obtain the median value of residuals in each neighborhood
@@ -216,8 +216,8 @@ ax = plt.gca()
 # Generate bloxplot of values by neighborhood
 # Note the data includes the median values merged on-the-fly
 seaborn.boxplot(
-    "neighborhood",
-    "residual",
+    x="neighborhood",
+    y="residual",
     ax=ax,
     data=db.merge(
         medians, how="left", left_on="neighborhood", right_index=True
@@ -225,7 +225,7 @@ seaborn.boxplot(
     palette="bwr",
 )
 # Auto-format of the X labels
-f.autofmt_xdate()
+f.autofmt_xdate(rotation=-90)
 # Display
 plt.show()
 ```
@@ -248,11 +248,11 @@ knn = weights.KNN.from_dataframe(db, k=1)
 
 This means that, when we compute the *spatial lag* of that $KNN$ weight and the residual, we get the residual of the Airbnb listing closest to each observation.
 
-```python caption="The relationship between prediction error for an Airbnb and the nearest Airbnb's prediction error. This suggests that if an Airbnb's nightly price is over-predicted, its nearby Airbnbs will also be over-predicted." tags=[]
+```python caption="The relationship between prediction error for an Airbnb and the nearest Airbnb's prediction error. This suggests that if an Airbnb's nightly price is over-predicted, its nearby Airbnbs will also be over-predicted."
 lag_residual = weights.spatial_lag.lag_spatial(knn, m1.u)
 ax = seaborn.regplot(
-    m1.u.flatten(),
-    lag_residual.flatten(),
+    x=m1.u.flatten(),
+    y=lag_residual.flatten(),
     line_kws=dict(color="orangered"),
     ci=None,
 )
@@ -270,7 +270,7 @@ Given this behavior, let's look at the stable $k=20$ number of neighbors.
 Examining the relationship between this stable *surrounding* average and the focal Airbnb, we can even find clusters in our model error. 
 Recalling the *local Moran* statistics in [Chapter 7](07_local_autocorrelation), Figure XXX4XXX is generated from the code below to identify certain areas where our predictions of the nightly (log) Airbnb price tend to be significantly off:
 
-```python caption="Map of clusters in regression errors, according to the Local Moran's $I_i$." tags=[]
+```python caption="Map of clusters in regression errors, according to the Local Moran's $I_i$."
 # Re-weight W to 20 nearest neighbors
 knn.reweight(k=20, inplace=True)
 # Row standardize weights
@@ -331,7 +331,7 @@ One relevant proximity-driven variable that could influence our San Diego model 
 
 Therefore, this is sometimes called a *spatially patterned omitted covariate*: geographic information our model needs to make good predictions which we have left out of our model. Therefore, let's build a new model containing this distance to Balboa Park covariate. First, though, it helps to visualize (Fig. XXX5XXX) the structure of this distance covariate itself:
 
-```python caption="A map showing the 'Distance to Balboa Park' variable." tags=[]
+```python caption="A map showing the 'Distance to Balboa Park' variable."
 ax = db.plot("d2balboa", marker=".", s=5)
 contextily.add_basemap(ax, crs=db.crs)
 ax.set_axis_off();
@@ -384,11 +384,11 @@ pandas.DataFrame(
 
 And, there still appears to be spatial structure in our model's errors, as we can see in Figure XXX6XXX, generated by the code below:
 
-```python caption="The relationship between prediction error and the nearest Airbnb's prediction error for the model including the 'Distance to Balboa Park' variable. Note the much stronger relationship here than before." tags=[]
+```python caption="The relationship between prediction error and the nearest Airbnb's prediction error for the model including the 'Distance to Balboa Park' variable. Note the much stronger relationship here than before."
 lag_residual = weights.spatial_lag.lag_spatial(knn, m2.u)
 ax = seaborn.regplot(
-    m2.u.flatten(),
-    lag_residual.flatten(),
+    x=m2.u.flatten(),
+    y=lag_residual.flatten(),
     line_kws=dict(color="orangered"),
     ci=None,
 )
@@ -435,7 +435,7 @@ The *tilde* operator in this statement is usually read as "log price is a functi
 
 Using this expression, we can estimate the unique effects of each neighborhood, fitting the model in `statsmodels` (note how the specification of the model, formula and data is separated from the fitting step): 
 
-```python tags=[]
+```python
 m3 = sm.ols(f, data=db).fit()
 ```
 
@@ -524,7 +524,7 @@ neighborhoods = geopandas.read_file(sd_path)
 
 And we can then merge the spatial FE and plot them on a map (Fig. XXX7XXX):
 
-```python caption="Neighborhood effects on Airbnb nightly prices. Neighborhoods shown in grey are 'not statistically significant' in their effect on Airbnb prices." tags=[]
+```python caption="Neighborhood effects on Airbnb nightly prices. Neighborhoods shown in grey are 'not statistically significant' in their effect on Airbnb prices."
 # Plot base layer with all neighborhoods in grey
 ax = neighborhoods.plot(
     color="k", linewidth=0, alpha=0.5, figsize=(12, 6)
@@ -906,7 +906,7 @@ y_pred_scenario = m6.betas[0] + slx_exog_scenario @ m6.betas[1:]
 
 Note the only difference between this set of predictions and the one in the original `m6` model is that we have switched site `2` from apartment into condominium. Hence, every property which is _not_ connected to site `2` (or is not site `2` itself) will be unaffected. The _neighbors_ of site `2` however will have different predictions. To explore these, let's first identify who is in this group:
 
-```python tags=[]
+```python
 print(knn.neighbors[2])
 ```
 
@@ -1072,7 +1072,7 @@ Below, we run 100 simulated re-assignments of districts to either "coast" or "no
 
 The black lines in Figure XXX8XXX represent our simulations, and the colored patches below them represent the observed distribution of residuals. If the black lines tend to be on the left of the colored patch, then, the simulations (where prediction error is totally random with respect to our categories of "coastal" and "not coastal") tend to have more negative residuals than our actual model. If the black lines tend to be on the right, then they tend to have more positive residuals. As a refresher, positive residuals mean that our model is under-predicting, and negative residuals mean that our model is over-predicting. Below, our simulations provide direct evidence for the claim that our model may be systematically under-predicting coastal price and over-predicting non-coastal prices. 
 
-```python caption="Distributions showing the differences between coastal and non-coastal prediction errors. Some 'random' simulations are shown in black in each plot, where observations are randomly assigned to either 'Coastal' or 'Not Coastal' groups." tags=[]
+```python caption="Distributions showing the differences between coastal and non-coastal prediction errors. Some 'random' simulations are shown in black in each plot, where observations are randomly assigned to either 'Coastal' or 'Not Coastal' groups."
 n_simulations = 100
 f, ax = plt.subplots(1, 2, figsize=(12, 3), sharex=True, sharey=True)
 ax[0].hist(
@@ -1164,7 +1164,7 @@ for order in range(1, 51, 5):
 
 And use the code below to generate Figure XXX9XXX:
 
-```python caption="Correlogram showing the change in correlation between prediction error at an Airbnb and its surroundings as the number of nearest neighbors increases. The null hypothesis, where residuals are shuffled around the map, shows no significant correlation at any distance. " tags=[]
+```python caption="Correlogram showing the change in correlation between prediction error at an Airbnb and its surroundings as the number of nearest neighbors increases. The null hypothesis, where residuals are shuffled around the map, shows no significant correlation at any distance. "
 plt.plot(range(1, 51, 5), correlations)
 plt.plot(range(1, 51, 5), nulls, color="orangered")
 plt.hlines(
