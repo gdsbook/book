@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.13.8
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -81,7 +81,7 @@ A first, conceptually straightforward, approach is to augment our dataset by cou
 
 To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our `airbnbs` points. From [Chapter 8](08_point_pattern_analysis), we can recall that there are a few different hulls that can be used. We'll use the Convex Hull here (Fig. XXX1XXX), which is the smallest convex polygon that covers all the points in the set. 
 
-```python caption="Convex hull of the Airbnbs in San Diego." tags=[]
+```python caption="Convex hull of the Airbnbs in San Diego."
 airbnbs_ch = airbnbs.unary_union.convex_hull
 geopandas.GeoSeries([airbnbs_ch]).plot()
 ```
@@ -125,7 +125,7 @@ pois.groupby("amenity").amenity.count()
 
 Once loaded into `pois` as a `GeoDataFrame`, we use the code below to generate Figure XXX2XXX, which takes a peek at their location, as compared with Airbnb spots:
 
-```python caption="Points of interest (POIs) and Airbnbs in San Diego." tags=[]
+```python caption="Points of interest (POIs) and Airbnbs in San Diego."
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(12, 12))
 # Plot Airbnb properties
@@ -199,7 +199,7 @@ joined = geopandas.sjoin(
     # `buffer_500m` column
     airbnbs_albers.set_geometry("buffer_500m")[["id", "buffer_500m"]],
     # Operation (spatial predicate) to use for the spatial join (`within`)
-    op="within",
+    predicate="within",
 )
 ```
 
@@ -232,7 +232,7 @@ airbnbs_w_counts = airbnbs_albers.merge(
 
 We can visualize now (Fig. XXX3XXX) the distribution of counts to get a sense of how "well-served" Airbnb properties are arranged over space:
 
-```python caption="Number of POIs within 500 meters of each Airbnb." tags=[]
+```python caption="Number of POIs within 500 meters of each Airbnb."
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot quantile map of No. of POIs for every Airbnb
@@ -265,7 +265,7 @@ To make this more accessible, let us illustrate the context with an example ques
 
 We use the code below, which opens and plot the file with elevation data, to generate Figure XXX4XXX:
 
-```python caption="Digital elevation model of the San Diego area." tags=[]
+```python caption="Digital elevation model of the San Diego area."
 # Open file
 dem = rasterio.open("../data/nasadem/nasadem_sd.tif")
 # Set up figure and axis
@@ -316,7 +316,7 @@ elevation.head()
 
 Now that we have a table with the elevation of each Airbnb property, we can plot the site elevations on a map (Fig. XXX5XXX) for visual inspection:
 
-```python caption="Elevation above sea level at each Airbnb." tags=[]
+```python caption="Elevation above sea level at each Airbnb."
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Join elevation data to original Airbnb table
@@ -380,7 +380,7 @@ x, y = numpy.meshgrid(
 
 To build an intuition on what they are we create Figure XXX6XXX, which visualizes both meshes side-by-side:
 
-```python caption="Example grid showing the coordiantes used for interpolation." tags=[]
+```python caption="Example grid showing the coordiantes used for interpolation."
 # Set up figure
 f, ax = plt.subplots(1, 2)
 # Plot X mesh
@@ -408,7 +408,7 @@ grid_df = geopandas.GeoDataFrame(
 
 We can visualize this grid together with the original Airbnb locations (Fig. XXX7XXX) to get a better sense of what we have just built:
 
-```python caption="Grid underlaid Airbnb locations used for interpolation." tags=[]
+```python caption="Grid underlaid Airbnb locations used for interpolation."
 # Plot grid points with size 1
 ax = grid_df.plot(markersize=1)
 # Plot on top Airbnb locations in red
@@ -439,14 +439,14 @@ predictions = model.predict(grid)
 
 The result can be displayed as a continuous choropleth (Fig. XXX8XXX), for example:
 
-```python caption="Predicted Airbnb price using ten nearest neighbor interpolation." tags=[]
+```python caption="Predicted Airbnb price using ten nearest neighbor interpolation."
 ax = grid_df.plot(predictions)
 ax.set_axis_off();
 ```
 
 The map is a result not only of the underlying data but also the algorithm we have used. For example, you can see in Figure XXX9XXX (generated with the code below) that the surface gets smoother as you increase the number of nearest neighbors to consider.
 
-```python caption="Predicted nightly price using a varying number of nearest neighbors. Note the plot smooths considerably as more neighbors are added." tags=[]
+```python caption="Predicted nightly price using a varying number of nearest neighbors. Note the plot smooths considerably as more neighbors are added."
 # Set up figure and 8 axes
 f, ax = plt.subplots(1, 8, figsize=(16, 4))
 # Loop over eight values equally spaced between 2 and 100
@@ -511,7 +511,7 @@ central_grid_df = geopandas.GeoDataFrame(
 
 Finally, we can reproduce the sequence of figures with different values of K only for the central part of the San Diego area (Fig. XXX10XXX):
 
-```python caption="Focus on downtown San Diego predictions for nearest neighbor interpolation." tags=[]
+```python caption="Focus on downtown San Diego predictions for nearest neighbor interpolation."
 # Set up figure and subplot
 f, ax = plt.subplots(1, 5, figsize=(16, 4), sharex=True, sharey=True)
 # Loop over five values equally spaced between 2 and 100
@@ -636,7 +636,7 @@ There is quite a bit going on in the cell above, let us unpack it:
 
 The `interpolated` output object is a geo-table that contains the target polygons and estimates of the variable(s) we originally had for the source geography (population and density in this case). Figure XXX11XXX (generated with the code below) illustrates the transfer of information from one geography to the other with for the case of total population estimates.
 
-```python caption="Interpolation of areal information to a different geometry. The Uber H3 hexagon grid is shown in the middle, and the interpolated values for population are shown on the right." tags=[]
+```python caption="Interpolation of areal information to a different geometry. The Uber H3 hexagon grid is shown in the middle, and the interpolated values for population are shown on the right."
 # Set up figure and axes
 f, axs = plt.subplots(1, 3, figsize=(18, 6))
 
@@ -681,7 +681,7 @@ plt.show()
 
 And Figure XXX12XXX, generated with the code below, shows the equivalent for population density.
 
-```python caption="Interpolation of population density from Census Tracts to Uber H3 Hexagons." tags=[]
+```python caption="Interpolation of population density from Census Tracts to Uber H3 Hexagons."
 # Set up figure and axes
 f, axs = plt.subplots(1, 3, figsize=(18, 6))
 
@@ -758,7 +758,7 @@ card = pandas.Series(d500_w.cardinalities)
 
 The `card` feature we have built will pick up areas of higher concentration of Airbnb properties with higher values, as we can see in Figure XXX13XXX.
 
-```python caption="Number of Airbnbs within 500 meters of each listing." tags=[]
+```python caption="Number of Airbnbs within 500 meters of each listing."
 # Set up figure and axis
 f, ax = plt.subplots(1)
 # Append cardinalities to main Airbnb geo-table
@@ -787,7 +787,7 @@ local_average_bedrooms = weights.lag_spatial(
 
 While related, these features contain quite distinct pieces of information, and both may prove useful in modeling. This is shown in Figure XXX14XXX, which compares them directly in a scatterplot. 
 
-```python caption="Relationship between the number of bedrooms at an Airbnb and the typical number of bedrooms among nearby Airbnbs." tags=[]
+```python caption="Relationship between the number of bedrooms at an Airbnb and the typical number of bedrooms among nearby Airbnbs."
 plt.scatter(
     airbnbs_albers[["bedrooms"]].values, local_average_bedrooms
 )
@@ -887,7 +887,7 @@ average_500m_to_1k = weights.lag_spatial(
 
 Thus, as we can see in Figure XXX15XXX (generated by the code below), the two features contain distinct, but related, information, and both may be valuable in their own right when attempting to predict outcomes of interest. 
 
-```python caption="Relationship between the size of Airbnbs between successive distance buffers around an Airbnb." tags=[]
+```python caption="Relationship between the size of Airbnbs between successive distance buffers around an Airbnb."
 # Plot scatter
 plt.scatter(
     average_within_500, average_500m_to_1k, color="k", marker="."
@@ -945,7 +945,7 @@ hulls = airbnbs_albers[["geometry"]].dissolve(by=labels).convex_hull
 
 The polygons in `hulls` (and displayed in Figure XXX16XXX) provide an intermediate layer between the granularity of each individual location and the global scale of San Diego as a geographical unit. Since people tend to make locational decisions hierarchically (e.g., first they select *San Diego* as a destination, then they pick a particular *part* of San Diego, then choose a house within the area), this approach might give us reasonable insight into enclaves of Airbnb properties:
 
-```python caption="Clusters in the locations of Airbnbs within San Diego." tags=[]
+```python caption="Clusters in the locations of Airbnbs within San Diego."
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot individual Airbnb locations
@@ -980,15 +980,15 @@ ax.set_axis_off();
 
 Note how the hierarchical nature of HDBSCAN, which picks density thresholds _locally_ is at work in the map, where some of the clusters (e.g., orange ones in the north) display lower density than parts of the center which are _not_ part of any cluster. These results also capture some information about the price of a listing. Figure XXX17XXX (generated with the code below) shows this by plotting the distribution of prices across the detected clusters.
 
-```python caption="Boxplot of price by detected 'competition cluster.' The clusters vary significantly in prices and could be used to train a model." tags=[]
+```python caption="Boxplot of price by detected 'competition cluster.' The clusters vary significantly in prices and could be used to train a model."
 # Set up figure
 f = plt.figure(figsize=(8, 3))
 # Add box plots of price by HDBSCAN cluster
-ax = airbnbs_albers.boxplot(
+ax = airbnbs_albers.assign(labels=labels).boxplot(
     # Plot distribution of 'price'
     "price",
     # Group by cluster label, generating one box plot/cluster
-    by=labels,
+    by='labels',
     # Do not display individual outlier observations
     flierprops=dict(marker=None),
     # Draw visualization on the current axis (inside `f`)

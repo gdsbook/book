@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.13.8
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -405,7 +405,7 @@ characteristics, mapping their labels allows to see to what extent similar areas
 to have similar locations.
 Thus, this gives us one map that incorporates the information from all nine covariates.
 
-```python caption="Clusters in the socio-demographic data, found using K-means with k=5. Note that the large eastern part of San Diego actually contains few observations, since those tracts are larger." tags=[]
+```python caption="Clusters in the socio-demographic data, found using K-means with k=5. Note that the large eastern part of San Diego actually contains few observations, since those tracts are larger."
 # Assign labels into a column
 db["k5cls"] = k5cls.labels_
 # Set up figure and ax
@@ -469,7 +469,7 @@ areas
 
 We can then use cluster shares to show visually in Figure XXX4XXX a comparison of the two membership representations (based on land and tracts):
 
-```python caption="Measuring cluster size by the number of tracts per cluster and land area per cluster." tags=[]
+```python caption="Measuring cluster size by the number of tracts per cluster and land area per cluster."
 # Bind cluster figures in a single table
 area_tracts = pandas.DataFrame({"No. Tracts": k5sizes, "Area": areas})
 # Convert raw values into percentages
@@ -668,7 +668,7 @@ tidy_db.head()
 
 And create a plot of the profiles' distributions (Fig. XXX6XXX):
 
-```python caption="Distributions of each variable in clusters obtained from Ward's hierarchical clutering." tags=[]
+```python caption="Distributions of each variable in clusters obtained from Ward's hierarchical clutering."
 # Setup the facets
 facets = seaborn.FacetGrid(
     data=tidy_db,
@@ -690,7 +690,7 @@ On the spatial side, we can explore the geographical dimension of the
 clustering solution by making a map of the clusters. To make the comparison
 with k-means simpler, Figure XXX7XXX, generated with the code below, displays both side-by-side:
 
-```python caption="Two clustering solutions, one for the K-means solution, and the other for Ward's hierarchical clustering. Note that colorings cannot be directly compared between the two maps." tags=[]
+```python caption="Two clustering solutions, one for the K-means solution, and the other for Ward's hierarchical clustering. Note that colorings cannot be directly compared between the two maps."
 db["ward5"] = model.labels_
 # Set up figure and ax
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
@@ -803,7 +803,7 @@ model.fit(db_scaled)
 
 Let's inspect the output visually (Fig. XXX8XXX):
 
-```python caption="Spatially constrained clusters, or 'regions', of San Diego using Ward's hierarchical clustering." tags=[]
+```python caption="Spatially constrained clusters, or 'regions', of San Diego using Ward's hierarchical clustering."
 db["ward5wq"] = model.labels_
 # Set up figure and ax
 f, ax = plt.subplots(1, figsize=(9, 9))
