@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -81,7 +81,7 @@ There are many ways to visualize geographic point patterns, and the choice of me
 The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatterplot with `seaborn` in Figure 1: 
 
 
-```python caption="Tokyo photographs jointplot showing the longitude and latitude where photographs were taken." tags=[]
+```python caption="Tokyo photographs jointplot showing the longitude and latitude where photographs were taken."
 # Generate scatter plot
 seaborn.jointplot(x="longitude", y="latitude", data=db, s=0.5);
 ```
@@ -91,7 +91,7 @@ This is a good start: we can see dots tend to be concentrated in the center of t
 
 Start with the context. The easiest way to provide additional context is by overlaying a tile map from the internet. Let us quickly call `contextily` for that, and integrate it with `jointplot` to create Figure 2: 
 
-```python caption="Tokyo jointplot showing longitude and latitude of photographs with a basemap via contextily." tags=[]
+```python caption="Tokyo jointplot showing longitude and latitude of photographs with a basemap via contextily."
 # Generate scatter plot
 joint_axes = seaborn.jointplot(
     x="longitude", y="latitude", data=db, s=0.5
@@ -114,7 +114,7 @@ Consider our second problem: cluttering. When too many photos are concentrated i
 One solution to get around cluttering relates to what we referred to earlier as moving from {ref}`"tables to surfaces" <ch03-surfaces_as_tables>`. We can now recast this approach as a *spatial* or *two-dimensional histogram*. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleth maps may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin two-dimensional histogram is straightforward in Python using the `hexbin` function to create Figure 3:
 
 
-```python caption="Tokyo photographs two-dimensional histogram built with hexbinning." tags=[]
+```python caption="Tokyo photographs two-dimensional histogram built with hexbinning."
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(12, 9))
 # Generate and add hexbin with 50 hexagons in each
@@ -145,15 +145,16 @@ Voila, this allows a lot more detail! It is now clear that the majority of photo
 
 Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g., the modifiable areal unit problem {cite}`wong2004`). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g., {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with a different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel map in Python is rather straightforward, using the `seaborn.kdeplot()` function to create Figure 4:
 
-```python caption="Tokyo photographs kernel density map." tags=[]
+```python caption="Tokyo photographs kernel density map."
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Generate and add KDE with a shading of 50 gradients
 # coloured contours, 75% of transparency,
 # and the reverse viridis colormap
 seaborn.kdeplot(
-    db["x"],
-    db["y"],
+    x="x",
+    y="y",
+    data=db,
     n_levels=50,
     shade=True,
     alpha=0.55,
@@ -194,7 +195,7 @@ med_center = centrography.euclidean_median(db[["x", "y"]])
 
 It is easiest to visualize this by plotting the point pattern and its mean center alongside one another, as done to create Figure 5:
 
-```python caption="Tokyo photographs mean and median centers." tags=[]
+```python caption="Tokyo photographs mean and median centers."
 # Generate scatterplot
 joint_axes = seaborn.jointplot(
     x="x", y="y", data=db, s=0.75, height=9
@@ -251,7 +252,7 @@ major, minor, rotation = centrography.ellipse(db[["x", "y"]])
 
 Then, we will visualize this in Figure 6: 
 
-```python caption="Tokyo photographs standard deviational ellipse." tags=[]
+```python caption="Tokyo photographs standard deviational ellipse."
 from matplotlib.patches import Ellipse
 
 # Set up figure and axis
@@ -320,20 +321,19 @@ alpha_shape, alpha, circs = libpysal.cg.alpha_shape_auto(
 )
 ```
 
-```python caption="Concave hull and (green) and convex hull (blue) for a subset of Tokyo photographs, with the bounding circles for the concave hull (red)." tags=[]
-from descartes import PolygonPatch  # to plot the alpha shape easily
+```python caption="Concave hull and (green) and convex hull (blue) for a subset of Tokyo photographs, with the bounding circles for the concave hull (red)."
 
 f, ax = plt.subplots(1, 1, figsize=(9, 9))
 
 # Plot a green alpha shape
-ax.add_patch(
-    PolygonPatch(
-        alpha_shape,
-        edgecolor="green",
-        facecolor="green",
-        alpha=0.2,
-        label="Tightest single alpha shape",
-    )
+geopandas.GeoSeries(
+    [alpha_shape]
+).plot(
+    ax=ax,
+    edgecolor="green",
+    facecolor="green",
+    alpha=0.2,
+    label="Tightest single alpha shape",
 )
 
 # Include the points for our prolific user in black
@@ -420,18 +420,8 @@ Now, to visualize these, we'll convert the raw vertices into `matplotlib` patche
 
 ```python
 from matplotlib.patches import Polygon, Circle, Rectangle
-from descartes import PolygonPatch
 
-# Make a purple alpha shape
-alpha_shape_patch = PolygonPatch(
-    alpha_shape,
-    edgecolor="purple",
-    facecolor="none",
-    linewidth=2,
-    label="Alpha Shape",
-)
-
-# a blue convex hull
+# Make a blue convex hull
 convex_hull_patch = Polygon(
     convex_hull_vertices,
     closed=True,
@@ -442,19 +432,8 @@ convex_hull_patch = Polygon(
     label="Convex Hull",
 )
 
-# a green minimum rotated rectangle
 
-min_rot_rect_patch = PolygonPatch(
-    min_rot_rect,
-    edgecolor="green",
-    facecolor="none",
-    linestyle="--",
-    label="Min Rotated Rectangle",
-    linewidth=2,
-)
-
-
-# compute the width and height of the
+# compute the width and height of the mbr
 min_rect_width = min_rect_vertices[2] - min_rect_vertices[0]
 min_rect_height = min_rect_vertices[2] - min_rect_vertices[0]
 
@@ -484,12 +463,34 @@ circ_patch = Circle(
 Finally, we'll plot the patches together with the photograph locations in Figure 8:
 
 
-```python caption="Alpha shape/concave hull, convex hull, minimum rotated rectangle, minimum bounding rectangle, and minimum bounding circle for the Tokyo photographs." tags=[]
+```python caption="Alpha shape/concave hull, convex hull, minimum rotated rectangle, minimum bounding rectangle, and minimum bounding circle for the Tokyo photographs."
 f, ax = plt.subplots(1, figsize=(10, 10))
 
-ax.add_patch(alpha_shape_patch)
+# a purple alpha shape
+geopandas.GeoSeries(
+    [alpha_shape]
+).plot(
+    ax=ax,
+    edgecolor="purple",
+    facecolor="none",
+    linewidth=2,
+    label="Alpha Shape",
+)
+
+# a green minimum rotated rectangle
+geopandas.GeoSeries(
+    [min_rot_rect]
+).plot(
+    ax=ax,
+    edgecolor="green",
+    facecolor="none",
+    linestyle="--",
+    label="Min Rotated Rectangle",
+    linewidth=2,
+)
+
+# add the rest of the patches
 ax.add_patch(convex_hull_patch)
-ax.add_patch(min_rot_rect_patch)
 ax.add_patch(min_rect_patch)
 ax.add_patch(circ_patch)
 
@@ -538,7 +539,7 @@ random_pattern = random.poisson(coordinates, size=len(coordinates))
 
 You can visualize this using the same methods as before, which we show in Figure 9:
 
-```python caption="Observed locations for Tokyo Photographs and random locations around Tokyo." tags=[]
+```python caption="Observed locations for Tokyo Photographs and random locations around Tokyo."
 f, ax = plt.subplots(1, figsize=(9, 9))
 plt.scatter(
     *coordinates.T,
@@ -566,7 +567,7 @@ random_pattern_ashape = random.poisson(
 
 We can visualize this in Figure 10:
 
-```python caption="Tokyo points, random and observed patterns within the alpha shape." tags=[]
+```python caption="Tokyo points, random and observed patterns within the alpha shape."
 f, ax = plt.subplots(1, figsize=(9, 9))
 plt.scatter(*coordinates.T, color="k", marker=".", label="Observed")
 plt.scatter(
@@ -586,7 +587,7 @@ Quadrat statistics examine the spatial distribution of points in an area in term
 
 In the `pointpats` package, you can visualize the results using the following `QStatistic.plot()` method. This shows the grid used to count the events, as well as the underlying pattern, shown in Figure 11:
 
-```python caption="Quadrat counts for the Tokyo photographs." tags=[]
+```python caption="Quadrat counts for the Tokyo photographs."
 qstat = QStatistic(coordinates)
 qstat.plot()
 ```
@@ -600,7 +601,7 @@ qstat.chi2_pvalue
 ```
 In contrast, our totally random point process will have nearly the same points in every cell, shown in Figure 12:
 
-```python caption="Quadrat counts for the Tokyo photographs." tags=[]
+```python caption="Quadrat counts for the Tokyo photographs."
 qstat_null = QStatistic(random_pattern)
 qstat_null.plot()
 ```
@@ -614,7 +615,7 @@ qstat_null.chi2_pvalue
 ```
 Be careful, however; the fact that quadrat counts are measured in a *regular tiling* that is overlaid on top of the potentially irregular extent of our pattern can mislead us. In particular, irregular *but random* patterns can be mistakenly found "significant" by this approach. Consider our random set generated within the alpha shape polygon, with the quadrat grid overlaid on top shown in Figure 13:
 
-```python caption="Quadrat statistics for the random points across constrained to alpha shape of the Tokyo photographs." tags=[]
+```python caption="Quadrat statistics for the random points across constrained to alpha shape of the Tokyo photographs."
 qstat_null_ashape = QStatistic(random_pattern_ashape)
 qstat_null_ashape.plot()
 ```
@@ -895,7 +896,7 @@ minp
 ```
 At the same time, let us expand the maximum radius to, say, 500 meters. Then we can re-run the algorithm and plot the output, all in the same cell this time to create Figure 18: 
 
-```python caption="Tokyo points, clusters with DBSCAN and minp=0.01." tags=[]
+```python caption="Tokyo points, clusters with DBSCAN and minp=0.01."
 # Rerun DBSCAN
 clusterer = DBSCAN(eps=500, min_samples=int(minp))
 clusterer.fit(db[["x", "y"]])
