@@ -1,4 +1,4 @@
-FROM darribas/gds_py:7.0
+FROM darribas/gds_py:9.0
 
 # Local docs
 RUN rm -R work/
