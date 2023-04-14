@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.14.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -21,7 +21,7 @@ warnings.filterwarnings("ignore")
 
 # Global Spatial Autocorrelation
 
-
+<!-- #region jp-MarkdownHeadingCollapsed=true -->
 The notion of spatial autocorrelation relates to the existence of a "functional relationship between what happens at one point in space and what happens elsewhere" {cite}`Anselin_1988`. Spatial autocorrelation thus has to do with the degree to which the similarity in values between observations in a dataset is related to the similarity in locations of such observations. This is similar to the traditional idea of correlation between two variables, which informs us about how the values in one variable change as a function of those in the other, albeit with some key differences discussed in this chapter. In a similar fashion, spatial autocorrelation is also related (but distinct) to temporal counterpart, *temporal autocorrelation*, which relates the value of a variable at a given point in time with those in previous periods. In contrast to these other ideas of correlation, *spatial autocorrelation* relates the value of the variable of interest in a given location, with values of the same variable in other locations. An alternative way to understand the concept is as the degree of information contained in the value of a variable at a given location about the value of that same variable in other locations.
 
 ## Understanding spatial autocorrelation
@@ -33,7 +33,7 @@ This definition is still too vague, though. So, to get more specific, spatial au
 It can also help to understand spatial autocorrelation using the scale at which it is considered. We generally talk of global or local processes. **Global** spatial autocorrelation, on which this chapter is focused, considers the overall trend that the location of values follows. In doing this, the study of global spatial autocorrelation makes possible statements about the degree of *clustering* in the dataset. Do values generally follow a particular pattern in their geographical distribution? Are similar values closer to other similar values than we would expect from pure chance? These are some of the questions that relate to global spatial autocorrelation. **Local** autocorrelation focuses on deviations from the global trend at much more focused levels than the entire map, and it is the subject of the next chapter.
 
 We will explore these concepts with an applied example, interrogating the data about the presence, nature, and strength of global spatial autocorrelation. To do this, we will use a set of tools collectively known as Exploratory Spatial Data Analysis (ESDA). Analogous to its non-spatial counterpart (EDA; {cite}`Tukey1977exploratory`), ESDA has been specifically designed for this purpose, and puts space and the relative location of the observations in a dataset at the forefront of the analysis. The range of ESDA methods is wide and spans from simpler approaches like choropleth maps (previous chapter), to more advanced and robust methodologies that include statistical inference and an explicit recognition of the geographical arrangement of the data. The purpose of this chapter is to dip our toes into the latter group.
-
+<!-- #endregion -->
 
 ## An empirical illustration: the EU Referendum
 
@@ -94,7 +94,7 @@ db.info()
 
 And with these elements, we can generate a choropleth map to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the `alpha` attribute) to make the final plot in Figure 1 easier to read: 
 
-```python caption="Percentage of voters wanting to leave the EU in the 2016 UK Referendum known as the 'Brexit' vote." tags=[]
+```python caption="Percentage of voters wanting to leave the EU in the 2016 UK Referendum known as the 'Brexit' vote."
 f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(
     column="Pct_Leave",
@@ -170,7 +170,7 @@ The first row (`E08000012`) represents Liverpool, which was a notorious "Remaine
 
 To end this section visually, the smoothing nature of the lag can be appreciated in the following map comparison in Figure 2.
 
-```python caption="Vote to leave the EU and its spatial lag." tags=[]
+```python caption="Vote to leave the EU and its spatial lag."
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 ax1, ax2 = axs
 
@@ -231,7 +231,7 @@ db[["Pct_Leave", "Leave"]].tail()
 
 Which we can visualize readily in Figure 3: 
 
-```python caption="Places with a majority voting leave in the Brexit vote" tags=[]
+```python caption="Places with a majority voting leave in the Brexit vote"
 f, ax = plt.subplots(1, figsize=(9, 9))
 db.plot(
     ax=ax,
@@ -350,7 +350,7 @@ db["Pct_Leave_lag_std"] = weights.lag_spatial(
 
 Technically speaking, creating a Moran Plot is very similar to creating any other scatterplot in Python. We will make one for Figure 4.
 
-```python caption="Brexit vote, % leave Moran Scatterplot." tags=[]
+```python caption="Brexit vote, % leave Moran Scatterplot."
 f, ax = plt.subplots(1, figsize=(6, 6))
 seaborn.regplot(
     x="Pct_Leave_std",
@@ -399,7 +399,7 @@ That is a very low value, particularly considering it is actually the minimum va
 
 Thanks to the `splot` visualization module in Pysal, we can obtain a quick representation of the statistic that combines the Moran scatterplot we saw before with a graphic of the empirical test that we carry out to obtain `p_sim`. This is shown in Figure 5.
 
-```python caption="Brexit vote, Moran's I replicate distribution and Scatterplot." tags=[]
+```python caption="Brexit vote, Moran's I replicate distribution and Scatterplot."
 plot_moran(moran);
 ```
 

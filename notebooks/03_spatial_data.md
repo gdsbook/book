@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -99,7 +99,7 @@ type(gt_polygons.geometry[0])
 
 In `geopandas` (as well as other packages representing geographic data), the `geometry` column has special traits which a "normal" column, such as `ADMIN`, does not. For example, when we plot the dataframe, the `geometry` column is used as the main shape to use in the plot, as shown in Figure 1. 
 
-```python caption="Map of the world made using the GeoDataFrame.plot() method" tags=[]
+```python caption="Map of the world made using the GeoDataFrame.plot() method"
 gt_polygons.plot();
 ```
 
@@ -119,7 +119,7 @@ gt_polygons.head()
 
 Despite the fact that `centroid` is a geometry (you can tell because each cell starts with `POINT`), it is not currently set as the active geometry for our table. We can switch to the `centroid` column using the `set_geometry()` method. Finally, we can plot the centroid and the boundary of each country after switching the geometry column with `set_geometry()`:
 
-```python caption="Plotting centroids and boundaries of polygon geometries." tags=[]
+```python caption="Plotting centroids and boundaries of polygon geometries."
 # Plot centroids
 ax = gt_polygons.set_geometry("centroid").plot("ADMIN", markersize=5)
 # Plot polygons without color filling
@@ -136,7 +136,7 @@ Thus, as should now be clear, nearly any kind of geographic object can be repres
 gt_polygons.query('ADMIN == "Bolivia"')
 ```
 
-```python caption="Plotting Bolivia based on a query." tags=[]
+```python caption="Plotting Bolivia based on a query."
 gt_polygons.query('ADMIN == "Bolivia"').plot();
 ```
 
@@ -146,7 +146,7 @@ while Indonesia is a `MultiPolygon` containing many `Polygons` for each individu
 gt_polygons.query('ADMIN == "Indonesia"')
 ```
 
-```python caption="Plotting Indonesia via a query." tags=[]
+```python caption="Plotting Indonesia via a query."
 gt_polygons.query('ADMIN == "Indonesia"').plot();
 ```
 
@@ -248,13 +248,13 @@ pop.sel(band=1)
 
 The resulting object is thus a two-dimensional array. Similar to geographic tables, we can quickly plot the values in our dataset:
 
-```python caption="Population surface of Sao Paulo, Brazil" tags=[]
+```python caption="Population surface of Sao Paulo, Brazil"
 pop.sel(band=1).plot();
 ```
 
 This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data is traditionally stored in surfaces not as a class of its own (e.g., `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
 
-```python caption="Population surface of Sao Paulo, Brazil omitting NAN values." tags=[]
+```python caption="Population surface of Sao Paulo, Brazil omitting NAN values."
 pop.where(pop != -200).sel(band=1).plot(cmap="RdPu");
 ```
 
@@ -301,7 +301,7 @@ type(graph)
 
 We can have a quick inspection of the structure of the graph with the `plot_graph` method:
 
-```python caption="OSMNX graph for a street network." tags=[]
+```python caption="OSMNX graph for a street network."
 osmnx.plot_graph(graph);
 ```
 
@@ -427,7 +427,7 @@ max_polys = (
 
 And generate a map with the same tooling that we use for any standard geo-table:
 
-```python caption="Combining points with Contextily." tags=[]
+```python caption="Combining points with Contextily."
 # Plot polygons
 ax = max_polys.plot(edgecolor="red", figsize=(9, 9))
 # Add basemap
@@ -453,7 +453,7 @@ use the digital elevation model [(DEM)](../data/nasadem/build_nasadem_sd) surfac
 
 Let's start by reading the data. First, the elevation model:
 
-```python caption="Digital Elevation Model as a raster." tags=[]
+```python caption="Digital Elevation Model as a raster."
 dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(
     band=1
 )
@@ -462,7 +462,7 @@ dem.where(dem > 0).plot.imshow();
 
 And the neighborhood areas (tracts) from the census:
 
-```python caption="San Diego California Census Tracts." tags=[]
+```python caption="San Diego California Census Tracts."
 sd_tracts = geopandas.read_file(
     "../data/sandiego/sandiego_tracts.gpkg"
 )
@@ -489,7 +489,7 @@ largest_tract = sd_tracts.loc[largest_tract_id, "geometry"]
 
 Clipping the section of the surface that is within the polygon in the DEM can be achieved with the `rioxarray` extension to clip surfaces based on geometries:
 
-```python caption="DEM clipped to San Diego" tags=[]
+```python caption="DEM clipped to San Diego"
 # Clip elevation for largest tract
 dem_clip = dem.rio.clip(
     [largest_tract.__geo_interface__], crs=sd_tracts.crs
@@ -570,7 +570,7 @@ elevations2.head()
 
 To visualize these results, we can make an elevation map:
 
-```python caption="Digital Elevation Model Estimates by Census Tract, San Diego." tags=[]
+```python caption="Digital Elevation Model Estimates by Census Tract, San Diego."
 # Set up figure
 f, axs = plt.subplots(1, 3, figsize=(15, 5))
 
@@ -603,7 +603,7 @@ The case for converting tables into surfaces is perhaps less controversial than 
 
 From a purely technical perspective, for datasets with too many points, representing every point in the data on a screen can be seriously overcrowded:
 
-```python caption="Point locations of Tokyo Photographs." tags=[]
+```python caption="Point locations of Tokyo Photographs."
 gt_points.plot();
 ```
 
@@ -623,7 +623,7 @@ grid = cvs.points(gt_points, x="longitude", y="latitude")
 
 The resulting `grid` is a standard `DataArray` object that we can then manipulate as we have seen before. When plotted below, the amount of detail that the resampled data allows for is much greater than when the points were visualized alone. This is shown in Figure 14. 
 
-```python caption="Point locations of Tokyo Photographs, and Point Density as a Surface." tags=[]
+```python caption="Point locations of Tokyo Photographs, and Point Density as a Surface."
 f, axs = plt.subplots(1, 2, figsize=(14, 6))
 gt_points.plot(ax=axs[0])
 grid.plot(ax=axs[1]);

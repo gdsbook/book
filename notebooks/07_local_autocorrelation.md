@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.10.3
+      jupytext_version: 1.14.5
   kernelspec:
-    display_name: Python 3
+    display_name: Python 3 (ipykernel)
     language: python
     name: python3
 ---
@@ -82,7 +82,7 @@ db.info()
 
 Although there are several variables that could be considered, we will focus on `Pct_Leave`, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union. With these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the `alpha` attribute) to make the final plot easier to read in Figure 1: 
 
-```python caption="Percentage of voters wanting to leave the EU in the 2016 UK Referendum known as the 'Brexit' vote." tags=[]
+```python caption="Percentage of voters wanting to leave the EU in the 2016 UK Referendum known as the 'Brexit' vote."
 # Set up figure and a single axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Build choropleth
@@ -117,11 +117,9 @@ w = weights.distance.KNN.from_dataframe(db, k=8)
 w.transform = "R"
 ```
 
-<!-- #region tags=[] -->
 ## Motivating local spatial autocorrelation
 
 To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardized form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:
-<!-- #endregion -->
 
 ```python
 db["w_Pct_Leave"] = weights.lag_spatial(w, db['Pct_Leave'])
@@ -136,7 +134,7 @@ db["w_Pct_Leave_std"] = weights.lag_spatial(w, db['Pct_Leave_std'])
 
 Technically speaking, creating a Moran scatterplot is very similar to creating any other scatterplot. We have also done this before in Chapter 6. To see this again, we can make Figure 2:
 
-```python caption="Brexit % leave Moran scatterplot." tags=[]
+```python caption="Brexit % leave Moran scatterplot."
 # Set up the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
@@ -148,7 +146,7 @@ plt.show()
 
 Using standardized values, we can immediately divide each variable (percentage that voted to leave, and its spatial lag) in two groups: those with above-average leave voting, which have positive standardized values; and those with below-average leave voting, which feature negative standardized values. Applying this thinking to both the percentage to leave and its spatial lag, divides a Moran scatterplot into four quadrants. Each of them captures a situation based on whether a given area displays a value above the mean (high) or below (low) in either the original variable (`Pct_Leave`) or its spatial lag (`w_Pct_Leave_std`). Using this terminology, we name the four quadrants as follows: high-high (HH) for the top-right, low-high (LH) for the top-left, low-low (LL) for the bottom-left, and high-low (HL) for the bottom right. Graphically, we can express this in Figure 3:
 
-```python caption="Brexit % leave Moran scatterplot with labelled quadrants." tags=[]
+```python caption="Brexit % leave Moran scatterplot with labelled quadrants."
 # Set up the figure and axis
 f, ax = plt.subplots(1, figsize=(6, 6))
 # Plot values
@@ -167,7 +165,7 @@ plt.text(-25, -11.0, "LL", fontsize=25, c="r")
 plt.show()
 ```
 
-<!-- #region jp-MarkdownHeadingCollapsed=true tags=[] jp-MarkdownHeadingCollapsed=true -->
+<!-- #region jp-MarkdownHeadingCollapsed=true -->
 ## Local Moran's $I_i$
 
 One way to look at the figure above is as a classification of each observation in the dataset depending on its value and that of its neighbors. Furthermore, this classification is exhaustive: every point is assigned a label. But remember local measures help us to identify areas of _unusual_ concentration of values. Clusters will represent values of one type that are _unlikely_ to appear under the assumption of spatial randomness. To know whether each location belongs to a *statistically significant* cluster of a given kind, we thus need to compare it with what we would expect if the data were allocated over space in a completely random way. However, what we are interested in is whether the strength with which the values are concentrated is unusually high. This is exactly what LISAs are designed to do. A detailed description of the statistical underpinnings of LISAs is beyond the scope of this chapter. If you would like to delve deeper into the math and probability challenges arising, a good recent reference is {cite}`sauer2021ga`. In this context, we will provide some intuition about how they work in one LISA statistic, the local Moran's $I_i$. 
@@ -191,7 +189,7 @@ lisa = esda.moran.Moran_Local(db["Pct_Leave"], w)
 
 We need to pass the variable of interest—proportion of Leave votes in this context—and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object (`lisa`) that has a number of attributes of interest. The local indicators themselves are in the `Is` attribute and we can get a sense of their distribution using `seaborn`'s kernel density estimate plotting, as in Figure 4: 
 
-```python caption="Brexit % Leave vote, observed distribution LISA statistics for all sites." tags=[]
+```python caption="Brexit % Leave vote, observed distribution LISA statistics for all sites."
 # Draw KDE line
 ax = seaborn.kdeplot(lisa.Is)
 # Add one small bar (rug) for each observation
@@ -214,7 +212,7 @@ from splot import esda as esdaplot
 
 With all pieces in place, let's first get busy building the figure:
 
-```python caption="Brexit % Leave vote, Pct_Leave. LISA (top-left), Quadrant (top-right), Signficance (bottom-left), Cluster Map (bottom-right)." tags=[]
+```python caption="Brexit % Leave vote, Pct_Leave. LISA (top-left), Quadrant (top-right), Signficance (bottom-left), Cluster Map (bottom-right)."
 # Set up figure and axes
 f, axs = plt.subplots(nrows=2, ncols=2, figsize=(12, 12))
 # Make the axes accessible with single indexing
@@ -464,7 +462,7 @@ def g_map(g, db, ax):
 
 With this function at hand, generating $G_i^{(*)}$ cluster maps is as straightforward as it is for LISA outputs through `splot` in Figure 6: 
 
-```python caption="BREXIT Leave vote, Pct_Leave, Getis-Ord G (left) and G* (right) statistics." tags=[]
+```python caption="BREXIT Leave vote, Pct_Leave, Getis-Ord G (left) and G* (right) statistics."
 # Set up figure and axes
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 # Loop over the two statistics
@@ -553,7 +551,7 @@ pop.rio.nodata
 
 At this point, we are ready to run a LISA the same way we have done in the previous chapter when using geo-tables:
 
-```python tags=[]
+```python
 # NOTE: this may take a bit longer to run depending on hardware
 pop_lisa = esda.moran.Moran_Local(
     pop_values.astype(float), w_surface, n_jobs=-1
@@ -632,7 +630,7 @@ lisa_cmap
 
 At this point, we have all the pieces we need to build our cluster map. Let's put them together to build Figure 8: 
 
-```python caption="LISA map for Sao Paulo population surface." tags=[]
+```python caption="LISA map for Sao Paulo population surface."
 # Set up figure and axis
 f, axs = plt.subplots(1, 2, figsize=(12, 6))
 # Subplot 1 #

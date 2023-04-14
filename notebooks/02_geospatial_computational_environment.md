@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -304,7 +304,7 @@ content. For example, we can include a YouTube clip by passing the video ID[^you
 
 [^youtube]: We regret to inform the reader that the printed page is not the best for displaying YouTube videos, or indeed any web content. So if you are reading this book on paper, the video will not render. We recommend viewing the notebooks online at [`geographicdata.science/book`](https://geographicdata.science/book) to see the full power of the notebook.
 
-```python caption="Embedding rich media in a notebook." tags=[]
+```python caption="Embedding rich media in a notebook."
 display.YouTubeVideo("iinQDhsdE9s")
 ```
 
