@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 
 
-<html >
+<html lang="en" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Global Spatial Autocorrelation &#8212; Geographic Data Science with Python</title>
   
@@ -45,6 +45,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
@@ -78,7 +79,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="Local Spatial Autocorrelation" href="07_local_autocorrelation.html" />
     <link rel="prev" title="Choropleth Mapping" href="05_choropleth.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="None"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
   
   
@@ -436,17 +437,17 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="global-spatial-autocorrelation">
-<h1>Global Spatial Autocorrelation<a class="headerlink" href="#global-spatial-autocorrelation" title="Permalink to this headline">#</a></h1>
+<h1>Global Spatial Autocorrelation<a class="headerlink" href="#global-spatial-autocorrelation" title="Permalink to this heading">#</a></h1>
 <p>The notion of spatial autocorrelation relates to the existence of a “functional relationship between what happens at one point in space and what happens elsewhere” <span id="id1">[<a class="reference internal" href="references.html#id8" title="Luc Anselin. Spatial Econometrics: Methods and Models. Springer Netherlands, 1988. ISBN 9789401577991. URL: http://dx.doi.org/10.1007/978-94-015-7799-1, doi:10.1007/978-94-015-7799-1.">Ans88</a>]</span>. Spatial autocorrelation thus has to do with the degree to which the similarity in values between observations in a dataset is related to the similarity in locations of such observations. This is similar to the traditional idea of correlation between two variables, which informs us about how the values in one variable change as a function of those in the other, albeit with some key differences discussed in this chapter. In a similar fashion, spatial autocorrelation is also related (but distinct) to temporal counterpart, <em>temporal autocorrelation</em>, which relates the value of a variable at a given point in time with those in previous periods. In contrast to these other ideas of correlation, <em>spatial autocorrelation</em> relates the value of the variable of interest in a given location, with values of the same variable in other locations. An alternative way to understand the concept is as the degree of information contained in the value of a variable at a given location about the value of that same variable in other locations.</p>
 <section id="understanding-spatial-autocorrelation">
-<h2>Understanding spatial autocorrelation<a class="headerlink" href="#understanding-spatial-autocorrelation" title="Permalink to this headline">#</a></h2>
+<h2>Understanding spatial autocorrelation<a class="headerlink" href="#understanding-spatial-autocorrelation" title="Permalink to this heading">#</a></h2>
 <p>In order to better understand the notion of spatial autocorrelation, it is useful to begin by considering what the world looks like in its absence. A key idea in this context is that of spatial randomness: a situation in which the location of an observation gives no information whatsoever about its value. In other words, a variable is spatially random if its distribution follows no discernible spatial pattern. Spatial autocorrelation can thus be defined as the “absence of spatial randomness”.</p>
 <p>This definition is still too vague, though. So, to get more specific, spatial autocorrelation is typically categorized along two main dimensions: sign and scale. Similar to the traditional, non-spatial case, spatial autocorrelation can adopt two main forms: <em>positive</em> and <em>negative</em>. The former relates to a situation where similarity and geographical closeness go hand-in-hand. In other words, similar values are located near each other, while different values tend to be scattered and further away. It is important that the sign of these values is not relevant for the presence of spatial autocorrelation: it may be high values close to high values, <em>or</em> low values close to low values. The important bit in this context is the relationship between closeness and statistical similarity is positive. This is a fairly common case in many social contexts and, in fact, several human phenomena display  clearly positive spatial autocorrelation. For example, think of the distribution of income, or poverty, over space: it is common to find similar values located nearby (wealthy areas close to other wealthy areas, poor population concentrated in space too). In contrast, <em>negative</em> spatial autocorrelation reflects a situation where similar values tend to be located away from each other. In this case, statistical similarity is associated with distance. This is somewhat less common in the social sciences, but it still exists. An example can be found in phenomena that follow processes of spatial competition or situations where the location of a set of facilities aims at the highest spatial coverage. The distribution of supermarkets of different brands, or of hospitals, usually follows a pattern of negative spatial dependence.</p>
 <p>It can also help to understand spatial autocorrelation using the scale at which it is considered. We generally talk of global or local processes. <strong>Global</strong> spatial autocorrelation, on which this chapter is focused, considers the overall trend that the location of values follows. In doing this, the study of global spatial autocorrelation makes possible statements about the degree of <em>clustering</em> in the dataset. Do values generally follow a particular pattern in their geographical distribution? Are similar values closer to other similar values than we would expect from pure chance? These are some of the questions that relate to global spatial autocorrelation. <strong>Local</strong> autocorrelation focuses on deviations from the global trend at much more focused levels than the entire map, and it is the subject of the next chapter.</p>
 <p>We will explore these concepts with an applied example, interrogating the data about the presence, nature, and strength of global spatial autocorrelation. To do this, we will use a set of tools collectively known as Exploratory Spatial Data Analysis (ESDA). Analogous to its non-spatial counterpart (EDA; <span id="id2">[<a class="reference internal" href="references.html#id56" title="John W Tukey. Exploratory data analysis. Addison-Wesley, 1977.">Tuk77</a>]</span>), ESDA has been specifically designed for this purpose, and puts space and the relative location of the observations in a dataset at the forefront of the analysis. The range of ESDA methods is wide and spans from simpler approaches like choropleth maps (previous chapter), to more advanced and robust methodologies that include statistical inference and an explicit recognition of the geographical arrangement of the data. The purpose of this chapter is to dip our toes into the latter group.</p>
 </section>
 <section id="an-empirical-illustration-the-eu-referendum">
-<h2>An empirical illustration: the EU Referendum<a class="headerlink" href="#an-empirical-illustration-the-eu-referendum" title="Permalink to this headline">#</a></h2>
+<h2>An empirical illustration: the EU Referendum<a class="headerlink" href="#an-empirical-illustration-the-eu-referendum" title="Permalink to this heading">#</a></h2>
 <p>To illustrate the notion of spatial autocorrelation and its different variants, let us turn to an example with real world data. Before the data, let us import all the relevant libraries that we will use throughout the chapter:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -619,11 +620,11 @@ memory usage: 22.9+ KB
 </div>
 </section>
 <section id="id3">
-<h2>Global spatial autocorrelation<a class="headerlink" href="#id3" title="Permalink to this headline">#</a></h2>
+<h2>Global spatial autocorrelation<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h2>
 <p>The map above is a good way to begin exploring the main spatial patterns in the data. At first sight, it appears to display a fair amount of positive spatial autocorrelation: local authorities with high percentages of votes to leave the EU tend to be next to each other (see, for instance, the eastern region), as are those where a much smaller proportion of their population voted to leave (with Scotland being a good example in the north). Humans however are very good pattern detectors. All over our history since we started as a species, life has rewarded pattern recognition abilities and punished individuals lacking it. Think of the advantage our ancestors had if they were able to spot particular shapes or movement when hunting, or the trouble they could get into if they were not able to recognize certain others in the darkness of night. This extraordinary capability to spot trends, patterns and associations tends to also create many false positives: cases where we think there is a pattern, but in fact what we are seeing is largely random <span id="id4">[<a class="reference internal" href="references.html#id82" title="Michael Shermer. Patternicity: Finding meaningful patterns in meaningless noise. Scientific American, 299(5):48, 2008.">She08</a>]</span>. This is particularly accentuated in the case of maps where, as we have seen in choropleth maps from Chapter 5, the shape and size of geometries can also significantly distort our perception of the underlying pattern. By looking at the map above, for example, we can have an educated guess about the presence of spatial autocorrelation; but actually determining whether what we are seeing could have come from pure chance or not is usually easier said than done.</p>
 <p>That is exactly the purpose of indicators of global spatial autocorrelation: to leverage the power of statistics to help us first summarize the spatial distribution of values present in a map, and second obtain a formal quantification of the departure from randomness. These are statistics to characterize a map in terms of its degree of clustering and summarize it, either in a visual or numerical way. However, before we can delve into the statistics, we need to understand a core building block: the spatial lag. With that concept under the belt, we are in a position to build a good understanding of global spatial autocorrelation. We will gently enter it with the binary case, when observations can only take two (potentially categorical) values, before we cover the two workhorses of the continuous case: the Moran Plot and Moran’s I.</p>
 <section id="spatial-lag">
-<h3>Spatial lag<a class="headerlink" href="#spatial-lag" title="Permalink to this headline">#</a></h3>
+<h3>Spatial lag<a class="headerlink" href="#spatial-lag" title="Permalink to this heading">#</a></h3>
 <p>The spatial lag operator is one of the most common and direct applications of spatial weights matrices (called <span class="math notranslate nohighlight">\(\textbf{W}\)</span> formally) in spatial analysis. The mathematical definition is the product of <span class="math notranslate nohighlight">\(\textbf{W}\)</span> and the vector of a given variable. Conceptually, the spatial lag captures the behavior of a variable in the immediate surroundings of each location; in that respect, it is akin to a local smoother of a variable.</p>
 <p>We can formally express it in matrix notation as:</p>
 <div class="math notranslate nohighlight">
@@ -752,7 +753,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <p>The stark differences on the left between immediate neighbors (as in the case of Liverpool, in the NW of England) are diminished in the map on the right. Thus, as discussed above, the spatial lag can also smooth out the differences between nearby observations.</p>
 </section>
 <section id="binary-case-join-counts">
-<h3>Binary case: join counts<a class="headerlink" href="#binary-case-join-counts" title="Permalink to this headline">#</a></h3>
+<h3>Binary case: join counts<a class="headerlink" href="#binary-case-join-counts" title="Permalink to this heading">#</a></h3>
 <p>The spatial lag plays an important role in quantifying spatial autocorrelation. Using it, we can begin to relate the behavior of a variable at a given location to its pattern in the immediate neighborhood. Measures of global spatial autocorrelation will then use each observation to construct overall measures about the general trend in a given dataset.</p>
 <p>Our first dip into these measures considers a simplified case: binary values. This occurs when the variable we are interested in only takes two values. In this context, we are interested in whether a given observation is surrounded by others within the same category. For example, returning to our dataset, we want to assess the extent to which local authorities who voted to Leave tend to be surrounded by others who also voted to leave. To proceed, let us first calculate a binary variable (<code class="docutils literal notranslate"><span class="pre">Leave</span></code>) that indicates 1 if the local authority voted to leave, and zero otherwise:</p>
 <div class="cell docutils container">
@@ -1011,7 +1012,7 @@ y_{sl-i} = \sum_j w_{ij} y_j
 <p>These results point to a clear presence of positive spatial autocorrelation, as there are a lot more joins of pairs in the same category than one would expect (<code class="docutils literal notranslate"><span class="pre">p_sim_bb</span></code>) and significantly less of opposite joins (<code class="docutils literal notranslate"><span class="pre">p_sim_bw</span></code>). We will discuss the generation of the pseudo-<span class="math notranslate nohighlight">\(p\)</span>-values in more detail in the next section.</p>
 </section>
 <section id="continuous-case-moran-plot-and-moran-s-i">
-<h3>Continuous case: Moran Plot and Moran’s I<a class="headerlink" href="#continuous-case-moran-plot-and-moran-s-i" title="Permalink to this headline">#</a></h3>
+<h3>Continuous case: Moran Plot and Moran’s I<a class="headerlink" href="#continuous-case-moran-plot-and-moran-s-i" title="Permalink to this heading">#</a></h3>
 <p>Once we have built some intuition around how spatial autocorrelation can be
 formally assessed in the binary case, let us move to situations where the
 variable of interest does not only take two values, but is instead continuous.
@@ -1109,10 +1110,10 @@ I = \dfrac{n}{\sum_i\sum_j w_{ij}} \dfrac{\sum_i\sum_j w_{ij} \, z_i \, z_j}{\su
 <p>On the left panel we can see in grey the empirical distribution generated from simulating 999 random maps with the values of the <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code> variable and then calculating Moran’s I for each of those maps. The blue rug signals the mean. In contrary, the red rug shows Moran’s I calculated for the variable using the geography observed in the dataset. It is clear the value under the observed pattern is significantly higher than under randomness. This insight is confirmed on the right panel, which shows an equivalent plot to the Moran Scatterplot we created above.</p>
 </section>
 <section id="other-global-indices">
-<h3>Other global indices<a class="headerlink" href="#other-global-indices" title="Permalink to this headline">#</a></h3>
+<h3>Other global indices<a class="headerlink" href="#other-global-indices" title="Permalink to this heading">#</a></h3>
 <p>Moran’s I is probably the most widely used statistic for global spatial autocorrelation; however, it is not the only one. In this final part of the chapter, we introduce two additional measures that are common in applied work. Although they all consider spatial autocorrelation, they differ in how the concept is tackled in the specification of each test.</p>
 <section id="geary-s-c">
-<h4>Geary’s C<a class="headerlink" href="#geary-s-c" title="Permalink to this headline">#</a></h4>
+<h4>Geary’s C<a class="headerlink" href="#geary-s-c" title="Permalink to this heading">#</a></h4>
 <p>The contiguity ratio <span class="math notranslate nohighlight">\(c\)</span>, proposed by <span id="id7">[<a class="reference internal" href="references.html#id26" title="Robert C Geary. The contiguity ratio and statistical mapping. The incorporated statistician, 5(3):115–146, 1954.">Gea54</a>]</span>, is given by:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -1159,7 +1160,7 @@ C = \dfrac{(n-1)}
 <p>In this case, Geary’s C points in the same direction as Moran’s I: there is clear indication that the statistic we calculate on the observed dataset is different from what would be expected in a situation of pure spatial randomness. Hence, from this analysis, we can also conclude spatial autocorrelation is present.</p>
 </section>
 <section id="getis-and-ord-s-g">
-<h4>Getis and Ord’s G<a class="headerlink" href="#getis-and-ord-s-g" title="Permalink to this headline">#</a></h4>
+<h4>Getis and Ord’s G<a class="headerlink" href="#getis-and-ord-s-g" title="Permalink to this heading">#</a></h4>
 <p>Originally proposed by <span id="id8">[<a class="reference internal" href="references.html#id28" title="Arthur Getis and JK Ord. The analysis of spatial association by use of distance statistics. Geographical Analysis, 24(3):189–206, 1992.">GO92</a>]</span>, the <span class="math notranslate nohighlight">\(G\)</span> is the global version of a family of statistics of spatial autocorrelation based on distance. The <span class="math notranslate nohighlight">\(G\)</span> class of statistics is conceived for points, hence the use of a distance <span class="math notranslate nohighlight">\(W\)</span>, but it can also be applied to polygon data if a binary spatial weights matrix can be constructed. Additionally, it is designed for the study of positive variables with a natural origin. The <span class="math notranslate nohighlight">\(G\)</span> can be expressed as follows:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -1220,7 +1221,7 @@ G(d) = \dfrac{ \sum_i \sum_j w_{ij}(d) \, y_i \, y_j }
 </section>
 </section>
 <section id="questions">
-<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">#</a></h2>
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this heading">#</a></h2>
 <ol class="arabic">
 <li><p>Return to the original <code class="docutils literal notranslate"><span class="pre">ref</span></code> table and pull out the <code class="docutils literal notranslate"><span class="pre">Pct_Rejected</span></code>
 variable. Let us explore patterns in rejected votes:
@@ -1264,7 +1265,7 @@ mean for the use and interpretation of both statistics?</p></li>
 </ol>
 </section>
 <section id="next-steps">
-<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">#</a></h2>
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this heading">#</a></h2>
 <p>For a timeless conceptual overview to the approaches of spatial data analysis, consult <span id="id9">[<a class="reference internal" href="references.html#id58" title="Luc Anselin. What is special about spatial data? alternative perspectives on spatial data analysis (89-4). National Center for Geographic Information and Analysis, University of California Santa Barbara, 1989.">Ans89</a>]</span>:</p>
 <p>“What is special about spatial data? Alternative perspectives on spatial data analysis.” UC Santa Barbara: National Center for Geographic Information and Analysis.</p>
 <p>The GIS body of knowledge represents a large set of collected knowledge by geographers across many different domains. Thus, the GISBoK, as it’s called, has a very good introductory discussion of global measures of spatial association, too. <span id="id10">[<a class="reference internal" href="references.html#id90" title="AM Wu, KK Kemp, and JP Wilson. Global measures of spatial association. The geographic information science &amp; technology body of knowledge, 1st ed., UCGIS, New York, USA. DOI, 2019.">WKW19</a>]</span>:</p>

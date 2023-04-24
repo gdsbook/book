@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 
 
-<html >
+<html lang="en" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Point Pattern Analysis &#8212; Geographic Data Science with Python</title>
   
@@ -45,6 +45,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
@@ -78,7 +79,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="Overview" href="../intro_part_iii.html" />
     <link rel="prev" title="Local Spatial Autocorrelation" href="07_local_autocorrelation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="None"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
   
   
@@ -444,11 +445,11 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="point-pattern-analysis">
-<h1>Point Pattern Analysis<a class="headerlink" href="#point-pattern-analysis" title="Permalink to this headline">#</a></h1>
+<h1>Point Pattern Analysis<a class="headerlink" href="#point-pattern-analysis" title="Permalink to this heading">#</a></h1>
 <p>Points are spatial entities that can be understood in two fundamentally different ways. On the one hand, points can be seen as fixed objects in space, which is to say their location is taken as given (<em>exogenous</em>). In this interpretation, the location of an observed point is considered as secondary to the value observed at the point. Think of this like measuring the number of cars traversing a given road intersection; the location is fixed, and the data of interest comes from the measurement taken at that location. The analysis of this kind of point data is very similar to that of other types of spatial data such as polygons and lines. On the other hand, an observation occurring at a point can also be thought of as a site of measurement from an underlying geographically-continuous process. In this case, the measurement could theoretically take place anywhere, but was only carried out or conducted in certain locations. Think of this as measuring the length of birds’ wings: the location at which birds are measured reflects the underlying geographical process of bird movement and foraging, and the length of the birds’ wings may reflect an underlying ecological process that varies by bird. This kind of approach means that both the location and the measurement matter. This is the perspective we will adopt in the rest of the chapter.</p>
 <p>When points are seen as events that could take place in several locations but only happen in a few of them, a collection of such events is called a <em>point pattern</em>. In this case, the location of points is one of the key aspects of interest for analysis. A good example of a point pattern is geo-tagged photographs: they could technically happen in many locations, but we usually find photos tend to concentrate only in a handful of them. Point patterns can be <em>marked</em>, if more attributes are provided with the location, or <em>unmarked</em>, if only the coordinates of where the event occurred are provided. Continuing the photo example, an unmarked pattern would result if only the location where the photos are taken is used for analysis; while we would be speaking of a marked point pattern if other attributes, such as the time, camera model, or a “image quality score” was provided with the location.</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h2>
 <p>Point pattern analysis is thus concerned with the visualization, description, statistical characterization, and modeling of point patterns, trying to understand the generating process that gives rise and explains the observed data. Common questions in this domain include:</p>
 <ul class="simple">
 <li><p><em>What does the pattern look like?</em></p></li>
@@ -460,7 +461,7 @@ document.write(`
 <p>In this chapter, we provide an introduction to point patterns through geo-tagged Flickr photos from Tokyo. We will treat the phenomena represented in the data as events: photos could be taken of any place in Tokyo, but only certain locations are captured. Keep in mind this understanding of Tokyo photos is not immutable: one could conceive cases where it makes sense to take those locations as given and look at the properties of each of them ignoring their “event” aspect. However, in this context, we will focus on those questions that relate to location and the collective shape of locations. The use of these tools will allow us to transform a long list of unintelligible XY coordinates into tangible phenomena with a characteristic spatial structure, and to answer questions about the center, dispersion, and clustering of attractions in Tokyo for Flickr users.</p>
 </section>
 <section id="patterns-in-tokyo-photographs">
-<h2>Patterns in Tokyo photographs<a class="headerlink" href="#patterns-in-tokyo-photographs" title="Permalink to this headline">#</a></h2>
+<h2>Patterns in Tokyo photographs<a class="headerlink" href="#patterns-in-tokyo-photographs" title="Permalink to this heading">#</a></h2>
 <p>The rise of new forms of data such as geo-tagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why do certain places attract many more photographers than others? All these questions and more become more than just rhetorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, <span id="id1">[<a class="reference internal" href="references.html#id31" title="Michael F Goodchild. Citizens as sensors: the world of volunteered geography. GeoJournal, 69(4):211–221, 2007.">Goo07</a>]</span>). In this chapter we will explore metadata from a sample of geo-referenced images uploaded to <a class="reference external" href="https://www.flickr.com/">Flickr</a> and extracted thanks to the <a class="reference external" href="https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&amp;did=67">100m Flickr dataset</a>. In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern.</p>
 <p>To get started, let’s load the packages we will need in this example.</p>
 <div class="cell docutils container">
@@ -514,10 +515,10 @@ memory usage: 547.0+ KB
 <p>Note that the data is provided as a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file, so the spatial information is encoded as separate columns, one for each coordinate. This is in contrast to how we have consumed spatial data in previous chapters, where spatial information was stored in a single column and encoded in geometry objects.</p>
 </section>
 <section id="visualizing-point-patterns">
-<h2>Visualizing point patterns<a class="headerlink" href="#visualizing-point-patterns" title="Permalink to this headline">#</a></h2>
+<h2>Visualizing point patterns<a class="headerlink" href="#visualizing-point-patterns" title="Permalink to this heading">#</a></h2>
 <p>There are many ways to visualize geographic point patterns, and the choice of method depends on the intended message.</p>
 <section id="showing-patterns-as-dots-on-a-map">
-<h3>Showing patterns as dots on a map<a class="headerlink" href="#showing-patterns-as-dots-on-a-map" title="Permalink to this headline">#</a></h3>
+<h3>Showing patterns as dots on a map<a class="headerlink" href="#showing-patterns-as-dots-on-a-map" title="Permalink to this heading">#</a></h3>
 <p>The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatterplot with <code class="docutils literal notranslate"><span class="pre">seaborn</span></code> in Figure 1:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -553,7 +554,7 @@ memory usage: 547.0+ KB
 <p>Note how we can pull out the axis where the points are plotted and add the basemap there, specifying the CRS as WGS84, since we are plotting longitude and latitude. Compared to the previous plot, adding a basemap to our initial plot makes the pattern of Flickr data clearer.</p>
 </section>
 <section id="showing-density-with-hexbinning">
-<h3>Showing density with hexbinning<a class="headerlink" href="#showing-density-with-hexbinning" title="Permalink to this headline">#</a></h3>
+<h3>Showing density with hexbinning<a class="headerlink" href="#showing-density-with-hexbinning" title="Permalink to this heading">#</a></h3>
 <p>Consider our second problem: cluttering. When too many photos are concentrated in some areas, plotting opaque dots on top of one another can make it hard to discern any pattern and explore its nature. For example, in the middle of the map in Figure 3, toward the right, there appears to be the highest concentration of pictures taken; the sheer amount of dots on the maps in some parts obscures whether all of that area receives as many pics or whether, within there, some places receive a particularly high degree of attention.</p>
 <p>One solution to get around cluttering relates to what we referred to earlier as moving from <span class="xref std std-ref">“tables to surfaces”</span>. We can now recast this approach as a <em>spatial</em> or <em>two-dimensional histogram</em>. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleth maps may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin two-dimensional histogram is straightforward in Python using the <code class="docutils literal notranslate"><span class="pre">hexbin</span></code> function to create Figure 3:</p>
 <div class="cell docutils container">
@@ -589,7 +590,7 @@ memory usage: 547.0+ KB
 <p>Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localized areas, and that the previous map was obscuring this.</p>
 </section>
 <section id="another-kind-of-density-kernel-density-estimation">
-<h3>Another kind of density: kernel density estimation<a class="headerlink" href="#another-kind-of-density-kernel-density-estimation" title="Permalink to this headline">#</a></h3>
+<h3>Another kind of density: kernel density estimation<a class="headerlink" href="#another-kind-of-density-kernel-density-estimation" title="Permalink to this heading">#</a></h3>
 <p>Grids are the spatial equivalent of a histogram: the user decides how many “buckets”, and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g., the modifiable areal unit problem <span id="id2">[<a class="reference internal" href="references.html#id4" title="David W. S. Wong. The Modifiable Areal Unit Problem (MAUP). In Donald G. Janelle, Barney Warf, and Kathy Hansen, editors, WorldMinds: Geographical Perspectives on 100 Problems: Commemorating the 100th Anniversary of the Association of American Geographers 1904–2004, pages 571–575. Springer Netherlands, Dordrecht, 2004. doi:10.1007/978-1-4020-2352-1_93.">Won04</a>]</span>). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g., <span id="id3">[<a class="reference internal" href="references.html#id53" title="Bernard W Silverman. Density estimation for statistics and data analysis. Volume 26. CRC press, 1986.">Sil86</a>]</span>), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with a different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel map in Python is rather straightforward, using the <code class="docutils literal notranslate"><span class="pre">seaborn.kdeplot()</span></code> function to create Figure 4:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -624,10 +625,10 @@ memory usage: 547.0+ KB
 </section>
 </section>
 <section id="centrography">
-<h2>Centrography<a class="headerlink" href="#centrography" title="Permalink to this headline">#</a></h2>
+<h2>Centrography<a class="headerlink" href="#centrography" title="Permalink to this heading">#</a></h2>
 <p>Centrography is the analysis of centrality in a point pattern. By “centrality,” we mean the general location and dispersion of the pattern. If the hexbin above can be seen as a “spatial histogram”, centrography is the point pattern equivalent of measures of central tendency such as the mean. These measures are useful because they allow us to summarize spatial distributions in smaller sets of information (e.g., a single point). Many different indices are used in centrography to provide an indication of “where” a point pattern is, how tightly the point pattern clusters around its center, or how irregular its shape is.</p>
 <section id="tendency">
-<h3>Tendency<a class="headerlink" href="#tendency" title="Permalink to this headline">#</a></h3>
+<h3>Tendency<a class="headerlink" href="#tendency" title="Permalink to this heading">#</a></h3>
 <p>A common measure of central tendency for a point pattern is its <em>center of mass</em>. For marked point patterns, the center of mass identifies a central point close to observations that have higher values in their marked attribute. For unmarked point patterns, the center of mass is equivalent to the <em>mean center</em>, or average of the coordinate values. In addition, the <em>median center</em> is analogous to the <em>median</em> elsewhere, and represents a point where half of the data is above or below the point and half is to its left or right. We can analyze the mean center with our Flickr point pattern using the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package in Python.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -687,7 +688,7 @@ memory usage: 547.0+ KB
 <p>The discrepancy between the two centers is caused by the skew; there are many “clusters” of pictures far out in West and South Tokyo, whereas North and East Tokyo is densely packed, but drops off very quickly. Thus, the far out clusters of pictures pulls the mean center to the west and south, relative to the median center.</p>
 </section>
 <section id="dispersion">
-<h3>Dispersion<a class="headerlink" href="#dispersion" title="Permalink to this headline">#</a></h3>
+<h3>Dispersion<a class="headerlink" href="#dispersion" title="Permalink to this heading">#</a></h3>
 <p>A measure of dispersion that is common in centrography is the <em>standard distance</em>. This measure provides the average distance away from the center of the point cloud (such as measured by the center of mass). This is also simple to compute using <code class="docutils literal notranslate"><span class="pre">pointpats</span></code>, using the <code class="docutils literal notranslate"><span class="pre">std_distance</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -755,7 +756,7 @@ memory usage: 547.0+ KB
 </div>
 </section>
 <section id="extent">
-<h3>Extent<a class="headerlink" href="#extent" title="Permalink to this headline">#</a></h3>
+<h3>Extent<a class="headerlink" href="#extent" title="Permalink to this heading">#</a></h3>
 <p>The last collection of centrography measures we will discuss characterizes the extent of a point cloud. Four shapes are useful, and they reflect varying levels of how “tightly” they bind the pattern.</p>
 <p>Below, we’ll walk through how to construct each example and visualize all of them together at the end. To make things more clear, we’ll use the Flickr photos for the most prolific user in the dataset (ID: <code class="docutils literal notranslate"><span class="pre">95795770</span></code>) to show how different these results can be.</p>
 <div class="cell docutils container">
@@ -984,7 +985,7 @@ memory usage: 547.0+ KB
 </section>
 </section>
 <section id="randomness-and-clustering">
-<h2>Randomness and clustering<a class="headerlink" href="#randomness-and-clustering" title="Permalink to this headline">#</a></h2>
+<h2>Randomness and clustering<a class="headerlink" href="#randomness-and-clustering" title="Permalink to this heading">#</a></h2>
 <p>Beyond questions of centrality and extent, spatial statistics on point patterns are often concerned with how <em>even</em> a distribution of points is. By this, we mean whether points tend to all cluster near one another or disperse evenly throughout the problem area. Questions like this refer to the <em>intensity</em> or <em>dispersion</em> of the point pattern overall. In the jargon of the last two chapters, this focus resembles the goals we examined when we introduced <a class="reference internal" href="06_spatial_autocorrelation.html"><span class="doc std std-doc">global spatial autocorrelation</span></a>: what is the overall degree of <em>clustering</em> we observe in the pattern? Spatial statistics has devoted plenty of effort to understand this kind of clustering. This section will cover methods useful for identifying clustering in point patterns.</p>
 <p>The first set of techniques, <strong>quadrat</strong> statistics, receive their name after their approach to split the data up into small areas (quadrants). Once created, these “buckets” are used to examine the uniformity of counts across them. The second set of techniques all derive from Ripley (1988) and involve measurements of the distance between points in a point pattern.</p>
 <div class="cell docutils container">
@@ -1062,7 +1063,7 @@ memory usage: 547.0+ KB
 </div>
 </div>
 <section id="quadrat-statistics">
-<h3>Quadrat statistics<a class="headerlink" href="#quadrat-statistics" title="Permalink to this headline">#</a></h3>
+<h3>Quadrat statistics<a class="headerlink" href="#quadrat-statistics" title="Permalink to this heading">#</a></h3>
 <p>Quadrat statistics examine the spatial distribution of points in an area in terms of the count of observations that fall within a given cell. By examining whether observations are spread <em>evenly</em> over cells, the quadrat approach aims to estimate whether points are spread out, or if they are clustered into a few cells. Strictly speaking, quadrat statistics examine the <em>evenness</em> of the distribution over cells using a <span class="math notranslate nohighlight">\(\chi^2\)</span> statistical test common in the analysis of contingency tables.</p>
 <p>In the <code class="docutils literal notranslate"><span class="pre">pointpats</span></code> package, you can visualize the results using the following <code class="docutils literal notranslate"><span class="pre">QStatistic.plot()</span></code> method. This shows the grid used to count the events, as well as the underlying pattern, shown in Figure 11:</p>
 <div class="cell docutils container">
@@ -1142,7 +1143,7 @@ memory usage: 547.0+ KB
 <p>Thus, quadrat counts can have issues with irregular study areas, and care should be taken to ensure that clustering is not mistakenly identified. One way to interpret the quadrat statistic that reconciles cases like the one above is to think of it as a test that considers both the uniformity of points <em>and</em> the shape of their extent to examine whether the resulting pattern is uniform across a regular grid. In some cases, this is a useful tool; in others, this needs to be used with caution.</p>
 </section>
 <section id="ripley-s-alphabet-of-functions">
-<h3>Ripley’s alphabet of functions<a class="headerlink" href="#ripley-s-alphabet-of-functions" title="Permalink to this headline">#</a></h3>
+<h3>Ripley’s alphabet of functions<a class="headerlink" href="#ripley-s-alphabet-of-functions" title="Permalink to this heading">#</a></h3>
 <p>The second group of spatial statistics we consider focuses on the distributions of two quantities in a point pattern: nearest neighbor distances and what we will term “gaps” in the pattern. They derive from seminal work by <span id="id4">[<a class="reference internal" href="references.html#id50" title="Brian D Ripley. Statistical inference for spatial processes. Cambridge University Press, 1991.">Rip91</a>]</span> on how to characterize clustering or co-location in point patterns. Each of these characterizes an aspect of the point pattern as we increase the distance range from each point to calculate them.</p>
 <p>The first function, Ripley’s <span class="math notranslate nohighlight">\(G\)</span>, focuses on the distribution of nearest neighbor distances. That is, the <span class="math notranslate nohighlight">\(G\)</span> function summarizes the distances between each point in the pattern and its nearest neighbor. In Figure 14, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are <em>mutual</em> nearest neighbors (and so have arrows going in both directions), but some are not.</p>
 <div class="cell tag_hide-input docutils container">
@@ -1345,7 +1346,7 @@ memory usage: 547.0+ KB
 </section>
 </section>
 <section id="identifying-clusters">
-<h2>Identifying clusters<a class="headerlink" href="#identifying-clusters" title="Permalink to this headline">#</a></h2>
+<h2>Identifying clusters<a class="headerlink" href="#identifying-clusters" title="Permalink to this heading">#</a></h2>
 <p>The previous two sections on exploratory spatial analysis of point patterns provide methods to characterize whether point patterns are dispersed or clustered in space. Another way to see the content in those sections is that they help us explore the degree of overall <em>clustering</em>. However, knowing that a point pattern is clustered does not necessarily give us information about where that (set of) cluster(s) resides. To do this, we need to switch to a method able to identify areas of high density of points within our pattern. In other words, in this section we focus on the existence and location of <em>clusters</em>. This distinction between cluster<em>ing</em> and cluster<em>s</em> of points is analogue to that discussed in the context of spatial autocorrelation (Chapters <a class="reference internal" href="06_spatial_autocorrelation.html"><span class="doc std std-doc">6</span></a> and <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">7</span></a>). The notion is the same, the differences in the techniques we examine in each part of the book relate to the unique nature of points we referred to in the beginning of the book. Remember that, while the methods we explored in the earlier chapters take the location of the spatial objects (points, lines, polygons) as given and focus on understanding the configurations of values within those locations, the methods discussed in this chapter understand points as events that happen in particular locations but that could happen in a much broader set of places. Factoring in this underlying relevance of the location of an object itself is what makes the techniques in this chapter distinct.</p>
 <p>From the many spatial point clustering algorithms, we will cover one called DBSCAN (Density-Based Spatial Clustering of Applications) <span id="id6">[<a class="reference internal" href="references.html#id72" title="Martin Ester, Hans-Peter Kriegel, Jörg Sander, Xiaowei Xu, and others. A density-based algorithm for discovering clusters in large spatial databases with noise. In Kdd, volume 96, 226–231. 1996.">EKS+96</a>]</span>. DBSCAN is a widely used algorithm that originated in the area of knowledge discovery and machine learning and that has since spread into many areas, including the analysis of spatial points. In part, its popularity resides in its intellectual simplicity and computational tractability. In some ways, we can think of DBSCAN as a point pattern counterpart of the local statistics we explored in <a class="reference internal" href="07_local_autocorrelation.html"><span class="doc std std-doc">Chapter 7</span></a>. They do, however, differ in fundamental ways. Unlike the local statistics we have seen earlier, DBSCAN is not based on an inferential framework, but it is instead a deterministic algorithm. This implies that, unlike the measures seen before, we will not be able to estimate a measure of the degree to which the clusters found are compatible with cases of spatial randomness.</p>
 <p>From the point of view of DBSCAN, a cluster is a concentration of at least <code class="docutils literal notranslate"><span class="pre">m</span></code> points, each of them within a distance of <code class="docutils literal notranslate"><span class="pre">r</span></code> of at least another point in the cluster. Following this definition, the algorithm classifies each point in our pattern into three categories:</p>
@@ -1495,11 +1496,11 @@ memory usage: 547.0+ KB
 </div>
 </section>
 <section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">#</a></h2>
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">#</a></h2>
 <p>Overall, this chapter has provided an overview of methods to analyze point patterns. We have begun our point journey by visualizing their location and learning a way to overcome the “cluttering” challenge that large point patterns present us with. From a graphical display, we have moved to statistical characterization of their spatial distribution. In this context, we have learned about central tendency dispersion and extent, and we have positioned these measures as the point pattern counterparts of traditional statistics such as the mean or the standard deviation. These measures provide a summary of an entire pattern, but they tell us little about the spatial organization of each point. To that end, we have introduced the quadrat and Ripley’s functions. These statistical devices help us in characterizing whether a point pattern is spatially clustered or dispersed. We have wrapped up the chapter going one step further and exploring methods to identify the location of clusters: areas of the map with high density of points. Taken altogether, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about point patterns that represent widely varied phenomena in the world, from the location where photographs were taken, to the distribution of bird nests, to the clustering of bike crashes in a city.</p>
 </section>
 <section id="questions">
-<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">#</a></h2>
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>What is the trade-off when picking the hexagon granularity when “hexbinning”? Put another way, can we pick a “good” number of bins for all problems? If not, how would you recommend to select a specific number of bins?</p></li>
 <li><p>Kernel Density Estimation (KDE) gets around the need to partition space in “buckets” to count points inside each of them. But, can you think of the limitations of applying this technique? To explore them, reproduce the KDE map from Figure 4, but change the arguments of the type of kernel (<code class="docutils literal notranslate"><span class="pre">kernel</span></code>) and the size of the bandwidth (<code class="docutils literal notranslate"><span class="pre">bw</span></code>). Consult the documentation of <code class="docutils literal notranslate"><span class="pre">seaborn.kdeplot</span></code> to learn what each of them controls. What happens when the bandwidth is very small? How does that relate to the number of bins in the hexbin plot?</p></li>
@@ -1511,7 +1512,7 @@ memory usage: 547.0+ KB
 </ol>
 </section>
 <section id="next-steps">
-<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">#</a></h2>
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this heading">#</a></h2>
 <p>For a much deeper and conceptual discussion of the analysis of spatial point patterns, consult Baddeley, Rubak and Turner. Their coverage is often the canonical resource for people interested in this topic:</p>
 <p>Baddeley, Adrian, Ege Rubak, and Rolf Turner. 2015. <em>Spatial Point Patterns: Methodology and Applications with R</em>. Boca Raton, FL: CRC Press.</p>
 </section>

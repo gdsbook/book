@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 
 
-<html >
+<html lang="en" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Local Spatial Autocorrelation &#8212; Geographic Data Science with Python</title>
   
@@ -45,6 +45,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
@@ -78,7 +79,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="Point Pattern Analysis" href="08_point_pattern_analysis.html" />
     <link rel="prev" title="Global Spatial Autocorrelation" href="06_spatial_autocorrelation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="None"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
   
   
@@ -429,7 +430,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="local-spatial-autocorrelation">
-<h1>Local Spatial Autocorrelation<a class="headerlink" href="#local-spatial-autocorrelation" title="Permalink to this headline">#</a></h1>
+<h1>Local Spatial Autocorrelation<a class="headerlink" href="#local-spatial-autocorrelation" title="Permalink to this heading">#</a></h1>
 <p>In the previous chapter, we explored how global measures of spatial autocorrelation can help us determine whether the overall spatial distribution of our phenomenon of interest is compatible with a geographically random process. These statistics are useful: the presence of spatial autocorrelation has important implications for subsequent statistical analysis. From a substantive perspective, spatial autocorrelation could reflect the operation of processes that generate association between the values in nearby locations. This could represent <em>spillovers</em>, where outcomes at one site influence other sites; or it could indicate <em>contagion</em>, where outcomes at one site <em>causally influence</em> other sites. As we will see later in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>, it could simply be the result of systematic spatial variation (or, as we will call it then, <em>heterogeneity</em>). Spatial autocorrelation also sometimes arises from data measurement and processing. In this case, the dependence is a form of non-random noise rather than due to substantive processes. For example, when “down-sampling” geographic data, sometimes large patches of identical values can be created. These may only be artifacts of the interpolation, rather than substantive autocorrelation. Regardless of whether the spatial autocorrelation is due to substantive or nuisance sources, it is a form of non-randomness that complicates statistical analysis. For these reasons, the ability to determine whether spatial autocorrelation is present in a geographically referenced data set is a critical component of the geographic data science toolbox.</p>
 <p>Despite their importance, global measures of spatial autocorrelation are “whole map” statistics. They provide a single summary for an entire data set. For example,
 Moran’s <span class="math notranslate nohighlight">\(I\)</span> is a good tool to summarize a dataset into a single value that captures the degree of geographical clustering (or dispersion, if negative). However, Moran’s <span class="math notranslate nohighlight">\(I\)</span> does not indicate areas within the map where specific types of values (e.g., high, low) are clustered, or instances of explicit dispersion.
@@ -437,7 +438,7 @@ In other words, Moran’s I can tell us whether values in our map <em>cluster</e
 <p>In this chapter, we introduce local measures of spatial autocorrelation.
 Local measures of spatial autocorrelation focus on the relationships between <em>each</em> observation and its surroundings, rather than providing a single summary of these relationships across the map. In this sense, they are not summary statistics but scores that allow us to learn more about the spatial structure in our data. The general intuition behind the metrics however is similar to that of global ones. Some of them are even mathematically connected, where the global version can be decomposed into a collection of local ones. One such example are Local Indicators of Spatial Association (LISAs) <span id="id1">[<a class="reference internal" href="references.html#id2" title="Luc Anselin. Local indicators of spatial association-LISA. Geographical Analysis, 27:93–115, 1995.">Ans95</a>]</span>, which we use to build the understanding of local spatial autocorrelation, and on which we spend a good part of the chapter. Once such concepts are clarified, we introduce a couple of alternative statistics that present complementary information or allow us to obtain similar insights for categorical data. Although very often these statistics are used with data expressed in geo-tables, there is nothing fundamentally connecting the two. In fact, the application of these methods to large surfaces is a promising area of work. For that reason, we close the chapter with an illustration of how one can run these statistics on data stored as surfaces.</p>
 <section id="an-empirical-illustration-the-eu-referendum">
-<h2>An empirical illustration: the EU Referendum<a class="headerlink" href="#an-empirical-illustration-the-eu-referendum" title="Permalink to this headline">#</a></h2>
+<h2>An empirical illustration: the EU Referendum<a class="headerlink" href="#an-empirical-illustration-the-eu-referendum" title="Permalink to this heading">#</a></h2>
 <p>We continue with the same dataset about Brexit voting that we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -554,7 +555,7 @@ memory usage: 22.9+ KB
 </div>
 </section>
 <section id="motivating-local-spatial-autocorrelation">
-<h2>Motivating local spatial autocorrelation<a class="headerlink" href="#motivating-local-spatial-autocorrelation" title="Permalink to this headline">#</a></h2>
+<h2>Motivating local spatial autocorrelation<a class="headerlink" href="#motivating-local-spatial-autocorrelation" title="Permalink to this heading">#</a></h2>
 <p>To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardized form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -617,7 +618,7 @@ memory usage: 22.9+ KB
 </div>
 </section>
 <section id="local-moran-s-i-i">
-<h2>Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span><a class="headerlink" href="#local-moran-s-i-i" title="Permalink to this headline">#</a></h2>
+<h2>Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span><a class="headerlink" href="#local-moran-s-i-i" title="Permalink to this heading">#</a></h2>
 <p>One way to look at the figure above is as a classification of each observation in the dataset depending on its value and that of its neighbors. Furthermore, this classification is exhaustive: every point is assigned a label. But remember local measures help us to identify areas of <em>unusual</em> concentration of values. Clusters will represent values of one type that are <em>unlikely</em> to appear under the assumption of spatial randomness. To know whether each location belongs to a <em>statistically significant</em> cluster of a given kind, we thus need to compare it with what we would expect if the data were allocated over space in a completely random way. However, what we are interested in is whether the strength with which the values are concentrated is unusually high. This is exactly what LISAs are designed to do. A detailed description of the statistical underpinnings of LISAs is beyond the scope of this chapter. If you would like to delve deeper into the math and probability challenges arising, a good recent reference is <span id="id2">[<a class="reference internal" href="references.html#id3" title="Jeffery Sauer, Taylor Oshan, Sergio Rey, and Levi John Wolf. The importance of null hypotheses: understanding differences in local moranâ€™s under heteroskedasticity. Geographical Analysis, n/a(n/a):, 2021. URL: https://onlinelibrary.wiley.com/doi/abs/10.1111/gean.12304, arXiv:https://onlinelibrary.wiley.com/doi/pdf/10.1111/gean.12304, doi:https://doi.org/10.1111/gean.12304.">SORW21</a>]</span>. In this context, we will provide some intuition about how they work in one LISA statistic, the local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span>.</p>
 <p>The core idea of a local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> is to identify cases in which the value of an observation and the average of its surroundings is either more similar (HH or LL in the scatterplot from Figure 3) or dissimilar (HL, LH) than we would expect from pure chance. The mechanism to do this is similar to the one in the global Moran’s I, but it is applied in this case to each observation. This results in as many statistics as original observations. The formal representation of the statistic can be written as:</p>
 <div class="math notranslate nohighlight">
@@ -1008,7 +1009,7 @@ Name: labels, dtype: int64
 <p>This shows, for one, that most local statistics are <em>not</em> statistically significant. Among those that are, we see many more hotspots/coldspots than doughnuts/diamonds-in-the-rough. This is consistent with the skew we saw in the distribution of local statistics earlier.</p>
 </section>
 <section id="getis-and-ord-s-local-statistics">
-<h2>Getis and Ord’s local statistics<a class="headerlink" href="#getis-and-ord-s-local-statistics" title="Permalink to this headline">#</a></h2>
+<h2>Getis and Ord’s local statistics<a class="headerlink" href="#getis-and-ord-s-local-statistics" title="Permalink to this heading">#</a></h2>
 <p>Similar to the global case, there are more local indicators of spatial correlation than the local Moran’s I. <code class="docutils literal notranslate"><span class="pre">esda</span></code> includes Getis and Ord’s <span class="math notranslate nohighlight">\(G_i\)</span>-type statistics. These are a different kind of local statistic that are commonly used in two forms: the <span class="math notranslate nohighlight">\(G_i\)</span> statistic, which omits the value at a site in its local summary, and the <span class="math notranslate nohighlight">\(G_i^*\)</span>, which includes the site’s own value in the local summary. The way to calculate them also follows similar patterns as with the Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistics above. Let us see how that would look like for our Brexit example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1216,7 +1217,7 @@ In a future release, GeoPandas will switch to using Shapely by default. If you a
 <p>In this case, the results are virtually the same for <span class="math notranslate nohighlight">\(G_i\)</span> and <span class="math notranslate nohighlight">\(G_i^*\)</span>. Also, at first glance, these maps appear to be visually similar to the final LISA map from above. Naturally, this leads to the question: <em>why use the <span class="math notranslate nohighlight">\(G_i\)</span> statistics at all?</em> The answer to this question is that the two sets of local statistics, local <span class="math notranslate nohighlight">\(I\)</span> and local <span class="math notranslate nohighlight">\(G_i\)</span>, are complementary statistics. The local <span class="math notranslate nohighlight">\(I_i\)</span> statistic (on its own) gives an indication of cluster/outlier status, and the local <span class="math notranslate nohighlight">\(G_i\)</span> shows which side of the hotspot/coldspot divide the observation is on. Alternatively, the local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> cluster map provides both pieces of information, but it can be more challenging to visualize all at once. Thus, it depends on your analytical preferences and the point of the analysis at hand.</p>
 </section>
 <section id="bonus-local-statistics-on-surfaces">
-<h2>Bonus: local statistics on surfaces<a class="headerlink" href="#bonus-local-statistics-on-surfaces" title="Permalink to this headline">#</a></h2>
+<h2>Bonus: local statistics on surfaces<a class="headerlink" href="#bonus-local-statistics-on-surfaces" title="Permalink to this heading">#</a></h2>
 <p>Before we wrap up the chapter, we are going to cover an illustration that, conceptually, is very similar to the topics we have seen above but, from a technical standpoint, has a bit of a different spin. We will learn how to compute local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> on data that are stored as a surface, rather than as a geo-table (as we have seen above). As we have seen earlier in the book, more and more data for which we might want to explore local spatial autocorrelation are being provided as surfaces rather than geo-tables. The trick to follow this illustration is to realize that, despite the data structure, surfaces also provide data spatially arranged and that, as such, we can apply the battery of tools we have learned in this chapter to better understand their spatial structure.</p>
 <p>Before we start, a note of caution. The functionality required to handle LISA on surfaces is still experimental and a bit rough around the edges. This is because, unlike the case of geo-tables, it has not been a common use-case for geographic data scientists and the tooling ecosystem is not as evolved. Nevertheless, it is an exciting time to get started on this, because a lot is happening in this space, and the basic building blocks to develop a full-fledged ecosystem are already in place. For this reason, we think it is important to cover in this chapter, even though some of the code we will use below is a bit more sophisticated than what we have seen above. Be patient and do not worry if you have to read things twice (or thrice!) before they start making sense. This is getting into <em>geographic data scientist pro</em> territory!</p>
 <p>For this case, we will use the GHSL dataset that contains an extract of gridded population for the metropolitan region of Sao Paulo (Brazil). Let us read the data first into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object:</p>
@@ -1455,11 +1456,11 @@ In a future release, GeoPandas will switch to using Shapely by default. If you a
 </div>
 </section>
 <section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">#</a></h2>
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">#</a></h2>
 <p>Local statistics are one of the most commonly-used tools in the geographic data science toolkit. When used properly, local statistics provide a powerful way to analyze and visualize the structure of geographic data. The Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistic, as Local Indicator of Spatial Association, summarizes the co-variation between observations and their immediate surroundings. The Getis-Ord local <span class="math notranslate nohighlight">\(G\)</span> statistics, on the other hand, compare the sum of values in the area around each site. Regardless, learning to use local statistics effectively is important for any geographic data scientist, as they are the most common “first brush” geographic statistic for many analyses.</p>
 </section>
 <section id="questions">
-<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">#</a></h2>
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>Do the same Local Moran analysis done for <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, but using <code class="docutils literal notranslate"><span class="pre">Pct_Turnout</span></code>. Is there a geography to how involved people were in different places? Where was turnout percentage (relatively) higher or lower?</p></li>
 <li><p>Do the same Getis-Ord analysis done for <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, but using <code class="docutils literal notranslate"><span class="pre">Pct_Turnout</span></code>.</p></li>
@@ -1505,7 +1506,7 @@ In a future release, GeoPandas will switch to using Shapely by default. If you a
 </ol>
 </section>
 <section id="next-steps">
-<h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">#</a></h2>
+<h2>Next Steps<a class="headerlink" href="#next-steps" title="Permalink to this heading">#</a></h2>
 <p>For more thinking on the foundational methods and concepts in local testing, Fotheringham is a classic:</p>
 <p>Fotheringham, A. Stewart. 1997. “Trends in Quantitative Methods I: Stressing the local.” <em>Progress in Human Geography</em> 21(1): 88-96.</p>
 <p>More recent discussion on local statistics (in the context of spatial statistics more generally) is provided by Nelson:</p>

@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 
 
-<html >
+<html lang="en" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Spatial Regression &#8212; Geographic Data Science with Python</title>
   
@@ -45,6 +45,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
@@ -78,7 +79,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="Spatial Feature Engineering" href="12_feature_engineering.html" />
     <link rel="prev" title="Clustering and Regionalization" href="10_clustering_and_regionalization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="None"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
   
   
@@ -452,10 +453,10 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="spatial-regression">
-<h1>Spatial Regression<a class="headerlink" href="#spatial-regression" title="Permalink to this headline">#</a></h1>
+<h1>Spatial Regression<a class="headerlink" href="#spatial-regression" title="Permalink to this heading">#</a></h1>
 <p>Regression (and prediction more generally) provides us a perfect case to examine how spatial structure can help us understand and analyze our data. In this chapter, we discuss how spatial structure can be used to both validate and improve prediction algorithms, focusing on linear regression specifically.</p>
 <section id="what-is-spatial-regression-and-why-should-i-care">
-<h2><em>What</em> is spatial regression and <em>why</em> should I care?<a class="headerlink" href="#what-is-spatial-regression-and-why-should-i-care" title="Permalink to this headline">#</a></h2>
+<h2><em>What</em> is spatial regression and <em>why</em> should I care?<a class="headerlink" href="#what-is-spatial-regression-and-why-should-i-care" title="Permalink to this heading">#</a></h2>
 <p>Usually, spatial structure helps regression models in one of two ways.
 The first (and most clear) way space can have an impact on our data is when the process <em>generating</em> the data is itself explicitly spatial.
 Here, think of something like the prices for single family homes.
@@ -494,7 +495,7 @@ Thus, <em>regardless of whether or not the true process is explicitly geographic
 </div>
 </section>
 <section id="data-san-diego-airbnb">
-<h2>Data: San Diego Airbnb<a class="headerlink" href="#data-san-diego-airbnb" title="Permalink to this headline">#</a></h2>
+<h2>Data: San Diego Airbnb<a class="headerlink" href="#data-san-diego-airbnb" title="Permalink to this heading">#</a></h2>
 <p>To learn a little more about how regression works, we’ll examine information about Airbnb properties in San Diego, CA.
 This dataset contains house intrinsic characteristics, both continuous (number of beds as in <code class="docutils literal notranslate"><span class="pre">beds</span></code>) and categorical (type of renting or, in Airbnb jargon, property group as in the series of <code class="docutils literal notranslate"><span class="pre">pg_X</span></code> binary variables), but also variables that explicitly refer to the location and spatial configuration of the dataset (e.g., distance to Balboa Park, <code class="docutils literal notranslate"><span class="pre">d2balboa</span></code> or neighborhood id, <code class="docutils literal notranslate"><span class="pre">neighborhood_cleansed</span></code>).</p>
 <div class="cell docutils container">
@@ -526,7 +527,7 @@ This dataset contains house intrinsic characteristics, both continuous (number o
 </div>
 </section>
 <section id="non-spatial-regression-a-very-quick-refresh">
-<h2>Non-spatial regression, a (very) quick refresh<a class="headerlink" href="#non-spatial-regression-a-very-quick-refresh" title="Permalink to this headline">#</a></h2>
+<h2>Non-spatial regression, a (very) quick refresh<a class="headerlink" href="#non-spatial-regression-a-very-quick-refresh" title="Permalink to this heading">#</a></h2>
 <p>Before we discuss how to explicitly include space into the linear regression framework, let us show how basic regression can be carried out in Python, and how one can begin to interpret the results. By no means is this a formal and complete introduction to regression so, if that is what you are looking for, we recommend <span id="id1">[<a class="reference internal" href="references.html#id27" title="Andrew Gelman and Jennifer Hill. Data Analysis Using Regression and Multilevel Hierarchical Models. Cambridge University Press, 2006. ISBN 9780511790942. URL: http://dx.doi.org/10.1017/cbo9780511790942, doi:10.1017/cbo9780511790942.">GH06</a>]</span>, in particular chapters 3 and 4, which provide a fantastic, non-spatial introduction.</p>
 <p>The core idea of linear regression is to explain the variation in a given (<em>dependent</em>) variable as a linear function of a collection of other (<em>explanatory</em>) variables. For example, in our case, we may want to express the price of a house as a function of the number of bedrooms it has and whether it is a condominium or not. At the individual level, we can express this as:</p>
 <div class="math notranslate nohighlight">
@@ -627,7 +628,7 @@ Koenker-Bassett test             10         135.581           0.0000
 <p>A full detailed explanation of the output is beyond the scope of this chapter, so we will focus on the relevant bits for our main purpose. This is concentrated on the <code class="docutils literal notranslate"><span class="pre">Coefficients</span></code> section, which gives us the estimates for <span class="math notranslate nohighlight">\(\beta_k\)</span> in our model. In other words, these numbers express the relationship between each explanatory variable and the dependent one, once the effect of confounding factors has been accounted for. Keep in mind however that regression is no magic; we are only discounting the effect of confounding factors that we include in the model, not of <em>all</em> potentially confounding factors.</p>
 <p>Results are largely as expected: houses tend to be significantly more expensive if they accommodate more people (<code class="docutils literal notranslate"><span class="pre">accommodates</span></code>), if they have more bathrooms and bedrooms, and if they are a condominium or part of the “other” category of house type. Conversely, given a number of rooms, houses with more beds (i.e., listings that are more “crowded”) tend to go for cheaper, as it is the case for properties where one does not rent the entire house but only a room (<code class="docutils literal notranslate"><span class="pre">rt_Private_room</span></code>) or even shares it (<code class="docutils literal notranslate"><span class="pre">rt_Shared_room</span></code>). Of course, you might conceptually doubt the assumption that it is possible to <em>arbitrarily</em> change the number of beds within an Airbnb without eventually changing the number of people it accommodates, but methods to address these concerns using <em>interaction effects</em> won’t be discussed here.</p>
 <section id="hidden-structures">
-<h3>Hidden structures<a class="headerlink" href="#hidden-structures" title="Permalink to this headline">#</a></h3>
+<h3>Hidden structures<a class="headerlink" href="#hidden-structures" title="Permalink to this heading">#</a></h3>
 <p>In general, our model performs well, being able to predict slightly about two-thirds (<span class="math notranslate nohighlight">\(R^2=0.67\)</span>) of the variation in the mean nightly price using the covariates we’ve discussed above.
 But, our model might display some clustering in the errors, which may be a problem as that violates the i.i.d. assumption linear models usually come built-in with.
 To interrogate this, we can do a few things.
@@ -813,7 +814,7 @@ This is critical since, if we can identify how these areas are structured — if
 </section>
 </section>
 <section id="bringing-space-into-the-regression-framework">
-<h2>Bringing space into the regression framework<a class="headerlink" href="#bringing-space-into-the-regression-framework" title="Permalink to this headline">#</a></h2>
+<h2>Bringing space into the regression framework<a class="headerlink" href="#bringing-space-into-the-regression-framework" title="Permalink to this heading">#</a></h2>
 <p>There are many different ways that spatial structure shows up in our models, predictions, and our data, even if we do not explicitly intend to study it.
 Fortunately, there are nearly as many techniques, called <em>spatial regression</em> methods, that are designed to handle these sorts of structures.
 Spatial regression is about <em>explicitly</em> introducing space or geographical context into the statistical framework of a regression.
@@ -824,7 +825,7 @@ To illustrate the latter, we can think of how the character of a neighborhood is
 In this brief introduction, we will consider two related but very different processes that give rise to spatial effects: spatial heterogeneity and spatial dependence. Before diving into them, we begin with another approach that introduces space in a regression model without modifying the model itself but rather creates spatially explicit independent variables.
 For more rigorous treatments of the topics introduced here, we refer you to <span id="id2">[<a class="reference internal" href="references.html#id10" title="Luc Anselin. Spatial externalities, spatial multipliers, and spatial econometrics. International Regional Science Review, 26(2):153–166, Apr 2003. URL: http://dx.doi.org/10.1177/0160017602250972, doi:10.1177/0160017602250972.">Ans03</a>, <a class="reference internal" href="references.html#id11" title="Luc Anselin and Sergio J. Rey. Modern spatial econometrics in practice: A guide to GeoDa, GeoDaSpace, and PySAL. GeoDa Press, 2014.">AR14</a>, <a class="reference internal" href="references.html#id27" title="Andrew Gelman and Jennifer Hill. Data Analysis Using Regression and Multilevel Hierarchical Models. Cambridge University Press, 2006. ISBN 9780511790942. URL: http://dx.doi.org/10.1017/cbo9780511790942, doi:10.1017/cbo9780511790942.">GH06</a>]</span>.</p>
 <section id="spatial-feature-engineering-proximity-variables">
-<h3>Spatial feature engineering: proximity variables<a class="headerlink" href="#spatial-feature-engineering-proximity-variables" title="Permalink to this headline">#</a></h3>
+<h3>Spatial feature engineering: proximity variables<a class="headerlink" href="#spatial-feature-engineering-proximity-variables" title="Permalink to this heading">#</a></h3>
 <p>Using geographic information to “construct” new data is a common approach to bring in spatial information into data analysis.
 Often, this reflects the fact that processes are not the same everywhere in the map of analysis, or that geographical information may be useful to predict our outcome of interest. In this section, we will briefly present how to insert <em>spatial features</em>, or <span class="math notranslate nohighlight">\(X\)</span> variables that are constructed from geographical relationships, in a standard linear model. We discuss spatial feature engineering extensively in <a class="reference internal" href="12_feature_engineering.html"><span class="doc std std-doc">Chapter 12</span></a>, though, and the depth and extent of spatial feature engineering is difficult to over-state. Rather than detail, this section will show how spatially explicit variables you engineer can be “plugged” into a model to improve its performance or help you explain the underlying process of interest with more accuracy.</p>
 <p>One relevant proximity-driven variable that could influence our San Diego model is based on the listings proximity to Balboa Park. A common tourist destination, Balboa Park is a central recreation hub for the city of San Diego, containing many museums and the San Diego Zoo. Thus, it could be the case that people searching for Airbnbs in San Diego are willing to pay a premium to live closer to the park. If this were true <em>and</em> we omitted this from our model, we may indeed see a significant spatial pattern caused by this distance decay effect.</p>
@@ -1053,10 +1054,10 @@ Often, this reflects the fact that processes are not the same everywhere in the 
 <p>Finally, the distance to Balboa Park variable does not fit our theory about how distance to amenity should affect the price of an Airbnb; the coefficient estimate is <em>positive</em>, meaning that people are paying a premium to be <em>further</em> from Balboa Park. We will revisit this result later on, when we consider spatial heterogeneity and will be able to shed some light on this. Further, the next chapter is an extensive treatment of spatial fixed effects, presenting many more spatial feature engineering methods. Here, we have only showed how to include these engineered features in a standard linear modeling framework.</p>
 </section>
 <section id="spatial-heterogeneity">
-<h3>Spatial heterogeneity<a class="headerlink" href="#spatial-heterogeneity" title="Permalink to this headline">#</a></h3>
+<h3>Spatial heterogeneity<a class="headerlink" href="#spatial-heterogeneity" title="Permalink to this heading">#</a></h3>
 <p>So far we have assumed that our proximity variable might stand in for a difficult-to-measure premium individuals pay when they’re close to a recreational zone (a park in this case). Our approach in that case was to incorporate space through a very specific channel, that is the distance to an amenity we thought might be influencing the final price. However, not all neighborhoods have the same house prices; some neighborhoods may be systematically more expensive than others, regardless of their proximity to Balboa Park. If this is our case, we need some way to account for the fact that each neighborhood may experience these kinds of <em>gestalt</em>, unique effects. One way to do this is by capturing <em>spatial heterogeneity</em> (SH). At its most basic, <em>spatial heterogeneity</em> means that parts of the model may vary systematically with geography, change in different places. For example, changes to the intercept, <span class="math notranslate nohighlight">\(\alpha\)</span>, may reflect the fact that different areas have different baseline exposures to a given process. Changes to the slope terms, <span class="math notranslate nohighlight">\(\beta\)</span>, may indicate some kind of geographical mediating factor that makes the relationship between the independent and dependent variables vary across space, such as when a governmental policy is not consistently applied across jurisdictions. Finally, changes to the variance of the residuals, commonly denoted <span class="math notranslate nohighlight">\(\sigma^2\)</span>, can introduce spatial heteroskedasticity. We deal with the first two in this section.</p>
 <section id="spatial-fixed-effects">
-<h4>Spatial fixed effects<a class="headerlink" href="#spatial-fixed-effects" title="Permalink to this headline">#</a></h4>
+<h4>Spatial fixed effects<a class="headerlink" href="#spatial-fixed-effects" title="Permalink to this heading">#</a></h4>
 <p>The literature commonly refers to geographic variations of <span class="math notranslate nohighlight">\(\alpha\)</span> as “spatial fixed effects (FE)”. To illustrate them, let us consider the house price example from the previous section. Sometimes, spatial fixed effects are said to capture “space as a proxy”, in that we know the outcome varies over space, we (hope to) know the pattern it follows (in our case, by neighborhood) and we can thus incorporate that knowledge into the model by letting <span class="math notranslate nohighlight">\(\alpha\)</span> vary accordingly. The rationale goes as follows. Given we are only including a few explanatory variables in the model, it is likely we are missing some important factors that play a role at determining the price at which a house is sold. Some of them, however, are likely to vary systematically over space (e.g., different neighborhood characteristics). If that is the case, we can control for those unobserved factors by using traditional binary variables but basing their creation on a spatial rule. For example, let us include a binary variable for every neighborhood, indicating whether a given house is located within such area (<code class="docutils literal notranslate"><span class="pre">1</span></code>) or not (<code class="docutils literal notranslate"><span class="pre">0</span></code>). Mathematically, we are now fitting the following equation:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -1605,7 +1606,7 @@ dtype: float64
 <p>We can see a clear spatial structure in the SFE estimates. The most expensive neighborhoods tend to be located near the coast, while the cheapest ones are more inland.</p>
 </section>
 <section id="spatial-regimes">
-<h4>Spatial regimes<a class="headerlink" href="#spatial-regimes" title="Permalink to this headline">#</a></h4>
+<h4>Spatial regimes<a class="headerlink" href="#spatial-regimes" title="Permalink to this heading">#</a></h4>
 <p>At the core of estimating spatial FEs is the idea that, instead of assuming the dependent variable behaves uniformly over space, there are systematic effects following a geographical pattern that affect its behavior. In other words, spatial FEs introduce econometrically the notion of spatial heterogeneity. They do this in the simplest possible form: by allowing the constant term to vary geographically. The other elements of the regression are left untouched and hence apply uniformly across space. The idea of spatial regimes (SRs) is to generalize the spatial FE approach to allow not only the constant term to vary but also any other explanatory variable. This implies that the equation we will be estimating is:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -1928,7 +1929,7 @@ dtype: float64
 </section>
 </section>
 <section id="spatial-dependence">
-<h3>Spatial dependence<a class="headerlink" href="#spatial-dependence" title="Permalink to this headline">#</a></h3>
+<h3>Spatial dependence<a class="headerlink" href="#spatial-dependence" title="Permalink to this heading">#</a></h3>
 <p>As we have just discussed, SH is about effects of phenomena that are <em>explicitly linked</em>
 to geography and that hence cause spatial variation and clustering. This
 encompasses many of the kinds of spatial effects we may be interested in when we fit
@@ -1953,7 +1954,7 @@ framework, with varying degrees of econometric sophistication (see
 <span id="id4">[<a class="reference internal" href="references.html#id9" title="Luc Anselin. Under the hood issues in the specification and interpretation of spatial regression models. Agricultural Economics, 27(3):247–267, Nov 2002. URL: http://dx.doi.org/10.1111/j.1574-0862.2002.tb00120.x, doi:10.1111/j.1574-0862.2002.tb00120.x.">Ans02</a>]</span> for a good overview). Common to all of them however is the way space is
 formally encapsulated: through <em>spatial weights matrices (<span class="math notranslate nohighlight">\(\mathbf{W}\)</span>)</em>, which we discussed in <a class="reference internal" href="04_spatial_weights.html"><span class="doc std std-doc">Chapter 4</span></a>. In this section, we consider three ways in which spatial dependence, through spatial weights matrices, can be incorporated in a regression framework. We begin with the “least invasive” one, where we only modify the set of independent variables, and the move into more substantial modifications of the baseline linear model.</p>
 <section id="exogenous-effects-the-slx-model">
-<h4>Exogenous effects: The SLX model<a class="headerlink" href="#exogenous-effects-the-slx-model" title="Permalink to this headline">#</a></h4>
+<h4>Exogenous effects: The SLX model<a class="headerlink" href="#exogenous-effects-the-slx-model" title="Permalink to this heading">#</a></h4>
 <p>Let us come back to the house price example we have been working with. So far, we
 have hypothesized that the price of a house rented in San Diego through Airbnb can
 be explained using information about its own characteristics as well as some
@@ -1981,7 +1982,7 @@ This can be stated in <em>matrix</em> form using the spatial weights matrix, <sp
 \]</div>
 <p>This splits the model to focus on two main effects: <span class="math notranslate nohighlight">\(\beta\)</span> and <span class="math notranslate nohighlight">\(\gamma\)</span>. The
 <span class="math notranslate nohighlight">\(\beta\)</span> effect describes the change in <span class="math notranslate nohighlight">\(y_i\)</span> when <span class="math notranslate nohighlight">\(X_{ik}\)</span> changes by one.
-<a class="footnote-reference brackets" href="#elast" id="id5">1</a> The subscript for site <span class="math notranslate nohighlight">\(i\)</span> is important here: since we’re dealing
+<a class="footnote-reference brackets" href="#elast" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> The subscript for site <span class="math notranslate nohighlight">\(i\)</span> is important here: since we’re dealing
 with a <span class="math notranslate nohighlight">\(\mathbf{W}\)</span> matrix, it’s useful to be clear about where the change occurs.</p>
 <p>Indeed, this matters for the <span class="math notranslate nohighlight">\(\gamma\)</span> effect, which represents the
 <em>indirect</em> association of a change in <span class="math notranslate nohighlight">\(X_i\)</span> with the house price. This can be conceptualized in two ways.
@@ -2161,7 +2162,7 @@ typically 11% more expensive (<span class="math notranslate nohighlight">\(\beta
 property type, apartments. More relevant to this section, any given house surrounded by
 condominiums <em>also</em> receives a price premium. But, since <span class="math notranslate nohighlight">\(pg_{Condominium}\)</span> is a dummy variable,
 the spatial lag at site <span class="math notranslate nohighlight">\(i\)</span> represents the <em>percentage</em> of properties near <span class="math notranslate nohighlight">\(i\)</span> that are
-condominiums, which is between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>.<a class="footnote-reference brackets" href="#discover" id="id6">2</a>
+condominiums, which is between <span class="math notranslate nohighlight">\(0\)</span> and <span class="math notranslate nohighlight">\(1\)</span>.<a class="footnote-reference brackets" href="#discover" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>
 So, a <em>unit</em> change in this variable means that you would increase the condominium
 percentage by 100%. Thus, a <span class="math notranslate nohighlight">\(.1\)</span> increase in <code class="docutils literal notranslate"><span class="pre">w_pg_Condominium</span></code> (a change of ten percentage points)
 would result in a 5.92% increase in the property house price (<span class="math notranslate nohighlight">\(\beta_{w_pg\_Condominium} = 0.6\)</span>).
@@ -2416,7 +2417,7 @@ Name: 2, dtype: object
 <p>The field of spatial econometrics however is a much broader one and has produced over the last decades many techniques to deal with spatial effects and spatial dependence in different ways. Although this might be an over-simplification, one can say that most of such efforts for the case of a single cross-section are focused on two main variations: the spatial lag and the spatial error model. Both are similar to the case we have seen in that they are based on the introduction of a spatial lag, but they differ in the component of the model they modify and affect.</p>
 </section>
 <section id="spatial-error">
-<h4>Spatial error<a class="headerlink" href="#spatial-error" title="Permalink to this headline">#</a></h4>
+<h4>Spatial error<a class="headerlink" href="#spatial-error" title="Permalink to this heading">#</a></h4>
 <p>The spatial error model includes a spatial lag in the <em>error</em> term of the equation:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -2511,7 +2512,7 @@ heteroskedasticity <span id="id7">[<a class="reference internal" href="reference
 </div>
 </section>
 <section id="spatial-lag">
-<h4>Spatial lag<a class="headerlink" href="#spatial-lag" title="Permalink to this headline">#</a></h4>
+<h4>Spatial lag<a class="headerlink" href="#spatial-lag" title="Permalink to this heading">#</a></h4>
 <p>The spatial lag model introduces a spatial lag of the <em>dependent</em> variable. In the example we have covered, this would translate into:</p>
 <div class="math notranslate nohighlight">
 \[
@@ -2671,14 +2672,14 @@ lag:</p>
 <p>Similarly to the effects in the SLX regression, changes in the spatial lag regression need to be interpreted with care. Here, <code class="docutils literal notranslate"><span class="pre">W_log_price</span></code> applies consistently over all observations and actually changes the effective strength of each of the <span class="math notranslate nohighlight">\(\beta\)</span> coefficients. Thus, it is useful to use predictions and scenario-building to predict <span class="math notranslate nohighlight">\(y\)</span> when changing <span class="math notranslate nohighlight">\(X\)</span>, which allows you to analyze the <em>direct</em> and <em>indirect</em> components.</p>
 </section>
 <section id="other-ways-of-bringing-space-into-regression">
-<h4>Other ways of bringing space into regression<a class="headerlink" href="#other-ways-of-bringing-space-into-regression" title="Permalink to this headline">#</a></h4>
+<h4>Other ways of bringing space into regression<a class="headerlink" href="#other-ways-of-bringing-space-into-regression" title="Permalink to this heading">#</a></h4>
 <p>We have covered here only a few ways to formally introduce space in a regression framework. There are however many other advanced spatial regression methods routinely used in statistics, data science, and applied analysis. For example, Generalized Additive Models <span id="id9">[<a class="reference internal" href="references.html#id29" title="Steve Gibbons, Henry G. Overman, and Eleonora Patacchini. Spatial methods. Handbook of Regional and Urban Economics, pages 115–168, 2015. URL: http://dx.doi.org/10.1016/b978-0-444-59517-1.00003-9, doi:10.1016/b978-0-444-59517-1.00003-9.">GOP15</a>, <a class="reference internal" href="references.html#id57" title="Simon N. Wood. Generalized Additive Models. Chapman and Hall/CRC, Feb 2006. ISBN 9781420010404. URL: http://dx.doi.org/10.1201/9781420010404, doi:10.1201/9781420010404.">Woo06</a>]</span> have been used to apply spatial kernel smoothing directly within a regression function. Other similar smoothing methods, such as spatial Gaussian Process Models <span id="id10">[<a class="reference internal" href="references.html#id17" title="Chris Brunsdon, A. Stewart Fotheringham, and Martin E. Charlton. Geographically weighted regression: a method for exploring spatial nonstationarity. Geographical Analysis, 28(4):281–298, Sep 2010. URL: http://dx.doi.org/10.1111/j.1538-4632.1996.tb00936.x, doi:10.1111/j.1538-4632.1996.tb00936.x.">BFC10</a>]</span> or Kriging, conceptualize the dependence between locations as smooth as well. Other methods in spatial regression that consider graph-based geographies (rather than distance/kernel effects) include variations on conditional autoregressive model, which examines spatial relationships at locations <em>conditional</em> on their surroundings, rather than as jointly co-emergent with them. Full coverage of these topics is beyond the scope of this book, however, though <span id="id11">[<a class="reference internal" href="references.html#id13" title="Sudipto Banerjee, Alan E. Gelfand, Andrew O. Finley, and Huiyan Sang. Gaussian predictive process models for large spatial data sets. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 70(4):825–848, Sep 2008. URL: http://dx.doi.org/10.1111/j.1467-9868.2008.00663.x, doi:10.1111/j.1467-9868.2008.00663.x.">BGFS08</a>]</span> provides a detailed and comprehensive discussion. We have not covered these (and other existing ones) not because we do not think are important or useful, far from it, but because we consider them a bit more advanced than the level at which we wanted to pitch the chapter.</p>
 <p>Both sets of models we have introduced in here and others that exist but that we have not covered share the feature of embedding space as a “first class” citizen in the regression framework. In all these cases, we conceptualize space (e.g., through a spatial weights matrix) and <em>modify</em> the functional form of our original model in a way that recognizes the location of its observations when generating predictions or inference. This approach results in modifications of the modeling framework to accommodate geography. In the next chapter, we discuss a different perspective to embed space in our modeling efforts. Rather than injecting space through the functional form, we will do it through the variables we use to explain/predict the outcome of interest. In this case, we will be using geography to <em>enrich</em> our data <em>before</em> it is passed through a modeling framework.</p>
 </section>
 </section>
 </section>
 <section id="questions">
-<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">#</a></h2>
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>One common kind of spatial econometric model is the “Spatial Durbin Model,” which combines the SLX model with the spatial lag model. Alternatively, the “Spatial Durbin Error Model” combines the SLX model with the spatial error model. Fit a Spatial Durbin variant of the spatial models we have fit in this chapter.</p>
 <ul class="simple">
@@ -2696,10 +2697,10 @@ lag:</p>
 <li><p>Where <em>spatial</em> regression models generally focus on how nearby observations are similar to one another, <em>platial</em> models focus on how observations in the same spatial group are similar to one another. These are often dealt with using multi-level or spatial mixed-effect models. When do these two ideas work together well? And, when might these disagree?</p></li>
 </ol>
 <section id="challenge-questions">
-<h3>Challenge questions<a class="headerlink" href="#challenge-questions" title="Permalink to this headline">#</a></h3>
+<h3>Challenge questions<a class="headerlink" href="#challenge-questions" title="Permalink to this heading">#</a></h3>
 <p>The following discussions are a bit challenging but reflect extra enhancements to the discussions in the chapter that may solidify or enhance an advanced understanding of the material.</p>
 <section id="the-random-coast">
-<h4>The random coast<a class="headerlink" href="#the-random-coast" title="Permalink to this headline">#</a></h4>
+<h4>The random coast<a class="headerlink" href="#the-random-coast" title="Permalink to this heading">#</a></h4>
 <p>In the section analyzing our naive model residuals, we ran a classic two-sample <span class="math notranslate nohighlight">\(t\)</span>-test to identify whether or not our coastal and non-coastal residential districts tended to have the same prediction errors. Often, though, it’s better to use straightforward, data-driven testing and simulation methods than assuming that the mathematical assumptions of the <span class="math notranslate nohighlight">\(t\)</span>-statistic are met.</p>
 <p>To do this, we can shuffle our assignments to coast and not-coast, and check whether or not there are differences in the distributions of the <em>observed</em> residual distributions and random distributions. In this way, we shuffle the observations that are on the coast, and plot the resulting cumulative distributions.</p>
 <p>Below, we run 100 simulated re-assignments of districts to either “coast” or “not coast,” and compare the distributions of randomly assigned residuals to the observed distributions of residuals. Further, we do this plotting by the <em>empirical cumulative density function</em>, not the histogram directly. This is because the <em>empirical cumulative density function</em> is usually easier to examine visually, especially for subtle differences.</p>
@@ -2769,7 +2770,7 @@ lag:</p>
 </div>
 </section>
 <section id="the-k-neighbor-correlogram">
-<h4>The K-neighbor correlogram<a class="headerlink" href="#the-k-neighbor-correlogram" title="Permalink to this headline">#</a></h4>
+<h4>The K-neighbor correlogram<a class="headerlink" href="#the-k-neighbor-correlogram" title="Permalink to this heading">#</a></h4>
 <p>Further, it might be the case that spatial dependence in our mispredictions only matters for sites that are extremely close to one another, and it decays quickly with distance.
 To investigate this, we can examine the correlation between each site’s residual and the <em>average</em> of the <span class="math notranslate nohighlight">\(k\)</span>th nearest neighbors’ residuals, increasing <span class="math notranslate nohighlight">\(k\)</span> until the estimate stabilizes.
 This main idea is central to the geostatistical concept, the <em>correlogram</em>, which gives the correlation between sites of an attribute being studied as distance increases.</p>
@@ -2851,7 +2852,7 @@ This means that our over- and under-predictions are likely to cluster.</p>
 </section>
 </section>
 <section id="next-steps">
-<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">#</a></h2>
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this heading">#</a></h2>
 <p>For additional reading on the topics covered in this chapter, please consult the following resources:</p>
 <p>For a more in-depth discussion of the fundamentals of spatial econometrics and applications in both GUI and command-line software, consult:</p>
 <p>Anselin, Luc and Sergio Rey. 2014. <em>Modern Spatial Econometrics in Practice: A Guide to GeoDa, GeoDaSpace, and Pysal.</em> GeoDa Press.</p>
@@ -2862,15 +2863,15 @@ This means that our over- and under-predictions are likely to cluster.</p>
 <p>And for a useful overview of the discussions around multi-level modeling, with references therein to further resources, consider:</p>
 <p>Owen, Gwilym, Richard Harris, and Kelvyn Jones. “Under Examination: Multilevel models, geography and health research.” <em>Progress in Human Geography</em> 40(3): 394-412.</p>
 <hr class="footnotes docutils" />
-<dl class="footnote brackets">
-<dt class="label" id="elast"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
-<dd><p>Since we use the log price as the dependent variable, our
+<aside class="footnote brackets" id="elast" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">1</a><span class="fn-bracket">]</span></span>
+<p>Since we use the log price as the dependent variable, our
 <span class="math notranslate nohighlight">\(\beta\)</span> coefficients can be interpreted as the percentage change in the price associated with a unit change in the explanatory variable.</p>
-</dd>
-<dt class="label" id="discover"><span class="brackets"><a class="fn-backref" href="#id6">2</a></span></dt>
-<dd><p>Discover this for yourself: what is the average of <code class="docutils literal notranslate"><span class="pre">numpy.array([True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">False,</span> <span class="pre">False,</span> <span class="pre">True)]</span></code>?</p>
-</dd>
-</dl>
+</aside>
+<aside class="footnote brackets" id="discover" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id6">2</a><span class="fn-bracket">]</span></span>
+<p>Discover this for yourself: what is the average of <code class="docutils literal notranslate"><span class="pre">numpy.array([True,</span> <span class="pre">True,</span> <span class="pre">True,</span> <span class="pre">False,</span> <span class="pre">False,</span> <span class="pre">True)]</span></code>?</p>
+</aside>
 </section>
 </section>
 

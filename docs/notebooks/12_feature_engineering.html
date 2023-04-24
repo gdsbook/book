@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 
 
-<html >
+<html lang="en" >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Spatial Feature Engineering &#8212; Geographic Data Science with Python</title>
   
@@ -45,6 +45,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
@@ -78,7 +79,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="References" href="references.html" />
     <link rel="prev" title="Spatial Regression" href="11_regression.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="None"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
   
   
@@ -443,7 +444,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="spatial-feature-engineering">
-<h1>Spatial Feature Engineering<a class="headerlink" href="#spatial-feature-engineering" title="Permalink to this headline">#</a></h1>
+<h1>Spatial Feature Engineering<a class="headerlink" href="#spatial-feature-engineering" title="Permalink to this heading">#</a></h1>
 <p>In machine learning and data science, we are often equipped with <em>tons</em> of data. Indeed, given the constellation of packages to query data services, free and open source data-sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful <em>features</em> from this rich and deep sea of data.</p>
 <p>Where data is available, but not yet directly <em>usable</em>, <em>feature engineering</em> helps to construct representations or transformations of the original data that are more useful for modeling a given phenomenon of interest. In traditional machine learning, feature engineering involves applying additional <em>domain knowledge</em> to raw information in order to structure it in a manner that is meaningful for a model. Often, this involves some sort of <em>transformation</em> of the original dataset, which is a well-studied concept in both classical statistics and remains so in machine learning methods. While <em>feature engineering</em> always relies on this implicit domain knowledge, it is an extremely important part of adapting general-purpose algorithms to unique or distinctive problems facing the every-day data scientist.</p>
 <p>Geography is one of the most high-quality, ubiquitous ways to introduce <em>domain knowledge</em> into a problem: everything has a position in both <em>space</em> and <em>time</em>. And, while things that happen near one another <em>in time</em> do not necessarily have a fundamental relationship, things that are <em>near</em> one another are often related. Thus, space is the ultimate <em>linkage key</em>, allowing us to connect different datasets together in order to improve our models and our predictions. This means that, even for <em>aspatial</em>, “non-geographic” data, you can use <em>spatial feature engineering</em> to create useful, highly relevant features for your analysis.</p>
@@ -471,7 +472,7 @@ document.write(`
 </div>
 </div>
 <section id="what-is-spatial-feature-engineering">
-<h2>What is spatial feature engineering?<a class="headerlink" href="#what-is-spatial-feature-engineering" title="Permalink to this headline">#</a></h2>
+<h2>What is spatial feature engineering?<a class="headerlink" href="#what-is-spatial-feature-engineering" title="Permalink to this heading">#</a></h2>
 <p>At its core, <em>spatial feature engineering</em> is the process of developing additional information from raw data using <em>geographic knowledge</em>. This synthesis could occur <em>between</em> datasets, where geography is used to link samples in separate datasets together; or <em>within</em> datasets, where geography can be used to borrow information from nearby samples. Building linkages <em>between</em> datasets is often called “Map Matching”, while we use the term “Map Synthesis” to describe the use of geographical structure to derive new features from existing data. We will cover both kinds of feature engineering.</p>
 <p>To help us discuss this, a vocabulary is helpful. We will cover a few different kinds of features in this chapter. All of them can be constructed using either Map Synthesis or Map Matching operations:</p>
 <ul class="simple">
@@ -487,12 +488,12 @@ document.write(`
 </ul>
 </section>
 <section id="feature-engineering-using-map-matching">
-<h2>Feature engineering using map matching<a class="headerlink" href="#feature-engineering-using-map-matching" title="Permalink to this headline">#</a></h2>
+<h2>Feature engineering using map matching<a class="headerlink" href="#feature-engineering-using-map-matching" title="Permalink to this heading">#</a></h2>
 <p>Space is the ultimate linkage key; map matching is all about exploiting this asset. Geographic information is collected at different scales, aggregated using bespoke geographic delineations, and ultimately stored in different datasets. Modeling and machine learning usually require the use of data aligned and coherently structured; to bring disparate geo-datasets together, the data scientist needs to be able to transfer information expressed for one geography into another. This is where map matching comes to the rescue. By using geographical location, we can connect datasets that have no common key or that are otherwise completely unrelated. This is a “magic trick” that we can pull off because of location that would be much harder, or impossible, with data lacking spatial information.</p>
 <p>The details, and difficulty, of this transfer of information from one geography to another one depend on the nature of the “source” and “target”, and on the precision with which we want to perform such transfer. In this context, there is always an inevitable trade-off between precision and sophistication: more precise transfer is usually possible at the expense of more advanced and involved techniques. Their additional cost in applying them, both in terms of cognitive load on the data scientist’s part or in terms of computation, must be weighted in on an individual basis: sometimes we need the best possible estimates, at all costs; sometimes “good enough” is, well, good enough.</p>
 <p>In this section, we cover a few cases that we consider represent the most common and widely used approaches. We begin with situations where we have two point datasets and all we need to calculate are descriptive statistics of one dataset to the observations in the other. We switch the type of data and consider how to attach information from a continuous grid, stored in a raster file, to a set of points. Then we show the equivalent case for “moving” information for a polygon geography to a point dataset. These are all cases that, in their simplest form, involve mostly traditional GIS operations (e.g., buffer construction, spatial joins) and little in the way of statistical modeling. As an example of a case that is more involved, we cover the transfer of information from a set of points to another set of points in different locations, and of a polygon geography to another different polygon geography. For these final cases, but also more generally, we try to include examples that capture the essence of the method but keep the technique as simple as possible. For almost any of these cases we cover, the reader can find more sophisticated techniques that usually yield more accurate estimates. Where possible, we try to signpost these.</p>
 <section id="counting-nearby-features">
-<h3>Counting <em>nearby</em> features<a class="headerlink" href="#counting-nearby-features" title="Permalink to this headline">#</a></h3>
+<h3>Counting <em>nearby</em> features<a class="headerlink" href="#counting-nearby-features" title="Permalink to this heading">#</a></h3>
 <p>A first, conceptually straightforward, approach is to augment our dataset by counting how many points of a different dataset are in the vicinity of each observation. For example, we might want to know how many bars and restaurants each Airbnb has within a given radius. This count can then become an additional  feature of our dataset, stored in a new column of <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code>.</p>
 <p>To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> points. From <a class="reference internal" href="08_point_pattern_analysis.html"><span class="doc std std-doc">Chapter 8</span></a>, we can recall that there are a few different hulls that can be used. We’ll use the Convex Hull here (Fig. XXX1XXX), which is the smallest convex polygon that covers all the points in the set.</p>
 <div class="cell docutils container">
@@ -818,7 +819,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </section>
 <section id="assigning-point-values-from-surfaces-elevation-of-airbnbs">
-<h3>Assigning point values from surfaces: elevation of Airbnbs<a class="headerlink" href="#assigning-point-values-from-surfaces-elevation-of-airbnbs" title="Permalink to this headline">#</a></h3>
+<h3>Assigning point values from surfaces: elevation of Airbnbs<a class="headerlink" href="#assigning-point-values-from-surfaces-elevation-of-airbnbs" title="Permalink to this heading">#</a></h3>
 <p>We have just seen how to count points around each observation in a point dataset. In other cases, we might be confronted with a related but different challenge: transferring the value of a particular point in a surface to a point in a different dataset.</p>
 <p>To make this more accessible, let us illustrate the context with an example question: <em>what is the elevation of each Airbnb property?</em> To answer this question, we require, at least, the following:</p>
 <ol class="arabic simple">
@@ -979,7 +980,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </section>
 <section id="point-interpolation-using-scikit-learn">
-<h3>Point interpolation using scikit-learn<a class="headerlink" href="#point-interpolation-using-scikit-learn" title="Permalink to this headline">#</a></h3>
+<h3>Point interpolation using scikit-learn<a class="headerlink" href="#point-interpolation-using-scikit-learn" title="Permalink to this heading">#</a></h3>
 <p>In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is <em>spatial interpolation</em>. For a continuous geographical field measured at a set of points, <em>spatial interpolation</em> methods provide us a way to guess at the value a field would take at sites we do not measure.</p>
 <p>There are many sophisticated methods with which this can be done. <em>Kriging</em>, common in the sub-field of spatial statistics called “geostatistics”, is one such practice based on the theory of <em>Gaussian Process Regression.</em> Another common approach, <em>geographically weighted regression</em>, provides unique model estimates at every control point, as well as predictions for places where there is no data. Here, though, we’ll use a fairly basic <span class="math notranslate nohighlight">\(k\)</span>-nearest neighbor prediction algorithm from <code class="docutils literal notranslate"><span class="pre">scikit-learn</span></code> to demonstrate the process.</p>
 <div class="cell docutils container">
@@ -1224,7 +1225,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 <p>Plenty more of these methods are implemented in <code class="docutils literal notranslate"><span class="pre">scikit-learn.neighbors</span></code>, as well as kriging methods in <code class="docutils literal notranslate"><span class="pre">GSTools</span></code> <span id="id1">[<a class="reference internal" href="references.html#id81" title="Sebastian Müller and Lennart Schüler. Geostat-framework/gstools: v1.3.3 'pure pink'. August 2021. URL: https://doi.org/10.5281/zenodo.5169658, doi:10.5281/zenodo.5169658.">MS21</a>]</span> and geographically weighted regression in <code class="docutils literal notranslate"><span class="pre">mgwr</span></code> <span id="id2">[<a class="reference internal" href="references.html#id79" title="Taylor M Oshan, Ziqi Li, Wei Kang, Levi J Wolf, and A Stewart Fotheringham. Mgwr: a python implementation of multiscale geographically weighted regression for investigating process spatial heterogeneity and scale. ISPRS International Journal of Geo-Information, 8(6):269, 2019.">OLK+19</a>]</span>.</p>
 </section>
 <section id="polygon-to-point">
-<h3>Polygon to point<a class="headerlink" href="#polygon-to-point" title="Permalink to this headline">#</a></h3>
+<h3>Polygon to point<a class="headerlink" href="#polygon-to-point" title="Permalink to this heading">#</a></h3>
 <p>We now move on to a case where the information we are interested in matching to our set of points is stored in a polygon geography. For example, we would like to know the population density of the neighborhood in which each Airbnb is located. This is conceptually similar to the sampling example above, but in the case the information we want to sample is not a surface but a geo-table of polygons. To determine density, we will download population estimates at the census tract level, and “transfer” those estimates over to each Airbnb point. Geographically, the only challenge here is finding the containing polygon for each point, and then performing what is in spatial databases parlance known as a “spatial join”, by which we link the two layers through their spatial connection.</p>
 <p>Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:</p>
 <div class="cell docutils container">
@@ -1322,7 +1323,7 @@ memory usage: 1.4+ MB
 </div>
 </section>
 <section id="area-to-area-interpolation">
-<h3>Area to area interpolation<a class="headerlink" href="#area-to-area-interpolation" title="Permalink to this headline">#</a></h3>
+<h3>Area to area interpolation<a class="headerlink" href="#area-to-area-interpolation" title="Permalink to this heading">#</a></h3>
 <p>The final case of map matching we consider is transfer of information from one polygon/areal geography to a different one. This is a common use-case when an analysis requires data that is provided at different levels of aggregation and different boundary delineations.</p>
 <p>There is a large literature around this problem under the umbrella of dasymetric mapping <span id="id3">[<a class="reference internal" href="references.html#id71" title="Cory L Eicher and Cynthia A Brewer. Dasymetric mapping and areal interpolation: implementation and evaluation. Cartography and Geographic Information Science, 28(2):125–138, 2001.">EB01</a>]</span>. The conceptual idea is relatively straightforward: we want to apportion values from one set of polygons to another based on how much “geography” is shared. In its simplest case, we can do this based on area. We will assign values from the former geography to the latter one based on how much they share. Let us illustrate this with an example. We will call the geography for which we have data the “source”, and that to which we want to transfer data the “target”. Let’s say we have a population count  measure for each of three source polygons, 1, 2, 3, and we have a target polygon A for which we require an estimated population. If the intersection of polygon A with each of the source polygons amounts to  50%, 30%, and 20% of the total area of polygon A, respectively, then the population estimate for A will be a weighted average between the rates in 1, 2, and 3, where the weights are 0.5, 0.3, and 0.2, respectively.</p>
 <p>We could also go in the other direction. If we had total population for polygon A, but population was not reported for polygons 1, 2, 3, we could use areal interpolation to allocate the population from A (now the source polygon) to each of the three target polygons. Polygon 1 would get 0.5 of the population of A, polygon 2 would get 0.3 of A’s population, and C the remainder. Here we are assuming the area of A is completely exhausted by the areas of 1, 2, and 3, and that the latter polygons do not overlap with each other. Of course, underlying this exercise is the implicit assumption that the values we are interested in are uniformly distributed within each polygon in the source and target. In some cases, this is a valid assumption or, at least, it does not introduce critical errors; in others, this is not acceptable. Dasymetric mapping has proposed a large amount of sophistications that try to come up with more realistic estimates and that can incorporate additional information.</p>
@@ -1475,14 +1476,14 @@ memory usage: 1.4+ MB
 </section>
 </section>
 <section id="feature-engineering-using-map-synthesis">
-<h2>Feature engineering using map synthesis<a class="headerlink" href="#feature-engineering-using-map-synthesis" title="Permalink to this headline">#</a></h2>
+<h2>Feature engineering using map synthesis<a class="headerlink" href="#feature-engineering-using-map-synthesis" title="Permalink to this heading">#</a></h2>
 <p>Feature engineering with map matching is most helpful when you have additional information to use in the analysis. And, with the wealth of freely available data from censuses, satellites, and open volunteered geographic information vendors such as OpenStreetMap, map matching can be a very powerful tool for enriching and improving your analyses. However, it is sometimes <em>also</em> useful to only examine the data you’ve got, and use the spatial structure within to build better features or better models. While this might be done using spatially explicit models (like those covered in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>), it is also possible to use map synthesis to build spatial features and improve model performance.</p>
 <p>There is an extensive amount of map synthesis features. In fact, many of them are usually derived for specific use cases and following the intuition of domain experts that can take technical guidance along the lines presented here. We discuss two main ones as an illustration, but reiterate that the sky really is the limit in this category. First, we will return to spatial <em>summary</em> features. Second, we will examine <em>regionalization features</em>, which detect and leverage geographical clusters in the data to improve prediction.</p>
 <section id="spatial-summary-features-in-map-synthesis">
-<h3>Spatial summary features in map synthesis<a class="headerlink" href="#spatial-summary-features-in-map-synthesis" title="Permalink to this headline">#</a></h3>
+<h3>Spatial summary features in map synthesis<a class="headerlink" href="#spatial-summary-features-in-map-synthesis" title="Permalink to this heading">#</a></h3>
 <p>Just like in map matching, you can use spatial summary features in map synthesis to build better models. One approach involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we now refer only to the data on hand. Thus, we may want to determine whether nearby Airbnbs are “competing” with each Airbnb. We might do this by finding the distance to the nearest Airbnb with the same number of bedrooms, since two nearby listings that <em>also</em> sleep the same number of people likely will compete with one another for tenants.</p>
 <section id="counting-neighbors">
-<h4>Counting neighbors<a class="headerlink" href="#counting-neighbors" title="Permalink to this headline">#</a></h4>
+<h4>Counting neighbors<a class="headerlink" href="#counting-neighbors" title="Permalink to this heading">#</a></h4>
 <p>A useful metric to characterize an observation in your data through geography is whether it is surrounded by other observations or not. This question (and the following one we cover) is another area of geographic data science where spatial weights matrices are useful.</p>
 <p>If we define to be “surrounded by other observations” as in “having many neighbors”, this translates into the cardinalities of a spatial weights matrix (i.e., the number of neighbors recorded in the matrix for each observation).</p>
 <p>For example, we can “engineer a feature” that contains the number of Airbnb properties each property has within 500 meters by constructing a distance band object:</p>
@@ -1527,7 +1528,7 @@ memory usage: 1.4+ MB
 </div>
 </section>
 <section id="distance-buffers-within-a-single-table">
-<h4>Distance buffers within a single table<a class="headerlink" href="#distance-buffers-within-a-single-table" title="Permalink to this headline">#</a></h4>
+<h4>Distance buffers within a single table<a class="headerlink" href="#distance-buffers-within-a-single-table" title="Permalink to this heading">#</a></h4>
 <p>If what we are interested in is finding the average number of bedrooms around each house, we might do this using a row-standardized version of the <code class="docutils literal notranslate"><span class="pre">DistanceBand</span></code> weight object we have just built, which considers Airbnb as “neighbors” if they are within the distance threshold, and computing the spatial lag of the number of bedrooms.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1918,7 +1919,7 @@ Name: bedrooms, Length: 6110, dtype: float64
 <p>Since the mean and/or mode are the most commonly used measures of central tendency, the <code class="docutils literal notranslate"><span class="pre">lag_spatial</span></code> and <code class="docutils literal notranslate"><span class="pre">lag_categorical</span></code> functions cover many of the required uses in practice.</p>
 </section>
 <section id="ring-buffer-features">
-<h4>“Ring” buffer features<a class="headerlink" href="#ring-buffer-features" title="Permalink to this headline">#</a></h4>
+<h4>“Ring” buffer features<a class="headerlink" href="#ring-buffer-features" title="Permalink to this heading">#</a></h4>
 <p>Sometimes, analysts might want to use multiple “bands” of buffer features. This requires that we build summaries of the observations that fall <em>only within</em> a given range of distances, such as the typical size of houses that are further than 500 meters, but still within one kilometer. This kind of “ring buffer”, or annulus, is a common request in spatial analysis, and can be done in substantially the same way as before by increasing the <code class="docutils literal notranslate"><span class="pre">threshold</span></code> in a <code class="docutils literal notranslate"><span class="pre">DistanceBand</span></code> weight.</p>
 <p>We can use our 500 meters weights from before to build the average again:</p>
 <div class="cell docutils container">
@@ -2038,7 +2039,7 @@ Name: bedrooms, Length: 6110, dtype: float64
 </section>
 </section>
 <section id="clustering-as-feature-engineering">
-<h3>Clustering as feature engineering<a class="headerlink" href="#clustering-as-feature-engineering" title="Permalink to this headline">#</a></h3>
+<h3>Clustering as feature engineering<a class="headerlink" href="#clustering-as-feature-engineering" title="Permalink to this heading">#</a></h3>
 <p>One unique way to use spatial or features information <em>within</em> your data as a feature in your existing models is to use <em>clustering</em>, as we saw in Chapters <a class="reference internal" href="08_point_pattern_analysis.html"><span class="doc std std-doc">8</span></a> and <a class="reference internal" href="10_clustering_and_regionalization.html"><span class="doc std std-doc">10</span></a>, respectively. This can provide an indication of whether an observation exists in a given “place” geographically, or if an observation is a specific “kind” of observation. Data reduction of many variates into a derived categorical feature can be useful in training models. This is even more useful when the <em>spatial location</em> of a given observation indicates a useful characteristic about the kind of observation that may be found at that location.</p>
 <p>While sometimes we might prefer to introduce space and (co-)location through our model (as we did in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>), others we can instead use (spatial) cluster labels themselves as features. For example, to cluster the listings based on their location, we can use hierarchical DBSCAN <span id="id5">[<a class="reference internal" href="references.html#id5" title="Ricardo JGB Campello, Davoud Moulavi, and Jörg Sander. Density-based clustering based on hierarchical density estimates. In Pacific-Asia conference on knowledge discovery and data mining, 160–172. Springer, 2013.">CMS13</a>]</span>, an improved variant of the traditional DBSCAN algorithm used in <a class="reference internal" href="08_point_pattern_analysis.html"><span class="doc std std-doc">Chapter 8</span></a>. We import it through its own package <span id="id6">[<a class="reference internal" href="references.html#id78" title="Leland McInnes, John Healy, and Steve Astels. Hdbscan: hierarchical density based clustering. Journal of Open Source Software, 2(11):205, 2017.">MHA17</a>]</span>:</p>
 <div class="cell docutils container">
@@ -2151,13 +2152,13 @@ Name: bedrooms, Length: 6110, dtype: float64
 </section>
 </section>
 <section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">#</a></h2>
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">#</a></h2>
 <p>Feature engineering is a powerful way to enrich your data and make the most out of them. It is often within reach whether you are able to mix in auxilliary data or not. At a minimum, it only requires that new variables are constructed from your existing data; however, if you have access to more data, spatial feature engineering provides the <em>ultimate linkage key</em>, a flexible and powerful tool with which you can unlock the value held in many <em>other</em> datasets that you may have access to even if they are not obviously connected to your own.</p>
 <p>We have structured all the approaches presented in this chapter along two main groups: those which allow you to augment a given dataset, which we have termed <em>map synthesis</em>; and those that enable connecting disparate datasets through space. In both cases, each operation involved in feature engineering, such as determining what the average value is in the area near each observation or identifying whether observations exist as part of a “cluster”, are relatively simple operations. As building blocks that may be combined with each other, they build large, rich, and useful datasets that can be used directly in your existing methods of analysis.</p>
 <p>Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters <a class="reference internal" href="10_clustering_and_regionalization.html"><span class="doc std std-doc">10</span></a> and <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">11</span></a>) can leverage spatial structure <em>directly</em> during learning/inference. These techniques allow you to embed space in non-spatial models to make them “geography aware”. Furthermore, the techniques in this chapter (and the methods that extend upon them) are immediately useful for most practicing data scientists, and they can be integrated into nearly any analytical method or approach.</p>
 </section>
 <section id="questions">
-<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">#</a></h2>
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this heading">#</a></h2>
 <ol class="arabic simple">
 <li><p>Thinking of your own research, provide an example where map matching would
 be a useful spatial feature engineering approach? How about an example where
@@ -2175,7 +2176,7 @@ the interpolation process. How does this occur and why is it important to acknow
 </ol>
 </section>
 <section id="next-steps">
-<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">#</a></h2>
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this heading">#</a></h2>
 <p>For more information on machine learning methods, it is difficult to beat <em>Introduction to Statistical Learning</em> by:</p>
 <p>James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. <em>Introduction to Statistical Learning</em> (2nd Edition). Wiley: New York.</p>
 <p>In addition, there are many geospatial relationships that can be leveraged to merge datasets together. These <em>spatial join</em> techniques often require quite a bit of background understanding in <em>geocomputation</em>, computation that focuses on the basic/fundamental geometric operations and relationships between geographic objects. However, simple introductions are offered by our partner book:</p>
