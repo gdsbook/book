@@ -6,7 +6,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.11.5
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -19,7 +19,6 @@ import warnings
 warnings.filterwarnings("ignore")
 ```
 
-<!-- #region tags=[] -->
 # Geographic Thinking for Data Scientists
 
 Data scientists have long worked with geographical data. Maps, particularly, are a favorite kind of "infographic" now that we are in the age of responsive web cartography. While we discuss a bit about computational cartography in the chapter on choropleth mapping, it's useful to think a bit more deeply about how geography works in the context of data science. So, this chapter delves a bit into "geographic thinking," which represents the collected knowledge geographers have about why geographical information deserves special care and attention, especially when using geographic data in computations. 
@@ -56,7 +55,7 @@ In our population density example, an "enumeration unit" is an object, as is a p
 The differences between these three representations are important to understand because they affect what kinds of *relations* are appropriate. For instance, the relationships among geographical processes with objects can be modelled using simple distances. Near objects might then be "strongly related," and distant objects "weakly related." Alternatively, we could consider (or construct) a network that relates the objects based on their interactions. Geographical processes with networks must account for this *topology*, or structure of the connections between the "nodes" (i.e., the origins or destinations). We cannot assume that every node is connected, and these connections also cannot be directly determined from the nodes alone. For example, two subway stations may be very far apart but could be connected by a frequent direct express train; given their connectivity, the raw distances (treating stops as geographic objects) may not be a good indication of their true geographic relationship. Finally, in a field, measurements can occur *anywhere*, so models need to account for the hypothetical realizations that could happen in the unobserved space between points of measurement. 
 
 These kinds of structures, in turn, arise directly from how processes are conceptualized and what questions the analyst seeks to answer. And, since the measurement of a process is often beyond the analyst's control, it is useful to recognize that *how a geographical process actually operates* (that is, its "causal" or "generative" structure) can be different from *how we are actually able to measure it*. In the subsequent sections, we discuss the common frames of measurement you may encounter, and the traditional linkages between data model and data structure that are found in classical geographic information systems.
-<!-- #endregion -->
+
 
 ## Computational representations: data structures
 
@@ -156,7 +155,3 @@ Worboys, Michael and Matt Duckham. 2004. *GIS, A Computing Perspective*. CRC Pre
 Finally, for more information on where the geographic data science perspective *came from* both historically and conceptually, consult Gahegan's mannifesto: 
 
 Gahegan, Mark. 1999. "Guest Editorial: What is Geocomputation?" *Transactions in GIS* 3: 203-206.
-
-```python
-
-```

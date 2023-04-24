@@ -3,11 +3,11 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html >
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
     <title>Clustering and Regionalization &#8212; Geographic Data Science with Python</title>
   
@@ -19,12 +19,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -39,13 +39,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <script src="../_static/clipboard.min.js"></script>
     <script src="../_static/copybutton.js"></script>
@@ -79,7 +78,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="Spatial Regression" href="11_regression.html" />
     <link rel="prev" title="Spatial Inequality Dynamics" href="09_spatial_inequality.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:language" content="None"/>
   </head>
   
   
@@ -442,7 +441,7 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="clustering-and-regionalization">
-<h1>Clustering and Regionalization<a class="headerlink" href="#clustering-and-regionalization" title="Permalink to this heading">#</a></h1>
+<h1>Clustering and Regionalization<a class="headerlink" href="#clustering-and-regionalization" title="Permalink to this headline">#</a></h1>
 <!--
 **NOTE**: parts of this notebook have been
 borrowed from [GDS'17 - Lab
@@ -457,7 +456,7 @@ Clustering is a fundamental method of geographical analysis that draws insights
 from large, complex multivariate processes. It works by finding similarities among the many dimensions in a multivariate process, condensing them down into a simpler representation.
 Thus, through clustering, a complex and difficult to understand process is recast into a simpler one that even non-technical audiences can use.</p>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">#</a></h2>
 <p>Clustering (as we discuss it in this chapter) borrows heavily from unsupervised statistical learning <span id="id1">[<a class="reference internal" href="references.html#id74" title="Jerome Friedman, Trevor Hastie, Robert Tibshirani, and others. The elements of statistical learning. Volume 1. Springer series in statistics New York, 2001.">FHT+01</a>]</span>.
 Often, clustering involves sorting observations into groups without any prior idea about what the groups are (or, in machine learning jargon, without any labels, hence the <em>unsupervised</em> name).
 These groups are delineated so that members of a group should be more
@@ -535,13 +534,18 @@ that traditional clustering is unable to articulate.</p>
 </div>
 </section>
 <section id="data">
-<h2>Data<a class="headerlink" href="#data" title="Permalink to this heading">#</a></h2>
+<h2>Data<a class="headerlink" href="#data" title="Permalink to this headline">#</a></h2>
 <p>We return to the San Diego tracts dataset we have used earlier in the book. In this case, we will not only rely on its polygon geometries, but also on its attribute information. The data comes from the American Community Survey
 (ACS) from 2017. Let us begin by reading in the data.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Read file</span>
 <span class="n">db</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/sandiego/sandiego_tracts.gpkg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>ERROR 1: PROJ: proj_create_from_database: Open of /opt/conda/share/proj failed
 </pre></div>
 </div>
 </div>
@@ -600,7 +604,7 @@ each attribute and compare them side-by-side (Fig. XXX1XXX):</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/c6086b3cbb261b5a9084dcc40273f140a49a897df2e1f565dde784f81ab7f24c.png" src="../_images/c6086b3cbb261b5a9084dcc40273f140a49a897df2e1f565dde784f81ab7f24c.png" />
+<img alt="../_images/d399e3e7b44a62fb8dcf161bc895ae3a48a0c863838cb1f670dabbd1ddb12ee5.png" src="../_images/d399e3e7b44a62fb8dcf161bc895ae3a48a0c863838cb1f670dabbd1ddb12ee5.png" />
 </div>
 </div>
 <p>Several visual patterns jump out from the maps, revealing both commonalities as
@@ -754,7 +758,7 @@ on the bivariate relationships between each pair of attributes, devoid for now o
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/41b675e64f3dc58044afd4c95a0386c389864b17e2888d7d9bab9caaabb2db3d.png" src="../_images/41b675e64f3dc58044afd4c95a0386c389864b17e2888d7d9bab9caaabb2db3d.png" />
+<img alt="../_images/b940cdb5f1fc0e9b8d2887b2a0b168721b01f6169f861900dc3b96f173f042a3.png" src="../_images/b940cdb5f1fc0e9b8d2887b2a0b168721b01f6169f861900dc3b96f173f042a3.png" />
 </div>
 </div>
 <p>Two different types of plots are contained in the scatterplot matrix. On the
@@ -893,7 +897,7 @@ For example, do nearby dots in each scatterplot of the matrix represent the <em>
 These types of questions are exactly what clustering helps us explore.</p>
 </section>
 <section id="geodemographic-clusters-in-san-diego-census-tracts">
-<h2>Geodemographic clusters in san diego census tracts<a class="headerlink" href="#geodemographic-clusters-in-san-diego-census-tracts" title="Permalink to this heading">#</a></h2>
+<h2>Geodemographic clusters in san diego census tracts<a class="headerlink" href="#geodemographic-clusters-in-san-diego-census-tracts" title="Permalink to this headline">#</a></h2>
 <p>Geodemographic analysis is a form of multivariate
 clustering where the observations represent geographical areas <span id="id3">[<a class="reference internal" href="references.html#id88" title="Richard Webber and Roger Burrows. The predictive postcode: The geodemographic classification of British society. Sage, 2018.">WB18</a>]</span>. The output
 of these clusterings is nearly always mapped. Altogether, these methods use
@@ -908,7 +912,7 @@ into a single categorical one that we can visualize through a map. To
 demonstrate the variety of approaches in clustering, we will show two
 distinct but very popular clustering algorithms: k-means and Ward’s hierarchical method.</p>
 <section id="k-means">
-<h3>K-means<a class="headerlink" href="#k-means" title="Permalink to this heading">#</a></h3>
+<h3>K-means<a class="headerlink" href="#k-means" title="Permalink to this headline">#</a></h3>
 <p>K-means is probably the most widely used approach to
 cluster a dataset. The algorithm groups observations into a
 pre-specified number of clusters so that each observation is
@@ -977,7 +981,7 @@ The profiles of the various clusters must be further explored by looking
 at the values of each dimension. But, before we do that, let’s make a map.</p>
 </section>
 <section id="spatial-distribution-of-clusters">
-<h3>Spatial distribution of clusters<a class="headerlink" href="#spatial-distribution-of-clusters" title="Permalink to this heading">#</a></h3>
+<h3>Spatial distribution of clusters<a class="headerlink" href="#spatial-distribution-of-clusters" title="Permalink to this headline">#</a></h3>
 <p>Having obtained the cluster labels, Figure XXX3XXX displays the spatial
 distribution of the clusters by using the labels as the categories in a
 choropleth map. This allows us to quickly grasp any sort of spatial pattern the
@@ -1004,7 +1008,7 @@ Thus, this gives us one map that incorporates the information from all nine cova
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/be2783360d8fb71cb27ddcb3fb9656e31348f5db3b52cc5c28d7180e9996bb95.png" src="../_images/be2783360d8fb71cb27ddcb3fb9656e31348f5db3b52cc5c28d7180e9996bb95.png" />
+<img alt="../_images/681cb1806a1b36bd24cc318ae1a2aab45a06c08e86a77155cd02d4ac48cddfbb.png" src="../_images/681cb1806a1b36bd24cc318ae1a2aab45a06c08e86a77155cd02d4ac48cddfbb.png" />
 </div>
 </div>
 <p>The map provides a useful view of the clustering results; it allows for
@@ -1022,7 +1026,7 @@ different sizes and shapes, we cannot solely rely on our eyes to interpret
 the spatial distribution of clusters.</p>
 </section>
 <section id="statistical-analysis-of-the-cluster-map">
-<h3>Statistical analysis of the cluster map<a class="headerlink" href="#statistical-analysis-of-the-cluster-map" title="Permalink to this heading">#</a></h3>
+<h3>Statistical analysis of the cluster map<a class="headerlink" href="#statistical-analysis-of-the-cluster-map" title="Permalink to this headline">#</a></h3>
 <p>To complement the geovisualization of the clusters, we can explore the
 statistical properties of the cluster map. This process allows us to delve
 into what observations are part of each cluster and what their
@@ -1094,7 +1098,7 @@ Name: area_sqm, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/ae760f2ae366e73377231dfb65ae380d4d62e164dee506a90e47b28c2d0704d8.png" src="../_images/ae760f2ae366e73377231dfb65ae380d4d62e164dee506a90e47b28c2d0704d8.png" />
+<img alt="../_images/6b6bc49a0f3811de2c086762b364b234eef543e75b9179e6033d78592d28b596.png" src="../_images/6b6bc49a0f3811de2c086762b364b234eef543e75b9179e6033d78592d28b596.png" />
 </div>
 </div>
 <p>Our visual impression from the map is confirmed: cluster 1 contains tracts that
@@ -1107,7 +1111,7 @@ which accounts for well over half of the total land area in the county:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7355953810798616
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.7355953810798617
 </pre></div>
 </div>
 </div>
@@ -1357,7 +1361,7 @@ for each variable. This gives us the full distributional profile of each cluster
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/6b6c437b259a81c3524fe1569d47d73cf6d875f254698ae795aafa83d6f367f6.png" src="../_images/6b6c437b259a81c3524fe1569d47d73cf6d875f254698ae795aafa83d6f367f6.png" />
+<img alt="../_images/977e95857491830d129a0d4f938bfcbf666f05e82e52b36963109f5ed5c70ad0.png" src="../_images/977e95857491830d129a0d4f938bfcbf666f05e82e52b36963109f5ed5c70ad0.png" />
 </div>
 </div>
 <p>Note that we create the figure using the facetting functionality in <code class="docutils literal notranslate"><span class="pre">seaborn</span></code>, which
@@ -1372,7 +1376,7 @@ complexity of each cluster and the types of areas behind them.</p>
 </section>
 </section>
 <section id="hierarchical-clustering">
-<h2>Hierarchical Clustering<a class="headerlink" href="#hierarchical-clustering" title="Permalink to this heading">#</a></h2>
+<h2>Hierarchical Clustering<a class="headerlink" href="#hierarchical-clustering" title="Permalink to this headline">#</a></h2>
 <p>As mentioned above, k-means is only one clustering algorithm. There are
 plenty more. In this section, we will take a similar look at the San Diego
 dataset using another staple of the clustering toolkit: agglomerative
@@ -1651,7 +1655,7 @@ dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/06f94c23f9d7b26a9d118c66cecfe3910b87dd737d42bf2fa40d8f117b87c47f.png" src="../_images/06f94c23f9d7b26a9d118c66cecfe3910b87dd737d42bf2fa40d8f117b87c47f.png" />
+<img alt="../_images/15c6c19ae53679118f6f1209cbbe8d2237e2b1ddc1b8286bea25a1dd248875ca.png" src="../_images/15c6c19ae53679118f6f1209cbbe8d2237e2b1ddc1b8286bea25a1dd248875ca.png" />
 </div>
 </div>
 <p>For the sake of brevity, we will not spend much time on the plots above.
@@ -1705,7 +1709,7 @@ with k-means simpler, Figure XXX7XXX, generated with the code below, displays bo
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/142295350dc53cf4a4076b3c116d7016e843dd5c27892b6fed163ad3f9d42eec.png" src="../_images/142295350dc53cf4a4076b3c116d7016e843dd5c27892b6fed163ad3f9d42eec.png" />
+<img alt="../_images/5ab76eb59a902e8ec13079f12ac9b47a50fae916b01f04ae35acbc47ee5c12d1.png" src="../_images/5ab76eb59a902e8ec13079f12ac9b47a50fae916b01f04ae35acbc47ee5c12d1.png" />
 </div>
 </div>
 <p>While we must remember our earlier caveat about how irregular polygons can
@@ -1720,9 +1724,9 @@ every tract belonging to a cluster, we would have to journey through
 other clusters as well.</p>
 </section>
 <section id="regionalization-spatially-constrained-hierarchical-clustering">
-<h2>Regionalization: spatially constrained hierarchical clustering<a class="headerlink" href="#regionalization-spatially-constrained-hierarchical-clustering" title="Permalink to this heading">#</a></h2>
+<h2>Regionalization: spatially constrained hierarchical clustering<a class="headerlink" href="#regionalization-spatially-constrained-hierarchical-clustering" title="Permalink to this headline">#</a></h2>
 <section id="contiguity-constraint">
-<h3>Contiguity constraint<a class="headerlink" href="#contiguity-constraint" title="Permalink to this heading">#</a></h3>
+<h3>Contiguity constraint<a class="headerlink" href="#contiguity-constraint" title="Permalink to this headline">#</a></h3>
 <p>Fragmented clusters are not intrinsically invalid, particularly if we are
 interested in exploring the overall structure and geography of multivariate
 data. However, in some cases, the application we are interested in might
@@ -1775,12 +1779,11 @@ in a cluster if they are also spatially connected:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AgglomerativeClustering(connectivity=&lt;628x628 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+<div class="output text_html"><style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>AgglomerativeClustering(connectivity=&lt;628x628 sparse matrix of type &#x27;&lt;class &#x27;numpy.float64&#x27;&gt;&#x27;
 	with 4016 stored elements in Compressed Sparse Row format&gt;,
-                        n_clusters=5)
-</pre></div>
-</div>
-</div>
+                        n_clusters=5)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">AgglomerativeClustering</label><div class="sk-toggleable__content"><pre>AgglomerativeClustering(connectivity=&lt;628x628 sparse matrix of type &#x27;&lt;class &#x27;numpy.float64&#x27;&gt;&#x27;
+	with 4016 stored elements in Compressed Sparse Row format&gt;,
+                        n_clusters=5)</pre></div></div></div></div></div></div></div>
 </div>
 <p>Let’s inspect the output visually (Fig. XXX8XXX):</p>
 <div class="cell docutils container">
@@ -1804,7 +1807,7 @@ in a cluster if they are also spatially connected:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/b93786b8ec7285dbe46baa2b8f3ad914aab87feef424a96c0164692cd533e434.png" src="../_images/b93786b8ec7285dbe46baa2b8f3ad914aab87feef424a96c0164692cd533e434.png" />
+<img alt="../_images/7d3eeefd8ba8283ca1b9e9d403559e8bf7806a9daadadac7dcd3a0841f9a30c0.png" src="../_images/7d3eeefd8ba8283ca1b9e9d403559e8bf7806a9daadadac7dcd3a0841f9a30c0.png" />
 </div>
 </div>
 <p>Introducing the spatial constraint results in fully connected clusters with much
@@ -1815,7 +1818,7 @@ However, closer inspection reveals that each of these tracts is indeed connected
 to another tract in its own cluster by very narrow shared boundaries.</p>
 </section>
 <section id="changing-the-spatial-constraint">
-<h3>Changing the spatial constraint<a class="headerlink" href="#changing-the-spatial-constraint" title="Permalink to this heading">#</a></h3>
+<h3>Changing the spatial constraint<a class="headerlink" href="#changing-the-spatial-constraint" title="Permalink to this headline">#</a></h3>
 <p>The spatial constraint in regionalization algorithms is structured by the
 spatial weights matrix we use. An interesting
 question is thus how the choice of weights influences the final region structure.
@@ -1847,12 +1850,11 @@ another AHC regionalization:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AgglomerativeClustering(connectivity=&lt;628x628 sparse matrix of type &#39;&lt;class &#39;numpy.float64&#39;&gt;&#39;
+<div class="output text_html"><style>#sk-container-id-2 {color: black;background-color: white;}#sk-container-id-2 pre{padding: 0;}#sk-container-id-2 div.sk-toggleable {background-color: white;}#sk-container-id-2 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-2 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-2 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-2 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-2 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-2 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-2 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-2 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-2 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-2 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-2 div.sk-item {position: relative;z-index: 1;}#sk-container-id-2 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-2 div.sk-item::before, #sk-container-id-2 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-2 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-2 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-2 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-2 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-2 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-2 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-2 div.sk-label-container {text-align: center;}#sk-container-id-2 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-2 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>AgglomerativeClustering(connectivity=&lt;628x628 sparse matrix of type &#x27;&lt;class &#x27;numpy.float64&#x27;&gt;&#x27;
 	with 2512 stored elements in Compressed Sparse Row format&gt;,
-                        n_clusters=5)
-</pre></div>
-</div>
-</div>
+                        n_clusters=5)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" checked><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">AgglomerativeClustering</label><div class="sk-toggleable__content"><pre>AgglomerativeClustering(connectivity=&lt;628x628 sparse matrix of type &#x27;&lt;class &#x27;numpy.float64&#x27;&gt;&#x27;
+	with 2512 stored elements in Compressed Sparse Row format&gt;,
+                        n_clusters=5)</pre></div></div></div></div></div></div></div>
 </div>
 <p>And plot the final regions (Fig. XXX9XXX):</p>
 <div class="cell tag_hide-input docutils container">
@@ -1883,7 +1885,7 @@ another AHC regionalization:</p>
 </div>
 </details>
 <div class="cell_output docutils container">
-<img alt="../_images/ea4795578cb5c96becafe6fc4de4c8eed7d21f7114c99b0d3be340baa5b34c68.png" src="../_images/ea4795578cb5c96becafe6fc4de4c8eed7d21f7114c99b0d3be340baa5b34c68.png" />
+<img alt="../_images/9d5414472bb45dee08ea4484e17e7c41890d2ce932cd4091f08b7d36e16cb868.png" src="../_images/9d5414472bb45dee08ea4484e17e7c41890d2ce932cd4091f08b7d36e16cb868.png" />
 </div>
 </div>
 <p>Even though we have specified a spatial constraint, the constraint applies to the
@@ -1896,7 +1898,7 @@ we used the 4-nearest tracts to constrain connectivity, all of our clusters are 
 while the latter generally focuses on whether cluster observations are more similar to their current clusters than to other clusters. This <em>goodness of fit</em> is usually better for unconstrained clustering algorithms than for the corresponding regionalizations. We’ll show this next.</p>
 </section>
 <section id="geographical-coherence">
-<h3>Geographical coherence<a class="headerlink" href="#geographical-coherence" title="Permalink to this heading">#</a></h3>
+<h3>Geographical coherence<a class="headerlink" href="#geographical-coherence" title="Permalink to this headline">#</a></h3>
 <p>One very simple measure of geographical coherence involves the “compactness” of a given shape. The most common of these measures is the isoperimetric quotient <span id="id5">[<a class="reference internal" href="references.html#id33" title="David L Horn, Charles R Hampton, and Anthony J Vandenberg. Practical application of district compactness. Political Geography, 12:103–120, 1993.">HHV93</a>]</span>. This compares the area of the region to the area of a circle with the same perimeter as the region. To obtain the statistic, we can recognize that the circumference of the circle <span class="math notranslate nohighlight">\(c\)</span> is the same as the perimeter of the region <span class="math notranslate nohighlight">\(i\)</span>, so <span class="math notranslate nohighlight">\(P_i = 2\pi r_c\)</span>. Then, the area of the isoperimetric circle is <span class="math notranslate nohighlight">\(A_c = \pi r_c^2 = \pi \left(\frac{P_i}{2 \pi}\right)^2\)</span>. Simplifying, we get:</p>
 <div class="math notranslate nohighlight">
 \[ IPQ_i = \frac{A_i}{A_c} = \frac{4 \pi A_i}{P_i^2}\]</div>
@@ -1989,7 +1991,7 @@ while the latter generally focuses on whether cluster observations are more simi
 <p>Many other measures of shape regularity exist. Most of the well-used ones are implemented in the <code class="docutils literal notranslate"><span class="pre">esda.shapestats</span></code> module, which also documents the sensitivity of the different measures of shape.</p>
 </section>
 <section id="feature-coherence-goodness-of-fit">
-<h3>Feature coherence (goodness of fit)<a class="headerlink" href="#feature-coherence-goodness-of-fit" title="Permalink to this heading">#</a></h3>
+<h3>Feature coherence (goodness of fit)<a class="headerlink" href="#feature-coherence-goodness-of-fit" title="Permalink to this headline">#</a></h3>
 <p>Many measures of the feature coherence, or <em>goodness of fit</em>, are implemented in scikit-learn’s <code class="docutils literal notranslate"><span class="pre">metrics</span></code> module, which we used earlier to compute distances. This metrics module also contains a few goodness of fit statistics that measure, for example:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">metrics.calinski_harabasz_score()</span></code> (CH): the within-cluster variance divided by the between-cluster variance.</p></li>
@@ -2067,7 +2069,7 @@ while the latter generally focuses on whether cluster observations are more simi
 <p>For all functions in <code class="docutils literal notranslate"><span class="pre">metrics</span></code> that end in “score”, higher numbers indicate greater fit, whereas functions that end in <code class="docutils literal notranslate"><span class="pre">loss</span></code> work in the other direction. Thus, the K-means solution has the highest Calinski-Harabasz score, while the ward clustering comes second. The regionalizations both come <em>well</em> below the clusterings, too. As we said before, the improved geographical coherence comes at a pretty hefty cost in terms of feature goodness of fit. This is because regionalization is <em>constrained</em>, and mathematically <em>cannot</em> achieve the same score as the unconstrained K-means solution, unless we get lucky and the k-means solution <em>is</em> a valid regionalization.</p>
 </section>
 <section id="solution-similarity">
-<h3>Solution similarity<a class="headerlink" href="#solution-similarity" title="Permalink to this heading">#</a></h3>
+<h3>Solution similarity<a class="headerlink" href="#solution-similarity" title="Permalink to this headline">#</a></h3>
 <p>The <code class="docutils literal notranslate"><span class="pre">metrics</span></code> module also contains useful tools to compare whether the labelings generated from different clustering algorithms are similar, such as the Adjusted Rand Score or the Mutual Information Score. To show that, we can see how similar clusterings are to one another:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2160,7 +2162,7 @@ while the latter generally focuses on whether cluster observations are more simi
 </section>
 </section>
 <section id="conclusion">
-<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this heading">#</a></h2>
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">#</a></h2>
 <p>Overall, clustering and regionalization are two complementary tools to reduce
 complexity in multivariate data and build better understandings of their spatial structure.
 Often, there is simply too much data to examine every variable’s map and its
@@ -2196,7 +2198,7 @@ determines the spatial structure and data profile of discovered clusters or regi
 Thus, clustering and regionalization are essential tools for the geographic data scientist.</p>
 </section>
 <section id="questions">
-<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this heading">#</a></h2>
+<h2>Questions<a class="headerlink" href="#questions" title="Permalink to this headline">#</a></h2>
 <ol class="arabic">
 <li><p>What disciplines employ regionalization? Cite concrete examples for each discipline you list.</p></li>
 <li><p>Contrast and compare  the concepts of <em>clusters</em> and <em>regions</em>?</p></li>
@@ -2213,7 +2215,7 @@ Thus, clustering and regionalization are essential tools for the geographic data
 </ol>
 </section>
 <section id="next-steps">
-<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this heading">#</a></h2>
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this headline">#</a></h2>
 <p>For a “classical” introduction to clustering methods in arbitrary data science problems, it is difficult to beat the <em>Introduction to Statistical Learning</em>:</p>
 <p>James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2021. <em>Introduction to Statistical Learning</em> (2nd Edition). Wiley: New York.</p>
 <p>For regionalization problems and methods, a useful discussion of the theory and operation of various heuristics and methods is provided by:</p>
@@ -2251,7 +2253,10 @@ Thus, clustering and regionalization are essential tools for the geographic data
               
               
                 <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
     <a class="left-prev"
        href="09_spatial_inequality.html"
@@ -2271,7 +2276,10 @@ Thus, clustering and regionalization are essential tools for the geographic data
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -2314,7 +2322,7 @@ Thus, clustering and regionalization are essential tools for the geographic data
             
           </div>
           <footer class="bd-footer-content">
-            <div class="bd-footer-content__inner">
+            
 <div class="bd-footer-content__inner container">
   
   <div class="footer-item">
@@ -2348,7 +2356,7 @@ By Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf
 </div>
   </div>
   
-</div></div>
+</div>
           </footer>
         
 
@@ -2357,8 +2365,8 @@ By Sergio J. Rey, Dani Arribas-Bel, Levi J. Wolf
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
-<script src="../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
 
   <footer class="bd-footer">
   </footer>

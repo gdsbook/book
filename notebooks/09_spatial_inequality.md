@@ -7,7 +7,7 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.13.8
+      jupytext_version: 1.14.5
   kernelspec:
     display_name: Python 3 (ipykernel)
     language: python
@@ -268,7 +268,7 @@ cumulative_share = shares.cumsum()
 
 With this, we can plot both the Lorenz curve and the line of perfect equality (Fig. XXX4XXX):
 
-```python caption="The Lorenz curve for county per capita income 1969." tags=[]
+```python caption="The Lorenz curve for county per capita income 1969."
 # Generate figure with one axis
 f, ax = plt.subplots()
 # Plot Lorenz Curve
@@ -393,7 +393,7 @@ The time paths of the Gini and the Theil coefficients appear to show striking
 similarities. At first glance, this might suggest that the indices are
 substitutes for one another. However, if we plot them against each other (Fig. XXX8XXX), we can see they are not perfectly correlated: 
 
-```python caption="Relationship between Gini and Theil indices for county per capita income distributions since 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"} tags=[]
+```python caption="Relationship between Gini and Theil indices for county per capita income distributions since 1969." ein.hycell=false ein.tags="worksheet-0" jupyter={"outputs_hidden": false} slideshow={"slide_type": "-"}
 _ = seaborn.regplot(x="theil", y="gini", data=inequalities)
 ```
 
