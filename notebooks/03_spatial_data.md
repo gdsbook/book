@@ -204,10 +204,10 @@ represented as grids where each cell contains a sample. A grid can also be
 thought of as a table with rows and columns but, as we discussed in the previous
 chapter, both of them are directly tied to a geographic location. This is in sharp contrast with geographic tables, where geography is confined to a single column.
 
-To explore how Python represents surfaces, we will use an extract for the Brazilian city of Sao Paulo of a [global population dataset](../data/ghsl/build_ghsl_extract). This dataset records population counts in cells of the same dimensions uniformly covering the surface of the Earth. Our extract is available as a GeoTIF file, a variation of the TIF image format that includes geographic information. We can use the `open_rasterio()` method from the `xarray` package to read in the GeoTIF:
+To explore how Python represents surfaces, we will use an extract for the Brazilian city of Sao Paulo of a [global population dataset](../data/ghsl/build_ghsl_extract). This dataset records population counts in cells of the same dimensions uniformly covering the surface of the Earth. Our extract is available as a GeoTIF file, a variation of the TIF image format that includes geographic information. We can use the `open_rasterio()` method from the `rioxarray` package to read in the GeoTIF:
 
 ```python
-pop = xarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
+pop = rioxarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
 ```
 
 This reads the data into a `DataArray` object:
@@ -357,10 +357,10 @@ We will see two ways of going from surfaces to tables: one converts every pixel 
 
 #### One pixel at a time
 
-Technically, going from surface to table involves traversing from `xarray` to `pandas` objects. This is actually a well established bridge. To illustrate it with an example, let's revisit the population counts in [Sao Paulo](../data/ghsl/build_ghsl_extract) used earlier. We can read the surface into a `DataArray` object with the `open_rasterio()` method:
+Technically, going from surface to table involves traversing from `xarray` to `pandas` objects. This is actually a well established bridge. To illustrate it with an example, let's revisit the population counts in [Sao Paulo](../data/ghsl/build_ghsl_extract) used earlier. We can read the surface into a `DataArray` object with `rioxarray`, a special package designed to work with raster data in `xarray`. We can use its `open_rasterio()` method to read in the data:
 
 ```python
-surface = xarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
+surface = rioxarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
 ```
 
 Transferring to a table is as simple as calling the `DataArray`'s `to_series()` method:
@@ -454,7 +454,7 @@ use the digital elevation model [(DEM)](../data/nasadem/build_nasadem_sd) surfac
 Let's start by reading the data. First, the elevation model:
 
 ```python caption="Digital Elevation Model as a raster."
-dem = xarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(
+dem = rioxarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(
     band=1
 )
 dem.where(dem > 0).plot.imshow();

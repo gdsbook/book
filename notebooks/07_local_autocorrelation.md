@@ -491,7 +491,7 @@ For this case, we will use the GHSL dataset that contains an extract of gridded 
 
 ```python
 # Open GeoTIFF file and read into `xarray.DataArray`
-pop = xarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
+pop = rioxarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
 ```
 
 Next is building a weights matrix that represents the spatial configuration of pixels with values in `pop`. We will use the same approach as we saw in the chapter on weights:
