@@ -5,6 +5,10 @@
 * [Dani Arribas-Bel](https://darribas.org)
 * [Levi J. Wolf](http://www.ljwolf.org/)
 
+[![](https://images.routledge.com/common/jackets/crclarge/978103244/9781032445953.jpg)](https://www.routledge.com/Geographic-Data-Science-with-Python/Rey-Arribas-Bel-Wolf/p/book/9781032445953)
+
+You can buy a physical copy of this book [here](https://www.routledge.com/Geographic-Data-Science-with-Python/Rey-Arribas-Bel-Wolf/p/book/9781032445953).
+
 ## Introduction
 
 This book provides the tools, the methods, and the theory to meet the challenges of contemporary data science applied to geographic problems and data. Social media, new forms of data, and new computational techniques are revolutionizing social science. In the new world of pervasive, large, frequent, and rapid data, we have new opportunities to understand and analyze the role of geography in everyday life. This book provides the first comprehensive curriculum in geographic data science.
