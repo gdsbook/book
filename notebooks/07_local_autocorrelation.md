@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.15.2
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-10.0
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -447,7 +447,7 @@ def g_map(g, db, ax):
     contextily.add_basemap(
         ax,
         crs=db.crs,
-        source=contextily.providers.Stamen.TerrainBackground,
+        source=contextily.providers.Esri.WorldTerrain,
     )
     # Flag to add a star to the title if it's G_i*
     st = ""
@@ -517,20 +517,21 @@ type(w_surface_sp)
 We take both steps in the following code snippet:
 
 ```python
-w_surface = weights.WSP2W(  # 3.Convert `WSP` object to `W`
-    weights.WSP(  # 2.Build `WSP` from the float sparse matrix
+w_surface_all = weights.WSP2W(  # 3.Convert `WSP` object to `W`
+    weights.WSP(  # 2a.Build `WSP` from the float sparse matrix
         w_surface_sp.sparse.astype(
             float
-        )  # 1.Convert sparse matrix to floats
+        ),  # 1.Convert sparse matrix to floats
+        id_order=w_surface_sp.index.tolist() # 2b. Ensure `W` is indexed
     )
 )
-w_surface.index = w_surface_sp.index  # 4.Assign index to new `W`
+w_surface_all.index = w_surface_sp.index  # 4.Assign index to new `W`
 ```
 
 There is quite a bit going on in those lines of code, so let's unpack them:
 
 1. The first step (line 3) is to convert the values from integers into floats. To do this, we access the sparse matrix at the core of `w_surface_sp` (which holds all the main data) and convert it to floats using `astype`.
-1. Then we convert that sparse matrix into a `WSP` object (line 2), which is a thin wrapper, so the operation is quick.
+1. Then we convert that sparse matrix into a `WSP` object (line 2), which is a thin wrapper, so the operation is quick (we also ensure the resulting object is properly indexed).
 1. Once represented as a `WSP`, we can use Pysal again to convert it into a full-fledged `W` object using the `WSP2W` utility. This step may take a bit more of computing muscle.
 1. Finally, spatial weights from surfaces include an `index` object that will help us later return data into a surface data structure. Since this is lost with the transformations, we reattach it in the final line (line 6) from the original object.
 
@@ -547,6 +548,13 @@ Note that we do two operations: one is to convert the two-dimensional `DataArray
 
 ```python
 pop.rio.nodata
+```
+
+One final step: our `w_surface_all` contains a row and a column for every pixel in `pop`, including those without a value (i.e., those with `nodata`). We need to subset it to align it with `pop_values`:
+
+```python
+w_surface = weights.w_subset(w_surface_all, pop_values.index)
+w_surface.index = pop_values.index
 ```
 
 At this point, we are ready to run a LISA the same way we have done in the previous chapter when using geo-tables:
@@ -586,7 +594,7 @@ lisa_da = raster.w2da(
     sig_pop,  # Values
     w_surface,  # Spatial weights
     attrs={
-        "nodatavals": pop.attrs["nodatavals"]
+        "nodatavals": [pop.rio.nodata]
     }  # Value for missing data
     # Add CRS information in a compliant manner
 ).rio.write_crs(pop.rio.crs)
