@@ -442,7 +442,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <p>We continue with the same dataset about Brexit voting that we examined in the previous chapter, and thus we utilize the same imports and initial data preparation steps:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># Graphics</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>  <span class="c1"># Graphics</span>
 <span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">colors</span>
 <span class="kn">import</span> <span class="nn">seaborn</span>  <span class="c1"># Graphics</span>
 <span class="kn">import</span> <span class="nn">geopandas</span>  <span class="c1"># Spatial data manipulation</span>
@@ -459,7 +459,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <p>We read the vote data as a non-spatial table:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ref</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
     <span class="s2">&quot;../data/brexit/brexit_vote.csv&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s2">&quot;Area_Code&quot;</span>
 <span class="p">)</span>
 </pre></div>
@@ -469,7 +469,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <p>And the spatial geometries for the local authority districts in Great Britain:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lads</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span>
     <span class="s2">&quot;../data/brexit/local_authority_districts.geojson&quot;</span>
 <span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;lad16cd&quot;</span><span class="p">)</span>
 </pre></div>
@@ -479,7 +479,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <p>Then, we “trim” the <code class="docutils literal notranslate"><span class="pre">DataFrame</span></code> so it retains only what we know we will need, reproject it to spherical mercator, and drop rows with missing data:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span> <span class="o">=</span> <span class="p">(</span>
     <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
         <span class="n">lads</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ref</span><span class="p">[[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]]),</span> <span class="n">crs</span><span class="o">=</span><span class="n">lads</span><span class="o">.</span><span class="n">crs</span>
     <span class="p">)</span>
@@ -493,11 +493,26 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+Index: 380 entries, E06000001 to W06000023
+Data columns (total 4 columns):
+ #   Column     Non-Null Count  Dtype   
+---  ------     --------------  -----   
+ 0   objectid   380 non-null    int64   
+ 1   lad16nm    380 non-null    object  
+ 2   Pct_Leave  380 non-null    float64 
+ 3   geometry   380 non-null    geometry
+dtypes: float64(1), geometry(1), int64(1), object(1)
+memory usage: 22.9+ KB
+</pre></div>
+</div>
+</div>
 </div>
 <p>Although there are several variables that could be considered, we will focus on <code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>, which measures the proportion of votes in the UK Local Authority that wanted to Leave the European Union. With these elements, we can generate a choropleth to get a quick sense of the spatial distribution of the data we will be analyzing. Note how we use some visual tweaks (e.g., transparency through the <code class="docutils literal notranslate"><span class="pre">alpha</span></code> attribute) to make the final plot easier to read in Figure 1:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and a single axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and a single axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
 <span class="c1"># Build choropleth</span>
 <span class="n">db</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
@@ -523,11 +538,14 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/4eaf1a0eed7d621517b99029e57da1dc914149bf6d1ca424c49975a36f944d25.png" src="../_images/4eaf1a0eed7d621517b99029e57da1dc914149bf6d1ca424c49975a36f944d25.png" />
+</div>
 </div>
 <p>As in the previous chapter, we require a spatial weights matrix to implement our statistic. Here, we will use eight nearest neighbors for the sake of the example, but the discussion in the earlier chapter on weights applies in this context, and other criteria would be valid too. We also row-standardize them:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate W from the GeoDataFrame</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Generate W from the GeoDataFrame</span>
 <span class="n">w</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">KNN</span><span class="o">.</span><span class="n">from_dataframe</span><span class="p">(</span><span class="n">db</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="c1"># Row-standardization</span>
 <span class="n">w</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="s2">&quot;R&quot;</span>
@@ -541,7 +559,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <p>To better understand the underpinnings of local spatial autocorrelation, we return to the Moran Plot as a graphical tool. In this context, it is more intuitive to represent the data in a standardized form, as it will allow us to more easily discern a typology of spatial structure. Let us first calculate the spatial lag of our variable of interest:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">])</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -549,7 +567,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <p>And their respective centered versions, where we subtract the average off of every value:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
 <span class="n">db</span><span class="p">[</span><span class="s2">&quot;w_Pct_Leave_std&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_spatial</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">db</span><span class="p">[</span><span class="s1">&#39;Pct_Leave_std&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
@@ -558,7 +576,7 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 <p>Technically speaking, creating a Moran scatterplot is very similar to creating any other scatterplot. We have also done this before in Chapter 6. To see this again, we can make Figure 2:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up the figure and axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up the figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Plot values</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
@@ -568,11 +586,14 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/8e3eaa2aef758420b31ca23decf029dacdca97888f378e6a5bcf6f6b9dd0dda7.png" src="../_images/8e3eaa2aef758420b31ca23decf029dacdca97888f378e6a5bcf6f6b9dd0dda7.png" />
+</div>
 </div>
 <p>Using standardized values, we can immediately divide each variable (percentage that voted to leave, and its spatial lag) in two groups: those with above-average leave voting, which have positive standardized values; and those with below-average leave voting, which feature negative standardized values. Applying this thinking to both the percentage to leave and its spatial lag, divides a Moran scatterplot into four quadrants. Each of them captures a situation based on whether a given area displays a value above the mean (high) or below (low) in either the original variable (<code class="docutils literal notranslate"><span class="pre">Pct_Leave</span></code>) or its spatial lag (<code class="docutils literal notranslate"><span class="pre">w_Pct_Leave_std</span></code>). Using this terminology, we name the four quadrants as follows: high-high (HH) for the top-right, low-high (LH) for the top-left, low-low (LL) for the bottom-left, and high-low (HL) for the bottom right. Graphically, we can express this in Figure 3:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up the figure and axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up the figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Plot values</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span>
@@ -591,6 +612,9 @@ Local measures of spatial autocorrelation focus on the relationships between <em
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/239313cd679b02f541c0b9695766e0b831ab65529101648de9069aaa58c8d164.png" src="../_images/239313cd679b02f541c0b9695766e0b831ab65529101648de9069aaa58c8d164.png" />
+</div>
 </div>
 </section>
 <section id="local-moran-s-i-i">
@@ -606,7 +630,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>In Python, we can calculate LISAs in a very streamlined way thanks to <code class="docutils literal notranslate"><span class="pre">esda</span></code>. To compute local Moran statistics, we use the <code class="docutils literal notranslate"><span class="pre">Moran_Local</span></code> function:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lisa</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -614,13 +638,16 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>We need to pass the variable of interest—proportion of Leave votes in this context—and the spatial weights that describes the neighborhood relations between the different areas that make up the dataset. This creates a LISA object (<code class="docutils literal notranslate"><span class="pre">lisa</span></code>) that has a number of attributes of interest. The local indicators themselves are in the <code class="docutils literal notranslate"><span class="pre">Is</span></code> attribute and we can get a sense of their distribution using <code class="docutils literal notranslate"><span class="pre">seaborn</span></code>’s kernel density estimate plotting, as in Figure 4:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Draw KDE line</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Draw KDE line</span>
 <span class="n">ax</span> <span class="o">=</span> <span class="n">seaborn</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">Is</span><span class="p">)</span>
 <span class="c1"># Add one small bar (rug) for each observation</span>
 <span class="c1"># along horizontal axis</span>
 <span class="n">seaborn</span><span class="o">.</span><span class="n">rugplot</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">Is</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">);</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/5097cf84530be0ccbadc96d7869c06328918c481ccc99d2ef8261495d04544bb.png" src="../_images/5097cf84530be0ccbadc96d7869c06328918c481ccc99d2ef8261495d04544bb.png" />
 </div>
 </div>
 <p>The figure reveals a rather skewed distribution of local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistics. This outcome is due to the dominance of positive forms of spatial association, implying most of the local statistic values will be positive. Here it is important to keep in mind that the high positive values arise from value similarity in space, and this can be due to either high values being next to high values <em>or</em> low values next to low values. The local <span class="math notranslate nohighlight">\(I_i\)</span> values alone cannot distinguish these two cases.</p>
@@ -629,7 +656,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>To answer these questions, we need to bring in additional information that we have computed when calculating the LISA statistics. We do this in four acts. The first one we have already mentioned: a straighforward choropleth of the local statistic of each area. The other three include information on the quadrant each area is assigned into, whether the statistic is considered significant or not, and a combination of those two in a single so-called <em>cluster</em> map. A handy tool in this context is the <code class="docutils literal notranslate"><span class="pre">splot</span></code> library, part of the Pysal family, which provides a lightweight visualization layer for spatial statistics:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">splot</span> <span class="kn">import</span> <span class="n">esda</span> <span class="k">as</span> <span class="n">esdaplot</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">splot</span> <span class="kn">import</span> <span class="n">esda</span> <span class="k">as</span> <span class="n">esdaplot</span>
 </pre></div>
 </div>
 </div>
@@ -637,7 +664,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>With all pieces in place, let’s first get busy building the figure:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axes</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axes</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
 <span class="c1"># Make the axes accessible with single indexing</span>
 <span class="n">axs</span> <span class="o">=</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
@@ -729,12 +756,20 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/75592cafdbca8db2fb189f06049ac9c95852118829caabe05389c3ce9de20d9b.png" src="../_images/75592cafdbca8db2fb189f06049ac9c95852118829caabe05389c3ce9de20d9b.png" />
+</div>
 </div>
 <p>The purple and yellow locations in the top-right map in Figure 5 display the largest magnitude (positive and negative values) for the local statistics <span class="math notranslate nohighlight">\(I_i\)</span>. Yet, remember this signifies positive spatial autocorrelation, which can be of high <em>or</em> low values. This map thus cannot distinguish between areas with low support for the Brexit vote and those highly in favour.</p>
 <p>To distinguish between these two cases, the map in the top-right of Figure 5 shows the location of the LISA statistic in the quadrant of the Moran scatterplot. This indicates whether the positive (or negative) local association exists within a specific <em>quadrant</em>, such as the HH quadrant. This information is recorded in the <code class="docutils literal notranslate"><span class="pre">q</span></code> attribute of the <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">[:</span><span class="mi">10</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([1, 1, 1, 1, 1, 1, 4, 1, 4, 1])
 </pre></div>
 </div>
 </div>
@@ -742,8 +777,17 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>The correspondence between the numbers in the <code class="docutils literal notranslate"><span class="pre">q</span></code> attribute and the actual quadrants is as follows: <code class="docutils literal notranslate"><span class="pre">1</span></code> represents observations in the HH quadrant, <code class="docutils literal notranslate"><span class="pre">2</span></code> those in the LH one, <code class="docutils literal notranslate"><span class="pre">3</span></code> in the LL region, and <code class="docutils literal notranslate"><span class="pre">4</span></code> in the HL quadrant. Comparing the two maps in the top row reveals that the positive local association in Scotland is due to low support for Brexit, while the positive local association in the south is among local authorities that strongly support Brexit. Overall, we can obtain counts of areas in each quadrant as follows:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">q</span><span class="p">)</span>
 <span class="n">counts</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1    183
+3    113
+2     50
+4     34
+Name: count, dtype: int64
 </pre></div>
 </div>
 </div>
@@ -753,7 +797,12 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>Reading the clustermap reveals a few interesting aspects that would have been hard to grasp by looking at the other maps only and that are arguably more relevant for an analysis of the data. First, fewer than half of polygons have degrees of local spatial association strong enough to reject the idea of pure chance:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>40.526315789473685
 </pre></div>
 </div>
 </div>
@@ -763,7 +812,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>First, we pull the information computed in <code class="docutils literal notranslate"><span class="pre">lisa</span></code> and insert it in the main data table:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assign pseudo P-values to `db`</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Assign pseudo P-values to `db`</span>
 <span class="n">db</span><span class="p">[</span><span class="s2">&quot;p-sim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span>
 <span class="c1"># `1` if significant (at 5% confidence level), `0` otherwise</span>
 <span class="n">sig</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="p">(</span><span class="n">lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">)</span>
@@ -774,21 +823,135 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sig</th>
+      <th>p-sim</th>
+    </tr>
+    <tr>
+      <th>lad16cd</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>E06000001</th>
+      <td>1</td>
+      <td>0.009</td>
+    </tr>
+    <tr>
+      <th>E06000002</th>
+      <td>1</td>
+      <td>0.009</td>
+    </tr>
+    <tr>
+      <th>E06000003</th>
+      <td>1</td>
+      <td>0.015</td>
+    </tr>
+    <tr>
+      <th>E06000004</th>
+      <td>1</td>
+      <td>0.011</td>
+    </tr>
+    <tr>
+      <th>E06000010</th>
+      <td>1</td>
+      <td>0.017</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print bottom of the table to inspect</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print bottom of the table to inspect</span>
 <span class="n">db</span><span class="p">[[</span><span class="s2">&quot;sig&quot;</span><span class="p">,</span> <span class="s2">&quot;p-sim&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">tail</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>sig</th>
+      <th>p-sim</th>
+    </tr>
+    <tr>
+      <th>lad16cd</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>W06000018</th>
+      <td>0</td>
+      <td>0.497</td>
+    </tr>
+    <tr>
+      <th>W06000019</th>
+      <td>0</td>
+      <td>0.486</td>
+    </tr>
+    <tr>
+      <th>W06000021</th>
+      <td>0</td>
+      <td>0.480</td>
+    </tr>
+    <tr>
+      <th>W06000022</th>
+      <td>0</td>
+      <td>0.348</td>
+    </tr>
+    <tr>
+      <th>W06000023</th>
+      <td>0</td>
+      <td>0.275</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
 </div>
 <p>Thus, the first five values are statistically significant, while the last five observations are not.</p>
 <p>Let us stop for a second on these two steps. First, we consider the <code class="docutils literal notranslate"><span class="pre">sig</span></code> column. Akin to global Moran’s I, <code class="docutils literal notranslate"><span class="pre">esda</span></code> automatically computes a pseudo-<span class="math notranslate nohighlight">\(p\)</span>-value for each LISA. Because some instances of the LISA statistics may not be statistically significant, we want to identify those with a p-value small enough that rules out the possibility of obtaining a similar value in random maps. A few different ways of generating random maps are considered by <code class="docutils literal notranslate"><span class="pre">esda</span></code>, but we focus on a strategy that actually simulates hundreds of thousands of random maps to get a rough idea of the possible local statistic values at each local authority given the data we saw. In addition, we follow a similar reasoning as with global Moran’s I and use 5% as the threshold for statistical significance. To identify these values, we create a variable, <code class="docutils literal notranslate"><span class="pre">sig</span></code>, that contains <code class="docutils literal notranslate"><span class="pre">True</span></code> if the p-value of the observation satisfies the condition, and <code class="docutils literal notranslate"><span class="pre">False</span></code> otherwise.</p>
 <p>Next, we construct our quadrant values using the <code class="docutils literal notranslate"><span class="pre">q</span></code> attribute which records the Moran Scatterplot quadrant for each local value. However, we now mask these values using the newly created binary significance measure <code class="docutils literal notranslate"><span class="pre">sig</span></code>, so only observations in a quadrant that are considered significant are labeled as part of that given quadrant. The remainder are labeled as non-significant.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pick as part of a quadrant only significant polygons,</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pick as part of a quadrant only significant polygons,</span>
 <span class="c1"># assign `0` otherwise (Non-significant polygons)</span>
 <span class="n">spots</span> <span class="o">=</span> <span class="n">lisa</span><span class="o">.</span><span class="n">q</span> <span class="o">*</span> <span class="n">sig</span>
 <span class="c1"># Mapping from value to name (as a dict)</span>
@@ -812,12 +975,34 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>lad16cd
+E06000001    HH
+E06000002    HH
+E06000003    HH
+E06000004    HH
+E06000010    HH
+Name: labels, dtype: object
+</pre></div>
+</div>
+</div>
 </div>
 <p>These cluster labels are meaningful if you know of the Moran Plot. To help making them a bit more intuitive, a terminology that is sometimes used goes as follows. Positive forms of local spatial autocorrelation are of two types. First, HH observations, which we can term as “hot spots”, represent areas where values at the site and its surroundings are larger than average. Second, LL observations, significant clusters of low values surrounded by low values, are sometimes referred to as “cold spots”. Negative forms of local spatial autocorrelation also include two cases. When the focal observation displays low values but its surroundings have high values (LH), we call them “doughnuts”. Conversely, areas with high values but neighbored by others with low values (HL) can be referred to as “diamonds in the rough”. We note this terminology is purely mnemonic, but recognize in some cases it can help in remembering the interpretation of local statistics.</p>
 <p>After building these new columns, analysis on the overall trends of LISA statistics is more straightforward than from the <code class="docutils literal notranslate"><span class="pre">lisa</span></code> object. For example, an overview of the distribution of labels is one line away:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>labels
+Non-Significant    226
+HH                  75
+LL                  69
+LH                   6
+HL                   4
+Name: count, dtype: int64
 </pre></div>
 </div>
 </div>
@@ -829,7 +1014,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>Similar to the global case, there are more local indicators of spatial correlation than the local Moran’s I. <code class="docutils literal notranslate"><span class="pre">esda</span></code> includes Getis and Ord’s <span class="math notranslate nohighlight">\(G_i\)</span>-type statistics. These are a different kind of local statistic that are commonly used in two forms: the <span class="math notranslate nohighlight">\(G_i\)</span> statistic, which omits the value at a site in its local summary, and the <span class="math notranslate nohighlight">\(G_i^*\)</span>, which includes the site’s own value in the local summary. The way to calculate them also follows similar patterns as with the Local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> statistics above. Let us see how that would look like for our Brexit example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gi</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Gi</span>
 <span class="n">go_i</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">)</span>
 <span class="c1"># Gi*</span>
 <span class="n">go_i_star</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">getisord</span><span class="o">.</span><span class="n">G_Local</span><span class="p">(</span><span class="n">db</span><span class="p">[</span><span class="s2">&quot;Pct_Leave&quot;</span><span class="p">],</span> <span class="n">w</span><span class="p">,</span> <span class="n">star</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -841,7 +1026,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>Unlike with LISAs, <code class="docutils literal notranslate"><span class="pre">splot</span></code> does not support visualization of G statistics at this point. To visualize their output, we will instead write a little function that generates the map from the statistic’s output object and its set of associated geometries.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">g_map</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">db</span><span class="p">,</span> <span class="n">ax</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a cluster map</span>
 <span class="sd">    ...</span>
@@ -879,7 +1064,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
     <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span>
         <span class="n">ax</span><span class="p">,</span>
         <span class="n">crs</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
-        <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Stamen</span><span class="o">.</span><span class="n">TerrainBackground</span><span class="p">,</span>
+        <span class="n">source</span><span class="o">=</span><span class="n">contextily</span><span class="o">.</span><span class="n">providers</span><span class="o">.</span><span class="n">Esri</span><span class="o">.</span><span class="n">WorldTerrain</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># Flag to add a star to the title if it&#39;s G_i*</span>
     <span class="n">st</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
@@ -897,7 +1082,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>With this function at hand, generating <span class="math notranslate nohighlight">\(G_i^{(*)}\)</span> cluster maps is as straightforward as it is for LISA outputs through <code class="docutils literal notranslate"><span class="pre">splot</span></code> in Figure 6:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axes</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axes</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Loop over the two statistics</span>
 <span class="k">for</span> <span class="n">g</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">go_i</span><span class="p">,</span> <span class="n">go_i_star</span><span class="p">],</span> <span class="n">axs</span><span class="o">.</span><span class="n">flatten</span><span class="p">()):</span>
@@ -910,6 +1095,9 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<img alt="../_images/74706c8208a263f2ceacd70bdcdd3ffa9026707c487f550d65c9aa0acdb6ba2c.png" src="../_images/74706c8208a263f2ceacd70bdcdd3ffa9026707c487f550d65c9aa0acdb6ba2c.png" />
+</div>
 </div>
 <p>In this case, the results are virtually the same for <span class="math notranslate nohighlight">\(G_i\)</span> and <span class="math notranslate nohighlight">\(G_i^*\)</span>. Also, at first glance, these maps appear to be visually similar to the final LISA map from above. Naturally, this leads to the question: <em>why use the <span class="math notranslate nohighlight">\(G_i\)</span> statistics at all?</em> The answer to this question is that the two sets of local statistics, local <span class="math notranslate nohighlight">\(I\)</span> and local <span class="math notranslate nohighlight">\(G_i\)</span>, are complementary statistics. The local <span class="math notranslate nohighlight">\(I_i\)</span> statistic (on its own) gives an indication of cluster/outlier status, and the local <span class="math notranslate nohighlight">\(G_i\)</span> shows which side of the hotspot/coldspot divide the observation is on. Alternatively, the local Moran’s <span class="math notranslate nohighlight">\(I_i\)</span> cluster map provides both pieces of information, but it can be more challenging to visualize all at once. Thus, it depends on your analytical preferences and the point of the analysis at hand.</p>
 </section>
@@ -920,7 +1108,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>For this case, we will use the GHSL dataset that contains an extract of gridded population for the metropolitan region of Sao Paulo (Brazil). Let us read the data first into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Open GeoTIFF file and read into `xarray.DataArray`</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Open GeoTIFF file and read into `xarray.DataArray`</span>
 <span class="n">pop</span> <span class="o">=</span> <span class="n">rioxarray</span><span class="o">.</span><span class="n">open_rasterio</span><span class="p">(</span><span class="s2">&quot;../data/ghsl/ghsl_sao_paulo.tif&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -929,7 +1117,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>Next is building a weights matrix that represents the spatial configuration of pixels with values in <code class="docutils literal notranslate"><span class="pre">pop</span></code>. We will use the same approach as we saw in the chapter on weights:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface_sp</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">Queen</span><span class="o">.</span><span class="n">from_xarray</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface_sp</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">Queen</span><span class="o">.</span><span class="n">from_xarray</span><span class="p">(</span><span class="n">pop</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -937,7 +1125,12 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>So far, so good. Now comes the first hairy bit. The weights builder for surfaces automatically generates a matrix with integers (<code class="docutils literal notranslate"><span class="pre">int8</span></code> in this case which, roughly speaking, are numbers without a decimal component):</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface_sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">dtype</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface_sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">dtype</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dtype(&#39;int8&#39;)
 </pre></div>
 </div>
 </div>
@@ -945,7 +1138,12 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>For the LISA computation, we will need two changes in <code class="docutils literal notranslate"><span class="pre">w_surface_sp</span></code>. First, the matrix needs to be expressed as floats (roughly speaking, numbers with a decimal component) so we can multiply values and obtain the correct result. Second, we need a <code class="docutils literal notranslate"><span class="pre">W</span></code> object and, so far, we have a <code class="docutils literal notranslate"><span class="pre">WSP</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">w_surface_sp</span><span class="p">)</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">type</span><span class="p">(</span><span class="n">w_surface_sp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>libpysal.weights.weights.WSP
 </pre></div>
 </div>
 </div>
@@ -954,14 +1152,15 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>We take both steps in the following code snippet:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">WSP2W</span><span class="p">(</span>  <span class="c1"># 3.Convert `WSP` object to `W`</span>
-    <span class="n">weights</span><span class="o">.</span><span class="n">WSP</span><span class="p">(</span>  <span class="c1"># 2.Build `WSP` from the float sparse matrix</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface_all</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">WSP2W</span><span class="p">(</span>  <span class="c1"># 3.Convert `WSP` object to `W`</span>
+    <span class="n">weights</span><span class="o">.</span><span class="n">WSP</span><span class="p">(</span>  <span class="c1"># 2a.Build `WSP` from the float sparse matrix</span>
         <span class="n">w_surface_sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
             <span class="nb">float</span>
-        <span class="p">)</span>  <span class="c1"># 1.Convert sparse matrix to floats</span>
+        <span class="p">),</span>  <span class="c1"># 1.Convert sparse matrix to floats</span>
+        <span class="n">id_order</span><span class="o">=</span><span class="n">w_surface_sp</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="c1"># 2b. Ensure `W` is indexed</span>
     <span class="p">)</span>
 <span class="p">)</span>
-<span class="n">w_surface</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">w_surface_sp</span><span class="o">.</span><span class="n">index</span>  <span class="c1"># 4.Assign index to new `W`</span>
+<span class="n">w_surface_all</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">w_surface_sp</span><span class="o">.</span><span class="n">index</span>  <span class="c1"># 4.Assign index to new `W`</span>
 </pre></div>
 </div>
 </div>
@@ -969,14 +1168,14 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>There is quite a bit going on in those lines of code, so let’s unpack them:</p>
 <ol class="arabic simple">
 <li><p>The first step (line 3) is to convert the values from integers into floats. To do this, we access the sparse matrix at the core of <code class="docutils literal notranslate"><span class="pre">w_surface_sp</span></code> (which holds all the main data) and convert it to floats using <code class="docutils literal notranslate"><span class="pre">astype</span></code>.</p></li>
-<li><p>Then we convert that sparse matrix into a <code class="docutils literal notranslate"><span class="pre">WSP</span></code> object (line 2), which is a thin wrapper, so the operation is quick.</p></li>
+<li><p>Then we convert that sparse matrix into a <code class="docutils literal notranslate"><span class="pre">WSP</span></code> object (line 2), which is a thin wrapper, so the operation is quick (we also ensure the resulting object is properly indexed).</p></li>
 <li><p>Once represented as a <code class="docutils literal notranslate"><span class="pre">WSP</span></code>, we can use Pysal again to convert it into a full-fledged <code class="docutils literal notranslate"><span class="pre">W</span></code> object using the <code class="docutils literal notranslate"><span class="pre">WSP2W</span></code> utility. This step may take a bit more of computing muscle.</p></li>
 <li><p>Finally, spatial weights from surfaces include an <code class="docutils literal notranslate"><span class="pre">index</span></code> object that will help us later return data into a surface data structure. Since this is lost with the transformations, we reattach it in the final line (line 6) from the original object.</p></li>
 </ol>
 <p>This leaves us with a weights object (<code class="docutils literal notranslate"><span class="pre">w_surface</span></code>) we can work with for the LISA. Next is to recast the values from the original data structure to one that <code class="docutils literal notranslate"><span class="pre">Moran_Local</span></code> will understand. This happens in the next code snippet:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert `DataArray` to a `pandas.Series`</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Convert `DataArray` to a `pandas.Series`</span>
 <span class="n">pop_values</span> <span class="o">=</span> <span class="n">pop</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span>
 <span class="c1"># Subset to keep only values that aren&#39;t missing</span>
 <span class="n">pop_values</span> <span class="o">=</span> <span class="n">pop_values</span><span class="p">[</span><span class="n">pop_values</span> <span class="o">!=</span> <span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span><span class="p">]</span>
@@ -987,7 +1186,21 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>Note that we do two operations: one is to convert the two-dimensional <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> surface into a one-dimensional vector in the form of a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object (<code class="docutils literal notranslate"><span class="pre">pop_values</span></code>); the second is to filter out values in which, in the surface, contain missing data. In surfaces, this is usually expressed with a rare value rather than with another data type. We can check that in <code class="docutils literal notranslate"><span class="pre">pop</span></code>, this is negative:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-200.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>One final step: our <code class="docutils literal notranslate"><span class="pre">w_surface_all</span></code> contains a row and a column for every pixel in <code class="docutils literal notranslate"><span class="pre">pop</span></code>, including those without a value (i.e., those with <code class="docutils literal notranslate"><span class="pre">nodata</span></code>). We need to subset it to align it with <code class="docutils literal notranslate"><span class="pre">pop_values</span></code>:</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">w_surface</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">w_subset</span><span class="p">(</span><span class="n">w_surface_all</span><span class="p">,</span> <span class="n">pop_values</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="n">w_surface</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pop_values</span><span class="o">.</span><span class="n">index</span>
 </pre></div>
 </div>
 </div>
@@ -995,7 +1208,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>At this point, we are ready to run a LISA the same way we have done in the previous chapter when using geo-tables:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: this may take a bit longer to run depending on hardware</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># NOTE: this may take a bit longer to run depending on hardware</span>
 <span class="n">pop_lisa</span> <span class="o">=</span> <span class="n">esda</span><span class="o">.</span><span class="n">moran</span><span class="o">.</span><span class="n">Moran_Local</span><span class="p">(</span>
     <span class="n">pop_values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span> <span class="n">w_surface</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span>
 <span class="p">)</span>
@@ -1007,7 +1220,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>Now that we have computed the LISA, on to visualization. For this, we need to express the results as a surface rather than as a table, for which we will use the bridge built in <code class="docutils literal notranslate"><span class="pre">pysal</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="kn">import</span> <span class="n">raster</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">libpysal.weights</span> <span class="kn">import</span> <span class="n">raster</span>
 </pre></div>
 </div>
 </div>
@@ -1015,7 +1228,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>We are aiming to create a cluster plot. This means we want to display values that are statistically significant in a color aligned with the quadrant of the Moran plot in which they lie. For this, we will create a new <code class="docutils literal notranslate"><span class="pre">Series</span></code> that intersects the quadrant information with significance. We use a 1% level for the example:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">sig_pop</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sig_pop</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span>
     <span class="n">pop_lisa</span><span class="o">.</span><span class="n">q</span>
     <span class="o">*</span> <span class="p">(</span>
         <span class="n">pop_lisa</span><span class="o">.</span><span class="n">p_sim</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
@@ -1029,12 +1242,12 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>The <code class="docutils literal notranslate"><span class="pre">sig_pop</span></code> object, expressed as a one-dimensional vector, contains the information we would like to recast into a <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> object. For this conversion, we can use the <code class="docutils literal notranslate"><span class="pre">w2da</span></code> function, which derives the spatial configuration of each value in <code class="docutils literal notranslate"><span class="pre">sig_pop</span></code> from <code class="docutils literal notranslate"><span class="pre">w_surface</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build `DataArray` from a set of values and weights</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build `DataArray` from a set of values and weights</span>
 <span class="n">lisa_da</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">w2da</span><span class="p">(</span>
     <span class="n">sig_pop</span><span class="p">,</span>  <span class="c1"># Values</span>
     <span class="n">w_surface</span><span class="p">,</span>  <span class="c1"># Spatial weights</span>
     <span class="n">attrs</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;nodatavals&quot;</span><span class="p">:</span> <span class="n">pop</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;nodatavals&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;nodatavals&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">nodata</span><span class="p">]</span>
     <span class="p">}</span>  <span class="c1"># Value for missing data</span>
     <span class="c1"># Add CRS information in a compliant manner</span>
 <span class="p">)</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">write_crs</span><span class="p">(</span><span class="n">pop</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
@@ -1045,7 +1258,12 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>The resulting <code class="docutils literal notranslate"><span class="pre">DataArray</span></code> only contains missing data pixels (expressed with the same value as the original <code class="docutils literal notranslate"><span class="pre">pop</span></code> feature), <code class="docutils literal notranslate"><span class="pre">0</span></code> for non-significant pixels, and 1-4 depending on the quadrant for HH, LH, LL, HL significant clusters, same as with the Brexit example before:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lisa_da</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa_da</span><span class="o">.</span><span class="n">to_series</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>array([-200,    0,    3,    1,    2,    4])
 </pre></div>
 </div>
 </div>
@@ -1054,7 +1272,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>First, we create the colormap to encode clusters with the same colors that <code class="docutils literal notranslate"><span class="pre">splot</span></code> uses for geo-tables. For that, we need the method in <code class="docutils literal notranslate"><span class="pre">matplotlib</span></code> that builds a color map from a list of colors:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">ListedColormap</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">ListedColormap</span>
 </pre></div>
 </div>
 </div>
@@ -1062,7 +1280,7 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>We express the colors we will use as a dictionary mapping the key to the color code:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># LISA colors</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># LISA colors</span>
 <span class="n">lc</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;ns&quot;</span><span class="p">:</span> <span class="s2">&quot;lightgrey&quot;</span><span class="p">,</span>  <span class="c1"># Values of 0</span>
     <span class="s2">&quot;HH&quot;</span><span class="p">:</span> <span class="s2">&quot;#d7191c&quot;</span><span class="p">,</span>  <span class="c1"># Values of 1</span>
@@ -1077,18 +1295,20 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
 <p>With these pieces, we can create the colormap object (shown in Figure 7) that replicates our original local Moran cluster map colors.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">lisa_cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">lisa_cmap</span> <span class="o">=</span> <span class="n">ListedColormap</span><span class="p">(</span>
     <span class="p">[</span><span class="n">lc</span><span class="p">[</span><span class="s2">&quot;ns&quot;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;HH&quot;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;LH&quot;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;LL&quot;</span><span class="p">],</span> <span class="n">lc</span><span class="p">[</span><span class="s2">&quot;HL&quot;</span><span class="p">]]</span>
 <span class="p">)</span>
 <span class="n">lisa_cmap</span>
 </pre></div>
 </div>
 </div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div style="vertical-align: middle;"><strong>from_list</strong> </div><div class="cmap"><img alt="from_list colormap" title="from_list" style="border: 1px solid #555;" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAABACAYAAABsv8+/AAAAGHRFWHRUaXRsZQBmcm9tX2xpc3QgY29sb3JtYXBDL89FAAAAHnRFWHREZXNjcmlwdGlvbgBmcm9tX2xpc3QgY29sb3JtYXABtCnOAAAAMHRFWHRBdXRob3IATWF0cGxvdGxpYiB2My44LjAsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmefc/hPAAAAMnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHYzLjguMCwgaHR0cHM6Ly9tYXRwbG90bGliLm9yZ7HVZ2gAAAFOSURBVHic7dZBDQJBAARBIDjCAwmysML3TGCAB1n8gIG7L3tJVymYZD59HGN8D+zS+XqbPYEVn+dr9gRW3B9+2aP3ZZk9gQ2n2QMAgP8TAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCBAAABAkAAAgSAAAQJAAAIEgAAECQAACAIAEAAEECAACCfhcVCotxILZcAAAAAElFTkSuQmCC"></div><div style="vertical-align: middle; max-width: 514px; display: flex; justify-content: space-between;"><div style="float: left;"><div title="#d3d3d3ff" style="display: inline-block; width: 1em; height: 1em; margin: 0; vertical-align: middle; border: 1px solid #555; background-color: #d3d3d3ff;"></div> under</div><div style="margin: 0 auto; display: inline-block;">bad <div title="#00000000" style="display: inline-block; width: 1em; height: 1em; margin: 0; vertical-align: middle; border: 1px solid #555; background-color: #00000000;"></div></div><div style="float: right;">over <div title="#fdae61ff" style="display: inline-block; width: 1em; height: 1em; margin: 0; vertical-align: middle; border: 1px solid #555; background-color: #fdae61ff;"></div></div></div></div>
 </div>
 <p>At this point, we have all the pieces we need to build our cluster map. Let’s put them together to build Figure 8:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set up figure and axis</span>
 <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="c1"># Subplot 1 #</span>
 <span class="c1"># Select pixels that do not have the `nodata` value</span>
@@ -1124,6 +1344,9 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
     <span class="n">contextily</span><span class="o">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="n">lisa_da</span><span class="o">.</span><span class="n">rio</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/7e033941d9cdcce2b70a21a688cf5ebe0cd08972f62ab4669db34eea101c8bf2.png" src="../_images/7e033941d9cdcce2b70a21a688cf5ebe0cd08972f62ab4669db34eea101c8bf2.png" />
 </div>
 </div>
 </section>
@@ -1195,16 +1418,16 @@ I_i = \dfrac{z_i}{m_2} \displaystyle\sum_j w_{ij} z_j \; ; \; m_2 = \dfrac{\sum_
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "gds"
         },
         kernelOptions: {
-            name: "python3",
+            name: "gds",
             path: "./notebooks"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'gds'</script>
 
                 </article>
               
