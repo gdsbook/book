@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.15.2
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-10.0
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -406,7 +406,7 @@ def row2cell(row, res_xy):
 For example:
 
 ```python
-row2cell(t_surface.loc[0, :], surface.attrs["res"])
+row2cell(t_surface.loc[0, :], surface.rio.resolution())
 ```
 
 One of the benefits of this approach is that we do not require entirely filled surfaces and can only record pixels where we have data. For the example above or cells with more than 1,000 people, we could create the associated geo-table as follows:
@@ -417,10 +417,10 @@ max_polys = (
         "Value > 1000"
     )  # Keep only cells with more than 1k people
     .apply(  # Build polygons for selected cells
-        row2cell, res_xy=surface.attrs["res"], axis=1
+        row2cell, res_xy=surface.rio.resolution(), axis=1
     )
     .pipe(  # Pipe result from apply to convert into a GeoSeries
-        geopandas.GeoSeries, crs=surface.attrs["crs"]
+        geopandas.GeoSeries, crs=surface.rio.crs
     )
 )
 ```
@@ -432,7 +432,7 @@ And generate a map with the same tooling that we use for any standard geo-table:
 ax = max_polys.plot(edgecolor="red", figsize=(9, 9))
 # Add basemap
 cx.add_basemap(
-    ax, crs=surface.attrs["crs"], source=cx.providers.CartoDB.Voyager
+    ax, crs=surface.rio.crs, source=cx.providers.CartoDB.Voyager
 );
 ```
 
@@ -507,7 +507,7 @@ sd_tracts.loc[[largest_tract_id]].plot(
 axs[1].set_axis_off()
 # Add basemap
 cx.add_basemap(
-    axs[1], crs=sd_tracts.crs, source=cx.providers.Stamen.Terrain
+    axs[1], crs=sd_tracts.crs, source=cx.providers.Esri.WorldTerrain
 );
 ```
 
