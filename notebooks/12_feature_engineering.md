@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.15.2
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-10.0
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -132,11 +132,11 @@ f, ax = plt.subplots(1, figsize=(12, 12))
 airbnbs.plot(ax=ax, marker=".")
 # Plot POIs in red
 pois.plot(ax=ax, color="r")
-# Add Stamen's Toner basemap
+# Add Carto's Voyager basemap
 contextily.add_basemap(
     ax,
     crs=airbnbs.crs.to_string(),
-    source=contextily.providers.Stamen.Toner,
+    source=contextily.providers.CartoDB.Voyager,
 )
 # Remove axes
 ax.set_axis_off()
@@ -247,7 +247,7 @@ airbnbs_w_counts.plot(
 contextily.add_basemap(
     ax,
     crs=airbnbs_albers.crs.to_string(),
-    source=contextily.providers.Stamen.Toner,
+    source=contextily.providers.CartoDB.Voyager,
 )
 # Remove axes
 ax.set_axis_off();
@@ -330,11 +330,11 @@ airbnbs.join(
     alpha=0.5,
     ax=ax,
 )
-# Add Stamen's terrain basemap
+# Add Esri's terrain basemap
 contextily.add_basemap(
     ax,
     crs=airbnbs.crs.to_string(),
-    source=contextily.providers.Stamen.TerrainBackground,
+    source=contextily.providers.Esri.WorldTerrain,
     alpha=0.5,
 )
 # Remove axes
@@ -417,7 +417,7 @@ two_bed_homes.plot(ax=ax, color="red")
 contextily.add_basemap(
     ax,
     crs=two_bed_homes.crs.to_string(),
-    source=contextily.providers.Stamen.TonerBackground,
+    source=contextily.providers.CartoDB.VoyagerNoLabels,
 )
 # Remove axes
 ax.set_axis_off();

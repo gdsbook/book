@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.15.2
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-10.0
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -111,7 +111,7 @@ db.plot(
 contextily.add_basemap(
     ax,
     crs=db.crs,
-    source=contextily.providers.Stamen.TerrainBackground,
+    source=contextily.providers.Esri.WorldTerrain,
 )
 ax.set_axis_off()
 ```
@@ -190,7 +190,7 @@ ax1.set_title("% Leave")
 contextily.add_basemap(
     ax1,
     crs=db.crs,
-    source=contextily.providers.Stamen.TerrainBackground,
+    source=contextily.providers.Esri.WorldTerrain,
 )
 
 db.plot(
@@ -209,7 +209,7 @@ ax2.set_title("% Leave - Spatial Lag")
 contextily.add_basemap(
     ax2,
     crs=db.crs,
-    source=contextily.providers.Stamen.TerrainBackground,
+    source=contextily.providers.Esri.WorldTerrain,
 )
 
 plt.show()
