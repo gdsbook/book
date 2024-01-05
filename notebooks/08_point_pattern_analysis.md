@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.15.2
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-10.0
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -380,19 +380,12 @@ plt.legend();
 
 We will cover three more bounding shapes, all of them rectangles or circles. First, two kinds of **minimum bounding rectangles**. They both are constructed as the tightest *rectangle* that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the **minimum rotated rectangle** provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated. 
 
-For the minimum rotated rectangle, we will use the `minimum_rotated_rectangle` function from the `pygeos` module, which constructs the minimum rotated rectangle for an input *multi-point* object. This means that we will need to collect our points together into a single multi-point object and then compute the rotated rectangle for that object. 
+For the minimum rotated rectangle, we will use the `minimum_rotated_rectangle` property from `geopandas`, which constructs the minimum rotated rectangle for an input *multi-point* object. This means that we will need to collect our points together into a single multi-point object and then compute the rotated rectangle for that object. 
 
 ```python
-from pygeos import minimum_rotated_rectangle, from_shapely, to_shapely
-
 point_array = geopandas.points_from_xy(x=user.x, y=user.y)
 
-min_rot_rect = minimum_rotated_rectangle(
-    from_shapely(
-        point_array.unary_union()
-    )
-)
-min_rot_rect = to_shapely(min_rot_rect)
+min_rot_rect = point_array.unary_union().minimum_rotated_rectangle
 ```
 
 And, for the minimum bounding rectangle without rotation, we will use the `minimum_bounding_rectangle` function from the `pointpats` package.

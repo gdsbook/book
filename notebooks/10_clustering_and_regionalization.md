@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.15.2
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-10.0
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -974,7 +974,7 @@ results = pandas.DataFrame(
     ami_scores, columns=["source", "target", "similarity"]
 )
 # and spread the dataframe out into a square
-results.pivot("source", "target", "similarity")
+results.pivot(columns="source", index="target", values="similarity")
 ```
 
 From this, we can see that the K-means and Ward clusterings are the most self-similar, and the two regionalizations are slightly less similar to one another than the clusterings. The regionalizations are generally *not* very similar to the clusterings, as would be expected from our discussions above. 
