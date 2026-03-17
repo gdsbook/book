@@ -1,3 +1,18 @@
+---
+jupyter:
+  jupytext:
+    formats: ipynb,md
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.19.1
+  kernelspec:
+    display_name: GDS-2026-03-15_amd64
+    language: python
+    name: gds
+---
+
 ```python
 import warnings
 from myst_nb import glue
@@ -166,7 +181,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_18_0.png)
     
 
@@ -399,7 +414,7 @@ ax.set_axis_off();
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_35_0.png)
     
 
@@ -428,7 +443,7 @@ ax.set_axis_off();
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_38_0.png)
     
 
@@ -565,7 +580,7 @@ ax.set_axis_off();
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_48_0.png)
     
 
@@ -630,7 +645,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_58_0.png)
     
 
@@ -666,7 +681,7 @@ ax.set_axis_off();
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_62_0.png)
     
 
@@ -696,7 +711,7 @@ ax.set_axis_off();
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_68_0.png)
     
 
@@ -736,7 +751,7 @@ for i, k_neighbors in enumerate(
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_70_0.png)
     
 
@@ -810,7 +825,7 @@ for i, k_neighbors in enumerate(
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_76_0.png)
     
 
@@ -834,9 +849,6 @@ try:
 except:
     print("Remote loading failed...")
 ```
-
-    Remote loading failed...
-
 
 The code snippet above sends a query to the Census Bureau server to fetch the data for San Diego. Note that it _requires_ internet connectivity to work. If you are working on the book _without_ connectivity, a cached version of the dataset is available on the data folder and can be read as:
 
@@ -1001,7 +1013,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_95_0.png)
     
 
@@ -1053,7 +1065,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_97_0.png)
     
 
@@ -1109,7 +1121,7 @@ ax.set_axis_off();
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_104_0.png)
     
 
@@ -1140,7 +1152,7 @@ plt.ylabel("Average of nearby\n listings' bedrooms");
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_108_0.png)
     
 
@@ -1632,7 +1644,7 @@ plt.legend();
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_130_0.png)
     
 
@@ -1710,7 +1722,7 @@ ax.set_axis_off();
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_142_0.png)
     
 
@@ -1745,7 +1757,7 @@ ax.set_ylim(0, 1250);
 ```
 
 
-    
+
 ![png](12_feature_engineering_files/12_feature_engineering_144_0.png)
     
 

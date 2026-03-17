@@ -7,9 +7,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.15.2
+      jupytext_version: 1.19.1
   kernelspec:
-    display_name: GDS-10.0
+    display_name: GDS-2026-03-15_amd64
     language: python
     name: gds
 ---
@@ -76,8 +76,8 @@ import pysal
 import numpy
 import mapclassify
 import matplotlib.pyplot as plt
-from pysal.explore import esda
-from pysal.lib import weights
+import esda
+from libpysal import weights
 ```
 
 ## Data: U.S. state per capita income 1969-2017
