@@ -448,7 +448,7 @@ For the minimum rotated rectangle, we will use the `minimum_rotated_rectangle` p
 ```python
 point_array = geopandas.points_from_xy(x=user.x, y=user.y)
 
-min_rot_rect = point_array.unary_union().minimum_rotated_rectangle
+min_rot_rect = point_array.union_all().minimum_rotated_rectangle
 ```
 
 And, for the minimum bounding rectangle without rotation, we will use the `minimum_bounding_rectangle` function from the `pointpats` package.

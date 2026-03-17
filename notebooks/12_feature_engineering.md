@@ -68,7 +68,7 @@ To obtain information on the location of restaurants and bars, we can download i
 
 
 ```python
-airbnbs_ch = airbnbs.unary_union.convex_hull
+airbnbs_ch = airbnbs.union_all().convex_hull
 geopandas.GeoSeries([airbnbs_ch]).plot()
 ```
 
