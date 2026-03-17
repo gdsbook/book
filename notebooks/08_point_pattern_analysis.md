@@ -1,19 +1,4 @@
----
-jupyter:
-  jupytext:
-    formats: ipynb,md
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.15.2
-  kernelspec:
-    display_name: GDS-10.0
-    language: python
-    name: gds
----
-
-```python tags=["remove-cell"]
+```python
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -34,17 +19,16 @@ Point pattern analysis is thus concerned with the visualization, description, st
 - *Is there any structure in the way locations are arranged over space? That is, are events clustered? or are they dispersed?*
 - *Why do events occur in those places and not in others?* 
 
-
 At this point, it is useful to remind ourselves of an important distinction between process and pattern. The former relates to the underlying mechanism that is at work to generate the outcome we end up observing. Because of its abstract nature, we do not get to see it. However, in many contexts, the key focus of any analysis is to learn about *what* determines a given phenomenon and *how* those factors combine to generate it. In this context, "process" is associated with the *how*. "Pattern," on the other hand, relates to the result of that process. In some cases, it is the only trace of the process we can observe and thus the only input we have to work with in order to reconstruct it. Although directly observable and, arguably, easier to tackle, pattern is only a reflection of process. The real challenge is not to characterize the former but to use it to work out the latter.
 
 In this chapter, we provide an introduction to point patterns through geo-tagged Flickr photos from Tokyo. We will treat the phenomena represented in the data as events: photos could be taken of any place in Tokyo, but only certain locations are captured. Keep in mind this understanding of Tokyo photos is not immutable: one could conceive cases where it makes sense to take those locations as given and look at the properties of each of them ignoring their "event" aspect. However, in this context, we will focus on those questions that relate to location and the collective shape of locations. The use of these tools will allow us to transform a long list of unintelligible XY coordinates into tangible phenomena with a characteristic spatial structure, and to answer questions about the center, dispersion, and clustering of attractions in Tokyo for Flickr users.
-
 
 ## Patterns in Tokyo photographs
 
 The rise of new forms of data such as geo-tagged photos uploaded to online services is creating new ways for researchers to study and understand cities. Where do people take pictures? When are those pictures taken? Why do certain places attract many more photographers than others? All these questions and more become more than just rhetorical ones when we consider, for example,  online photo hosting services as volunteered geographic information (VGI, {cite}`Goodchild2007citizens`). In this chapter we will explore metadata from a sample of geo-referenced images uploaded to [Flickr](https://www.flickr.com/) and extracted thanks to the [100m Flickr dataset](https://webscope.sandbox.yahoo.com/catalog.php?datatype=i&did=67). In doing so, we will introduce a few approaches that help us better understand the distribution and characteristics of a point pattern. 
 
 To get started, let's load the packages we will need in this example. 
+
 
 ```python
 import numpy
@@ -60,17 +44,35 @@ from sklearn.cluster import DBSCAN
 Then, let us load some data about picture locations from Flickr:
 
 
+
 ```python
 db = pandas.read_csv("../data/tokyo/tokyo_clean.csv")
 ```
 
 The table contains the following information about the sample of 10,000 photographs: the ID of the user who took the photo, the location expressed as latitude and longitude columns, a transformed version of those coordinates expressed in Pseudo Mercator, the timestamp when the photo was taken, and the URL where the picture they refer to is stored online:
 
+
 ```python
 db.info()
 ```
-Note that the data is provided as a `.csv` file, so the spatial information is encoded as separate columns, one for each coordinate. This is in contrast to how we have consumed spatial data in previous chapters, where spatial information was stored in a single column and encoded in geometry objects.
 
+    <class 'pandas.core.frame.DataFrame'>
+    RangeIndex: 10000 entries, 0 to 9999
+    Data columns (total 7 columns):
+     #   Column                Non-Null Count  Dtype  
+    ---  ------                --------------  -----  
+     0   user_id               10000 non-null  object 
+     1   longitude             10000 non-null  float64
+     2   latitude              10000 non-null  float64
+     3   date_taken            10000 non-null  object 
+     4   photo/video_page_url  10000 non-null  object 
+     5   x                     10000 non-null  float64
+     6   y                     10000 non-null  float64
+    dtypes: float64(4), object(3)
+    memory usage: 547.0+ KB
+
+
+Note that the data is provided as a `.csv` file, so the spatial information is encoded as separate columns, one for each coordinate. This is in contrast to how we have consumed spatial data in previous chapters, where spatial information was stored in a single column and encoded in geometry objects.
 
 ## Visualizing point patterns
 
@@ -81,17 +83,24 @@ There are many ways to visualize geographic point patterns, and the choice of me
 The first step to get a sense of what the spatial dimension of this dataset looks like is to plot it. At its most basic level, we can generate a scatterplot with `seaborn` in Figure 1: 
 
 
-```python caption="Tokyo photographs jointplot showing the longitude and latitude where photographs were taken."
+
+```python
 # Generate scatter plot
 seaborn.jointplot(x="longitude", y="latitude", data=db, s=0.5);
 ```
+
+
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_11_0.png)
+    
 
 
 This is a good start: we can see dots tend to be concentrated in the center of the covered area in a non-random pattern. Furthermore, within the broad pattern, we can also see there seems to be more localized clusters. However, the plot above has two key drawbacks: one, it lacks geographical context; and two, there are areas where the density of points is so large that it is hard to tell anything beyond a blue blurb. 
 
 Start with the context. The easiest way to provide additional context is by overlaying a tile map from the internet. Let us quickly call `contextily` for that, and integrate it with `jointplot` to create Figure 2: 
 
-```python caption="Tokyo jointplot showing longitude and latitude of photographs with a basemap via contextily."
+
+```python
 # Generate scatter plot
 joint_axes = seaborn.jointplot(
     x="longitude", y="latitude", data=db, s=0.5
@@ -104,8 +113,12 @@ contextily.add_basemap(
 ```
 
 
-Note how we can pull out the axis where the points are plotted and add the basemap there, specifying the CRS as WGS84, since we are plotting longitude and latitude. Compared to the previous plot, adding a basemap to our initial plot makes the pattern of Flickr data clearer.
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_13_0.png)
+    
 
+
+Note how we can pull out the axis where the points are plotted and add the basemap there, specifying the CRS as WGS84, since we are plotting longitude and latitude. Compared to the previous plot, adding a basemap to our initial plot makes the pattern of Flickr data clearer.
 
 ### Showing density with hexbinning
 
@@ -114,7 +127,8 @@ Consider our second problem: cluttering. When too many photos are concentrated i
 One solution to get around cluttering relates to what we referred to earlier as moving from {ref}`"tables to surfaces" <ch03-surfaces_as_tables>`. We can now recast this approach as a *spatial* or *two-dimensional histogram*. Here, we generate a regular grid (either squared or hexagonal), count how many dots fall within each grid cell, and present it as we would any other choropleth. This is attractive because it is simple, intuitive and, if fine enough, the regular grid removes some of the area distortions choropleth maps may induce. For this illustration, let us use use hexagonal binning (sometimes called hexbin) because it has slightly nicer properties than squared grids, such as less shape distortion and more regular connectivity between cells. Creating a hexbin two-dimensional histogram is straightforward in Python using the `hexbin` function to create Figure 3:
 
 
-```python caption="Tokyo photographs two-dimensional histogram built with hexbinning."
+
+```python
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(12, 9))
 # Generate and add hexbin with 50 hexagons in each
@@ -139,26 +153,41 @@ ax.set_axis_off()
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_16_0.png)
+    
+
+
 Voila, this allows a lot more detail! It is now clear that the majority of photographs relate to much more localized areas, and that the previous map was obscuring this.
 
 ### Another kind of density: kernel density estimation
 
-Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g., the modifiable areal unit problem {cite}`wong2004`). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g., {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with a different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel map in Python is rather straightforward, using the `seaborn.kdeplot()` function to create Figure 4:
+Grids are the spatial equivalent of a histogram: the user decides how many "buckets", and the points are counted within them in a discrete fashion. This is fast, efficient, and potentially very detailed (if many bins are created). However, it does represent a discretization of an essentially contiguous phenomenon and, as such, it may introduce distortions (e.g., the modifiable areal unit problem {cite}`wong2004`). An alternative approach is to instead create what is known as a kernel density estimation (KDE): an empirical approximation of the probability density function. This approach is covered in detail elsewhere (e.g., {cite}`Silverman1986density`), but we can provide the intuition here. Instead of overlaying a grid of squares of hexagons and count how many points fall within each, a KDE lays a grid of points over the space of interest on which it places kernel functions that count points around them with a different weight based on the distance. These counts are then aggregated to generate a global surface with probability. The most common kernel function is the Gaussian one, which applies a normal distribution to weight points. The result is a continuous surface with a probability function that may be evaluated at every point. Creating a Gaussian kernel map in Python is rather straightforward, using the `pointats.plot_density()` function to create Figure 4:
 
-```python caption="Tokyo photographs kernel density map."
+
+```python
+from pointpats import plot_density
+```
+
+
+```python
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Generate and add KDE with a shading of 50 gradients
 # coloured contours, 75% of transparency,
 # and the reverse viridis colormap
-seaborn.kdeplot(
-    x="x",
-    y="y",
-    data=db,
-    n_levels=50,
-    shade=True,
-    alpha=0.55,
+seaborn.scatterplot(
+    x="x", 
+    y="y", 
+    data=db, 
+    s=0.5, 
+    ax=ax
+)
+plot_density(
+    data=db[['x','y']].values,
+    bandwidth=1000,
     cmap="viridis_r",
+    ax=ax,
 )
 # Add basemap
 contextily.add_basemap(
@@ -169,18 +198,22 @@ ax.set_axis_off()
 ```
 
 
-The result is a smoother output that captures the same structure of the hexbin but "eases" the transitions between different areas. This provides a better generalization of the theoretical probability distribution over space.  Technically, the continuous nature of the KDE function implies that for any given point the probability of an event is 0. However, as the area around a point increases, the probability of an event within that area can be obtained.  This is useful in some cases, but it is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares. 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_19_0.png)
+    
 
+
+The result is a smoother output that captures the same structure of the hexbin but "eases" the transitions between different areas. This provides a better generalization of the theoretical probability distribution over space.  Technically, the continuous nature of the KDE function implies that for any given point the probability of an event is 0. However, as the area around a point increases, the probability of an event within that area can be obtained.  This is useful in some cases, but it is mainly of use to escape the restrictions imposed by a regular grid of hexagons or squares. 
 
 ## Centrography
 
 Centrography is the analysis of centrality in a point pattern. By "centrality," we mean the general location and dispersion of the pattern. If the hexbin above can be seen as a "spatial histogram", centrography is the point pattern equivalent of measures of central tendency such as the mean. These measures are useful because they allow us to summarize spatial distributions in smaller sets of information (e.g., a single point). Many different indices are used in centrography to provide an indication of "where" a point pattern is, how tightly the point pattern clusters around its center, or how irregular its shape is. 
 
 
-
 ### Tendency
 
 A common measure of central tendency for a point pattern is its *center of mass*. For marked point patterns, the center of mass identifies a central point close to observations that have higher values in their marked attribute. For unmarked point patterns, the center of mass is equivalent to the *mean center*, or average of the coordinate values. In addition, the *median center* is analogous to the *median* elsewhere, and represents a point where half of the data is above or below the point and half is to its left or right. We can analyze the mean center with our Flickr point pattern using the `pointpats` package in Python. 
+
 
 
 ```python
@@ -195,7 +228,8 @@ med_center = centrography.euclidean_median(db[["x", "y"]])
 
 It is easiest to visualize this by plotting the point pattern and its mean center alongside one another, as done to create Figure 5:
 
-```python caption="Tokyo photographs mean and median centers."
+
+```python
 # Generate scatterplot
 joint_axes = seaborn.jointplot(
     x="x", y="y", data=db, s=0.75, height=9
@@ -229,8 +263,12 @@ plt.show()
 ```
 
 
-The discrepancy between the two centers is caused by the skew; there are many "clusters" of pictures far out in West and South Tokyo, whereas North and East Tokyo is densely packed, but drops off very quickly. Thus, the far out clusters of pictures pulls the mean center to the west and south, relative to the median center. 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_26_0.png)
+    
 
+
+The discrepancy between the two centers is caused by the skew; there are many "clusters" of pictures far out in West and South Tokyo, whereas North and East Tokyo is densely packed, but drops off very quickly. Thus, the far out clusters of pictures pulls the mean center to the west and south, relative to the median center. 
 
 
 ### Dispersion
@@ -238,21 +276,31 @@ The discrepancy between the two centers is caused by the skew; there are many "c
 A measure of dispersion that is common in centrography is the *standard distance*. This measure provides the average distance away from the center of the point cloud (such as measured by the center of mass). This is also simple to compute using `pointpats`, using the `std_distance` function:
 
 
+
 ```python
 centrography.std_distance(db[["x", "y"]])
 ```
+
+
+
+
+    np.float64(8778.218564382098)
+
+
+
 This means that, on average, pictures are taken around 8800 meters away from the mean center. 
 
 Another helpful visualization is the *standard deviational ellipse*, or *standard ellipse*. This is an ellipse drawn from the data that reflects its center, dispersion, and orientation. To visualize this, we first compute the axes and rotation using the `ellipse` function in `pointpats`:
+
 
 ```python
 major, minor, rotation = centrography.ellipse(db[["x", "y"]])
 ```
 
-
 Then, we will visualize this in Figure 6: 
 
-```python caption="Tokyo photographs standard deviational ellipse."
+
+```python
 from matplotlib.patches import Ellipse
 
 # Set up figure and axis
@@ -289,11 +337,17 @@ plt.show()
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_33_0.png)
+    
+
+
 ### Extent
 
 The last collection of centrography measures we will discuss characterizes the extent of a point cloud. Four shapes are useful, and they reflect varying levels of how "tightly" they bind the pattern. 
 
 Below, we'll walk through how to construct each example and visualize all of them together at the end. To make things more clear, we'll use the Flickr photos for the most prolific user in the dataset (ID: `95795770`) to show how different these results can be.
+
 
 
 ```python
@@ -302,6 +356,7 @@ coordinates = user[["x", "y"]].values
 ```
 
 First, we'll compute the **convex hull**, which is the tightest *convex* shape that encloses the user's photos. By *convex*, we mean that the shape never "doubles back" on itself; it has no divets, valleys, crenulations, or holes. All of its interior angles are smaller than 180 degrees.  This is computed using the `centrography.hull` method.
+
 
 
 ```python
@@ -313,6 +368,7 @@ Second, we'll compute the **alpha shape**, which can be understood as a "tighter
 In contrast, you can think of an alpha shape as the space made from rolling a *small* ball around the shape. Since the ball is smaller, it rolls into the dips and valleys created between points. As that ball gets bigger, the alpha shape becomes the convex hull. But, for small balls, the shape can get very tight indeed. In fact, if alpha gets too small, it "slips" through the points, resulting in *more than one hull!* As such, the `libpysal` package has an `alpha_shape_auto` function to find the smallest *single* alpha shape, so that you don't have to guess at how big the ball needs to be. 
 
 
+
 ```python
 import libpysal
 
@@ -321,7 +377,8 @@ alpha_shape, alpha, circs = libpysal.cg.alpha_shape_auto(
 )
 ```
 
-```python caption="Concave hull and (green) and convex hull (blue) for a subset of Tokyo photographs, with the bounding circles for the concave hull (red)."
+
+```python
 f, ax = plt.subplots(1, 1, figsize=(9, 9))
 
 # Plot a green alpha shape
@@ -378,9 +435,15 @@ plt.legend();
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_40_0.png)
+    
+
+
 We will cover three more bounding shapes, all of them rectangles or circles. First, two kinds of **minimum bounding rectangles**. They both are constructed as the tightest *rectangle* that can be drawn around the data that contains all of the points. One kind of minimum bounding rectangle can be drawn just by considering vertical and horizontal lines. However, diagonal lines can often be drawn to construct a rectangle with a smaller area. This means that the **minimum rotated rectangle** provides a tighter rectangular bound on the point pattern, but the rectangle is askew or rotated. 
 
 For the minimum rotated rectangle, we will use the `minimum_rotated_rectangle` property from `geopandas`, which constructs the minimum rotated rectangle for an input *multi-point* object. This means that we will need to collect our points together into a single multi-point object and then compute the rotated rectangle for that object. 
+
 
 ```python
 point_array = geopandas.points_from_xy(x=user.x, y=user.y)
@@ -389,6 +452,7 @@ min_rot_rect = point_array.unary_union().minimum_rotated_rectangle
 ```
 
 And, for the minimum bounding rectangle without rotation, we will use the `minimum_bounding_rectangle` function from the `pointpats` package.
+
 
 
 ```python
@@ -400,6 +464,7 @@ min_rect_vertices = centrography.minimum_bounding_rectangle(
 Finally, the **minimum bounding circle** is the smallest circle that can be drawn to enclose the entire dataset. Often, this circle is bigger than the minimum bounding rectangle. It is implemented in the `minimum_bounding_circle` function in `pointpats`. 
 
 
+
 ```python
 (center_x, center_y), radius = centrography.minimum_bounding_circle(
     coordinates
@@ -407,6 +472,7 @@ Finally, the **minimum bounding circle** is the smallest circle that can be draw
 ```
 
 Now, to visualize these, we'll convert the raw vertices into `matplotlib` patches: 
+
 
 
 ```python
@@ -453,7 +519,8 @@ circ_patch = Circle(
 Finally, we'll plot the patches together with the photograph locations in Figure 8:
 
 
-```python caption="Alpha shape/concave hull, convex hull, minimum rotated rectangle, minimum bounding rectangle, and minimum bounding circle for the Tokyo photographs."
+
+```python
 f, ax = plt.subplots(1, figsize=(10, 10))
 
 # a purple alpha shape
@@ -495,8 +562,12 @@ plt.show()
 ```
 
 
-Each gives a different impression of the area enclosing the user's range of photographs. In this, you can see that the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle and circle are the "loosest" shapes, in that they contain the most area outside of the user's typical area. But, they're also the simplest shapes to draw and understand. 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_50_0.png)
+    
 
+
+Each gives a different impression of the area enclosing the user's range of photographs. In this, you can see that the alpha shape is much tighter than the rest of the shapes. The minimum bounding rectangle and circle are the "loosest" shapes, in that they contain the most area outside of the user's typical area. But, they're also the simplest shapes to draw and understand. 
 
 
 
@@ -505,6 +576,7 @@ Each gives a different impression of the area enclosing the user's range of phot
 Beyond questions of centrality and extent, spatial statistics on point patterns are often concerned with how *even* a distribution of points is. By this, we mean whether points tend to all cluster near one another or disperse evenly throughout the problem area. Questions like this refer to the *intensity* or *dispersion* of the point pattern overall. In the jargon of the last two chapters, this focus resembles the goals we examined when we introduced [global spatial autocorrelation](06_spatial_autocorrelation): what is the overall degree of *clustering* we observe in the pattern? Spatial statistics has devoted plenty of effort to understand this kind of clustering. This section will cover methods useful for identifying clustering in point patterns.
 
 The first set of techniques, **quadrat** statistics, receive their name after their approach to split the data up into small areas (quadrants). Once created, these "buckets" are used to examine the uniformity of counts across them. The second set of techniques all derive from Ripley (1988) and involve measurements of the distance between points in a point pattern. 
+
 
 
 ```python
@@ -521,14 +593,15 @@ For the purposes of illustration, it also helps to provide a pattern derived fro
 To simulate these processes from a given point set, you can use the `pointpats.random` module. 
 
 
+
 ```python
 random_pattern = random.poisson(coordinates, size=len(coordinates))
 ```
 
-
 You can visualize this using the same methods as before, which we show in Figure 9:
 
-```python caption="Observed locations for Tokyo Photographs and random locations around Tokyo."
+
+```python
 f, ax = plt.subplots(1, figsize=(9, 9))
 plt.scatter(
     *coordinates.T,
@@ -545,7 +618,13 @@ plt.show()
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_57_0.png)
+    
+
+
 As you can see, the simulation (by default) works with the bounding box of the input point pattern. To simulate from more restricted areas formed by the point pattern, pass those hulls to the simulator! For example, to generate a random pattern within the alpha shapes: 
+
 
 ```python
 random_pattern_ashape = random.poisson(
@@ -553,10 +632,10 @@ random_pattern_ashape = random.poisson(
 )
 ```
 
-
 We can visualize this in Figure 10:
 
-```python caption="Tokyo points, random and observed patterns within the alpha shape."
+
+```python
 f, ax = plt.subplots(1, figsize=(9, 9))
 plt.scatter(*coordinates.T, color="k", marker=".", label="Observed")
 plt.scatter(
@@ -570,53 +649,123 @@ plt.show()
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_61_0.png)
+    
+
+
 ### Quadrat statistics
 
 Quadrat statistics examine the spatial distribution of points in an area in terms of the count of observations that fall within a given cell. By examining whether observations are spread *evenly* over cells, the quadrat approach aims to estimate whether points are spread out, or if they are clustered into a few cells. Strictly speaking, quadrat statistics examine the *evenness* of the distribution over cells using a $\chi^2$ statistical test common in the analysis of contingency tables. 
 
 In the `pointpats` package, you can visualize the results using the following `QStatistic.plot()` method. This shows the grid used to count the events, as well as the underlying pattern, shown in Figure 11:
 
-```python caption="Quadrat counts for the Tokyo photographs."
+
+```python
 qstat = QStatistic(coordinates)
 qstat.plot()
 ```
 
 
+
+
+    <Axes: title={'center': 'Quadrat Count'}>
+
+
+
+
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_63_1.png)
+    
+
+
 In this case, for the default of a three-by-three grid spanning the point pattern, we see that the central square has over 350 observations, but the surrounding cells have many fewer Flickr photographs. This means that the chi-squared test (which compares how likely this distribution is if the cell counts are uniform) will be statistically significant, with a very small $p$-value:
+
 
 
 ```python
 qstat.chi2_pvalue
 ```
+
+
+
+
+    np.float64(0.0)
+
+
+
 In contrast, our totally random point process will have nearly the same points in every cell, shown in Figure 12:
 
-```python caption="Quadrat counts for the Tokyo photographs."
+
+```python
 qstat_null = QStatistic(random_pattern)
 qstat_null.plot()
 ```
 
 
+
+
+    <Axes: title={'center': 'Quadrat Count'}>
+
+
+
+
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_67_1.png)
+    
+
+
 This means its p-value will be large and likely not significant:
+
 
 
 ```python
 qstat_null.chi2_pvalue
 ```
+
+
+
+
+    np.float64(0.9439879606409082)
+
+
+
 Be careful, however; the fact that quadrat counts are measured in a *regular tiling* that is overlaid on top of the potentially irregular extent of our pattern can mislead us. In particular, irregular *but random* patterns can be mistakenly found "significant" by this approach. Consider our random set generated within the alpha shape polygon, with the quadrat grid overlaid on top shown in Figure 13:
 
-```python caption="Quadrat statistics for the random points across constrained to alpha shape of the Tokyo photographs."
+
+```python
 qstat_null_ashape = QStatistic(random_pattern_ashape)
 qstat_null_ashape.plot()
 ```
 
 
+
+
+    <Axes: title={'center': 'Quadrat Count'}>
+
+
+
+
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_71_1.png)
+    
+
+
 The quadrat test finds this to be *statistically non-random*, while our simulating process ensured that *within the given study area*, the pattern is a complete spatially-random process. 
+
 
 ```python
 qstat_null_ashape.chi2_pvalue
 ```
-Thus, quadrat counts can have issues with irregular study areas, and care should be taken to ensure that clustering is not mistakenly identified. One way to interpret the quadrat statistic that reconciles cases like the one above is to think of it as a test that considers both the uniformity of points *and* the shape of their extent to examine whether the resulting pattern is uniform across a regular grid. In some cases, this is a useful tool; in others, this needs to be used with caution.
 
+
+
+
+    np.float64(8.23043851667287e-28)
+
+
+
+Thus, quadrat counts can have issues with irregular study areas, and care should be taken to ensure that clustering is not mistakenly identified. One way to interpret the quadrat statistic that reconciles cases like the one above is to think of it as a test that considers both the uniformity of points *and* the shape of their extent to examine whether the resulting pattern is uniform across a regular grid. In some cases, this is a useful tool; in others, this needs to be used with caution.
 
 ### Ripley's alphabet of functions
 
@@ -625,7 +774,8 @@ The second group of spatial statistics we consider focuses on the distributions 
 The first function, Ripley's $G$, focuses on the distribution of nearest neighbor distances. That is, the $G$ function summarizes the distances between each point in the pattern and its nearest neighbor. In Figure 14, this nearest neighbor logic is visualized with the red dots being a detailed view of the point pattern and the black arrows indicating the nearest neighbor to each point. Note that sometimes two points are *mutual* nearest neighbors (and so have arrows going in both directions), but some are not. 
 
 
-```python caption="Tokyo points and nearest neighbor graph. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
+
+```python
 # Code generated for this figure is available on the web version of the book.
 f, ax = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
 ax[0].scatter(*random_pattern.T, color="red")
@@ -675,9 +825,15 @@ plt.show()
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_76_0.png)
+    
+
+
 Ripley's $G$ keeps track of the proportion of points for which the nearest neighbor is within a given distance threshold, and plots that cumulative percentage against the increasing distance radii. The distribution of these cumulative percentages has a distinctive shape under completely spatially random processes. The intuition behind Ripley's G goes as follows: we can learn about how similar our pattern is to a spatially random one by computing the cumulative distribution of nearest neighbor distances over increasing distance thresholds, and comparing it to that of a set of simulated patterns that follow a known spatially random process. Usually, a spatial Poisson point process is used as such reference distribution. 
 
 To do this in the `pointpats` package, we can use the `g_test` function, which computes both the `G` function for the empirical data *and* these hypothetical replications under a completely spatially random process.
+
 
 
 ```python
@@ -693,7 +849,8 @@ We can visualize this in Figure 15. On the left, we plot the $G(d)$ function, wi
 In Figure 15, we see that the red empirical function rises much faster than simulated completely spatially random patterns. This means that the observed pattern of this user's Flickr photographs are *closer* to their nearest neighbors than would be expected from a completely spatially random pattern. The pattern is *clustered.*
 
 
-```python caption="Tokyo points, Ripley's *G* Function. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
+
+```python
 f, ax = plt.subplots(
     1, 2, figsize=(9, 3), gridspec_kw=dict(width_ratios=(6, 3))
 )
@@ -736,9 +893,15 @@ plt.show()
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_80_0.png)
+    
+
+
 The second function we introduce is Ripley's $F$. Where the $G$ function works by analyzing the distance *between* points in the pattern, the *F* function works by analyzing the distance *to* points in the pattern from locations in empty space. That is why the $F$ function is called the "the empty space function", since it characterizes the typical distance from arbitrary points in empty space to the point pattern. More explicitly, the $F$ accumulates, for a growing distance range, the percentage of points that can be found within that range from a random point pattern generated within the extent of the observed pattern. If the pattern has large gaps or empty areas, the $F$ function will increase slowly. But, if the pattern is highly dispersed, then the $F$ function will increase rapidly. The shape of this cumulative distribution is then compared to those constructed by calculating the same cumulative distribution between the random pattern and an additional, random one generated in each simulation step.
 
 We can use similar tooling to investigate the $F$ function, since it is so mathematically similar to the $G$ function. This is implemented identically using the `f_test` function in `pointpats`. Since the $F$ function estimated for the observed pattern increases *much* more slowly than the $F$ functions for the simulated patterns, we can be confident that there are many gaps in our pattern; i.e., the pattern is *clustered*. 
+
 
 
 ```python
@@ -747,10 +910,10 @@ f_test = distance_statistics.f_test(
 )
 ```
 
-
 We can visualize this as before in Figure 16. 
 
-```python caption="Tokyo points, Cluster vs. non-cluster points. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
+
+```python
 f, ax = plt.subplots(
     1, 2, figsize=(9, 3), gridspec_kw=dict(width_ratios=(6, 3))
 )
@@ -794,8 +957,12 @@ plt.show()
 ```
 
 
-Ripley's "alphabet" extends to several other letter-named functions that can be used for conducting point pattern analysis in this vein. Good "next steps" in your point pattern analysis journey include the book by {cite}`Baddeley2015`, and the `pointpats` documentation for guidance on how to run these in Python.
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_84_0.png)
+    
 
+
+Ripley's "alphabet" extends to several other letter-named functions that can be used for conducting point pattern analysis in this vein. Good "next steps" in your point pattern analysis journey include the book by {cite}`Baddeley2015`, and the `pointpats` documentation for guidance on how to run these in Python.
 
 ## Identifying clusters
 
@@ -812,6 +979,7 @@ From the point of view of DBSCAN, a cluster is a concentration of at least `m` p
 The flexibility (but also some of the limitations) of the algorithm resides in that both `m` and `r` need to be specified by the user before running DBSCAN. This is a critical point, as their value can influence significantly the final result. Before exploring this in greater depth, let us get a first run at computing `DBSCAN` in Python:
 
 
+
 ```python
 # Define DBSCAN
 clusterer = DBSCAN()
@@ -819,21 +987,462 @@ clusterer = DBSCAN()
 clusterer.fit(db[["x", "y"]])
 ```
 
+
+
+
+<style>#sk-container-id-1 {
+  /* Definition of color scheme common for light and dark mode */
+  --sklearn-color-text: #000;
+  --sklearn-color-text-muted: #666;
+  --sklearn-color-line: gray;
+  /* Definition of color scheme for unfitted estimators */
+  --sklearn-color-unfitted-level-0: #fff5e6;
+  --sklearn-color-unfitted-level-1: #f6e4d2;
+  --sklearn-color-unfitted-level-2: #ffe0b3;
+  --sklearn-color-unfitted-level-3: chocolate;
+  /* Definition of color scheme for fitted estimators */
+  --sklearn-color-fitted-level-0: #f0f8ff;
+  --sklearn-color-fitted-level-1: #d4ebff;
+  --sklearn-color-fitted-level-2: #b3dbfd;
+  --sklearn-color-fitted-level-3: cornflowerblue;
+
+  /* Specific color for light theme */
+  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-icon: #696969;
+
+  @media (prefers-color-scheme: dark) {
+    /* Redefinition of color scheme for dark theme */
+    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+    --sklearn-color-icon: #878787;
+  }
+}
+
+#sk-container-id-1 {
+  color: var(--sklearn-color-text);
+}
+
+#sk-container-id-1 pre {
+  padding: 0;
+}
+
+#sk-container-id-1 input.sk-hidden--visually {
+  border: 0;
+  clip: rect(1px 1px 1px 1px);
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+}
+
+#sk-container-id-1 div.sk-dashed-wrapped {
+  border: 1px dashed var(--sklearn-color-line);
+  margin: 0 0.4em 0.5em 0.4em;
+  box-sizing: border-box;
+  padding-bottom: 0.4em;
+  background-color: var(--sklearn-color-background);
+}
+
+#sk-container-id-1 div.sk-container {
+  /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+     but bootstrap.min.css set `[hidden] { display: none !important; }`
+     so we also need the `!important` here to be able to override the
+     default hidden behavior on the sphinx rendered scikit-learn.org.
+     See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+  display: inline-block !important;
+  position: relative;
+}
+
+#sk-container-id-1 div.sk-text-repr-fallback {
+  display: none;
+}
+
+div.sk-parallel-item,
+div.sk-serial,
+div.sk-item {
+  /* draw centered vertical line to link estimators */
+  background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+  background-size: 2px 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+/* Parallel-specific style estimator block */
+
+#sk-container-id-1 div.sk-parallel-item::after {
+  content: "";
+  width: 100%;
+  border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+  flex-grow: 1;
+}
+
+#sk-container-id-1 div.sk-parallel {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  background-color: var(--sklearn-color-background);
+  position: relative;
+}
+
+#sk-container-id-1 div.sk-parallel-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#sk-container-id-1 div.sk-parallel-item:first-child::after {
+  align-self: flex-end;
+  width: 50%;
+}
+
+#sk-container-id-1 div.sk-parallel-item:last-child::after {
+  align-self: flex-start;
+  width: 50%;
+}
+
+#sk-container-id-1 div.sk-parallel-item:only-child::after {
+  width: 0;
+}
+
+/* Serial-specific style estimator block */
+
+#sk-container-id-1 div.sk-serial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--sklearn-color-background);
+  padding-right: 1em;
+  padding-left: 1em;
+}
+
+
+/* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+clickable and can be expanded/collapsed.
+- Pipeline and ColumnTransformer use this feature and define the default style
+- Estimators will overwrite some part of the style using the `sk-estimator` class
+*/
+
+/* Pipeline and ColumnTransformer style (default) */
+
+#sk-container-id-1 div.sk-toggleable {
+  /* Default theme specific background. It is overwritten whether we have a
+  specific estimator or a Pipeline/ColumnTransformer */
+  background-color: var(--sklearn-color-background);
+}
+
+/* Toggleable label */
+#sk-container-id-1 label.sk-toggleable__label {
+  cursor: pointer;
+  display: flex;
+  width: 100%;
+  margin-bottom: 0;
+  padding: 0.5em;
+  box-sizing: border-box;
+  text-align: center;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+#sk-container-id-1 label.sk-toggleable__label .caption {
+  font-size: 0.6rem;
+  font-weight: lighter;
+  color: var(--sklearn-color-text-muted);
+}
+
+#sk-container-id-1 label.sk-toggleable__label-arrow:before {
+  /* Arrow on the left of the label */
+  content: "▸";
+  float: left;
+  margin-right: 0.25em;
+  color: var(--sklearn-color-icon);
+}
+
+#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {
+  color: var(--sklearn-color-text);
+}
+
+/* Toggleable content - dropdown */
+
+#sk-container-id-1 div.sk-toggleable__content {
+  max-height: 0;
+  max-width: 0;
+  overflow: hidden;
+  text-align: left;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content pre {
+  margin: 0.2em;
+  border-radius: 0.25em;
+  color: var(--sklearn-color-text);
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-toggleable__content.fitted pre {
+  /* unfitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+  /* Expand drop-down */
+  max-height: 200px;
+  max-width: 100%;
+  overflow: auto;
+}
+
+#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+  content: "▾";
+}
+
+/* Pipeline/ColumnTransformer-specific style */
+
+#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator-specific style */
+
+/* Colorize estimator box */
+#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+#sk-container-id-1 div.sk-label label.sk-toggleable__label,
+#sk-container-id-1 div.sk-label label {
+  /* The background is the default theme color */
+  color: var(--sklearn-color-text-on-default-background);
+}
+
+/* On hover, darken the color of the background */
+#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+/* Label box, darken color on hover, fitted */
+#sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+  color: var(--sklearn-color-text);
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Estimator label */
+
+#sk-container-id-1 div.sk-label label {
+  font-family: monospace;
+  font-weight: bold;
+  display: inline-block;
+  line-height: 1.2em;
+}
+
+#sk-container-id-1 div.sk-label-container {
+  text-align: center;
+}
+
+/* Estimator-specific */
+#sk-container-id-1 div.sk-estimator {
+  font-family: monospace;
+  border: 1px dotted var(--sklearn-color-border-box);
+  border-radius: 0.25em;
+  box-sizing: border-box;
+  margin-bottom: 0.5em;
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-0);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
+}
+
+/* on hover */
+#sk-container-id-1 div.sk-estimator:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-2);
+}
+
+#sk-container-id-1 div.sk-estimator.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-2);
+}
+
+/* Specification for estimator info (e.g. "i" and "?") */
+
+/* Common style for "i" and "?" */
+
+.sk-estimator-doc-link,
+a:link.sk-estimator-doc-link,
+a:visited.sk-estimator-doc-link {
+  float: right;
+  font-size: smaller;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1em;
+  height: 1em;
+  width: 1em;
+  text-decoration: none !important;
+  margin-left: 0.5em;
+  text-align: center;
+  /* unfitted */
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-1);
+}
+
+.sk-estimator-doc-link.fitted,
+a:link.sk-estimator-doc-link.fitted,
+a:visited.sk-estimator-doc-link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+div.sk-estimator:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover,
+div.sk-label-container:hover .sk-estimator-doc-link:hover,
+.sk-estimator-doc-link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover,
+div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+.sk-estimator-doc-link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+/* Span, style for the box shown on hovering the info icon */
+.sk-estimator-doc-link span {
+  display: none;
+  z-index: 9999;
+  position: relative;
+  font-weight: normal;
+  right: .2ex;
+  padding: .5ex;
+  margin: .5ex;
+  width: min-content;
+  min-width: 20ex;
+  max-width: 50ex;
+  color: var(--sklearn-color-text);
+  box-shadow: 2pt 2pt 4pt #999;
+  /* unfitted */
+  background: var(--sklearn-color-unfitted-level-0);
+  border: .5pt solid var(--sklearn-color-unfitted-level-3);
+}
+
+.sk-estimator-doc-link.fitted span {
+  /* fitted */
+  background: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3);
+}
+
+.sk-estimator-doc-link:hover span {
+  display: block;
+}
+
+/* "?"-specific style due to the `<a>` HTML tag */
+
+#sk-container-id-1 a.estimator_doc_link {
+  float: right;
+  font-size: 1rem;
+  line-height: 1em;
+  font-family: monospace;
+  background-color: var(--sklearn-color-background);
+  border-radius: 1rem;
+  height: 1rem;
+  width: 1rem;
+  text-decoration: none;
+  /* unfitted */
+  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+}
+
+#sk-container-id-1 a.estimator_doc_link.fitted {
+  /* fitted */
+  border: var(--sklearn-color-fitted-level-1) 1pt solid;
+  color: var(--sklearn-color-fitted-level-1);
+}
+
+/* On hover */
+#sk-container-id-1 a.estimator_doc_link:hover {
+  /* unfitted */
+  background-color: var(--sklearn-color-unfitted-level-3);
+  color: var(--sklearn-color-background);
+  text-decoration: none;
+}
+
+#sk-container-id-1 a.estimator_doc_link.fitted:hover {
+  /* fitted */
+  background-color: var(--sklearn-color-fitted-level-3);
+}
+</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>DBSCAN()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" checked><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>DBSCAN</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.cluster.DBSCAN.html">?<span>Documentation for DBSCAN</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>DBSCAN()</pre></div> </div></div></div></div>
+
+
+
 Following the standard interface in scikit-learn, we first define the algorithm we want to run (creating the `clusterer` object), and then we *fit* it to our data. Once fit, `clusterer` contains the required information to access all the results of the algorithm. The `core_sample_indices_` attribute contains the indices (order, starting from zero) of each point that is classified as a *core*. We can have a peek into it to see what it looks like:
+
 
 
 ```python
 # Print the first 5 elements of `cs`
 clusterer.core_sample_indices_[:5]
 ```
+
+
+
+
+    array([ 1, 22, 30, 36, 42])
+
+
+
 The printout above tells us that the second (remember, Python starts counting at zero!) point in the dataset is a core, as are the 23rd, 31st, 36th, and 43rd points. This attribute has a variable length, depending on how many cores the algorithm finds.
 
 The second attribute of interest is `labels_`:
 
+
 ```python
 clusterer.labels_[:5]
 ```
+
+
+
+
+    array([-1,  0, -1, -1, -1])
+
+
+
 The `labels_` attribute always has the same length as the number of points used to run DBSCAN. Each value represents the index of the cluster a point belongs to. If the point is classified as *noise*, it receives a −1. Above, we can see that the second point belongs to cluster 1, while the others in the list are effectively not part of any cluster. To make things easier later on, let us turn the labels into a `Series` object that we can index in the same way as our collection of points:
+
 
 
 ```python
@@ -843,7 +1452,8 @@ lbls = pandas.Series(clusterer.labels_, index=db.index)
 Now that we already have the clusters, we can proceed to visualize them. There are many ways in which this can be done. We will start just by coloring points in a cluster in red and noise in grey, as done in Figure 17. 
 
 
-```python caption="Tokyo points, DBSCAN clusters."
+
+```python
 # Setup figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Subset points that are not part of any cluster (noise)
@@ -871,6 +1481,11 @@ plt.show()
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_95_0.png)
+    
+
+
 Although informative, the result of this run is not particularly satisfactory. There are *way* too many points that are classified as "noise".
 
 This is because we have run DBSCAN with the default parameters: a radius of 0.5 and a minimum of five points per cluster. Since our data is expressed in meters, a radius of half a meter will only pick up hyper local clusters. This might be of interest in some cases but, in others, it can result in odd outputs. 
@@ -878,14 +1493,24 @@ This is because we have run DBSCAN with the default parameters: a radius of 0.5 
 If we change those parameters, we can pick up more general patterns. For example, let us say a cluster needs to, at least, have roughly 1% of all the points in the dataset:
 
 
+
 ```python
 # Obtain the number of points 1% of the total represents
 minp = numpy.round(db.shape[0] * 0.01)
 minp
 ```
+
+
+
+
+    np.float64(100.0)
+
+
+
 At the same time, let us expand the maximum radius to, say, 500 meters. Then we can re-run the algorithm and plot the output, all in the same cell this time to create Figure 18: 
 
-```python caption="Tokyo points, clusters with DBSCAN and minp=0.01."
+
+```python
 # Rerun DBSCAN
 clusterer = DBSCAN(eps=500, min_samples=int(minp))
 clusterer.fit(db[["x", "y"]])
@@ -918,10 +1543,14 @@ plt.show()
 ```
 
 
+    
+![png](08_point_pattern_analysis_files/08_point_pattern_analysis_99_0.png)
+    
+
+
 ## Conclusion
 
 Overall, this chapter has provided an overview of methods to analyze point patterns. We have begun our point journey by visualizing their location and learning a way to overcome the "cluttering" challenge that large point patterns present us with. From a graphical display, we have moved to statistical characterization of their spatial distribution. In this context, we have learned about central tendency dispersion and extent, and we have positioned these measures as the point pattern counterparts of traditional statistics such as the mean or the standard deviation. These measures provide a summary of an entire pattern, but they tell us little about the spatial organization of each point. To that end, we have introduced the quadrat and Ripley's functions. These statistical devices help us in characterizing whether a point pattern is spatially clustered or dispersed. We have wrapped up the chapter going one step further and exploring methods to identify the location of clusters: areas of the map with high density of points. Taken altogether, point pattern analysis has many applications across classical statistical fields as well as in data science. Using the techniques discussed here, you should be able to answer fundamental questions about point patterns that represent widely varied phenomena in the world, from the location where photographs were taken, to the distribution of bird nests, to the clustering of bike crashes in a city.
-
 
 
 ## Questions
