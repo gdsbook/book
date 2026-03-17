@@ -443,7 +443,17 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="spatial-feature-engineering">
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">myst_nb</span> <span class="kn">import</span> <span class="n">glue</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section class="tex2jax_ignore mathjax_ignore" id="spatial-feature-engineering">
 <h1>Spatial Feature Engineering<a class="headerlink" href="#spatial-feature-engineering" title="Permalink to this heading">#</a></h1>
 <p>In machine learning and data science, we are often equipped with <em>tons</em> of data. Indeed, given the constellation of packages to query data services, free and open source data-sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful <em>features</em> from this rich and deep sea of data.</p>
 <p>Where data is available, but not yet directly <em>usable</em>, <em>feature engineering</em> helps to construct representations or transformations of the original data that are more useful for modeling a given phenomenon of interest. In traditional machine learning, feature engineering involves applying additional <em>domain knowledge</em> to raw information in order to structure it in a manner that is meaningful for a model. Often, this involves some sort of <em>transformation</em> of the original dataset, which is a well-studied concept in both classical statistics and remains so in machine learning methods. While <em>feature engineering</em> always relies on this implicit domain knowledge, it is an extremely important part of adapting general-purpose algorithms to unique or distinctive problems facing the every-day data scientist.</p>
@@ -459,6 +469,13 @@ document.write(`
 <span class="kn">import</span> <span class="nn">seaborn</span>
 <span class="kn">import</span> <span class="nn">rasterio</span>
 <span class="kn">from</span> <span class="nn">rasterio.plot</span> <span class="kn">import</span> <span class="n">show</span> <span class="k">as</span> <span class="n">rioshow</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">osmnx</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">overpass_settings</span> <span class="o">=</span> <span class="s1">&#39;[out:json][timeout:90][date:&quot;2021-10-07T00:00:00Z&quot;]&#39;</span>
 </pre></div>
 </div>
 </div>
@@ -498,7 +515,7 @@ document.write(`
 <p>To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using <code class="docutils literal notranslate"><span class="pre">osmnx</span></code>. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> points. From <a class="reference internal" href="08_point_pattern_analysis.html"><span class="doc std std-doc">Chapter 8</span></a>, we can recall that there are a few different hulls that can be used. We’ll use the Convex Hull here (Fig. XXX1XXX), which is the smallest convex polygon that covers all the points in the set.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_ch</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">unary_union</span><span class="o">.</span><span class="n">convex_hull</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_ch</span> <span class="o">=</span> <span class="n">airbnbs</span><span class="o">.</span><span class="n">union_all</span><span class="p">()</span><span class="o">.</span><span class="n">convex_hull</span>
 <span class="n">geopandas</span><span class="o">.</span><span class="n">GeoSeries</span><span class="p">([</span><span class="n">airbnbs_ch</span><span class="p">])</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -507,18 +524,25 @@ document.write(`
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;Axes: &gt;
 </pre></div>
 </div>
-<img alt="../_images/c65e073c00892069f1a2556b6fb20518fd1ed427e5c9d1a7faf4fcee3fc37d85.png" src="../_images/c65e073c00892069f1a2556b6fb20518fd1ed427e5c9d1a7faf4fcee3fc37d85.png" />
+<img alt="../_images/4e7742d6eed93229f9cbc574f2d730b606949a4787de2bbabbc32bd3e73557a0.png" src="../_images/4e7742d6eed93229f9cbc574f2d730b606949a4787de2bbabbc32bd3e73557a0.png" />
 </div>
 </div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Axes: &gt;
+</pre></div>
+</div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_9_1.png" /></p>
 <p>Using this polygon, we can use the <code class="docutils literal notranslate"><span class="pre">osmnx</span></code> package to fetch POIs from OpenStreetMap. We can make our request more manageable by only requesting POIs that fall within specific categories. Below, we’ll request POIs within San Diego that are “restaurants” or “bars,” according to their metadata stored in OpenStreetMap. Once returned, we only use a few columns to keep the table small and tidy:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
-<span class="n">pois</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">geometries_from_polygon</span><span class="p">(</span>
+<span class="n">pois</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">features_from_polygon</span><span class="p">(</span>
     <span class="n">airbnbs_ch</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;amenity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;restaurant&quot;</span><span class="p">,</span> <span class="s2">&quot;bar&quot;</span><span class="p">]}</span>
-<span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[</span>
+<span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+<span class="n">pois</span> <span class="o">=</span> <span class="n">pois</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
+    <span class="n">columns</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;osmid&#39;</span><span class="p">)</span>
+<span class="p">)[</span>
     <span class="p">[</span>
-        <span class="s2">&quot;element_type&quot;</span><span class="p">,</span>
         <span class="s2">&quot;osmid&quot;</span><span class="p">,</span>
         <span class="s2">&quot;amenity&quot;</span><span class="p">,</span>
         <span class="s2">&quot;cuisine&quot;</span><span class="p">,</span>
@@ -530,8 +554,22 @@ document.write(`
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 580 ms, sys: 18.6 ms, total: 599 ms
-Wall time: 7.85 s
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 158 ms, sys: 0 ns, total: 158 ms
+Wall time: 168 ms
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>CPU times: user 110 ms, sys: 8.28 ms, total: 118 ms
+Wall time: 129 ms
+</pre></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">geopandas</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">&quot;../data/cache/sd_pois.gpkg&quot;</span><span class="p">)</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">pois</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="s2">&quot;../data/cache/sd_pois.gpkg&quot;</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s2">&quot;GPKG&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -560,6 +598,12 @@ Name: amenity, dtype: int64
 </div>
 </div>
 </div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>amenity
+bar            308
+restaurant    1060
+Name: amenity, dtype: int64
+</pre></div>
+</div>
 <p>Once loaded into <code class="docutils literal notranslate"><span class="pre">pois</span></code> as a <code class="docutils literal notranslate"><span class="pre">GeoDataFrame</span></code>, we use the code below to generate Figure XXX2XXX, which takes a peek at their location, as compared with Airbnb spots:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -583,9 +627,10 @@ Name: amenity, dtype: int64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/64f80575f9aaa0aaa98f002755b21cc6c2f28c7b19835ac8763e052215d4ec6a.png" src="../_images/64f80575f9aaa0aaa98f002755b21cc6c2f28c7b19835ac8763e052215d4ec6a.png" />
+<img alt="../_images/5b0d53677d7aece6100d69a5919fa8e2755826b596ac2b3ff6473efbbdf4c08a.png" src="../_images/5b0d53677d7aece6100d69a5919fa8e2755826b596ac2b3ff6473efbbdf4c08a.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_18_0.png" /></p>
 <p>Now for some feature engineering. It may be extremely useful to know whether an Airbnb is located in a “hot” location, with a lot of restaurants and bars to choose from. Alternatively, if Airbnbs are very remote, they might not be as lucrative for short, expensive “city-break” reservations. That is, Airbnb users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be <em>willing to pay more</em> for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the Airbnb.</p>
 <p>Thus, we can <em>engineer features</em> in the Airbnb data using the nearby POIs. To do this, we can create a new feature for the Airbnb dataset –that is, a new column in <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code>– which incorporates information about how many POIs are <em>nearby</em> each property. This kind of “feature counting” is useful in applications where the mere presence of nearby features can affect the quantity we are modeling.</p>
 <p>To do this kind of feature engineering, let us first walk through what we need to do at a conceptual level:</p>
@@ -618,6 +663,19 @@ Datum: World Geodetic System 1984 ensemble
 </div>
 </div>
 </div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
+Name: WGS 84
+Axis Info [ellipsoidal]:
+- Lat[north]: Geodetic latitude (degree)
+- Lon[east]: Geodetic longitude (degree)
+Area of Use:
+- name: World.
+- bounds: (-180.0, -90.0, 180.0, 90.0)
+Datum: World Geodetic System 1984 ensemble
+- Ellipsoid: WGS 84
+- Prime Meridian: Greenwich
+</pre></div>
+</div>
 <p>In addition, the <code class="docutils literal notranslate"><span class="pre">pois</span></code> are also provided in terms of their latitude and longitude:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -640,6 +698,19 @@ Datum: World Geodetic System 1984 ensemble
 </pre></div>
 </div>
 </div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Geographic 2D CRS: EPSG:4326&gt;
+Name: WGS 84
+Axis Info [ellipsoidal]:
+- Lat[north]: Geodetic latitude (degree)
+- Lon[east]: Geodetic longitude (degree)
+Area of Use:
+- name: World.
+- bounds: (-180.0, -90.0, 180.0, 90.0)
+Datum: World Geodetic System 1984 ensemble
+- Ellipsoid: WGS 84
+- Prime Meridian: Greenwich
+</pre></div>
 </div>
 <p>Therefore, we need to convert this into a coordinate system that is easier to work with. Here, we will use a projection common for mapping in California, the California Albers projection:</p>
 <div class="cell docutils container">
@@ -675,6 +746,22 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 </div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Projected CRS: EPSG:3311&gt;
+Name: NAD83(HARN) / California Albers
+Axis Info [cartesian]:
+- X[east]: Easting (metre)
+- Y[north]: Northing (metre)
+Area of Use:
+- name: United States (USA) - California.
+- bounds: (-124.45, 32.53, -114.12, 42.01)
+Coordinate Operation:
+- name: California Albers
+- method: Albers Equal Area
+Datum: NAD83 (High Accuracy Reference Network)
+- Ellipsoid: GRS 1980
+- Prime Meridian: Greenwich
+</pre></div>
+</div>
 <p>With this, we can create the radius of 500 meters around each Airbnb. This is often called <em>buffering</em>, where a shape is dilated by a given radius.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -696,14 +783,8 @@ Datum: NAD83 (High Accuracy Reference Network)
     <span class="c1"># `buffer_500m` column</span>
     <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">set_geometry</span><span class="p">(</span><span class="s2">&quot;buffer_500m&quot;</span><span class="p">)[[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;buffer_500m&quot;</span><span class="p">]],</span>
     <span class="c1"># Operation (spatial predicate) to use for the spatial join (`within`)</span>
-    <span class="n">op</span><span class="o">=</span><span class="s2">&quot;within&quot;</span><span class="p">,</span>
+    <span class="n">predicate</span><span class="o">=</span><span class="s2">&quot;within&quot;</span><span class="p">,</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/envs/gds/lib/python3.9/site-packages/IPython/core/interactiveshell.py:3466: FutureWarning: The `op` parameter is deprecated and will be removed in a future release. Please use the `predicate` parameter instead.
-  if await self.run_code(code, result, async_=asy):
 </pre></div>
 </div>
 </div>
@@ -779,11 +860,61 @@ Datum: NAD83 (High Accuracy Reference Network)
 </table>
 </div></div></div>
 </div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>poi_count</th>
+    </tr>
+    <tr>
+      <th>id</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>6</th>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>5570</th>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>9553</th>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>38245</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>69385</th>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 <p>The resulting <code class="docutils literal notranslate"><span class="pre">Series</span></code> is indexed on the Airbnb IDs, so we can assign it to the original <code class="docutils literal notranslate"><span class="pre">airbnbs</span></code> table. In this case, we know by construction that missing Airbnbs in <code class="docutils literal notranslate"><span class="pre">poi_count</span></code> do not have any POI within 500m, so we can fill missing values in the column with zeros.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">airbnbs_w_counts</span> <span class="o">=</span> <span class="n">airbnbs_albers</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
-    <span class="n">poi_count</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">poi_count</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span>
 <span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">({</span><span class="s2">&quot;poi_count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
 </pre></div>
 </div>
@@ -814,9 +945,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/8655d0dc182bc0cc39de29ef2dea91b76617298413551b995634767ade41649d.png" src="../_images/8655d0dc182bc0cc39de29ef2dea91b76617298413551b995634767ade41649d.png" />
+<img alt="../_images/ee2c368496cdbbd89bf8fb45fec1074a9f76dbf55343d4b7f879582d0ed756ad.png" src="../_images/ee2c368496cdbbd89bf8fb45fec1074a9f76dbf55343d4b7f879582d0ed756ad.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_35_0.png" /></p>
 </section>
 <section id="assigning-point-values-from-surfaces-elevation-of-airbnbs">
 <h3>Assigning point values from surfaces: elevation of Airbnbs<a class="headerlink" href="#assigning-point-values-from-surfaces-elevation-of-airbnbs" title="Permalink to this heading">#</a></h3>
@@ -841,21 +973,25 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/2c7a9ced181981772e1d69aef76d8f62b0d45179670fac5d5ee4cfdb4c79f4ba.png" src="../_images/2c7a9ced181981772e1d69aef76d8f62b0d45179670fac5d5ee4cfdb4c79f4ba.png" />
+<img alt="../_images/ac441927dab91a0a285cd6e8470191e0f7e4006f385cbb2b078f715853c5b5cb.png" src="../_images/ac441927dab91a0a285cd6e8470191e0f7e4006f385cbb2b078f715853c5b5cb.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_38_0.png" /></p>
 <p>Let’s first check the CRS is aligned with our sample of point locations:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dem</span><span class="o">.</span><span class="n">crs</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">dem</span><span class="o">.</span><span class="n">crs</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CRS.from_epsg(4326)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>EPSG:4326
 </pre></div>
 </div>
 </div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>EPSG:4326
+</pre></div>
 </div>
 <p>We have opened the file with <code class="docutils literal notranslate"><span class="pre">rasterio</span></code>, which has not read the entire dataset just yet. This feature allows us to use this approach with files that are potentially very large, as only requested data is read into memory. To extract a discrete set of values from the elevation surface in <code class="docutils literal notranslate"><span class="pre">dem</span></code>, we can use <code class="docutils literal notranslate"><span class="pre">sample</span></code>. For a single location, this is how it works:</p>
 <div class="cell docutils container">
@@ -869,6 +1005,9 @@ Datum: NAD83 (High Accuracy Reference Network)
 </pre></div>
 </div>
 </div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[array([7], dtype=int16)]
+</pre></div>
 </div>
 <p>Now, we can  apply this logic to a sequence of coordinates. For that, we need to extract them from the <code class="docutils literal notranslate"><span class="pre">geometry</span></code> object:</p>
 <div class="cell docutils container">
@@ -946,6 +1085,52 @@ Datum: NAD83 (High Accuracy Reference Network)
 </table>
 </div></div></div>
 </div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Elevation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>112</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>114</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>30</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 <p>Now that we have a table with the elevation of each Airbnb property, we can plot the site elevations on a map (Fig. XXX5XXX) for visual inspection:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -975,9 +1160,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/95772a3bc8d06d4a8aca23396821c35c4cb3322567f51f0959aeaf859f7732b0.png" src="../_images/95772a3bc8d06d4a8aca23396821c35c4cb3322567f51f0959aeaf859f7732b0.png" />
+<img alt="../_images/43d90dc60c6db4fe9244ba7ee574031ab3b618d218a952c0b70c0a175beddb2b.png" src="../_images/43d90dc60c6db4fe9244ba7ee574031ab3b618d218a952c0b70c0a175beddb2b.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_48_0.png" /></p>
 </section>
 <section id="point-interpolation-using-scikit-learn">
 <h3>Point interpolation using scikit-learn<a class="headerlink" href="#point-interpolation-using-scikit-learn" title="Permalink to this heading">#</a></h3>
@@ -1042,9 +1228,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/23a5d63bbce425ef87b5f4ee2ae3892f0b85e66cb82ead7d7ad5d0784f89e0f6.png" src="../_images/23a5d63bbce425ef87b5f4ee2ae3892f0b85e66cb82ead7d7ad5d0784f89e0f6.png" />
+<img alt="../_images/577de708f969213d53f98c2490e33645242ecd1d35dfab02848e909246c3e972.png" src="../_images/577de708f969213d53f98c2490e33645242ecd1d35dfab02848e909246c3e972.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_58_0.png" /></p>
 <p>With these coordinates, we can make a GeoDataFrame containing the grid cells at which we would like to predict:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1077,9 +1264,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/1344013fb8f42b12641601174bc91b36dd16364979679e9655650bb208ada6db.png" src="../_images/1344013fb8f42b12641601174bc91b36dd16364979679e9655650bb208ada6db.png" />
+<img alt="../_images/07b48c73b37bc71ccb493f46c0d5b4c82394ad9625afd9b5d2edcd78809e9a25.png" src="../_images/07b48c73b37bc71ccb493f46c0d5b4c82394ad9625afd9b5d2edcd78809e9a25.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_62_0.png" /></p>
 <p>With this done, we can now construct the predictions. First we train the model:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1107,9 +1295,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/43ca8ae90177a7e70c15c8c56f969f50f102d1b5626a97bb709a6f89935d1be8.png" src="../_images/43ca8ae90177a7e70c15c8c56f969f50f102d1b5626a97bb709a6f89935d1be8.png" />
+<img alt="../_images/66cb3cb5e90cee7784f37f94fda0655e98f0e94cb458d8b3322453acece7c573.png" src="../_images/66cb3cb5e90cee7784f37f94fda0655e98f0e94cb458d8b3322453acece7c573.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_68_0.png" /></p>
 <p>The map is a result not only of the underlying data but also the algorithm we have used. For example, you can see in Figure XXX9XXX (generated with the code below) that the surface gets smoother as you increase the number of nearest neighbors to consider.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1145,9 +1334,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/92419adfed27ecf5e60aacb07c1dc3eb1fdaccd46d757cd9d3e8a7cb19d79405.png" src="../_images/92419adfed27ecf5e60aacb07c1dc3eb1fdaccd46d757cd9d3e8a7cb19d79405.png" />
+<img alt="../_images/bb7b65f86dee2393cbdaa42a4314dd90a0cd8daea071669f4101f280341e3952.png" src="../_images/bb7b65f86dee2393cbdaa42a4314dd90a0cd8daea071669f4101f280341e3952.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_70_0.png" /></p>
 <p>Focusing in on central San Diego tells the story a bit more clearly, since there are interesting points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface. To visualize a zoom into the region, we begin by extracting its bounding box:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1219,9 +1409,10 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/2d6ecf654a8967bec49f3caf9473d4bbda87a0e027a4f0a5e1e20e11f7a70cea.png" src="../_images/2d6ecf654a8967bec49f3caf9473d4bbda87a0e027a4f0a5e1e20e11f7a70cea.png" />
+<img alt="../_images/92d6f9e0663f3a3d34ed3a5da70e24e181020c84f00835a62928826e4dafc73f.png" src="../_images/92d6f9e0663f3a3d34ed3a5da70e24e181020c84f00835a62928826e4dafc73f.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_76_0.png" /></p>
 <p>Plenty more of these methods are implemented in <code class="docutils literal notranslate"><span class="pre">scikit-learn.neighbors</span></code>, as well as kriging methods in <code class="docutils literal notranslate"><span class="pre">GSTools</span></code> <span id="id1">[<a class="reference internal" href="references.html#id81" title="Sebastian Müller and Lennart Schüler. Geostat-framework/gstools: v1.3.3 'pure pink'. August 2021. URL: https://doi.org/10.5281/zenodo.5169658, doi:10.5281/zenodo.5169658.">MS21</a>]</span> and geographically weighted regression in <code class="docutils literal notranslate"><span class="pre">mgwr</span></code> <span id="id2">[<a class="reference internal" href="references.html#id79" title="Taylor M Oshan, Ziqi Li, Wei Kang, Levi J Wolf, and A Stewart Fotheringham. Mgwr: a python implementation of multiscale geographically weighted regression for investigating process spatial heterogeneity and scale. ISPRS International Journal of Geo-Information, 8(6):269, 2019.">OLK+19</a>]</span>.</p>
 </section>
 <section id="polygon-to-point">
@@ -1242,8 +1433,7 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/envs/gds/lib/python3.9/site-packages/cenpy/products.py:748: FutureWarning: The `op` parameter is deprecated and will be removed in a future release. Please use the `predicate` parameter instead.
-  return self._from_name(
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Remote loading failed...
 </pre></div>
 </div>
 </div>
@@ -1283,29 +1473,29 @@ Datum: NAD83 (High Accuracy Reference Network)
 </div>
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
-Index: 6110 entries, 0 to 6068
+Index: 6110 entries, 0 to 6109
 Data columns (total 28 columns):
  #   Column              Non-Null Count  Dtype   
 ---  ------              --------------  -----   
- 0   accommodates        6110 non-null   int64   
+ 0   accommodates        6110 non-null   int32   
  1   bathrooms           6110 non-null   float64 
  2   bedrooms            6110 non-null   float64 
  3   beds                6110 non-null   float64 
  4   neighborhood        6110 non-null   object  
- 5   pool                6110 non-null   int64   
+ 5   pool                6110 non-null   int32   
  6   d2balboa            6110 non-null   float64 
- 7   coastal             6110 non-null   int64   
+ 7   coastal             6110 non-null   int32   
  8   price               6110 non-null   float64 
  9   log_price           6110 non-null   float64 
- 10  id                  6110 non-null   int64   
- 11  pg_Apartment        6110 non-null   int64   
- 12  pg_Condominium      6110 non-null   int64   
- 13  pg_House            6110 non-null   int64   
- 14  pg_Other            6110 non-null   int64   
- 15  pg_Townhouse        6110 non-null   int64   
- 16  rt_Entire_home/apt  6110 non-null   int64   
- 17  rt_Private_room     6110 non-null   int64   
- 18  rt_Shared_room      6110 non-null   int64   
+ 10  id                  6110 non-null   int32   
+ 11  pg_Apartment        6110 non-null   int32   
+ 12  pg_Condominium      6110 non-null   int32   
+ 13  pg_House            6110 non-null   int32   
+ 14  pg_Other            6110 non-null   int32   
+ 15  pg_Townhouse        6110 non-null   int32   
+ 16  rt_Entire_home/apt  6110 non-null   int32   
+ 17  rt_Private_room     6110 non-null   int32   
+ 18  rt_Shared_room      6110 non-null   int32   
  19  geometry            6110 non-null   geometry
  20  index_right         6110 non-null   int64   
  21  GEOID               6110 non-null   object  
@@ -1315,11 +1505,48 @@ Data columns (total 28 columns):
  25  county              6110 non-null   object  
  26  tract               6110 non-null   object  
  27  density             6110 non-null   float64 
-dtypes: float64(8), geometry(1), int64(13), object(6)
-memory usage: 1.4+ MB
+dtypes: float64(8), geometry(1), int32(12), int64(1), object(6)
+memory usage: 1.1+ MB
 </pre></div>
 </div>
 </div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;class &#39;geopandas.geodataframe.GeoDataFrame&#39;&gt;
+Index: 6110 entries, 0 to 6109
+Data columns (total 28 columns):
+ #   Column              Non-Null Count  Dtype   
+---  ------              --------------  -----   
+ 0   accommodates        6110 non-null   int32   
+ 1   bathrooms           6110 non-null   float64 
+ 2   bedrooms            6110 non-null   float64 
+ 3   beds                6110 non-null   float64 
+ 4   neighborhood        6110 non-null   object  
+ 5   pool                6110 non-null   int32   
+ 6   d2balboa            6110 non-null   float64 
+ 7   coastal             6110 non-null   int32   
+ 8   price               6110 non-null   float64 
+ 9   log_price           6110 non-null   float64 
+ 10  id                  6110 non-null   int32   
+ 11  pg_Apartment        6110 non-null   int32   
+ 12  pg_Condominium      6110 non-null   int32   
+ 13  pg_House            6110 non-null   int32   
+ 14  pg_Other            6110 non-null   int32   
+ 15  pg_Townhouse        6110 non-null   int32   
+ 16  rt_Entire_home/apt  6110 non-null   int32   
+ 17  rt_Private_room     6110 non-null   int32   
+ 18  rt_Shared_room      6110 non-null   int32   
+ 19  geometry            6110 non-null   geometry
+ 20  index_right         6110 non-null   int64   
+ 21  GEOID               6110 non-null   object  
+ 22  B02001_001E         6110 non-null   float64 
+ 23  NAME                6110 non-null   object  
+ 24  state               6110 non-null   object  
+ 25  county              6110 non-null   object  
+ 26  tract               6110 non-null   object  
+ 27  density             6110 non-null   float64 
+dtypes: float64(8), geometry(1), int32(12), int64(1), object(6)
+memory usage: 1.1+ MB
+</pre></div>
 </div>
 </section>
 <section id="area-to-area-interpolation">
@@ -1420,9 +1647,10 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/abcae4f96062fae1998ead3fd760f9f5c87bef96561ff5e7f63831704355f7d5.png" src="../_images/abcae4f96062fae1998ead3fd760f9f5c87bef96561ff5e7f63831704355f7d5.png" />
+<img alt="../_images/0f4a190ca5cd71267a30c0a4ba5a3e24e8010ec910f4927525af8f475ca5a21f.png" src="../_images/0f4a190ca5cd71267a30c0a4ba5a3e24e8010ec910f4927525af8f475ca5a21f.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_95_0.png" /></p>
 <p>And Figure XXX12XXX, generated with the code below, shows the equivalent for population density.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1470,9 +1698,10 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/5107eed499292f7c39fa51816980c95684dc33078034c82ee32d78b4fc00babb.png" src="../_images/5107eed499292f7c39fa51816980c95684dc33078034c82ee32d78b4fc00babb.png" />
+<img alt="../_images/0ee96300741265a9b29bc236fdcc72b43e2a17e88996151f29061ff172a12829.png" src="../_images/0ee96300741265a9b29bc236fdcc72b43e2a17e88996151f29061ff172a12829.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_97_0.png" /></p>
 </section>
 </section>
 <section id="feature-engineering-using-map-synthesis">
@@ -1523,9 +1752,10 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/53afab7befc2d9ba37fb74ae66baa8d001249fedf0bf6009b4f1a41af23aee26.png" src="../_images/53afab7befc2d9ba37fb74ae66baa8d001249fedf0bf6009b4f1a41af23aee26.png" />
+<img alt="../_images/867c0e1acbd0b40608299157a72f0c9f6b0d01bb64d9210afdc3fdb25e033d02.png" src="../_images/867c0e1acbd0b40608299157a72f0c9f6b0d01bb64d9210afdc3fdb25e033d02.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_104_0.png" /></p>
 </section>
 <section id="distance-buffers-within-a-single-table">
 <h4>Distance buffers within a single table<a class="headerlink" href="#distance-buffers-within-a-single-table" title="Permalink to this heading">#</a></h4>
@@ -1554,23 +1784,16 @@ memory usage: 1.4+ MB
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/908812a36c1adc18bddf22f037781a949600a26c08f7f64ef973a77bcdd7fec7.png" src="../_images/908812a36c1adc18bddf22f037781a949600a26c08f7f64ef973a77bcdd7fec7.png" />
+<img alt="../_images/a0018d1f1facb8b9c45fb2d0227fe764b45c5ef9adb104d1b7cbf3d1e813cfbc.png" src="../_images/a0018d1f1facb8b9c45fb2d0227fe764b45c5ef9adb104d1b7cbf3d1e813cfbc.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_108_0.png" /></p>
 <p>If we were instead interested in the most common number of bedrooms, rather than the average, we could use the <code class="docutils literal notranslate"><span class="pre">lag_categorical</span></code> function, which will consider each value as a category and return the most common value in each neighbor set:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">local_mode</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">lag_categorical</span><span class="p">(</span>
     <span class="n">d500_w</span><span class="p">,</span> <span class="n">airbnbs_albers</span><span class="p">[[</span><span class="s2">&quot;bedrooms&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/envs/gds/lib/python3.9/site-packages/numpy/core/fromnumeric.py:3432: RuntimeWarning: Mean of empty slice.
-  return _methods._mean(a, axis=axis, dtype=dtype,
-/opt/conda/envs/gds/lib/python3.9/site-packages/numpy/core/_methods.py:190: RuntimeWarning: invalid value encountered in double_scalars
-  ret = ret.dtype.type(ret / rcount)
 </pre></div>
 </div>
 </div>
@@ -1630,31 +1853,31 @@ memory usage: 1.4+ MB
     <tr>
       <th>0.0</th>
       <td>4</td>
-      <td>389</td>
+      <td>392</td>
       <td>39</td>
-      <td>8</td>
-      <td>3</td>
-      <td>2</td>
-      <td>0</td>
+      <td>7</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1.0</th>
-      <td>3</td>
+      <td>1</td>
       <td>3065</td>
-      <td>214</td>
-      <td>32</td>
+      <td>215</td>
+      <td>33</td>
       <td>18</td>
-      <td>6</td>
+      <td>4</td>
       <td>0</td>
-      <td>0</td>
+      <td>2</td>
     </tr>
     <tr>
       <th>2.0</th>
       <td>1</td>
       <td>978</td>
-      <td>267</td>
-      <td>12</td>
+      <td>268</td>
+      <td>11</td>
       <td>4</td>
       <td>1</td>
       <td>0</td>
@@ -1662,22 +1885,22 @@ memory usage: 1.4+ MB
     </tr>
     <tr>
       <th>3.0</th>
-      <td>2</td>
-      <td>428</td>
+      <td>3</td>
+      <td>427</td>
       <td>165</td>
-      <td>35</td>
+      <td>34</td>
       <td>12</td>
       <td>2</td>
-      <td>0</td>
+      <td>1</td>
       <td>0</td>
     </tr>
     <tr>
       <th>4.0</th>
       <td>0</td>
-      <td>166</td>
-      <td>58</td>
+      <td>162</td>
+      <td>61</td>
       <td>10</td>
-      <td>31</td>
+      <td>32</td>
       <td>6</td>
       <td>2</td>
       <td>0</td>
@@ -1685,23 +1908,23 @@ memory usage: 1.4+ MB
     <tr>
       <th>5.0</th>
       <td>0</td>
-      <td>50</td>
+      <td>51</td>
       <td>17</td>
       <td>2</td>
       <td>10</td>
       <td>18</td>
       <td>0</td>
-      <td>1</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>6.0</th>
       <td>0</td>
       <td>14</td>
       <td>8</td>
-      <td>1</td>
       <td>3</td>
-      <td>2</td>
+      <td>3</td>
       <td>1</td>
+      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1752,7 +1975,187 @@ memory usage: 1.4+ MB
 </table>
 </div></div></div>
 </div>
-<p>From the table we can see the most common case (N=<span class="output text_plain">3065</span>) is properties with one bedroom surrounded mostly by other properties with also only one bedroom. Similarly we also find out, for example, that the two properties with ten bedrooms in the dataset are surrounded by properties with mostly two bedrooms. The remaining cells in the table can be interpreted in a similar fashion.</p>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>nearby</th>
+      <th>0.0</th>
+      <th>1.0</th>
+      <th>2.0</th>
+      <th>3.0</th>
+      <th>4.0</th>
+      <th>5.0</th>
+      <th>6.0</th>
+      <th>7.0</th>
+    </tr>
+    <tr>
+      <th>bedrooms</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0.0</th>
+      <td>4</td>
+      <td>392</td>
+      <td>39</td>
+      <td>8</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1.0</th>
+      <td>1</td>
+      <td>3068</td>
+      <td>214</td>
+      <td>32</td>
+      <td>18</td>
+      <td>5</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2.0</th>
+      <td>1</td>
+      <td>978</td>
+      <td>268</td>
+      <td>11</td>
+      <td>4</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3.0</th>
+      <td>1</td>
+      <td>427</td>
+      <td>167</td>
+      <td>34</td>
+      <td>12</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4.0</th>
+      <td>0</td>
+      <td>162</td>
+      <td>60</td>
+      <td>10</td>
+      <td>32</td>
+      <td>6</td>
+      <td>3</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5.0</th>
+      <td>0</td>
+      <td>52</td>
+      <td>16</td>
+      <td>2</td>
+      <td>9</td>
+      <td>18</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>6.0</th>
+      <td>0</td>
+      <td>14</td>
+      <td>9</td>
+      <td>1</td>
+      <td>4</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>7.0</th>
+      <td>0</td>
+      <td>5</td>
+      <td>1</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>8.0</th>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>9.0</th>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>10.0</th>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">glue</span><span class="p">(</span><span class="s1">&#39;most_common&#39;</span><span class="p">,</span> <span class="n">crosstab</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>np.int64(3065)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>np.int64(3068)
+</pre></div>
+</div>
+<p>From the table we can see the most common case (N=<span class="output text_plain">np.int64(3065)</span>) is properties with one bedroom surrounded mostly by other properties with also only one bedroom. Similarly we also find out, for example, that the two properties with ten bedrooms in the dataset are surrounded by properties with mostly two bedrooms. The remaining cells in the table can be interpreted in a similar fashion.</p>
 <p>If more complicated statistics are required, it can help to reexpress the construction of summary statistics as a <em>reduction</em> of the <em>adjacency list</em> representation of our weights, as done in <a class="reference internal" href="04_spatial_weights.html"><span class="doc std std-doc">Chapter 4</span></a>. To recap, the <em>adjacency list</em> is a <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> where each row contains a single link in our graph. It contains the identifier for some <code class="docutils literal notranslate"><span class="pre">focal</span></code> observation, the identifier for some <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> observation, and a value for the <code class="docutils literal notranslate"><span class="pre">weight</span></code> of the link that connects the <code class="docutils literal notranslate"><span class="pre">focal</span></code> and <code class="docutils literal notranslate"><span class="pre">neighbor</span></code>:</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1825,6 +2228,64 @@ memory usage: 1.4+ MB
   </tbody>
 </table>
 </div></div></div>
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>focal</th>
+      <th>neighbor</th>
+      <th>weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>136</td>
+      <td>0.023256</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>279</td>
+      <td>0.023256</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>317</td>
+      <td>0.023256</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>616</td>
+      <td>0.023256</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>761</td>
+      <td>0.023256</td>
+    </tr>
+  </tbody>
+</table>
 </div>
 <p>If we had the values for each for the neighbors in this adjacency list table, then we could use a <code class="docutils literal notranslate"><span class="pre">groupby()</span></code> to summarize the values of observations connected to a given focal observation. This merge can be done directly with the original data, linking the <code class="docutils literal notranslate"><span class="pre">neighbor</span></code> key in the adjacency list back to that observation in our source table:</p>
 <div class="cell docutils container">
@@ -1904,6 +2365,70 @@ memory usage: 1.4+ MB
 </table>
 </div></div></div>
 </div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</pre></div>
+</div>
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>focal</th>
+      <th>neighbor</th>
+      <th>weight</th>
+      <th>bedrooms</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>136</td>
+      <td>0.023256</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>279</td>
+      <td>0.023256</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>317</td>
+      <td>0.023256</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>616</td>
+      <td>0.023256</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>761</td>
+      <td>0.023256</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
 <p>Now, we need only to group the adjacency list by the focal observation and summarize the <code class="docutils literal notranslate"><span class="pre">bedrooms</span></code> column to obtain the median number of bedrooms for each <code class="docutils literal notranslate"><span class="pre">focal</span></code> observation.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -1928,6 +2453,21 @@ Name: bedrooms, Length: 6110, dtype: float64
 </pre></div>
 </div>
 </div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>focal
+0       1.0
+1       2.0
+2       1.0
+3       1.0
+4       1.0
+       ... 
+6105    1.0
+6106    1.0
+6107    1.0
+6108    1.0
+6109    1.0
+Name: bedrooms, Length: 6110, dtype: float64
+</pre></div>
 </div>
 <p>Since the mean and/or mode are the most commonly used measures of central tendency, the <code class="docutils literal notranslate"><span class="pre">lag_spatial</span></code> and <code class="docutils literal notranslate"><span class="pre">lag_categorical</span></code> functions cover many of the required uses in practice.</p>
 </section>
@@ -1960,14 +2500,6 @@ Name: bedrooms, Length: 6110, dtype: float64
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d1k_exclusive</span> <span class="o">=</span> <span class="n">weights</span><span class="o">.</span><span class="n">set_operations</span><span class="o">.</span><span class="n">w_difference</span><span class="p">(</span>
     <span class="n">d1k_w</span><span class="p">,</span> <span class="n">d500_w</span><span class="p">,</span> <span class="n">constrained</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/envs/gds/lib/python3.9/site-packages/libpysal/weights/weights.py:224: UserWarning: The weights matrix is not fully connected: 
- There are 60 disconnected components.
- There are 32 islands with ids: 762, 907, 976, 1003, 1776, 1867, 2789, 2841, 3130, 3138, 3184, 3604, 3748, 3962, 3989, 4366, 4443, 4627, 4764, 4885, 4989, 5014, 5536, 5733, 5756, 5790, 5796, 5808, 6005, 6026, 6049, 6068.
-  warnings.warn(message)
 </pre></div>
 </div>
 </div>
@@ -2019,6 +2551,40 @@ Name: bedrooms, Length: 6110, dtype: float64
 </div>
 </div>
 </div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>(&#39;WARNING: &#39;, 762, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 907, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 976, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 1003, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 1776, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 1867, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 2789, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 2841, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 3130, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 3138, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 3184, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 3604, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 3748, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 3962, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 3989, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 4366, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 4443, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 4627, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 4764, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 4885, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 4989, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 5014, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 5536, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 5733, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 5756, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 5790, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 5796, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 5808, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 6005, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 6026, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 6049, &#39; is an island (no neighbors)&#39;)
+(&#39;WARNING: &#39;, 6068, &#39; is an island (no neighbors)&#39;)
+</pre></div>
+</div>
 <p>Thus, as we can see in Figure XXX15XXX (generated by the code below), the two features contain distinct, but related, information, and both may be valuable in their own right when attempting to predict outcomes of interest.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2045,9 +2611,10 @@ Name: bedrooms, Length: 6110, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/0f4128154ff31143f340f1c13a702db03a3d73ca93c22aaf79236ea36364e5e5.png" src="../_images/0f4128154ff31143f340f1c13a702db03a3d73ca93c22aaf79236ea36364e5e5.png" />
+<img alt="../_images/c2e8b9c1bd184a410c0f50ddfcd9353cfae5d4f1a338970ae894a287e8c66e47.png" src="../_images/c2e8b9c1bd184a410c0f50ddfcd9353cfae5d4f1a338970ae894a287e8c66e47.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_130_0.png" /></p>
 <p>As the plot shows, although the relationship between both is positive, there is quite a bit of variation and departure from the (red) line of equality. These represent cases with either larger (above the line) or smaller (below) average size in the 500 meters to 1 kilometer ring than in the 500 meters buffer.</p>
 </section>
 </section>
@@ -2058,14 +2625,6 @@ Name: bedrooms, Length: 6110, dtype: float64
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">hdbscan</span> <span class="kn">import</span> <span class="n">HDBSCAN</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/opt/conda/envs/gds/lib/python3.9/site-packages/hdbscan/plots.py:448: DeprecationWarning: invalid escape sequence \l
-  axis.set_ylabel(&#39;$\lambda$ value&#39;)
-/opt/conda/envs/gds/lib/python3.9/site-packages/hdbscan/robust_single_linkage_.py:154: DeprecationWarning: invalid escape sequence \{
-  &quot;&quot;&quot;Perform robust single linkage clustering from a vector array
 </pre></div>
 </div>
 </div>
@@ -2133,9 +2692,10 @@ Name: bedrooms, Length: 6110, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/fccab07e3da6cbd33dcefcff6433389452a651bb4effce06d4512e9d3630dfa2.png" src="../_images/fccab07e3da6cbd33dcefcff6433389452a651bb4effce06d4512e9d3630dfa2.png" />
+<img alt="../_images/e870999811a1e63904497d2bde38cf72674744a789a7fc4d1688847089092a67.png" src="../_images/e870999811a1e63904497d2bde38cf72674744a789a7fc4d1688847089092a67.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_142_0.png" /></p>
 <p>Note how the hierarchical nature of HDBSCAN, which picks density thresholds <em>locally</em> is at work in the map, where some of the clusters (e.g., orange ones in the north) display lower density than parts of the center which are <em>not</em> part of any cluster. These results also capture some information about the price of a listing. Figure XXX17XXX (generated with the code below) shows this by plotting the distribution of prices across the detected clusters.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -2166,9 +2726,10 @@ Name: bedrooms, Length: 6110, dtype: float64
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/8f0bca5da82f9a5e56f738d90b6b27b0069531773e7c38052b5782b3c3d4e5ba.png" src="../_images/8f0bca5da82f9a5e56f738d90b6b27b0069531773e7c38052b5782b3c3d4e5ba.png" />
+<img alt="../_images/bd2f3c9db868bc09fb9689439b122a2174f340aa027dc2bd9dcc4c570529cad2.png" src="../_images/bd2f3c9db868bc09fb9689439b122a2174f340aa027dc2bd9dcc4c570529cad2.png" />
 </div>
 </div>
+<p><img alt="png" src="notebooks/12_feature_engineering_files/12_feature_engineering_144_0.png" /></p>
 <p>If we want to capture the variation picked up by membership to these clusters in a regression model, we could use these labels as the basis for spatial fixed effects, for example, as we saw in <a class="reference internal" href="11_regression.html"><span class="doc std std-doc">Chapter 11</span></a>.</p>
 </section>
 </section>

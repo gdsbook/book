@@ -483,8 +483,7 @@ scientific community could study, understand, and replicate their findings.
 One of the most famous of these annotations is Galileo’s drawings of Jupiter (<a class="reference external" href="https://commons.wikimedia.org/wiki/File:Medicean_Stars.png">source</a>) and the Medicean stars, shown in Figure 1.</p>
 <div class="cell tag_remove-input docutils container">
 <div class="cell_output docutils container">
-<img alt="../_images/85cbb7d9c3d8f0bc88607cd381f26e6ddc7153685acf5061f528cb30fb6f7396.png" src="../_images/85cbb7d9c3d8f0bc88607cd381f26e6ddc7153685acf5061f528cb30fb6f7396.png" />
-</div>
+<div class="output text_html"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Medicean_Stars.png" width="250"/></div></div>
 </div>
 <p>There is a growing perception that much of this original scientific ethos—operating transparently and arguing with accessible materials—has been lost. A series of
 recent high profile scandals have even prompted some to call a state of
@@ -984,11 +983,18 @@ dialog from within the notebook is to add a question mark after it:</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Red">Signature:</span> read_file<span class=" -Color -Color-Blue">(</span>filename<span class=" -Color -Color-Blue">,</span> bbox<span class=" -Color -Color-Blue">=</span><span class=" -Color -Color-Green">None</span><span class=" -Color -Color-Blue">,</span> mask<span class=" -Color -Color-Blue">=</span><span class=" -Color -Color-Green">None</span><span class=" -Color -Color-Blue">,</span> rows<span class=" -Color -Color-Blue">=</span><span class=" -Color -Color-Green">None</span><span class=" -Color -Color-Blue">,</span> engine<span class=" -Color -Color-Blue">=</span><span class=" -Color -Color-Green">None</span><span class=" -Color -Color-Blue">,</span> <span class=" -Color -Color-Blue">**</span>kwargs<span class=" -Color -Color-Blue">)</span>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span><span class=" -Color -Color-Red">Signature:</span>
+read_file(
+    filename,
+    bbox=<span class=" -Color -Color-Bold -Color-Bold-C28">None</span>,
+    mask=<span class=" -Color -Color-Bold -Color-Bold-C28">None</span>,
+    columns=<span class=" -Color -Color-Bold -Color-Bold-C28">None</span>,
+    rows=<span class=" -Color -Color-Bold -Color-Bold-C28">None</span>,
+    engine=<span class=" -Color -Color-Bold -Color-Bold-C28">None</span>,
+    **kwargs,
+)
 <span class=" -Color -Color-Red">Docstring:</span>
-Returns a GeoDataFrame from a file or URL.
-
-.. versionadded:: 0.7.0 mask, rows
+Return a GeoDataFrame from a file or URL.
 
 Parameters
 ----------
@@ -1006,21 +1012,28 @@ mask : dict | GeoDataFrame or GeoSeries | shapely Geometry, default None
     Filter for features that intersect with the given dict-like geojson
     geometry, GeoSeries, GeoDataFrame or shapely geometry.
     CRS mis-matches are resolved if given a GeoSeries or GeoDataFrame.
-    Cannot be used with bbox.
+    Cannot be used with bbox. If multiple geometries are passed, this will
+    first union all geometries, which may be computationally expensive.
+columns : list, optional
+    List of column names to import from the data source. Column names
+    must exactly match the names in the data source. To avoid reading
+    any columns (besides the geometry column), pass an empty list-like.
+    By default reads all columns.
 rows : int or slice, default None
     Load in specific rows by passing an integer (first `n` rows) or a
     slice() object.
-engine : str, &quot;fiona&quot; or &quot;pyogrio&quot;
+engine : str,  &quot;pyogrio&quot; or &quot;fiona&quot;
     The underlying library that is used to read the file. Currently, the
-    supported options are &quot;fiona&quot; and &quot;pyogrio&quot;. Defaults to &quot;fiona&quot; if
-    installed, otherwise tries &quot;pyogrio&quot;.
+    supported options are &quot;pyogrio&quot; and &quot;fiona&quot;. Defaults to &quot;pyogrio&quot; if
+    installed, otherwise tries &quot;fiona&quot;. Engine can also be set globally
+    with the ``geopandas.options.io_engine`` option.
 **kwargs :
-    Keyword args to be passed to the engine. In case of the &quot;fiona&quot; engine,
-    the keyword arguments are passed to :func:`fiona.open` or
-    :class:`fiona.collection.BytesCollection` when opening the file.
-    For more information on possible keywords, type:
-    ``import fiona; help(fiona.open)``. In case of the &quot;pyogrio&quot; engine,
-    the keyword arguments are passed to :func:`pyogrio.read_dataframe`.
+    Keyword args to be passed to the engine, and can be used to write
+    to multi-layer data, store data within archives (zip files), etc.
+    In case of the &quot;pyogrio&quot; engine, the keyword arguments are passed to
+    `pyogrio.read_dataframe`. In case of the &quot;fiona&quot; engine, the keyword
+    arguments are passed to fiona.open`. For more information on possible
+    keywords, type: ``import pyogrio; help(pyogrio.read_dataframe)``.
 
 
 Examples
@@ -1053,7 +1066,22 @@ Notes
 The format drivers will attempt to detect the encoding of your data, but
 may fail. In this case, the proper encoding can be specified explicitly
 by using the encoding keyword parameter, e.g. ``encoding=&#39;utf-8&#39;``.
-<span class=" -Color -Color-Red">File:</span>      /opt/conda/lib/python3.10/site-packages/geopandas/io/file.py
+
+For faster data reading with the default pyogrio engine when
+pyarrow is installed, pass ``use_arrow=True`` as an argument. See the User
+Guide page :doc:`../../user_guide/io` for details.
+
+
+When specifying a URL, geopandas will check if the server supports reading
+partial data and in that case pass the URL as is to the underlying engine,
+which will then use the network file system handler of GDAL to read from
+the URL. Otherwise geopandas will download the data from the URL and pass
+all data in-memory to the underlying engine.
+If you need more control over how the URL is read, you can specify the
+GDAL virtual filesystem manually (e.g. ``/vsicurl/https://...``). See the
+GDAL documentation on filesystems for more details
+(https://gdal.org/user/virtual_file_systems.html#vsicurl-http-https-ftp-files-random-access).
+<span class=" -Color -Color-Red">File:</span>      /opt/conda/envs/gds/lib/python3.12/site-packages/geopandas/io/file.py
 <span class=" -Color -Color-Red">Type:</span>      function
 </pre></div>
 </div>
@@ -1306,16 +1334,16 @@ may slightly change.</p>
         },
         codeMirrorConfig: {
             theme: "abcdef",
-            mode: "python"
+            mode: "gds"
         },
         kernelOptions: {
-            name: "python3",
+            name: "gds",
             path: "./notebooks"
         },
         predefinedOutput: true
     }
     </script>
-    <script>kernelName = 'python3'</script>
+    <script>kernelName = 'gds'</script>
 
                 </article>
               
