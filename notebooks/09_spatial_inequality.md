@@ -7,11 +7,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.15.2
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-10.0
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -566,7 +566,8 @@ rmeans = (
         by="Region_Name"
         # Calculate mean by region and save only year columns
     )
-    .mean()[years]
+    [years]
+    .mean()
 )
 ```
 
