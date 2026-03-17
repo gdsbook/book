@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.19.1
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-2026-03-15_amd64
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -734,7 +734,7 @@ To illustrate this approach, we will create a figure with choropleths of GDP per
 # List the years we want of pc GDP
 years = ["PCGDP1940", "PCGDP1960", "PCGDP1980", "PCGDP2000"]
 # Create pooled classification
-pooled = mapclassify.Pooled(mx[years], classifier="Quantiles", k=5)
+pooled = mapclassify.Pooled(mx[years].values, classifier="Quantiles", k=5)
 ```
 
 The `pooled` object contains a lot of information on the classification and we can use it to generate a figure with the maps. To do that, we rely also on the `UserDefined` classifier we have just seen in the previous section to create a multi-pane figure showing the per capita income as it changes over time (Figure 11). 
@@ -808,7 +808,3 @@ We have but touched the surface of the large literature on choropleth mapping in
 - {cite}`cromely1996comparison`. "A comparison of optimal classification strategies for choroplethic displays of spatiall aggregated data." *International Journal of Geographc Information Systems*, 10: 405-424.
 - {cite}`brewer2005designming`. Designing better maps: A guide for GIS Users. ESRI press.
 
-
-```python
-
-```

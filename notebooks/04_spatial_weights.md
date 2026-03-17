@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.19.1
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-2026-03-15_amd64
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -40,14 +40,14 @@ import pandas
 import numpy
 import matplotlib.pyplot as plt
 from shapely.geometry import Polygon
-from pysal.lib import cg as geometry
+from libpysal import cg as geometry
 ```
 
 Since they provide a way to represent these spatial relationships, spatial weights are widely used throughout spatial and geographic data science.
 In this chapter, we first consider different approaches to construct spatial weights, distinguishing between those based on contiguity/adjacency relations from weights obtained from distance based relationships. We then discuss the case of hybrid weights which combine one or more spatial operations in deriving the neighbor relationships between observations. We illustrate all of these concepts through the spatial weights class in `pysal`, which provides a rich set of methods and characteristics for spatial weights and it is stored under the `weights` sub-module:
 
 ```python
-from pysal.lib import weights
+from libpysal import weights
 ```
 
 We also demonstrate its set-theoretic functionality, which permits the derivation of weights through the application of set operations. Throughout the chapter, we discuss common file formats used to store spatial weights of different types, and we include visual discussion of spatial weights, making these sometimes abstract constructs more intuitive.

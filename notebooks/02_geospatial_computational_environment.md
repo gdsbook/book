@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.19.1
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-2026-03-15_amd64
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -66,7 +66,7 @@ url = (
     "https://upload.wikimedia.org/wikipedia/"
     "commons/c/ca/Medicean_Stars.png"
 )
-Image(url, width=250)
+Image(url=url, width=250)
 ```
 
 There is a growing perception that much of this original scientific ethos—operating transparently and arguing with accessible materials—has been lost. A series of

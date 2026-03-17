@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.15.2
+      jupytext_version: 1.19.1
   kernelspec:
-    display_name: GDS-10.0
+    display_name: GDS-2026-03-15_amd64
     language: python
     name: gds
 ---
@@ -43,8 +43,8 @@ import geopandas  # Spatial data manipulation
 import pandas  # Tabular data manipulation
 import rioxarray  # Surface data manipulation
 import xarray  # Surface data manipulation
-from pysal.explore import esda  # Exploratory Spatial analytics
-from pysal.lib import weights  # Spatial weights
+import esda  # Exploratory Spatial analytics
+from libpysal import weights  # Spatial weights
 import contextily  # Background tiles
 ```
 

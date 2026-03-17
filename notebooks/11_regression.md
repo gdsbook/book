@@ -6,11 +6,11 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.14.5
+      jupytext_version: 1.19.1
   kernelspec:
-    display_name: Python 3 (ipykernel)
+    display_name: GDS-2026-03-15_amd64
     language: python
-    name: python3
+    name: gds
 ---
 
 ```python tags=["remove-cell"]
@@ -54,8 +54,8 @@ In this chapter, we build space into the traditional regression framework. We be
 
 
 ```python
-from pysal.lib import weights
-from pysal.explore import esda
+from libpysal import weights
+import esda
 import numpy
 import pandas
 import geopandas
