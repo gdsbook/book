@@ -1,19 +1,4 @@
----
-jupyter:
-  jupytext:
-    formats: ipynb,md
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.15.2
-  kernelspec:
-    display_name: GDS-10.0
-    language: python
-    name: gds
----
-
-```python tags=["remove-cell"]
+```python
 import warnings
 from myst_nb import glue
 
@@ -22,7 +7,6 @@ warnings.filterwarnings("ignore")
 
 # Spatial Feature Engineering
 
-
 In machine learning and data science, we are often equipped with *tons* of data. Indeed, given the constellation of packages to query data services, free and open source data-sets, and the rapid and persistent collection of geographical data, there is simply too much data to even represent coherently in a single, tidy fashion. However, we often need to be able to construct useful *features* from this rich and deep sea of data. 
 
 Where data is available, but not yet directly *usable*, *feature engineering* helps to construct representations or transformations of the original data that are more useful for modeling a given phenomenon of interest. In traditional machine learning, feature engineering involves applying additional *domain knowledge* to raw information in order to structure it in a manner that is meaningful for a model. Often, this involves some sort of *transformation* of the original dataset, which is a well-studied concept in both classical statistics and remains so in machine learning methods. While *feature engineering* always relies on this implicit domain knowledge, it is an extremely important part of adapting general-purpose algorithms to unique or distinctive problems facing the every-day data scientist. 
@@ -30,6 +14,7 @@ Where data is available, but not yet directly *usable*, *feature engineering* he
 Geography is one of the most high-quality, ubiquitous ways to introduce *domain knowledge* into a problem: everything has a position in both *space* and *time*. And, while things that happen near one another *in time* do not necessarily have a fundamental relationship, things that are *near* one another are often related. Thus, space is the ultimate *linkage key*, allowing us to connect different datasets together in order to improve our models and our predictions. This means that, even for *aspatial*, "non-geographic" data, you can use *spatial feature engineering* to create useful, highly relevant features for your analysis. 
 
 At its core, *spatial feature engineering* is the process of developing additional information from raw data using *geographic knowledge*. This distilling of information can occur *between* datasets, where geography is used to link information in separate datasets together; or *within* datasets, where geography can be used to augment the information available for one sample by borrowing from nearby ones. This chapter is structured following that distinction: for cases where geography connects *different* datasets, we adopt the term "Map Matching", often used in industry; while we use the mirroring concept of "Map Synthesis" describing the use of geographical structure to derive new features from a given dataset. Technically speaking, some of the methods we review are similar across these two cases, or even the same; however, they can be applied in the context of "matching" or "synthesis", and we consider those conceptually different, hence their inclusion in both sections. Throughout the chapter, we use the Airbnb nightly rental prices in San Diego, as well as auxiliary datasets such as elevation or census demographics.
+
 
 ```python
 import geopandas, pandas, libpysal.weights as weights, contextily
@@ -42,13 +27,14 @@ import rasterio
 from rasterio.plot import show as rioshow
 ```
 
-```python tags=["remove-cell"]
-osmnx.config(
-    overpass_settings='[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
-)
+
+```python
+osmnx.settings.overpass_settings = '[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
+
 ```
 
 Throughout this chapter, we will use the same dataset to which we want to append more information or augment, and we will do so through leveraging geography. For the illustration, we will use the set of [Airbnb properties](../data/airbnb/regression_cleaning) we have used in [Chapter 11](11_regression). Let's read it:
+
 
 ```python
 airbnbs = geopandas.read_file("../data/airbnb/regression_db.geojson")
@@ -76,25 +62,42 @@ In this section, we cover a few cases that we consider represent the most common
 
 ### Counting *nearby* features
 
-
 A first, conceptually straightforward, approach is to augment our dataset by counting how many points of a different dataset are in the vicinity of each observation. For example, we might want to know how many bars and restaurants each Airbnb has within a given radius. This count can then become an additional  feature of our dataset, stored in a new column of `airbnbs`.
 
 To obtain information on the location of restaurants and bars, we can download it from OpenStreetMap directly using `osmnx`. We first query all the points of interest (POIs) within the area our points cover, and then filter out everything except restaurants and bars. For that, we require  a polygon that covers all our `airbnbs` points. From [Chapter 8](08_point_pattern_analysis), we can recall that there are a few different hulls that can be used. We'll use the Convex Hull here (Fig. XXX1XXX), which is the smallest convex polygon that covers all the points in the set. 
 
-```python caption="Convex hull of the Airbnbs in San Diego."
+
+```python
 airbnbs_ch = airbnbs.unary_union.convex_hull
 geopandas.GeoSeries([airbnbs_ch]).plot()
 ```
 
+
+
+
+    <Axes: >
+
+
+
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_9_1.png)
+    
+
+
 Using this polygon, we can use the `osmnx` package to fetch POIs from OpenStreetMap. We can make our request more manageable by only requesting POIs that fall within specific categories. Below, we'll request POIs within San Diego that are "restaurants" or "bars," according to their metadata stored in OpenStreetMap. Once returned, we only use a few columns to keep the table small and tidy:
+
 
 ```python
 %%time
-pois = osmnx.geometries_from_polygon(
+pois = osmnx.features_from_polygon(
     airbnbs_ch, tags={"amenity": ["restaurant", "bar"]}
-).reset_index()[
+).reset_index()
+
+pois = pois.rename(
+    columns=dict(id='osmid')
+)[
     [
-        "element_type",
         "osmid",
         "amenity",
         "cuisine",
@@ -104,7 +107,12 @@ pois = osmnx.geometries_from_polygon(
 ]
 ```
 
-```python tags=["remove-cell"]
+    CPU times: user 109 ms, sys: 11.7 ms, total: 121 ms
+    Wall time: 168 ms
+
+
+
+```python
 try:
     _ = geopandas.read_file("../data/cache/sd_pois.gpkg")
 except:
@@ -113,19 +121,32 @@ except:
 
 The code snippet above sends a query to the OpenStreetMap server to fetch the data on amenities. Note that it _requires_ internet connectivity to work. If you are working on the book _without_ connectivity, a cached version of the dataset is available on the data folder and can be read as:
 
+
 ```python
 pois = geopandas.read_file("../data/cache/sd_pois.gpkg")
 ```
 
 This provides us with every location within our convex hull that is tagged in the metadata stored in OpenStreetMap as a "restaurant" or "bar". Overall, this provides us with about 1300 POIs: 
 
+
 ```python
 pois.groupby("amenity").amenity.count()
 ```
 
+
+
+
+    amenity
+    bar            308
+    restaurant    1060
+    Name: amenity, dtype: int64
+
+
+
 Once loaded into `pois` as a `GeoDataFrame`, we use the code below to generate Figure XXX2XXX, which takes a peek at their location, as compared with Airbnb spots:
 
-```python caption="Points of interest (POIs) and Airbnbs in San Diego."
+
+```python
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(12, 12))
 # Plot Airbnb properties
@@ -144,6 +165,12 @@ ax.set_axis_off()
 plt.show()
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_18_0.png)
+    
+
+
 Now for some feature engineering. It may be extremely useful to know whether an Airbnb is located in a "hot" location, with a lot of restaurants and bars to choose from. Alternatively, if Airbnbs are very remote, they might not be as lucrative for short, expensive "city-break" reservations. That is, Airbnb users may decide to reserve stays where there are a lot of dining and drinking opportunities, and thus may be *willing to pay more* for the same accommodation. We might be able to predict prices better if we know about the drinking and dining scene near the Airbnb. 
 
 Thus, we can *engineer features* in the Airbnb data using the nearby POIs. To do this, we can create a new feature for the Airbnb dataset --that is, a new column in `airbnbs`-- which incorporates information about how many POIs are *nearby* each property. This kind of "feature counting" is useful in applications where the mere presence of nearby features can affect the quantity we are modeling. 
@@ -158,28 +185,87 @@ At the end of this procedure, we have the number of bars and restaurants that ar
 
 Let us now translate the list above into code. For part 1., we need to be able to measure distances in meters. However, `airbnbs` is originally expressed in degrees, since it is provided in terms of locations in latitude and longitude:
 
+
 ```python
 airbnbs.crs
 ```
 
+
+
+
+    <Geographic 2D CRS: EPSG:4326>
+    Name: WGS 84
+    Axis Info [ellipsoidal]:
+    - Lat[north]: Geodetic latitude (degree)
+    - Lon[east]: Geodetic longitude (degree)
+    Area of Use:
+    - name: World.
+    - bounds: (-180.0, -90.0, 180.0, 90.0)
+    Datum: World Geodetic System 1984 ensemble
+    - Ellipsoid: WGS 84
+    - Prime Meridian: Greenwich
+
+
+
 In addition, the `pois` are also provided in terms of their latitude and longitude:
+
 
 ```python
 pois.crs
 ```
 
+
+
+
+    <Geographic 2D CRS: EPSG:4326>
+    Name: WGS 84
+    Axis Info [ellipsoidal]:
+    - Lat[north]: Geodetic latitude (degree)
+    - Lon[east]: Geodetic longitude (degree)
+    Area of Use:
+    - name: World.
+    - bounds: (-180.0, -90.0, 180.0, 90.0)
+    Datum: World Geodetic System 1984 ensemble
+    - Ellipsoid: WGS 84
+    - Prime Meridian: Greenwich
+
+
+
 Therefore, we need to convert this into a coordinate system that is easier to work with. Here, we will use a projection common for mapping in California, the California Albers projection:
+
 
 ```python
 airbnbs_albers = airbnbs.to_crs(epsg=3311)
 pois_albers = pois.to_crs(epsg=3311)
 ```
 
+
 ```python
 pois_albers.crs
 ```
 
+
+
+
+    <Projected CRS: EPSG:3311>
+    Name: NAD83(HARN) / California Albers
+    Axis Info [cartesian]:
+    - X[east]: Easting (metre)
+    - Y[north]: Northing (metre)
+    Area of Use:
+    - name: United States (USA) - California.
+    - bounds: (-124.45, 32.53, -114.12, 42.01)
+    Coordinate Operation:
+    - name: California Albers
+    - method: Albers Equal Area
+    Datum: NAD83 (High Accuracy Reference Network)
+    - Ellipsoid: GRS 1980
+    - Prime Meridian: Greenwich
+
+
+
 With this, we can create the radius of 500 meters around each Airbnb. This is often called *buffering*, where a shape is dilated by a given radius.
+
 
 ```python
 airbnbs_albers["buffer_500m"] = airbnbs_albers.buffer(500)
@@ -188,6 +274,7 @@ airbnbs_albers["buffer_500m"] = airbnbs_albers.buffer(500)
 Now, `abb_buffer` contains a 500-meter circle around each Airbnb.
 
 Using these, we can count the number of POIs that are within these areas using a *spatial join*. Spatial joins link geometries based on spatial relationships (or predicates). Here, we need to know the relationship: `pois within airbnb_buffers`, where `within` is the predicate relating `pois` to `airbnb_buffers`. Predicates are not always *reversible*: no `airbnb_buffer` can be `within` a `poi`. In `geopandas`, we can compute all pairs of relations between the `pois` and `airbnb_buffers` efficiently using the `sjoin` function, which takes a `predicate` argument defining the requested relationship between the first and second argument. 
+
 
 ```python
 # Spatial join, appending attributes from right table to left one
@@ -199,11 +286,12 @@ joined = geopandas.sjoin(
     # `buffer_500m` column
     airbnbs_albers.set_geometry("buffer_500m")[["id", "buffer_500m"]],
     # Operation (spatial predicate) to use for the spatial join (`within`)
-    op="within",
+    predicate="within",
 )
 ```
 
 The resulting `joined` object contains a row for every pair of POI and Airbnb that are linked. From there, we can apply a group-by operation, using the Airbnb ID, and count how many POIs each Airbnb has within 500 meters of distance:
+
 
 ```python
 # Group POIs by Airbnb ID (`id`)
@@ -222,17 +310,74 @@ poi_count = (
 poi_count.head()
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>poi_count</th>
+    </tr>
+    <tr>
+      <th>id</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>6</th>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>5570</th>
+      <td>7</td>
+    </tr>
+    <tr>
+      <th>9553</th>
+      <td>12</td>
+    </tr>
+    <tr>
+      <th>38245</th>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>69385</th>
+      <td>8</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 The resulting `Series` is indexed on the Airbnb IDs, so we can assign it to the original `airbnbs` table. In this case, we know by construction that missing Airbnbs in `poi_count` do not have any POI within 500m, so we can fill missing values in the column with zeros.
+
 
 ```python
 airbnbs_w_counts = airbnbs_albers.merge(
-    poi_count, left_on="id", right_index=True
+    poi_count, left_on="id", right_index=True, how="left"
 ).fillna({"poi_count": 0})
 ```
 
 We can visualize now (Fig. XXX3XXX) the distribution of counts to get a sense of how "well-served" Airbnb properties are arranged over space:
 
-```python caption="Number of POIs within 500 meters of each Airbnb."
+
+```python
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot quantile map of No. of POIs for every Airbnb
@@ -253,8 +398,13 @@ contextily.add_basemap(
 ax.set_axis_off();
 ```
 
-### Assigning point values from surfaces: elevation of Airbnbs
 
+    
+![png](12_feature_engineering_files/12_feature_engineering_35_0.png)
+    
+
+
+### Assigning point values from surfaces: elevation of Airbnbs
 
 We have just seen how to count points around each observation in a point dataset. In other cases, we might be confronted with a related but different challenge: transferring the value of a particular point in a surface to a point in a different dataset. 
 
@@ -265,7 +415,8 @@ To make this more accessible, let us illustrate the context with an example ques
 
 We use the code below, which opens and plot the file with elevation data, to generate Figure XXX4XXX:
 
-```python caption="Digital elevation model of the San Diego area."
+
+```python
 # Open file
 dem = rasterio.open("../data/nasadem/nasadem_sd.tif")
 # Set up figure and axis
@@ -276,19 +427,42 @@ rioshow(dem, ax=ax)
 ax.set_axis_off();
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_38_0.png)
+    
+
+
 Let's first check the CRS is aligned with our sample of point locations:
+
 
 ```python
 dem.crs
 ```
 
+
+
+
+    CRS.from_wkt('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]')
+
+
+
 We have opened the file with `rasterio`, which has not read the entire dataset just yet. This feature allows us to use this approach with files that are potentially very large, as only requested data is read into memory. To extract a discrete set of values from the elevation surface in `dem`, we can use `sample`. For a single location, this is how it works:
+
 
 ```python
 list(dem.sample([(-117.24592208862305, 32.761619109301606)]))
 ```
 
+
+
+
+    [array([7], dtype=int16)]
+
+
+
 Now, we can  apply this logic to a sequence of coordinates. For that, we need to extract them from the `geometry` object:
+
 
 ```python
 # Create table with XY coordinates of Airbnb locations
@@ -299,6 +473,7 @@ abb_xys = pandas.DataFrame(
 ```
 
 And then we can apply the same logic as above to sample elevation for the list of Airbnb locations:
+
 
 ```python
 # Save results as a DataFrame
@@ -314,9 +489,61 @@ elevation = pandas.DataFrame(
 elevation.head()
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Elevation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>112</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>99</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>114</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>30</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Now that we have a table with the elevation of each Airbnb property, we can plot the site elevations on a map (Fig. XXX5XXX) for visual inspection:
 
-```python caption="Elevation above sea level at each Airbnb."
+
+```python
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Join elevation data to original Airbnb table
@@ -341,17 +568,25 @@ contextily.add_basemap(
 ax.set_axis_off();
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_48_0.png)
+    
+
+
 ### Point interpolation using scikit-learn 
 
 In the previous example, we have transferred information from a surface (stored in a raster layer) to a set of points; in other words, we have gone from surface to points. Sometimes, however, we do not have the luxury of a ready-made surface. Instead, all we have available is a set of points with measurements for the variable of interest that do not match the points we want the information for. In this situation, a solution we can rely on is *spatial interpolation*. For a continuous geographical field measured at a set of points, *spatial interpolation* methods provide us a way to guess at the value a field would take at sites we do not measure. 
 
 There are many sophisticated methods with which this can be done. *Kriging*, common in the sub-field of spatial statistics called "geostatistics", is one such practice based on the theory of *Gaussian Process Regression.* Another common approach, *geographically weighted regression*, provides unique model estimates at every control point, as well as predictions for places where there is no data. Here, though, we'll use a fairly basic $k$-nearest neighbor prediction algorithm from `scikit-learn` to demonstrate the process. 
 
+
 ```python
 from sklearn.neighbors import KNeighborsRegressor
 ```
 
 This algorithm will select the nearest ten listings, then compute the prediction using a weighted average of these nearest observations. To keep predictions relatively consistent, we will build an interpolation only for listings that are entire homes/apartments with two bedrooms:
+
 
 ```python
 two_bed_homes = airbnbs[
@@ -361,6 +596,7 @@ two_bed_homes = airbnbs[
 
 Once subset, we can extract the XY coordinates for each of them into a two-dimensional array:
 
+
 ```python
 two_bed_home_locations = numpy.column_stack(
     (two_bed_homes.geometry.x, two_bed_homes.geometry.y)
@@ -368,6 +604,7 @@ two_bed_home_locations = numpy.column_stack(
 ```
 
 To plot the interpolated surface, we must also construct a grid of locations for which we will make predictions. This can be done using `numpy.meshgrid`, which constructs all the combinations of the input dimensions as a grid of outputs. 
+
 
 ```python
 # Extract bounding box of Airbnb locations
@@ -380,7 +617,8 @@ x, y = numpy.meshgrid(
 
 To build an intuition on what they are we create Figure XXX6XXX, which visualizes both meshes side-by-side:
 
-```python caption="Example grid showing the coordiantes used for interpolation."
+
+```python
 # Set up figure
 f, ax = plt.subplots(1, 2)
 # Plot X mesh
@@ -395,7 +633,14 @@ ax[1].set_title("Y values")
 plt.show()
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_58_0.png)
+    
+
+
 With these coordinates, we can make a GeoDataFrame containing the grid cells at which we would like to predict:
+
 
 ```python
 # Bind a 1D (flattened) of X and Y meshes into a 2D array
@@ -408,7 +653,8 @@ grid_df = geopandas.GeoDataFrame(
 
 We can visualize this grid together with the original Airbnb locations (Fig. XXX7XXX) to get a better sense of what we have just built:
 
-```python caption="Grid underlaid Airbnb locations used for interpolation."
+
+```python
 # Plot grid points with size 1
 ax = grid_df.plot(markersize=1)
 # Plot on top Airbnb locations in red
@@ -423,7 +669,14 @@ contextily.add_basemap(
 ax.set_axis_off();
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_62_0.png)
+    
+
+
 With this done, we can now construct the predictions. First we train the model:
+
 
 ```python
 model = KNeighborsRegressor(n_neighbors=10, weights="distance").fit(
@@ -433,20 +686,29 @@ model = KNeighborsRegressor(n_neighbors=10, weights="distance").fit(
 
 And then we predict at the grid cell locations:
 
+
 ```python
 predictions = model.predict(grid)
 ```
 
 The result can be displayed as a continuous choropleth (Fig. XXX8XXX), for example:
 
-```python caption="Predicted Airbnb price using ten nearest neighbor interpolation."
+
+```python
 ax = grid_df.plot(predictions)
 ax.set_axis_off();
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_68_0.png)
+    
+
+
 The map is a result not only of the underlying data but also the algorithm we have used. For example, you can see in Figure XXX9XXX (generated with the code below) that the surface gets smoother as you increase the number of nearest neighbors to consider.
 
-```python caption="Predicted nightly price using a varying number of nearest neighbors. Note the plot smooths considerably as more neighbors are added."
+
+```python
 # Set up figure and 8 axes
 f, ax = plt.subplots(1, 8, figsize=(16, 4))
 # Loop over eight values equally spaced between 2 and 100
@@ -477,7 +739,14 @@ for i, k_neighbors in enumerate(
     facet.set_title(f"{k_neighbors} neighbors")
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_70_0.png)
+    
+
+
 Focusing in on central San Diego tells the story a bit more clearly, since there are interesting points there to show. The increasing number of nearest neighbors increases the smoothness of the interpolated surface. To visualize a zoom into the region, we begin by extracting its bounding box:
+
 
 ```python
 central_sd_bounds = [-117.179832, 32.655563, -117.020874, 32.769909]
@@ -490,6 +759,7 @@ central_sd_bounds = [-117.179832, 32.655563, -117.020874, 32.769909]
 ```
 
 And repeating the process above for this area, including building the meshes of coordinates:
+
 
 ```python
 # Build X and Y meshes
@@ -511,7 +781,8 @@ central_grid_df = geopandas.GeoDataFrame(
 
 Finally, we can reproduce the sequence of figures with different values of K only for the central part of the San Diego area (Fig. XXX10XXX):
 
-```python caption="Focus on downtown San Diego predictions for nearest neighbor interpolation."
+
+```python
 # Set up figure and subplot
 f, ax = plt.subplots(1, 5, figsize=(16, 4), sharex=True, sharey=True)
 # Loop over five values equally spaced between 2 and 100
@@ -542,14 +813,20 @@ for i, k_neighbors in enumerate(
     facet.set_title(f"{k_neighbors} neighbors")
 ```
 
-Plenty more of these methods are implemented in `scikit-learn.neighbors`, as well as kriging methods in `GSTools` {cite}`sebastian_muller_2021_5169658` and geographically weighted regression in `mgwr` {cite}`oshan2019mgwr`.
 
+    
+![png](12_feature_engineering_files/12_feature_engineering_76_0.png)
+    
+
+
+Plenty more of these methods are implemented in `scikit-learn.neighbors`, as well as kriging methods in `GSTools` {cite}`sebastian_muller_2021_5169658` and geographically weighted regression in `mgwr` {cite}`oshan2019mgwr`.
 
 ### Polygon to point
 
 We now move on to a case where the information we are interested in matching to our set of points is stored in a polygon geography. For example, we would like to know the population density of the neighborhood in which each Airbnb is located. This is conceptually similar to the sampling example above, but in the case the information we want to sample is not a surface but a geo-table of polygons. To determine density, we will download population estimates at the census tract level, and "transfer" those estimates over to each Airbnb point. Geographically, the only challenge here is finding the containing polygon for each point, and then performing what is in spatial databases parlance known as a "spatial join", by which we link the two layers through their spatial connection.
 
 Let us pull down the number of inhabitants from the American Community Survey for tracts in San Diego:
+
 
 ```python
 try:
@@ -562,13 +839,18 @@ except:
     print("Remote loading failed...")
 ```
 
+    Remote loading failed...
+
+
 The code snippet above sends a query to the Census Bureau server to fetch the data for San Diego. Note that it _requires_ internet connectivity to work. If you are working on the book _without_ connectivity, a cached version of the dataset is available on the data folder and can be read as:
+
 
 ```python
 sd_pop = geopandas.read_file("../data/cache/sd_census.gpkg")
 ```
 
 And calculate population density:
+
 
 ```python
 sd_pop["density"] = (
@@ -578,15 +860,54 @@ sd_pop["density"] = (
 
 Now, to "transfer" density estimates to each Airbnb, we can rely on the spatial join in `geopandas`:
 
+
 ```python
 j = geopandas.sjoin(airbnbs, sd_pop.to_crs(airbnbs.crs))
 ```
 
 The result is a table with one row per Airbnb and one column for each attribute we originally had for properties, *as well as* those of the tract where the area is located:
 
+
 ```python
 j.info()
 ```
+
+    <class 'geopandas.geodataframe.GeoDataFrame'>
+    Index: 6110 entries, 0 to 6109
+    Data columns (total 28 columns):
+     #   Column              Non-Null Count  Dtype   
+    ---  ------              --------------  -----   
+     0   accommodates        6110 non-null   int32   
+     1   bathrooms           6110 non-null   float64 
+     2   bedrooms            6110 non-null   float64 
+     3   beds                6110 non-null   float64 
+     4   neighborhood        6110 non-null   object  
+     5   pool                6110 non-null   int32   
+     6   d2balboa            6110 non-null   float64 
+     7   coastal             6110 non-null   int32   
+     8   price               6110 non-null   float64 
+     9   log_price           6110 non-null   float64 
+     10  id                  6110 non-null   int32   
+     11  pg_Apartment        6110 non-null   int32   
+     12  pg_Condominium      6110 non-null   int32   
+     13  pg_House            6110 non-null   int32   
+     14  pg_Other            6110 non-null   int32   
+     15  pg_Townhouse        6110 non-null   int32   
+     16  rt_Entire_home/apt  6110 non-null   int32   
+     17  rt_Private_room     6110 non-null   int32   
+     18  rt_Shared_room      6110 non-null   int32   
+     19  geometry            6110 non-null   geometry
+     20  index_right         6110 non-null   int64   
+     21  GEOID               6110 non-null   object  
+     22  B02001_001E         6110 non-null   float64 
+     23  NAME                6110 non-null   object  
+     24  state               6110 non-null   object  
+     25  county              6110 non-null   object  
+     26  tract               6110 non-null   object  
+     27  density             6110 non-null   float64 
+    dtypes: float64(8), geometry(1), int32(12), int64(1), object(6)
+    memory usage: 1.1+ MB
+
 
 ### Area to area interpolation
 
@@ -598,6 +919,7 @@ We could also go in the other direction. If we had total population for polygon 
 
 To implement dasymetric mapping in Python, the best option is `tobler`, a package from the Pysal federation designed exactly for this goal. We will show here the simplest case, that of areal interpolation where apportioning is estimated based on area, but the package also provides more sophisticated approaches.
 
+
 ```python
 from tobler.area_weighted import area_interpolate
 ```
@@ -606,11 +928,13 @@ For the example, we need two polygon layers. We will stick with San Diego and us
 
 First, let us load the H3 grid:
 
+
 ```python
 h3 = geopandas.read_file("../data/h3_grid/sd_h3_grid.gpkg")
 ```
 
 We are ready to interpolate:
+
 
 ```python
 # Area interpolation from polygon geotable to polygon geo-table
@@ -636,7 +960,8 @@ There is quite a bit going on in the cell above, let us unpack it:
 
 The `interpolated` output object is a geo-table that contains the target polygons and estimates of the variable(s) we originally had for the source geography (population and density in this case). Figure XXX11XXX (generated with the code below) illustrates the transfer of information from one geography to the other with for the case of total population estimates.
 
-```python caption="Interpolation of areal information to a different geometry. The Uber H3 hexagon grid is shown in the middle, and the interpolated values for population are shown on the right."
+
+```python
 # Set up figure and axes
 f, axs = plt.subplots(1, 3, figsize=(18, 6))
 
@@ -679,9 +1004,16 @@ axs[0].set_ylim(minY, maxY)
 plt.show()
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_95_0.png)
+    
+
+
 And Figure XXX12XXX, generated with the code below, shows the equivalent for population density.
 
-```python caption="Interpolation of population density from Census Tracts to Uber H3 Hexagons."
+
+```python
 # Set up figure and axes
 f, axs = plt.subplots(1, 3, figsize=(18, 6))
 
@@ -724,6 +1056,12 @@ axs[0].set_ylim(minY, maxY)
 plt.show()
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_97_0.png)
+    
+
+
 ## Feature engineering using map synthesis
 
 Feature engineering with map matching is most helpful when you have additional information to use in the analysis. And, with the wealth of freely available data from censuses, satellites, and open volunteered geographic information vendors such as OpenStreetMap, map matching can be a very powerful tool for enriching and improving your analyses. However, it is sometimes *also* useful to only examine the data you've got, and use the spatial structure within to build better features or better models. While this might be done using spatially explicit models (like those covered in [Chapter 11](11_regression)), it is also possible to use map synthesis to build spatial features and improve model performance.
@@ -731,7 +1069,6 @@ Feature engineering with map matching is most helpful when you have additional i
 There is an extensive amount of map synthesis features. In fact, many of them are usually derived for specific use cases and following the intuition of domain experts that can take technical guidance along the lines presented here. We discuss two main ones as an illustration, but reiterate that the sky really is the limit in this category. First, we will return to spatial *summary* features. Second, we will examine *regionalization features*, which detect and leverage geographical clusters in the data to improve prediction. 
 
 ### Spatial summary features in map synthesis
-
 
 Just like in map matching, you can use spatial summary features in map synthesis to build better models. One approach involves constructing spatial summary measures of your training data. This is done in the same manner as in map matching, except we now refer only to the data on hand. Thus, we may want to determine whether nearby Airbnbs are "competing" with each Airbnb. We might do this by finding the distance to the nearest Airbnb with the same number of bedrooms, since two nearby listings that *also* sleep the same number of people likely will compete with one another for tenants. 
 
@@ -743,6 +1080,7 @@ If we define to be "surrounded by other observations" as in "having many neighbo
 
 For example, we can "engineer a feature" that contains the number of Airbnb properties each property has within 500 meters by constructing a distance band object:
 
+
 ```python
 # Build distance band spatial weights matrix
 d500_w = weights.DistanceBand.from_dataframe(
@@ -752,13 +1090,15 @@ d500_w = weights.DistanceBand.from_dataframe(
 
 And extracting its cardinalities:
 
+
 ```python
 card = pandas.Series(d500_w.cardinalities)
 ```
 
 The `card` feature we have built will pick up areas of higher concentration of Airbnb properties with higher values, as we can see in Figure XXX13XXX.
 
-```python caption="Number of Airbnbs within 500 meters of each listing."
+
+```python
 # Set up figure and axis
 f, ax = plt.subplots(1)
 # Append cardinalities to main Airbnb geo-table
@@ -772,9 +1112,16 @@ contextily.add_basemap(ax, crs=airbnbs.crs)
 ax.set_axis_off();
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_104_0.png)
+    
+
+
 #### Distance buffers within a single table
 
 If what we are interested in is finding the average number of bedrooms around each house, we might do this using a row-standardized version of the `DistanceBand` weight object we have just built, which considers Airbnb as "neighbors" if they are within the distance threshold, and computing the spatial lag of the number of bedrooms.
+
 
 ```python
 # Row standardize
@@ -787,7 +1134,8 @@ local_average_bedrooms = weights.lag_spatial(
 
 While related, these features contain quite distinct pieces of information, and both may prove useful in modeling. This is shown in Figure XXX14XXX, which compares them directly in a scatterplot. 
 
-```python caption="Relationship between the number of bedrooms at an Airbnb and the typical number of bedrooms among nearby Airbnbs."
+
+```python
 plt.scatter(
     airbnbs_albers[["bedrooms"]].values, local_average_bedrooms
 )
@@ -795,7 +1143,14 @@ plt.xlabel("Number of bedrooms")
 plt.ylabel("Average of nearby\n listings' bedrooms");
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_108_0.png)
+    
+
+
 If we were instead interested in the most common number of bedrooms, rather than the average, we could use the `lag_categorical` function, which will consider each value as a category and return the most common value in each neighbor set:
+
 
 ```python
 local_mode = weights.lag_categorical(
@@ -805,6 +1160,7 @@ local_mode = weights.lag_categorical(
 
 Since we are now treating the number of bedrooms as a discrete feature, we can use a `crosstab` from `pandas` to examine the relationship between a listing and the typical size of listings nearby:
 
+
 ```python
 crosstab = pandas.crosstab(
     airbnbs_albers.bedrooms, local_mode.flatten()
@@ -812,23 +1168,265 @@ crosstab = pandas.crosstab(
 crosstab.columns.name = "nearby"
 crosstab
 ```
-```python tags=["remove-cell"]
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>nearby</th>
+      <th>0.0</th>
+      <th>1.0</th>
+      <th>2.0</th>
+      <th>3.0</th>
+      <th>4.0</th>
+      <th>5.0</th>
+      <th>6.0</th>
+      <th>7.0</th>
+    </tr>
+    <tr>
+      <th>bedrooms</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0.0</th>
+      <td>5</td>
+      <td>390</td>
+      <td>39</td>
+      <td>6</td>
+      <td>3</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1.0</th>
+      <td>2</td>
+      <td>3066</td>
+      <td>214</td>
+      <td>32</td>
+      <td>18</td>
+      <td>5</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2.0</th>
+      <td>1</td>
+      <td>977</td>
+      <td>268</td>
+      <td>13</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3.0</th>
+      <td>3</td>
+      <td>431</td>
+      <td>160</td>
+      <td>35</td>
+      <td>12</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4.0</th>
+      <td>1</td>
+      <td>166</td>
+      <td>54</td>
+      <td>13</td>
+      <td>32</td>
+      <td>5</td>
+      <td>2</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>5.0</th>
+      <td>0</td>
+      <td>51</td>
+      <td>16</td>
+      <td>3</td>
+      <td>9</td>
+      <td>19</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>6.0</th>
+      <td>0</td>
+      <td>14</td>
+      <td>9</td>
+      <td>1</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>7.0</th>
+      <td>0</td>
+      <td>5</td>
+      <td>1</td>
+      <td>2</td>
+      <td>1</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>8.0</th>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>9.0</th>
+      <td>0</td>
+      <td>3</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>10.0</th>
+      <td>0</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+
+```python
 glue('most_common', crosstab.values.max())
 ```
+
+
+    np.int64(3066)
+
 
 From the table we can see the most common case (N={glue:}`most_common`) is properties with one bedroom surrounded mostly by other properties with also only one bedroom. Similarly we also find out, for example, that the two properties with ten bedrooms in the dataset are surrounded by properties with mostly two bedrooms. The remaining cells in the table can be interpreted in a similar fashion.
 
 If more complicated statistics are required, it can help to reexpress the construction of summary statistics as a *reduction* of the *adjacency list* representation of our weights, as done in [Chapter 4](04_spatial_weights). To recap, the *adjacency list* is a `pandas.DataFrame` where each row contains a single link in our graph. It contains the identifier for some `focal` observation, the identifier for some `neighbor` observation, and a value for the `weight` of the link that connects the `focal` and `neighbor`:
 
+
 ```python
 adjlist = d500_w.to_adjlist()
 ```
+
 
 ```python
 adjlist.head()
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>focal</th>
+      <th>neighbor</th>
+      <th>weight</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>136</td>
+      <td>0.023256</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>279</td>
+      <td>0.023256</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>317</td>
+      <td>0.023256</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>616</td>
+      <td>0.023256</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>761</td>
+      <td>0.023256</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 If we had the values for each for the neighbors in this adjacency list table, then we could use a `groupby()` to summarize the values of observations connected to a given focal observation. This merge can be done directly with the original data, linking the `neighbor` key in the adjacency list back to that observation in our source table: 
+
 
 ```python
 adjlist = adjlist.merge(
@@ -840,11 +1438,100 @@ adjlist = adjlist.merge(
 adjlist.head()
 ```
 
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>focal</th>
+      <th>neighbor</th>
+      <th>weight</th>
+      <th>bedrooms</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>136</td>
+      <td>0.023256</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>279</td>
+      <td>0.023256</td>
+      <td>3.0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>317</td>
+      <td>0.023256</td>
+      <td>2.0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>616</td>
+      <td>0.023256</td>
+      <td>1.0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>761</td>
+      <td>0.023256</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
 Now, we need only to group the adjacency list by the focal observation and summarize the `bedrooms` column to obtain the median number of bedrooms for each `focal` observation. 
+
 
 ```python
 adjlist.groupby("focal").bedrooms.median()
 ```
+
+
+
+
+    focal
+    0       1.0
+    1       2.0
+    2       1.0
+    3       1.0
+    4       1.0
+           ... 
+    6105    1.0
+    6106    1.0
+    6107    1.0
+    6108    1.0
+    6109    1.0
+    Name: bedrooms, Length: 6110, dtype: float64
+
+
 
 Since the mean and/or mode are the most commonly used measures of central tendency, the `lag_spatial` and `lag_categorical` functions cover many of the required uses in practice. 
 
@@ -854,6 +1541,7 @@ Sometimes, analysts might want to use multiple "bands" of buffer features. This 
 
 We can use our 500 meters weights from before to build the average again:
 
+
 ```python
 average_within_500 = weights.lag_spatial(
     d500_w, airbnbs_albers[["bedrooms"]].values
@@ -861,6 +1549,7 @@ average_within_500 = weights.lag_spatial(
 ```
 
 Then, we need to build the graph of Airbnbs that fall *between* 500 meters and 1 kilometer from one another. To start, we build the `DistanceBand` graph of all listings closer than 1 kilometer:
+
 
 ```python
 d1k_w = weights.DistanceBand.from_dataframe(
@@ -870,6 +1559,7 @@ d1k_w = weights.DistanceBand.from_dataframe(
 
 Then, using the `weights.set_operations` module, we can express set-theoretic relationships between graphs. Here, we need to *remove* the links in our 1 kilometer graph that are *also* links in the 500 meters graph. To do this, we need `w_difference(d1k_w, d500_w)`, the difference between the one kilometer graph and the 500 meters graph: 
 
+
 ```python
 d1k_exclusive = weights.set_operations.w_difference(
     d1k_w, d500_w, constrained=False
@@ -878,6 +1568,7 @@ d1k_exclusive = weights.set_operations.w_difference(
 
 Then, we can compute the average size of listings between 500 meters and 1 kilometer in the same manner as before using our `d1k_exclusive` graph, which now omits all edges shorter than 500 meters. 
 
+
 ```python
 d1k_exclusive.transform = "r"
 average_500m_to_1k = weights.lag_spatial(
@@ -885,9 +1576,44 @@ average_500m_to_1k = weights.lag_spatial(
 )
 ```
 
+    ('WARNING: ', 762, ' is an island (no neighbors)')
+    ('WARNING: ', 907, ' is an island (no neighbors)')
+    ('WARNING: ', 976, ' is an island (no neighbors)')
+    ('WARNING: ', 1003, ' is an island (no neighbors)')
+    ('WARNING: ', 1776, ' is an island (no neighbors)')
+    ('WARNING: ', 1867, ' is an island (no neighbors)')
+    ('WARNING: ', 2789, ' is an island (no neighbors)')
+    ('WARNING: ', 2841, ' is an island (no neighbors)')
+    ('WARNING: ', 3130, ' is an island (no neighbors)')
+    ('WARNING: ', 3138, ' is an island (no neighbors)')
+    ('WARNING: ', 3184, ' is an island (no neighbors)')
+    ('WARNING: ', 3604, ' is an island (no neighbors)')
+    ('WARNING: ', 3748, ' is an island (no neighbors)')
+    ('WARNING: ', 3962, ' is an island (no neighbors)')
+    ('WARNING: ', 3989, ' is an island (no neighbors)')
+    ('WARNING: ', 4366, ' is an island (no neighbors)')
+    ('WARNING: ', 4443, ' is an island (no neighbors)')
+    ('WARNING: ', 4627, ' is an island (no neighbors)')
+    ('WARNING: ', 4764, ' is an island (no neighbors)')
+    ('WARNING: ', 4885, ' is an island (no neighbors)')
+    ('WARNING: ', 4989, ' is an island (no neighbors)')
+    ('WARNING: ', 5014, ' is an island (no neighbors)')
+    ('WARNING: ', 5536, ' is an island (no neighbors)')
+    ('WARNING: ', 5733, ' is an island (no neighbors)')
+    ('WARNING: ', 5756, ' is an island (no neighbors)')
+    ('WARNING: ', 5790, ' is an island (no neighbors)')
+    ('WARNING: ', 5796, ' is an island (no neighbors)')
+    ('WARNING: ', 5808, ' is an island (no neighbors)')
+    ('WARNING: ', 6005, ' is an island (no neighbors)')
+    ('WARNING: ', 6026, ' is an island (no neighbors)')
+    ('WARNING: ', 6049, ' is an island (no neighbors)')
+    ('WARNING: ', 6068, ' is an island (no neighbors)')
+
+
 Thus, as we can see in Figure XXX15XXX (generated by the code below), the two features contain distinct, but related, information, and both may be valuable in their own right when attempting to predict outcomes of interest. 
 
-```python caption="Relationship between the size of Airbnbs between successive distance buffers around an Airbnb."
+
+```python
 # Plot scatter
 plt.scatter(
     average_within_500, average_500m_to_1k, color="k", marker="."
@@ -909,21 +1635,27 @@ plt.plot(
 plt.legend();
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_130_0.png)
+    
+
+
 As the plot shows, although the relationship between both is positive, there is quite a bit of variation and departure from the (red) line of equality. These represent cases with either larger (above the line) or smaller (below) average size in the 500 meters to 1 kilometer ring than in the 500 meters buffer.
 
-
 ### Clustering as feature engineering
-
 
 One unique way to use spatial or features information *within* your data as a feature in your existing models is to use *clustering*, as we saw in Chapters [8](08_point_pattern_analysis) and [10](10_clustering_and_regionalization), respectively. This can provide an indication of whether an observation exists in a given "place" geographically, or if an observation is a specific "kind" of observation. Data reduction of many variates into a derived categorical feature can be useful in training models. This is even more useful when the *spatial location* of a given observation indicates a useful characteristic about the kind of observation that may be found at that location. 
 
 While sometimes we might prefer to introduce space and (co-)location through our model (as we did in [Chapter 11](11_regression)), others we can instead use (spatial) cluster labels themselves as features. For example, to cluster the listings based on their location, we can use hierarchical DBSCAN {cite}`campello2013density`, an improved variant of the traditional DBSCAN algorithm used in [Chapter 8](08_point_pattern_analysis). We import it through its own package {cite}`mcinnes2017hdbscan`:
+
 
 ```python
 from hdbscan import HDBSCAN
 ```
 
 To apply to our Airbnb data, we need the coordinates as a two-dimensional array of XY pairs:
+
 
 ```python
 coordinates = numpy.column_stack(
@@ -933,11 +1665,13 @@ coordinates = numpy.column_stack(
 
 With a little tuning, we can decide on an effective parameterization. The main advantage of HDBSCAN over the traditional approach is that it reduces the number of tuning parameters from two to one: we only need to set the minimum number of observations we want to define a cluster. Here, we look for relatively large clusters of Airbnbs, those with about 25 listings or more, fit them to our array of coordinates, and store the cluster labels identified:
 
+
 ```python
 labels = HDBSCAN(min_cluster_size=25).fit(coordinates).labels_
 ```
 
 The spatial distribution of these clusters will give us a sense of areas of San Diego with relatively high density of the observations. But the `labels` object does not contain clusters, only observation memberships. To derive those clusters geographically, we construct the convex hull of the observations in each detected cluster, creating thus a polygon that delimits every observation that is part of the cluster:
+
 
 ```python
 hulls = airbnbs_albers[["geometry"]].dissolve(by=labels).convex_hull
@@ -945,7 +1679,8 @@ hulls = airbnbs_albers[["geometry"]].dissolve(by=labels).convex_hull
 
 The polygons in `hulls` (and displayed in Figure XXX16XXX) provide an intermediate layer between the granularity of each individual location and the global scale of San Diego as a geographical unit. Since people tend to make locational decisions hierarchically (e.g., first they select *San Diego* as a destination, then they pick a particular *part* of San Diego, then choose a house within the area), this approach might give us reasonable insight into enclaves of Airbnb properties:
 
-```python caption="Clusters in the locations of Airbnbs within San Diego."
+
+```python
 # Set up figure and axis
 f, ax = plt.subplots(1, figsize=(9, 9))
 # Plot individual Airbnb locations
@@ -978,9 +1713,16 @@ contextily.add_basemap(
 ax.set_axis_off();
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_142_0.png)
+    
+
+
 Note how the hierarchical nature of HDBSCAN, which picks density thresholds _locally_ is at work in the map, where some of the clusters (e.g., orange ones in the north) display lower density than parts of the center which are _not_ part of any cluster. These results also capture some information about the price of a listing. Figure XXX17XXX (generated with the code below) shows this by plotting the distribution of prices across the detected clusters.
 
-```python caption="Boxplot of price by detected 'competition cluster.' The clusters vary significantly in prices and could be used to train a model."
+
+```python
 # Set up figure
 f = plt.figure(figsize=(8, 3))
 # Add boxplots of price by HDBSCAN cluster
@@ -1006,18 +1748,21 @@ ax.set_title(None)
 ax.set_ylim(0, 1250);
 ```
 
+
+    
+![png](12_feature_engineering_files/12_feature_engineering_144_0.png)
+    
+
+
 If we want to capture the variation picked up by membership to these clusters in a regression model, we could use these labels as the basis for spatial fixed effects, for example, as we saw in [Chapter 11](11_regression).
 
-
 ## Conclusion
-
 
 Feature engineering is a powerful way to enrich your data and make the most out of them. It is often within reach whether you are able to mix in auxilliary data or not. At a minimum, it only requires that new variables are constructed from your existing data; however, if you have access to more data, spatial feature engineering provides the *ultimate linkage key*, a flexible and powerful tool with which you can unlock the value held in many *other* datasets that you may have access to even if they are not obviously connected to your own. 
 
 We have structured all the approaches presented in this chapter along two main groups: those which allow you to augment a given dataset, which we have termed _map synthesis_; and those that enable connecting disparate datasets through space. In both cases, each operation involved in feature engineering, such as determining what the average value is in the area near each observation or identifying whether observations exist as part of a "cluster", are relatively simple operations. As building blocks that may be combined with each other, they build large, rich, and useful datasets that can be used directly in your existing methods of analysis. 
 
 Beyond feature engineering, statistical techniques we discuss in this book (particularly in Chapters [10](10_clustering_and_regionalization) and [11](11_regression)) can leverage spatial structure *directly* during learning/inference. These techniques allow you to embed space in non-spatial models to make them "geography aware". Furthermore, the techniques in this chapter (and the methods that extend upon them) are immediately useful for most practicing data scientists, and they can be integrated into nearly any analytical method or approach. 
-
 
 ## Questions
 
@@ -1034,7 +1779,6 @@ Beyond feature engineering, statistical techniques we discuss in this book (part
    the interpolation process. How does this occur and why is it important to acknowledge?
 5. From the previous spatial regression chapter, is the SLX model a map matching or a map synthesis technique?
 6. Feature engineering can be used in many different applied contexts. When might feature engineering actually *not* improve a model? 
-
 
 ## Next steps
 
