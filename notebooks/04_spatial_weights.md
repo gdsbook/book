@@ -47,7 +47,7 @@ Since they provide a way to represent these spatial relationships, spatial weigh
 In this chapter, we first consider different approaches to construct spatial weights, distinguishing between those based on contiguity/adjacency relations from weights obtained from distance based relationships. We then discuss the case of hybrid weights which combine one or more spatial operations in deriving the neighbor relationships between observations. We illustrate all of these concepts through the spatial weights class in `pysal`, which provides a rich set of methods and characteristics for spatial weights and it is stored under the `weights` sub-module:
 
 ```python
-from libpysal import weights
+from libpysal import graph
 ```
 
 We also demonstrate its set-theoretic functionality, which permits the derivation of weights through the application of set operations. Throughout the chapter, we discuss common file formats used to store spatial weights of different types, and we include visual discussion of spatial weights, making these sometimes abstract constructs more intuitive.
@@ -110,7 +110,7 @@ question share an *edge*. According to this definition, polygon $0$ would be a R
 ```python
 # Build a rook contiguity matrix from a regular 3x3
 # lattice stored in a geo-table
-wr = weights.contiguity.Rook.from_dataframe(gdf)
+wr = graph.Graph.build_contiguity(gdf, rook=True)
 ```
 
 Note the pattern we use to build the `w` object, which is similar across the library: we specify the criterium we want for the weights (`weights.contiguity.Rook`) and then the "constructor" we will use (`from_dataframe`). We can visualize the result plotted on top of the same grid of labeled polygons, using red dotted lines to represent the edges between a pair of nodes (polygon centroids in this case). We can see this in the following figure. 
@@ -155,7 +155,9 @@ memory requirements. However, it is possible to create the fully dense, matrix
 representation if needed:
 
 ```python
-pandas.DataFrame(*wr.full()).astype(int)
+pandas.DataFrame(
+    wr.sparse.todense().astype(int)
+)
 ```
 
 As you can see from the matrix above, most entries are zero. In fact out of all of the possible $9^2=81$ linkages that there could be in this matrix, there are only 24 non-zero entries:
@@ -190,7 +192,7 @@ neighbor relations for this same configuration as follows:
 ```python
 # Build a queen contiguity matrix from a regular 3x3
 # lattice stored in a geo-table
-wq = weights.contiguity.Queen.from_dataframe(gdf)
+wq = graph.Graph.build_contiguity(gdf, rook=False)
 wq.neighbors
 ```
 
@@ -243,21 +245,13 @@ large number of other attributes and methods that can be useful. The
 wq.cardinalities
 ```
 
-The related `histogram` attribute provides an overview of the distribution of
-these cardinalities:
+Since the internal representation is a `DataFrame`, we can obtain a histogram to visualise cardinalities:
 
 ```python
-wq.histogram
+wq.cardinalities.plot.hist(color='k');
 ```
 
-We can obtain a quick visual representation by converting the cardinalities
-into a `pandas.Series` and creating a histogram:
-
-```python caption="Histogram of  cardinalities (i.e., the number of neighbors each cell has) in the Queen grid."
-pandas.Series(wq.cardinalities).plot.hist(color="k");
-```
-
-The `cardinalities` and `histogram` attributes help quickly spot asymmetries in
+The `cardinalities` attribute help quickly spot asymmetries in
 the number of neighbors. This, as we will see later in the book, is relevant
 when using spatial weights in other analytical techniques (e.g.,
 spatial autocorrelation analysis or spatial regression). Here we see that there are four corner
@@ -266,11 +260,11 @@ and the one central observation has eight neighbors. There are also no
 observations with four, six, or seven neighbors.
 
 By convention, an ordered pair of contiguous observations constitutes a *join*
-represented by a non-zero weight in a $W$. The attribute `s0` records the number
+represented by a non-zero weight in a $W$. The attribute `nonzero` records the number
 of joins.
 
 ```python
-wq.s0
+wq.nonzero
 ```
 Thus, the Queen weights here have just under twice the number of joins in this case.
 The `pct_nonzero` attribute provides a measure of the density (compliment of
@@ -296,6 +290,13 @@ polygons as a collection of vertices defining the edges of the geometry's
 boundary. No information about the neighbor relations is explicitly encoded, so we
 must construct it ourselves. Under the hood, `pysal` uses efficient spatial indexing
 structures to extract these.
+
+```python
+san_diego_tracts = geopandas.read_file(
+    "../data/sandiego/sandiego_tracts.gpkg"
+)
+w_queen = graph.Graph.build_contiguity(san_diego_tracts, rook=False)
+```
 
 ```python
 san_diego_tracts = geopandas.read_file(
@@ -337,8 +338,9 @@ also much sparser for the tracts than what we saw for our smaller toy
 grid. Moreover, the cardinalities have a radically different distribution:
 
 ```python caption="Cardinalities for the Queen contiguity graph among San Diego tracts."
-s = pandas.Series(w_queen.cardinalities)
-s.plot.hist(bins=s.unique().shape[0]);
+w_queen.cardinalities.plot.hist(
+    bins=w_queen.cardinalities.unique().shape[0]
+);
 ```
 
 As the minimum number of neighbors is 1, while there is one polygon with 29
@@ -346,10 +348,11 @@ Queen neighbors. The most common number of neighbors is 6. For comparison, we
 can also plot the equivalent for Rook weights of the same dataframe:
 
 ```python caption="Cardinalities for the Rook contiguity graph among San Diego tracts."
-w_rook = weights.contiguity.Rook.from_dataframe(san_diego_tracts)
+w_rook = graph.Graph.build_contiguity(san_diego_tracts, rook=True)
 print(w_rook.pct_nonzero)
-s = pandas.Series(w_rook.cardinalities)
-s.plot.hist(bins=s.unique().shape[0]);
+w_rook.cardinalities.plot.hist(
+    bins=w_rook.cardinalities.unique().shape[0]
+);
 ```
 
 The cardinality histogram shifts downward due to the increasing sparsity of the
@@ -380,7 +383,7 @@ sao_paulo = rioxarray.open_rasterio("../data/ghsl/ghsl_sao_paulo.tif")
 From version 2.4 onwards, `pysal` added support to build spatial weights from `xarray.DataArray` objects.
 
 ```python
-w_sao_paulo = weights.contiguity.Queen.from_xarray(sao_paulo)
+w_sao_paulo = graph.Graph.build_raster_contiguity(sao_paulo)
 ```
 
 Although the internals differ quite a bit, once built, the objects are a sparse version of the same object that is constructed from a geographic table. 
@@ -407,7 +410,7 @@ between these polygon objects, however. To do so we develop a representative
 point for each of the polygons using the centroid. 
 
 ```python
-wk4 = weights.distance.KNN.from_dataframe(san_diego_tracts, k=4)
+wk4 = graph.Graph.build_knn(san_diego_tracts.centroid, k=4)
 ```
 
 The centroids are calculated from
@@ -418,13 +421,13 @@ $k$ nearest observations to each polygon.
 The k-nearest neighbor weights displays no island problem, that is *everyone* has at least one neighbor:
 
 ```python
-wk4.islands
+wk4.isolates
 ```
 
-This is the same for the contiguity case above but, in the case of k-nearest neighbor weights, this is by construction. Examination of the cardinality histogram for the k-nearest neighbor weights shows another built-in feature:
+This is the same for the contiguity case above but, in the case of k-nearest neighbor weights, this is by construction. Examination of the cardinality structure for the k-nearest neighbor weights shows another built-in feature:
 
 ```python
-wk4.histogram
+wk4.cardinalities.unique()
 ```
 
 Everyone has the same number of neighbors. In some cases, this is not an issue but a desired feature. In
@@ -452,7 +455,7 @@ The simplest way to compute Kernel weights in `pysal` involves a single function
 call:
 
 ```python
-w_kernel = weights.distance.Kernel.from_dataframe(gdf)
+w_kernel = graph.Graph.build_kernel(gdf.centroid)
 ```
 
 Like k-nearest neighbor weights, the Kernel weights are based on distances between observations. By default, if the input data is an areal unit, we use a central representative point (like the centroid) for that polygon.
@@ -464,25 +467,10 @@ of functions that determine the shape of the distance
 decay function. The bandwidth specifies the distance from each focal unit over which
 the kernel function is applied. For observations separated by distances larger
 than the bandwidth, the weights are set to zero.
-
 The default values for kernels are to use a triangular kernel with a bandwidth distance
 equal to the maximum knn=2 distance
 for all observations. The latter implies a so-called fixed bandwidth where all
-observations use the same distance for the cut-off. We can inspect this from
-the generated `W` object:
-
-```python
-w_kernel.function
-```
-
-for the kernel function, and:
-
-```python
-# Show the first five values of bandwidths
-w_kernel.bandwidth[0:5]
-```
-
-For the bandwidth applied to each observation.
+observations use the same distance for the cut-off.
 
 Although simple, a fixed bandwidth is not always the best choice. For example,
 in cases where the density of the observations varies over the study region,
@@ -504,49 +492,55 @@ sub_30.head(30).centroid.plot(color="r", ax=ax)
 ax.set_axis_off();
 ```
 
+---
+
+
 If we now build a weights object with adaptive bandwidth (`fixed=False`), the values for bandwidth differ:
 
 ```python
-# Build weights with adaptive bandwidth
-w_adaptive = weights.distance.Kernel.from_dataframe(
-    sub_30, fixed=False, k=15
-)
-# Print first five bandwidth values
-w_adaptive.bandwidth[:5]
+#   # Build weights with adaptive bandwidth
+#   w_adaptive = weights.distance.Kernel.from_dataframe(
+#       sub_30, fixed=False, k=15
+#   )
+#   # Print first five bandwidth values
+#   w_adaptive.bandwidth[:5]
 ```
 
 And, we can visualize what these kernels look like on the map, too, by focusing on an individual unit and showing how the distance decay attenuates the weight by grabbing the corresponding row of the full kernel matrix:
 
 ```python caption="A Gaussian kernel centered on two different tracts."
-# Create full matrix version of weights
-full_matrix, ids = w_adaptive.full()
-# Set up figure with two subplots in a row
-f, ax = plt.subplots(
-    1, 2, figsize=(12, 6), subplot_kw=dict(aspect="equal")
-)
-# Append weights for first polygon and plot on first subplot
-sub_30.assign(weight_0=full_matrix[0]).plot(
-    "weight_0", cmap="plasma", ax=ax[0]
-)
-# Append weights for 18th polygon and plot on first subplot
-sub_30.assign(weight_18=full_matrix[17]).plot(
-    "weight_18", cmap="plasma", ax=ax[1]
-)
-# Add centroid of focal tracts
-sub_30.iloc[[0], :].centroid.plot(
-    ax=ax[0], marker="*", color="k", label="Focal Tract"
-)
-sub_30.iloc[[17], :].centroid.plot(
-    ax=ax[1], marker="*", color="k", label="Focal Tract"
-)
-# Add titles
-ax[0].set_title("Kernel centered on first tract")
-ax[1].set_title("Kernel centered on 18th tract")
-# Remove axis
-[ax_.set_axis_off() for ax_ in ax]
-# Add legend
-[ax_.legend(loc="upper left") for ax_ in ax];
+#   # Create full matrix version of weights
+#   full_matrix, ids = w_adaptive.full()
+#   # Set up figure with two subplots in a row
+#   f, ax = plt.subplots(
+#       1, 2, figsize=(12, 6), subplot_kw=dict(aspect="equal")
+#   )
+#   # Append weights for first polygon and plot on first subplot
+#   sub_30.assign(weight_0=full_matrix[0]).plot(
+#       "weight_0", cmap="plasma", ax=ax[0]
+#   )
+#   # Append weights for 18th polygon and plot on first subplot
+#   sub_30.assign(weight_18=full_matrix[17]).plot(
+#       "weight_18", cmap="plasma", ax=ax[1]
+#   )
+#   # Add centroid of focal tracts
+#   sub_30.iloc[[0], :].centroid.plot(
+#       ax=ax[0], marker="*", color="k", label="Focal Tract"
+#   )
+#   sub_30.iloc[[17], :].centroid.plot(
+#       ax=ax[1], marker="*", color="k", label="Focal Tract"
+#   )
+#   # Add titles
+#   ax[0].set_title("Kernel centered on first tract")
+#   ax[1].set_title("Kernel centered on 18th tract")
+#   # Remove axis
+#   [ax_.set_axis_off() for ax_ in ax]
+#   # Add legend
+#   [ax_.legend(loc="upper left") for ax_ in ax];
 ```
+
+---
+
 
 What the kernel looks like can be strongly affected by the structure of spatial proximity, so any part of the map can look quite different from any other part of the map. By imposing a clear distance decay over several of the neighbors of each observation,
 kernel weights incorporate Tobler's law explicitly. Often, this comes at the cost of
@@ -554,7 +548,7 @@ increased memory requirements, as every single pair of observations within the
 bandwidth distance is considered:
 
 ```python
-w_kernel.pct_nonzero
+w_kernel.pct_nonzero # `weights`-based is 40.74074074074074
 ```
 
 In many instances, this may be at odds with the nature of the spatial
