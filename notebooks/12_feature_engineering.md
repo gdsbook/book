@@ -107,8 +107,8 @@ pois = pois.rename(
 ]
 ```
 
-    CPU times: user 109 ms, sys: 11.7 ms, total: 121 ms
-    Wall time: 168 ms
+    CPU times: user 110 ms, sys: 8.28 ms, total: 118 ms
+    Wall time: 129 ms
 
 
 
@@ -437,14 +437,10 @@ Let's first check the CRS is aligned with our sample of point locations:
 
 
 ```python
-dem.crs
+print(dem.crs)
 ```
 
-
-
-
-    CRS.from_wkt('GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]')
-
+    EPSG:4326
 
 
 We have opened the file with `rasterio`, which has not read the entire dataset just yet. This feature allows us to use this approach with files that are potentially very large, as only requested data is read into memory. To extract a discrete set of values from the elevation surface in `dem`, we can use `sample`. For a single location, this is how it works:
@@ -1214,43 +1210,43 @@ crosstab
   <tbody>
     <tr>
       <th>0.0</th>
-      <td>5</td>
-      <td>390</td>
+      <td>4</td>
+      <td>392</td>
       <td>39</td>
-      <td>6</td>
-      <td>3</td>
-      <td>1</td>
-      <td>1</td>
+      <td>8</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>1.0</th>
-      <td>2</td>
-      <td>3066</td>
+      <td>1</td>
+      <td>3068</td>
       <td>214</td>
       <td>32</td>
       <td>18</td>
       <td>5</td>
       <td>0</td>
-      <td>1</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>2.0</th>
       <td>1</td>
-      <td>977</td>
+      <td>978</td>
       <td>268</td>
-      <td>13</td>
-      <td>3</td>
+      <td>11</td>
+      <td>4</td>
       <td>1</td>
       <td>0</td>
       <td>0</td>
     </tr>
     <tr>
       <th>3.0</th>
-      <td>3</td>
-      <td>431</td>
-      <td>160</td>
-      <td>35</td>
+      <td>1</td>
+      <td>427</td>
+      <td>167</td>
+      <td>34</td>
       <td>12</td>
       <td>3</td>
       <td>0</td>
@@ -1258,25 +1254,25 @@ crosstab
     </tr>
     <tr>
       <th>4.0</th>
-      <td>1</td>
-      <td>166</td>
-      <td>54</td>
-      <td>13</td>
+      <td>0</td>
+      <td>162</td>
+      <td>60</td>
+      <td>10</td>
       <td>32</td>
-      <td>5</td>
-      <td>2</td>
+      <td>6</td>
+      <td>3</td>
       <td>0</td>
     </tr>
     <tr>
       <th>5.0</th>
       <td>0</td>
-      <td>51</td>
+      <td>52</td>
       <td>16</td>
-      <td>3</td>
+      <td>2</td>
       <td>9</td>
-      <td>19</td>
+      <td>18</td>
       <td>0</td>
-      <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>6.0</th>
@@ -1284,8 +1280,8 @@ crosstab
       <td>14</td>
       <td>9</td>
       <td>1</td>
-      <td>3</td>
-      <td>2</td>
+      <td>4</td>
+      <td>1</td>
       <td>0</td>
       <td>0</td>
     </tr>
@@ -1345,7 +1341,7 @@ glue('most_common', crosstab.values.max())
 ```
 
 
-    np.int64(3066)
+    np.int64(3068)
 
 
 From the table we can see the most common case (N={glue:}`most_common`) is properties with one bedroom surrounded mostly by other properties with also only one bedroom. Similarly we also find out, for example, that the two properties with ten bedrooms in the dataset are surrounded by properties with mostly two bedrooms. The remaining cells in the table can be interpreted in a similar fashion.
