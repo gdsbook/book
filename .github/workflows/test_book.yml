@@ -1,45 +1,24 @@
-name: Test Book
+name: Render check
 
 on:
-  push:
-    branches: [ master ]
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-
-  Test:
-    name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-
+  render:
+    name: quarto render (from _freeze)
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
-      - name: Setup Conda
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Setup Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
         with:
-            auto-update-conda: true
-            auto-activate-base: true
+          version: 1.6.43
 
-      - name: Set up GDS Env
-        shell: bash -l {0}
-        run: |
-          conda update -y -n base -c defaults conda
-          conda --version
-          conda env create -f ../infrastructure/book_stack.yml 
-          conda activate gdsbook
-      - name: Check and Log Environment
-        shell: bash -l {0}
-        run: |
-          conda activate gdsbook
-          conda info
-          # Print conda list
-          conda list
-          
-      - name: Run Tests
-        shell: bash -l {0}
-        continue-on-error: false
-        run: |
-          conda activate gdsbook
-          make test
+      # Validates the book renders cleanly from the committed _freeze/ cache.
+      # Does not deploy. Fails if a .qmd changed without its freeze reseeded.
+      - name: Render HTML
+        run: quarto render --to html

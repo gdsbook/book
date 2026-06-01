@@ -1,90 +1,52 @@
-.PHONY: all html
-    
+.PHONY: all html pdf preview freeze clean lab lablocal pack_site pack_content
+
+# Default: render every configured format (HTML + PDF) from the _freeze cache.
+all:
+	quarto render
+
+# HTML site only -> docs/
+html:
+	quarto render --to html
+
+# PDF book only -> docs/
+pdf:
+	quarto render --to pdf
+
+# Live-reloading local preview.
+preview:
+	quarto preview
+
+# Re-seed the execution cache by running every chapter. Requires the full
+# `gds` conda env (see infrastructure/book_stack.yml) and the datasets in
+# data/. Commit the resulting _freeze/ so CI can render without the geo stack.
+freeze:
+	quarto render
+
+clean:
+	rm -rf docs _book .quarto
+
+# Docker dev environments (Jupyter/Lab) -----------------------------------
 lab:
 	docker run --rm \
                -p 4000:4000 \
                -p 8888:8888 \
                --user root \
-			   -e NB_UID=$UID \
-			   -e NB_GID=100 \
+               -e NB_UID=$UID \
+               -e NB_GID=100 \
                -v ${PWD}:/home/jovyan/work \
                darribas/gds_dev:7.0
+
 lablocal:
 	docker run --rm \
                -p 4000:4000 \
                -p 8888:8888 \
                --user root \
-			   -e NB_UID=1000 \
-			   -e NB_GID=1000 \
+               -e NB_UID=1000 \
+               -e NB_GID=1000 \
                -v ${PWD}:/home/jovyan/work \
                darribas/gds_dev:7.0
 
-    
-    
-sync: 
-	jupytext --sync ./notebooks/*.ipynb
-
-rerun:
-	echo "import matplotlib.pyplot as plt\nplt.rcParams['figure.dpi']=300" \
-			> ~/.ipython/profile_default/startup/00.py
-	jupyter nbconvert --to notebook\
-			--execute \
-			--output-dir=build \
-			--ExecutePreprocessor.timeout=600 \
-			--ExecutePreprocessor.ipython_hist_file='' \
-			notebooks/*ipynb
-	mv build/*ipynb ./notebooks/
-	make sync
-	rm ~/.ipython/profile_default/startup/00.py
-
-    
-html: sync
-	echo "Cleaning up existing tmp_book folder..."
-	rm -rf docs
-	rm -rf tmp_book
-	echo "Populating build folder..."
-	mkdir tmp_book
-	mkdir tmp_book/notebooks
-	cp notebooks/*.ipynb tmp_book/notebooks/
-	cp notebooks/references.bib tmp_book/notebooks/
-	cp -r data tmp_book/data
-	cp -r figures tmp_book/figures
-	cp -r infrastructure/website_content/* tmp_book/
-	cp infrastructure/logo/ico_256x256.png tmp_book/logo.png
-	cp infrastructure/logo/favicon.ico tmp_book/favicon.ico
-	echo "Starting book build..."
-	jupyter-book build tmp_book
-	echo "Moving build..."
-	mv tmp_book/_build/html docs
-	echo "Cleaning up..."
-	rm -r tmp_book
-	touch docs/.nojekyll
-    
-reset_docs:
-	rm -rf docs/*
-	git checkout HEAD docs/*
-
-# Run for example as: `make test_one nb=00_toc`
-test_one:
-	jupyter nbconvert --to notebook \
-                      --execute \
-                      --ExecutePreprocessor.timeout=600 \
-                      notebooks/$(nb).ipynb
-	rm notebooks/$(nb).nbconvert.ipynb
-
-test:
-	rm -rf tests
-	mkdir tests
-	jupyter nbconvert --to notebook \
-                      --execute \
-                      --output-dir=tests \
-                      --ExecutePreprocessor.timeout=600 \
-                      --ExecutePreprocessor.ipython_hist_file='' \
-                      notebooks/*.ipynb 
-
-	rm -rf tests
-	echo "########\n\nAll blocks passed\n\n########"
-
+# Distribution archives ----------------------------------------------------
 pack_site: html
 	rm -f gdsbook_site.zip
 	cd docs && zip -r ../gdsbook_site.zip ./
@@ -94,7 +56,8 @@ pack_content:
 	rm -rf gdsbook_content
 	mkdir gdsbook_content
 	mkdir gdsbook_content/notebooks
-	cp notebooks/*.ipynb gdsbook_content/notebooks
+	cp notebooks/*.qmd gdsbook_content/notebooks
+	cp notebooks/references.bib gdsbook_content/notebooks
 	cp -r figures gdsbook_content/figures
 	cp -r data gdsbook_content/data
 	cp README.md gdsbook_content/README.md
