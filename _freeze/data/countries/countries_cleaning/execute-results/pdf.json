@@ -1,0 +1,11 @@
+{
+  "hash": "d042dc61e885098a353b62c9ad62509f",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: Countries\njupyter: python3\n---\n\n\n\n::: {.cell execution_count=2}\n``` {.python .cell-code}\n%matplotlib inline\n\nimport geopandas\n```\n:::\n\n\n- Remove small islands\n\n::: {.cell execution_count=3}\n``` {.python .cell-code}\nsource_url = (\"https://www.naturalearthdata.com/\"\\\n              \"http//www.naturalearthdata.com/download/\"\\\n              \"10m/cultural/ne_10m_admin_0_countries.zip\"\n             )\nsource_url\n```\n:::\n\n\n::: {.cell execution_count=4}\n``` {.python .cell-code}\nctys = geopandas.read_file(source_url)\n```\n:::\n\n\n::: {.cell execution_count=5}\n``` {.python .cell-code}\nctys.plot()\n```\n:::\n\n\n::: {.cell execution_count=6}\n``` {.python .cell-code}\nareas = ctys.to_crs(epsg=3857).area\n```\n:::\n\n\n::: {.cell execution_count=7}\n``` {.python .cell-code}\nareas.plot.hist(bins=100)\n```\n:::\n\n\n::: {.cell execution_count=8}\n``` {.python .cell-code}\nsmallest = areas.max() / 4000\n```\n:::\n\n\n::: {.cell execution_count=9}\n``` {.python .cell-code}\nsmall = areas.loc[areas<smallest].index\nlarge = ctys.loc[ctys.index.difference(small), :]\nlarge.plot()\n```\n:::\n\n\n- Antartica\n\n::: {.cell execution_count=10}\n``` {.python .cell-code}\nys = large.centroid.geometry.y\nlarge = large.loc[ys > ys.min(), :]\n```\n:::\n\n\n---\n\n::: {.cell execution_count=11}\n``` {.python .cell-code}\n%time large = large.to_crs(epsg=3857)\n```\n:::\n\n\n::: {.cell execution_count=12}\n``` {.python .cell-code}\nlarge.plot()\n```\n:::\n\n\n- Keep only relevant columns\n\n::: {.cell execution_count=13}\n``` {.python .cell-code}\nlarge.info()\n```\n:::\n\n\n::: {.cell execution_count=14}\n``` {.python .cell-code}\ntokeep = [\n    \"ADMIN\",\n    \"geometry\"\n         ]\n```\n:::\n\n\n- Write out to file\n\n::: {.cell execution_count=15}\n``` {.python .cell-code}\nlarge[tokeep].to_file('countries_clean.gpkg', \n                      driver=\"GPKG\"\n                     )\n```\n:::\n\n\n---\n\n## Donwload link\n\n{download}`[Download the *countries_clean.gpkg* file] <countries_clean.gpkg>`\n\n",
+    "supporting": [
+      "countries_cleaning_files"
+    ],
+    "filters": []
+  }
+}

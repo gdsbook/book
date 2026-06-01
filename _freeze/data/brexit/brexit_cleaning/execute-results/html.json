@@ -1,0 +1,12 @@
+{
+  "hash": "fa35fa6b3d8324114d192e7c50c30f4a",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: Brexit\njupyter: python3\n---\n\n::: {#e750a47e .cell execution_count=1}\n``` {.python .cell-code}\nimport geopandas\nimport topojson\nimport matplotlib.pyplot as plt\n```\n:::\n\n\n\n\n## Local Authority District (LAD) geometries\n\nThe original geometries are downloaded from the Office of National Statistics through [`data.gov.uk`](https://data.gov.uk/dataset/1261032e-c683-4408-a82d-37281d0e250d/local-authority-districts-december-2016-full-clipped-boundaries-in-great-britain) and stored locally:\n\n::: {#9f9bb9c9 .cell execution_count=3}\n``` {.python .cell-code}\nlads = geopandas.read_file('./Local_Authority_Districts_December_2016_'\n                           'Generalised_Clipped_Boundaries_in_the_UK_WGS84/'\n                           'Local_Authority_Districts_December_2016_'\n                           'Generalised_Clipped_Boundaries_in_the_UK_WGS84.shp'\n                          )\n```\n:::\n\n\n## Topology simplification\n\nTo obtain a much more lightweight set of geometries, we simplify the layer, respecting its topology. First we build the topology:\n\n::: {#53e66cd4 .cell execution_count=4}\n``` {.python .cell-code}\ntopology = topojson.Topology(lads)\n```\n:::\n\n\nThen simplify it:\n\n::: {#547536b7 .cell execution_count=5}\n``` {.python .cell-code}\nsimple_uk = topology.toposimplify(.025)\n```\n:::\n\n\nInspect the resulting geography:\n\n::: {#c8ee5285 .cell execution_count=6}\n``` {.python .cell-code}\nsimple_uk.to_gdf().plot()\n```\n:::\n\n\nAnd we can write it to a GeoJSON file:\n\n::: {#f632ef58 .cell execution_count=7}\n``` {.python .cell-code}\nsimple_uk.to_gdf().to_file('./local_authority_districts.geojson', driver=\"GeoJSON\")\n```\n:::\n\n\n---\n\n## Download link\n\n- {download}`[Download the simplified LAD geometries as a GeoJSON] <local_authority_districts.geojson>`\n- {download}`[Download the EU referendum vote results as a CSV] <brexit_vote.csv>`\n\n",
+    "supporting": [
+      "brexit_cleaning_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

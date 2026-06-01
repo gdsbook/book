@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.43">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>7&nbsp; Choropleth Mapping – Geographic Data Science with Python</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../notebooks/06_spatial_autocorrelation.html" rel="next">
+<link href="../intro_part_ii.html" rel="prev">
+<link href="../favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-d4d76bf8491c20bad77d141916dc28e1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-aea08a910c4a1394ff747f59e342c841.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../intro_part_ii.html">Part II — Spatial Data Analysis</a></li><li class="breadcrumb-item"><a href="../notebooks/05_choropleth.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Choropleth Mapping</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Geographic Data Science with Python</a> 
+        <div class="sidebar-tools-main">
+    <a href="https://github.com/gdsbook/book" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Home</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Preface</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/00_toc.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Table of Contents</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../intro_part_i.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Part I — Building Blocks</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/01_geo_thinking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Geographic Thinking for Data Scientists</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/02_geospatial_computational_environment.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Computational Tools for Geographic Data Science</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/03_spatial_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Spatial Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/04_spatial_weights.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Spatial Weights</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../intro_part_ii.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Part II — Spatial Data Analysis</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/05_choropleth.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Choropleth Mapping</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/06_spatial_autocorrelation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Global Spatial Autocorrelation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/07_local_autocorrelation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Local Spatial Autocorrelation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/08_point_pattern_analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Point Pattern Analysis</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../intro_part_iii.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Part III — Advanced Topics</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/09_spatial_inequality.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Spatial Inequality Dynamics</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/10_clustering_and_regionalization.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Clustering and Regionalization</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/11_regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Spatial Regression</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/12_feature_engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Spatial Feature Engineering</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Endmatter</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Datasets</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/README.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Overview</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/airbnb/regression_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">AirBnb</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/airports/airports_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Airports</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/brexit/brexit_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Brexit</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/countries/countries_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Countries</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/ghsl/build_ghsl_extract.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">GHSL</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/h3_grid/build_sd_h3_grid.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">H3 Grid</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/mexico/README.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Mexico</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/nasadem/build_nasadem_sd.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">NASA DEM</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/sandiego/sandiego_tracts_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">San Diego Tracts</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/texas/README.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Texas</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/tokyo/tokyo_cleaning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Tokyo Photographs</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../data/us_county_income/README.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">US County Income 1969-2017</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#principles" id="toc-principles" class="nav-link active" data-scroll-target="#principles"><span class="header-section-number">7.1</span> Principles</a></li>
+  <li><a href="#quantitative-data-classification" id="toc-quantitative-data-classification" class="nav-link" data-scroll-target="#quantitative-data-classification"><span class="header-section-number">7.2</span> Quantitative data classification</a>
+  <ul class="collapse">
+  <li><a href="#equal-intervals" id="toc-equal-intervals" class="nav-link" data-scroll-target="#equal-intervals"><span class="header-section-number">7.2.1</span> Equal intervals</a></li>
+  <li><a href="#quantiles" id="toc-quantiles" class="nav-link" data-scroll-target="#quantiles"><span class="header-section-number">7.2.2</span> Quantiles</a></li>
+  <li><a href="#mean-standard-deviation" id="toc-mean-standard-deviation" class="nav-link" data-scroll-target="#mean-standard-deviation"><span class="header-section-number">7.2.3</span> Mean-standard deviation</a></li>
+  <li><a href="#maximum-breaks" id="toc-maximum-breaks" class="nav-link" data-scroll-target="#maximum-breaks"><span class="header-section-number">7.2.4</span> Maximum breaks</a></li>
+  <li><a href="#boxplot" id="toc-boxplot" class="nav-link" data-scroll-target="#boxplot"><span class="header-section-number">7.2.5</span> Boxplot</a></li>
+  <li><a href="#head-tail-breaks" id="toc-head-tail-breaks" class="nav-link" data-scroll-target="#head-tail-breaks"><span class="header-section-number">7.2.6</span> Head-tail breaks</a></li>
+  <li><a href="#jenks-caspall-breaks" id="toc-jenks-caspall-breaks" class="nav-link" data-scroll-target="#jenks-caspall-breaks"><span class="header-section-number">7.2.7</span> Jenks-Caspall breaks</a></li>
+  <li><a href="#fisher-jenks-breaks" id="toc-fisher-jenks-breaks" class="nav-link" data-scroll-target="#fisher-jenks-breaks"><span class="header-section-number">7.2.8</span> Fisher-Jenks breaks</a></li>
+  <li><a href="#max-p" id="toc-max-p" class="nav-link" data-scroll-target="#max-p"><span class="header-section-number">7.2.9</span> Max-p</a></li>
+  <li><a href="#comparing-classification-schemes" id="toc-comparing-classification-schemes" class="nav-link" data-scroll-target="#comparing-classification-schemes"><span class="header-section-number">7.2.10</span> Comparing classification schemes</a></li>
+  </ul></li>
+  <li><a href="#color" id="toc-color" class="nav-link" data-scroll-target="#color"><span class="header-section-number">7.3</span> Color</a>
+  <ul class="collapse">
+  <li><a href="#sequential-palettes" id="toc-sequential-palettes" class="nav-link" data-scroll-target="#sequential-palettes"><span class="header-section-number">7.3.1</span> Sequential palettes</a></li>
+  <li><a href="#diverging-palettes" id="toc-diverging-palettes" class="nav-link" data-scroll-target="#diverging-palettes"><span class="header-section-number">7.3.2</span> Diverging palettes</a></li>
+  <li><a href="#qualitative-palettes" id="toc-qualitative-palettes" class="nav-link" data-scroll-target="#qualitative-palettes"><span class="header-section-number">7.3.3</span> Qualitative palettes</a></li>
+  </ul></li>
+  <li><a href="#advanced-topics" id="toc-advanced-topics" class="nav-link" data-scroll-target="#advanced-topics"><span class="header-section-number">7.4</span> Advanced topics</a>
+  <ul class="collapse">
+  <li><a href="#user-defined-choropleths" id="toc-user-defined-choropleths" class="nav-link" data-scroll-target="#user-defined-choropleths"><span class="header-section-number">7.4.1</span> User-defined choropleths</a></li>
+  <li><a href="#pooled-classifications" id="toc-pooled-classifications" class="nav-link" data-scroll-target="#pooled-classifications"><span class="header-section-number">7.4.2</span> Pooled classifications</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">7.5</span> Conclusion</a></li>
+  <li><a href="#questions" id="toc-questions" class="nav-link" data-scroll-target="#questions"><span class="header-section-number">7.6</span> Questions</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps"><span class="header-section-number">7.7</span> Next steps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../intro_part_ii.html">Part II — Spatial Data Analysis</a></li><li class="breadcrumb-item"><a href="../notebooks/05_choropleth.html"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Choropleth Mapping</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Choropleth Mapping</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Choropleths are geographic maps that display statistical information encoded in a color palette. Choropleth maps play a prominent role in geographic data science as they allow us to display non-geographic attributes or variables on a geographic map. The word choropleth stems from the root “choro”, meaning “region”. Choropleth maps represent data at the region level, and are appropriate for areal unit data where each observation combines a value of an attribute and a geometric figure, usually a polygon. Choropleth maps derive from an earlier era where cartographers faced technological constraints that precluded the use of unclassed maps where each unique attribute value could be represented by a distinct symbol or color. Instead, attribute values were grouped into a smaller number of classes, usually not more than 12. Each class was associated with a unique symbol that was in turn applied to all observations with attribute values falling in the class.</p>
+<p>Although today these technological constraints are no longer binding, and unclassed mapping is feasible, there are still good reasons for adopting a classed approach. Chief among these is to reduce the cognitive load involved in parsing the complexity of an unclassed map. A choropleth map reduces this complexity by drawing upon statistical and visualization theory to provide an effective representation of the spatial distribution of the attribute values across the areal units.</p>
+<section id="principles" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="principles"><span class="header-section-number">7.1</span> Principles</h2>
+<p>The effectiveness of a choropleth map depends largely on the purpose of the map. Which message you want to communicate will shape what options are preferable over others. In this chapter we consider three dimensions over which putting intentional thinking will pay off. Choropleth mapping thus revolves around: first, selecting a number of groups smaller than <span class="math inline">\(n\)</span> into which all values in our dataset will be mapped to; second, identifying a classification algorithm that executes such mapping, following some principle that is aligned with our interest; and third, once we know into how many groups we are going to reduce all values in our data, which color is assigned to each group to ensure it encodes the information we want to reflect. In broad terms, the classification scheme defines the number of classes as well as the rules for assignment; while a good symbolization conveys information about the value differentiation across classes.</p>
+<p>In this chapter we first discuss the approaches used to classify attribute values. This is followed by a (brief) overview of color theory and the implications of different color schemes for effective map design. We combine theory and practice by exploring how these concepts are implemented in different Python packages, including <code>geopandas</code>, and the Pysal federation of packages.</p>
+<div id="7f117e52" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pysal</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="quantitative-data-classification" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="quantitative-data-classification"><span class="header-section-number">7.2</span> Quantitative data classification</h2>
+<p>Selecting the number of groups into which we want to assign the values in our data, and how each value is assigned into a group can be seen as a classification problem. Data classification considers the problem of partitioning the attribute values into mutually exclusive and exhaustive groups. The precise manner in which this is done will be a function of the measurement scale of the attribute in question. For quantitative attributes (ordinal, interval, ratio scales), the classes will have an explicit ordering. More formally, the classification problem is to define class boundaries such that</p>
+<p><span class="math display">\[
+c_j &lt; y_i \le  c_{j+1} \ \forall y_i \in C_{j}
+\]</span></p>
+<p>where <span class="math inline">\(y_i\)</span> is the value of the attribute for spatial location <span class="math inline">\(i\)</span>, <span class="math inline">\(j\)</span> is a class index, and <span class="math inline">\(c_j\)</span> represents the lower bound of interval <span class="math inline">\(j\)</span>. Different classification schemes obtain from their definition of the class boundaries. The choice of the classification scheme should take into consideration the statistical distribution of the attribute values as well as the goal of our map (e.g., highlight outliers vs.&nbsp;accurately depict the distribution of values).</p>
+<p>To illustrate these considerations, we will examine regional income data for 32 Mexican states <span class="citation" data-cites="Rey_2010">(<a href="references.html#ref-Rey_2010" role="doc-biblioref">Rey and Sastré-Gutiérrez 2010</a>)</span> in this chapter. The variable we focus on is per capita gross domestic product for 1940 (<code>PCGDP1940</code>):</p>
+<div id="a359f56f" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>mx <span class="op">=</span> geopandas.read_file(<span class="st">"../data/mexico/mexicojoin.shp"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>mx[[<span class="st">"NAME"</span>, <span class="st">"PCGDP1940"</span>]].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="3">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">NAME</th>
+<th data-quarto-table-cell-role="th">PCGDP1940</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>Baja California Norte</td>
+<td>22361.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>Baja California Sur</td>
+<td>9573.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>Nayarit</td>
+<td>4836.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>Jalisco</td>
+<td>5309.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>Aguascalientes</td>
+<td>10384.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Which displays the following statistical distribution (in Figure 1).</p>
+<div id="589d5482" class="cell" data-caption="Distribution of per capita GDP across 1940s Mexican states" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot histogram</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> seaborn.histplot(mx[<span class="st">"PCGDP1940"</span>], bins<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Add rug on horizontal axis</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>seaborn.rugplot(mx[<span class="st">"PCGDP1940"</span>], height<span class="op">=</span><span class="fl">0.05</span>, color<span class="op">=</span><span class="st">"red"</span>, ax<span class="op">=</span>ax)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-5-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As we can see, the distribution is positively skewed as is common in regional income studies. In other words, the mean exceeds the median (<code>50%</code>, in the table below), leading to the long right tail in the figure. As we shall see, this skewness will have implications for the choice of choropleth classification scheme.</p>
+<div id="188922dd" class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"PCGDP1940"</span>].describe()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="5">
+<pre><code>count       32.000000
+mean      7230.531250
+std       5204.952883
+min       1892.000000
+25%       3701.750000
+50%       5256.000000
+75%       8701.750000
+max      22361.000000
+Name: PCGDP1940, dtype: float64</code></pre>
+</div>
+</div>
+<p>For quantitative attributes we first sort the data by their value, such that <span class="math inline">\(x_0 \le x_2 \ldots \le x_{n-1}\)</span>. For a prespecified number of classes <span class="math inline">\(k\)</span>, the classification problem boils down to selecting <span class="math inline">\(k-1\)</span> break points along the sorted values that separate the values into mutually exclusive and exhaustive groups.</p>
+<p>In fact, the determination of the histogram above can be viewed as one approach to this selection. The method <code>seaborn.histplot</code> uses the matplotlib <code>hist</code> function under the hood to determine the class boundaries and the counts of observations in each class. In the figure, we have five classes which can be extracted with an explicit call to the <code>hist</code> function:</p>
+<div id="eda32ba1" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>counts, bins, patches <span class="op">=</span> ax.hist(mx[<span class="st">"PCGDP1940"</span>], bins<span class="op">=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>counts</code> object captures how many observations each category in the classification has:</p>
+<div id="795d380c" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>counts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>array([17.,  9.,  3.,  1.,  2.])</code></pre>
+</div>
+</div>
+<p>The <code>bin</code> object stores these break points we are interested in when considering classification schemes (the <code>patches</code> object can be ignored in this context, as it stores the geometries of the histogram plot):</p>
+<div id="4c18a016" class="cell" data-execution_count="8">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>bins</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="8">
+<pre><code>array([ 1892. ,  5985.8, 10079.6, 14173.4, 18267.2, 22361. ])</code></pre>
+</div>
+</div>
+<p>This yields five bins, with the first having a lower bound of 1892 and an upper bound of 5985.8 which contains 17 observations. The determination of the interval width (<span class="math inline">\(w\)</span>) and the number of bins in <code>seaborn</code> is based on the Freedman-Diaconis rule <span class="citation" data-cites="freedman1981histogram">(<a href="references.html#ref-freedman1981histogram" role="doc-biblioref">Freedman and Diaconis 1981</a>)</span>:</p>
+<p><span class="math display">\[
+w = 2 * IQR * n^{-1/3}
+\]</span></p>
+<p>where <span class="math inline">\(IQR\)</span> is the inter quartile range of the attribute values. Given <span class="math inline">\(w\)</span>, the number of bins (<span class="math inline">\(k\)</span>) is:</p>
+<p><span class="math display">\[k = \dfrac{(max-min)}{w}\]</span></p>
+<p>The choropleth literature has many alternative classification algorithms that follow criteria that can be of interest in different contexts, as they focus on different priorities. Below, we will focus on a few of them. To compute the classification, we will rely on the <code>mapclassify</code> package of the Pysal family:</p>
+<div id="d5fe5618" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mapclassify</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="equal-intervals" class="level3" data-number="7.2.1">
+<h3 data-number="7.2.1" class="anchored" data-anchor-id="equal-intervals"><span class="header-section-number">7.2.1</span> Equal intervals</h3>
+<p>The Freedman-Diaconis approach provides a rule to determine the width and, in turn, the number of bins for the classification. This is a special case of a more general classifier known as “equal intervals”, where each of the bins has the same width in the value space. For a given value of <span class="math inline">\(k\)</span>, equal intervals classification splits the range of the attribute space into <span class="math inline">\(k\)</span> equal length intervals, with each interval having a width <span class="math inline">\(w = \frac{x_0 - x_{n-1}}{k}\)</span>. Thus the maximum class is <span class="math inline">\((x_{n-1}-w, x_{n-1}]\)</span> and the first class is <span class="math inline">\((-\infty,
+x_{n-1} - (k-1)w]\)</span>.</p>
+<p>Equal intervals have the dual advantages of simplicity and ease of interpretation. However, this rule only considers the extreme values of the distribution and, in some cases, this can result in one or more classes being sparse. This is clearly the case in our income dataset, as the majority of the values are placed into the first two classes leaving the last three classes rather sparse:</p>
+<div id="efe84619" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ei5 <span class="op">=</span> mapclassify.EqualInterval(mx[<span class="st">"PCGDP1940"</span>], k<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ei5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="10">
+<pre><code>EqualInterval
+
+      Interval         Count
+----------------------------
+[ 1892.00,  5985.80] |    17
+( 5985.80, 10079.60] |     9
+(10079.60, 14173.40] |     3
+(14173.40, 18267.20] |     1
+(18267.20, 22361.00] |     2</code></pre>
+</div>
+</div>
+<p>Note that each of the intervals, however, has equal width of <span class="math inline">\(w=4093.8\)</span>. It should also be noted that the first class is closed on the lower bound, in contrast to the general approach defined above.</p>
+</section>
+<section id="quantiles" class="level3" data-number="7.2.2">
+<h3 data-number="7.2.2" class="anchored" data-anchor-id="quantiles"><span class="header-section-number">7.2.2</span> Quantiles</h3>
+<p>To avoid the potential problem of sparse classes, the quantiles of the distribution can be used to identify the class boundaries. Indeed, each class will have approximately <span class="math inline">\(\mid\frac{n}{k}\mid\)</span> observations using the quantile classifier. If <span class="math inline">\(k=5\)</span> the sample quintiles are used to define the upper limits of each class resulting in the following classification:</p>
+<div id="2d2dddc3" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>q5 <span class="op">=</span> mapclassify.Quantiles(mx.PCGDP1940, k<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>q5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="11">
+<pre><code>Quantiles
+
+      Interval         Count
+----------------------------
+[ 1892.00,  3576.20] |     7
+( 3576.20,  4582.80] |     6
+( 4582.80,  6925.20] |     6
+( 6925.20,  9473.00] |     6
+( 9473.00, 22361.00] |     7</code></pre>
+</div>
+</div>
+<p>Note that while the numbers of values in each class are roughly equal, the widths of the first four intervals are rather different:</p>
+<div id="4f2187e3" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>q5.bins[<span class="dv">1</span>:] <span class="op">-</span> q5.bins[:<span class="op">-</span><span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="12">
+<pre><code>array([ 1006.6,  2342.4,  2547.8, 12888. ])</code></pre>
+</div>
+</div>
+<p>While quantile classification avoids the pitfall of sparse classes, this classification is not problem-free. The varying widths of the intervals can be markedly different which can lead to problems of interpretation. A second challenge facing quantiles arises when there are a large number of duplicate values in the distribution such that the limits for one or more classes become ambiguous. For example, if one had a variable with <span class="math inline">\(n=20\)</span> but 10 of the observations took on the same value which was the minimum observed, then for values of <span class="math inline">\(k&gt;2\)</span>, the class boundaries become ill-defined since a simple rule of splitting at the <span class="math inline">\(n/k\)</span> ranked observed value would depend upon how ties are treated when ranking.</p>
+<p>Let us generate a synthetic variable with these characteristics:</p>
+<div id="2e2fe55a" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set seed for reproducibility</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>numpy.random.seed(<span class="dv">12345</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a variable of 20 values randomly</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># selected from 0 to 10</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> numpy.random.randint(<span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">20</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Manually ensure the first ten values are 0 (the</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># minimum value)</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">0</span>:<span class="dv">10</span>] <span class="op">=</span> x.<span class="bu">min</span>()</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<pre><code>array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 7, 6, 0, 2, 9, 1, 2, 6, 7])</code></pre>
+</div>
+</div>
+<p>And we will now run quantile classification:</p>
+<div id="55f213c6" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ties <span class="op">=</span> mapclassify.Quantiles(x, k<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>ties</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<pre><code>Quantiles
+
+  Interval     Count
+--------------------
+[0.00, 0.00] |    11
+(0.00, 1.40] |     1
+(1.40, 6.20] |     4
+(6.20, 9.00] |     4</code></pre>
+</div>
+</div>
+<p>For clarity, the unique values in our dataset are:</p>
+<div id="f604eeb2" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>ux <span class="op">=</span> numpy.unique(x)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>ux</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<pre><code>array([0, 1, 2, 6, 7, 9])</code></pre>
+</div>
+</div>
+<p>In this case, <code>mapclassify</code> will issue a warning alerting the user to the issue that this sample does not contain enough unique values to form the number of well-defined classes requested. It then forms a lower number of classes using pseudo-quantiles, or quantiles defined on the unique values in the sample, and then uses the pseudo-quantiles to classify all the values.</p>
+</section>
+<section id="mean-standard-deviation" class="level3" data-number="7.2.3">
+<h3 data-number="7.2.3" class="anchored" data-anchor-id="mean-standard-deviation"><span class="header-section-number">7.2.3</span> Mean-standard deviation</h3>
+<p>Our third classifier uses the sample mean <span class="math inline">\(\bar{x} =
+\frac{1}{n} \sum_{i=1}^n x_i\)</span> and sample standard deviation <span class="math inline">\(s = \sqrt{
+\frac{1}{n-1} \sum_{i=1}^n (x_i - \bar{x})  }\)</span> to define class boundaries as some distance from the sample mean, with the distance being a multiple of the standard deviation. For example, a common definition for <span class="math inline">\(k=5\)</span> is to set the upper limit of the first class to two standard deviations (<span class="math inline">\(c_{0}^u = \bar{x} - 2 s\)</span>), and the intermediate classes to have upper limits within one standard deviation (<span class="math inline">\(c_{1}^u = \bar{x}-s,\ c_{2}^u = \bar{x}+s, \ c_{3}^u
+= \bar{x}+2s\)</span>). Any values greater (smaller) than two standard deviations above (below) the mean are placed into the top (bottom) class.</p>
+<div id="38aebbfa" class="cell" data-execution_count="16">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>msd <span class="op">=</span> mapclassify.StdMean(mx[<span class="st">"PCGDP1940"</span>])</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>msd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
+<pre><code>StdMean
+
+      Interval         Count
+----------------------------
+(    -inf, -3179.37] |     0
+(-3179.37,  2025.58] |     1
+( 2025.58, 12435.48] |    28
+(12435.48, 17640.44] |     0
+(17640.44, 22361.00] |     3</code></pre>
+</div>
+</div>
+<p>This classifier is best used when data is normally distributed or, at least, when the sample mean is a meaningful measure to anchor the classification around. Clearly this is not the case for our income data as the positive skew results in a loss of information when we use the standard deviation. The lack of symmetry leads to an inadmissible upper bound for the first class as well as a concentration of the vast majority of values in the middle class.</p>
+</section>
+<section id="maximum-breaks" class="level3" data-number="7.2.4">
+<h3 data-number="7.2.4" class="anchored" data-anchor-id="maximum-breaks"><span class="header-section-number">7.2.4</span> Maximum breaks</h3>
+<p>The maximum breaks classifier decides where to set the break points between classes by considering the difference between sorted values. That is, rather than considering a value of the dataset in itself, it looks at how apart each value is from the next one in the sorted sequence. The classifier then places the <span class="math inline">\(k-1\)</span> break points in between the pairs of values most stretched apart from each other in the entire sequence, proceeding in descending order relative to the size of the breaks:</p>
+<div id="c366ba51" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>mb5 <span class="op">=</span> mapclassify.MaximumBreaks(mx[<span class="st">"PCGDP1940"</span>], k<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>mb5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
+<pre><code>MaximumBreaks
+
+      Interval         Count
+----------------------------
+[ 1892.00,  5854.00] |    17
+( 5854.00, 11574.00] |    11
+(11574.00, 14974.00] |     1
+(14974.00, 19890.50] |     1
+(19890.50, 22361.00] |     2</code></pre>
+</div>
+</div>
+<p>Maximum breaks is an appropriate approach when we are interested in making sure observations in each class are separated from those in neighboring classes. As such, it works well in cases where the distribution of values is not unimodal. In addition, the algorithm is relatively fast to compute. However, its simplicity can sometimes cause unexpected results. To the extent that maximum breaks classification only considers the top <span class="math inline">\(k-1\)</span> differences between consecutive values, other more nuanced within-group differences and dissimilarities can be ignored.</p>
+</section>
+<section id="boxplot" class="level3" data-number="7.2.5">
+<h3 data-number="7.2.5" class="anchored" data-anchor-id="boxplot"><span class="header-section-number">7.2.5</span> Boxplot</h3>
+<p>The boxplot classification is a blend of the quantile and standard deviation classifiers. Here <span class="math inline">\(k\)</span> is predefined to six, with the upper limit of the first class set to:</p>
+<p><span class="math display">\[q_{0.25}-h \, IQR\]</span></p>
+<p>where <span class="math inline">\(IQR = q_{0.75}-q_{0.25}\)</span> is the inter-quartile range; and <span class="math inline">\(h\)</span> corresponds to the hinge, or the multiplier of the <span class="math inline">\(IQR\)</span> to obtain the bounds of the “whiskers” from a box-and-whisker plot of the data. The lower limit of the sixth class is set to <span class="math inline">\(q_{0.75}+h \,
+IQR\)</span>. Intermediate classes have their upper limits set to the 0.25, 0.50 and 0.75 percentiles of the attribute values.</p>
+<div id="aa3ede34" class="cell" data-execution_count="18">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>bp <span class="op">=</span> mapclassify.BoxPlot(mx[<span class="st">"PCGDP1940"</span>])</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>bp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
+<pre><code>BoxPlot
+
+      Interval         Count
+----------------------------
+(    -inf, -3798.25] |     0
+(-3798.25,  3701.75] |     8
+( 3701.75,  5256.00] |     8
+( 5256.00,  8701.75] |     8
+( 8701.75, 16201.75] |     5
+(16201.75, 22361.00] |     3</code></pre>
+</div>
+</div>
+<p>Any values falling into either of the extreme classes are defined as outliers. Note that because the income values are non-negative by definition, the lower outlier class has an inadmissible upper bound meaning that lower outliers would not be possible for this sample.</p>
+<p>The default value for the hinge is <span class="math inline">\(h=1.5\)</span> in <code>mapclassify</code>. However, this can be specified by the user for an alternative classification:</p>
+<div id="36c9b3ff" class="cell" data-execution_count="19">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>bp1 <span class="op">=</span> mapclassify.BoxPlot(mx[<span class="st">"PCGDP1940"</span>], hinge<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>bp1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="19">
+<pre><code>BoxPlot
+
+      Interval         Count
+----------------------------
+(    -inf, -1298.25] |     0
+(-1298.25,  3701.75] |     8
+( 3701.75,  5256.00] |     8
+( 5256.00,  8701.75] |     8
+( 8701.75, 13701.75] |     5
+(13701.75, 22361.00] |     3</code></pre>
+</div>
+</div>
+<p>Doing so will affect the definition of the outlier classes, as well as the neighboring internal classes.</p>
+</section>
+<section id="head-tail-breaks" class="level3" data-number="7.2.6">
+<h3 data-number="7.2.6" class="anchored" data-anchor-id="head-tail-breaks"><span class="header-section-number">7.2.6</span> Head-tail breaks</h3>
+<p>The head tail algorithm <span class="citation" data-cites="Jiang_2013">(<a href="references.html#ref-Jiang_2013" role="doc-biblioref">Jiang 2013</a>)</span> is based on a recursive partitioning of the data using splits around iterative means. The splitting process continues until the distributions within each of the classes no longer display a heavy-tailed distribution in the sense that there is a balance between the number of smaller and larger values assigned to each class.</p>
+<div id="f0110b1a" class="cell" data-execution_count="20">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>ht <span class="op">=</span> mapclassify.HeadTailBreaks(mx[<span class="st">"PCGDP1940"</span>])</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>ht</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<pre><code>HeadTailBreaks
+
+      Interval         Count
+----------------------------
+[ 1892.00,  7230.53] |    20
+( 7230.53, 12244.42] |     9
+(12244.42, 20714.00] |     1
+(20714.00, 22163.00] |     1
+(22163.00, 22361.00] |     1</code></pre>
+</div>
+</div>
+<p>For data with a heavy-tailed distribution, such as power law and log normal distributions, the head tail breaks classifier can be particularly effective.</p>
+</section>
+<section id="jenks-caspall-breaks" class="level3" data-number="7.2.7">
+<h3 data-number="7.2.7" class="anchored" data-anchor-id="jenks-caspall-breaks"><span class="header-section-number">7.2.7</span> Jenks-Caspall breaks</h3>
+<p>This approach, as well as the following two, tackles the classification challenge from a heuristic perspective, rather than from a deterministic one. Originally proposed by <span class="citation" data-cites="Jenks_1971">(<a href="references.html#ref-Jenks_1971" role="doc-biblioref">Jenks and Caspall 1971</a>)</span>, the Jenks-Caspall classification algorithm aims to minimize the sum of absolute deviations around class means. The approach begins with a prespecified number of classes and an arbitrary initial set of class breaks - for example using quintiles. The algorithm attempts to improve the objective function by considering the movement of observations between adjacent classes. For example, the largest value in the lowest quintile would be considered for movement into the second quintile, while the lowest value in the second quintile would be considered for a possible move into the first quintile. The candidate move resulting in the largest reduction in the objective function would be made, and the process continues until no other improving moves are possible. The Jenks-Caspall algorithm is the one-dimension case of the widely used K-Means algorithm for clustering, which we will see later in this book when we consider <a href="10_clustering_and_regionalization">Clustering and Regionalization</a>.</p>
+<div id="54e9473c" class="cell" data-execution_count="21">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>numpy.random.seed(<span class="dv">12345</span>)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>jc5 <span class="op">=</span> mapclassify.JenksCaspall(mx[<span class="st">"PCGDP1940"</span>], k<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>jc5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<pre><code>JenksCaspall
+
+      Interval         Count
+----------------------------
+[ 1892.00,  2934.00] |     4
+( 2934.00,  4414.00] |     9
+( 4414.00,  6399.00] |     5
+( 6399.00, 12132.00] |    11
+(12132.00, 22361.00] |     3</code></pre>
+</div>
+</div>
+</section>
+<section id="fisher-jenks-breaks" class="level3" data-number="7.2.8">
+<h3 data-number="7.2.8" class="anchored" data-anchor-id="fisher-jenks-breaks"><span class="header-section-number">7.2.8</span> Fisher-Jenks breaks</h3>
+<p>The second optimal algorithm adopts a dynamic programming approach to minimize the sum of the absolute deviations around class medians. In contrast to the Jenks-Caspall algorithm, the Fisher-Jenks alorithm is guaranteed to produce an optimal classification for a prespecified number of classes:</p>
+<div id="8483daf5" class="cell" data-execution_count="22">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>numpy.random.seed(<span class="dv">12345</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>fj5 <span class="op">=</span> mapclassify.FisherJenks(mx[<span class="st">"PCGDP1940"</span>], k<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>fj5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="22">
+<pre><code>FisherJenks
+
+      Interval         Count
+----------------------------
+[ 1892.00,  5309.00] |    17
+( 5309.00,  9073.00] |     8
+( 9073.00, 12132.00] |     4
+(12132.00, 17816.00] |     1
+(17816.00, 22361.00] |     2</code></pre>
+</div>
+</div>
+</section>
+<section id="max-p" class="level3" data-number="7.2.9">
+<h3 data-number="7.2.9" class="anchored" data-anchor-id="max-p"><span class="header-section-number">7.2.9</span> Max-p</h3>
+<p>Finally, the max-p classifier adopts the algorithm underlying the max-p region building method <span class="citation" data-cites="Duque_2011">(<a href="references.html#ref-Duque_2011" role="doc-biblioref">Duque, Anselin, and Rey 2011</a>)</span> to the case of map classification. It is similar in spirit to Jenks-Caspall in that it considers greedy swapping between adjacent classes to improve the objective function. It is a heuristic, however, so unlike Fisher-Jenks, there is no optimal solution guaranteed:</p>
+<div id="97c56d7f" class="cell" data-execution_count="23">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>mp5 <span class="op">=</span> mapclassify.MaxP(mx[<span class="st">"PCGDP1940"</span>], k<span class="op">=</span><span class="dv">5</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>mp5</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="23">
+<pre><code>MaxP
+
+      Interval         Count
+----------------------------
+[ 1892.00,  3569.00] |     7
+( 3569.00,  5309.00] |    10
+( 5309.00,  7990.00] |     5
+( 7990.00,  9573.00] |     4
+( 9573.00, 22361.00] |     6</code></pre>
+</div>
+</div>
+</section>
+<section id="comparing-classification-schemes" class="level3" data-number="7.2.10">
+<h3 data-number="7.2.10" class="anchored" data-anchor-id="comparing-classification-schemes"><span class="header-section-number">7.2.10</span> Comparing classification schemes</h3>
+<p>As a special case of clustering, the definition of the number of classes and the class boundaries pose a problem to the map designer. Recall that the Freedman-Diaconis rule was said to be optimal, however; optimality can only be measured relative to a specified objective function. In the case of Freedman-Diaconis, the objective function is to minimize the difference between the area under estimated kernel density based on the sample and the area under the theoretical population distribution that generated the sample.</p>
+<p>This notion of statistical fit is an important one. However, it is not the only consideration when evaluating classifiers for the purpose of choropleth mapping. Also relevant is the spatial distribution of the attribute values and the ability of the classifier to convey a sense of that spatial distribution. As we shall see, this is not necessarily directly related to the statistical distribution of the attribute values. We will return to a joint consideration of both the statistical and spatial distribution of the attribute values when comparing classifiers later in this chapter.</p>
+<p>For map classification, a common optimality criterion is a measure of fit. In <code>mapclassify</code>, the absolute deviation around class medians (ADCM) is calculated and provides a measure of fit that allows for comparison of alternative classifiers for the same value of <span class="math inline">\(k\)</span>. The ADCM will give us a sense of how “compact” each group is. To see this, we can compare different classifiers for <span class="math inline">\(k=5\)</span> on the Mexico data in Figure 2:</p>
+<div id="9af63e6e" class="cell" data-caption="Absolute Deviation around Class Medians. Alternative classification schemes, Mexican state per capita GDP in 1940." data-execution_count="24">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bunch classifier objects</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>class5 <span class="op">=</span> q5, ei5, ht, mb5, msd, fj5, jc5, mp5</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Collect ADCM for each classifier</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>fits <span class="op">=</span> numpy.array([c.adcm <span class="cf">for</span> c <span class="kw">in</span> class5])</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert ADCM scores to a DataFrame</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>adcms <span class="op">=</span> pandas.DataFrame(fits)</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Add classifier names</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>adcms[<span class="st">"classifier"</span>] <span class="op">=</span> [c.name <span class="cf">for</span> c <span class="kw">in</span> class5]</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Add column names to the ADCM</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>adcms.columns <span class="op">=</span> [<span class="st">"ADCM"</span>, <span class="st">"Classifier"</span>]</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> seaborn.barplot(</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span><span class="st">"Classifier"</span>, x<span class="op">=</span><span class="st">"ADCM"</span>, data<span class="op">=</span>adcms, palette<span class="op">=</span><span class="st">"Pastel1"</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-25-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As is to be expected, the Fisher-Jenks classifier dominates all other k=5 classifiers with an ADCM of 23,729 (remember, lower is better). Interestingly, the equal interval classifier performs well despite the problems associated with being sensitive to the extreme values in the distribution. The mean-standard deviation classifier has a very poor fit due to the skewed nature of the data and the concentrated assignment of the majority of the observations to the central class.</p>
+<p>The ADCM provides a global measure of fit which can be used to compare the alternative classifiers. As a complement to this global perspective, it can be revealing to consider how each of the observations in our data was classified across the alternative approaches. To do this, we can add the class bin attribute (<code>yb</code>) generated by the <code>mapclassify</code> classifiers as additional columns in the dataframe to visualize how they map to observations:</p>
+<div id="565ba926" class="cell" data-execution_count="25">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Append class values as a separate column</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"Quantiles"</span>] <span class="op">=</span> q5.yb</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"Equal Interval"</span>] <span class="op">=</span> ei5.yb</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"Head-Tail Breaks"</span>] <span class="op">=</span> ht.yb</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"Maximum Breaks"</span>] <span class="op">=</span> mb5.yb</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"Mean-Standard Deviation"</span>] <span class="op">=</span> msd.yb</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"Fisher-Jenks"</span>] <span class="op">=</span> fj5.yb</span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"Jenks Caspall"</span>] <span class="op">=</span> jc5.yb</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"MaxP"</span>] <span class="op">=</span> mp5.yb</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>With those in one place, we can display their labels in a heatmap. Note that, since our variable of interest is continuous, we can sort the rows of the table by their value (<code>.sort_values('PCGDP1940')</code>) and color each cell according to the label assigned to it by each classifier. To make the heatmap easier to read, we transpose it (<code>.T</code>) so that Mexican states are displayed along the horizontal axis and classification schemes are along the vertical one. (see Figure 3)</p>
+<div id="e08fa300" class="cell" data-caption="Assignment differences between alternative classification schemes, Mexican state per capita GDP in 1940." data-execution_count="26">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>f, ax <span class="op">=</span> plt.subplots(<span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">9</span>, <span class="dv">3</span>))</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>seaborn.heatmap(</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    mx.set_index(<span class="st">"NAME"</span>)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    .sort_values(<span class="st">"PCGDP1940"</span>)[</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        [</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Head-Tail Breaks"</span>,</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Fisher-Jenks"</span>,</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Maximum Breaks"</span>,</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Equal Interval"</span>,</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>            <span class="st">"MaxP"</span>,</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Quantiles"</span>,</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Jenks Caspall"</span>,</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>            <span class="st">"Mean-Standard Deviation"</span>,</span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>    .T,</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"YlGn"</span>,</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>    cbar<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax,</span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb42-21"><a href="#cb42-21" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"State ID"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-27-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure 3 can be challenging to read at first but, once you “decode” it, it packs a lot of information. Each row includes a full series of all of our data, classified by an algorithm, with the group to which it has been assigned encoded on a color scale from light yellow (lowest value group) to dark green (largest value group). Conversely, each column represents how a given state is classified across the different schemes considered. Inspection of the table reveals a number of interesting results. For example, the only Mexican state that is treated consistently across the k=5 classifiers is Baja California Norte which is placed in the highest class by all classifiers. Additionally, the mean-standard deviation classifier has an empty first class due to the inadmissible upper bound and the over-concentration of values in the central class (2).</p>
+<p>Finally, we can consider a meso-level view of the classification results by comparing the number of values assigned to each class across the different classifiers:</p>
+<div id="87cfaaa1" class="cell" data-execution_count="27">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>pandas.DataFrame(</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    {c.name: c.counts <span class="cf">for</span> c <span class="kw">in</span> class5},</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    index<span class="op">=</span>[<span class="st">"Class-</span><span class="sc">{}</span><span class="st">"</span>.<span class="bu">format</span>(i) <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>)],</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="27">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Quantiles</th>
+<th data-quarto-table-cell-role="th">EqualInterval</th>
+<th data-quarto-table-cell-role="th">HeadTailBreaks</th>
+<th data-quarto-table-cell-role="th">MaximumBreaks</th>
+<th data-quarto-table-cell-role="th">StdMean</th>
+<th data-quarto-table-cell-role="th">FisherJenks</th>
+<th data-quarto-table-cell-role="th">JenksCaspall</th>
+<th data-quarto-table-cell-role="th">MaxP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Class-0</td>
+<td>7</td>
+<td>17</td>
+<td>20</td>
+<td>17</td>
+<td>0</td>
+<td>17</td>
+<td>4</td>
+<td>7</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Class-1</td>
+<td>6</td>
+<td>9</td>
+<td>9</td>
+<td>11</td>
+<td>1</td>
+<td>8</td>
+<td>9</td>
+<td>10</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Class-2</td>
+<td>6</td>
+<td>3</td>
+<td>1</td>
+<td>1</td>
+<td>28</td>
+<td>4</td>
+<td>5</td>
+<td>5</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">Class-3</td>
+<td>6</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>1</td>
+<td>11</td>
+<td>4</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">Class-4</td>
+<td>7</td>
+<td>2</td>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>2</td>
+<td>3</td>
+<td>6</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Doing so highlights the similarities between Fisher-Jenks and equal intervals as the distribution counts are very similar, with the two approaches agreeing on all 17 states assigned to the first class. Indeed, the only observation that distinguishes the two classifiers is the treatment of Baja California Sur which is kept in class 1 in equal intervals, but assigned to class 2 by Fisher-Jenks.</p>
+</section>
+</section>
+<section id="color" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="color"><span class="header-section-number">7.3</span> Color</h2>
+<p>Having considered the evaluation of the statistical distribution of the attribute values and the alternative classification approaches, we turn to select the symbolization and color scheme. Together with the choice of classifier, these will determine the overall effectiveness of the choropleth map in representing the spatial distribution of the attribute values.</p>
+<p>Prior to examining the attribute values it is important to note that, as we will see in the figures below, the spatial units for these states are far from homogeneous in their shapes and sizes. This can have major impacts on our brain’s pattern recognition capabilities, as we tend to be drawn to the larger polygons, even though they might not be the most relevant ones for our analysis. Yet, when we considered the statistical distribution above, each observation was given equal weight. Thus, the spatial distribution becomes more complicated to evaluate from a visual and statistical perspective.</p>
+<p>The choice of a color scheme for a choropleth map should be based on the type of variable under consideration <span class="citation" data-cites="Brewer1997mapping">(<a href="references.html#ref-Brewer1997mapping" role="doc-biblioref">Brewer et al. 1997</a>)</span>. Generally, a distinction is drawn between three types of numerical attributes: sequential, diverging, and qualitative. We will dig into each below, but we will explore how we can make choropleths in Python first. The mechanics are the same across different types of data, so it is worth spending a bit of time first to get the general idea.</p>
+<p>We will illustrate it with a quantile map in Figure 4:</p>
+<div id="6e405d67" class="cell" data-caption="Quantile choropleth, Mexican state per capita GDP in 1940." data-execution_count="28">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> mx.plot(</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"PCGDP1940"</span>,  <span class="co"># Data to plot</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    scheme<span class="op">=</span><span class="st">"Quantiles"</span>,  <span class="co"># Classification scheme</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"YlGn"</span>,  <span class="co"># Color palette</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,  <span class="co"># Add legend</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>{<span class="st">"fmt"</span>: <span class="st">"</span><span class="sc">{:.0f}</span><span class="st">"</span>},  <span class="co"># Remove decimals in legend</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-29-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Making choropleths on geo-tables is an extension of plotting their geometries. We use the same <code>.plot()</code> function, but now we also select the column of data we want to encode with color (in our case, <code>PCGDP1940</code>). We can also specify the classification scheme using the same names as we saw above with <code>mapclassify</code>. In fact, the underlying computation is always performed with <code>mapclassify</code>. This approach simply dispatches it so it is more convenient and we can make maps in one line of code. Next, we pick the color scheme. The default color map used by <code>geopandas</code> is viridis, which is a multi-hue sequential scheme but, for this example, we pick the yellow-to-green scale from Color Brewer. Finally, we specify that we would like to add a legend, and format it for legibility so that there are no decimals and it reads cleaner.</p>
+<section id="sequential-palettes" class="level3" data-number="7.3.1">
+<h3 data-number="7.3.1" class="anchored" data-anchor-id="sequential-palettes"><span class="header-section-number">7.3.1</span> Sequential palettes</h3>
+<p>Sequential color schemes are appropriate for continuous data where the origin is in one end of the series. The <code>PCGDP1940</code> column we have been using so far is a good example. In these cases, we want a palette that encodes this feature in its choice of colors. Sequential palettes use a gradient of colors from an origin color to a destination color. The example above, where lowest values are encoded in the lightest yellow and the highest in dark green is a good one. Sequential palettes can also have a shades of a single color. For example, the popular “blues” palette in Color Brewer is a great choice too, shown in Figure 5:</p>
+<div id="414f8d92" class="cell" data-caption="Quantile choropleth with black borderlines, Mexican state per capita GDP in 1940." data-execution_count="29">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> mx.plot(</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"PCGDP1940"</span>,  <span class="co"># Data to plot</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    scheme<span class="op">=</span><span class="st">"Quantiles"</span>,  <span class="co"># Classification scheme</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"Blues"</span>,  <span class="co"># Color palette</span></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>    edgecolor<span class="op">=</span><span class="st">"k"</span>,  <span class="co"># Borderline color</span></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="fl">0.1</span>,  <span class="co"># Borderline width</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,  <span class="co"># Add legend</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>{</span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"fmt"</span>: <span class="st">"</span><span class="sc">{:.0f}</span><span class="st">"</span></span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>    },  <span class="co"># Remove decimals in legend (for legibility)</span></span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-30-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Note how, in this case, we switch borderlines to black so that we can distinguish states in the lowest category from the white background.</p>
+</section>
+<section id="diverging-palettes" class="level3" data-number="7.3.2">
+<h3 data-number="7.3.2" class="anchored" data-anchor-id="diverging-palettes"><span class="header-section-number">7.3.2</span> Diverging palettes</h3>
+<p>A slightly different pallete from the sequential one is the so-called “diverging” values palette. This is useful with continuous data when one wishes to place equal emphasis on mid-range critical values as well as extremes at both ends of the distribution. Light colors are used to emphasize the mid-range class, while dark colors with contrasting hues are used to distinguish the low and high extremes.</p>
+<p>To illustrate this with the Mexican income data, we can derive a new variable which measures the change in a state’s rank in the income distribution from 1940 to 2000:</p>
+<div id="0628dc1a" class="cell" data-execution_count="30">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create income-based rank table (Rank 1 is highest)</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>rnk <span class="op">=</span> mx[[<span class="st">"NAME"</span>, <span class="st">"PCGDP1940"</span>, <span class="st">"PCGDP2000"</span>]].rank(ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute change from 1940 to 2000</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>rnk[<span class="st">"change"</span>] <span class="op">=</span> rnk[<span class="st">"PCGDP1940"</span>] <span class="op">-</span> rnk[<span class="st">"PCGDP2000"</span>]</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Add column with bin class</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>rnk[<span class="st">"class"</span>] <span class="op">=</span> pandas.cut(rnk[<span class="st">"change"</span>], [<span class="op">-</span>numpy.inf, <span class="op">-</span><span class="dv">5</span>, <span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">20</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>rnk</code> table now contains the change in rank positions of each state between 1940 and 2000, as well as a <code>class</code> column that binds together states in the [-inf, -5), [-5, 0), [0, 5), [5, 20] groups. Note that these are descending ranks, so the wealthiest state in any period has a rank of 1, and therefore when considering the change in ranks, a negative change reflects moving down the income distribution. We can use a divergent palette to signify both intensity of the change in ranks, as well as direction in Figure 6:</p>
+<div id="a2d49600" class="cell" data-caption="Divergent palette, Mexican state per capita income rank change." data-execution_count="31">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> (</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>    mx[[<span class="st">"geometry"</span>]]</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    .join(rnk)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    .plot(<span class="st">"class"</span>, legend<span class="op">=</span><span class="va">True</span>, cmap<span class="op">=</span><span class="st">"RdYlGn"</span>)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-32-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In the map, the red (green) hues are states that have moved downward (upward) in the income distribution, with the darker hue representing a larger movement.</p>
+</section>
+<section id="qualitative-palettes" class="level3" data-number="7.3.3">
+<h3 data-number="7.3.3" class="anchored" data-anchor-id="qualitative-palettes"><span class="header-section-number">7.3.3</span> Qualitative palettes</h3>
+<p>Qualitative palettes encode categorical data. In this case, colors do <em>not</em> follow a gradient but rather imply qualitative differences between classes. That is, observations in one group are not more or less, above or below those in other groups, rather just different.</p>
+<p>The Mexico data set also has several variables that are on a nominal measurement scale. One of these is a region definition variable that groups individual states in contiguous clusters of similar characteristics:</p>
+<div id="002e00c5" class="cell" data-execution_count="32">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>mx[<span class="st">"HANSON98"</span>].head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="32">
+<pre><code>0    1.0
+1    2.0
+2    2.0
+3    3.0
+4    2.0
+Name: HANSON98, dtype: float64</code></pre>
+</div>
+</div>
+<p>This aggregation scheme partitions Mexico into five regions, recorded with the numbers 1 to 5 in the table. A naive (and incorrect) way to display this would be to treat the region variable as sequential, visualized in Figure 7:</p>
+<div id="ce1a048b" class="cell" data-caption="(Incorrect) sequential palette, Mexican regions." data-execution_count="33">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> mx.plot(<span class="st">"HANSON98"</span>)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-34-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This is not correct because the region variable is not on an interval scale, so the differences between the values have no quantitative significance, but rather the values simply indicate region membership. However, the choropleth in Figure 7 gives a clear visual cue that regions in the south have larger values than those in the north, as the color map implies an intensity gradient.</p>
+<p>A more appropriate visualization is to use a “qualitative” color palette, which is used if you specify that the variable is categorical (Figure 8).</p>
+<div id="db8990f2" class="cell" data-caption="Qualitative palette, Mexican regions." data-execution_count="34">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> mx.plot(<span class="st">"HANSON98"</span>, categorical<span class="op">=</span><span class="va">True</span>, legend<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-35-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="advanced-topics" class="level2" data-number="7.4">
+<h2 data-number="7.4" class="anchored" data-anchor-id="advanced-topics"><span class="header-section-number">7.4</span> Advanced topics</h2>
+<section id="user-defined-choropleths" class="level3" data-number="7.4.1">
+<h3 data-number="7.4.1" class="anchored" data-anchor-id="user-defined-choropleths"><span class="header-section-number">7.4.1</span> User-defined choropleths</h3>
+<p>In this last section of the chapter, we consider bespoke partitions of the data that do not follow any particular algorithm but instead are informed by, for example, domain knowledge. Consider the case of classifying income in a policy context. Imagine we wanted to explore the distribution of areas with less than $$$10,000, then those between $$$10,000 and $$$12,500; $$$12,500 and $$$15,000; and greater than $$$15,000. These boundaries are arbitrary but may be tied to specific policies in which the first group is targetted in one particular way, the second and third in different ways, and the fourth is not part of the policy, for example.</p>
+<p>To create a choropleth that reflects this partitioning of the data, we can use the <code>UserDefined</code> classifier in <code>mapclassify</code>:</p>
+<div id="bb4718fb" class="cell" data-execution_count="35">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>classi <span class="op">=</span> mapclassify.UserDefined(</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>    mx[<span class="st">"PCGDP2000"</span>], [<span class="dv">10000</span>, <span class="dv">12500</span>, <span class="dv">15000</span>]</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>classi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="35">
+<pre><code>UserDefined
+
+      Interval         Count
+----------------------------
+[ 8684.00, 10000.00] |     2
+(10000.00, 12500.00] |     7
+(12500.00, 15000.00] |     1
+(15000.00, 54349.00] |    22</code></pre>
+</div>
+</div>
+<p>If we now want to display these classes on a map, we can use a similar approach to how we have seen above, or use the built-in plotting method in <code>mapclassify</code> to generate Figure 9:</p>
+<div id="ca8dec9b" class="cell" data-caption="Choropleth map colored to focus on areas of southern Mexico eligible for a target policy, showcasing user-defined map classifications." data-execution_count="36">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>classi.plot(</span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>    mx,  <span class="co"># Use geometries in the geo-table</span></span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">True</span>,  <span class="co"># Add a legend</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    legend_kwds<span class="op">=</span>{</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"loc"</span>: <span class="st">"upper right"</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    },  <span class="co"># Place legend on top right corner</span></span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>    axis_on<span class="op">=</span><span class="va">False</span>,  <span class="co"># Remove axis</span></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">"viridis_r"</span>,  <span class="co"># Use reverse Viridis</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-37-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Since we want to draw attention to the classes at the bottom of the scale, we use the reverse viridis (<code>viridis_r</code>) palette. Thus, Figure 9 shows in purple the areas not targeted by our hypothetical policy.</p>
+<p>The approach above is useful in that it is based on <code>mapclassify</code> and thus provides a unified interface shared with all the algorithms seen above. An alternative one involves using the <code>pandas.cut</code> method, which allows us to easily include a legend too in Figure 10:</p>
+<div id="a57c66b5" class="cell" data-caption="User-defined palette, `pandas` approach." data-execution_count="37">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Classify values specifying bins</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>lbls <span class="op">=</span> pandas.cut(</span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>    mx[<span class="st">"PCGDP2000"</span>], [<span class="op">-</span>numpy.inf, <span class="dv">10000</span>, <span class="dv">12500</span>, <span class="dv">15000</span>, numpy.inf]</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Dynamically assign to geo-table and plot with a legend</span></span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> mx.plot(lbls, cmap<span class="op">=</span><span class="st">"viridis_r"</span>, legend<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove axis</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>ax.set_axis_off()<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-38-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="pooled-classifications" class="level3" data-number="7.4.2">
+<h3 data-number="7.4.2" class="anchored" data-anchor-id="pooled-classifications"><span class="header-section-number">7.4.2</span> Pooled classifications</h3>
+<p>Sometimes choropleths exist as part of larger figures that may include more choropleths. In some cases, each of them can be best considered as an independent map, and then everything we have seen so far applies directly. In other instances, we may want to create a single classification of values <em>across</em> the maps and use it consistently. For those situations, we can create <em>pooled</em> classifications that consider all the values across the series.</p>
+<p>To illustrate this approach, we will create a figure with choropleths of GDP per capita in 1940, 1960, 1980, and 2000; and we will use the same classification across the four maps.</p>
+<div id="e9d8c123" class="cell" data-execution_count="38">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># List the years we want of pc GDP</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>years <span class="op">=</span> [<span class="st">"PCGDP1940"</span>, <span class="st">"PCGDP1960"</span>, <span class="st">"PCGDP1980"</span>, <span class="st">"PCGDP2000"</span>]</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create pooled classification</span></span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>pooled <span class="op">=</span> mapclassify.Pooled(mx[years].values, classifier<span class="op">=</span><span class="st">"Quantiles"</span>, k<span class="op">=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>pooled</code> object contains a lot of information on the classification and we can use it to generate a figure with the maps. To do that, we rely also on the <code>UserDefined</code> classifier we have just seen in the previous section to create a multi-pane figure showing the per capita income as it changes over time (Figure 11).</p>
+<div id="1698750a" class="cell" data-caption="Pooled quantile classification of per capita GDP for 1940, 1960, 1980, and 2000, Mexican states." data-execution_count="39">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set up figure with four axis</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>f, axs <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">12</span>))</span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Flatten the array of axis so you can loop over</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a><span class="co"># in one dimension</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>axs <span class="op">=</span> axs.flatten()</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Loop over each year</span></span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, y <span class="kw">in</span> <span class="bu">enumerate</span>(years):</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>    mx.plot(</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>        y,  <span class="co"># Year to plot</span></span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>        scheme<span class="op">=</span><span class="st">"UserDefined"</span>,  <span class="co"># Use our own bins</span></span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>        classification_kwds<span class="op">=</span>{</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>            <span class="st">"bins"</span>: pooled.global_classifier.bins</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>        },  <span class="co"># Use global bins</span></span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>        legend<span class="op">=</span><span class="va">True</span>,  <span class="co"># Add a legend</span></span>
+<span id="cb57-15"><a href="#cb57-15" aria-hidden="true" tabindex="-1"></a>        ax<span class="op">=</span>axs[i],  <span class="co"># Plot on the corresponding axis</span></span>
+<span id="cb57-16"><a href="#cb57-16" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb57-17"><a href="#cb57-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Remove axis</span></span>
+<span id="cb57-18"><a href="#cb57-18" aria-hidden="true" tabindex="-1"></a>    axs[i].set_axis_off()</span>
+<span id="cb57-19"><a href="#cb57-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Name the subplot with the name of the column</span></span>
+<span id="cb57-20"><a href="#cb57-20" aria-hidden="true" tabindex="-1"></a>    axs[i].set_title(y)</span>
+<span id="cb57-21"><a href="#cb57-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Tight layout to better use space</span></span>
+<span id="cb57-22"><a href="#cb57-22" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb57-23"><a href="#cb57-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Display figure</span></span>
+<span id="cb57-24"><a href="#cb57-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="05_choropleth_files/figure-html/cell-40-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level2" data-number="7.5">
+<h2 data-number="7.5" class="anchored" data-anchor-id="conclusion"><span class="header-section-number">7.5</span> Conclusion</h2>
+<p>In this chapter we have considered the construction of choropleth maps for spatial data visualization. The key issues of the choice of classification scheme, variable measurement scale, spatial configuration and color palettes were illustrated using Pysal’s map classification module together with other related packages in the Python data stack.</p>
+<p>Choropleth maps are a central tool in the geographic data science toolkit, as they provide powerful visualizations of the spatial distribution of attribute values. We have only touched on the basic concepts in this chapter, as there is much more that can be said about cartographic theory and the design of effective choropleth maps. Readers interested in pursuing this literature are encouraged to see the references cited.</p>
+<p>At the same time, given the philosophy underlying Pysal, the methods we cover here are sufficient for exploratory data analysis where the rapid and flexible generation of views is critical to the work flow. Once the analysis is complete, and the final presentation quality maps are to be generated, there are excellent packages in the data stack that the user can turn to.</p>
+</section>
+<section id="questions" class="level2" data-number="7.6">
+<h2 data-number="7.6" class="anchored" data-anchor-id="questions"><span class="header-section-number">7.6</span> Questions</h2>
+<ol type="1">
+<li>A variable (such as population density measured for census tracts in a metropolitan area) can display a high degree of skewness. That is, the distribution may be very asymmetric, either with a few very high values and a bulk of low ones; or a few very low values with a bulk of high values. What is an appropriate choice for a choropleth classification for a skewed variable?</li>
+<li>Provide two solutions to the problem of ties when applying quantile classification to the following series: <span class="math inline">\(y=[2,2,2,2,2,2,4,7,8,9,20,21]\)</span> and <span class="math inline">\(k=4\)</span>. Discuss the merits of each approach.</li>
+<li>Which classifiers are appropriate for data that displays a high degree of multi-modality in its statistical distribution?</li>
+<li>Are there any colormaps that work well for multi-modal data?</li>
+<li>Contrast and compare classed choropleth maps with class-less (i.e., continuous-scale) choropleth maps? What are the strengths and limitations of each type of visualization for spatial data?</li>
+<li>In what ways do choropleth classifiers treat intra-class and inter-class heterogeneity differently? What are the implications of these choices?</li>
+<li>To what extent do most commonly employed choropleth classification methods take the geographical distribution of the variable into consideration? Can you think of ways to incorporate the spatial features of a variable into a classification for a choropleth map?</li>
+<li>Discuss the similarities between the choice of the number of classes in choropleth mapping, on the one hand, and the determination of the number of clusters in a data set on the other. What aspects of choropleth mapping differentiate the former from the latter?</li>
+<li>The Fisher-Jenks classifier will always have more internally homogeneous classes than other k-classifiers. Given this, why might one decide on choosing a different k-classifier for a particular data set?</li>
+</ol>
+</section>
+<section id="next-steps" class="level2" data-number="7.7">
+<h2 data-number="7.7" class="anchored" data-anchor-id="next-steps"><span class="header-section-number">7.7</span> Next steps</h2>
+<p>We have but touched the surface of the large literature on choropleth mapping in particular, and geovisualization more generally. Readers interested in delving deeper into these topices are directed to the following:</p>
+<ul>
+<li><span class="citation" data-cites="slocum2014thematic">(<a href="references.html#ref-slocum2014thematic" role="doc-biblioref">Slocum et al. 2014</a>)</span>. Thematic Cartography and Geovisualization. Pearson.</li>
+<li><span class="citation" data-cites="cromely2009choropleth">(<a href="references.html#ref-cromely2009choropleth" role="doc-biblioref"><strong>cromely2009choropleth?</strong></a>)</span>. “Choropleth map legend design for visualizing community health disparities.” <em>International Journal of Health Geographics</em>, 8: 1-11.</li>
+<li><span class="citation" data-cites="cromely1996comparison">(<a href="references.html#ref-cromely1996comparison" role="doc-biblioref"><strong>cromely1996comparison?</strong></a>)</span>. “A comparison of optimal classification strategies for choroplethic displays of spatiall aggregated data.” <em>International Journal of Geographc Information Systems</em>, 10: 405-424.</li>
+<li><span class="citation" data-cites="brewer2005designming">(<a href="references.html#ref-brewer2005designming" role="doc-biblioref"><strong>brewer2005designming?</strong></a>)</span>. Designing better maps: A guide for GIS Users. ESRI press.</li>
+</ul>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Brewer1997mapping" class="csl-entry" role="listitem">
+Brewer, Cynthia A, Alan M MacEachren, Linda W Pickle, and Douglas Herrmann. 1997. <span>“Mapping Mortality: Evaluating Color Schemes for Choropleth Maps.”</span> <em>Annals of the Association of American Geographers</em> 87 (3): 411–38.
+</div>
+<div id="ref-Duque_2011" class="csl-entry" role="listitem">
+Duque, Juan C., Luc Anselin, and Sergio J. Rey. 2011. <span>“The Max-p-Regions Problem.”</span> <em>Journal of Regional Science</em> 52 (3): 397–419. <a href="https://doi.org/10.1111/j.1467-9787.2011.00743.x">https://doi.org/10.1111/j.1467-9787.2011.00743.x</a>.
+</div>
+<div id="ref-freedman1981histogram" class="csl-entry" role="listitem">
+Freedman, David, and Persi Diaconis. 1981. <span>“On the Histogram as a Density Estimator: L 2 Theory.”</span> <em>Zeitschrift f<span>ü</span>r Wahrscheinlichkeitstheorie Und Verwandte Gebiete</em> 57 (4): 453–76.
+</div>
+<div id="ref-Jenks_1971" class="csl-entry" role="listitem">
+Jenks, George F., and Fred C. Caspall. 1971. <span>“Error on Choroplethic Maps: Definition, Measurement, Reduction.”</span> <em>Annals of the Association of American Geographers</em> 61 (2): 217–44. <a href="https://doi.org/10.1111/j.1467-8306.1971.tb00779.x">https://doi.org/10.1111/j.1467-8306.1971.tb00779.x</a>.
+</div>
+<div id="ref-Jiang_2013" class="csl-entry" role="listitem">
+Jiang, Bin. 2013. <span>“Head/Tail Breaks: A New Classification Scheme for Data with a Heavy-Tailed Distribution.”</span> <em>The Professional Geographer</em> 65 (3): 482–94. <a href="https://doi.org/10.1080/00330124.2012.700499">https://doi.org/10.1080/00330124.2012.700499</a>.
+</div>
+<div id="ref-Rey_2010" class="csl-entry" role="listitem">
+Rey, Sergio J., and Myrna L. Sastré-Gutiérrez. 2010. <span>“Interregional Inequality Dynamics in Mexico.”</span> <em>Spatial Economic Analysis</em> 5 (3): 277–98. <a href="https://doi.org/10.1080/17421772.2010.493955">https://doi.org/10.1080/17421772.2010.493955</a>.
+</div>
+<div id="ref-slocum2014thematic" class="csl-entry" role="listitem">
+Slocum, Terry A, Robert B McMaster, Fritz C Kessler, and Hugh H Howard. 2014. <em>Thematic Cartography and Geovisualization</em>. Pearson.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/geographicdata\.science\/book");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../intro_part_ii.html" class="pagination-link" aria-label="Part II — Spatial Data Analysis">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Part II — Spatial Data Analysis</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../notebooks/06_spatial_autocorrelation.html" class="pagination-link" aria-label="Global Spatial Autocorrelation">
+        <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Global Spatial Autocorrelation</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

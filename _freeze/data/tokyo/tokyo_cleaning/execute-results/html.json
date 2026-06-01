@@ -1,0 +1,12 @@
+{
+  "hash": "6bfb951bea88c7b771c55ac8e67f4837",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: Tokyo Photographs\njupyter: python3\n---\n\n\n\n::: {#b157d1ab .cell jupyter='{\"outputs_hidden\":true}' execution_count=2}\n``` {.python .cell-code}\n%matplotlib inline\n\nimport geopandas as gpd\nimport pandas as pd\nimport matplotlib.pyplot as plt\nimport numpy as np\n```\n:::\n\n\n::: {#75036fcf .cell jupyter='{\"outputs_hidden\":true}' execution_count=3}\n``` {.python .cell-code}\ndb = pd.read_csv('data/tokyo.csv')\n```\n:::\n\n\n## Randomly subsetting\n\n::: {#91aebf97 .cell execution_count=4}\n``` {.python .cell-code}\n# Set the \"seed\" so every run produces the generates the same random numbers\nnp.random.seed(1234)\n# Create a sequence of length equal to the number of rows in the table\nri = np.arange(len(db))\n# Randomly reorganize (shuffle) the values\nnp.random.shuffle(ri)\n# Reindex the table by using only the first 10,000 numbers \n# of the (now randomly arranged) sequence\ndb = db.iloc[ri[:10000], :]\n```\n:::\n\n\n## Reproject XY coordinates in separate columns\n\n::: {#fb8315fb .cell execution_count=5}\n``` {.python .cell-code}\n%%time\npts = db.apply(lambda r: Point(r.longitude, r.latitude), axis=1)\n```\n:::\n\n\n::: {#6627b073 .cell jupyter='{\"outputs_hidden\":true}' execution_count=6}\n``` {.python .cell-code}\ngdb = gpd.GeoDataFrame(db.assign(geometry=pts), \\\n                       crs={'init' :'epsg:4326'})\n```\n:::\n\n\n::: {#16c8c161 .cell execution_count=7}\n``` {.python .cell-code}\n%%time\ngdb = gdb.to_crs(epsg=3857)\n```\n:::\n\n\n::: {#1c67af85 .cell execution_count=8}\n``` {.python .cell-code}\n%%time\nxys = gdb['geometry'].apply(lambda pt: pd.Series({'x': pt.x, 'y': pt.y}))\ngdb['x'] = xys['x']\ngdb['y'] = xys['y']\n```\n:::\n\n\n::: {#dd11dbaf .cell jupyter='{\"outputs_hidden\":true}' execution_count=9}\n``` {.python .cell-code}\ngdb.drop('geometry', axis=1).to_csv('tokyo_clean.csv', index=False)\n```\n:::\n\n\n---\n\n## Download link\n\n{download}`[Download the *tokyo_clean.csv* file] <tokyo_clean.csv>`\n\n",
+    "supporting": [
+      "tokyo_cleaning_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
