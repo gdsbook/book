@@ -1,0 +1,62 @@
+---
+title: Airports
+jupyter: python3
+---
+
+
+
+```{python}
+#| echo: false
+from IPython.display import display_markdown
+
+display_markdown(open("README.md").read(), raw=True)
+```
+
+```{python}
+%matplotlib inline
+
+import requests
+import geopandas
+import matplotlib.pyplot as plt
+```
+
+```{python}
+source_url = ("https://www.naturalearthdata.com/"\
+              "http//www.naturalearthdata.com/"\
+              "download/10m/cultural/ne_10m_airports.zip"
+             )
+source_url
+```
+
+```{python}
+air = geopandas.read_file(source_url)
+air.head()
+```
+
+- Project airports to Web Mercator
+
+```{python}
+air = air.to_crs(epsg=3857)
+```
+
+- Extract XY coordinates from a point `GeoDataFrame`
+
+```{python}
+air["x"] = air.geometry.x
+air["y"] = air.geometry.y
+```
+
+```{python}
+plt.scatter(air["x"], air["y"])
+```
+
+```{python}
+air.to_file('airports_clean.geojson', driver='GeoJSON')
+```
+
+---
+
+## Download link
+
+[[Download the `airports_clean.geojson` file]](airports_clean.geojson)
+

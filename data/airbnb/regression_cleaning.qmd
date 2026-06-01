@@ -1,0 +1,261 @@
+---
+title: AirBnb
+jupyter: python3
+---
+
+
+
+```{python}
+#| echo: false
+from IPython.display import display_markdown
+
+display_markdown(open("README.md").read(), raw=True)
+```
+
+```{python}
+%matplotlib inline
+
+import requests
+import pandas as pd
+import geopandas as gpd
+#import googlemaps
+from scipy.spatial.distance import cdist
+```
+
+## Download files
+
+* Download detailed listings file:
+
+```{python}
+url = 'http://data.insideairbnb.com/united-states/'\
+      'ca/san-diego/2016-07-07/data/'\
+      'listings.csv.gz'
+r = requests.get(url)
+with open('listings.csv.gz', 'wb') as fo:
+    fo.write(r.content)
+```
+
+* Download calendar file with prices
+
+```{python}
+url = 'http://data.insideairbnb.com/united-states/'\
+      'ca/san-diego/2016-07-07/data/'\
+      'calendar.csv.gz'
+r = requests.get(url)
+with open('calendar.csv.gz', 'wb') as fo:
+    fo.write(r.content)
+```
+
+* Download neighborhoods
+
+```{python}
+url = 'http://data.insideairbnb.com/united-states/'\
+      'ca/san-diego/2016-07-07/visualisations/'\
+      'neighbourhoods.geojson'
+r = requests.get(url)
+with open('neighbourhoods.geojson', 'wb') as fo:
+    fo.write(r.content)
+```
+
+## Variable setup
+
+### Parse price
+
+```{python}
+lst = pd.read_csv('listings.csv.gz')
+lst['priceN'] = lst['price'].apply(
+                    lambda x: float(str(x)\
+                                    .replace(',', '')\
+                                    .strip('$')))
+lst['l_price'] = pd.np.log(lst['priceN'])
+```
+
+### `GeoDataFrame`
+
+```{python}
+from shapely.geometry import Point
+xys = lst[['longitude', 'latitude']]\
+        .apply(lambda row: Point(*row), axis=1)
+gdb = gpd.GeoDataFrame(lst.assign(geometry=xys),
+                       crs="+init=epsg:4326")
+```
+
+### Variables
+
+* Pool
+
+```{python}
+ams = []
+gdb['pool'] = 0
+for i in range(gdb.shape[0]):
+    r = gdb.loc[i, 'amenities']
+    pcs = r.strip('{').strip('}').split(',')
+    ams.extend(pcs)
+    if 'Pool' in pcs:
+        gdb.loc[i, 'pool'] = 1
+set(ams)
+```
+
+* Distance to Balboa park
+
+<iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-117.16953277587892%2C32.63070127641626%2C-117.12335586547853%2C32.82983681046287&amp;layer=mapnik&amp;marker=32.73030211394726%2C-117.14649954999999" style="border: 1px solid black"></iframe><br/><small><a href="https://www.openstreetmap.org/?mlat=32.7303&amp;mlon=-117.1465#map=13/32.7303/-117.1465">View Larger Map</a></small>
+
+We can use [`geopy`](https://github.com/geopy/geopy) to find out its location:
+
+```{python}
+from geopy.geocoders import Nominatim
+geolocator = Nominatim()
+```
+
+Just type the name into the locator:
+
+```{python}
+bp = geolocator.geocode("Balboa Park, San Diego, US")
+bp
+```
+
+```{python}
+b_ll = bp.longitude, bp.latitude
+b_ll
+```
+
+Then calculate distance to the park from each house:
+
+```{python}
+# USA Contiguous Albers Equal Area (m.)
+# http://epsg.io/102003
+tgt_crs = "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 "\
+          "+lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs"
+
+b_xy = gpd.GeoSeries(Point(b_ll), crs=gdb.crs).to_crs(tgt_crs)[0]
+b_xy = (b_xy.x, b_xy.y)
+# Calculate distance in Km.
+d2b = lambda pt: cdist([(pt.x, pt.y)], [b_xy])[0][0] / 1000
+```
+
+```{python}
+gdb['d2balboa'] = gdb['geometry'].to_crs(tgt_crs)\
+                                 .apply(d2b)
+gdb.plot(column='d2balboa', scheme='quantiles', k=9,
+         cmap='viridis_r', s=1)
+```
+
+* Elevation
+
+```{python}
+key = open('../google_maps_key').readline().strip('\n')
+gmaps = googlemaps.Client(key=key)
+```
+
+```{python}
+# Google takes lat/lon instead of lon/lat
+gmaps.elevation([b_ll[::-1]])
+```
+
+```{python}
+pts = gdb['geometry'].apply(lambda pt: (pt.y, pt.x))
+%time ele = gmaps.elevation(pts.head().tolist())
+ele
+```
+
+```{python}
+extract_ele = lambda x: pd.Series(x)['elevation']
+eleS = pd.Series(ele).apply(extract_ele)
+eleS
+```
+
+* Coastal neighborhood?
+
+**NOTE**: Still some mistakes it seems but `neighborhood_cleansed` works much better than `neighborhood`.
+
+```{python}
+coastal_neighborhoods = ['Wooded Area', 'Ocean Beach', 'Pacific Beach', \
+                         'La Jolla', 'Torrey Pines', 'Del Mar Heighs', \
+                         'Mission Bay']
+def coastal(neigh):
+    if neigh in coastal_neighborhoods:
+        return 1
+    else:
+        return 0
+gdb['coastal_neig'] = gdb['neighbourhood_cleansed'].apply(coastal)
+
+gdb.plot(column='coastal_neig', s=1,
+         categorical=True, legend=True);
+```
+
+* Large neighborhood
+
+We keep only observations in neighborhoods with more than 25 AirBnb houses so FE on neighborhood make sense.
+
+```{python}
+lrg_nei = gdb.groupby('neighbourhood_cleansed').size() > 25
+gdb['lrg_nei'] = gdb['neighbourhood_cleansed'].map(lrg_nei)
+```
+
+* List to keep
+
+```{python}
+xs = ['accommodates', 'bathrooms', 'bedrooms', 
+      'beds', 'neighbourhood_cleansed', 'pool',
+      'd2balboa', 'coastal_neig', 'lrg_nei',
+      'priceN', 'l_price',
+      'geometry', 'id']
+```
+
+### Dummies
+
+* Room type
+
+```{python}
+rt = pd.get_dummies(gdb['room_type'], prefix='rt').rename(columns=lambda x: x.replace(' ', '_'))
+```
+
+* Property type
+
+```{python}
+def simplify(p):
+    bigs = ['House', 'Apartment', 'Condominium', 'Townhouse']
+    if p in bigs:
+        return p
+    else:
+        return 'Other'
+
+gdb['property_group'] = gdb['property_type'].apply(simplify)
+pg = pd.get_dummies(gdb['property_group'], prefix='pg')
+```
+
+## Write out
+
+```{python}
+gdb[['lrg_nei']].info()
+```
+
+```{python}
+! rm 'regression_db.geojson'
+final = gdb[xs].join(pg)\
+               .join(rt)\
+               .rename(columns={'priceN': 'price'})\
+               .loc[gdb['lrg_nei']==True, :]\
+               .drop(['lrg_nei'], axis=1)\
+               .dropna()
+```
+
+```{python}
+final = final.rename(columns=dict(neighbourhood_cleansed='neighborhood', 
+                          coastal_neig='coastal',
+                          l_price = 'log_price'))
+```
+
+```{python}
+!rm regression_db.geojson
+final.to_file('regression_db.geojson', driver='GeoJSON')
+final.info()
+```
+
+---
+
+## Download Link
+
+{download}`Download the *regression_db.geojson* file <regression_db.geojson>`
+
+

@@ -1,0 +1,100 @@
+---
+title: Countries
+jupyter: python3
+---
+
+
+
+```{python}
+#| echo: false
+from IPython.display import display_markdown
+
+display_markdown(open("README.md").read(), raw=True)
+```
+
+```{python}
+%matplotlib inline
+
+import geopandas
+```
+
+- Remove small islands
+
+```{python}
+source_url = ("https://www.naturalearthdata.com/"\
+              "http//www.naturalearthdata.com/download/"\
+              "10m/cultural/ne_10m_admin_0_countries.zip"
+             )
+source_url
+```
+
+```{python}
+ctys = geopandas.read_file(source_url)
+```
+
+```{python}
+ctys.plot()
+```
+
+```{python}
+areas = ctys.to_crs(epsg=3857).area
+```
+
+```{python}
+areas.plot.hist(bins=100)
+```
+
+```{python}
+smallest = areas.max() / 4000
+```
+
+```{python}
+small = areas.loc[areas<smallest].index
+large = ctys.loc[ctys.index.difference(small), :]
+large.plot()
+```
+
+- Antartica
+
+```{python}
+ys = large.centroid.geometry.y
+large = large.loc[ys > ys.min(), :]
+```
+
+---
+
+```{python}
+%time large = large.to_crs(epsg=3857)
+```
+
+```{python}
+large.plot()
+```
+
+- Keep only relevant columns
+
+```{python}
+large.info()
+```
+
+```{python}
+tokeep = [
+    "ADMIN",
+    "geometry"
+         ]
+```
+
+- Write out to file
+
+```{python}
+large[tokeep].to_file('countries_clean.gpkg', 
+                      driver="GPKG"
+                     )
+```
+
+---
+
+## Donwload link
+
+{download}`[Download the *countries_clean.gpkg* file] <countries_clean.gpkg>`
+

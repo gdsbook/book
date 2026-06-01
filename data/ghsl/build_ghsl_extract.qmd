@@ -1,0 +1,118 @@
+---
+title: GHSL
+jupyter: python3
+---
+
+
+## Extract GHSL population for Sao Paulo (Brazil)
+
+
+```{python}
+#| echo: false
+from IPython.display import display_markdown
+
+display_markdown(open("README.md").read(), raw=True)
+```
+
+```{python}
+import geopandas
+import rioxarray
+import contextily
+import datashader as ds
+import matplotlib.pyplot as plt
+```
+
+## Functional Urban Area boundary
+
+The file with all the FUAs is available at:
+
+```{python}
+url = ("https://jeodpp.jrc.ec.europa.eu/ftp/"\
+       "jrc-opendata/GHSL/"\
+       "GHS_FUA_UCDB2015_GLOBE_R2019A/V1-0/"\
+       "GHS_FUA_UCDB2015_GLOBE_R2019A_54009_1K_V1_0.zip"
+      )
+url
+```
+
+From there we can build a path to read and uncompress directly on-the-fly in `geopandas`:
+
+```{python}
+p = f"zip+{url}!GHS_FUA_UCDB2015_GLOBE_R2019A_54009_1K_V1_0.gpkg"
+fuas = geopandas.read_file(p)
+sao_paulo = fuas.query("eFUA_name == 'São Paulo'").to_crs("EPSG:4326")
+```
+
+```{python}
+ax = sao_paulo.plot(alpha=0.5, figsize=(9, 9))
+contextily.add_basemap(ax, crs=sao_paulo.crs);
+```
+
+## Population layer
+
+The file for the tile we need is available for download at:
+
+```{python}
+url = ("https://cidportal.jrc.ec.europa.eu/ftp/"\
+       "jrc-opendata/GHSL/GHS_POP_MT_GLOBE_R2019A/"\
+       "GHS_POP_E2015_GLOBE_R2019A_54009_250/V1-0/"\
+       "tiles/"\
+       "GHS_POP_E2015_GLOBE_R2019A_54009_250_V1_0_13_11.zip"
+      )
+url
+```
+
+From there we can build a path to read and uncompress directly on-the-fly in `xarray`:
+
+```{python}
+%%time
+p = f"zip+{url}!GHS_POP_E2015_GLOBE_R2019A_54009_250_V1_0_13_11.tif"
+ghsl = rioxarray.open_rasterio(p)
+ghsl
+```
+
+```{python}
+cvs = ds.Canvas(plot_width=600, plot_height=600)
+agg = cvs.raster(ghsl.where(ghsl>0).sel(band=1))
+```
+
+```{python}
+f, ax = plt.subplots(1, figsize=(9, 7))
+agg.plot.imshow(ax=ax, alpha=0.5, cmap="cividis_r")
+contextily.add_basemap(
+    ax, 
+    crs=ghsl.rio.crs, 
+    zorder=-1, 
+    source=contextily.providers.CartoDB.Voyager
+)
+```
+
+## Extraction
+
+To clip what we need from `ghsl` based on `sao_paulo`, we can clip it:
+
+```{python}
+ghsl_sp = ghsl.rio.clip(sao_paulo.to_crs(ghsl.rio.crs).geometry.iloc[0])
+ghsl_sp
+```
+
+And we can write it to a GeoTIF file:
+
+```{python}
+out_p = "ghsl_sao_paulo.tif"
+! rm $out_p
+ghsl_sp.rio.to_raster(out_p)
+```
+
+From `rioxarray` we get a COG for free!
+
+```{python}
+! rio cogeo validate ghsl_sao_paulo.tif
+```
+
+---
+
+## Download link
+
+{download}`[Download the *ghsl_sao_paulo.tif* file] <ghsl_sao_paulo.tif>`
+

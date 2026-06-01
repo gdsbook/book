@@ -1,0 +1,83 @@
+---
+title: Tokyo Photographs
+jupyter: python3
+---
+
+
+
+```{python}
+#| echo: false
+from IPython.display import display_markdown
+
+display_markdown(open("README.md").read(), raw=True)
+```
+
+```{python}
+#| collapsed: true
+#| jupyter: {outputs_hidden: true}
+%matplotlib inline
+
+import geopandas as gpd
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+```
+
+```{python}
+#| collapsed: true
+#| jupyter: {outputs_hidden: true}
+db = pd.read_csv('data/tokyo.csv')
+```
+
+## Randomly subsetting
+
+```{python}
+# Set the "seed" so every run produces the generates the same random numbers
+np.random.seed(1234)
+# Create a sequence of length equal to the number of rows in the table
+ri = np.arange(len(db))
+# Randomly reorganize (shuffle) the values
+np.random.shuffle(ri)
+# Reindex the table by using only the first 10,000 numbers 
+# of the (now randomly arranged) sequence
+db = db.iloc[ri[:10000], :]
+```
+
+## Reproject XY coordinates in separate columns
+
+```{python}
+%%time
+pts = db.apply(lambda r: Point(r.longitude, r.latitude), axis=1)
+```
+
+```{python}
+#| collapsed: true
+#| jupyter: {outputs_hidden: true}
+gdb = gpd.GeoDataFrame(db.assign(geometry=pts), \
+                       crs={'init' :'epsg:4326'})
+```
+
+```{python}
+%%time
+gdb = gdb.to_crs(epsg=3857)
+```
+
+```{python}
+%%time
+xys = gdb['geometry'].apply(lambda pt: pd.Series({'x': pt.x, 'y': pt.y}))
+gdb['x'] = xys['x']
+gdb['y'] = xys['y']
+```
+
+```{python}
+#| collapsed: true
+#| jupyter: {outputs_hidden: true}
+gdb.drop('geometry', axis=1).to_csv('tokyo_clean.csv', index=False)
+```
+
+---
+
+## Download link
+
+{download}`[Download the *tokyo_clean.csv* file] <tokyo_clean.csv>`
+

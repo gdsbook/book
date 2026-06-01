@@ -1,0 +1,121 @@
+---
+title: NASA DEM
+jupyter: python3
+---
+
+
+
+```{python}
+#| echo: false
+from IPython.display import display_markdown
+
+display_markdown(open("README.md").read(), raw=True)
+```
+
+## Build the `nasadem_sd` extract
+
+This notebook documents the acquisition and extraction of the San Diego region from the global [NASADEM dataset](https://lpdaac.usgs.gov/news/release-nasadem-data-products/).
+
+```{python}
+%matplotlib inline
+
+import zipfile
+import cenpy
+import contextily as cx
+import rasterio
+from rasterio.plot import show as rioshow
+import matplotlib.pyplot as plt
+```
+
+## Data acquisition
+
+We use the `NASADEM_HGT` variant of the project. We select the areas to download through the [NASA EarthData Search](https://search.earthdata.nasa.gov/search) tool. Once selected, the extract requires the following files:
+
+```{python}
+base_url = ("https://e4ftl01.cr.usgs.gov//"\
+            "MODV6_Dal_G/MEASURES/NASADEM_HGT.001/"\
+            "2000.02.11/"
+           )
+f_urls = ["NASADEM_HGT_n33w118.zip",
+          "NASADEM_HGT_n33w117.zip",
+          "NASADEM_HGT_n32w117.zip",
+          "NASADEM_HGT_n32w118.zip"
+         ]
+for url in f_urls:
+    print(base_url + url)
+```
+
+Download is free but requires a login from the USGS. We assume the four files have been downloaded and placed in the same folder as this notebook.
+
+Next is extracting the DEM files (`.hgt`) and merging them into a single `.tif` for convenience. `.tif` is a common file format for rasters that will make it handier later on to work with the merged file to clip it.
+
+- Extraction of `.hgt` files
+
+```{python}
+for zipped in f_urls:
+    zip_f = zipfile.ZipFile(zipped, "r")
+    f = zipped.strip("NASADEM_HGT_").strip(".zip")
+    zip_f.extract(f+".hgt")
+    zip_f.close()
+```
+
+- Merging into a single `.tif` file
+
+```{python}
+! rio merge -f GTIFF *.hgt merged.tif
+! rm *.hgt
+```
+
+## Extraction of SD region
+
+* Region boundaries
+
+Let's pull out total population (`P001001`):
+
+```{python}
+%%time
+census10 = cenpy.products.Decennial2010()
+sd = census10.from_msa("San Diego, CA",
+                       level="county",
+                       variables=["P001001"]
+                      )\
+             .to_crs(epsg=4326)
+```
+
+```{python}
+r = rasterio.open("merged.tif")
+
+f, ax = plt.subplots(1, figsize=(9, 9))
+sd.plot(facecolor="none", edgecolor="#F93822", zorder=1, ax=ax)
+ax = rioshow(r, alpha=0.5, zorder=2, ax=ax)
+cx.add_basemap(ax, crs=r.crs)
+```
+
+```{python}
+sd.to_file("sd.geojson", driver="GeoJSON")
+```
+
+* Clipping of DEM for SD
+
+```{python}
+! rio mask merged.tif \
+           nasadem_sd.tif \
+           --crop \
+           --geojson-mask\
+           sd.geojson
+! rm merged.tif sd.geojson
+```
+
+```{python}
+f, ax = plt.subplots(1, figsize=(9, 9))
+r = rasterio.open("nasadem_sd.tif")
+rioshow(r, zorder=1, alpha=0.75, ax=ax)
+cx.add_basemap(ax, alpha=0.5, crs=r.crs)
+```
+
+---
+
+## Download link
+
+{download}`[Download the *nasadem_sd.tif* file] <./nasadem_sd.tif>`
+
