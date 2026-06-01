@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.19.1
+      jupytext_version: 1.19.3
   kernelspec:
-    display_name: GDS-2026-03-15_amd64
+    display_name: GDS-2026-05-30_amd64
     language: python
     name: gds
 ---
@@ -298,13 +298,6 @@ san_diego_tracts = geopandas.read_file(
 w_queen = graph.Graph.build_contiguity(san_diego_tracts, rook=False)
 ```
 
-```python
-san_diego_tracts = geopandas.read_file(
-    "../data/sandiego/sandiego_tracts.gpkg"
-)
-w_queen = weights.contiguity.Queen.from_dataframe(san_diego_tracts)
-```
-
 Like before, we can visualize the adjacency relationships, but they are much more difficult to see without showing a closer detail. This higher level of detail is shown in the right pane of the plot.
 
 ```python caption="The Queen contiguity graph for San Diego tracts. Tracts connected with a red line are neighbors. Code generated for this figure is available on the web version of the book." tags=["hide-input"]
@@ -568,8 +561,8 @@ other observations are within the buffer. If they are, they are assigned a
 weight of one in the spatial weights matrix; if not they receive a zero.
 
 ```python
-w_bdb = weights.distance.DistanceBand.from_dataframe(
-    gdf, 1.5, binary=True
+w_bdb = graph.Graph.build_distance_band(
+    gdf.centroid, 1.5, binary=True
 )
 ```
 
@@ -582,8 +575,8 @@ everyone else. For this example we will return to the small lattice example
 covered in the beginning:
 
 ```python
-w_hy = weights.distance.DistanceBand.from_dataframe(
-    gdf, 1.5, binary=False
+w_hy = graph.Graph.build_distance_band(
+    gdf.centroid, 1.5, binary=False
 )
 ```
 
@@ -602,61 +595,6 @@ while the hybrid weights object modulates, giving less relevance to further obse
 
 ```python
 w_hy.weights[4]
-```
-
-### Great circle distances
-
-We must make one final curve before leaving the distance based weights. It is important that the
-calculation of distances between objects takes the curvature of the Earth's
-surface into account. This can be done before computing the spatial weights object, 
-by transforming the coordinates of data points into a projected reference system. If 
-this is not possible or convenient, an approximation that considers the
-curvature implicit in non-projected reference systems (e.g.,
-longitude/latitude) can be a sufficient workaround. `pysal` provides such
-approximation as part of its functionality.
-
-To illustrate the relevance of ignoring this aspect altogether, we will examine
-distance based weights for the case of counties in the state of Texas. First, let us compute
-a KNN-4 object that ignores the curvature of the Earth's surface (note how we use
-in this case the `from_shapefile` constructor to build the weights directly from a
-shapefile full of polygons):
-
-```python
-# ignore curvature of the earth
-knn4_bad = weights.distance.KNN.from_shapefile(
-    "../data/texas/texas.shp", k=4
-)
-```
-
-Next, let us take curvature into account. To do this, we require the
-radius of the Earth expressed in a given metric. `pysal` provides this number
-in both miles and kilometers. For the sake of the example, we will use miles:
-
-```python
-radius = geometry.sphere.RADIUS_EARTH_MILES
-radius
-```
-
-With this measure at hand, we can pass it to the weights constructor (either
-straight from a shapefile or from a `GeoDataFrame`), and distances will be
-expressed in the units we have used for the radius, that is in miles in our
-case:
-
-```python
-knn4 = weights.distance.KNN.from_shapefile(
-    "../data/texas/texas.shp", k=4, radius=radius
-)
-```
-
-Comparing the resulting neighbor sets, we see that ignoring the curvature of the
-Earth's surface can create erroneous neighbor pairs. For example, the four *correct* nearest neighbors to observation 0 when accounting for the Earth's curvature are 6, 4, 5, and 3. However, observation 13 is *ever so slightly* closer when computing the straight line distance instead of the distance that accounts for curvature. 
-
-```python
-knn4[0]
-```
-
-```python
-knn4_bad[0]
 ```
 
 ## Block weights 
@@ -685,7 +623,14 @@ list of memberships. In this case, we will use the county membership:
 
 ```python
 # NOTE: since this is a large dataset, it might take a while to process
-w_bl = weights.util.block_weights(
+w_bl = graph.Graph.build_block_contiguity(
+    san_diego_tracts.set_index("GEOID")["county"],
+)
+```
+
+```python
+# NOTE: since this is a large dataset, it might take a while to process
+ow_bl = oweights.util.block_weights(
     san_diego_tracts["county"].values,
     ids=san_diego_tracts["GEOID"].values,
 )
@@ -731,7 +676,7 @@ create issues in the spatial analytics that build on spatial weights, so it is g
 to amend the matrix before using it.
 The first approach we adopt is to find the nearest neighbor for the island observation
 and then add this pair of neighbors to extend the neighbor pairs from the
-original contiguity weight to obtain a fully connected set of weights. 
+original contiguity weight to obtain a fully connected set of weights. This requires creating an ancillary matrix with just that one connection, and then combining it with the original one.
 
 We will assume, for the sake of the example, that the disconnected observation was number 103. For us to reattach this tract, we can assign it to be "connected" to its nearest neighbor. Let's first extract our "problem" geometry:
 
@@ -745,18 +690,25 @@ As we have seen above, this tract *does* have neighbors:
 w_queen[103]
 ```
 
+---
+
+**NOTE**: this requires creating a new weights and adding it to the original one
+
+---
+
+
 But, for this example, we will assume it does not and thus we find ourselves in the position of having to create additional neighboring units. This approach does not only apply in the context of islands. Sometimes, the process we are interested in may require that we manually edit the weights to better reflect connections we want to capture.
 
 We will connect the observation to its nearest neighbor. To do this, we can construct the KNN graph as we did above, but set `k=1`, so observations are only assigned to their nearest neighbor:
 
 ```python
-wk1 = weights.distance.KNN.from_dataframe(san_diego_tracts, k=1)
+wk1 = graph.Graph.build_knn(san_diego_tracts.centroid, k=1)
 ```
 
 In this graph, all our observations are connected to one other observation by construction:
 
 ```python
-wk1.histogram
+wk1.cardinalities.unique()
 ```
 
 So is, of course, our tract of interest:
