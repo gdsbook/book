@@ -1,8 +1,13 @@
-.PHONY: all html pdf preview freeze clean lab lablocal pack_site pack_content
+.PHONY: all html pdf preview freeze hooks clean lab lablocal pack_site pack_content
 
 # Default: render every configured format (HTML + PDF) from the _freeze cache.
 all:
 	quarto render
+
+# Enable the versioned git hooks (pre-commit refreshes _freeze on .qmd changes).
+hooks:
+	git config core.hooksPath .githooks
+	@echo "core.hooksPath set to .githooks"
 
 # HTML site only -> docs/
 html:

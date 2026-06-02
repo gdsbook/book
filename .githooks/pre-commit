@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# Rebuild the Quarto _freeze cache for any staged chapter .qmd so the committed
+# cache (and rendered docs/) always match the source. CI renders the site from
+# _freeze without a geo env, so a stale cache would break the build.
+#
+# Requirements: `quarto` on PATH and a Jupyter kernel named "gds" registered
+# (chapters set `jupyter: gds`). Any environment manager works — conda, mamba,
+# pixi, venv — as long as that kernel is installed. Rebuilding executes the
+# changed chapters, so commits touching a heavy chapter will take a while.
+# Skip in a pinch with `git commit --no-verify`.
+#
+# Enable in a fresh clone with: make hooks   (sets core.hooksPath=.githooks)
+
+set -euo pipefail
+
+# --- collect staged chapter .qmd (added/copied/modified) ---------------------
+# data/**/*.qmd are eval:false appendices with no freeze, so they're excluded.
+staged_qmd=$(git diff --cached --name-only --diff-filter=ACM -- '*.qmd' \
+    | grep -v '^data/' || true)
+
+if [ -z "$staged_qmd" ]; then
+    exit 0
+fi
+
+# --- preflight: quarto + the 'gds' kernel -----------------------------------
+if ! command -v quarto >/dev/null 2>&1; then
+    echo "pre-commit: 'quarto' not on PATH" >&2
+    echo "            install Quarto, or bypass with: git commit --no-verify" >&2
+    exit 1
+fi
+
+# Best-effort: if a jupyter CLI is available, confirm the 'gds' kernel exists.
+# (Quarto resolves the kernel by name on its own; this just gives a clearer
+# message than a mid-render failure. Skipped if no jupyter CLI is on PATH.)
+if command -v jupyter >/dev/null 2>&1; then
+    if ! jupyter kernelspec list 2>/dev/null | grep -qE '^[[:space:]]*gds([[:space:]]|$)'; then
+        echo "pre-commit: no Jupyter kernel named 'gds' found." >&2
+        echo "            register one (e.g. python -m ipykernel install --user --name gds)," >&2
+        echo "            or bypass with: git commit --no-verify" >&2
+        exit 1
+    fi
+fi
+
+# --- rebuild freeze for each changed chapter --------------------------------
+echo "pre-commit: rebuilding _freeze for:"
+echo "$staged_qmd" | sed 's/^/  - /'
+
+while IFS= read -r qmd; do
+    [ -z "$qmd" ] && continue
+    # _freeze path mirrors the source path minus the .qmd extension.
+    freeze_dir="_freeze/${qmd%.qmd}"
+    rm -rf "$freeze_dir"            # force a clean re-execute
+    quarto render "$qmd" --to html
+done <<EOF
+$staged_qmd
+EOF
+
+# --- stage refreshed cache + rendered output --------------------------------
+git add _freeze docs
+
+echo "pre-commit: _freeze and docs refreshed and staged."
