@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.15.2
+      jupytext_version: 1.19.1
   kernelspec:
-    display_name: GDS-10.0
+    display_name: GDS-2026-03-15_amd64
     language: python
     name: gds
 ---

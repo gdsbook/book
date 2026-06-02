@@ -1,3 +1,18 @@
+---
+jupyter:
+  jupytext:
+    formats: ipynb,md
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.19.1
+  kernelspec:
+    display_name: GDS-2026-03-15_amd64
+    language: python
+    name: gds
+---
+
 ```python
 import warnings
 
@@ -90,7 +105,7 @@ seaborn.jointplot(x="longitude", y="latitude", data=db, s=0.5);
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_11_0.png)
     
 
@@ -113,7 +128,7 @@ contextily.add_basemap(
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_13_0.png)
     
 
@@ -153,7 +168,7 @@ ax.set_axis_off()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_16_0.png)
     
 
@@ -198,7 +213,7 @@ ax.set_axis_off()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_19_0.png)
     
 
@@ -263,7 +278,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_26_0.png)
     
 
@@ -337,7 +352,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_33_0.png)
     
 
@@ -435,7 +450,7 @@ plt.legend();
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_40_0.png)
     
 
@@ -562,7 +577,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_50_0.png)
     
 
@@ -618,7 +633,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_57_0.png)
     
 
@@ -649,7 +664,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_61_0.png)
     
 
@@ -825,7 +840,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_76_0.png)
     
 
@@ -893,7 +908,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_80_0.png)
     
 
@@ -957,7 +972,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_84_0.png)
     
 
@@ -1481,7 +1496,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_95_0.png)
     
 
@@ -1543,7 +1558,7 @@ plt.show()
 ```
 
 
-    
+
 ![png](08_point_pattern_analysis_files/08_point_pattern_analysis_99_0.png)
     
 

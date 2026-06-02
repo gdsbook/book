@@ -6,9 +6,9 @@ jupyter:
       extension: .md
       format_name: markdown
       format_version: '1.3'
-      jupytext_version: 1.15.2
+      jupytext_version: 1.19.1
   kernelspec:
-    display_name: GDS-10.0
+    display_name: GDS-2026-03-15_amd64
     language: python
     name: gds
 ---
@@ -43,15 +43,15 @@ To illustrate the notion of spatial autocorrelation and its different variants, 
 # Graphics
 import matplotlib.pyplot as plt
 import seaborn
-from pysal.viz import splot
+import splot
 from splot.esda import plot_moran
 import contextily
 
 # Analysis
 import geopandas
 import pandas
-from pysal.explore import esda
-from pysal.lib import weights
+import esda
+from libpysal import weights
 from numpy.random import seed
 ```
 
@@ -111,7 +111,7 @@ db.plot(
 contextily.add_basemap(
     ax,
     crs=db.crs,
-    source=contextily.providers.Esri.WorldTerrain,
+    source=contextily.providers.CartoDB.Positron,
 )
 ax.set_axis_off()
 ```
@@ -190,7 +190,7 @@ ax1.set_title("% Leave")
 contextily.add_basemap(
     ax1,
     crs=db.crs,
-    source=contextily.providers.Esri.WorldTerrain,
+    source=contextily.providers.CartoDB.Positron,
 )
 
 db.plot(
@@ -209,7 +209,7 @@ ax2.set_title("% Leave - Spatial Lag")
 contextily.add_basemap(
     ax2,
     crs=db.crs,
-    source=contextily.providers.Esri.WorldTerrain,
+    source=contextily.providers.CartoDB.Positron,
 )
 
 plt.show()

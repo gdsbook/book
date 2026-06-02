@@ -1,8 +1,23 @@
-```python
+---
+jupyter:
+  jupytext:
+    formats: ipynb,md
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.3'
+      jupytext_version: 1.19.1
+  kernelspec:
+    display_name: GDS-2026-03-15_amd64
+    language: python
+    name: gds
+---
+
+```python tags=["remove-cell"]
 import warnings, osmnx
 
 warnings.filterwarnings("ignore")
-osmnx.settings.overpass_settings = '[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'
+osmnx.settings.overpass_settings = '[out:json][timeout:90][date:"2021-10-07T00:00:00Z"]'  
 ```
 
 # Spatial Data
