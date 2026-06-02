@@ -1,0 +1,59 @@
+[workspace]
+name = "gdsbook"
+authors = ["Serge Rey <sjsrey@gmail.com>"]
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+version = "0.1.0"
+
+[dependencies]
+# Core Data Science & Geospatial Stack
+cenpy = "*"
+contextily = "*"
+datashader = "*"
+geopandas = "*"
+hdbscan = "*"
+ipython = "*"
+mapclassify = "*"
+myst-nb = "*"
+nbconvert = "*"
+osmnx = "*"
+pandas = "*"
+pysal = "*"
+rasterio = "*"
+rioxarray = "*"
+scikit-learn = "*"
+seaborn = "*"
+shapely = "*"
+xarray = "*"
+
+# Build Tools & Utilities (coreutils removed)
+jupytext = "*"
+jupyter-book = "*"
+quarto = ">=1.9.38,<2"
+ipykernel = "*" 
+tectonic = ">=0.16.9,<0.17"
+
+[tasks]
+# --- Kernel Management ---
+register-kernel = "python -m ipykernel install --user --name gds --display-name 'Python (gds)'"
+
+# --- Legacy Jupyter-Book Pipeline ---
+sync = "jupytext --sync ./notebooks/*.ipynb"
+
+test-one = "jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=600 notebooks/$nb.ipynb && rm notebooks/$nb.nbconvert.ipynb"
+
+test = { cmd = "rm -rf tests && mkdir tests && jupyter nbconvert --to notebook --execute --output-dir=tests --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.ipython_hist_file='' notebooks/*.ipynb && rm -rf tests && echo '########\n\nAll blocks passed\n\n########'", depends-on = ["sync"] }
+
+rerun = { cmd = "mkdir -p ~/.ipython/profile_default/startup/ && echo \"import matplotlib.pyplot as plt\nplt.rcParams['figure.dpi']=300\" > ~/.ipython/profile_default/startup/00.py && jupyter nbconvert --to notebook --execute --output-dir=build --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.ipython_hist_file='' notebooks/*ipynb && mv build/*ipynb ./notebooks/ && rm -rf build && rm ~/.ipython/profile_default/startup/00.py", depends-on = ["sync"] }
+
+jb-html = { cmd = "echo 'Cleaning up existing tmp_book folder...' && rm -rf docs tmp_book && echo 'Populating build folder...' && mkdir -p tmp_book/notebooks && cp notebooks/*.ipynb tmp_book/notebooks/ && cp notebooks/references.bib tmp_book/notebooks/ && cp -r data tmp_book/data && cp -r figures tmp_book/figures && cp -r infrastructure/website_content/* tmp_book/ && cp infrastructure/logo/ico_256x256.png tmp_book/logo.png && cp infrastructure/logo/favicon.ico tmp_book/favicon.ico && echo 'Starting book build...' && jupyter-book build tmp_book && echo 'Moving build...' && mv tmp_book/_build/html docs && echo 'Cleaning up...' && rm -rf tmp_book && touch docs/.nojekyll", depends-on = ["sync"] }
+
+# --- New Quarto Book Pipeline ---
+preview = { cmd = "quarto preview", depends-on = ["register-kernel"] }
+build = { cmd = "quarto render", depends-on = ["register-kernel"] }
+render-pdf = { cmd = "quarto render --to pdf", depends-on = ["register-kernel"] }
+
+# --- Cross-Platform Packaging & Maintenance ---
+pack-site = "python -m zipfile -c gdsbook_site.zip docs/"
+pack-content = { cmd = "rm -f gdsbook_content.zip && rm -rf gdsbook_content && mkdir -p gdsbook_content/notebooks && cp notebooks/*.ipynb gdsbook_content/notebooks && cp -r figures gdsbook_content/figures && cp -r data gdsbook_content/data && cp README.md gdsbook_content/README.md && python -m zipfile -c gdsbook_content.zip gdsbook_content/ && rm -rf gdsbook_content" }
+reset-docs = "rm -rf docs/* && git checkout HEAD docs/*"
