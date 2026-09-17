@@ -145,7 +145,7 @@ gt_polygons.query('ADMIN == "Indonesia"').plot();
 
 In many cases, geographic tables will have geometries of a single type; records will *all* be `Point` or `LineString`, for instance. However, there is no formal requirement that a *geographic table* has geometries that all have the same type. 
 
-Throughout this book, we will use geographic tables extensively, storing polygons, but also points and lines. We will explore lines a bit more in the second part of this chapter but, for now, let us stop on points for a second. As mentioned above, these are the simplest type of feature in that they do not have any dimension, only a pair of coordinates attached to them. This means that points can sometimes be stored in a non-geographic table, simply using one column for each coordinate. We find an example of this on the Tokyo dataset we will use more later. The data is stored as a comma-separated value table, or `.csv`:
+Throughout this book, we will use geographic tables extensively, storing polygons, but also points and lines. We will explore lines a bit more in the second part of this chapter but, for now, let us stop on points for a second. As mentioned above, these are the simplest type of geometry in that they do not have any dimension, only a pair of coordinates attached to them. This means that points can sometimes be stored in a non-geographic table, simply using one column for each coordinate. We find an example of this on the Tokyo dataset we will use more later. The data is stored as a comma-separated value table, or `.csv`:
 
 ```{python}
 gt_points = pandas.read_csv("../data/tokyo/tokyo_clean.csv")
@@ -170,7 +170,7 @@ pt_geoms = geopandas.points_from_xy(
     x=gt_points["longitude"],
     y=gt_points["latitude"],
     # x,y are Earth longitude & latitude
-    crs="EPSG:4326",
+	crs="OGC:CRS84",
 )
 ```
 
@@ -249,7 +249,7 @@ pop.sel(band=1).plot();
 This gives us a first overview of the distribution of population in the Sao Paulo region. However, if we inspect the map further, we can see that the map includes negative counts! How could this be? As it turns out, missing data is traditionally stored in surfaces not as a class of its own (e.g., `NaN`) but with an impossible value. If we return to the `attrs` printout above, we can see how the `nodatavals` attribute specifies missing data recorded with -200. With that in mind, we can use the `where()` method to select only values that are *not* -200:
 
 ```{python}
-#| caption: Population surface of Sao Paulo, Brazil omitting NAN values.
+#| caption: Population surface of Sao Paulo, Brazil omitting missing values.
 pop.where(pop != -200).sel(band=1).plot(cmap="RdPu");
 ```
 
@@ -451,7 +451,7 @@ Let's start by reading the data. First, the elevation model:
 dem = rioxarray.open_rasterio("../data/nasadem/nasadem_sd.tif").sel(
     band=1
 )
-dem.where(dem > 0).plot.imshow();
+dem.where(dem >= 0).plot.imshow();
 ```
 
 And the neighborhood areas (tracts) from the census:
